@@ -1,4 +1,5 @@
 {
-  "name": "DanimMobile",
-  "displayName": "DanimMobile"
+	"name": "DanimMobile",
+	"displayName": "DanimMobile",
+	"plugins": ["@react-native-google-signin/google-signin"]
 }
