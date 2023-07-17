@@ -38,6 +38,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DanimMobile/main.m; sourceTree = "<group>"; };
 		22E5E9E328B016B19C88AEC3 /* Pods-DanimMobile-DanimMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.release.xcconfig"; sourceTree = "<group>"; };
 		2399325F089AB479C492C75C /* libPods-DanimMobile-DanimMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DanimMobile-DanimMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		34D809C12A5FBA35006EA5A1 /* DanimMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DanimMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		712815DCED3333CFDBE656B8 /* Pods-DanimMobile-DanimMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DanimMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A2D0C0DA7B455CB83E42AA7E /* Pods-DanimMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.release.xcconfig"; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				34D809C12A5FBA35006EA5A1 /* DanimMobile-Bridging-Header.h */,
 			);
 			name = DanimMobile;
 			sourceTree = "<group>";
