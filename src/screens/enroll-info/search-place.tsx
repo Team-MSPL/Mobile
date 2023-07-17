@@ -14,7 +14,6 @@ export default function SearchPlace({navigation, route}: any) {
 				placeholder='장소를 검색해보세요!'
 				query={{
 					key: GOOGLE_API_KEY,
-					//TODO 좀따 env로 빼기
 					language: 'ko',
 					components: 'country:kr',
 				}}
