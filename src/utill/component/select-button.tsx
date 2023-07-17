@@ -1,22 +1,23 @@
 import {Text} from 'native-base';
 import {TouchableOpacity} from 'react-native';
 
-export default function CustomButton({label, onPress, isDisabled}: CustomButtonProps) {
+export default function SelectButton({label, onPress, isDisabled, bgColor}: CustomButtonProps) {
 	return (
 		<TouchableOpacity
 			onPress={onPress}
 			style={{
-				backgroundColor: '#ABD9FF',
-				borderRadius: 10,
-				width: '100%',
+				backgroundColor: bgColor ? 'yellow' : 'white',
+				borderRadius: 99,
+				borderWidth: 1,
+				marginVertical: 4,
+				width: 100,
 				height: 50,
-				justifyContent: 'center',
 				alignItems: 'center',
-				marginVertical: 10,
-				opacity: isDisabled ? 0.5 : 1,
+				justifyContent: 'center',
+				marginHorizontal: 5,
 			}}
 			disabled={isDisabled}>
-			<Text color='white' bold>
+			<Text color='black' bold>
 				{label}
 			</Text>
 		</TouchableOpacity>
@@ -27,4 +28,5 @@ type CustomButtonProps = {
 	label: string;
 	onPress: () => void;
 	isDisabled?: boolean;
+	bgColor?: boolean;
 };

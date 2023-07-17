@@ -1,12 +1,11 @@
-import {useNavigation} from '@react-navigation/native';
-import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
 import {useLayoutEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import CustomButton from '../../utill/component/custom-button';
 import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-export default function SelectDay() {
+import CustomButton from '../../utill/component/custom-button';
+import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
+export default function SelectDay({navigation}: any) {
 	LocaleConfig.locales['fr'] = {
 		monthNames: [
 			'Janvier',
@@ -43,19 +42,26 @@ export default function SelectDay() {
 	LocaleConfig.defaultLocale = 'fr';
 	const currentTime = new Date();
 	currentTime.setMinutes(0);
+	currentTime.setHours(10);
 	const [startdate, onstartChangeDate] = useState(currentTime); // 선택 날짜
 	const [enddate, onendChangeDate] = useState(currentTime);
-	const dateFlag = useRef('start');
-	const [select, setSelect] = useState(0);
+	const dateFlag = useRef(0);
+	const dayFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
-	const navigation = useNavigation();
-	const {day} = useAppSelector(state => state.travelSlice);
+	const {day, Place} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const nDay = day[1]?.timestamp - day[0]?.timestamp > 0 ? (day[1].timestamp - day[0].timestamp) / 86400000 : 0;
 
 	const onConfirm = (selectedDate: Date) => {
 		// 날짜 또는 시간 선택 시
 		setVisible(false); // 모달 close
-		dateFlag.current === 'start' ? onstartChangeDate(selectedDate) : onendChangeDate(selectedDate);
+		let copy = [...day];
+		copy[dateFlag.current] = {
+			...day[dateFlag.current],
+			hours: selectedDate.getHours(),
+			minute: selectedDate.getMinutes(),
+		};
+		dispatch(travelSliceActions.selectDay(copy));
 	};
 
 	const onCancel = () => {
@@ -63,47 +69,49 @@ export default function SelectDay() {
 		setVisible(false); // 모달 close
 	};
 
-	const onPressTime = (e: string) => {
+	const onPressTime = (e: number) => {
 		dateFlag.current = e;
 		setVisible(true);
 	};
 
 	const goNext = () => {
-		navigation.navigate('SelectDay');
+		dispatch(travelSliceActions.setNDay(nDay));
+		const data = [...Array(nDay + 2)].map(item => {
+			return Place;
+		});
+		let copy = [day[0].hours, day[1].hours];
+		dispatch(travelSliceActions.enrollTimeLimitArray(copy));
+		dispatch(travelSliceActions.enrollAccommodations(data));
+		navigation.navigate('SelectMulti');
 	};
 
 	const addDay = (e: DateData) => {
-		// if (day.length) let copy = [...day];
-		// copy = copy.push(e);
-		// dispatch(travelSliceActions.selectDay(copy));
+		if (dayFlag.current > 1) {
+			dayFlag.current = 0;
+		}
+		let copy = [...day];
+		copy[dayFlag.current] = {...day[dayFlag.current], day: e.dateString, timestamp: e.timestamp, month: e.month};
+		dayFlag.current += 1;
+		dispatch(travelSliceActions.selectDay(copy));
 	};
+
 	const getNowTime = () => {
 		let now = new Date();
 		let year = now.getFullYear();
 		let month = now.getMonth() + 1;
 		let date = now.getDate();
 		const nowTime = year + '-' + month + '-' + date;
-		const nowTimes = [nowTime, nowTime];
+		const nowTimes = [
+			{...day[0], day: nowTime, hours: 10, minute: 0, month: month},
+			{...day[1], day: nowTime, hours: 20, minute: 0, month: month},
+		];
 		dispatch(travelSliceActions.setDay(nowTimes));
 	};
 	const a = {
-		'2023-07-11': {select: true, color: 'red', startingDay: true},
-		'2023-07-13': {select: true, color: 'red', endingDay: true},
+		[day[0]?.day]: {selected: true, color: 'blue', startingDay: true},
+		[day[1]?.day]: {selected: true, color: 'blue', endingDay: true},
 	};
-	const viewDay =
-		day[0] +
-		'-' +
-		startdate.getHours() +
-		':' +
-		startdate.getMinutes() +
-		' > ' +
-		day[1] +
-		'-' +
-		enddate.getHours() +
-		':' +
-		enddate.getMinutes();
-
-	const startDataView = useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		getNowTime();
 	}, []);
 	return (
@@ -123,63 +131,51 @@ export default function SelectDay() {
 					<HStack>
 						<Text mr='2'>시계</Text>
 						<Text fontSize='lg' bold>
-							{viewDay}
+							{day[0]?.day + '>' + day[1]?.day}
 						</Text>
 						<Spacer />
-						<Text>{enddate.getDay() - startdate.getDay()}</Text>
+						<Text fontSize='lg' bold>
+							{nDay + '박' + (nDay + 1) + '일'}
+						</Text>
 					</HStack>
 				</Box>
 				<Box>
 					<HStack>
-						<Box w='1/2'>
-							<Text bold fontSize='lg' mb='2'>
-								시작 시간
-							</Text>
-							<Pressable
-								onPress={() => {
-									onPressTime('start');
-								}}
-								borderWidth='1px'
-								alignItems='center'
-								w='80%'
-								borderColor='grey'
-								borderRadius='3px'>
-								<Text fontSize='xl'>{startdate.getHours() + '시' + startdate.getMinutes() + '분'}</Text>
-							</Pressable>
-						</Box>
-						<Box w='1/2'>
-							<Text bold fontSize='lg' mb='2'>
-								종료 시간
-							</Text>
-							<Pressable
-								borderWidth='1px'
-								alignItems='center'
-								w='80%'
-								borderColor='grey'
-								borderRadius='3px'
-								onPress={() => {
-									onPressTime('end');
-								}}>
-								<Text fontSize='xl'>{enddate.getHours() + '시' + enddate.getMinutes() + '분'}</Text>
-							</Pressable>
-						</Box>
+						{day.map((item, idx) => {
+							return (
+								<Box w='1/2' key={idx}>
+									<Text bold fontSize='lg' mb='2'>
+										{idx == 0 ? '시작 시간' : '종료 시간'}
+									</Text>
+									<Pressable
+										onPress={() => {
+											onPressTime(idx);
+										}}
+										borderWidth='1px'
+										alignItems='center'
+										w='80%'
+										borderColor='grey'
+										borderRadius='3px'>
+										<Text fontSize='xl'>{item.hours + '시' + item.minute + '분'}</Text>
+									</Pressable>
+								</Box>
+							);
+						})}
 					</HStack>
 				</Box>
 				<Divider my='1' />
 				<Calendar
-					current={day[0]}
-					minDate={day[0]}
+					current={day[0]?.day}
+					minDate={day[0]?.day}
 					monthFormat={'yyyy MM'}
 					firstDay={1}
 					disableAllTouchEventsForDisabledDays={false}
 					onDayPress={day => {
 						addDay(day);
-						console.log(day.timestamp);
-						console.log(day.dateString);
-						// addDay(day.dateString);
 					}}
 					markingType='period'
 					markedDates={a}
+					//markedDates={{[Object.values(day)]: {selected: true, disableTouchEvent: true, color: 'red'}}}
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>
@@ -190,7 +186,7 @@ export default function SelectDay() {
 				onConfirm={onConfirm}
 				onCancel={onCancel}
 				minuteInterval={30}
-				date={dateFlag.current === 'start' ? startdate : enddate}></DateTimePicker>
+				date={dateFlag.current === 0 ? startdate : enddate}></DateTimePicker>
 		</ScrollView>
 	);
 }
