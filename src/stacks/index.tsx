@@ -10,7 +10,14 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
+import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
+import React, {useState} from 'react';
+import {DrawerLayoutAndroidComponent} from 'react-native';
+import BottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
+import CommunityMainScreen from '../screens/community/community-main-screen';
 import FinalCheck from '../screens/enroll-info/final-check';
+
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -84,6 +91,17 @@ export default function StackNavigator() {
 						title: '새 여행 (5/5)',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='CommunityMainScreen'
+					component={CommunityMainScreen}
+					options={{
+						headerBackVisible: true,
+						headerBackTitleVisible: true,
+						headerTitle: '커뮤니티',
+						headerTitleAlign: 'center',
+						headerRight: () => <BottomPopupSheet></BottomPopupSheet>,
 					}}
 				/>
 				<Stack.Screen
