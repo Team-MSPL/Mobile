@@ -16,6 +16,7 @@ import React, {useState} from 'react';
 import {DrawerLayoutAndroidComponent} from 'react-native';
 import BottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
+import FinalCheck from '../screens/enroll-info/final-check';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -101,6 +102,15 @@ export default function StackNavigator() {
 						headerTitle: '커뮤니티',
 						headerTitleAlign: 'center',
 						headerRight: () => <BottomPopupSheet></BottomPopupSheet>,
+					}}
+				/>
+				<Stack.Screen
+					name='FinalCheck'
+					component={FinalCheck}
+					options={{
+						title: '선택 사항 확인',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
 					}}
 				/>
 			</Stack.Navigator>
