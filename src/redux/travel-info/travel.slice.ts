@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState: LiteState = {
 	region: [],
+	cityName: '',
 	day: [],
 	nDay: 0,
 	Place: {name: '', lat: 0, lng: 0, category: 4, takenTime: 30},
@@ -24,6 +25,9 @@ export const travelSlice = createSlice({
 		},
 		setRegion: state => {
 			state.region = [];
+		},
+		setCityName: (state, {payload}) => {
+			state.cityName = payload;
 		},
 		selectDay: (state, {payload}) => {
 			state.day = payload;
@@ -63,6 +67,7 @@ export default travelSlice.reducer;
 
 interface LiteState {
 	region: string[];
+	cityName: string;
 	day: DayType[];
 	nDay: number;
 	Place: PlaceType;
@@ -70,7 +75,7 @@ interface LiteState {
 	essentialPlaces: EssentialPlaceType[];
 	distance: number;
 	transit: number;
-	tendency: number[];
+	tendency: boolean[];
 	timeLimitArray: number[];
 }
 

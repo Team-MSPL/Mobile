@@ -10,6 +10,7 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
+import FinalCheck from '../screens/enroll-info/final-check';
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -81,6 +82,15 @@ export default function StackNavigator() {
 					component={SelectTendency}
 					options={{
 						title: '새 여행 (5/5)',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='FinalCheck'
+					component={FinalCheck}
+					options={{
+						title: '선택 사항 확인',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}

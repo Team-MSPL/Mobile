@@ -9,42 +9,33 @@ export default function SelectEssential({navigation}: any) {
 	const dispatch = useAppDispatch();
 
 	const goSearchPlace = () => {
-		console.log(navigation);
 		navigation.navigate('SearchPlace', {id: 1});
 	};
 
 	const deleteEssential = (e: EssentialPlaceType) => {
-		let copy = [...essentialPlaces];
-		copy = copy.filter(item => item.id !== e.id);
-		dispatch(travelSliceActions.enrollessentialPlaces(copy));
+		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
+		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
 
 	return (
 		<Box>
-			<CustomButton label='필수추가' onPress={goSearchPlace}></CustomButton>
+			<CustomButton label='필수추가' onPress={goSearchPlace} />
 			{[...Array(nDay + 1)].map((item, idx) => {
+				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+
 				return (
 					<Box key={idx} my='3'>
 						<Text fontSize='lg' bold>
 							day {idx + 1}
 						</Text>
-						{essentialPlaces
-							.filter(item => item.day === idx + 1)
-							.map((data, idx) => {
-								return (
-									<HStack key={idx}>
-										<Text fontSize='lg' bold>
-											{data.name}
-										</Text>
-										<Button
-											onPress={() => {
-												deleteEssential(data);
-											}}>
-											x
-										</Button>
-									</HStack>
-								);
-							})}
+						{filteredPlaces.map((data, idx) => (
+							<HStack key={data.id}>
+								<Text fontSize='lg' bold>
+									{data.name}
+								</Text>
+								<Button onPress={() => deleteEssential(data)}>x</Button>
+							</HStack>
+						))}
 					</Box>
 				);
 			})}

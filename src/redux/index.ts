@@ -1,12 +1,13 @@
-import { configureStore, combineReducers, Reducer, AnyAction } from '@reduxjs/toolkit';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import colorSliceReducer from './color/color.slice'
+import {configureStore, combineReducers, Reducer, AnyAction} from '@reduxjs/toolkit';
+import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
+import colorSliceReducer from './color/color.slice';
 import travelSliceReducer from './travel-info/travel.slice';
-
+import loginSliceReducer from './login-info/login.slice';
 
 const appReducer = combineReducers({
-	colorMode:colorSliceReducer,
-	travelSlice:travelSliceReducer,
+	colorMode: colorSliceReducer,
+	travelSlice: travelSliceReducer,
+	loginSlice: loginSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
@@ -26,15 +27,13 @@ const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
 
 export const store = configureStore({
 	reducer: rootReducer,
-	middleware: (getDefaultMiddleware) =>
+	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware({
-	
 			serializableCheck: false,
 			immutableCheck: false,
 		}),
 	devTools: process.env.NODE_ENV !== 'production',
 });
-
 
 export type RootState = ReturnType<typeof appReducer>;
 type AppDispatch = typeof store.dispatch;
