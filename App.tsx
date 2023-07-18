@@ -6,19 +6,13 @@
  */
 
 import React from 'react';
-import {
-	SafeAreaView,
-	StatusBar,
-	useColorScheme,
-} from 'react-native';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
-import {
-	Colors,
-} from 'react-native/Libraries/NewAppScreen';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import StackNavigator from './src/stacks';
-import { NativeBaseProvider } from 'native-base';
-
+import {NativeBaseProvider} from 'native-base';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -35,12 +29,10 @@ function App(): JSX.Element {
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
 			<NativeBaseProvider>
-				<StackNavigator/>
+				<StackNavigator />
 			</NativeBaseProvider>
 		</SafeAreaProvider>
 	);
 }
-
-
 
 export default App;

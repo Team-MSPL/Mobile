@@ -1,11 +1,9 @@
-import {useNavigation} from '@react-navigation/native';
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
-export default function Main() {
-	const navigation = useNavigation();
+import {Touchable, TouchableOpacity} from 'react-native';
+export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		navigation.navigate('SelectCity');
 	};
-
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color='#2E9AFE'>
@@ -52,6 +50,9 @@ export default function Main() {
 			<Text fontSize='sm' color='grey'>
 				다님이 성향에 맞는 추천 코스를 찾아봤어요
 			</Text>
+			<TouchableOpacity onPress={() => navigation.navigate('CommunityMainScreen')}>
+				<Text>커뮤니티</Text>
+			</TouchableOpacity>
 		</ScrollView>
 	);
 }
