@@ -1,17 +1,20 @@
 import {createSlice} from '@reduxjs/toolkit';
+import moment from 'moment';
 
 const initialState: LiteState = {
 	region: [],
 	cityName: '',
-	day: [],
+	day: [moment().format('YY-MM-DD'), moment().format('YY-MM-DD')],
 	nDay: 0,
-	Place: {name: '', lat: 0, lng: 0, category: 4, takenTime: 30},
+	Place: {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, imageUrl: ''},
 	accommodations: [],
 	essentialPlaces: [],
 	distance: 0,
 	transit: 0,
 	tendency: [],
 	timeLimitArray: [10, 20],
+	minuteLimitArray: [0, 0],
+	season: [false, false, false, false],
 
 	//시작시간,끝시간
 };
@@ -20,20 +23,14 @@ export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
 	reducers: {
+		reset: state => {
+			Object.assign(state, initialState);
+		},
 		selectRegion: (state, {payload}) => {
 			state.region = payload;
 		},
-		setRegion: state => {
-			state.region = [];
-		},
 		setCityName: (state, {payload}) => {
 			state.cityName = payload;
-		},
-		selectDay: (state, {payload}) => {
-			state.day = payload;
-		},
-		setDay: (state, {payload}) => {
-			state.day = payload;
 		},
 		setNDay: (state, {payload}) => {
 			state.nDay = payload;
@@ -59,6 +56,19 @@ export const travelSlice = createSlice({
 		enrollTimeLimitArray: (state, {payload}) => {
 			state.timeLimitArray = payload;
 		},
+		enrollMinuteLimitArray: (state, {payload}) => {
+			state.minuteLimitArray = payload;
+		},
+		setTimeAndMinute: (state, {payload}) => {
+			state.timeLimitArray = payload.time;
+			state.minuteLimitArray = payload.minute;
+		},
+		enrollDayInfo: (state, {payload}) => {
+			state.day = payload.day;
+			state.nDay = payload.nDay;
+			state.accommodations = payload.accommodations;
+			state.season = payload.season;
+		},
 	},
 });
 
@@ -68,23 +78,17 @@ export default travelSlice.reducer;
 interface LiteState {
 	region: string[];
 	cityName: string;
-	day: DayType[];
+	day: string[];
 	nDay: number;
 	Place: PlaceType;
 	accommodations: PlaceType[];
 	essentialPlaces: EssentialPlaceType[];
 	distance: number;
 	transit: number;
-	tendency: boolean[];
+	tendency: boolean[][];
 	timeLimitArray: number[];
-}
-
-interface DayType {
-	day: string;
-	minute: number;
-	hours: number;
-	timestamp: number;
-	month: number;
+	minuteLimitArray: number[];
+	season: boolean[];
 }
 
 interface PlaceType {
@@ -93,6 +97,7 @@ interface PlaceType {
 	lng: number;
 	category: number;
 	takenTime: number;
+	imageUrl: string;
 }
 
 export interface EssentialPlaceType {
@@ -103,4 +108,5 @@ export interface EssentialPlaceType {
 	category: number;
 	takenTime: number;
 	id: string;
+	imageUrl: string;
 }

@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import {Heading, Text, Center, Image, HStack, Button} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
@@ -8,11 +7,10 @@ import {socialLogin} from '../../redux/login-info/login.slice';
 import {Alert} from 'react-native';
 import {Google_Signin_Key} from '@env';
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
 		navigation.navigate('Home');
 	};
-	const navigation = useNavigation();
 	const dispatch = useAppDispatch();
 	const kakaoLogin = async () => {
 		try {

@@ -1,14 +1,15 @@
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
 import {Touchable, TouchableOpacity} from 'react-native';
+import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		navigation.navigate('SelectCity');
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
-			<Text fontSize='2xl' bold color='#2E9AFE'>
+			<Text fontSize='2xl' bold color={colors.TextSecondary}>
 				나느네
-				<Text fontSize='2xl' color='black'>
+				<Text fontSize='2xl' color={colors.TextPrimary}>
 					님,{'\n'}다님과 떠나볼까요?
 				</Text>
 			</Text>

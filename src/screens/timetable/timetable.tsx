@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
-export default function SelectDistance({navigation}: any) {
+export default function Timetable({navigation}: any) {
 	const {distance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);

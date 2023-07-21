@@ -5,7 +5,7 @@ import {API_ROUTE} from '@env';
 const initialState: LiteState = {
 	login: [],
 	userInfo: [],
-	a: '',
+	jwtToken: '',
 };
 
 const axiosAuth = axios.create({
@@ -40,8 +40,9 @@ export const loginSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder.addCase(socialLogin.fulfilled, (state, {payload}) => {
-			setStorage('token', payload.userJwtToken);
-			state.a = payload.userJwtToken;
+			console.log(payload);
+			//setStorage('token', payload.userJwtToken);
+			state.jwtToken = payload.userJwtToken;
 		});
 	},
 });
@@ -68,7 +69,7 @@ export default loginSlice.reducer;
 interface LiteState {
 	login: LoginType[];
 	userInfo: string[];
-	a: string;
+	jwtToken: string;
 }
 
 interface LoginType {

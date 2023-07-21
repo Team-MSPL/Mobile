@@ -1,3 +1,4 @@
+import {Image, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {EssentialPlaceType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 
@@ -8,8 +9,8 @@ export default function SelectEssential({navigation}: any) {
 	const {nDay, essentialPlaces} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
-	const goSearchPlace = () => {
-		navigation.navigate('SearchPlace', {id: 1});
+	const goSearchPlace = (idx: number) => {
+		navigation.navigate('SearchPlace', {id: 1, idx: idx});
 	};
 
 	const deleteEssential = (e: EssentialPlaceType) => {
@@ -19,24 +20,51 @@ export default function SelectEssential({navigation}: any) {
 
 	return (
 		<Box>
-			<CustomButton label='필수추가' onPress={goSearchPlace} />
+			<CustomButton
+				label='필수추가'
+				onPress={() => {
+					goSearchPlace(0);
+				}}
+			/>
 			{[...Array(nDay + 1)].map((item, idx) => {
 				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
 				return (
-					<Box key={idx} my='3'>
+					<TouchableOpacity
+						key={idx}
+						style={{marginVertical: 10}}
+						onPress={() => {
+							goSearchPlace(idx + 1);
+						}}>
 						<Text fontSize='lg' bold>
 							day {idx + 1}
 						</Text>
 						{filteredPlaces.map((data, idx) => (
 							<HStack key={data.id}>
+								<Image
+									source={{
+										uri: data.imageUrl,
+									}}
+									style={{width: 50, height: 50}}
+									alt='Place Image'
+								/>
 								<Text fontSize='lg' bold>
 									{data.name}
 								</Text>
-								<Button onPress={() => deleteEssential(data)}>x</Button>
+								<TouchableOpacity
+									style={{
+										width: 30,
+										height: 30,
+										backgroundColor: 'red',
+									}}
+									onPress={() => {
+										deleteEssential(data);
+									}}>
+									<Text>삭제</Text>
+								</TouchableOpacity>
 							</HStack>
 						))}
-					</Box>
+					</TouchableOpacity>
 				);
 			})}
 		</Box>
