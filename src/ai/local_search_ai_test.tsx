@@ -30,6 +30,8 @@ export default function LocalSearchAITest({navigation}: any) {
 	];
 	const accomodationList = [
 		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
+		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
+		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
 		{name: '', selectList: selectList, lat: 34.333, long: 121.32323},
 	];
 	const essentialPlaceList = {...Place, day: 1, id: shortId.generate()};

@@ -50,69 +50,7 @@ async function dataLoading(cityList) {
 	}
 }
 
-//Step 2. Initialization
-async function initializeGreedy(selectList, first, timeLimit) {
-	let path = [];
-	path.push(first);
-
-	//placeListCopy에서는 제거
-	placeListCopy = placeListCopy.filter(item => item.name != first.name);
-
-	let numPlace = placeListCopy.length;
-	let totalTime = 0; // Total travel time
-
-	let startIndex = -1;
-
-	//만약, 숙소를 골라두었을 경우, 마지막 장소로 가는 소요시간까지 생각하기
-	if (first.name != '' && timeLimit > 2) {
-		timeLimit -= 1;
-	}
-
-	// Iteratively connect nearest cities
-	for (let i = path.length; i < numPlace; i++) {
-		let sum = Array(numPlace).fill(0); // 각 관광지의 점수 합
-
-		//각 관광지별 계산하기
-		for (let n = 0; n < placeListCopy.length; n++) {
-			//첫 관광지가 이미 path에 있으므로 beforePlace에 null 넣는 예외처리 안해줘도 된다.
-			//각 성향 점수 * 가중치 * 선택 유무 sum에 +해주기
-			sum[n] += placePoint(selectList, path[i - 1], placeListCopy[n]);
-		}
-
-		//sort해서 다음 목적지 고르기, sort해서 그 인덱스 번호를 알아와야함. 그래야 Place리스트에서 쓸 수 있음.
-		//let sumCopy = [...sum];
-		let sumCopy = _.cloneDeep(sum);
-
-		for (let q = 0; q < numPlace; q++) {
-			startIndex = sum.indexOf(sumCopy[q]); // 다음 목적지의 Index
-
-			// path에 placeListCopy[startIndex]가 없을 경우 다음 목적지 확정 (sort결과 최고의 목적지)
-			if (path.indexOf(placeListCopy[startIndex]) === -1) {
-				break;
-			}
-		}
-
-		// path에 관광지 추가, placeListCopy에서는 제거
-		path.push(placeListCopy[startIndex]);
-		placeListCopy.splice(startIndex, 1);
-
-		//첫 관광지에서의 소요시간
-		if (i == 0) {
-			totalTime += path[0].takenTime;
-		} else {
-			//distance해서 거리 비율 시간 계산
-			totalTime += path[i].takenTime; // 관광지에서 소요시간
-		}
-
-		//예정된 여행 시간만큼의 일정이 채워졌다면 반복 종료
-		if (totalTime > timeLimit) {
-			break;
-		}
-	}
-
-	return path;
-}
-
+// 관광지 점수 계산 프로세스 - 가장 많이 반복되는 함수
 function placePoint(selectList, beforePlace, targetPlace) {
 	//반려견과, 실내여행지는 예외처리 - selectList에 있고 + 점수가 30점 이하면, sum = 0을 리턴
 	if ((selectList[0][6] == 1 && targetPlace.partner[6] < 30) || (selectList[3][5] == 1 && targetPlace.tour[5] < 30)) {
@@ -121,33 +59,56 @@ function placePoint(selectList, beforePlace, targetPlace) {
 
 	let sum = 0;
 	//각 성향 카테고리별 가중치, weight[5]는 popular, 인기관광지 점수
-	//0:누구와, 1:테마, 2:무엇을, 3:어디 ,4:게절
+	//0:누구와, 1:테마, 2:무엇을, 3:어디 ,4:계절, 5: 인기도
 	const weight = [20, 120, 120, 120, 10, 1];
-	const listSum = [0, 0, 0, 0, 0];
+	let listSum = 0;
 
-	for (let y = 0; y < selectList[0].length; y++) {
-		listSum[0] += targetPlace.partner[y] * weight[0] * selectList[0][y];
-	}
-	for (let y = 0; y < selectList[1].length; y++) {
-		listSum[1] += targetPlace.concept[y] * weight[1] * selectList[1][y];
-	}
-	for (let y = 0; y < selectList[2].length; y++) {
-		listSum[2] += targetPlace.play[y] * weight[2] * selectList[2][y];
-	}
-	for (let y = 0; y < selectList[3].length; y++) {
-		listSum[3] += targetPlace.tour[y] * weight[3] * selectList[3][y];
-	}
-	for (let y = 0; y < selectList[4].length; y++) {
-		listSum[4] += targetPlace.season[y] * weight[4] * selectList[4][y];
-	}
-
-	for (let x = 0; x < 5; x++) {
-		if (count[x] > 0) {
-			sum += Math.ceil(listSum[x] / count[x]);
+	//count가 0이면 스킵되게 바꿔버림 + selectList[0].length만큼 반복대신, 고정값만큼 반복되게하여 속도 향상
+	//TODO for문이 더 빠르다길래 if + for 조합으로 하였음. 차후 && + map 조합으로도 테스트해볼 것
+	if (count[0] > 0) {
+		for (let y = 0; y < 7; y++) {
+			listSum += targetPlace.partner[y] * weight[0] * selectList[0][y];
 		}
+		//평균을 계산하는 코드, 원래는 뒤에서 따로 계산하였으나, if (count[0] > 0)를 넣었기에 내부에 추가함
+		//각 테마별 평균을 계산하는 것임. count 이용(routeSearch 시작때 미리 계산해 두었음)
+		//TODO 유지할지, 수정할지 고민
+		sum += listSum / count[0];
+		//Math.ceil도 제거 - JavaScript에서는 int와 double의 구분이 없기 때문에!!
 	}
 
-	sum += Math.ceil(targetPlace.popular * weight[5]); //인기관광지 지표 포함하기
+	listSum = 0;
+	if (count[1] > 0) {
+		for (let y = 0; y < 4; y++) {
+			listSum += targetPlace.concept[y] * weight[1] * selectList[1][y];
+		}
+		sum += listSum / count[1];
+	}
+
+	listSum = 0;
+	if (count[2] > 0) {
+		for (let y = 0; y < 6; y++) {
+			listSum += targetPlace.play[y] * weight[2] * selectList[2][y];
+		}
+		sum += listSum / count[2];
+	}
+
+	listSum = 0;
+	if (count[3] > 0) {
+		for (let y = 0; y < 9; y++) {
+			listSum += targetPlace.tour[y] * weight[3] * selectList[3][y];
+		}
+		sum += listSum / count[3];
+	}
+
+	listSum = 0;
+	if (count[4] > 0) {
+		for (let y = 0; y < 4; y++) {
+			listSum += targetPlace.season[y] * weight[4] * selectList[4][y];
+		}
+		sum += listSum / count[4];
+	}
+
+	sum += Math.ceil(targetPlace.popular * weight[5]); //인기도 지표 포함하기
 
 	if (beforePlace.name != '') {
 		//더미는 스킵
@@ -158,25 +119,94 @@ function placePoint(selectList, beforePlace, targetPlace) {
 		const latDiff = targetPlace.latitude - beforePlace.latitude;
 		const longDiff = targetPlace.longitude - beforePlace.longitude;
 
-		let distance;
+		//대중교통, 자차에 따른 거리민감도 계산 - 삼항 연산자로 간단하게 바꿈
+		//latDiff * latDiff와 같은 부분도 거듭 제곱 연산자 **로 바꿈
+		//TODO 거리민감도 계산이 확 달라지기에, Math.sqrt를 제거하지 못했음. 추후 제거할 것
+		let distance =
+			transitInAI === 1
+				? Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 2000 + 6000)
+				: Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 2000 + 2000);
 
-		//대중교통
-		if (transitInAI === 1) {
-			distance = Math.sqrt(latDiff * latDiff + longDiff * longDiff) * (distanceSensitivity * 2000 + 6000);
-		}
-		//자차
-		else {
-			distance = Math.sqrt(latDiff * latDiff + longDiff * longDiff) * (distanceSensitivity * 2000 + 2000);
-		}
-
-		sum -= Math.round(distance); // - Calculate the distance
+		sum -= distance; // 거리가 커질수록 안좋은 것임. 총점수에 - 연산으로 계산해줘야함. 위와 마찬가지로 Math.round()연산 제거
 	}
 
 	return sum;
 }
 
+//Step 2. Initialization
+async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList, timeLimit) {
+	let path = [];
+	path.push(firstPlace);
+
+	//placeListCopy에서는 제거
+	placeListCopy = placeListCopy.filter(item => item.name != firstPlace.name);
+
+	//todayEssentialPlaceList가 있을 경우 - 미리 넣어준다!
+	todayEssentialPlaceList.length > 0 &&
+		todayEssentialPlaceList.map((item, idx) => {
+			path.push(todayEssentialPlaceList[idx]);
+			placeListCopy = placeListCopy.filter(item => item.name !== todayEssentialPlaceList[idx].name);
+		});
+
+	let numPlace = placeListCopy.length; //향후 반복문 내부에서 값이 바뀔 것이기에, 미리 저장해두고 사용한다.
+
+	let totalTime = 0; // 총 여행 시간 (오늘치)
+
+	let nextIndex = -1;
+
+	//만약, 숙소를 골라두었을 경우, 마지막 장소로 가는 소요시간까지 생각하기 - 과거 firstPlace가 없을 수도 있었던 시절의 유산
+	// if (firstPlace.name != '' && timeLimit > 2) {
+	// 	timeLimit -= 1;
+	// }
+
+	// Iteratively connect nearest places - 점수 계산 프로세스(placePoint)를 통해
+	for (let i = path.length; i < numPlace; i++) {
+		if (numPlace < 1) {
+			//이러면, 관광지 부족하다는 뜻!, 중단하고 프리셋에서 안내메세지 띄우자
+
+			console.log('남은 관광지 수1111');
+			console.log(numPlace);
+			enoughPlace = false;
+			break;
+		}
+
+		let sum = Array(numPlace).fill(0); // 각 관광지의 점수 합
+
+		//각 관광지별  점수 계산하기
+		placeListCopy.map((item, idx) => {
+			sum[idx] += placePoint(selectList, path[i - 1], placeListCopy[idx]);
+		});
+
+		//sort해서 다음 목적지 고르기, sort해서 그 인덱스 번호를 알아와야함. 그래야 Place리스트에서 쓸 수 있음.
+		let sumCopy = _.cloneDeep(sum);
+
+		for (let q = 0; q < numPlace; q++) {
+			nextIndex = sum.indexOf(sumCopy[q]); // 다음 목적지의 Index
+
+			// path에 placeListCopy[nextIndex]가 없을 경우 다음 목적지 확정 (sort결과 최고의 목적지)
+			if (path.indexOf(placeListCopy[nextIndex]) === -1) {
+				break;
+			}
+		}
+
+		// path에 관광지 추가, placeListCopy에서는 제거
+		path.push(placeListCopy[nextIndex]);
+		placeListCopy.splice(nextIndex, 1);
+
+		//그리디 종료 시점 계산 - 오늘치 총 소요시간을 계산함
+		totalTime += path[i].takenTime; // 관광지에서 소요시간
+
+		//예정된 여행 시간만큼의 일정이 채워졌다면 반복 종료
+		if (totalTime > timeLimit) {
+			break;
+		}
+	}
+
+	return path;
+}
+
 //Step 3-2. 코스 개선 시도를 위한 방법 - 2가지 (관광지 교체, 순서 변경)
-function twoOpts(path, selectList, finishPath) {
+function twoOpts(path, selectList, todayEssentialPlaceList) {
 	let iterations = 500; //2-opts 시도 횟수
 
 	let bestPath = _.cloneDeep(path);
@@ -352,16 +382,17 @@ function twoOpts(path, selectList, finishPath) {
 }
 
 //Step 3-1. 코스 개선을 위한 Hill Climbing - Local Optima를 찾기 위한 과정
-function hillClimbing(path, selectList, finishPath, todayAccomodationList, timeLimit) {
-	let StopRepeat = 5; //개선 여부에 따른 HC 횟수 조절
-	let StopRepeat2 = 1000; //너무 많이 반복되는 것 방지
+function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPlaceList, timeLimit) {
+	//숙소, 필수여행지 선택 횟수에 따라 HC 횟수 조절
+	let StopRepeat = 5 - selectedNum; //개선 여부에 따른 HC 횟수 조절
+	let StopRepeat2 = 2000 - selectedNum * 300; //너무 많이 반복되는 것 방지
 
 	let kOptContinue = true;
 
 	let kOptCheck = 0;
 	let kOptCheck2 = 0;
 
-	let bestPath = twoOpts(path, selectList, finishPath);
+	let bestPath = _.cloneDeep(newPath);
 
 	let bestPoint = 0;
 
@@ -369,12 +400,13 @@ function hillClimbing(path, selectList, finishPath, todayAccomodationList, timeL
 	//제한 시간은 동일하니, 동선이 좋다면 관광지 수가 많아 점수가 높을 것
 	bestPoint += placePoint(selectList, dummy, bestPath[0]);
 
-	for (let i = 1; i < bestPath.length; i++) {
-		bestPoint += placePoint(selectList, bestPath[i - 1], bestPath[i]);
-	}
+	bestPath.map((item, idx) => {
+		bestPoint += placePoint(selectList, bestPath[idx - 1], bestPath[idx]);
+	});
+	//여기까지 살펴봄!!!!
 
 	while (kOptContinue) {
-		let newPath = twoOpts(path, selectList, finishPath);
+		let newPath = twoOpts(path, selectList, todayEssentialPlaceList);
 
 		let newPoint = 0;
 
@@ -543,6 +575,9 @@ function searchFullCourse(placeList, selectList, todayAccomodationList) {
 		searchFullCourse(placeList, selectList, todayAccomodationList);
 
 		let temp = selectList.length;
+
+		//pop 방식으로 수정??
+		//var popResult = arr.pop();
 
 		placeList.splice(i, 0, selectList[temp - 1]);
 
@@ -757,7 +792,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 			}
 
 			//이태운 - 필수여행지 추가 - map형식임
-			let essentialPlaceListCopy = [];
+			let todayEssentialPlaceList = []; // 하루치 필수여행지만 객체 배열로 빼둠
 			essentialPlaceList.length > 0 &&
 				essentialPlaceList.map((item, idx) => {
 					//fixedPlaceDayList의 원소가 d+1(n일차)와 같을때만
@@ -775,13 +810,13 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 							season: [0, 0, 0, 0],
 							category: 5,
 						};
-						essentialPlaceListCopy.push(readData);
+						todayEssentialPlaceList.push(readData);
 						placeListCopy = placeListCopy.filter(item => item.name !== readData.name);
 					}
 				});
 
 			//초기 path 만들기
-			let initializePath = await initializeGreedy(selectList, firstPlace, time[d]);
+			let initializePath = await initializeGreedy(selectList, firstPlace, todayEssentialPlaceList, time[d]);
 
 			//태운 - 임시로 accomodationList 하나 추가해 봄. - 왜 되는지는 모르겠네??
 			if (d != nDay - 1 && accomodationList[d + 1].name != '') {
@@ -791,8 +826,14 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 			//날짜 기준으로 사용할 숙소(Accomodation) 2개만 따로 분리. [0]은 시작 숙소, [1]은 끝 숙소
 			let todayAccomodationList = [_.cloneDeep(accomodationList[d]), _.cloneDeep(accomodationList[d + 1])];
 
-			//초기 path 개선 - Hill-Climbing으로
-			let improvedPath = hillClimbing(initializePath, selectList, finishPath, todayAccomodationList, time[d]);
+			//path 개선 - Hill-Climbing으로
+			let improvedPath = hillClimbing(
+				initializePath,
+				selectList,
+				todayAccomodationList,
+				todayEssentialPlaceList,
+				time[d],
+			);
 
 			// placeListCopy를 한번 더 제대로 업데이트 해주는 것임 - 없애도 무방, Flutter에서 에러났어서 만들었던 코드
 			// 와중에 이중 for문이라, 개선필요할듯, 일단 주석처리해봄. 문제시 다시 실행
