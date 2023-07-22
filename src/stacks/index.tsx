@@ -10,6 +10,8 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
+//import LocalSearchAI from '../ai/local_search_ai';
+import LocalSearchAITest from '../ai/local_search_ai_test';
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -81,6 +83,15 @@ export default function StackNavigator() {
 					component={SelectTendency}
 					options={{
 						title: '새 여행 (5/5)',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='LocalSearchAITest'
+					component={LocalSearchAITest}
+					options={{
+						title: 'AI 임시',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}
