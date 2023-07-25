@@ -1,79 +1,98 @@
+import React, {useState} from 'react';
+import {View, TextInput, Button, StyleSheet, Text} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Text, Center, IconButton, ThreeDotsIcon} from 'native-base';
-import {color} from 'native-base/lib/typescript/theme/styled-system';
-import LinearGradient from 'react-native-linear-gradient';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import * as KakaoLogin from '@react-native-seoul/kakao-login';
-import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
-import {useState} from 'react';
-import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
+import shortid from 'shortid';
 
-export default function CommunityWriteScreen() {
-	const goNext = () => {
-		navigation.navigate('Home');
+export default function CommunityWritingScreen({navigation}: any) {
+	const goBack = () => {
+		navigation.goBack();
 	};
-	const navigation = useNavigation();
-	const [modalVisible, setModalVisibile] = useState(false);
-	const deviceHeight = Dimensions.get('window').height;
-	const communityMenuList = [
-		{
-			title: '글 쓰기',
-			onPress: () => console.log('글쓰기 페이지로 이동'),
-		},
-		{
-			title: '신고',
-			onPress: () => console.log('신고 페이지로 이동'),
-		},
-	];
+
+	const [title, setTitle] = useState<string>('');
+	const [content, setContent] = useState<string>('');
+
+	const handleTitleChange = (text: string) => {
+		setTitle(text);
+	};
+
+	const handleContentChange = (text: string) => {
+		setContent(text);
+	};
+
+	const handleSubmit = () => {
+		// Firebase Firestore에 데이터 저장
+		firestore()
+			.collection('커뮤니티')
+			.doc(title) // 제목을 문서 ID로 사용
+			.set({
+				postTitle: title,
+				postContent: content,
+				postKey: shortid.generate(),
+				createdAt: firestore.FieldValue.serverTimestamp(),
+				// 여러 필드값 추가 가능
+				// 예: author: 'John Doe', views: 0, likes: 0, ...
+			})
+			.then(() => {
+				console.log('글이 성공적으로 저장되었습니다.');
+			})
+			.catch(error => {
+				console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+			});
+	};
+
 	return (
-		<SafeAreaView>
-			<TouchableOpacity
+		<View style={styles.container}>
+			<Text>제목</Text>
+			<TextInput
+				style={styles.titleInput}
+				placeholder='제목을 입력하세요'
+				onChangeText={handleTitleChange}
+				value={title}
+			/>
+			<Text>본문 내용</Text>
+			<TextInput
+				style={styles.contentInput}
+				placeholder='내용을 입력하세요'
+				onChangeText={handleContentChange}
+				value={content}
+				multiline={true} // 여러 줄 입력 가능하도록 설정
+			/>
+			<Button
+				title='글 등록'
 				onPress={() => {
-					setModalVisibile(!modalVisible);
-				}}>
-				<View>
-					<ThreeDotsIcon></ThreeDotsIcon>
-				</View>
-			</TouchableOpacity>
-			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => setModalVisibile(!modalVisible)}>
-				<View
-					style={{
-						flex: 1,
-						backgroundColor: '#000000AA',
-						justifyContent: 'flex-end',
-					}}>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderTopRightRadius: 10,
-							borderTopLeftRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
-						}}>
-						<View>
-							<Text
-								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
-								}}>
-								게시판 메뉴
-							</Text>
-							<FlatList
-								data={communityMenuList}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
-					</View>
-				</View>
-			</Modal>
-		</SafeAreaView>
+					handleSubmit();
+					goBack();
+				}}
+			/>
+		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		padding: 16,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	titleInput: {
+		width: '100%',
+		height: 40,
+		borderWidth: 1,
+		borderColor: '#ccc',
+		borderRadius: 8,
+		paddingHorizontal: 10,
+		marginBottom: 16,
+	},
+	contentInput: {
+		width: '100%',
+		height: 200,
+		borderWidth: 1,
+		borderColor: '#ccc',
+		borderRadius: 8,
+		paddingHorizontal: 10,
+		textAlignVertical: 'top', // 내용 입력시 상단 정렬
+		marginBottom: 16,
+	},
+});

@@ -7,18 +7,24 @@ import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
 import {useState} from 'react';
 import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
+import CommunityWriteScreen from '../../screens/community/community-writing-screen';
 
 export default function CommunityBottomPopSheet() {
 	const goNext = () => {
-		navigation.navigate('Home');
+		navigation.navigate('CommunityWritingScreen');
 	};
 	const navigation = useNavigation();
+
 	const [modalVisible, setModalVisibile] = useState(false);
 	const deviceHeight = Dimensions.get('window').height;
 	const communityMenuList = [
 		{
 			title: '글 쓰기',
-			onPress: () => console.log('글쓰기 페이지로 이동'),
+			onPress: () => {
+				console.log('글쓰기 페이지로 이동');
+				setModalVisibile(!modalVisible);
+				goNext();
+			},
 		},
 		{
 			title: '신고',

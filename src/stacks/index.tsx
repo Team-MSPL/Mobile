@@ -14,9 +14,11 @@ import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpa
 import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
 import React, {useState} from 'react';
 import {DrawerLayoutAndroidComponent} from 'react-native';
-import BottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
+import CommunityBottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import FinalCheck from '../screens/enroll-info/final-check';
+import CommunityWritingScreen from '../screens/community/community-writing-screen';
+import CommunityReadingScreen from '../screens/community/community-reading-screen';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -101,7 +103,26 @@ export default function StackNavigator() {
 						headerBackTitleVisible: true,
 						headerTitle: '커뮤니티',
 						headerTitleAlign: 'center',
-						headerRight: () => <BottomPopupSheet></BottomPopupSheet>,
+						headerRight: () => <CommunityBottomPopupSheet></CommunityBottomPopupSheet>,
+					}}
+				/>
+				<Stack.Screen
+					name='CommunityReadingScreen'
+					component={CommunityReadingScreen}
+					options={{
+						headerBackVisible: true,
+						headerBackTitleVisible: true,
+						headerTitle: '커뮤니티',
+						headerTitleAlign: 'center',
+					}}
+				/>
+				<Stack.Screen
+					name='CommunityWritingScreen'
+					component={CommunityWritingScreen}
+					options={{
+						title: '커뮤니티 글 작성',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
 					}}
 				/>
 				<Stack.Screen
