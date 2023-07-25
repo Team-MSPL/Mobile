@@ -10,6 +10,9 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
+
+//import LocalSearchAI from '../ai/local_search_ai';
+import LocalSearchAITest from '../ai/local_search_ai_test';
 import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
 import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
 import React, {useState} from 'react';
@@ -109,6 +112,15 @@ export default function StackNavigator() {
 					component={FinalCheck}
 					options={{
 						title: '선택 사항 확인',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+            		<Stack.Screen
+					name='LocalSearchAITest'
+					component={LocalSearchAITest}
+					options={{
+						title: 'AI 임시',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}

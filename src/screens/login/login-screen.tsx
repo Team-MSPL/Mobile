@@ -1,5 +1,23 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Text, Center, Image, HStack, Button} from 'native-base';
+
+import {
+	Heading,
+	Text,
+	Center,
+	Box,
+	AspectRatio,
+	Image,
+	HStack,
+	Stack,
+	Container,
+	VStack,
+	Button,
+	Icon,
+	Spacer,
+} from 'native-base';
+import {color} from 'native-base/lib/typescript/theme/styled-system';
+import LinearGradient from 'react-native-linear-gradient';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
@@ -11,6 +29,9 @@ import {Google_Signin_Key} from '@env';
 export default function LoginScreen() {
 	const goNext = () => {
 		navigation.navigate('Home');
+	};
+	const goAI = () => {
+		navigation.navigate('LocalSearchAITest');
 	};
 	const navigation = useNavigation();
 	const dispatch = useAppDispatch();
@@ -105,6 +126,19 @@ export default function LoginScreen() {
 					}}
 					onPress={goNext}>
 					로그인 없이 다님 이용하기
+				</Button>
+				
+				<Spacer />
+				
+				<Button
+					marginTop={24}
+					variant={'link'}
+					_text={{
+						color: '#58AEF3',
+						fontSize: '16',
+					}}
+					onPress={goAI}>
+					AI 테스트하기
 				</Button>
 			</Center>
 		</SafeAreaView>
