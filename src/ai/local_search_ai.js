@@ -30,6 +30,9 @@ var placeListCopy = []; //장소 리스트, 전역 변수, n일차 코스를 위
 var transitInAI = 0;
 var corDis = [];
 
+var checkTime = 0.0;
+var checkTime100 = 0.0;
+
 // 숙소, 필수여행지 총 합계 계산(숙소는 -2) + 총날짜도 고려!! - 반복 횟수 줄이기에 사용
 var selectedNum = 0;
 
@@ -125,8 +128,8 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 	//todayEssentialPlaceList가 있을 경우 - 미리 넣어준다!
 	todayEssentialPlaceList.length > 0 &&
 		todayEssentialPlaceList.map((item, idx) => {
-			path.push(todayEssentialPlaceList[idx]);
-			placeListCopy = placeListCopy.filter(item => item.name !== todayEssentialPlaceList[idx].name);
+			path.push(item);
+			placeListCopy = placeListCopy.filter(item2 => item2.name !== item.name);
 		});
 
 	let numPlace = placeListCopy.length; //향후 반복문 내부에서 값이 바뀔 것이기에, 미리 저장해두고 사용한다.
@@ -216,8 +219,12 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 	for (let i = 1; i < bestPath.length; i++) {
 		bestPoint += placePoint(selectList, bestPath[i - 1], bestPath[i]);
 	}
-
+	let checkTime2 = 0;
+	let checkTime3 = 0;
+	let checkTime4 = 0;
 	for (let i = 0; i < iterations + 1; i++) {
+		checkTime2 = performance.now();
+
 		let newPath = _.cloneDeep(bestPath);
 		var addPlace;
 		var removePlace;
@@ -226,26 +233,33 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 		let idx2 = -1;
 		if (bestPath.length > 2) {
 			//코스 마지막이 숙소라면, 인덱스로 선택되면 안됨
-			if (todayAccomodationList[1].name != '') {
-				idx1 = Math.floor(Math.random() * (bestPath.length - 2)) + 1;
-				idx2 = Math.floor(Math.random() * (bestPath.length - 2)) + 1;
-			} else {
-				idx1 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
-				idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
-			}
+			// if (todayAccomodationList[1].name != '') {
+			// 	idx1 = Math.floor(Math.random() * (bestPath.length - 2)) + 1;
+			// 	idx2 = Math.floor(Math.random() * (bestPath.length - 2)) + 1;
+			// } else {
+			// 	idx1 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
+			// 	idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
+			// }
+			const isAccommodationEmpty = todayAccomodationList[1].name === '';
+			const maxIdx = bestPath.length - (isAccommodationEmpty ? 1 : 2);
+
+			idx1 = Math.floor(Math.random() * maxIdx) + 1;
+			idx2 = Math.floor(Math.random() * maxIdx) + 1;
 		} else {
 			//twoOpts할 필요없이, 코스가 너무 짧음
 			break;
 		}
 
 		//두 개의 인덱스는 같으면 안됨!
-		while (idx1 == idx2) {
-			//코스 마지막이 숙소라면, 인덱스로 선택되면 안됨
-			if (todayAccomodationList[1].name != '') {
-				idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
-			} else {
-				idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
-			}
+		// 속도를 위해 while -> if, continue로 바꿔봄
+		if (idx1 == idx2) {
+			// //코스 마지막이 숙소라면, 인덱스로 선택되면 안됨
+			// if (todayAccomodationList[1].name != '') {
+			// 	idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
+			// } else {
+			// 	idx2 = Math.floor(Math.random() * (bestPath.length - 1)) + 1;
+			// }
+			continue;
 		}
 
 		//idx1, 2 순서 정렬 - idx1이 idx2보다 작아야함 (오름차순)
@@ -254,17 +268,20 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 			idx1 = idx2;
 			idx2 = idx3;
 		}
+		checkTime4 = performance.now();
+
+		let idxa = -1;
 
 		//1. 관광지 하나를 새 관광지로 바꾼다. - 모든 관광지를 갈 경우 안함.
-		if ((i == 0 || selectWay == 1) && placeList.length > newPath.length && placeListCopy.length > 0) {
+		if ((i == 0 || selectWay == 1) && placeListCopy.length > 0) {
 			var temp;
 			let flag = true;
 			let flag2 = 0;
 			flag3 = false;
 
 			while (true) {
-				let a = Math.floor(Math.random() * placeListCopy.length);
-				let temp2 = _.cloneDeep(placeListCopy[a]);
+				idxa = Math.floor(Math.random() * placeListCopy.length);
+				let temp2 = _.cloneDeep(placeListCopy[idxa]);
 
 				for (let j = 1; j < newPath.length; j++) {
 					if (temp2.name == newPath[j].name) {
@@ -309,9 +326,11 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 				continue;
 			}
 
-			newPath = newPath.filter(item => item.name !== _.cloneDeep(removePlace).name);
+			// removePlace = _.cloneDeep(newPath[idx1]); 이므로, idx1을 삭제
+			newPath.splice(idx1, 1);
+			//newPath = newPath.filter(item => item.name !== _.cloneDeep(removePlace).name);
 			//혹시모르니까, 추가전에 한번 더 없애줌 - 제거 가능?
-			newPath = newPath.filter(item => item.name !== _.cloneDeep(addPlace).name);
+			//newPath = newPath.filter(item => item.name !== _.cloneDeep(addPlace).name);
 			if (idx1 >= newPath.length) {
 				newPath.push(_.cloneDeep(addPlace));
 			} else {
@@ -341,21 +360,18 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 			newPoint += placePoint(selectList, newPath[n - 1], newPath[n]);
 		}
 
+		checkTime3 = performance.now();
 		if (newPoint >= bestPoint) {
 			bestPath = newPath;
 
 			//만약 1번 방법일 경우, placeListCopy도 업데이트 해줘야함
-			if (
-				(i == 0 || selectWay == 1) &&
-				placeList.length > newPath.length &&
-				placeListCopy.length > 0 &&
-				flag3 == false &&
-				addPlace.name != removePlace.name
-			) {
-				placeListCopy = placeListCopy.filter(item => item.name !== addPlace.name);
+			if ((i == 0 || selectWay == 1) && placeListCopy.length > 0 && addPlace.name != removePlace.name) {
+				//let temp2 = _.cloneDeep(placeListCopy[idxa]); 이므로, 인덱스는 idxa
+				//placeListCopy = placeListCopy.filter(item => item.name !== addPlace.name);
+				placeListCopy.splice(idxa, 1);
 
 				//혹시 모르니까 추가 전에 한번 더 없애줌 - 제거 가능
-				placeListCopy = placeListCopy.filter(item => item.name !== removePlace.name);
+				//placeListCopy = placeListCopy.filter(item => item.name !== removePlace.name);
 
 				if (addPlace.name != removePlace.name) {
 					placeListCopy.push(_.cloneDeep(removePlace));
@@ -379,6 +395,8 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 				selectWay = 1;
 			}
 		}
+		checkTime += checkTime3 - checkTime2;
+		checkTime100 += checkTime4 - checkTime2;
 	}
 
 	return bestPath;
@@ -505,6 +523,11 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 			if (bestPath.length == 1) {
 				break;
 			} else {
+				// let index2 = bestPath.indexOf(bestPath.find(item => item.name === canPopPlaceList[index].name));
+				// if (index2 !== -1) {
+				// 	bestPath.splice(index2, 1);
+				// }
+
 				bestPath = bestPath.filter(item => item.name != canPopPlaceList[index].name);
 			}
 
@@ -1103,6 +1126,8 @@ async function localSearchAI(
 	const elapsedTime = endTime - startTime;
 
 	console.log(`Elapsed time: ${elapsedTime / 1000} seconds`);
+	console.log(`twoOpts 시간 1: ${checkTime / 1000} seconds`);
+	console.log(`twoOpts 시간 2: ${checkTime100 / 1000} seconds`);
 
 	return readData;
 }
