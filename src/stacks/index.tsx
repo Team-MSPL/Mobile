@@ -10,8 +10,17 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
+
 //import LocalSearchAI from '../ai/local_search_ai';
 import LocalSearchAITest from '../ai/local_search_ai_test';
+import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
+import React, {useState} from 'react';
+import {DrawerLayoutAndroidComponent} from 'react-native';
+import BottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
+import CommunityMainScreen from '../screens/community/community-main-screen';
+import FinalCheck from '../screens/enroll-info/final-check';
+
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -88,6 +97,26 @@ export default function StackNavigator() {
 					}}
 				/>
 				<Stack.Screen
+					name='CommunityMainScreen'
+					component={CommunityMainScreen}
+					options={{
+						headerBackVisible: true,
+						headerBackTitleVisible: true,
+						headerTitle: '커뮤니티',
+						headerTitleAlign: 'center',
+						headerRight: () => <BottomPopupSheet></BottomPopupSheet>,
+					}}
+				/>
+				<Stack.Screen
+					name='FinalCheck'
+					component={FinalCheck}
+					options={{
+						title: '선택 사항 확인',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+            		<Stack.Screen
 					name='LocalSearchAITest'
 					component={LocalSearchAITest}
 					options={{

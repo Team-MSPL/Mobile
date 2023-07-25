@@ -12,7 +12,7 @@ export default function SelectTendency({navigation}: any) {
 	const dispatch = useAppDispatch();
 
 	const [select, setSelect] = useState(
-		viewList.map(item => {
+		tendencyList.map(item => {
 			return Array(item.list.length).fill(false);
 		}),
 	);
@@ -29,17 +29,9 @@ export default function SelectTendency({navigation}: any) {
 			});
 		});
 
-		// console.log('sss', season);
-		// console.log('하우스', accommodations);
-		// console.log('성향', copy);
-		// console.log('필여', essentialPlaces);
-		// console.log('며칠', nDay);
-		// console.log('뭐탐', transit);
-		// console.log('시간', timeLimitArray);
-		console.log(copy);
+		dispatch(travelSliceActions.enrollTendency(copy));
 
-		dispatch(travelSliceActions.enrollTendency(select));
-		//navigation.navigate('SelectDay');
+		navigation.navigate('FinalCheck');
 	};
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
 		let copy = [...select];
@@ -71,7 +63,7 @@ export default function SelectTendency({navigation}: any) {
 						onPress={() => dispatch(travelSliceActions.enrollTransit(1))}
 						bgColor={transit == 1}></SelectButton>
 				</HStack>
-				{viewList.map((item, index) => {
+				{tendencyList.map((item, index) => {
 					return (
 						<Box key={index}>
 							<Text fontSize='lg' bold>
@@ -98,7 +90,7 @@ export default function SelectTendency({navigation}: any) {
 	);
 }
 
-const viewList = [
+export const tendencyList = [
 	{
 		title: '누구와 떠나시나요?',
 		multi: true,
