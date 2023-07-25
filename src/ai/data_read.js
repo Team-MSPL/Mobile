@@ -1,4 +1,4 @@
-import database from './firebase_read_place';
+//import database from './firebase_read_place';
 
 //TODO 데이터 로딩 시간 절약 -> 한 번에 불러오기 ( 플러터에선 실패 )
 const readAllPlace = async city => {
@@ -74,8 +74,8 @@ async function readOnePlace(city, name) {
 
 			placeData = {
 				name: name,
-				latitude: latitude,
-				longitude: longitude,
+				lat: latitude,
+				lng: longitude,
 				takenTime: takenTime,
 				popular: popular,
 				partner: partner,

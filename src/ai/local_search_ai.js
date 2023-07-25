@@ -11,8 +11,8 @@ var enoughPlace = true; //관광지가 부족하여 중단할 경우 false가 �
 
 var dummy = {
 	name: '',
-	latitude: 0.0,
-	longitude: 0.0,
+	lat: 0.0,
+	lng: 0.0,
 	takenTime: 0,
 	popular: 0,
 	partner: [0, 0, 0, 0, 0, 0, 0],
@@ -63,22 +63,17 @@ function placePoint(selectList, beforePlace, targetPlace) {
 	const weight = [20, 120, 120, 120, 10, 1];
 	let listSum = 0;
 
-	let targetPlaceList = [targetPlace.concept, targetPlace.play, targetPlace.tour, targetPlace.season];
+	let targetPlaceList = [
+		targetPlace.partner,
+		targetPlace.concept,
+		targetPlace.play,
+		targetPlace.tour,
+		targetPlace.season,
+	];
 
 	//count가 0이면 스킵되게 바꿔버림 + selectList[0].length만큼 반복대신, 고정값만큼 반복되게하여 속도 향상
 	//TODO for문이 더 빠르다길래 if + for 조합으로 하였음. 차후 && + map 조합으로도 테스트해볼 것
-	if (count[0] > 0) {
-		for (let y = 0; y < 7; y++) {
-			listSum += targetPlace.partner[y] * weight[0] * selectList[0][y];
-		}
-		//평균을 계산하는 코드, 원래는 뒤에서 따로 계산하였으나, if (count[0] > 0)를 넣었기에 내부에 추가함
-		//각 테마별 평균을 계산하는 것임. count 이용(routeSearch 시작때 미리 계산해 두었음)
-		//TODO 유지할지, 수정할지 고민
-		sum += listSum / count[0];
-		//Math.ceil도 제거 - JavaScript에서는 int와 double의 구분이 없기 때문에!!
-	}
-
-	for (let x = 0; x < 4; x++) {
+	for (let x = 0; x < 5; x++) {
 		listSum = 0;
 		let targetPlaceNow = targetPlaceList[x]; //x까지 찾아가는 연산시간 절약
 		let selectListNow = selectList[x]; //x까지 찾아가는 연산시간 절약
@@ -86,20 +81,24 @@ function placePoint(selectList, beforePlace, targetPlace) {
 			selectListNow.map((item, idx) => {
 				listSum += targetPlaceNow[idx] * weight[x] * item;
 			});
+			//평균을 계산하는 코드, 원래는 뒤에서 따로 계산하였으나, if (count[0] > 0)를 넣었기에 내부에 추가함
+			//각 테마별 평균을 계산하는 것임. count 이용(routeSearch 시작때 미리 계산해 두었음)
+			//TODO 유지할지, 수정할지 고민
 			sum += listSum / count[x];
+			//Math.ceil도 제거 - JavaScript에서는 int와 double의 구분이 없기 때문에!!
 		}
 	}
 
-	sum += Math.ceil(targetPlace.popular * weight[5]); //인기도 지표 포함하기
+	sum += targetPlace.popular * weight[5]; //인기도 지표 포함하기
 
 	if (beforePlace.name != '') {
 		//더미는 스킵
-		if (targetPlace.latitude === 0.0 || beforePlace.latitude === 0.0) {
+		if (targetPlace.lat === 0.0 || beforePlace.lat === 0.0) {
 			return sum;
 		}
 
-		const latDiff = targetPlace.latitude - beforePlace.latitude;
-		const longDiff = targetPlace.longitude - beforePlace.longitude;
+		const latDiff = targetPlace.lat - beforePlace.lat;
+		const longDiff = targetPlace.lng - beforePlace.lng;
 
 		//대중교통, 자차에 따른 거리민감도 계산 - 삼항 연산자로 간단하게 바꿈
 		//latDiff * latDiff와 같은 부분도 거듭 제곱 연산자 **로 바꿈
@@ -136,6 +135,13 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 
 	let nextIndex = -1;
 
+	//거리 민감도에 따라 이동시간 어림을 다르게 함
+	let moveTime = 30;
+
+	if (distanceSensitivity < 6) {
+		moveTime = 60;
+	}
+
 	//만약, 숙소를 골라두었을 경우, 마지막 장소로 가는 소요시간까지 생각하기 - 과거 firstPlace가 없을 수도 있었던 시절의 유산
 	// if (firstPlace.name != '' && timeLimit > 2) {
 	// 	timeLimit -= 1;
@@ -152,20 +158,22 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 			break;
 		}
 
-		let sum = Array(numPlace).fill(0); // 각 관광지의 점수 합
+		let sum = Array(placeListCopy.length).fill(-100000000); // 각 관광지의 점수 합
 
 		//각 관광지별  점수 계산하기
 		placeListCopy.map((item, idx) => {
 			//path[i - 1]이 맞음. 외부 반복문 확인할것.
-			sum[idx] += placePoint(selectList, path[i - 1], placeListCopy[idx]);
+			//단순히 indexOf로 찾으면 중복값 처리가 안됨. -> 맨 앞의 값으로 하기 때문에 안좋은 결과가 나옴
+			sum[idx] = {sum: placePoint(selectList, path[i - 1], placeListCopy[idx]), index: idx};
 		});
 
 		//sort해서 다음 목적지 고르기, sort해서 그 인덱스 번호를 알아와야함. 그래야 Place리스트에서 쓸 수 있음.
 		let sumCopy = _.cloneDeep(sum);
-		sumCopy.toSorted((a, b) => b - a); // 내림차순!! 밑의 q가 0번 인덱스부터 시도하니깐
+		sumCopy = [...sum].sort((a, b) => b.sum - a.sum); // 내림차순!! 밑의 q가 0번 인덱스부터 시도하니깐
 
 		for (let q = 0; q < numPlace; q++) {
-			nextIndex = sum.indexOf(sumCopy[q]); // 다음 목적지의 Index
+			//nextIndex = sum.indexOf(sumCopy[q]);
+			nextIndex = sumCopy[q].index; // 다음 목적지의 Index
 
 			// path에 placeListCopy[nextIndex]가 없을 경우 다음 목적지 확정 (sort결과 최고의 목적지)
 			if (path.indexOf(placeListCopy[nextIndex]) === -1) {
@@ -180,8 +188,10 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 		//그리디 종료 시점 계산 - 오늘치 총 소요시간을 계산함
 		totalTime += path[i].takenTime; // 관광지에서 소요시간
 
-		//예정된 여행 시간만큼의 일정이 채워졌다면 반복 종료
-		if (totalTime > timeLimit) {
+		//코스의 길이가 길수록 이동시간도 길어짐
+		//길이에 비례하여 timeLimit를 줄임
+		if (totalTime > timeLimit - (path.length - 1) * moveTime) {
+			//예정된 여행 시간만큼의 일정이 채워졌다면 반복 종료
 			break;
 		}
 	}
@@ -192,7 +202,8 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 //Step 3-2. 코스 개선 시도를 위한 방법 - 2가지 (관광지 교체, 순서 변경)
 function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceList) {
 	//숙소, 필수여행지 선택 횟수에 따라 2-opts 시도 횟수 조절
-	let iterations = 5000 - selectedNum * 600; //2-opts 시도 횟수
+	let iterations = 500 - selectedNum * 60; //2-opts 시도 횟수
+	//성능이 구려서, Flutter의 1/10로 낮춤
 
 	let bestPath = _.cloneDeep(path);
 
@@ -206,7 +217,7 @@ function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceLis
 		bestPoint += placePoint(selectList, bestPath[i - 1], bestPath[i]);
 	}
 
-	for (let i = 0; i < iterations; i++) {
+	for (let i = 0; i < iterations + 1; i++) {
 		let newPath = _.cloneDeep(bestPath);
 		var addPlace;
 		var removePlace;
@@ -384,7 +395,7 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 	let kOptCheck = 0;
 	let kOptCheck2 = 0;
 
-	let bestPath = _.cloneDeep(newPath);
+	let bestPath = _.cloneDeep(path);
 
 	let bestPoint = 0;
 
@@ -397,6 +408,8 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 	//여기까지 살펴봄!!!!
 
 	while (kOptContinue) {
+		console.log('twoOpt 실행', kOptCheck, kOptCheck2);
+		console.log(bestPoint);
 		let newPath = twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceList);
 
 		let newPoint = 0;
@@ -404,7 +417,7 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 		newPoint += placePoint(selectList, dummy, newPath[0]);
 
 		for (let i = 1; i < newPath.length; i++) {
-			bestPoint += placePoint(selectList, newPath[i - 1], newPath[i]);
+			newPoint += placePoint(selectList, newPath[i - 1], newPath[i]);
 		}
 
 		// 2-opts를 통해 개선이 일어났다면, 기존 path와 교체
@@ -460,27 +473,35 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 				todayEssentialPlaceList.map((item, idx) => {
 					//bestPath[t]가 todayEssentialPlaceList 내부에 있을 경우, 필수 여행지라는 뜻
 					if (bestPath[t].name == item.name) {
-						checkFix = true;
+						checkEssential = true;
 					}
 				});
 
 			//숙소 or 필수 여행지가 아니라면, bestPath[t]를 canPopPlaceList에 넣음
-			!checkAcm && !checkAcm && canPopPlaceList.push(_.cloneDeep(bestPath[t]));
+			!checkAcm && !checkEssential && canPopPlaceList.push(_.cloneDeep(bestPath[t]));
+			// if (!checkAcm && !checkEssential) {
+			// 	console.log(checkEssential);
+			// 	canPopPlaceList.push(_.cloneDeep(bestPath[t]));
+			// }
 		}
 
 		let canPopPlaceListPoint = [];
 
 		//canPopPlaceList의 시간을 제외한 point를 탐색
 		canPopPlaceList.map((item, idx) => {
-			canPopPlaceListPoint.push(placePoint(selectList, dummy, item));
+			//트러블슈팅
+			//기존에 canPopPlaceListPointCopy를 활용하여 indexOf를 하다보니까, 같은 점수인 곳이 있으면 똑같은데만 빼려고함
+			canPopPlaceListPoint.push({point: placePoint(selectList, dummy, item), index: idx});
 		});
 
 		let canPopPlaceListPointCopy = [];
-		canPopPlaceListPointCopy = canPopPlaceListPoint.toSorted(); //오름차순, 낮은 점수부터 빼야함
+		//canPopPlaceListPointCopy = [...canPopPlaceListPoint].sort((a, b) => a - b); //오름차순, 낮은 점수부터 빼야함
+		canPopPlaceListPointCopy = [...canPopPlaceListPoint].sort((a, b) => a.point - b.point); //오름차순, 낮은 점수부터 빼야함
 
 		//canPopPlaceList에 속한 값들을 빼보면서, 제한 시간 보다 관광지가 적게 맞추는 작업
 		for (let x = 0; x < canPopPlaceListPointCopy.length; x++) {
-			let index = canPopPlaceListPoint.indexOf(canPopPlaceListPointCopy[x]); //낮은 점수부터 index에 넣어 빼려는 시도
+			//let index = canPopPlaceListPoint.indexOf(canPopPlaceListPointCopy[x]); //낮은 점수부터 index에 넣어 빼려는 시도
+			let index = canPopPlaceListPointCopy[x].index;
 			if (bestPath.length == 1) {
 				break;
 			} else {
@@ -495,12 +516,13 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 			if (totalTime <= timeLimit - (bestPath.length - 1) * moveTime) {
 				break;
 			}
-			//canPopPlaceList가 없음. 더이상 뺄 수 있는 관광지가 없다는 뜻
+			//canPopPlaceList가 없음. 뺄 수 있는 관광지가 없다는 뜻
 			if (canPopPlaceList.length == 0) {
 				break;
 			}
 			//반복문이 너무 반복되어버렸을 경우. 에러
-			x == canPopPlaceListPointCopy.length - 1 && console.log('place pop 에러');
+			x == canPopPlaceListPointCopy.length - 1 &&
+				console.log('place pop 에러', canPopPlaceList.length, bestPath.length, todayEssentialPlaceList.length);
 		}
 	}
 	//관광지 갯수를 제한시간에 맞춰 pop하는 작업 종료
@@ -522,11 +544,13 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 		tempPath = tempPath.filter(item => item.name != todayAccomodationList[1].name); //미리 빼두고, 나중에 넣음(맨 뒤에 와야해서)
 
 		//첫번째 관광지는 고정이니까
+		//console.log('완전탐색 시작');
 		searchFullCourse(tempPath, [tempPlace]);
 	}
 	//시작 숙소(todayAccomodationList[0]가 없을 경우
 	else {
 		tempPath = tempPath.filter(item => item.name != todayAccomodationList[1].name); //미리 빼두고, 나중에 넣음(맨 뒤에 와야해서)
+		//console.log('완전탐색 시작');
 		searchFullCourse(tempPath, []);
 	}
 
@@ -534,28 +558,34 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 	for (let x = 0; x < corDis.length; x++) {
 		if (corDis[x].length == 0) {
 			console.log('경로최적화 중 알 수 없는 에러 발생');
+			// console.log(bestPoint);
+			// for (let q = 0; q < corDis.length; q++) {
+			// 	console.log(corDis[x].length);
+			// }
+			// console.log('-------------------------------------');
 			break;
 		}
-		// 마지막 숙소가 있을 경우 - 맨 마지막에 넣어줌 - 아까 빼둔거
-		todayAccomodationList[1].name != '' && corDis[x].push(_.cloneDeep(todayAccomodationList[1]));
 
 		let sum = 0.0;
 
-		let corDisNow = _.cloneDeep(corDis[x]); // 이렇게 해야 x번까지 찾아가는 탐색 시간을 줄일 수 있어서, 빠름!
+		let corDisNow = corDis[x]; // 이렇게 해야 x번까지 찾아가는 탐색 시간을 줄일 수 있어서, 빠름!
 
-		for (let y = 0; y < corDis[x].length - 1; y++) {
-			if (corDis[x][y].latitude == 0.0) {
+		// 마지막 숙소가 있을 경우 - 맨 마지막에 넣어줌 - 아까 빼둔거
+		todayAccomodationList[1].name != '' && corDis[x].push(_.cloneDeep(todayAccomodationList[1]));
+
+		for (let y = 0; y < corDisNow.length - 1; y++) {
+			if (corDisNow[y].lat == 0.0) {
 				continue;
 			}
-			let latDiff = corDisNow[y].latitude - corDisNow[y + 1].latitude;
-			let longDiff = corDisNow[y].longitude - corDisNow[y + 1].longitude;
+			let latDiff = corDisNow[y].lat - corDisNow[y + 1].lat;
+			let longDiff = corDisNow[y].lng - corDisNow[y + 1].lng;
 
 			let dis = Math.sqrt(latDiff ** 2 + longDiff ** 2);
 			sum += dis;
 		}
 		// 코스 길이 합이 짧아졌다면 기존 코스와 교체
 		if (sum < bestSum) {
-			bestPath = corDis[x];
+			bestPath = _.cloneDeep(corDisNow);
 			bestSum = sum;
 		}
 	}
@@ -568,12 +598,13 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 function searchFullCourse(unselectPlaceList, selectPlaceList) {
 	//selectPlaceList가 모든 관광지를 가져온 경우
 	if (unselectPlaceList.length == 0) {
-		corDis.push(selectPlaceList);
+		corDis.push(_.cloneDeep(selectPlaceList));
+		//console.log(selectPlaceList.length);
 	}
 	//재귀 하향 탐색? selectPlaceList에 관광지 하나씩 넘겨가면서
 	unselectPlaceList.map((item, idx) => {
 		//selectPlaceList에 하나 선택해서 넣음
-		selectPlaceList.push(item);
+		selectPlaceList.push(_.cloneDeep(item));
 
 		//unselectPlaceList에서는 제거 - idx번째부터, 1개 제거 - > filter보다 빠름
 		unselectPlaceList.splice(idx, 1);
@@ -585,7 +616,7 @@ function searchFullCourse(unselectPlaceList, selectPlaceList) {
 		let popResult = selectPlaceList.pop();
 
 		//idx번째부터 0개 제거, popResult추가
-		unselectPlaceList.splice(idx, 0, popResult);
+		unselectPlaceList.splice(idx, 0, _.cloneDeep(popResult));
 
 		//2개 이상인 경우는 숙소가 빠지는 경우밖에 없음 - 이거 미리 todayAccomodationList[1]빼놔서 ㄱㅊ
 		// if (
@@ -606,9 +637,15 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 	//자차, 대중교통 - 전역변수 저장
 	transitInAI = transit;
 
-	// 숙소, 필수여행지 총 합계 계산(숙소는 -2) + 총날짜도 고려!! - , 반복 횟수 줄이기에 사용
+	// 숙소, 필수여행지 총 합계 계산 + 총날짜도 고려!! - , 반복 횟수 줄이기에 사용
 	// 총날짜 (nDay)를 3으로 나눈 몫만큼 빼주자 -> 3일이면 -1, 6일이면 -2 -> 날짜가 많으면 선택 많이해도 지장 줄어드니까
-	selectedNum = houseList.length - 2 + fixTourSpotList.length - ~~(nDay / 3);
+	let accomodationNum = 0;
+	accomodationList.map((item, idx) => {
+		if (item.name != '') {
+			accomodationNum += 1;
+		}
+	});
+	selectedNum = accomodationNum + essentialPlaceList.length - ~~(nDay / 3);
 
 	//selectList 선순회 - placePoint에서 평균 구할 때 사용 - 내부에서 계산하면 시간 오래 걸리니까
 	count = [0, 0, 0, 0, 0]; //초기화
@@ -621,8 +658,6 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 	//path의 List,관광지의 List의 List, 날짜별로 한번 더 쪼갠것임
 	//pathList[프리셋넘버][n일차넘버][n번째관광지] - 중요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	let pathList = [];
-
-	let point = [];
 
 	//let fixedPlaceList = [];
 
@@ -693,7 +728,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 				if (d == 0) {
 					//첫째날 숙소(마지막 장소)가 있을 경우
 					if (accomodationList[d + 1].name == '') {
-						point = [];
+						let point = [];
 						//모든 관광지의 시간을 제외한 point를 탐색
 						for (let f = 0; f < placeListCopy.length; f++) {
 							point.push(placePoint(selectList, accomodationList[d + 1], placeListCopy[f]));
@@ -701,7 +736,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 						// 점수를 기준으로 sort해서 시작 관광지를 numPreset * day만큼 추출
 						let pointCopy = _.cloneDeep(point);
 
-						pointCopy.toSorted(); // 오름차순! index가 뒤쪽부터 시도함
+						pointCopy = [...point].sort((a, b) => a - b); // 오름차순! index가 뒤쪽부터 시도함
 
 						// 출발지의 Index, 프리셋마다 다르게 시작하기 위함
 						let index = point.indexOf(pointCopy[pointCopy.length - 1 - i * 4]);
@@ -727,14 +762,14 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 
 					//첫째날 숙소(마지막 장소)가 없을 경우
 					else {
-						point = [];
+						let point = [];
 						//모든 관광지의 시간을 제외한 point를 탐색
 						for (let f = 0; f < placeListCopy.length; f++) {
 							point.push(placePoint(selectList, dummy, placeListCopy[f]));
 						}
 						// 점수를 기준으로 sort해서 시작 관광지를 numPreset * day만큼 추출
 						let pointCopy = _.cloneDeep(point);
-						pointCopy.toSorted(); // 오름차순! index가 뒤쪽부터 시도함
+						pointCopy = [...point].sort((a, b) => a - b); // 오름차순! index가 뒤쪽부터 시도함
 
 						// 출발지의 Index, 프리셋마다 다르게 시작하기 위함
 						let index = point.indexOf(pointCopy[pointCopy.length - 1 - i * 4]);
@@ -762,7 +797,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 
 				//첫날이 아니면
 				else {
-					point = [];
+					let point = [];
 					//모든 관광지의 시간을 제외한 point를 탐색
 					for (let f = 0; f < placeListCopy.length; f++) {
 						point.push(placePoint(selectList, tempPath.at(-1).at(-1), placeListCopy[f]));
@@ -770,7 +805,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 					// 점수를 기준으로 sort해서 시작 관광지를 numPreset * day만큼 추출
 					let pointCopy = _.cloneDeep(point);
 
-					pointCopy.toSorted(); // 오름차순! index가 뒤쪽부터 시도함
+					pointCopy = [...point].sort((a, b) => a - b); // 오름차순! index가 뒤쪽부터 시도함
 
 					let index = point.indexOf(pointCopy[pointCopy.length - 1 - i * 4]);
 
@@ -802,17 +837,17 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 					//fixedPlaceDayList의 원소가 d+1(n일차)와 같을때만
 					if (item.day === d + 1) {
 						let readData = {
-							name: fixTourSpotList[f].name,
-							latitude: fixTourSpotList[f].latitude,
-							longitude: fixTourSpotList[f].longitude,
-							takenTime: 60,
+							name: item.name,
+							lat: item.lat,
+							lng: item.lng,
+							takenTime: item.takenTime,
 							popular: 0,
 							partner: [0, 0, 0, 0, 0, 0, 0],
 							concept: [0, 0, 0, 0],
 							play: [0, 0, 0, 0, 0, 0],
 							tour: [0, 0, 0, 0, 0, 0, 0, 0, 0],
 							season: [0, 0, 0, 0],
-							category: 5,
+							category: item.category,
 						};
 						todayEssentialPlaceList.push(readData);
 						placeListCopy = placeListCopy.filter(item => item.name !== readData.name);
@@ -821,7 +856,6 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 
 			//초기 path 만들기
 			let initializePath = await initializeGreedy(selectList, firstPlace, todayEssentialPlaceList, time[d]);
-
 			//태운 - 임시로 accomodationList 하나 추가해 봄. - 왜 되는지는 모르겠네??
 			if (d != nDay - 1 && accomodationList[d + 1].name != '') {
 				initializePath.push(_.cloneDeep(accomodationList[d + 1]));
@@ -838,6 +872,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 				todayEssentialPlaceList,
 				time[d],
 			);
+			//let improvedPath = initializePath;
 
 			// placeListCopy를 한번 더 제대로 업데이트 해주는 것임 - 없애도 무방, Flutter에서 에러났어서 만들었던 코드
 			// 와중에 이중 for문이라, 개선필요할듯, 일단 주석처리해봄. 문제시 다시 실행
@@ -897,7 +932,7 @@ async function localSearchAI(
 	//     if(home == null){
 	//       home = dummy;
 	//     }else{
-	//       home = new Place(home.name, home.latitude, home.longitude, 30, 0, [0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0])
+	//       home = new Place(home.name, home.lat, home.lng, 30, 0, [0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0])
 	//     }
 	//     return home;
 	//   })
@@ -913,8 +948,8 @@ async function localSearchAI(
 	placeList = [
 		{
 			name: '임시관광지1',
-			latitude: 35.11111,
-			longitude: 127.012411,
+			lat: 35.11111,
+			lng: 127.012411,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 0],
@@ -926,8 +961,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지2',
-			latitude: 35.13213,
-			longitude: 127.012411,
+			lat: 35.13213,
+			lng: 127.012411,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 0],
@@ -939,8 +974,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지3',
-			latitude: 35.11111,
-			longitude: 127.32532,
+			lat: 35.11111,
+			lng: 127.32532,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 80, 0],
@@ -952,8 +987,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지4',
-			latitude: 35.22211,
-			longitude: 127.532332,
+			lat: 35.22211,
+			lng: 127.532332,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 0],
@@ -965,8 +1000,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지5',
-			latitude: 35.53424,
-			longitude: 127.43221,
+			lat: 35.53424,
+			lng: 127.43221,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 80],
@@ -978,8 +1013,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지6',
-			latitude: 35.53243,
-			longitude: 127.54364,
+			lat: 35.53243,
+			lng: 127.54364,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 80, 0],
@@ -991,8 +1026,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지7',
-			latitude: 35.12312,
-			longitude: 127.534242,
+			lat: 35.12312,
+			lng: 127.534242,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 0],
@@ -1004,8 +1039,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지8',
-			latitude: 35.65644,
-			longitude: 127.53243,
+			lat: 35.65644,
+			lng: 127.53243,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 0, 0],
@@ -1017,8 +1052,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지9',
-			latitude: 35.85654,
-			longitude: 127.263345,
+			lat: 35.85654,
+			lng: 127.263345,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 0, 0, 0, 0, 80, 0],
@@ -1030,8 +1065,8 @@ async function localSearchAI(
 		},
 		{
 			name: '임시관광지10',
-			latitude: 35.66409,
-			longitude: 127.098765,
+			lat: 35.66409,
+			lng: 127.098765,
 			takenTime: 60,
 			popular: 100,
 			partner: [0, 80, 0, 0, 0, 0, 0],
@@ -1052,11 +1087,12 @@ async function localSearchAI(
 	const endTime = performance.now();
 
 	for (let i = 0; i < readData.length; i++) {
-		console.log(`코스`);
+		console.log(`코스`, i + 1);
 		for (let j = 0; j < readData[i].length; j++) {
 			console.log(`날짜 : ${j + 1}`);
 			for (let k = 0; k < readData[i][j].length; k++) {
 				console.log(readData[i][j][k].name);
+				//console.log(readData[i][j][k]);
 			}
 		}
 		console.log(`------------------------------------------`);

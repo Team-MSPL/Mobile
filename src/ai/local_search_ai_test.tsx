@@ -29,12 +29,31 @@ export default function LocalSearchAITest({navigation}: any) {
 		[0, 1, 0, 0],
 	];
 	const accomodationList = [
-		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
-		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
-		{name: '', selectList: selectList, lat: 35.333, long: 122.32323},
-		{name: '', selectList: selectList, lat: 34.333, long: 121.32323},
+		{name: '', selectList: selectList, lat: 35.333, lng: 122.32323, takenTime: 30, category: 4},
+		{name: '', selectList: selectList, lat: 35.333, lng: 122.32323, takenTime: 30, category: 4},
+		{name: '', selectList: selectList, lat: 35.333, lng: 122.32323, takenTime: 30, category: 4},
+		{name: '', selectList: selectList, lat: 34.333, lng: 121.32323, takenTime: 30, category: 4},
 	];
-	const essentialPlaceList = {...Place, day: 1, id: shortId.generate()};
+	const essentialPlaceList = [
+		{
+			day: 1,
+			name: '필수여행지1',
+			lat: 35.51243,
+			lng: 127.5436,
+			category: 5,
+			takenTime: 60,
+			id: 1,
+		},
+		{
+			day: 2,
+			name: '필수여행지2',
+			lat: 35.12221,
+			lng: 127.6234,
+			category: 5,
+			takenTime: 60,
+			id: 1,
+		},
+	];
 	const timeLimitArray = [10, 20];
 	const nDay = 3;
 	const transit = 1;
