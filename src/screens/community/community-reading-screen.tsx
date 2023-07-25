@@ -15,11 +15,11 @@ export default function CommunityMainScreen({navigation, route}: any) {
 
 	useEffect(() => {
 		fetchPostData();
-	}, []);
+	});
 
 	const fetchPostData = async () => {
 		try {
-			const docRef = firestore().collection('커뮤니티').doc('킹태운');
+			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			const docSnapshot = await docRef.get();
 
 			if (docSnapshot.exists) {
@@ -43,7 +43,7 @@ export default function CommunityMainScreen({navigation, route}: any) {
 		}
 
 		try {
-			const docRef = firestore().collection('커뮤니티').doc('킹태운');
+			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 
 			// 새로운 댓글을 commentList에 추가
 			const updatedCommentList = [...commentList, newComment];
@@ -66,7 +66,10 @@ export default function CommunityMainScreen({navigation, route}: any) {
 
 	return (
 		<View style={styles.container}>
+			<Text>제목: {route.params.postTitle}</Text>
+			<Text>본문</Text>
 			<Text style={styles.postContentText}>{postContent}</Text>
+			<Text>댓글</Text>
 			<FlatList
 				data={commentList}
 				renderItem={renderCommentItem}
