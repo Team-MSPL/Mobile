@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {useAppDispatch} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Box} from 'native-base';
 import {GOOGLE_API_KEY} from '@env';
 export default function SearchPlace({navigation, route}: any) {
@@ -20,13 +20,10 @@ export default function SearchPlace({navigation, route}: any) {
 				fetchDetails={true}
 				onPress={async (data, details) => {
 					const placeId = details?.place_id;
-					const response = await fetch(
-						`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=photos&key=${GOOGLE_API_KEY}`,
-					);
-					const responseToJson = await response.json();
+					const response = await dispatch(googleDetailApi({placeId: placeId}));
 					let imageUrl;
-					if (responseToJson.result.photos) {
-						const photoReference = responseToJson.result?.photos[0]?.photo_reference;
+					if (response.payload.result.photos) {
+						const photoReference = response.payload.result?.photos[0]?.photo_reference;
 						imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_API_KEY}`;
 					} else {
 						imageUrl =

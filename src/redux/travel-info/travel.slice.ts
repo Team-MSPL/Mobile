@@ -1,6 +1,7 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import axios from 'axios';
 import moment from 'moment';
-
+import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_API_KEY} from '@env';
 const initialState: LiteState = {
 	region: [],
 	cityName: '',
@@ -18,6 +19,142 @@ const initialState: LiteState = {
 
 	//시작시간,끝시간
 };
+
+const axiosAuth = axios.create({
+	baseURL: API_ROUTE,
+	headers: {'content-type': 'application/json'},
+});
+
+const axiosGoogle = axios.create({
+	baseURL: 'https://maps.googleapis.com/maps/api',
+	headers: {'content-type': 'application/json'},
+});
+const axiosKakao = axios.create({
+	baseURL: 'https://dapi.kakao.com/v2/local/search',
+	headers: {
+		'content-type': 'application/json',
+		Authorization: `KakaoAK 1639f743957ac1b957ecc29b73f380cb`,
+	},
+});
+
+export const getDrivingDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+	try {
+		console.log('하위요');
+		const response = await axiosAuth.get(
+			`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${'126.9403619316089,37.50743514849087'}&goal=${'126.96076545753868,37.50717338607686'}&waypoints=${'127.09922913614956,37.51180542624659|126.97836638977465,37.57682519650363'}&option=trafast`,
+			{
+				headers: {
+					'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
+					'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+				},
+			},
+		);
+		console.log('q', response.data.route.trafast[0].summary);
+		console.log(Math.floor(response.data.route.trafast[0].summary.duration / 1000 / 60));
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
+
+export const getTransitDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+	try {
+		console.log('하위요');
+		const response = await axiosGoogle.get(
+			`/directions/json?origin=${'37.5125,127.102778'}&destination=${'37.5586545,126.7944739'}&mode=transit&language=ko&key=${GOOGLE_API_KEY}`,
+		);
+		console.log(Math.floor(response.data.routes[0].legs[0].duration.value / 60));
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
+
+export const googleDetailApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+	try {
+		const response = await axiosGoogle.get(
+			`/place/details/json?place_id=${data.placeId}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+		);
+		console.log('q', response.data.result);
+		//제로리절트 처리하기
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
+export const googleKeywordApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+	try {
+		console.log('하위요');
+		const response = await axiosGoogle.get(
+			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
+		);
+		// const q = await dispatch(googleKeywordApi());
+		// const qwe = await dispatch(googleDetailApi({placeId: q.payload.results[0].place_id}));
+		// console.log(qwe.payload.result);
+		// console.log(response.data.results[0].place_id);
+		//제로리절트 처리하기
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
+
+export const recommendApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+	try {
+		console.log('하위요');
+		const response = await axiosKakao.get(
+			`/category.json?category_group_code=FD6&x=126.94098402134308&y=37.50739041068636&radius=2000`,
+		);
+		console.log(response.data);
+		// const q = await dispatch(googleKeywordApi());
+		// const qwe = await dispatch(googleDetailApi({placeId: q.payload.results[0].place_id}));
+		// console.log(qwe.payload.result);
+		// console.log(response.data.results[0].place_id);
+		//제로리절트 처리하기
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
+
+// export const googleImageApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+// 	try {
+// 		console.log('하위요');
+// 		const response = await axiosGoogle.get(
+// 			`/place/photo?maxwidth=400&photoreference=${data.photoReference}&key=${GOOGLE_API_KEY}`,
+// 		);
+// 		console.log(response.data.results[0].place_id);
+// 		//제로리절트 처리하기
+// 		return response.data;
+// 	} catch (error) {
+// 		return console.log(error);
+// 	}
+// });
+
+// export const tourApiTest = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+// 	try {
+// 		console.log('하위요');
+// 		const response = await axiosAuth.get(
+// 			`http://apis.data.go.kr/B551011/KorService1/searchKeyword1?MobileOS=AND&MobileApp=Danim&serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&keyword=롯데월드타워&contentTypeId=12`,
+// 		);
+// 		console.log(response.data);
+// 		return response.data;
+// 	} catch (error) {
+// 		return console.log(error);
+// 	}
+// });
+// export const tourTourApiTest = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+// 	try {
+// 		console.log('하위ㅇ요');
+// 		const response = await axiosAuth.get(
+// 			`http://apis.data.go.kr/B551011/KorService1/detailInfo1?MobileOS=AND&MobileApp=Danim&serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&contentId=2003909&contentTypeId=12`,
+// 		);
+// 		console.log(response.data);
+// 		return response.data;
+// 	} catch (error) {
+// 		return console.log(error);
+// 	}
+// });
 
 export const travelSlice = createSlice({
 	name: 'travel',
@@ -70,6 +207,12 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 		},
 	},
+	// extraReducers: builder => {
+	// 	builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
+	// 		console.log('하');
+	// 		googleDetailApi({placeId: payload.results[0].place_id});
+	// 	});
+	// },
 });
 
 export const travelSliceActions = travelSlice.actions;

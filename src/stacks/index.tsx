@@ -17,6 +17,7 @@ import {DrawerLayoutAndroidComponent} from 'react-native';
 import BottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import FinalCheck from '../screens/enroll-info/final-check';
+import Preset from '../screens/timetable/preset';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -109,6 +110,15 @@ export default function StackNavigator() {
 					component={FinalCheck}
 					options={{
 						title: '선택 사항 확인',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='Preset'
+					component={Preset}
+					options={{
+						title: '다님의 제안이에요',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}

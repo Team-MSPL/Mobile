@@ -25,7 +25,7 @@ export default function SelectButton({label, onPress, isDisabled, bgColor}: Cust
 }
 
 type CustomButtonProps = {
-	label: string;
+	label: string | number;
 	onPress: () => void;
 	isDisabled?: boolean;
 	bgColor?: boolean;

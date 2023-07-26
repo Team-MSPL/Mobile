@@ -1,10 +1,19 @@
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
 import {Touchable, TouchableOpacity} from 'react-native';
+import {useAppDispatch} from '../../redux';
+import {googleDetailApi, recommendApi} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		navigation.navigate('SelectCity');
 	};
+	const zxc = async () => {
+		dispatch(recommendApi());
+		// const q = await dispatch(googleKeywordApi());
+		// const qwe = await dispatch(googleDetailApi({placeId: q.payload.results[0].place_id}));
+		// console.log(qwe.payload.result);
+	};
+	const dispatch = useAppDispatch();
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>
@@ -54,6 +63,10 @@ export default function Main({navigation}: any) {
 			<TouchableOpacity onPress={() => navigation.navigate('CommunityMainScreen')}>
 				<Text>커뮤니티</Text>
 			</TouchableOpacity>
+			<TouchableOpacity onPress={zxc}>
+				<Text>ㅂㅈㅂ</Text>
+			</TouchableOpacity>
+			<Box h='10'></Box>
 		</ScrollView>
 	);
 }

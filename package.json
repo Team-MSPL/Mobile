@@ -28,6 +28,7 @@
     "react-native-dotenv": "^3.4.9",
     "react-native-google-places-autocomplete": "^2.5.1",
     "react-native-linear-gradient": "^2.7.3",
+    "react-native-maps": "^1.7.1",
     "react-native-modal-datetime-picker": "^17.0.0",
     "react-native-safe-area-context": "^3.4.1",
     "react-native-screens": "^3.22.0",
