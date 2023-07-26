@@ -16,8 +16,6 @@ const initialState: LiteState = {
 	timeLimitArray: [10, 20],
 	minuteLimitArray: [0, 0],
 	season: [false, false, false, false],
-
-	//시작시간,끝시간
 };
 
 const axiosAuth = axios.create({
