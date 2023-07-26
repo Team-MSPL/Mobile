@@ -1,9 +1,21 @@
 import React, {useState} from 'react';
-import {View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Image, Alert} from 'react-native';
+import {
+	View,
+	TextInput,
+	Button,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	Image,
+	Alert,
+	ScrollView,
+	Modal,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import shortid from 'shortid';
-import ImagePicker from 'react-native-image-picker';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 export default function CommunityWritingScreen({navigation}: any) {
 	const goBack = () => {
@@ -12,30 +24,49 @@ export default function CommunityWritingScreen({navigation}: any) {
 
 	const [title, setTitle] = useState<string>('');
 	const [content, setContent] = useState<string>('');
-	const [imageList, setImageList] = useState<string[]>([]);
+	const [images, setImages] = useState<string[]>([]);
+	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-	const handleImageLibraryLaunch = () => {
-		const options: any = {mediaType: 'photo', maxWidth: 500, maxHeight: 500};
-		ImagePicker.launchImageLibrary(options, handleImageResponse);
+	const handleImagePickerLaunch = () => {
+		ImageCropPicker.openPicker({
+			multiple: true,
+			mediaType: 'photo',
+			cropping: true,
+			maxFiles: 10 - images.length,
+		}).then(response => {
+			for (var i = 0; i < response.length; i++) {
+				if (response[i].size > 10000000) {
+					Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
+					return;
+				}
+			}
+			if (!response || response.length === 0) {
+				console.log('사진 선택을 취소하였습니다.');
+				return;
+			}
+			const selectedImageUris = response.map(image => image.path);
+			setImages(prevImages => [...prevImages, ...selectedImageUris]);
+		});
 	};
 
-	const handleImageResponse = (response: ImagePicker.ImagePickerResponse) => {
-		if (response.didCancel) {
-			console.log('사용자가 이미지 선택을 취소했습니다.');
-		} else if (response.assets && response.assets.length > 0) {
-			const updatedImageList: any = [...imageList, response.assets[0].uri];
-			setImageList(updatedImageList);
-		}
-	};
-
-	const handleSubmit = async () => {
-		if (title.trim() === '' || content.trim() === '') {
-			Alert.alert('제목과 내용을 입력해주세요.');
+	const handlePostSubmit = () => {
+		if (title.trim() === '') {
+			Alert.alert('제목을 입력해주세요');
+			console.log('제목을 입력해주세요.');
 			return;
 		}
-		// 글 작성과 이미지 업로드 등 필요한 처리를 수행합니다.
-		// Firestore에 데이터를 저장하고, 이미지를 저장하는 로직 등을 구현해야 합니다.
-		// 아래의 예시는 Firestore에 데이터를 저장하는 방법을 보여줍니다.
+
+		if (content.trim() === '') {
+			Alert.alert('내용을 입력해주세요');
+			console.log('내용을 입력해주세요.');
+			return;
+		}
+
+		if (images.length > 10) {
+			Alert.alert('최대 10장까지만 사진을 업로드할 수 있습니다.');
+			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
+			return;
+		}
 
 		try {
 			firestore()
@@ -46,6 +77,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 					postContent: content,
 					postKey: shortid.generate(),
 					createdAt: firestore.FieldValue.serverTimestamp(),
+					postPhoto: images,
 					// 여러 필드값 추가 가능
 					// 예: author: 'John Doe', views: 0, likes: 0, ...
 				})
@@ -64,34 +96,48 @@ export default function CommunityWritingScreen({navigation}: any) {
 		}
 	};
 
+	const handleMoreButtonPress = () => {
+		setIsModalVisible(true);
+	};
+
+	const handleModalClose = () => {
+		setIsModalVisible(false);
+	};
+
 	return (
-		<View style={styles.container}>
+		<ScrollView style={styles.container}>
+			<TextInput style={styles.titleInput} placeholder='제목' value={title} onChangeText={setTitle} />
 			<TextInput
-				style={styles.input}
-				value={title}
-				onChangeText={text => setTitle(text)}
-				placeholder='제목을 입력하세요...'
-			/>
-			<TextInput
-				style={styles.input}
+				style={styles.contentInput}
+				placeholder='내용'
 				value={content}
-				onChangeText={text => setContent(text)}
-				placeholder='내용을 입력하세요...'
-				multiline={true}
+				onChangeText={setContent}
+				multiline
 			/>
 			<View style={styles.imageContainer}>
-				{imageList.map((imageUri, index) => (
-					<Image key={index} source={{uri: imageUri}} style={styles.uploadedImage} />
+				{images.slice(0, 8).map((uri, index) => (
+					<Image key={index} source={{uri}} style={styles.uploadedImage} />
 				))}
+				{images.length > 8 && (
+					<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+						<Text style={styles.moreButtonText}>더보기</Text>
+					</TouchableOpacity>
+				)}
 			</View>
-
-			<TouchableOpacity style={styles.attachButton} onPress={handleImageLibraryLaunch}>
-				<Text style={styles.attachButtonText}>갤러리에서 사진 선택하기</Text>
+			<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
+				<Text style={styles.attachButtonText}>사진 선택하기</Text>
 			</TouchableOpacity>
-			<TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+			<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
 				<Text style={styles.submitButtonText}>글 등록하기</Text>
 			</TouchableOpacity>
-		</View>
+			<Modal visible={isModalVisible} onRequestClose={handleModalClose}>
+				<ScrollView contentContainerStyle={styles.modalContainer}>
+					{images.map((uri, index) => (
+						<Image key={index} source={{uri}} style={styles.modalImage} />
+					))}
+				</ScrollView>
+			</Modal>
+		</ScrollView>
 	);
 }
 
@@ -99,48 +145,77 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 16,
-		backgroundColor: '#fff',
 	},
-	input: {
+	titleInput: {
+		fontSize: 18,
+		borderBottomWidth: 1,
+		borderColor: '#ccc',
+		marginBottom: 16,
+	},
+	contentInput: {
+		fontSize: 16,
 		borderWidth: 1,
 		borderColor: '#ccc',
-		borderRadius: 8,
-		padding: 10,
-		marginBottom: 12,
+		height: 200,
+		padding: 8,
+		marginBottom: 16,
 	},
 	imageContainer: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		marginBottom: 12,
+		justifyContent: 'flex-start',
+		marginBottom: 16,
 	},
 	uploadedImage: {
 		width: 100,
 		height: 100,
-		borderRadius: 8,
-		marginBottom: 8,
+		margin: 8,
+	},
+	moreButton: {
+		width: 100,
+		height: 100,
+		margin: 8,
+		backgroundColor: '#ccc',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	moreButtonText: {
+		color: 'white',
+		fontWeight: 'bold',
+		fontSize: 18,
 	},
 	attachButton: {
-		backgroundColor: '#4CAF50',
-		padding: 10,
-		borderRadius: 8,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: 12,
-	},
-	attachButtonText: {
-		color: '#fff',
-		fontSize: 16,
-	},
-	submitButton: {
-		backgroundColor: '#1976D2',
+		backgroundColor: 'blue',
 		padding: 12,
 		borderRadius: 8,
 		alignItems: 'center',
-		justifyContent: 'center',
+		marginBottom: 16,
+	},
+	attachButtonText: {
+		color: 'white',
+		fontWeight: 'bold',
+		fontSize: 16,
+	},
+	submitButton: {
+		backgroundColor: 'green',
+		padding: 12,
+		borderRadius: 8,
+		alignItems: 'center',
 	},
 	submitButtonText: {
-		color: '#fff',
+		color: 'white',
+		fontWeight: 'bold',
 		fontSize: 18,
+	},
+	modalContainer: {
+		flexWrap: 'wrap',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		padding: 16,
+	},
+	modalImage: {
+		width: 100,
+		height: 100,
+		margin: 8,
 	},
 });

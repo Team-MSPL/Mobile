@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import {Heading, Center} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Alert} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 export default function CommunityMainScreen({navigation, route}: any) {
@@ -12,10 +12,14 @@ export default function CommunityMainScreen({navigation, route}: any) {
 	const [commentList, setCommentList] = useState<string[]>([]);
 	const [postContent, setPostContent] = useState<string>('');
 	const [newComment, setNewComment] = useState<string>('');
+	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
 	useEffect(() => {
 		fetchPostData();
-	});
+	}, []);
+	useEffect(() => {
+		setIsButtonDisabled(newComment.trim() === '');
+	}, [newComment]);
 
 	const fetchPostData = async () => {
 		try {
@@ -30,7 +34,7 @@ export default function CommunityMainScreen({navigation, route}: any) {
 				const postContent = data?.postContent ?? '';
 				setPostContent(postContent);
 			} else {
-				console.log('킹태운 문서가 존재하지 않습니다.');
+				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
 			}
 		} catch (error) {
 			console.log('데이터를 가져오는 중에 오류가 발생했습니다:', error);
@@ -51,6 +55,8 @@ export default function CommunityMainScreen({navigation, route}: any) {
 
 			// 댓글 등록 후 입력창 초기화
 			setNewComment('');
+			Alert.alert('댓글이 등록되었습니다.');
+			fetchPostData();
 		} catch (error) {
 			console.log('댓글 등록 중에 오류가 발생했습니다:', error);
 		}
@@ -74,7 +80,7 @@ export default function CommunityMainScreen({navigation, route}: any) {
 				data={commentList}
 				renderItem={renderCommentItem}
 				keyExtractor={(item, index) => index.toString()}
-				ListEmptyComponent={<Text>No comments available</Text>}
+				ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
 			/>
 			<View style={styles.inputContainer}>
 				<TextInput
@@ -83,8 +89,11 @@ export default function CommunityMainScreen({navigation, route}: any) {
 					onChangeText={text => setNewComment(text)}
 					placeholder='댓글을 입력하세요...'
 				/>
-				<TouchableOpacity style={styles.button} onPress={handleCommentSubmit}>
-					<Text style={styles.buttonText}>등록</Text>
+				<TouchableOpacity
+					style={[styles.submitButton, isButtonDisabled && styles.disabledButton]}
+					disabled={isButtonDisabled}
+					onPress={handleCommentSubmit}>
+					<Text style={styles.submitButtonText}>등록</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -120,15 +129,17 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 8,
 	},
-	button: {
-		marginLeft: 8,
-		backgroundColor: '#007BFF',
-		paddingHorizontal: 16,
-		paddingVertical: 8,
+	submitButton: {
+		backgroundColor: 'blue',
+		padding: 10,
 		borderRadius: 8,
 	},
-	buttonText: {
+	submitButtonText: {
 		color: 'white',
+		textAlign: 'center',
 		fontWeight: 'bold',
+	},
+	disabledButton: {
+		opacity: 0.5,
 	},
 });
