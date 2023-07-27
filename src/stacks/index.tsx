@@ -23,6 +23,7 @@ import FinalCheck from '../screens/enroll-info/final-check';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import Preset from '../screens/timetable/preset';
+import Timetable from '../screens/timetable/timetable';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -152,6 +153,15 @@ export default function StackNavigator() {
 					component={LocalSearchAITest}
 					options={{
 						title: 'AI 임시',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='Timetable'
+					component={Timetable}
+					options={{
+						title: '타임.....ㅌ..',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}

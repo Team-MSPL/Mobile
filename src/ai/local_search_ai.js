@@ -934,7 +934,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 }
 
 //localSearchAI를 실행시키는 비동기 함수
-async function localSearchAI(
+async function localSearchAI({
 	regionList,
 	accomodationList,
 	selectList,
@@ -942,7 +942,7 @@ async function localSearchAI(
 	timeLimitArray,
 	nDay,
 	transit,
-) {
+}) {
 	//이태운 주석처리
 	// if(house == null){
 	//   house = [...Array(nDay+1)].map((home,id)=>{

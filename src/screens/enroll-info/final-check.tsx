@@ -1,20 +1,37 @@
-import {useEffect, useState} from 'react';
 import {Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import SelectButton from '../../utill/component/select-button';
 import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
+import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function FinalCheck({navigation}: any) {
-	const {region, accommodations, nDay, day, essentialPlaces, tendency} = useAppSelector(state => state.travelSlice);
+	const {region, accommodations, nDay, day, essentialPlaces, tendency, timeLimitArray, transit} = useAppSelector(
+		state => state.travelSlice,
+	);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
+	const goNext = () => {
+		dispatch(LoadingSliceActions.onLoading());
+		//navigation.reset({routes: [{name: 'Preset'}]});
+		navigation.popToTop();
+		navigation.navigate('Preset');
+	};
 
 	const goReset = () => {
 		navigation.navigate('SelectCity');
 		dispatch(travelSliceActions.reset());
 	};
+
+	if (isLoading) {
+		return (
+			<Box>
+				<Text>로딩중인데용?</Text>
+			</Box>
+		);
+	}
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
@@ -74,7 +91,7 @@ export default function FinalCheck({navigation}: any) {
 				);
 			})}
 			<CustomButton label='다시 만들래' onPress={goReset}></CustomButton>
-			<CustomButton label='다음 단계' onPress={() => {}}></CustomButton>
+			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 		</ScrollView>
 	);
 }

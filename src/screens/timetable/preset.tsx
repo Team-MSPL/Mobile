@@ -1,18 +1,50 @@
-import {JSX, JSXElementConstructor, ReactElement, ReactNode, useState} from 'react';
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
+import {Text, Box, ScrollView, VStack, Center} from 'native-base';
 import MapView, {Polyline, Marker} from 'react-native-maps';
 import SelectButton from '../../utill/component/select-button';
+import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function Preset({navigation}: any) {
-	const {distance} = useAppSelector(state => state.travelSlice);
+	const {region, accommodations, nDay, day, essentialPlaces, tendency, timeLimitArray, transit, presetDatas} =
+		useAppSelector(state => state.travelSlice);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 
+	const getAi = async () => {
+		try {
+			const data = await localSearchAI({
+				regionList: region,
+				accomodationList: accommodations,
+				selectList: tendency,
+				essentialPlaceList: essentialPlaces,
+				timeLimitArray: timeLimitArray,
+				nDay: nDay + 1,
+				transit: transit,
+			});
+			if (!enoughPlace) {
+				console.log('관광지 부족');
+			} else {
+				if (data) {
+					dispatch(travelSliceActions.enrollPreset(data));
+				}
+			}
+		} catch {
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		getAi();
+	}, []);
 	const goNext = () => {
-		navigation.navigate('SelectTendency');
+		dispatch(travelSliceActions.enrollTimetable(select));
+		navigation.popToTop();
+		navigation.navigate('Timetable');
 	};
 
 	const change = (idx: number) => {
@@ -28,7 +60,7 @@ export default function Preset({navigation}: any) {
 		| ReactElement<any, string | JSXElementConstructor<any>>
 		| null
 		| undefined = [];
-	dummyData[select].forEach((value, index) => {
+	presetDatas[select].forEach((value, index) => {
 		const polylineCoordinates = value.map(vvalue => ({
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
@@ -53,7 +85,13 @@ export default function Preset({navigation}: any) {
 			/>,
 		);
 	});
-
+	if (isLoading) {
+		return (
+			<Box>
+				<Text>로딩중인데용?</Text>
+			</Box>
+		);
+	}
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<VStack space='5'>
@@ -68,21 +106,24 @@ export default function Preset({navigation}: any) {
 				<MapView
 					style={{width: '100%', height: 300}}
 					region={{
-						latitude: dummyData[select][0][0].lat,
-						longitude: dummyData[select][0][0].lng,
+						latitude: presetDatas[select][0][0].lat,
+						longitude: presetDatas[select][0][0].lng,
 						latitudeDelta: 1,
 						longitudeDelta: 1,
 					}}>
 					{markers}
 					{polylines}
 				</MapView>
-				{dummyData.map((item, idx) => (
-					<SelectButton
-						key={idx}
-						label={idx}
-						bgColor={idx === select}
-						onPress={() => change(idx)}></SelectButton>
-				))}
+				<Box flexDir='row' flexWrap='wrap'>
+					{presetDatas.map((item, idx) => (
+						<SelectButton
+							key={idx}
+							label={idx + 1 + '일차'}
+							bgColor={idx === select}
+							onPress={() => change(idx)}></SelectButton>
+					))}
+				</Box>
+				{presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text>{qwe.name}</Text>))}
 
 				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 			</VStack>

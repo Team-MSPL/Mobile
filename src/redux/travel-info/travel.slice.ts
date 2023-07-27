@@ -16,6 +16,8 @@ const initialState: LiteState = {
 	timeLimitArray: [10, 20],
 	minuteLimitArray: [0, 0],
 	season: [false, false, false, false],
+	presetDatas: [[[]]],
+	timetable: [[]],
 };
 
 const axiosAuth = axios.create({
@@ -204,6 +206,12 @@ export const travelSlice = createSlice({
 			state.accommodations = payload.accommodations;
 			state.season = payload.season;
 		},
+		enrollPreset: (state, {payload}) => {
+			state.presetDatas = payload;
+		},
+		enrollTimetable: (state, {payload}) => {
+			state.timetable = state.presetDatas[payload];
+		},
 	},
 	// extraReducers: builder => {
 	// 	builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
@@ -230,6 +238,8 @@ interface LiteState {
 	timeLimitArray: number[];
 	minuteLimitArray: number[];
 	season: boolean[];
+	presetDatas: [[TimetableType[]]];
+	timetable: [TimetableType[]];
 }
 
 interface PlaceType {
@@ -250,4 +260,18 @@ export interface EssentialPlaceType {
 	takenTime: number;
 	id: string;
 	imageUrl: string;
+}
+
+export interface TimetableType {
+	category: number;
+	concept: number[];
+	lat: number;
+	lng: number;
+	name: string;
+	partner: number[];
+	play: number[];
+	popular: number;
+	season: number[];
+	takenTime: number;
+	tour: number[];
 }

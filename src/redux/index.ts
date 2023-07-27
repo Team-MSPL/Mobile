@@ -2,10 +2,11 @@ import {configureStore, combineReducers, Reducer, AnyAction} from '@reduxjs/tool
 import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
 import travelSliceReducer from './travel-info/travel.slice';
 import loginSliceReducer from './login-info/login.slice';
-
+import loadingSliceReducer from './loading/loading.slice';
 const appReducer = combineReducers({
 	travelSlice: travelSliceReducer,
 	loginSlice: loginSliceReducer,
+	loadingSlice: loadingSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
