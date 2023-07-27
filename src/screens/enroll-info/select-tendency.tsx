@@ -6,9 +6,7 @@ import SelectButton from '../../utill/component/select-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Button} from 'native-base';
 
 export default function SelectTendency({navigation}: any) {
-	const {transit, accommodations, nDay, day, essentialPlaces, timeLimitArray} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {transit, season} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	const [select, setSelect] = useState(
@@ -18,9 +16,6 @@ export default function SelectTendency({navigation}: any) {
 	);
 
 	const goNext = () => {
-		let season = Array(4).fill(false);
-		let index = Math.floor(day[0].month / 3) - 1;
-		index < 0 ? (season[3] = true) : (season[index] = true);
 		let copy = [...select];
 		copy.push(season);
 		copy = copy.map(item => {
@@ -28,9 +23,8 @@ export default function SelectTendency({navigation}: any) {
 				return data ? 1 : 0;
 			});
 		});
-
 		dispatch(travelSliceActions.enrollTendency(copy));
-
+		console.log(copy);
 		navigation.navigate('FinalCheck');
 	};
 	const selectData = ({index, idx}: {index: number; idx: number}) => {

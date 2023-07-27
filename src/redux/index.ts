@@ -1,11 +1,9 @@
 import {configureStore, combineReducers, Reducer, AnyAction} from '@reduxjs/toolkit';
 import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
-import colorSliceReducer from './color/color.slice';
 import travelSliceReducer from './travel-info/travel.slice';
 import loginSliceReducer from './login-info/login.slice';
 
 const appReducer = combineReducers({
-	colorMode: colorSliceReducer,
 	travelSlice: travelSliceReducer,
 	loginSlice: loginSliceReducer,
 });

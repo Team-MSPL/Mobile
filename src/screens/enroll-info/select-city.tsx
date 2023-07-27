@@ -17,35 +17,34 @@ export default function SelectCity({navigation}: any) {
 		if (e === '전체' || region.includes('전체')) {
 			dispatch(travelSliceActions.selectRegion([e]));
 		} else if (region.includes(e)) {
-			let copy = [...region];
-			copy = copy.filter(item => item !== e);
+			const copy = region.filter(item => item !== e);
 			dispatch(travelSliceActions.selectRegion(copy));
 		} else {
 			let copy = [...region];
 			copy.push(e);
 			dispatch(travelSliceActions.selectRegion(copy));
 		}
-
-		console.log(region);
 	};
 
 	const deleteRegion = (e: string) => {
-		let copy = [...region];
-		copy = region.filter(item => item != e);
+		const copy = region.filter(item => item != e);
 		dispatch(travelSliceActions.selectRegion(copy));
 	};
 
 	const selectCity = (e: number) => {
 		if (region) {
-			dispatch(travelSliceActions.setRegion());
+			dispatch(travelSliceActions.selectRegion([]));
 		}
 		setSelect(e);
 	};
 
 	const goNext = () => {
-		dispatch(travelSliceActions.setCityName(viewList[select].title));
+		const a = region.map(item => viewList[select].title + ' ' + item);
+		dispatch(travelSliceActions.selectRegion(a));
 		navigation.navigate('SelectDay');
 	};
+
+	//검색 관련
 	const searchData =
 		search &&
 		viewList.find(item =>
@@ -62,7 +61,6 @@ export default function SelectCity({navigation}: any) {
 	const addCity = () => {
 		searchData && selectCity(searchData.id);
 		const data = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
-		// data && selectRegion(data);
 		dispatch(travelSliceActions.selectRegion([data]));
 	};
 
@@ -92,7 +90,7 @@ export default function SelectCity({navigation}: any) {
 							지역
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView>
+							<ScrollView nestedScrollEnabled={true}>
 								{viewList.map((item, idx) => {
 									return (
 										<TouchableOpacity
@@ -117,7 +115,7 @@ export default function SelectCity({navigation}: any) {
 							상세 지역
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView>
+							<ScrollView nestedScrollEnabled={true}>
 								{viewList[select]?.sub.map((item, idx) => {
 									return (
 										<TouchableOpacity

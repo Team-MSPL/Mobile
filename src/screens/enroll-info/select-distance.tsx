@@ -6,7 +6,7 @@ import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-bas
 export default function SelectDistance({navigation}: any) {
 	const {distance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [range, setRange] = useState(0);
+	const [range, setRange] = useState(5);
 
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollDistance(range));
