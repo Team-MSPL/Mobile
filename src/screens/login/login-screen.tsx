@@ -1,11 +1,58 @@
+import {useNavigation} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 import {Heading, Text, Center, Image, HStack, Button, Spacer} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
-import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
+import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
 import {useAppDispatch} from '../../redux';
-import {socialLogin} from '../../redux/login-info/login.slice';
 import {Alert} from 'react-native';
 import {Google_Signin_Key} from '@env';
+import {socialLogin} from '../../redux/login-info/login.slice';
+
+const kakaoLogin = () => {
+	KakaoLogin.login()
+		.then(result => {
+			console.log('Login Success', JSON.stringify(result));
+		})
+		.catch(error => {
+			if (error.code === 'E_CANCELLED_OPERATION') {
+				console.log('Login Cancel', error.message);
+			} else {
+				console.log(`Login Fail(code:${error.code})`, error.message);
+			}
+		});
+};
+
+const googleLogin = async () => {
+	GoogleSignin.configure({
+		webClientId: '70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com',
+	});
+	try {
+		await GoogleSignin.hasPlayServices();
+		const userInfo = await GoogleSignin.signIn();
+		console.log('구글 로그인 이이이이이', userInfo);
+	} catch (error) {
+		if (error === statusCodes.SIGN_IN_CANCELLED) {
+			console.log('구글 로그인 취소됨', error);
+			// user cancelled the login flow
+		} else if (error === statusCodes.IN_PROGRESS) {
+			console.log('구글 로그인 이미 실행 중', error);
+			// operation (e.g. sign in) is in progress already
+		} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+			console.log('구글 로그인 서비스 이용 불가 및 만료');
+			// play services not available or outdated
+		} else {
+			console.log('구글 로그인 다른 에러 발생', error);
+			// some other error happened
+		}
+	}
+};
+
+const platforms = [
+	{color: 'yellow.300', image: require('../../../public/images/kakao_logo.png'), onPress: kakaoLogin},
+	{color: 'white', image: require('../../../public/images/google_logo.png'), onPress: googleLogin},
+	{color: 'black', image: require('../../../public/images/apple_logo.png'), onPress: kakaoLogin},
+];
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -65,7 +112,6 @@ export default function LoginScreen({navigation}: any) {
 		{color: 'white', image: require('../../../public/images/google_logo.png'), onPress: googleLogin},
 		{color: 'black', image: require('../../../public/images/apple_logo.png'), onPress: kakaoLogin},
 	];
-
 	return (
 		<SafeAreaView>
 			<Center>
@@ -79,7 +125,13 @@ export default function LoginScreen({navigation}: any) {
 					인기 여행지, 특이 여행지, 콘텐츠까지
 				</Text>
 				<Text fontWeight={'hairline'}>여행 일정의 모든 것</Text>
-				<Image marginTop={8} source={require('../../../public/images/danim_logo.png')} width={24} height={24} />
+				<Image
+					marginTop={8}
+					source={require('../../../public/images/danim_logo.png')}
+					width={24}
+					height={24}
+					alt='icon'
+				/>
 				<HStack marginTop={16} space={8}>
 					{platforms.map(platform => (
 						<Button
