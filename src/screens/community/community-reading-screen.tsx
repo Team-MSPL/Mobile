@@ -1,7 +1,19 @@
 import {useNavigation} from '@react-navigation/native';
 import {Heading, Center, KeyboardAvoidingView} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Dimensions} from 'react-native';
+import {
+	View,
+	Text,
+	FlatList,
+	TextInput,
+	TouchableOpacity,
+	Image,
+	StyleSheet,
+	Alert,
+	Dimensions,
+	Modal,
+	ScrollView,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 export default function CommunityMainScreen({navigation, route}: any) {
@@ -14,7 +26,8 @@ export default function CommunityMainScreen({navigation, route}: any) {
 	const [newComment, setNewComment] = useState<string>('');
 	const [postImageList, setPostImageList] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
-	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+	const [isMoreModalVisible, setIsMoreModalVisible] = useState<boolean>(false);
+	const [isDetailImageModalVisible, setIsDetailImageModalVisible] = useState<boolean>(false);
 
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
@@ -103,11 +116,15 @@ export default function CommunityMainScreen({navigation, route}: any) {
 		</View>
 	);
 	const handleMoreButtonPress = () => {
-		setIsModalVisible(true);
+		setIsMoreModalVisible(true);
+	};
+
+	const handleDetailImagePress = () => {
+		setIsDetailImageModalVisible(true);
 	};
 
 	const handleModalClose = () => {
-		setIsModalVisible(false);
+		setIsMoreModalVisible(false);
 	};
 
 	return (
@@ -126,6 +143,14 @@ export default function CommunityMainScreen({navigation, route}: any) {
 					</TouchableOpacity>
 				)}
 			</View>
+			<Modal visible={isMoreModalVisible} onRequestClose={handleModalClose}>
+				<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+				<ScrollView contentContainerStyle={styles.modalContainer}>
+					{postImageList.map((uri, index) => (
+						<Image key={index} source={{uri}} style={styles.modalImage} />
+					))}
+				</ScrollView>
+			</Modal>
 
 			<Text>댓글</Text>
 			<FlatList
@@ -217,5 +242,16 @@ const styles = StyleSheet.create({
 		color: 'white',
 		fontWeight: 'bold',
 		fontSize: 18,
+	},
+	modalContainer: {
+		flexWrap: 'wrap',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		padding: 16,
+	},
+	modalImage: {
+		width: 100,
+		height: 100,
+		margin: 8,
 	},
 });
