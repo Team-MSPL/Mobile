@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import shortId from 'shortid';
@@ -6,7 +6,8 @@ import shortId from 'shortid';
 import {Text, ScrollView} from 'native-base';
 import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
-export default function AddEssential({navigation}: any) {
+import {Image} from 'react-native';
+export default function AddEssential({navigation, route}: any) {
 	const {Place, nDay, essentialPlaces} = useAppSelector(state => state.travelSlice);
 	const [select, setSelect] = useState(Array(nDay).fill(false));
 	const dispatch = useAppDispatch();
@@ -14,7 +15,7 @@ export default function AddEssential({navigation}: any) {
 	const addInn = () => {
 		let copy = [...essentialPlaces];
 		select.map((item, idx) => {
-			item && copy.push({...Place, day: idx + 1, id: shortId.generate()});
+			item && copy.push({...Place, day: idx + 1, id: shortId.generate(), category: 5, takenTime: 60});
 		});
 		dispatch(travelSliceActions.enrollessentialPlaces(copy));
 		navigation.goBack();
@@ -25,6 +26,9 @@ export default function AddEssential({navigation}: any) {
 		copy[idx] = !copy[idx];
 		setSelect(copy);
 	};
+	useLayoutEffect(() => {
+		route.params.idx && selectDay(route.params.idx - 1);
+	}, []);
 
 	return (
 		<ScrollView p='5' bgColor='#EFFBFB' flex='1'>
@@ -37,6 +41,13 @@ export default function AddEssential({navigation}: any) {
 			<Text fontSize='lg' bold>
 				{Place.name}
 			</Text>
+			<Image
+				source={{
+					uri: Place.imageUrl,
+				}}
+				style={{width: '100%', height: 300}}
+				alt='Place Image'
+			/>
 			{[...Array(nDay + 1)].map((item, idx) => {
 				return (
 					<SelectButton

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {TextInput, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
@@ -11,13 +11,13 @@ export default function SelectCity({navigation}: any) {
 	const [select, setSelect] = useState(0);
 	const {region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const [search, setSearch] = useState('');
 
 	const selectRegion = (e: string) => {
 		if (e === '전체' || region.includes('전체')) {
 			dispatch(travelSliceActions.selectRegion([e]));
 		} else if (region.includes(e)) {
-			let copy = [...region];
-			copy = copy.filter(item => item !== e);
+			const copy = region.filter(item => item !== e);
 			dispatch(travelSliceActions.selectRegion(copy));
 		} else {
 			let copy = [...region];
@@ -27,23 +27,45 @@ export default function SelectCity({navigation}: any) {
 	};
 
 	const deleteRegion = (e: string) => {
-		let copy = [...region];
-		copy = region.filter(item => item != e);
+		const copy = region.filter(item => item != e);
 		dispatch(travelSliceActions.selectRegion(copy));
 	};
 
 	const selectCity = (e: number) => {
 		if (region) {
-			dispatch(travelSliceActions.setRegion());
+			dispatch(travelSliceActions.selectRegion([]));
 		}
 		setSelect(e);
 	};
 
 	const goNext = () => {
+		const a = region.map(item => viewList[select].title + ' ' + item);
+		dispatch(travelSliceActions.selectRegion(a));
 		navigation.navigate('SelectDay');
 	};
+
+	//검색 관련
+	const searchData =
+		search &&
+		viewList.find(item =>
+			item.sub.some(
+				subItem =>
+					(subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
+					subItem.subTitle.startsWith(search),
+			),
+		);
+
+	const changeSearch = (e: any) => {
+		setSearch(e);
+	};
+	const addCity = () => {
+		searchData && selectCity(searchData.id);
+		const data = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
+		dispatch(travelSliceActions.selectRegion([data]));
+	};
+
 	return (
-		<Box bgColor='#EFFBFB' p='2'>
+		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
 			<VStack>
 				<Text fontSize='2xl' bold color='black'>
@@ -54,6 +76,13 @@ export default function SelectCity({navigation}: any) {
 				</Text>
 			</VStack>
 			<Divider my='5' />
+			<TextInput
+				style={{backgroundColor: 'red'}}
+				value={search}
+				onChangeText={text => changeSearch(text)}></TextInput>
+			<TouchableOpacity onPress={addCity}>
+				<Text>{searchData && searchData?.title}</Text>
+			</TouchableOpacity>
 			<VStack space='10'>
 				<HStack>
 					<Box w='1/2' h='300'>
@@ -61,7 +90,7 @@ export default function SelectCity({navigation}: any) {
 							지역
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView>
+							<ScrollView nestedScrollEnabled={true}>
 								{viewList.map((item, idx) => {
 									return (
 										<TouchableOpacity
@@ -86,7 +115,7 @@ export default function SelectCity({navigation}: any) {
 							상세 지역
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView>
+							<ScrollView nestedScrollEnabled={true}>
 								{viewList[select]?.sub.map((item, idx) => {
 									return (
 										<TouchableOpacity
@@ -111,10 +140,10 @@ export default function SelectCity({navigation}: any) {
 				</HStack>
 				<Box w='full' h='20' bgColor='#B0B0B0'>
 					<Text color='white' bold ml='3'>
-						{region.length}개
+						{region?.length}개
 					</Text>
 					<ScrollView flexDir='row' horizontal>
-						{region.map((item, idx) => {
+						{region?.map((item, idx) => {
 							return (
 								<SelectButton key={idx} label={item} onPress={() => deleteRegion(item)}></SelectButton>
 							);
@@ -123,7 +152,7 @@ export default function SelectCity({navigation}: any) {
 				</Box>
 				<CustomButton label='다음단계' onPress={goNext} isDisabled={!region.length} />
 			</VStack>
-		</Box>
+		</ScrollView>
 	);
 }
 
@@ -135,71 +164,70 @@ const viewList = [
 	{id: 4, title: '광주', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 5, title: '대전', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 6, title: '울산', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 7, title: '세종', sub: [{id: 0, subTitle: '전체'}]},
 	{
-		id: 7,
+		id: 8,
 		title: '경기',
 		sub: [
 			{id: 0, subTitle: '전체'},
-			{id: 1, subTitle: '수원시'},
-			{id: 2, subTitle: '고양시'},
-			{id: 3, subTitle: '성남시'},
-			{id: 4, subTitle: '용인시'},
-			{id: 5, subTitle: '부천시'},
-			{id: 6, subTitle: '안산시'},
-			{id: 7, subTitle: '남양주시'},
-			{id: 8, subTitle: '안양시'},
-			{id: 9, subTitle: '화성시'},
-			{id: 10, subTitle: '평택시'},
-			{id: 11, subTitle: '의정부시'},
-			{id: 12, subTitle: '시흥시'},
-			{id: 13, subTitle: '파주시'},
-			{id: 14, subTitle: '김포시'},
-			{id: 15, subTitle: '광명시'},
-			{id: 16, subTitle: '광주시'},
-			{id: 17, subTitle: '군포시'},
-			{id: 18, subTitle: '오산시'},
-			{id: 19, subTitle: '이천시'},
-			{id: 20, subTitle: '양주시'},
-			{id: 21, subTitle: '안성시'},
-			{id: 22, subTitle: '구리시'},
-			{id: 23, subTitle: '포천시'},
-			{id: 24, subTitle: '의왕시'},
-			{id: 25, subTitle: '하남시'},
-			{id: 26, subTitle: '여주시'},
-			{id: 27, subTitle: '양평군'},
-			{id: 28, subTitle: '동두천시'},
-			{id: 29, subTitle: '과천시'},
-			{id: 30, subTitle: '가평군'},
-			{id: 31, subTitle: '연천군'},
-		],
-	},
-	{
-		id: 8,
-		title: '강원',
-		sub: [
-			{id: 1, subTitle: '전체'},
-			{id: 2, subTitle: '강릉시'},
-			{id: 3, subTitle: '동해시'},
-			{id: 4, subTitle: '삼척시'},
-			{id: 5, subTitle: '속초시'},
-			{id: 6, subTitle: '원주시'},
-			{id: 7, subTitle: '춘천시'},
-			{id: 8, subTitle: '태백시'},
-			{id: 9, subTitle: '고성군'},
-			{id: 10, subTitle: '양구군'},
-			{id: 11, subTitle: '양양군'},
-			{id: 12, subTitle: '영월군'},
-			{id: 13, subTitle: '인제군'},
-			{id: 14, subTitle: '정선군'},
-			{id: 15, subTitle: '철원군'},
-			{id: 16, subTitle: '평창군'},
-			{id: 17, subTitle: '홍천군'},
-			{id: 18, subTitle: '화천군'},
-			{id: 19, subTitle: '횡성군'},
+			{id: 1, subTitle: '가평군'},
+			{id: 2, subTitle: '과천시'},
+			{id: 3, subTitle: '광명시'},
+			{id: 4, subTitle: '광주시'},
+			{id: 5, subTitle: '구리시'},
+			{id: 6, subTitle: '군포시'},
+			{id: 7, subTitle: '김포시'},
+			{id: 8, subTitle: '고양시'},
+			{id: 9, subTitle: '남양주시'},
+			{id: 10, subTitle: '동두천시'},
+			{id: 11, subTitle: '부천시'},
+			{id: 12, subTitle: '성남시'},
+			{id: 13, subTitle: '수원시'},
+			{id: 14, subTitle: '시흥시'},
+			{id: 15, subTitle: '안산시'},
+			{id: 16, subTitle: '안성시'},
+			{id: 17, subTitle: '안양시'},
+			{id: 18, subTitle: '양주시'},
+			{id: 19, subTitle: '양평군'},
+			{id: 20, subTitle: '여주시'},
+			{id: 21, subTitle: '연천군'},
+			{id: 22, subTitle: '오산시'},
+			{id: 23, subTitle: '용인시'},
+			{id: 24, subTitle: '의정부시'},
+			{id: 25, subTitle: '이천시'},
+			{id: 26, subTitle: '파주시'},
+			{id: 27, subTitle: '평택시'},
+			{id: 28, subTitle: '포천시'},
+			{id: 29, subTitle: '하남시'},
+			{id: 30, subTitle: '화성시'},
 		],
 	},
 	{
 		id: 9,
+		title: '강원',
+		sub: [
+			{id: 1, subTitle: '전체'},
+			{id: 2, subTitle: '강릉시'},
+			{id: 3, subTitle: '인제군'},
+			{id: 4, subTitle: '정선군'},
+			{id: 5, subTitle: '철원군'},
+			{id: 6, subTitle: '춘천시'},
+			{id: 7, subTitle: '태백시'},
+			{id: 8, subTitle: '평창군'},
+			{id: 9, subTitle: '홍천군'},
+			{id: 10, subTitle: '횡성군'},
+			{id: 11, subTitle: '고성군'},
+			{id: 12, subTitle: '동해시'},
+			{id: 13, subTitle: '삼척시'},
+			{id: 14, subTitle: '속초시'},
+			{id: 15, subTitle: '양구군'},
+			{id: 16, subTitle: '양양군'},
+			{id: 17, subTitle: '영월군'},
+			{id: 18, subTitle: '원주시'},
+		],
+	},
+	{
+		id: 10,
 		title: '충북',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -214,11 +242,10 @@ const viewList = [
 			{id: 9, subTitle: '음성군'},
 			{id: 10, subTitle: '진천군'},
 			{id: 11, subTitle: '증평군'},
-			{id: 12, subTitle: '청원군'},
 		],
 	},
 	{
-		id: 10,
+		id: 11,
 		title: '충남',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -233,14 +260,14 @@ const viewList = [
 			{id: 9, subTitle: '부여군'},
 			{id: 10, subTitle: '서천군'},
 			{id: 11, subTitle: '예산군'},
-			{id: 12, subTitle: '연기군'},
+			{id: 12, subTitle: '계룡시'},
 			{id: 13, subTitle: '청양군'},
 			{id: 14, subTitle: '태안군'},
 			{id: 15, subTitle: '홍성군'},
 		],
 	},
 	{
-		id: 11,
+		id: 12,
 		title: '전북',
 		sub: [
 			{id: 1, subTitle: '전체'},
@@ -261,9 +288,10 @@ const viewList = [
 		],
 	},
 	{
-		id: 12,
+		id: 13,
 		title: '전남',
 		sub: [
+			{id: 0, subTitle: '전체'},
 			{id: 1, subTitle: '광양시'},
 			{id: 2, subTitle: '나주시'},
 			{id: 3, subTitle: '목포시'},
@@ -289,7 +317,7 @@ const viewList = [
 		],
 	},
 	{
-		id: 13,
+		id: 14,
 		title: '경북',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -319,7 +347,7 @@ const viewList = [
 		],
 	},
 	{
-		id: 14,
+		id: 15,
 		title: '경남',
 		sub: [
 			{id: 1, subTitle: '전체'},
@@ -341,6 +369,15 @@ const viewList = [
 			{id: 17, subTitle: '함안군'},
 			{id: 18, subTitle: '함양군'},
 			{id: 19, subTitle: '합천군'},
+		],
+	},
+	{
+		id: 16,
+		title: '제주',
+		sub: [
+			{id: 1, subTitle: '전체'},
+			{id: 2, subTitle: '제주시'},
+			{id: 3, subTitle: '서귀포시'},
 		],
 	},
 ];

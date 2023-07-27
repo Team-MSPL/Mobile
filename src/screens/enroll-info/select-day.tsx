@@ -1,67 +1,30 @@
-import {useLayoutEffect, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
+
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
-export default function SelectDay({navigation}: any) {
-	LocaleConfig.locales['fr'] = {
-		monthNames: [
-			'Janvier',
-			'Février',
-			'Mars',
-			'Avril',
-			'Mai',
-			'Juin',
-			'Juillet',
-			'Août',
-			'Septembre',
-			'Octobre',
-			'Novembre',
-			'Décembre',
-		],
-		monthNamesShort: [
-			'Janv.',
-			'Févr.',
-			'Mars',
-			'Avril',
-			'Mai',
-			'Juin',
-			'Juil.',
-			'Août',
-			'Sept.',
-			'Oct.',
-			'Nov.',
-			'Déc.',
-		],
-		dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-		dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-		today: "Aujourd'hui",
-	};
-	LocaleConfig.defaultLocale = 'fr';
-	const currentTime = new Date();
-	currentTime.setMinutes(0);
-	currentTime.setHours(10);
-	const [startdate, onstartChangeDate] = useState(currentTime); // 선택 날짜
-	const [enddate, onendChangeDate] = useState(currentTime);
-	const dateFlag = useRef(0);
-	const dayFlag = useRef(0);
-	const [visible, setVisible] = useState(false);
-	const {day, Place} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
-	const nDay = day[1]?.timestamp - day[0]?.timestamp > 0 ? (day[1].timestamp - day[0].timestamp) / 86400000 : 0;
+import moment, {Moment} from 'moment';
 
+export default function SelectDay({navigation}: any) {
+	const dateFlag = useRef(0);
+	const [visible, setVisible] = useState(false);
+	const {day, Place, timeLimitArray, minuteLimitArray} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
+
+	const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+	const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
 	const onConfirm = (selectedDate: Date) => {
 		// 날짜 또는 시간 선택 시
 		setVisible(false); // 모달 close
-		let copy = [...day];
-		copy[dateFlag.current] = {
-			...day[dateFlag.current],
-			hours: selectedDate.getHours(),
-			minute: selectedDate.getMinutes(),
-		};
-		dispatch(travelSliceActions.selectDay(copy));
+		let timeCopy = [...timeLimitArray];
+		timeCopy[dateFlag.current] = selectedDate.getHours();
+		let minuteCopy = [...minuteLimitArray];
+		minuteCopy[dateFlag.current] = selectedDate.getMinutes();
+		dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
 	};
 
 	const onCancel = () => {
@@ -75,45 +38,50 @@ export default function SelectDay({navigation}: any) {
 	};
 
 	const goNext = () => {
-		dispatch(travelSliceActions.setNDay(nDay));
 		const data = [...Array(nDay + 2)].map(item => {
 			return Place;
 		});
-		let copy = [day[0].hours, day[1].hours];
-		dispatch(travelSliceActions.enrollTimeLimitArray(copy));
-		dispatch(travelSliceActions.enrollAccommodations(data));
+		let season = Array(4).fill(false);
+		let index = Math.floor((moment(selectedStartDate).month() + 1) / 3) - 1;
+		index < 0 ? (season[3] = true) : (season[index] = true);
+		dispatch(
+			travelSliceActions.enrollDayInfo({
+				day: [moment(selectedStartDate).format('YY-MM-DD'), moment(selectedEndDate).format('YY-MM-DD')],
+				nDay: nDay,
+				accommodations: data,
+				season: season,
+			}),
+		);
 		navigation.navigate('SelectMulti');
 	};
 
-	const addDay = (e: DateData) => {
-		if (dayFlag.current > 1) {
-			dayFlag.current = 0;
+	const onDateChange = (date: any, type: string) => {
+		if (type === 'END_DATE') {
+			setSelectedEndDate(date);
+		} else {
+			setSelectedStartDate(date);
+			setSelectedEndDate(null);
 		}
-		let copy = [...day];
-		copy[dayFlag.current] = {...day[dayFlag.current], day: e.dateString, timestamp: e.timestamp, month: e.month};
-		dayFlag.current += 1;
-		dispatch(travelSliceActions.selectDay(copy));
 	};
 
-	const getNowTime = () => {
-		let now = new Date();
-		let year = now.getFullYear();
-		let month = now.getMonth() + 1;
-		let date = now.getDate();
-		const nowTime = year + '-' + month + '-' + date;
-		const nowTimes = [
-			{...day[0], day: nowTime, hours: 10, minute: 0, month: month},
-			{...day[1], day: nowTime, hours: 20, minute: 0, month: month},
-		];
-		dispatch(travelSliceActions.setDay(nowTimes));
+	const calculateDateDifference = () => {
+		if (selectedStartDate && selectedEndDate) {
+			const diffInMilliseconds = selectedEndDate.diff(selectedStartDate);
+			const duration = moment.duration(diffInMilliseconds);
+			const days = duration.asDays();
+			return Math.abs(days); // 절대값으로 반환 (음수 값 제거)
+		}
+		return 0;
 	};
-	const a = {
-		[day[0]?.day]: {selected: true, color: 'blue', startingDay: true},
-		[day[1]?.day]: {selected: true, color: 'blue', endingDay: true},
-	};
-	useLayoutEffect(() => {
-		getNowTime();
-	}, []);
+
+	const nDay = calculateDateDifference();
+	const nowTime = new Date();
+
+	const viewDate =
+		moment(selectedStartDate).format('YY-MM-DD') +
+		'>' +
+		moment(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
+
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
@@ -131,11 +99,11 @@ export default function SelectDay({navigation}: any) {
 					<HStack>
 						<Text mr='2'>시계</Text>
 						<Text fontSize='lg' bold>
-							{day[0]?.day + '>' + day[1]?.day}
+							{viewDate}
 						</Text>
 						<Spacer />
 						<Text fontSize='lg' bold>
-							{nDay + '박' + (nDay + 1) + '일'}
+							{nDay ? `${nDay}박 ${nDay + 1}일` : '당일'}
 						</Text>
 					</HStack>
 				</Box>
@@ -156,7 +124,9 @@ export default function SelectDay({navigation}: any) {
 										w='80%'
 										borderColor='grey'
 										borderRadius='3px'>
-										<Text fontSize='xl'>{item.hours + '시' + item.minute + '분'}</Text>
+										<Text fontSize='xl'>
+											{timeLimitArray[idx] + '시' + minuteLimitArray[idx] + '분'}
+										</Text>
 									</Pressable>
 								</Box>
 							);
@@ -164,29 +134,28 @@ export default function SelectDay({navigation}: any) {
 					</HStack>
 				</Box>
 				<Divider my='1' />
-				<Calendar
-					current={day[0]?.day}
-					minDate={day[0]?.day}
-					monthFormat={'yyyy MM'}
-					firstDay={1}
-					disableAllTouchEventsForDisabledDays={false}
-					onDayPress={day => {
-						addDay(day);
-					}}
-					markingType='period'
-					markedDates={a}
-					//markedDates={{[Object.values(day)]: {selected: true, disableTouchEvent: true, color: 'red'}}}
+				<CalendarPicker
+					weekdays={weekdays}
+					startFromMonday={true}
+					allowRangeSelection={true}
+					onDateChange={onDateChange}
+					minDate={nowTime}
+					showDayStragglers={true}
+					previousTitle='이전 달'
+					nextTitle='다음 달'
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>
-
 			<DateTimePicker
 				isVisible={visible}
 				mode='time'
 				onConfirm={onConfirm}
 				onCancel={onCancel}
 				minuteInterval={30}
-				date={dateFlag.current === 0 ? startdate : enddate}></DateTimePicker>
+				date={moment()
+					.hours(timeLimitArray[dateFlag.current])
+					.minutes(minuteLimitArray[dateFlag.current])
+					.toDate()}></DateTimePicker>
 		</ScrollView>
 	);
 }

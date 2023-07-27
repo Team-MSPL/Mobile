@@ -1,16 +1,23 @@
-import {useNavigation} from '@react-navigation/native';
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
-export default function Main() {
-	const navigation = useNavigation();
+import {Touchable, TouchableOpacity, Linking} from 'react-native';
+import {useAppDispatch} from '../../redux';
+import {googleDetailApi, recommendApi} from '../../redux/travel-info/travel.slice';
+import {colors} from '../../utill/colors';
+export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		navigation.navigate('SelectCity');
 	};
-
+	const zxc = () => {
+		Linking.openURL(
+			'nmap://route/car?slat=37.507401685953916&slng=126.94100946014014&sname=주니집&dlat=37.40262592956716&dlng=126.97485321423363&dname=워니집&appname=com.example.myapp',
+		);
+	};
+	const dispatch = useAppDispatch();
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
-			<Text fontSize='2xl' bold color='#2E9AFE'>
+			<Text fontSize='2xl' bold color={colors.TextSecondary}>
 				나느네
-				<Text fontSize='2xl' color='black'>
+				<Text fontSize='2xl' color={colors.TextPrimary}>
 					님,{'\n'}다님과 떠나볼까요?
 				</Text>
 			</Text>
@@ -52,6 +59,13 @@ export default function Main() {
 			<Text fontSize='sm' color='grey'>
 				다님이 성향에 맞는 추천 코스를 찾아봤어요
 			</Text>
+			<TouchableOpacity onPress={() => navigation.navigate('CommunityMainScreen')}>
+				<Text>커뮤니티</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={zxc}>
+				<Text>ㅂㅈㅂ</Text>
+			</TouchableOpacity>
+			<Box h='10'></Box>
 		</ScrollView>
 	);
 }
