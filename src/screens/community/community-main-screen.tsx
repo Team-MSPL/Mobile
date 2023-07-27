@@ -57,6 +57,7 @@ export default function CommunityMainScreen({navigation}: any) {
 					</View>
 				)}
 				keyExtractor={(item, index) => index.toString()}
+				initialNumToRender={communityData.length}
 				refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 			/>
 		</View>

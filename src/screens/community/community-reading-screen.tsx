@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Center} from 'native-base';
+import {Heading, Center, KeyboardAvoidingView} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Alert} from 'react-native';
+import {View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Dimensions} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 export default function CommunityMainScreen({navigation, route}: any) {
@@ -12,6 +12,10 @@ export default function CommunityMainScreen({navigation, route}: any) {
 	const [commentList, setCommentList] = useState<string[]>([]);
 	const [postContent, setPostContent] = useState<string>('');
 	const [newComment, setNewComment] = useState<string>('');
+	const [postImageList, setPostImageList] = useState<string[]>([]);
+	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
+	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
 	useEffect(() => {
@@ -20,6 +24,25 @@ export default function CommunityMainScreen({navigation, route}: any) {
 	useEffect(() => {
 		setIsButtonDisabled(newComment.trim() === '');
 	}, [newComment]);
+	useEffect(() => {
+		// 화면 크기 변경 시 사진 크기 조정
+		const handleResize = () => {
+			const newSize = Dimensions.get('window').width / 4 - 16;
+			setImageSize(newSize);
+		};
+
+		const resizeSubscription = Dimensions.addEventListener('change', handleResize);
+
+		// 컴포넌트가 언마운트될 때 이벤트 리스너 구독 제거
+		return () => {
+			resizeSubscription.remove();
+		};
+	}, []);
+	const handleResize = () => {
+		const newSize = Dimensions.get('window').width / 4 - 16;
+		setImageSize(newSize);
+	};
+	const numColumns = 4;
 
 	const fetchPostData = async () => {
 		try {
@@ -33,6 +56,10 @@ export default function CommunityMainScreen({navigation, route}: any) {
 
 				const postContent = data?.postContent ?? '';
 				setPostContent(postContent);
+
+				const postImageList = data?.postImageList ?? [];
+				setPostImageList(postImageList);
+				console.log(postImageList);
 			} else {
 				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
 			}
@@ -70,11 +97,36 @@ export default function CommunityMainScreen({navigation, route}: any) {
 		);
 	};
 
+	const renderPostImageItem = ({item}: {item: string}) => (
+		<View style={[styles.imageContainer, {width: imageSize, height: imageSize}]}>
+			{item ? <Image source={{uri: item}} style={styles.image} /> : <Text>이미지를 불러오는 중...</Text>}
+		</View>
+	);
+	const handleMoreButtonPress = () => {
+		setIsModalVisible(true);
+	};
+
+	const handleModalClose = () => {
+		setIsModalVisible(false);
+	};
+
 	return (
 		<View style={styles.container}>
 			<Text>제목: {route.params.postTitle}</Text>
 			<Text>본문</Text>
 			<Text style={styles.postContentText}>{postContent}</Text>
+			<Text>사진 목록</Text>
+			<View style={styles.imageContainer}>
+				{postImageList.slice(0, 8).map((uri, index) => (
+					<Image key={index} source={{uri}} style={styles.image} />
+				))}
+				{postImageList.length > 8 && (
+					<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+						<Text style={styles.moreButtonText}>더보기</Text>
+					</TouchableOpacity>
+				)}
+			</View>
+
 			<Text>댓글</Text>
 			<FlatList
 				data={commentList}
@@ -141,5 +193,29 @@ const styles = StyleSheet.create({
 	},
 	disabledButton: {
 		opacity: 0.5,
+	},
+	imageContainer: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'flex-start',
+		marginBottom: 16,
+	},
+	image: {
+		width: 100,
+		height: 100,
+		margin: 8,
+	},
+	moreButton: {
+		width: 100,
+		height: 100,
+		margin: 8,
+		backgroundColor: '#ccc',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	moreButtonText: {
+		color: 'white',
+		fontWeight: 'bold',
+		fontSize: 18,
 	},
 });
