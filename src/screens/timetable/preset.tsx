@@ -35,7 +35,7 @@ export default function Preset({navigation}: any) {
 				timeLimitArray: timeLimitArray,
 				nDay: nDay + 1,
 				transit: transit,
-				//distanceSensitivity:distance
+				distanceSensitivity: distance,
 			});
 			if (!enoughPlace) {
 				console.log('관광지 부족');

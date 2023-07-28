@@ -27,6 +27,7 @@ export default function Timetable({navigation}: any) {
 	let wayPoint = '';
 	useLayoutEffect(() => {
 		timetable.map((item, idx) => (wayPoint += item.map(value => `${value.lng},${value.lat}ㅋ${idx}`)));
+		console.log(wayPoint);
 
 		//dispatch(getDrivingDuration());
 	}, []);
