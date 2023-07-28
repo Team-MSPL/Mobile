@@ -16,11 +16,11 @@ var distanceSensitivity = 5; // 거리민감도, 이건 local_search_ai.js에서
 export {distanceSensitivity};
 
 export default function LocalSearchAITest({navigation}: any) {
-	const {Place, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	//const {Place, essentialPlaces} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	//이태운 - 임시 데이터
-	const regionList = ['경기 오산시', '경기 안양시'];
+	const regionList = ['서울 전체'];
 	const selectList = [
 		[0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0],
@@ -55,12 +55,20 @@ export default function LocalSearchAITest({navigation}: any) {
 		},
 	];
 	const timeLimitArray = [10, 20];
-	const nDay = 3;
+	const nDay = 2;
 	const transit = 1;
 	//이태운 - 임시 데이터
 
 	useEffect(() => {
-		localSearchAI(regionList, accomodationList, selectList, essentialPlaceList, timeLimitArray, nDay, transit)
+		localSearchAI({
+			regionList: regionList,
+			accomodationList: accomodationList,
+			selectList: selectList,
+			essentialPlaceList: essentialPlaceList,
+			timeLimitArray: timeLimitArray,
+			nDay: nDay + 1,
+			transit: transit,
+		})
 			.then(pathList => {
 				if (!enoughPlace) {
 					console.log('관광지 수 부족. 프리셋화면에서 다이어로그 띄울 것');
