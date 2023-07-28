@@ -15,8 +15,10 @@ import {
 	ScrollView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import {useAppDispatch} from '../../redux';
+import {communitySliceActions} from '../../redux/community/community.slice';
 
-export default function CommunityMainScreen({navigation, route}: any) {
+export default function CommunityReadingScreen({navigation, route}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
@@ -31,6 +33,8 @@ export default function CommunityMainScreen({navigation, route}: any) {
 
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
+	const dispatch = useAppDispatch();
+	dispatch(communitySliceActions.setPostInfo());
 	useEffect(() => {
 		fetchPostData();
 	}, []);
@@ -55,7 +59,6 @@ export default function CommunityMainScreen({navigation, route}: any) {
 		const newSize = Dimensions.get('window').width / 4 - 16;
 		setImageSize(newSize);
 	};
-	const numColumns = 4;
 
 	const fetchPostData = async () => {
 		try {

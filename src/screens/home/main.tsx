@@ -16,7 +16,7 @@ export default function Main({navigation}: any) {
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>
-				나느네
+				나그네
 				<Text fontSize='2xl' color={colors.TextPrimary}>
 					님,{'\n'}다님과 떠나볼까요?
 				</Text>
@@ -64,6 +64,9 @@ export default function Main({navigation}: any) {
 			</TouchableOpacity>
 			<TouchableOpacity onPress={zxc}>
 				<Text>ㅂㅈㅂ</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={() => navigation.goBack()}>
+				<Text>로그아웃</Text>
 			</TouchableOpacity>
 			<Box h='10'></Box>
 		</ScrollView>

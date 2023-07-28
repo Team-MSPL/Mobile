@@ -23,6 +23,7 @@ import FinalCheck from '../screens/enroll-info/final-check';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import Preset from '../screens/timetable/preset';
+import CommunityReadingBottomPopupSheet from '../utill/component/community-reading-bottom-popup-sheet';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -118,6 +119,7 @@ export default function StackNavigator() {
 						headerBackTitleVisible: true,
 						headerTitle: '커뮤니티',
 						headerTitleAlign: 'center',
+						headerRight: () => <CommunityReadingBottomPopupSheet></CommunityReadingBottomPopupSheet>,
 					}}
 				/>
 				<Stack.Screen

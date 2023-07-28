@@ -8,34 +8,110 @@ import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-googl
 import {useState} from 'react';
 import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
 import CommunityWriteScreen from '../../screens/community/community-writing-screen';
+import firestore from '@react-native-firebase/firestore';
 
-export default function CommunityBottomPopSheet() {
+export default function CommunityBottomPopSheet({navigation}: any) {
 	const goNext = () => {
 		navigation.navigate('CommunityWritingScreen');
 	};
-	const navigation = useNavigation();
 
-	const [modalVisible, setModalVisibile] = useState(false);
+	const [menuModalVisible, setMenuModalVisibile] = useState(false);
+	const [reportModalVisible, setReportModalVisible] = useState(false);
+
 	const deviceHeight = Dimensions.get('window').height;
 	const communityMenuList = [
 		{
 			title: '글 쓰기',
 			onPress: () => {
 				console.log('글쓰기 페이지로 이동');
-				setModalVisibile(!modalVisible);
+				setMenuModalVisibile(!menuModalVisible);
 				goNext();
 			},
 		},
 		{
 			title: '신고',
-			onPress: () => console.log('신고 페이지로 이동'),
+			onPress: () => {
+				console.log('신고 페이지로 이동');
+			},
 		},
 	];
+
+	const reportMenuList = [
+		{
+			title: '무분별한 도배',
+			onPress: () => {
+				console.log('무분별한 도배 신고');
+			},
+		},
+		{
+			title: '정당/정치인 비하 및 선거 운동',
+			onPress: () => {
+				console.log('정당/정치인 비하 및 선거 운동');
+			},
+		},
+		{
+			title: '욕설/비하',
+			onPress: () => {
+				console.log('욕설/비하');
+			},
+		},
+		{
+			title: '상업적 광고 및 판매',
+			onPress: () => {
+				console.log('상업적 광고 및 판매');
+			},
+		},
+		{
+			title: '음란물/불건전한 만남 및 대화',
+			onPress: () => {
+				console.log('음란물/불건전한 만남 및 대화');
+			},
+		},
+		{
+			title: '유출/사칭/사기',
+			onPress: () => {
+				console.log('유출/사칭/사기');
+			},
+		},
+		{
+			title: '기타 - 사유 작성',
+			onPress: () => {
+				console.log('기타');
+			},
+		},
+	];
+
+	const handleReportSubmit = () => {
+		try {
+			firestore()
+				.collection('게시글 신고')
+				.doc(title) // 제목을 문서 ID로 사용
+				.set({
+					reporterToken: jwtToken,
+					postTitle: title,
+					postContent: content,
+					reportedAt: firestore.FieldValue.serverTimestamp(),
+					postImageList: images,
+				})
+				.then(() => {
+					console.log('신고가 성공적으로 되었습니다.');
+				})
+				.catch(error => {
+					console.log('신고를 하는 중에 오류가 발생했습니다:', error);
+				});
+
+			console.log('신고가 등록되었습니다.');
+			// 게시글 등록 완료 후 필요한 처리를 추가하면 됩니다.
+		} catch (error) {
+			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
+		}
+	};
+
 	return (
 		<SafeAreaView>
 			<TouchableOpacity
 				onPress={() => {
-					setModalVisibile(!modalVisible);
+					setMenuModalVisibile(!menuModalVisible);
 				}}>
 				<View>
 					<ThreeDotsIcon></ThreeDotsIcon>
@@ -44,8 +120,8 @@ export default function CommunityBottomPopSheet() {
 			<Modal
 				animationType={'fade'}
 				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => setModalVisibile(!modalVisible)}>
+				visible={menuModalVisible}
+				onRequestClose={() => setMenuModalVisibile(!menuModalVisible)}>
 				<View
 					style={{
 						flex: 1,
@@ -80,6 +156,11 @@ export default function CommunityBottomPopSheet() {
 					</View>
 				</View>
 			</Modal>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={reportModalVisible}
+				onRequestClose={() => setReportModalVisible(!reportModalVisible)}></Modal>
 		</SafeAreaView>
 	);
 }
