@@ -66,45 +66,45 @@ export default function LocalSearchAITest({navigation}: any) {
 	//이태운 - 임시 데이터
 
 	// 여행코스 AI 주석처리
-	// useEffect(() => {
-	// 	localSearchAI({
-	// 		regionList: regionList,
-	// 		accomodationList: accomodationList,
-	// 		selectList: selectList,
-	// 		essentialPlaceList: essentialPlaceList,
-	// 		timeLimitArray: timeLimitArray,
-	// 		nDay: nDay + 1,
-	// 		transit: transit,
-	//distanceSensitivity: 5,
-	// 	})
-	// 		.then(pathList => {
-	// 			if (!enoughPlace) {
-	// 				console.log('관광지 수 부족. 프리셋화면에서 다이어로그 띄울 것');
-	// 			} else {
-	// 				if (pathList) {
-	// 					console.log('AI 결과값 출력');
-	// 					// for (let i = 0; i < pathList.length; i++) {
-	// 					// 	console.log("---------------------------  " + '${i + 1}' + "번째 프리셋");
-	// 					// 	console.log("코스");
-	// 					// 	for (let j = 0; j < pathList[i].length; j++) {
-	// 					// 		console.log("날짜 : " + (j + 1).toString());
-	// 					// 	  for (let k = 0; k < pathList[i][j].length; k++) {
-	// 					// 		console.log(pathList[i][j][k].name);
-	// 					// 	  }
-	// 					// 	}
-	// 					// 	console.log("---------------------------  " + '${i + 1}' + "번째 프리셋");
-	// 					//   }
-	// 				} else {
-	// 					console.log('pathList가 undefined입니다.');
-	// 					// pathList가 undefined인 경우 처리
-	// 				}
-	// 			}
-	// 		})
-	// 		.catch(error => {
-	// 			// 오류 처리
-	// 			console.log(error);
-	// 		});
-	// }, []);
+	useEffect(() => {
+		localSearchAI({
+			regionList: regionList,
+			accomodationList: accomodationList,
+			selectList: selectList,
+			essentialPlaceList: essentialPlaceList,
+			timeLimitArray: timeLimitArray,
+			nDay: nDay + 1,
+			transit: transit,
+			distanceSensitivity: distanceSensitivity,
+		})
+			.then(pathList => {
+				if (!enoughPlace) {
+					console.log('관광지 수 부족. 프리셋화면에서 다이어로그 띄울 것');
+				} else {
+					if (pathList) {
+						console.log('AI 결과값 출력');
+						for (let i = 0; i < pathList.length; i++) {
+							// console.log('---------------------------  ' + '${i + 1}' + '번째 프리셋');
+							// console.log('코스');
+							// for (let j = 0; j < pathList[i].length; j++) {
+							// 	console.log('날짜 : ' + (j + 1).toString());
+							// 	for (let k = 0; k < pathList[i][j].length; k++) {
+							// 		console.log(pathList[i][j][k].name);
+							// 	}
+							// }
+							// console.log('---------------------------  ' + '${i + 1}' + '번째 프리셋');
+						}
+					} else {
+						console.log('pathList가 undefined입니다.');
+						// pathList가 undefined인 경우 처리
+					}
+				}
+			})
+			.catch(error => {
+				// 오류 처리
+				console.log(error);
+			});
+	}, []);
 
 	useEffect(() => {
 		regionSearch({
@@ -114,7 +114,7 @@ export default function LocalSearchAITest({navigation}: any) {
 			recentPosition: recentPosition,
 		})
 			.then(result => {
-				console.log(result);
+				//console.log(result);
 			})
 			.catch(error => {
 				// 오류 처리

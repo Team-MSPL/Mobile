@@ -91,6 +91,7 @@ async function regionSearch({selectList, selectPopular, distanceSensitivity, rec
 
 	//selectList 선순회 - placePoint에서 평균 구할 때 사용 - 내부에서 계산하면 시간 오래 걸리니까
 	count = [0, 0, 0, 0, 0]; //초기화
+	countNum = 0;
 	for (let x = 1; x < 5; x++) {
 		for (let y = 0; y < selectList[x].length; y++) {
 			if (selectList[x][y] == 1) {
@@ -135,13 +136,13 @@ async function regionSearch({selectList, selectPopular, distanceSensitivity, rec
 
 	console.log(`상위 5개 지역. 성향 선택 개수`, countNum);
 	console.log(result);
-	console.log(`------------------------------------------`);
 
 	console.log(`알고리즘 돌리는데 걸리는 시간`);
 
 	const elapsedTime = endTime - startTime;
 
 	console.log(`Elapsed time: ${elapsedTime / 1000} seconds`);
+	console.log(`------------------------------------------`);
 
 	return result;
 }

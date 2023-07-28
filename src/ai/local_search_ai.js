@@ -110,8 +110,8 @@ function placePoint(selectList, beforePlace, targetPlace) {
 		//TODO 거리민감도 계산이 확 달라지기에, Math.sqrt를 제거하지 못했음. 추후 제거할 것
 		let distance =
 			transitInAI === 1
-				? Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 0.12) * sumForDistance
-				: Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 0.18) * sumForDistance;
+				? Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivityInAI * 0.12) * sumForDistance
+				: Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivityInAI * 0.18) * sumForDistance;
 
 		sum -= distance; // 거리가 커질수록 안좋은 것임. 총점수에 - 연산으로 계산해줘야함. 위와 마찬가지로 Math.round()연산 제거
 	}
@@ -143,7 +143,7 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 	//거리 민감도에 따라 이동시간 어림을 다르게 함
 	let moveTime = 30;
 
-	if (distanceSensitivity < 6) {
+	if (distanceSensitivityInAI < 6) {
 		moveTime = 60;
 	}
 
@@ -466,7 +466,7 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 	//거리 민감도에 따라 이동시간 어림을 다르게 함
 	let moveTime = 30;
 
-	if (distanceSensitivity < 6) {
+	if (distanceSensitivityInAI < 6) {
 		moveTime = 60;
 	}
 
@@ -946,7 +946,7 @@ async function localSearchAI({
 	transit,
 	distanceSensitivity,
 }) {
-	console.log('시작!');
+	console.log('여행 코스 AI 시작!');
 
 	distanceSensitivityInAI = distanceSensitivity;
 
@@ -982,6 +982,7 @@ async function localSearchAI({
 	console.log(`Elapsed time: ${elapsedTime / 1000} seconds`);
 	console.log(`twoOpts 시간 1: ${checkTime / 1000} seconds`);
 	console.log(`twoOpts 시간 2: ${checkTime100 / 1000} seconds`);
+	console.log(`------------------------------------------`);
 
 	return readData;
 }
