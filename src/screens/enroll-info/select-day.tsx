@@ -15,6 +15,7 @@ export default function SelectDay({navigation}: any) {
 	const dispatch = useAppDispatch();
 
 	const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 	const [selectedStartDate, setSelectedStartDate] = useState(new Date());
 	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
 	const onConfirm = (selectedDate: Date) => {
@@ -46,7 +47,10 @@ export default function SelectDay({navigation}: any) {
 		index < 0 ? (season[3] = true) : (season[index] = true);
 		dispatch(
 			travelSliceActions.enrollDayInfo({
-				day: [moment(selectedStartDate).format('YY-MM-DD'), moment(selectedEndDate).format('YY-MM-DD')],
+				day: [
+					moment(selectedStartDate).format('YY-MM-DD'),
+					moment(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD'),
+				],
 				nDay: nDay,
 				accommodations: data,
 				season: season,
@@ -136,6 +140,7 @@ export default function SelectDay({navigation}: any) {
 				<Divider my='1' />
 				<CalendarPicker
 					weekdays={weekdays}
+					months={months}
 					startFromMonday={true}
 					allowRangeSelection={true}
 					onDateChange={onDateChange}
@@ -143,6 +148,7 @@ export default function SelectDay({navigation}: any) {
 					showDayStragglers={true}
 					previousTitle='이전 달'
 					nextTitle='다음 달'
+					allowBackwardRangeSelect={true}
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>

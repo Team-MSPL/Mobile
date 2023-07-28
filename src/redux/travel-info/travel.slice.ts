@@ -57,18 +57,21 @@ export const getDrivingDuration = createAsyncThunk('/li', async (data: any, thun
 	}
 });
 
-export const getTransitDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-	try {
-		console.log('하위요');
-		const response = await axiosGoogle.get(
-			`/directions/json?origin=${'37.5125,127.102778'}&destination=${'37.5586545,126.7944739'}&mode=transit&language=ko&key=${GOOGLE_API_KEY}`,
-		);
-		console.log(Math.floor(response.data.routes[0].legs[0].duration.value / 60));
-		return response.data;
-	} catch (error) {
-		return console.log(error);
-	}
-});
+// export const getTransitDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+// 	try {
+// 		console.log('하위요');
+// 		const response = await axiosGoogle.get(
+// 			`/directions/json?origin=37.5125,127.102778&destination=37.5586545,126.7944739&mode=transit&language=ko&waypoints=37.5118,127.0992|37.5768,126.9783&key=${GOOGLE_API_KEY}`,
+// 		);
+// 		//`/directions/json?origin=${'37.5125,127.102778'}&destination=${'37.5586545,126.7944739'}&mode=transit&language=ko&waypoints=via%3A-37.81223%2C144.96254%7Cvia%3A-34.92788%2C138.60008&key=${GOOGLE_API_KEY}`,
+
+// 		console.log('하위', response.data);
+// 		console.log(Math.floor(response.data.routes[0].legs[0].duration.value / 60));
+// 		return response.data;
+// 	} catch (error) {
+// 		return console.log(error);
+// 	}
+// });
 
 export const googleDetailApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
 	try {

@@ -9,8 +9,18 @@ import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function Preset({navigation}: any) {
-	const {region, accommodations, nDay, day, essentialPlaces, tendency, timeLimitArray, transit, presetDatas} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		region,
+		accommodations,
+		nDay,
+		day,
+		essentialPlaces,
+		tendency,
+		timeLimitArray,
+		transit,
+		presetDatas,
+		distance,
+	} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -25,6 +35,7 @@ export default function Preset({navigation}: any) {
 				timeLimitArray: timeLimitArray,
 				nDay: nDay + 1,
 				transit: transit,
+				//distanceSensitivity:distance
 			});
 			if (!enoughPlace) {
 				console.log('관광지 부족');

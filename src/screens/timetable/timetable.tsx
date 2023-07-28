@@ -1,6 +1,6 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useState} from 'react';
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getDrivingDuration, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
 import MapView, {Polyline, Marker} from 'react-native-maps';
@@ -22,6 +22,14 @@ export default function Timetable({navigation}: any) {
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
+	let start = '';
+	let destination = '';
+	let wayPoint = '';
+	useLayoutEffect(() => {
+		timetable.map((item, idx) => (wayPoint += item.map(value => `${value.lng},${value.lat}ㅋ${idx}`)));
+
+		//dispatch(getDrivingDuration());
+	}, []);
 
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
