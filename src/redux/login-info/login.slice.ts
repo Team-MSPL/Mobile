@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {API_ROUTE} from '@env';
+import {API_ROUTE, GOOGLE_API_KEY} from '@env';
 const initialState: LiteState = {
 	login: [],
 	userInfo: [],
@@ -27,6 +27,18 @@ export const socialLogin = createAsyncThunk('/auth/login', async (data: LoginTyp
 		return response.data;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
+	}
+});
+export const tete = createAsyncThunk('/tete', async thunkAPI => {
+	try {
+		const response = await axiosAuth.get(
+			'http://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&MobileApp=다님&MobileOS=AND&arrange=A&keyword=$창덕궁',
+		);
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		return error;
 	}
 });
 

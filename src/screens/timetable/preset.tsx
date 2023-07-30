@@ -129,12 +129,12 @@ export default function Preset({navigation}: any) {
 					{presetDatas.map((item, idx) => (
 						<SelectButton
 							key={idx}
-							label={idx + 1 + '일차'}
+							label={idx + 1 + '번 후보'}
 							bgColor={idx === select}
 							onPress={() => change(idx)}></SelectButton>
 					))}
 				</Box>
-				{presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text>{qwe.name}</Text>))}
+				{presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text key={asd}>{qwe.name}</Text>))}
 
 				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 			</VStack>

@@ -6,12 +6,12 @@ import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
 import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {useEffect} from 'react';
 
 export default function FinalCheck({navigation}: any) {
 	const {region, accommodations, nDay, day, essentialPlaces, tendency, timeLimitArray, transit} = useAppSelector(
 		state => state.travelSlice,
 	);
-	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const goNext = () => {
 		dispatch(LoadingSliceActions.onLoading());
@@ -24,21 +24,13 @@ export default function FinalCheck({navigation}: any) {
 		navigation.navigate('SelectCity');
 		dispatch(travelSliceActions.reset());
 	};
-
-	if (isLoading) {
-		return (
-			<Box>
-				<Text>로딩중인데용?</Text>
-			</Box>
-		);
-	}
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
 
 			<Text>{region}</Text>
-			<Text>출발: {day[0]}</Text>
-			<Text>종료: {day[1]}</Text>
+			<Text>출발: {day[0].format('YY-MM-DD')}</Text>
+			<Text>종료: {day[day.length - 1].format('YY-MM-DD')}</Text>
 			{accommodations.map((item, idx) => {
 				return (
 					idx != 0 &&
