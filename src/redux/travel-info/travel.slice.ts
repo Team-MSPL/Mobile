@@ -1,23 +1,24 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
-import moment from 'moment';
-import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_API_KEY} from '@env';
+import moment, {Moment} from 'moment';
+import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
 const initialState: LiteState = {
 	region: [],
 	cityName: '',
-	day: [moment().format('YY-MM-DD'), moment().format('YY-MM-DD')],
+	day: [],
 	nDay: 0,
 	Place: {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, imageUrl: ''},
 	accommodations: [],
 	essentialPlaces: [],
 	distance: 0,
 	transit: 0,
-	tendency: [],
+	tendency: [[]],
 	timeLimitArray: [10, 20],
 	minuteLimitArray: [0, 0],
 	season: [false, false, false, false],
 	presetDatas: [[[]]],
 	timetable: [[]],
+	moveTimeList: [],
 };
 
 const axiosAuth = axios.create({
@@ -33,29 +34,36 @@ const axiosKakao = axios.create({
 	baseURL: 'https://dapi.kakao.com/v2/local/search',
 	headers: {
 		'content-type': 'application/json',
-		Authorization: `KakaoAK 1639f743957ac1b957ecc29b73f380cb`,
+		Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
 	},
 });
 
-export const getDrivingDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-	try {
-		console.log('하위요');
-		const response = await axiosAuth.get(
-			`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${'126.9403619316089,37.50743514849087'}&goal=${'126.96076545753868,37.50717338607686'}&waypoints=${'127.09922913614956,37.51180542624659|126.97836638977465,37.57682519650363'}&option=trafast`,
-			{
-				headers: {
-					'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
-					'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+//교통 시간 구하는 거
+export const getDrivingDuration = createAsyncThunk(
+	'/li',
+	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+		try {
+			console.log('하위요', data.start, data.goal, data.wayPoint);
+			const response = await axiosAuth.get(
+				`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${data.start}&goal=${
+					data.goal
+				}&waypoints=${`${data.wayPoint}`}&option=trafast`,
+				{
+					headers: {
+						'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
+						'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+					},
 				},
-			},
-		);
-		console.log('q', response.data.route.trafast[0].summary);
-		console.log(Math.floor(response.data.route.trafast[0].summary.duration / 1000 / 60));
-		return response.data;
-	} catch (error) {
-		return console.log(error);
-	}
-});
+			);
+			console.log('q', response.data.route.trafast[0].summary);
+			console.log('q', response.data.route.trafast[0].summary.duration);
+			console.log(Math.floor(response.data.route.trafast[0].summary.duration / 1000 / 60));
+			return response.data.route.trafast[0].summary;
+		} catch (error) {
+			return console.log(error);
+		}
+	},
+);
 
 // export const getTransitDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
 // 	try {
@@ -73,6 +81,7 @@ export const getDrivingDuration = createAsyncThunk('/li', async (data: any, thun
 // 	}
 // });
 
+//장소 정보 얻어오는거
 export const googleDetailApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
 	try {
 		const response = await axiosGoogle.get(
@@ -85,6 +94,8 @@ export const googleDetailApi = createAsyncThunk('/li', async (data: any, thunkAP
 		return console.log(error);
 	}
 });
+
+// 탐테에서 눌렀을때 검색이 아니라 이름으로 장소 찾는 거
 export const googleKeywordApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
 	try {
 		console.log('하위요');
@@ -102,6 +113,7 @@ export const googleKeywordApi = createAsyncThunk('/li', async (data: any, thunkA
 	}
 });
 
+//카카오 식당,카페 등 추천 장소 얻는 거
 export const recommendApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
 	try {
 		console.log('하위요');
@@ -216,12 +228,15 @@ export const travelSlice = createSlice({
 			state.timetable = state.presetDatas[payload];
 		},
 	},
-	// extraReducers: builder => {
-	// 	builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
-	// 		console.log('하');
-	// 		googleDetailApi({placeId: payload.results[0].place_id});
-	// 	});
-	// },
+	extraReducers: builder => {
+		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
+			let list: number[] = [];
+			payload.waypoints && (list = payload.waypoints.map((item, idx) => item.duration));
+			list.push(payload.goal.duration);
+			state.moveTimeList.push(list);
+			console.log('니는 안덥나', state.moveTimeList);
+		});
+	},
 });
 
 export const travelSliceActions = travelSlice.actions;
@@ -230,19 +245,20 @@ export default travelSlice.reducer;
 interface LiteState {
 	region: string[];
 	cityName: string;
-	day: string[];
+	day: Moment[];
 	nDay: number;
 	Place: PlaceType;
 	accommodations: PlaceType[];
 	essentialPlaces: EssentialPlaceType[];
 	distance: number;
 	transit: number;
-	tendency: boolean[][];
+	tendency: [boolean[]];
 	timeLimitArray: number[];
 	minuteLimitArray: number[];
 	season: boolean[];
 	presetDatas: [[TimetableType[]]];
 	timetable: [TimetableType[]];
+	moveTimeList: [number[]] | [];
 }
 
 interface PlaceType {
@@ -277,4 +293,6 @@ export interface TimetableType {
 	season: number[];
 	takenTime: number;
 	tour: number[];
+	x?: number;
+	y?: number;
 }

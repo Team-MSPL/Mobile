@@ -16,7 +16,7 @@ export default function SelectDay({navigation}: any) {
 
 	const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-	const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+	const [selectedStartDate, setSelectedStartDate] = useState(moment());
 	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
 	const onConfirm = (selectedDate: Date) => {
 		// 날짜 또는 시간 선택 시
@@ -43,14 +43,16 @@ export default function SelectDay({navigation}: any) {
 			return Place;
 		});
 		let season = Array(4).fill(false);
-		let index = Math.floor((moment(selectedStartDate).month() + 1) / 3) - 1;
+		let index = Math.floor((selectedStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = true) : (season[index] = true);
+		let dateArray = [];
+		while (selectedStartDate.isSameOrBefore(selectedEndDate)) {
+			dateArray.push(selectedStartDate.clone());
+			selectedStartDate.add(1, 'day');
+		}
 		dispatch(
 			travelSliceActions.enrollDayInfo({
-				day: [
-					moment(selectedStartDate).format('YY-MM-DD'),
-					moment(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD'),
-				],
+				day: dateArray,
 				nDay: nDay,
 				accommodations: data,
 				season: season,
@@ -82,9 +84,9 @@ export default function SelectDay({navigation}: any) {
 	const nowTime = new Date();
 
 	const viewDate =
-		moment(selectedStartDate).format('YY-MM-DD') +
+		selectedStartDate.format('YY-MM-DD') +
 		'>' +
-		moment(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
+		(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
 
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
