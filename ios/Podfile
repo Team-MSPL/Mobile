@@ -1,3 +1,4 @@
+$RNFirebaseAsStaticFramework = true
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -27,7 +28,10 @@ end
 
 target 'DanimMobile' do
   config = use_native_modules!
-  pod 'GoogleUtilities', :modular_headers => true
+  # pod 'GoogleUtilities', :modular_headers => true
+  pod 'Firebase/Core', '~> 10.0'
+  
+  use_frameworks! :linkage => :static
 
   # Flags change depending on the env values.
   flags = get_default_flags()
@@ -41,7 +45,7 @@ target 'DanimMobile' do
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
-    :flipper_configuration => flipper_config,
+    #:flipper_configuration => flipper_config,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )

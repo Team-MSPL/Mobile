@@ -40,7 +40,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 				Alert.alert('사진은 최대 10장까지 가능합니다.');
 				return;
 			}
-			for (var i = 0; i < response.length; i++) {
+			for (let i = 0; i < response.length; i++) {
 				if (response[i].size > 10000000) {
 					Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
 					return;
