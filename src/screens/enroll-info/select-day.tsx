@@ -46,10 +46,14 @@ export default function SelectDay({navigation}: any) {
 		let index = Math.floor((selectedStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = true) : (season[index] = true);
 		let dateArray = [];
-		while (selectedStartDate.isSameOrBefore(selectedEndDate)) {
+		let count = 0;
+		console.log(nDay);
+		while (nDay > 4 ? selectedStartDate.isSameOrBefore(selectedEndDate) : count < 5) {
 			dateArray.push(selectedStartDate.clone());
 			selectedStartDate.add(1, 'day');
+			count += 1;
 		}
+		console.log(dateArray);
 		dispatch(
 			travelSliceActions.enrollDayInfo({
 				day: dateArray,

@@ -24,6 +24,11 @@ import CommunityWritingScreen from '../screens/community/community-writing-scree
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import Preset from '../screens/timetable/preset';
 import Timetable from '../screens/timetable/timetable';
+import CourseDetail from '../screens/timetable/course-detail';
+import TimetableAddPlace from '../screens/timetable/timetable-add-place';
+import Recommend from '../screens/timetable/recommend';
+import Modify from '../screens/timetable/modify';
+import MapInfo from '../screens/timetable/map-info';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
@@ -162,6 +167,51 @@ export default function StackNavigator() {
 					component={Timetable}
 					options={{
 						title: '타임.....ㅌ..',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='CourseDetail'
+					component={CourseDetail}
+					options={{
+						title: '설명고고',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='TimetableAddPlace'
+					component={TimetableAddPlace}
+					options={{
+						title: '추가고고',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='Recommend'
+					component={Recommend}
+					options={{
+						title: '선택해보삼',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='Modify'
+					component={Modify}
+					options={{
+						title: '수정해보삼',
+						headerStyle: {backgroundColor: '#EFFBFB'},
+						headerShadowVisible: false,
+					}}
+				/>
+				<Stack.Screen
+					name='MapInfo'
+					component={MapInfo}
+					options={{
+						title: '지도요',
 						headerStyle: {backgroundColor: '#EFFBFB'},
 						headerShadowVisible: false,
 					}}

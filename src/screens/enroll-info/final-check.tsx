@@ -30,7 +30,7 @@ export default function FinalCheck({navigation}: any) {
 
 			<Text>{region}</Text>
 			<Text>출발: {day[0].format('YY-MM-DD')}</Text>
-			<Text>종료: {day[day.length - 1].format('YY-MM-DD')}</Text>
+			<Text>종료: {day[nDay].format('YY-MM-DD')}</Text>
 			{accommodations.map((item, idx) => {
 				return (
 					idx != 0 &&
@@ -45,7 +45,6 @@ export default function FinalCheck({navigation}: any) {
 									alt='Place Image'
 								/>
 							)}
-
 							<Text>{item.name ? idx + ' 일밤 ' + item.name : idx + '일밤 안정함 ㅋ'}</Text>
 						</HStack>
 					)

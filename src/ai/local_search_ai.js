@@ -207,7 +207,7 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 //Step 3-2. 코스 개선 시도를 위한 방법 - 2가지 (관광지 교체, 순서 변경)
 function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceList) {
 	//숙소, 필수여행지 선택 횟수에 따라 2-opts 시도 횟수 조절
-	let iterations = 500 - selectedNum * 60; //2-opts 시도 횟수
+	let iterations = 50 - selectedNum * 6; //2-opts 시도 횟수
 	//성능이 구려서, Flutter의 1/10로 낮춤
 
 	let bestPath = _.cloneDeep(path);

@@ -1,18 +1,18 @@
+import moment from 'moment';
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
 import {Touchable, TouchableOpacity, Linking} from 'react-native';
 import {useAppDispatch} from '../../redux';
-import {googleDetailApi, recommendApi} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		navigation.navigate('SelectCity');
 	};
-	const zxc = () => {
-		Linking.openURL(
-			'nmap://route/car?slat=37.507401685953916&slng=126.94100946014014&sname=주니집&dlat=37.40262592956716&dlng=126.97485321423363&dname=워니집&appname=com.example.myapp',
-		);
-	};
 	const dispatch = useAppDispatch();
+	const zxc = () => {
+		dispatch(travelSliceActions.setSingleMode());
+		navigation.navigate('Timetable');
+	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>

@@ -1,4 +1,4 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useState} from 'react';
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useState, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -40,12 +40,15 @@ export default function Preset({navigation}: any) {
 			if (!enoughPlace) {
 				console.log('관광지 부족');
 			} else {
+				console.log('다시다시');
 				if (data) {
 					dispatch(travelSliceActions.enrollPreset(data));
 				}
 			}
-		} catch {
+		} catch (error) {
+			console.log(error);
 		} finally {
+			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
@@ -59,8 +62,21 @@ export default function Preset({navigation}: any) {
 	};
 
 	const change = (idx: number) => {
+		if (mapRef.current) {
+			mapRef.current.animateToRegion(
+				{
+					latitude: presetDatas[idx][0][0].lat, // 목표 지점의 위도
+					longitude: presetDatas[idx][0][0].lng, // 목표 지점의 경도
+					latitudeDelta: 0.6,
+					longitudeDelta: 0.6,
+				},
+				1000,
+			); // 1000ms 동안 목표 지점으로 애니메이션 이동
+		}
 		setSelect(idx);
 	};
+
+	const mapRef = useRef<MapView>(null);
 
 	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
 	const polylines:
@@ -115,12 +131,13 @@ export default function Preset({navigation}: any) {
 					</Text>
 				</Center>
 				<MapView
+					ref={mapRef}
 					style={{width: '100%', height: 300}}
 					region={{
 						latitude: presetDatas[select][0][0].lat,
 						longitude: presetDatas[select][0][0].lng,
-						latitudeDelta: 1,
-						longitudeDelta: 1,
+						latitudeDelta: 0.6,
+						longitudeDelta: 0.6,
 					}}>
 					{markers}
 					{polylines}
@@ -143,70 +160,3 @@ export default function Preset({navigation}: any) {
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-
-const dummyData = [
-	[
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.22211, lng: 127.532332, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12312, lng: 127.534242, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12221, lng: 127.6234, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51211, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53212, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53413, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65614, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51215, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.3216, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5417, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65618, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.1219, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5322, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53421, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5622, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-	],
-	[
-		[
-			{category: 5, lat: 36.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.22211, lng: 127.532332, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12312, lng: 127.534242, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12221, lng: 127.6234, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-	],
-];

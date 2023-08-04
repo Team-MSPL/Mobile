@@ -1,103 +1,110 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getDrivingDuration, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import CustomButton from '../../utill/component/custom-button';
+import shortId from 'shortid';
+import {TouchableOpacity} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
-import TimetableDayView from '../../utill/component/timetable/timetable-day-view';
-import TimetableInfoView from '../../utill/component/timetable/timetable-info-view';
+import DayView from '../../utill/component/timetable/day-view';
+import InfoView from '../../utill/component/timetable/info-view';
+import Background from '../../utill/component/timetable/background';
 export default function Timetable({navigation}: any) {
-	const {timetable, day, moveTimeList} = useAppSelector(state => state.travelSlice);
-	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const {timetable, day, makeMode, editMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
-
+	const [deleteList, setDeleteList] = useState<string[]>([]);
+	const [addList, setAddList] = useState<number[]>([]);
+	const [x, setX] = useState(-1);
+	const [viewDayIndex, setViewDayIndex] = useState(0);
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
 	const getDuration = async () => {
-		timetable.map(async (item, idx) => {
-			item.map((value, index) => {
-				if (index === 0) {
-					wayPoint.start = `${value.lng},${value.lat}`;
-				} else if (index === item.length - 1) {
-					wayPoint.goal = `${value.lng},${value.lat}`;
-				} else {
-					wayPoint.wayPoint += `${value.lng},${value.lat}|`;
+		for (let i = 0; i < timetable.length; i++) {
+			if (timetable[i].length != 1) {
+				for (let j = 0; j < timetable[i].length; j++) {
+					if (j === 0) {
+						wayPoint.start = `${timetable[i][j].lng},${timetable[i][j].lat}`;
+					} else if (j === timetable[i].length - 1) {
+						wayPoint.goal = `${timetable[i][j].lng},${timetable[i][j].lat}`;
+					} else {
+						wayPoint.wayPoint += `${timetable[i][j].lng},${timetable[i][j].lat}|`;
+					}
 				}
-			});
-			wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
-			await dispatch(getDrivingDuration(wayPoint));
-			console.log(wayPoint);
-			wayPoint = {start: '', goal: '', wayPoint: ''};
-		});
-
-		drawTimetable();
+				wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
+				await dispatch(getDrivingDuration(wayPoint));
+				console.log(wayPoint);
+				wayPoint = {start: '', goal: '', wayPoint: ''};
+			}
+		}
+		dispatch(travelSliceActions.drawTimetable());
 	};
-	const drawTimetable = async () => {
-		console.log('나 왔엉~!');
-		console.log('wpqkf', moveTimeList[0][0]);
-		let copy = [...timetable];
-		timetable.map((item, idx) => {
-			let time = 9;
-			item.map((value, index) => {
-				copy[idx][index].x = idx;
-				copy[idx][index].y = time;
-				index != item.length - 1 && (time += Math.ceil(moveTimeList[idx][index] / 1000 / 60 / 30));
-			});
-		});
-		await dispatch(travelSliceActions.enrollTimetable(copy));
+	const goMapInfo = () => {
+		navigation.navigate('MapInfo');
+	};
+	const goSave = () => {
+		// 저장 누를시 백엔드에 보내줄 아이들,.
+		// const a = {
+		// 	userId: userId,
+		// 	travelId: travelId,
+		// 	region: region,
+		// 	day: day,
+		// 	nDay: nDay,
+		// 	transit: transit,
+		// 	timetable: timetable,
+		// 	tendency:tendency,
+		// };
+		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		getDuration();
-
-		//dispatch(getDrivingDuration());
-	}, []);
-	useEffect(() => {
-		console.log('덥당', moveTimeList);
+		makeMode || getDuration();
 	}, []);
 	return (
 		<Box bgColor='#EFFBFB'>
-			<HStack bgColor='blue.400'>
-				<Text fontSize='md' bold>
-					왼쪽
-				</Text>
-				<Spacer />
-				<Text fontSize='xl' bold>
-					{day[0].format('YYYY-MM-DD') + '~' + day[day.length - 1].format('YYYY-MM-DD')}
-				</Text>
-				<Spacer />
-				<Text fontSize='md' bold>
-					오른쪽
-				</Text>
-			</HStack>
-			<TimetableDayView />
+			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} />
+			<TouchableOpacity onPress={goMapInfo}>
+				<Text>지도 함 볼래?</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={goMapInfo}>
+				<Text>저장 함 해볼래?</Text>
+			</TouchableOpacity>
+			{editMode == 'delete' ? (
+				<Box w='100%' h='60' alignItems='center'>
+					<Text bold>{deleteList.length}개</Text>
+					<TouchableOpacity
+						onPress={() => {
+							const a = timetable.map((item, idx) =>
+								item.filter(value => !deleteList.includes(value?.id)),
+							);
+							setDeleteList([]);
+							dispatch(travelSliceActions.changeTimetable(a));
+							console.log(a);
+						}}>
+						<Text>삭제요</Text>
+					</TouchableOpacity>
+				</Box>
+			) : editMode == 'add' ? (
+				<Box w='100%' h='60' alignItems='center'>
+					<Text bold>{addList.length}개</Text>
+					<TouchableOpacity
+						onPress={() => {
+							navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+							setAddList([]);
+							console.log('다음페이지');
+						}}>
+						<Text>추가요</Text>
+					</TouchableOpacity>
+				</Box>
+			) : (
+				<Box w='100%' h='60'>
+					<Text>노노</Text>
+				</Box>
+			)}
 			<ScrollView position='relative'>
-				<TimetableInfoView />
-				<HStack>
-					<VStack>
-						{[...Array(18)].map((value, index) => (
-							<Box key={index} w='60px' h='70px'>
-								<Text>{index + 6}</Text>
-							</Box>
-						))}
-					</VStack>
-					{[...Array(5)].map((item, inx) => {
-						return (
-							<VStack key={inx}>
-								{[...Array(36)].map((value, index) => (
-									<Box
-										key={index}
-										w='70px'
-										h='35px'
-										borderLeftWidth='1px'
-										borderTopWidth={index % 2 ? '0px' : '1px'}
-										borderRightWidth={inx == 4 ? '1px' : '0px'}
-										borderBottomWidth={index == 35 ? '1px' : '0px'}>
-										<Text>{index}</Text>
-									</Box>
-								))}
-							</VStack>
-						);
-					})}
-				</HStack>
+				<InfoView
+					navigation={navigation}
+					setDeleteList={setDeleteList}
+					deleteList={deleteList}
+					viewDayIndex={viewDayIndex}
+				/>
+				<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 			</ScrollView>
 		</Box>
 	);

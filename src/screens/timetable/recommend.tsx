@@ -1,0 +1,122 @@
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import shortId from 'shortid';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {TouchableOpacity} from 'react-native';
+import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {useAppDispatch, useAppSelector} from '../../redux';
+
+import MapView, {Polyline, Marker} from 'react-native-maps';
+import {GOOGLE_API_KEY} from '@env';
+import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+export default function Recommend({navigation, route}: any) {
+	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
+	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
+	const newY = useRef(0);
+	const [select, setSelect] = useState(-1);
+	const [recommendItem, setRecommendItem] = useState([...timetable[route.params.x]]);
+
+	const polylineCoordinates = recommendItem.map((item, value) => ({latitude: item.lat, longitude: item.lng}));
+	const markers = recommendItem.map((value, idx) => (
+		<Marker key={`marker_${idx}`} coordinate={{latitude: value.lat, longitude: value.lng}} title={value.name} />
+	));
+	const polylines = recommendItem.map((val, ind) => (
+		<Polyline
+			key={`polyline_${ind}`}
+			coordinates={polylineCoordinates}
+			strokeColor={'red'}
+			strokeWidth={5} // You can change the width of the line here
+		/>
+	));
+
+	const changeRecommend = (idx: number) => {
+		let copy = [...recommendItem];
+		const updateItem = {
+			name: recommendList[idx].place_name,
+			lat: Number(recommendList[idx].y),
+			lng: Number(recommendList[idx].x),
+			category: route.params.category,
+			concept: [0],
+			partner: [0],
+			play: [0],
+			popular: 0,
+			season: [0],
+			tour: [0],
+			x: route.params.x,
+			y: route.params.y[0],
+			id: shortId.generate(),
+			takenTime: route.params.y.length * 30,
+		};
+		select == -1 && route.params.category != 1
+			? copy.splice(route.params.index, 0, updateItem)
+			: (copy[route.params.index] = updateItem);
+		setRecommendItem(copy);
+		setSelect(idx);
+		console.log(copy[idx]);
+		if (mapRef.current) {
+			mapRef.current.animateToRegion(
+				{
+					latitude: updateItem.lat, // 목표 지점의 위도
+					longitude: updateItem.lng, // 목표 지점의 경도
+					latitudeDelta: 0.04,
+					longitudeDelta: 0.04,
+				},
+				1000,
+			); // 1000ms 동안 목표 지점으로 애니메이션 이동
+		}
+	};
+	const addRecommend = () => {
+		let copy = [...timetable];
+		copy[route.params.x] = recommendItem;
+
+		console.log(copy);
+		dispatch(travelSliceActions.changeTimetable(copy));
+		navigation.navigate('Timetable');
+	};
+
+	const mapRef = useRef<MapView>(null);
+	if (!recommendList) {
+		return (
+			<Box>
+				<Text>추천 받는 주제에 좀 기다려 보삼 ㅋ </Text>
+			</Box>
+		);
+	}
+	return (
+		<Box flex='1'>
+			<MapView
+				ref={mapRef}
+				style={{width: '100%', height: 300}}
+				region={{
+					latitude: recommendItem[0].lat,
+					longitude: recommendItem[0].lng,
+					latitudeDelta: 0.4,
+					longitudeDelta: 0.4,
+				}}>
+				{markers}
+				{polylines}
+			</MapView>
+			<ScrollView>
+				{recommendList.map((item, idx) => (
+					<TouchableOpacity
+						onPress={() => {
+							changeRecommend(idx);
+						}}
+						key={idx}
+						style={{width: '100%', margin: 10, backgroundColor: idx == select ? 'red' : 'white'}}>
+						<Text>
+							{item.category_name}/{item.place_name}
+						</Text>
+					</TouchableOpacity>
+				))}
+			</ScrollView>
+			<TouchableOpacity
+				onPress={addRecommend}
+				style={{width: '100%', height: 50, margin: 5, backgroundColor: 'orange', alignItems: 'center'}}>
+				<Text bold fontSize='lg' disabled={select == -1}>
+					선택이요
+				</Text>
+			</TouchableOpacity>
+		</Box>
+	);
+}

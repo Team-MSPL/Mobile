@@ -14,6 +14,7 @@ export default function AddAccommodation({navigation, route}: any) {
 	const addInn = () => {
 		let copy = [...accommodations];
 		select.map((item, idx) => {
+			console.log(Place);
 			item && (copy[idx + 1] = Place);
 		});
 		dispatch(travelSliceActions.enrollAccommodations(copy));

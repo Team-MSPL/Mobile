@@ -1,12 +1,13 @@
 import {useState} from 'react';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Box} from 'native-base';
 import {GOOGLE_API_KEY} from '@env';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
+	const {Place} = useAppSelector(state => state.travelSlice);
 
 	return (
 		<Box p='5' bgColor='#EFFBFB' flex='1'>
@@ -30,6 +31,7 @@ export default function SearchPlace({navigation, route}: any) {
 							'https://ssl.pstatic.net/melona/libs/1458/1458328/a3d169ecc295102274f4_20230718175149113.jpg';
 					}
 					const datas = {
+						...Place,
 						name: details?.name,
 						lat: details?.geometry.location.lat,
 						lng: details?.geometry.location.lng,
