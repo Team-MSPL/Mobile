@@ -16,7 +16,6 @@ import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import shortid from 'shortid';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {launchImageLibrary} from 'react-native-image-picker';
 import {useAppSelector} from '../../redux';
 
 export default function CommunityWritingScreen({navigation}: any) {

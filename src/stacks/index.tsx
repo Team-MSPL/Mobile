@@ -17,14 +17,13 @@ import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpa
 import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
 import React, {useState} from 'react';
 import {DrawerLayoutAndroidComponent} from 'react-native';
-import CommunityBottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
+import CommunityBottomPopupSheet from '../screens/community/community-main-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import FinalCheck from '../screens/enroll-info/final-check';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import Preset from '../screens/timetable/preset';
-import CommunityReadingBottomPopupSheet from '../utill/component/community-reading-bottom-popup-sheet';
-
+import CommunityReadingBottomPopupSheet from '../screens/community/community-reading-bottom-popup-sheet';
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (

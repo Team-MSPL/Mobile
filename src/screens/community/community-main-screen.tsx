@@ -20,7 +20,7 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	useEffect(() => {
 		fetchCommunityData();
-	});
+	}, []);
 
 	const fetchCommunityData = async () => {
 		try {

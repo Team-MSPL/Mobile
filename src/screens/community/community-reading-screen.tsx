@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Center, KeyboardAvoidingView} from 'native-base';
-import {useEffect, useState} from 'react';
+import {Heading, Center, StatusBar, Row, HStack} from 'native-base';
+import {useEffect, useRef, useState} from 'react';
 import {
 	View,
 	Text,
@@ -13,62 +13,53 @@ import {
 	Dimensions,
 	Modal,
 	ScrollView,
+	KeyboardAvoidingView,
+	Platform,
+	TouchableWithoutFeedback,
+	Keyboard,
+	NativeModules,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {firebase} from '@react-native-firebase/firestore';
 import {useAppDispatch} from '../../redux';
 import {communitySliceActions} from '../../redux/community/community.slice';
+import moment from 'moment';
+import {getStorage} from '../../redux/login-info/login.slice';
 
+const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
 
-	const [commentList, setCommentList] = useState<string[]>([]);
+	const [commentDataList, setCommentDataList] = useState<string[]>([]);
 	const [postContent, setPostContent] = useState<string>('');
 	const [newComment, setNewComment] = useState<string>('');
 	const [postImageList, setPostImageList] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
-	const [isMoreModalVisible, setIsMoreModalVisible] = useState<boolean>(false);
+	const [isMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isDetailImageModalVisible, setIsDetailImageModalVisible] = useState<boolean>(false);
+	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
 
-	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
-
-	const dispatch = useAppDispatch();
-	dispatch(communitySliceActions.setPostInfo());
+	// firestore로부터 데이터 가져옴
 	useEffect(() => {
 		fetchPostData();
 	}, []);
-	useEffect(() => {
-		setIsButtonDisabled(newComment.trim() === '');
-	}, [newComment]);
-	useEffect(() => {
-		// 화면 크기 변경 시 사진 크기 조정
-		const handleResize = () => {
-			const newSize = Dimensions.get('window').width / 4 - 16;
-			setImageSize(newSize);
-		};
-
-		const resizeSubscription = Dimensions.addEventListener('change', handleResize);
-
-		// 컴포넌트가 언마운트될 때 이벤트 리스너 구독 제거
-		return () => {
-			resizeSubscription.remove();
-		};
-	}, []);
-	const handleResize = () => {
-		const newSize = Dimensions.get('window').width / 4 - 16;
-		setImageSize(newSize);
-	};
 
 	const fetchPostData = async () => {
 		try {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			const docSnapshot = await docRef.get();
-
 			if (docSnapshot.exists) {
 				const data = docSnapshot.data();
-				const commentList = data?.commentList ?? [];
-				setCommentList(commentList);
+				const originCommentDataList = data?.commentDataList ?? [];
+				const commentDataList = originCommentDataList.map((data: any) => ({
+					...data,
+					commentedAt: moment(
+						data.commentedAt._seconds * 1000 + data.commentedAt._nanoseconds / 1000000,
+					).format('yy/MM/DD HH:mm'),
+				}));
+				console.log('댓글 가져오기', commentDataList);
+				setCommentDataList(commentDataList);
 
 				const postContent = data?.postContent ?? '';
 				setPostContent(postContent);
@@ -84,18 +75,59 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	const handleCommentSubmit = async () => {
-		if (newComment.trim() === '') {
-			return; // 댓글이 비어있으면 등록하지 않음
-		}
+	// iOS에서 키보드 활성화시 TextInput이 안 보이는 이슈를 위한 코드
+	useEffect(() => {
+		if (Platform.OS === 'ios')
+			StatusBarManager.getHeight((statusBarFrameData: any) => {
+				setStatusBarHeight(statusBarFrameData.height);
+			});
+	}, []);
+	const [statusBarHeight, setStatusBarHeight] = useState(0);
+	const scrollViewRef = useRef<ScrollView>(null);
 
+	// 댓글 등록 버튼 활성 및 비활성화
+	useEffect(() => {
+		setCommentButtonDisabled(newComment.trim() === '');
+	}, [newComment]);
+
+	useEffect(() => {
+		// 화면 크기 변경 시 사진 크기 조정
+		const handleResize = () => {
+			const newSize = Dimensions.get('window').width / 4 - 16;
+			setImageSize(newSize);
+		};
+
+		const resizeSubscription = Dimensions.addEventListener('change', handleResize);
+
+		// 컴포넌트가 언마운트될 때 이벤트 리스너 구독 제거
+		return () => {
+			resizeSubscription.remove();
+		};
+	}, []);
+
+	const handleTextInputFocus = () => {
+		// 텍스트 입력 창이 포커스되면 스크롤 뷰를 해당 입력 창 위치로 스크롤
+		scrollViewRef.current?.scrollToEnd({animated: true});
+	};
+
+	const handleResize = () => {
+		const newSize = Dimensions.get('window').width / 4 - 16;
+		setImageSize(newSize);
+	};
+
+	// *댓글 등록 버튼 눌렀을 때
+	const handleCommentSubmit = async () => {
 		try {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
-
+			const newCommentData = {
+				commenter: '여기는 나중에 바꿔야함',
+				userid: '다님에서 제공하는 각 유저의 고유 아이디 값',
+				comment: newComment,
+				commentedAt: moment(firebase.firestore.Timestamp.now()).format('yy/MM/DD HH:mm'),
+			};
 			// 새로운 댓글을 commentList에 추가
-			const updatedCommentList = [...commentList, newComment];
-			await docRef.update({commentList: updatedCommentList});
-
+			const updatedCommentDataList = [...commentDataList, newCommentData];
+			await docRef.update({commentDataList: updatedCommentDataList});
 			// 댓글 등록 후 입력창 초기화
 			setNewComment('');
 			Alert.alert('댓글이 등록되었습니다.');
@@ -105,10 +137,23 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	const renderCommentItem = ({item}: {item: string}) => {
+	// 가져온 댓글 보여주기
+	const renderCommentItem = ({item}: {item: any}) => {
 		return (
 			<View style={styles.commentItemContainer}>
-				<Text>{item}</Text>
+				<HStack space={1} alignItems='center'>
+					{/* TODO: 이미지를 유저 개인 프로필 사진 가져오는 걸로 바꿔야 함.*/}
+					<Image
+						source={require('/Users/sjw/Danim_RN/Mobile/public/images/danim_logo.png')}
+						style={styles.commentProfileImage}></Image>
+					<Text>{item.commenter}</Text>
+				</HStack>
+				<Text>{item.comment}</Text>
+				<Text style={{fontSize: 8}}>
+					{moment(item.commentedAt._seconds * 1000 + item.commentedAt._nanoseconds / 1000000).format(
+						'yy/MM/DD HH:mm',
+					)}
+				</Text>
 			</View>
 		);
 	};
@@ -118,69 +163,94 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			{item ? <Image source={{uri: item}} style={styles.image} /> : <Text>이미지를 불러오는 중...</Text>}
 		</View>
 	);
-	const handleMoreButtonPress = () => {
-		setIsMoreModalVisible(true);
-	};
 
+	// 사진 자세히 보기
 	const handleDetailImagePress = () => {
 		setIsDetailImageModalVisible(true);
 	};
 
-	const handleModalClose = () => {
-		setIsMoreModalVisible(false);
+	// 사진 더보기 버튼 눌렀을 때
+	const handleMoreButtonPress = () => {
+		setMoreModalVisible(true);
+	};
+
+	const handleMoreModalClose = () => {
+		setMoreModalVisible(false);
 	};
 
 	return (
-		<View style={styles.container}>
-			<Text>제목: {route.params.postTitle}</Text>
-			<Text>본문</Text>
-			<Text style={styles.postContentText}>{postContent}</Text>
-			<Text>사진 목록</Text>
-			<View style={styles.imageContainer}>
-				{postImageList.slice(0, 8).map((uri, index) => (
-					<Image key={index} source={{uri}} style={styles.image} />
-				))}
-				{postImageList.length > 8 && (
-					<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-						<Text style={styles.moreButtonText}>더보기</Text>
-					</TouchableOpacity>
-				)}
-			</View>
-			<Modal visible={isMoreModalVisible} onRequestClose={handleModalClose}>
-				<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-				<ScrollView contentContainerStyle={styles.modalContainer}>
-					{postImageList.map((uri, index) => (
-						<Image key={index} source={{uri}} style={styles.modalImage} />
-					))}
-				</ScrollView>
-			</Modal>
-
-			<Text>댓글</Text>
-			<FlatList
-				data={commentList}
-				renderItem={renderCommentItem}
-				keyExtractor={(item, index) => index.toString()}
-				ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
-			/>
-			<View style={styles.inputContainer}>
-				<TextInput
-					style={styles.input}
-					value={newComment}
-					onChangeText={text => setNewComment(text)}
-					placeholder='댓글을 입력하세요...'
-				/>
-				<TouchableOpacity
-					style={[styles.submitButton, isButtonDisabled && styles.disabledButton]}
-					disabled={isButtonDisabled}
-					onPress={handleCommentSubmit}>
-					<Text style={styles.submitButtonText}>등록</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
+		<KeyboardAvoidingView
+			style={styles.keyboardContainer}
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			keyboardVerticalOffset={statusBarHeight + 44}>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<View style={styles.container}>
+					<ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollViewContainer}>
+						<View onStartShouldSetResponder={() => true}>
+							<Text>제목: {route.params.postTitle}</Text>
+							<Text>본문</Text>
+							<Text style={styles.postContentText}>{postContent}</Text>
+							<Text>사진 목록</Text>
+							<View style={styles.imageContainer}>
+								{postImageList.slice(0, 8).map((uri, index) => (
+									<Image key={index} source={{uri}} style={styles.image} />
+								))}
+								{postImageList.length > 8 && (
+									<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+										<Text style={styles.moreButtonText}>더보기</Text>
+									</TouchableOpacity>
+								)}
+							</View>
+							<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
+								<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+								<ScrollView contentContainerStyle={styles.modalContainer}>
+									{postImageList.map((uri, index) => (
+										<Image key={index} source={{uri}} style={styles.modalImage} />
+									))}
+								</ScrollView>
+							</Modal>
+							<Text>댓글</Text>
+							<FlatList
+								data={commentDataList}
+								renderItem={renderCommentItem}
+								keyExtractor={(item, index) => index.toString()}
+								ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
+							/>
+						</View>
+					</ScrollView>
+					<View style={styles.inputContainer}>
+						<TextInput
+							style={styles.input}
+							value={newComment}
+							onChangeText={text => setNewComment(text)}
+							placeholder='댓글을 입력하세요...'
+						/>
+						<TouchableOpacity
+							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+							disabled={isCommentButtonDisabled}
+							onPress={handleCommentSubmit}>
+							<Text style={styles.submitButtonText}>등록</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</TouchableWithoutFeedback>
+		</KeyboardAvoidingView>
 	);
 }
 
 const styles = StyleSheet.create({
+	commentProfileImage: {
+		width: 24,
+		height: 24,
+		marginBottom: 8,
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: '#5DC3DB',
+		resizeMode: 'contain',
+	},
+	scrollViewContainer: {
+		flexGrow: 1,
+	},
 	container: {
 		flex: 1,
 		padding: 16,
@@ -256,5 +326,9 @@ const styles = StyleSheet.create({
 		width: 100,
 		height: 100,
 		margin: 8,
+	},
+	keyboardContainer: {
+		flex: 1,
+		backgroundColor: '#ffffff',
 	},
 });

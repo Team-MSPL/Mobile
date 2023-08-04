@@ -6,11 +6,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
 import {useState} from 'react';
-import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
-import CommunityWriteScreen from '../../screens/community/community-writing-screen';
+import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+import CommunityWriteScreen from './community-writing-screen';
 import firestore from '@react-native-firebase/firestore';
+import { SvgAst } from 'react-native-svg';
 
-export default function CommunityBottomPopSheet({navigation}: any) {
+export default function CommunityMainBottomPopSheet() {
+	const navigation = useNavigation();
 	const goNext = () => {
 		navigation.navigate('CommunityWritingScreen');
 	};
@@ -24,7 +26,7 @@ export default function CommunityBottomPopSheet({navigation}: any) {
 			title: '글 쓰기',
 			onPress: () => {
 				console.log('글쓰기 페이지로 이동');
-				setMenuModalVisibile(!menuModalVisible);
+				setMenuModalVisibile(false);
 				goNext();
 			},
 		},
@@ -81,37 +83,37 @@ export default function CommunityBottomPopSheet({navigation}: any) {
 		},
 	];
 
-	const handleReportSubmit = () => {
-		try {
-			firestore()
-				.collection('게시글 신고')
-				.doc(title) // 제목을 문서 ID로 사용
-				.set({
-					reporterToken: jwtToken,
-					postTitle: title,
-					postContent: content,
-					reportedAt: firestore.FieldValue.serverTimestamp(),
-					postImageList: images,
-				})
-				.then(() => {
-					console.log('신고가 성공적으로 되었습니다.');
-				})
-				.catch(error => {
-					console.log('신고를 하는 중에 오류가 발생했습니다:', error);
-				});
+	// const handleReportSubmit = () => {
+	// 	try {
+	// 		firestore()
+	// 			.collection('게시글 신고')
+	// 			.doc(title) // 제목을 문서 ID로 사용
+	// 			.set({
+	// 				reporterToken: jwtToken,
+	// 				postTitle: title,
+	// 				postContent: content,
+	// 				reportedAt: firestore.FieldValue.serverTimestamp(),
+	// 				postImageList: images,
+	// 			})
+	// 			.then(() => {
+	// 				console.log('신고가 성공적으로 되었습니다.');
+	// 			})
+	// 			.catch(error => {
+	// 				console.log('신고를 하는 중에 오류가 발생했습니다:', error);
+	// 			});
 
-			console.log('신고가 등록되었습니다.');
-			// 게시글 등록 완료 후 필요한 처리를 추가하면 됩니다.
-		} catch (error) {
-			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
-		}
-	};
+	// 		console.log('신고가 등록되었습니다.');
+	// 		// 게시글 등록 완료 후 필요한 처리를 추가하면 됩니다.
+	// 	} catch (error) {
+	// 		console.log('게시글 등록 중에 오류가 발생했습니다:', error);
+	// 	}
+	// };
 
 	return (
-		<SafeAreaView>
+		<View>
 			<TouchableOpacity
 				onPress={() => {
-					setMenuModalVisibile(!menuModalVisible);
+					setMenuModalVisibile(true);
 				}}>
 				<View>
 					<ThreeDotsIcon></ThreeDotsIcon>
@@ -121,46 +123,53 @@ export default function CommunityBottomPopSheet({navigation}: any) {
 				animationType={'fade'}
 				transparent={true}
 				visible={menuModalVisible}
-				onRequestClose={() => setMenuModalVisibile(!menuModalVisible)}>
-				<View
-					style={{
-						flex: 1,
-						backgroundColor: '#000000AA',
-						justifyContent: 'flex-end',
-					}}>
+				onRequestClose={() => setMenuModalVisibile(false)}
+			>
+				<TouchableWithoutFeedback onPress={() => setMenuModalVisibile(false)}>
 					<View
 						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderTopRightRadius: 10,
-							borderTopLeftRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
+							flex: 1,
+							backgroundColor: '#000000AA',
+							justifyContent: 'flex-end',
 						}}>
-						<View>
-							<Text
+						<SafeAreaView>
+							<View
 								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
+									backgroundColor: '#FFFFFFFF',
+									width: '100%',
+									borderRadius:10,
+									paddingHorizontal: 10,
+									maxHeight: deviceHeight * 0.4,
 								}}>
-								게시판 메뉴
-							</Text>
-							<FlatList
-								data={communityMenuList}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
+								<View>
+									<Text
+										style={{
+											color: '#182E44',
+											fontSize: 20,
+											fontWeight: '500',
+											margin: 15,
+										}}>
+										게시판 메뉴
+									</Text>
+									<FlatList
+										data={communityMenuList}
+										renderItem={({item}) => (
+											<Button title={item.title} onPress={item.onPress}></Button>
+										)}></FlatList>
+								</View>
+							</View>
+						</SafeAreaView>
+
+
 					</View>
-				</View>
+				</TouchableWithoutFeedback>		
+				
 			</Modal>
 			<Modal
 				animationType={'fade'}
 				transparent={true}
 				visible={reportModalVisible}
 				onRequestClose={() => setReportModalVisible(!reportModalVisible)}></Modal>
-		</SafeAreaView>
+		</View>
 	);
 }
