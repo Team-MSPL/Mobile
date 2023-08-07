@@ -17,6 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import shortid from 'shortid';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useAppSelector} from '../../redux';
+import moment from 'moment';
 
 export default function CommunityWritingScreen({navigation}: any) {
 	const goBack = () => {
@@ -51,6 +52,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 			}
 			const selectedImageUris = response.map(image => image.path);
 			setImages(prevImages => [...prevImages, ...selectedImageUris]);
+			console.log('이미지 주소', images);
 		});
 	};
 
@@ -82,7 +84,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 					postTitle: title,
 					postContent: content,
 					postKey: shortid.generate(),
-					createdAt: firestore.FieldValue.serverTimestamp(),
+					createdAt: moment(Date()).format('yy/MM/DD HH:mm'),
 					postImageList: images,
 					// 여러 필드값 추가 가능
 					// 예: author: 'John Doe', views: 0, likes: 0, ...

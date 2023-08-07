@@ -54,9 +54,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				const originCommentDataList = data?.commentDataList ?? [];
 				const commentDataList = originCommentDataList.map((data: any) => ({
 					...data,
-					commentedAt: moment(
-						data.commentedAt._seconds * 1000 + data.commentedAt._nanoseconds / 1000000,
-					).format('yy/MM/DD HH:mm'),
+					commentedAt: moment(data.commentedAt).format('yy/MM/DD HH:mm'),
 				}));
 				console.log('댓글 가져오기', commentDataList);
 				setCommentDataList(commentDataList);
@@ -123,7 +121,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				commenter: '여기는 나중에 바꿔야함',
 				userid: '다님에서 제공하는 각 유저의 고유 아이디 값',
 				comment: newComment,
-				commentedAt: moment(firebase.firestore.Timestamp.now()).format('yy/MM/DD HH:mm'),
+				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
 			};
 			// 새로운 댓글을 commentList에 추가
 			const updatedCommentDataList = [...commentDataList, newCommentData];
@@ -149,11 +147,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					<Text>{item.commenter}</Text>
 				</HStack>
 				<Text>{item.comment}</Text>
-				<Text style={{fontSize: 8}}>
-					{moment(item.commentedAt._seconds * 1000 + item.commentedAt._nanoseconds / 1000000).format(
-						'yy/MM/DD HH:mm',
-					)}
-				</Text>
+				<Text style={{fontSize: 8}}>{item.commentedAt}</Text>
 			</View>
 		);
 	};
