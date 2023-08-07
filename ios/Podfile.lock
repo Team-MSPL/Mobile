@@ -1313,6 +1313,8 @@ PODS:
     - React-RCTImage
   - RNSVG (12.5.1):
     - React-Core
+  - RNVectorIcons (10.0.0):
+    - React-Core
   - SocketRocket (0.6.1)
   - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
@@ -1373,6 +1375,7 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1516,6 +1519,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1602,10 +1607,11 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
   RNScreens: 6a8a3c6b808aa48dca1780df7b73ea524f602c63
   RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
+  RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 8796b55dba14d7004f980b54bcc9833ee45b28ce
 
-PODFILE CHECKSUM: 423ae2776e1f3077999335e4b59b45c99d8db29e
+PODFILE CHECKSUM: c5449b59018426d74c3728e6981ae1d00a3b4c51
 
 COCOAPODS: 1.12.1

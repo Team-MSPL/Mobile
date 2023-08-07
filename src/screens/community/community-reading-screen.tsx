@@ -1,6 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Center, StatusBar, Row, HStack} from 'native-base';
+import {Heading, Center, StatusBar, Row, HStack, Icon} from 'native-base';
 import {useEffect, useRef, useState} from 'react';
+
 import {
 	View,
 	Text,
@@ -24,6 +25,7 @@ import {useAppDispatch} from '../../redux';
 import {communitySliceActions} from '../../redux/community/community.slice';
 import moment from 'moment';
 import {getStorage} from '../../redux/login-info/login.slice';
+import shortid from 'shortid';
 
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
@@ -39,6 +41,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isDetailImageModalVisible, setIsDetailImageModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
+	const [likeCount, setLikeCount] = useState(0);
+	const [isLiked, setIsLiked] = useState<boolean>(false);
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -65,6 +69,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				const postImageList = data?.postImageList ?? [];
 				setPostImageList(postImageList);
 				console.log(postImageList);
+
+				const likeList = data?.likeList ?? [];
+				if (likeList.some((item: string) => item === '123')) {
+					setIsLiked(isLiked);
+				}
+				setLikeCount(likeList.length);
+				console.log('좋아요 수 ', likeCount);
 			} else {
 				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
 			}
@@ -172,6 +183,28 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		setMoreModalVisible(false);
 	};
 
+	// 좋아요 버튼을 눌렀을 때
+	const handleLikePress = async () => {
+		setIsLiked(!isLiked);
+		console.log('좋아요 버튼 안 눌러졌나요? ', isLiked);
+		try {
+			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			if (isLiked) {
+				// TODO shortid 대신에 userid로 수정해야 함.
+				await docRef.update({
+					likeList: firestore.FieldValue.arrayRemove('123123'),
+				});
+			} else {
+				await docRef.update({
+					likeList: firestore.FieldValue.arrayUnion('123123'),
+				});
+			}
+			fetchPostData();
+		} catch (error) {
+			console.log('좋아요에 오류가 발생했습니다:', error);
+		}
+	};
+
 	return (
 		<KeyboardAvoidingView
 			style={styles.keyboardContainer}
@@ -203,6 +236,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 									))}
 								</ScrollView>
 							</Modal>
+							<View style={styles.likeContainer}>
+								<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+									<Icon name={isLiked ? 'heart' : 'heart-o'} size={20} color='white' />
+									<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
+								</TouchableOpacity>
+								<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
+							</View>
 							<Text>댓글</Text>
 							<FlatList
 								data={commentDataList}
@@ -324,5 +364,26 @@ const styles = StyleSheet.create({
 	keyboardContainer: {
 		flex: 1,
 		backgroundColor: '#ffffff',
+	},
+	likeContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'flex-start',
+		marginBottom: 48,
+	},
+	likeButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: 'blue',
+		padding: 10,
+		borderRadius: 5,
+	},
+	likeButtonText: {
+		color: 'white',
+		fontWeight: 'bold',
+		marginLeft: 5,
+	},
+	likesCount: {
+		marginTop: 10,
 	},
 });

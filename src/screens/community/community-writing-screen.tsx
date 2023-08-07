@@ -11,6 +11,7 @@ import {
 	ScrollView,
 	Button,
 	StyleSheet,
+	Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
@@ -35,6 +36,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 			mediaType: 'photo',
 			cropping: true,
 			maxFiles: 10,
+			includeBase64: Platform.OS === 'android',
 		}).then(response => {
 			if (response.length > 10) {
 				Alert.alert('사진은 최대 10장까지 가능합니다.');
