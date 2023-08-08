@@ -1,43 +1,43 @@
 import {GOOGLE_API_KEY} from '@env';
 import firestore from '@react-native-firebase/firestore';
 
-async function readAllPlace(city) {
-	let allPlace = [];
+async function readAllRegion() {
+	let allregion = [];
 	try {
 		//"관광지 목록" 문서는 제거
-		const placeSnapshot = await firestore().collection(city).where('name', '!=', '관광지 목록').get();
+		const regionSnapshot = await firestore()
+			.collection('전국 여행 지역')
+			.where('name', '!=', '여행 지역 목록')
+			.get();
 		let data = [];
-		placeSnapshot.forEach(doc => {
+		regionSnapshot.forEach(doc => {
 			const docData = doc.data();
 			data.push(docData);
 		});
 
 		data.map((item, idx) => {
 			let name = item?.name;
+			let popular = item.popular;
+			let takenDay = item.takenDay;
 			let latitude = item.latitude;
 			let longitude = item.longitude;
-			let popular = item.popular;
-			let takenTime = item.takenTime;
 
-			let partner = item.partner;
 			let concept = item.concept;
 			let play = item.play;
 			let tour = item.tour;
 			let season = item.season;
-			placeData = {
+			let regionData = {
 				name: name,
 				lat: latitude,
 				lng: longitude,
-				takenTime: takenTime,
 				popular: popular,
-				partner: partner,
+				takenDay: takenDay,
 				concept: concept,
 				play: play,
 				tour: tour,
 				season: season,
-				category: 0, // 이태운 추가 - 타임테이블을 위함
 			};
-			allPlace.push(placeData);
+			allregion.push(regionData);
 		});
 
 		//setCommunityData(data);
@@ -47,61 +47,58 @@ async function readAllPlace(city) {
 	//한번에 map으로 불러오고, 관광지목록 <- 이것만 예외처리 해주면 될듯??, 이후에 매핑
 	//혹은 데이터셋에 하나하나 관광지 이름 값도 넣어주기? - 코드로, 불러오기한 후에 다시 입력하기 하는 식으로
 
-	// let placeList = await readPlaceList(city).then(data => {
+	// let regionList = await readregionList(city).then(data => {
 	// 	return data;
 	// });
 
-	// for (let i = 0; i < placeList.length; i++) {
-	// 	await readOnePlace(city, placeList[i]).then(res => {
-	// 		allPlace[i] = res;
+	// for (let i = 0; i < regionList.length; i++) {
+	// 	await readOneregion(city, regionList[i]).then(res => {
+	// 		allregion[i] = res;
 	// 	});
 	// }
-	return allPlace;
+	return allregion;
 }
 
-async function readPlaceList(city) {
-	let placeList = null;
-	const placeListSnapshot = await firestore().collection(city).doc('관광지목록').get();
+async function readRegionList() {
+	let regionList = null;
+	const regionListSnapshot = await firestore().collection('전국 여행 지역').doc('여행 지역 목록').get();
 
-	placeList = placeListSnapshot.data().관광지;
+	regionList = regionListSnapshot.data().관광지;
 
-	return placeList;
+	return regionList;
 }
 
-async function readOnePlace(city, name) {
-	let placeData = {};
+async function readOneRegion(name) {
+	let regionData = {};
 	try {
-		const onePlaceSnapshot = await firestore().collection(city).doc(name).get();
-		let item = onePlaceSnapshot.data();
+		const oneregionSnapshot = await firestore().collection('전국 여행 지역').doc(name).get();
+		let item = oneregionSnapshot.data();
 
 		let name = item.name;
+		let popular = item.popular;
+		let takenDay = item.takenDay;
 		let latitude = item.latitude;
 		let longitude = item.longitude;
-		let popular = item.popular;
-		let takenTime = item.takenTime;
 
-		let partner = item.partner;
 		let concept = item.concept;
 		let play = item.play;
 		let tour = item.tour;
 		let season = item.season;
-		placeData = {
+		regionData = {
 			name: name,
 			lat: latitude,
 			lng: longitude,
-			takenTime: takenTime,
+			takenDay: takenDay,
 			popular: popular,
-			partner: partner,
 			concept: concept,
 			play: play,
 			tour: tour,
 			season: season,
-			category: 0, // 이태운 추가 - 타임테이블을 위함
 		};
 	} catch (error) {
-		console.log('관광지 데이터를 읽어오는 중에 오류가 발생했습니다:', error);
+		console.log('관광 지역 데이터를 읽어오는 중에 오류가 발생했습니다:', error);
 	}
-	return placeData;
+	return regionData;
 }
 
-export {readAllPlace, readOnePlace, readPlaceList};
+export {readAllRegion, readRegionList, readOneRegion};

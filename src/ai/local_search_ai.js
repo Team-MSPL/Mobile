@@ -1,7 +1,4 @@
-import {readAllPlace} from './data_read';
-
-//이태운 - 임시 import - 거리민감도
-import {distanceSensitivity} from './local_search_ai_test';
+import {readAllPlace} from './firebase_read_place';
 
 var _ = require('lodash');
 
@@ -28,6 +25,7 @@ var count = [0, 0, 0, 0, 0]; //selectList 선택 개수 저장 배열
 var placeList = []; //장소 리스트, 전역 변수, 원본
 var placeListCopy = []; //장소 리스트, 전역 변수, n일차 코스를 위함, path에 들어간 Place들은 제거하는 리스트
 var transitInAI = 0;
+var distanceSensitivityInAI = 5; //거리민감도 전역변수
 var corDis = [];
 
 var checkTime = 0.0;
@@ -63,8 +61,9 @@ function placePoint(selectList, beforePlace, targetPlace) {
 	let sum = 0;
 	//각 성향 카테고리별 가중치, weight[5]는 popular, 인기관광지 점수
 	//0:누구와, 1:테마, 2:무엇을, 3:어디 ,4:계절, 5: 인기도
-	const weight = [20, 120, 120, 120, 10, 1];
+	const weight = [100, 500, 500, 500, 50, 1];
 	let listSum = 0;
+	let sumForDistance = 0;
 
 	let targetPlaceList = [
 		targetPlace.partner,
@@ -78,11 +77,14 @@ function placePoint(selectList, beforePlace, targetPlace) {
 	//TODO for문이 더 빠르다길래 if + for 조합으로 하였음. 차후 && + map 조합으로도 테스트해볼 것
 	for (let x = 0; x < 5; x++) {
 		listSum = 0;
-		let targetPlaceNow = targetPlaceList[x]; //x까지 찾아가는 연산시간 절약
-		let selectListNow = selectList[x]; //x까지 찾아가는 연산시간 절약
+		const targetPlaceNow = targetPlaceList[x]; //x까지 찾아가는 연산시간 절약
+		const selectListNow = selectList[x]; //x까지 찾아가는 연산시간 절약
+		const weightNow = weight[x];
+
 		if (count[x] > 0) {
 			selectListNow.map((item, idx) => {
-				listSum += targetPlaceNow[idx] * weight[x] * item;
+				listSum += targetPlaceNow[idx] * weightNow * item;
+				sumForDistance += weightNow * item;
 			});
 			//평균을 계산하는 코드, 원래는 뒤에서 따로 계산하였으나, if (count[0] > 0)를 넣었기에 내부에 추가함
 			//각 테마별 평균을 계산하는 것임. count 이용(routeSearch 시작때 미리 계산해 두었음)
@@ -108,8 +110,8 @@ function placePoint(selectList, beforePlace, targetPlace) {
 		//TODO 거리민감도 계산이 확 달라지기에, Math.sqrt를 제거하지 못했음. 추후 제거할 것
 		let distance =
 			transitInAI === 1
-				? Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 2000 + 6000)
-				: Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivity * 2000 + 2000);
+				? Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivityInAI * 0.12) * sumForDistance
+				: Math.sqrt(latDiff ** 2 + longDiff ** 2) * (distanceSensitivityInAI * 0.18) * sumForDistance;
 
 		sum -= distance; // 거리가 커질수록 안좋은 것임. 총점수에 - 연산으로 계산해줘야함. 위와 마찬가지로 Math.round()연산 제거
 	}
@@ -141,7 +143,7 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 	//거리 민감도에 따라 이동시간 어림을 다르게 함
 	let moveTime = 30;
 
-	if (distanceSensitivity < 6) {
+	if (distanceSensitivityInAI < 6) {
 		moveTime = 60;
 	}
 
@@ -205,7 +207,7 @@ async function initializeGreedy(selectList, firstPlace, todayEssentialPlaceList,
 //Step 3-2. 코스 개선 시도를 위한 방법 - 2가지 (관광지 교체, 순서 변경)
 function twoOpts(path, selectList, todayAccomodationList, todayEssentialPlaceList) {
 	//숙소, 필수여행지 선택 횟수에 따라 2-opts 시도 횟수 조절
-	let iterations = 500 - selectedNum * 60; //2-opts 시도 횟수
+	let iterations = 50 - selectedNum * 6; //2-opts 시도 횟수
 	//성능이 구려서, Flutter의 1/10로 낮춤
 
 	let bestPath = _.cloneDeep(path);
@@ -464,7 +466,7 @@ function hillClimbing(path, selectList, todayAccomodationList, todayEssentialPla
 	//거리 민감도에 따라 이동시간 어림을 다르게 함
 	let moveTime = 30;
 
-	if (distanceSensitivity < 6) {
+	if (distanceSensitivityInAI < 6) {
 		moveTime = 60;
 	}
 
@@ -934,7 +936,7 @@ async function routeSearch(accomodationList, selectList, essentialPlaceList, tim
 }
 
 //localSearchAI를 실행시키는 비동기 함수
-async function localSearchAI(
+async function localSearchAI({
 	regionList,
 	accomodationList,
 	selectList,
@@ -942,166 +944,18 @@ async function localSearchAI(
 	timeLimitArray,
 	nDay,
 	transit,
-) {
-	//이태운 주석처리
-	// if(house == null){
-	//   house = [...Array(nDay+1)].map((home,id)=>{
-	//     home = dummy;
+	distanceSensitivity,
+}) {
+	console.log('여행 코스 AI 시작!');
 
-	//     return home;
-	//   })
-	// }else{
-	//   house = house.map((home,id)=>{
-	//     if(home == null){
-	//       home = dummy;
-	//     }else{
-	//       home = new Place(home.name, home.lat, home.lng, 30, 0, [0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0])
-	//     }
-	//     return home;
-	//   })
-	// }
-	console.log('시작!');
+	distanceSensitivityInAI = distanceSensitivity;
 
 	//시간 재기
 	const startTime = performance.now();
 
 	//데이터 로딩
-	//await dataLoading(regionList);
-	//임시로 주석처리하고, 임시관광지 넣음 - 파이어베이스 연결 이후에 수정할 것!
-	placeList = [
-		{
-			name: '임시관광지1',
-			lat: 35.11111,
-			lng: 127.012411,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 0],
-			concept: [0, 0, 0, 0],
-			play: [0, 80, 0, 0, 0, 0],
-			tour: [0, 0, 0, 0, 80, 0, 0, 0, 0],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지2',
-			lat: 35.13213,
-			lng: 127.012411,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 0],
-			concept: [0, 0, 80, 0],
-			play: [0, 0, 80, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 0, 80, 0],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지3',
-			lat: 35.11111,
-			lng: 127.32532,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 80, 0],
-			concept: [0, 0, 0, 0],
-			play: [0, 0, 0, 80, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 80, 0, 0],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지4',
-			lat: 35.22211,
-			lng: 127.532332,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 0],
-			concept: [0, 0, 0, 80],
-			play: [0, 80, 0, 0, 0, 0],
-			tour: [0, 0, 0, 0, 80, 0, 0, 0, 0],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지5',
-			lat: 35.53424,
-			lng: 127.43221,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 80],
-			concept: [0, 0, 0, 0],
-			play: [80, 0, 0, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 0, 0, 80],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지6',
-			lat: 35.53243,
-			lng: 127.54364,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 80, 0],
-			concept: [0, 0, 0, 0],
-			play: [0, 0, 0, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 80, 0, 0],
-			season: [0, 80, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지7',
-			lat: 35.12312,
-			lng: 127.534242,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 0],
-			concept: [80, 0, 0, 0],
-			play: [0, 0, 80, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-			season: [0, 80, 80, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지8',
-			lat: 35.65644,
-			lng: 127.53243,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 0, 0],
-			concept: [0, 0, 0, 80],
-			play: [0, 0, 80, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 0, 0, 80],
-			season: [0, 0, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지9',
-			lat: 35.85654,
-			lng: 127.263345,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 0, 0, 0, 0, 80, 0],
-			concept: [0, 0, 0, 0],
-			play: [80, 0, 0, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 0, 80, 0, 0],
-			season: [0, 0, 0, 0],
-			category: 1,
-		},
-		{
-			name: '임시관광지10',
-			lat: 35.66409,
-			lng: 127.098765,
-			takenTime: 60,
-			popular: 100,
-			partner: [0, 80, 0, 0, 0, 0, 0],
-			concept: [0, 0, 0, 0],
-			play: [0, 0, 80, 0, 0, 0],
-			tour: [0, 0, 0, 0, 0, 80, 0, 0, 0],
-			season: [0, 0, 0, 0],
-			category: 1,
-		},
-	];
-	placeListCopy = _.cloneDeep(placeList);
-	//임시로 주석처리하고, 임시관광지 넣음 - 파이어베이스 연결 이후에 수정할 것!
+	await dataLoading(regionList);
+	console.log('전체 관광지 수', placeList.length);
 
 	//AI 실행
 	const readData = await routeSearch(accomodationList, selectList, essentialPlaceList, timeLimitArray, nDay, transit);
@@ -1128,6 +982,7 @@ async function localSearchAI(
 	console.log(`Elapsed time: ${elapsedTime / 1000} seconds`);
 	console.log(`twoOpts 시간 1: ${checkTime / 1000} seconds`);
 	console.log(`twoOpts 시간 2: ${checkTime100 / 1000} seconds`);
+	console.log(`------------------------------------------`);
 
 	return readData;
 }

@@ -1,15 +1,25 @@
-import {useEffect, useState} from 'react';
 import {Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import SelectButton from '../../utill/component/select-button';
 import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
+import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {useEffect} from 'react';
+import {cityViewList} from './select-city';
 
 export default function FinalCheck({navigation}: any) {
-	const {region, accommodations, nDay, day, essentialPlaces, tendency} = useAppSelector(state => state.travelSlice);
+	const {region, accommodations, nDay, day, essentialPlaces, tendency, cityIndex} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
+	const goNext = () => {
+		dispatch(LoadingSliceActions.onLoading());
+		//navigation.reset({routes: [{name: 'Preset'}]});
+		navigation.popToTop();
+		navigation.navigate('Preset');
+	};
 
 	const goReset = () => {
 		navigation.navigate('SelectCity');
@@ -19,9 +29,9 @@ export default function FinalCheck({navigation}: any) {
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
 
-			<Text>{region}</Text>
-			<Text>출발: {day[0]}</Text>
-			<Text>종료: {day[1]}</Text>
+			<Text>{cityViewList[cityIndex].title + region}</Text>
+			<Text>출발: {day[0].format('YY-MM-DD')}</Text>
+			<Text>종료: {day[nDay].format('YY-MM-DD')}</Text>
 			{accommodations.map((item, idx) => {
 				return (
 					idx != 0 &&
@@ -36,7 +46,6 @@ export default function FinalCheck({navigation}: any) {
 									alt='Place Image'
 								/>
 							)}
-
 							<Text>{item.name ? idx + ' 일밤 ' + item.name : idx + '일밤 안정함 ㅋ'}</Text>
 						</HStack>
 					)
@@ -74,7 +83,7 @@ export default function FinalCheck({navigation}: any) {
 				);
 			})}
 			<CustomButton label='다시 만들래' onPress={goReset}></CustomButton>
-			<CustomButton label='다음 단계' onPress={() => {}}></CustomButton>
+			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 		</ScrollView>
 	);
 }

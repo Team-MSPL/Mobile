@@ -1,23 +1,90 @@
-import {JSX, JSXElementConstructor, ReactElement, ReactNode, useState} from 'react';
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useState, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
+import {Text, Box, ScrollView, VStack, Center} from 'native-base';
 import MapView, {Polyline, Marker} from 'react-native-maps';
 import SelectButton from '../../utill/component/select-button';
+import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {cityViewList} from '../enroll-info/select-city';
 
 export default function Preset({navigation}: any) {
-	const {distance} = useAppSelector(state => state.travelSlice);
+	const {
+		region,
+		accommodations,
+		nDay,
+		cityIndex,
+		essentialPlaces,
+		tendency,
+		timeLimitArray,
+		transit,
+		presetDatas,
+		distance,
+	} = useAppSelector(state => state.travelSlice);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 
+	const getAi = async () => {
+		try {
+			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+				a = cityViewList[cityIndex].sub.map(
+					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+				);
+				a.shift();
+			}
+			const data = await localSearchAI({
+				regionList: a,
+				accomodationList: accommodations,
+				selectList: tendency,
+				essentialPlaceList: essentialPlaces,
+				timeLimitArray: timeLimitArray,
+				nDay: nDay + 1,
+				transit: transit,
+				distanceSensitivity: distance,
+			});
+			if (!enoughPlace) {
+				console.log('관광지 부족');
+			} else {
+				console.log('다시다시');
+				if (data) {
+					dispatch(travelSliceActions.enrollPreset(data));
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		getAi();
+	}, []);
 	const goNext = () => {
-		navigation.navigate('SelectTendency');
+		dispatch(travelSliceActions.enrollTimetable(select));
+		navigation.popToTop();
+		navigation.navigate('Timetable');
 	};
 
 	const change = (idx: number) => {
+		if (mapRef.current) {
+			mapRef.current.animateToRegion(
+				{
+					latitude: presetDatas[idx][0][0].lat, // 목표 지점의 위도
+					longitude: presetDatas[idx][0][0].lng, // 목표 지점의 경도
+					latitudeDelta: 0.6,
+					longitudeDelta: 0.6,
+				},
+				1000,
+			); // 1000ms 동안 목표 지점으로 애니메이션 이동
+		}
 		setSelect(idx);
 	};
+
+	const mapRef = useRef<MapView>(null);
 
 	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
 	const polylines:
@@ -28,7 +95,7 @@ export default function Preset({navigation}: any) {
 		| ReactElement<any, string | JSXElementConstructor<any>>
 		| null
 		| undefined = [];
-	dummyData[select].forEach((value, index) => {
+	presetDatas[select].forEach((value, index) => {
 		const polylineCoordinates = value.map(vvalue => ({
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
@@ -53,7 +120,13 @@ export default function Preset({navigation}: any) {
 			/>,
 		);
 	});
-
+	if (isLoading) {
+		return (
+			<Box>
+				<Text>로딩중인데용?</Text>
+			</Box>
+		);
+	}
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<VStack space='5'>
@@ -66,23 +139,27 @@ export default function Preset({navigation}: any) {
 					</Text>
 				</Center>
 				<MapView
+					ref={mapRef}
 					style={{width: '100%', height: 300}}
 					region={{
-						latitude: dummyData[select][0][0].lat,
-						longitude: dummyData[select][0][0].lng,
-						latitudeDelta: 1,
-						longitudeDelta: 1,
+						latitude: presetDatas[select][0][0].lat,
+						longitude: presetDatas[select][0][0].lng,
+						latitudeDelta: 0.6,
+						longitudeDelta: 0.6,
 					}}>
 					{markers}
 					{polylines}
 				</MapView>
-				{dummyData.map((item, idx) => (
-					<SelectButton
-						key={idx}
-						label={idx}
-						bgColor={idx === select}
-						onPress={() => change(idx)}></SelectButton>
-				))}
+				<Box flexDir='row' flexWrap='wrap'>
+					{presetDatas.map((item, idx) => (
+						<SelectButton
+							key={idx}
+							label={idx + 1 + '번 후보'}
+							bgColor={idx === select}
+							onPress={() => change(idx)}></SelectButton>
+					))}
+				</Box>
+				{presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text key={asd}>{qwe.name}</Text>))}
 
 				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 			</VStack>
@@ -91,70 +168,3 @@ export default function Preset({navigation}: any) {
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-
-const dummyData = [
-	[
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.22211, lng: 127.532332, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12312, lng: 127.534242, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12221, lng: 127.6234, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51211, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53212, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53413, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65614, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51215, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.3216, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5417, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65618, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.1219, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5322, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53421, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.5622, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-	],
-	[
-		[
-			{category: 5, lat: 36.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.22211, lng: 127.532332, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12312, lng: 127.534242, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.12221, lng: 127.6234, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-		[
-			{category: 5, lat: 35.51243, lng: 127.5436, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53243, lng: 127.54364, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.53424, lng: 127.43221, name: '필수여행지1', takenTime: 60},
-			{category: 5, lat: 35.65644, lng: 127.53243, name: '필수여행지1', takenTime: 60},
-		],
-	],
-];

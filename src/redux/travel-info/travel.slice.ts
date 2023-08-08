@@ -1,21 +1,42 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
-import moment from 'moment';
-import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_API_KEY} from '@env';
+import moment, {Moment} from 'moment';
+import shortId from 'shortid';
+import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
 const initialState: LiteState = {
-	region: [],
-	cityName: '',
-	day: [moment().format('YY-MM-DD'), moment().format('YY-MM-DD')],
-	nDay: 0,
-	Place: {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, imageUrl: ''},
-	accommodations: [],
-	essentialPlaces: [],
-	distance: 0,
-	transit: 0,
-	tendency: [],
-	timeLimitArray: [10, 20],
-	minuteLimitArray: [0, 0],
-	season: [false, false, false, false],
+	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
+	cityIndex: 0, //지역이름 ex)경남
+	day: [], //타임테이블 용날짜 리스트
+	nDay: 0, // 몇박인지 5박6일이면 5
+	Place: {
+		name: '',
+		lat: 0,
+		lng: 0,
+		category: 4,
+		takenTime: 30,
+		imageUrl: '',
+		popular: 0,
+		partner: [0, 0, 0, 0, 0, 0, 0],
+		concept: [0, 0, 0, 0],
+		play: [0, 0, 0, 0, 0, 0],
+		tour: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+		season: [0, 0, 0, 0],
+	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
+	accommodations: [], // 숙소리스트
+	essentialPlaces: [], //필수여행지 리스트
+	distance: 0, //거리민감도
+	transit: 0, //교통수단 0= 자차 1=대중교통
+	tendency: [[]], //성향
+	timeLimitArray: [10, 20], //시작시간과 끝시간
+	minuteLimitArray: [0, 0], //시작시간 분과 끝분
+	season: [false, false, false, false], //계절
+	presetDatas: [[[]]], //프리셋 저장하는곳
+	timetable: [[]], // 타임테이블
+	moveTimeList: [], // 이동시간
+	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
+	editMode: '', // 삭제모드=delete, 추가모드=add
+	recommendList: [], //추천할때 쓰이는 리스트
+	makeMode: false, //true=추천모드, fasle==혼자짤래요
 };
 
 const axiosAuth = axios.create({
@@ -31,128 +52,75 @@ const axiosKakao = axios.create({
 	baseURL: 'https://dapi.kakao.com/v2/local/search',
 	headers: {
 		'content-type': 'application/json',
-		Authorization: `KakaoAK 1639f743957ac1b957ecc29b73f380cb`,
+		Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
 	},
 });
 
-export const getDrivingDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-	try {
-		console.log('하위요');
-		const response = await axiosAuth.get(
-			`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${'126.9403619316089,37.50743514849087'}&goal=${'126.96076545753868,37.50717338607686'}&waypoints=${'127.09922913614956,37.51180542624659|126.97836638977465,37.57682519650363'}&option=trafast`,
-			{
-				headers: {
-					'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
-					'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+//교통 시간 구하는 거
+export const getDrivingDuration = createAsyncThunk(
+	'/getDrivingDuration',
+	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+		try {
+			const response = await axiosAuth.get(
+				`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${data.start}&goal=${data.goal}${
+					data.wayPoint && `&waypoints=${data.wayPoint}`
+				}&option=trafast`,
+				{
+					headers: {
+						'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
+						'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+					},
 				},
-			},
-		);
-		console.log('q', response.data.route.trafast[0].summary);
-		console.log(Math.floor(response.data.route.trafast[0].summary.duration / 1000 / 60));
-		return response.data;
-	} catch (error) {
-		return console.log(error);
-	}
-});
+			);
+			return response.data.route.trafast[0].summary;
+		} catch (error) {
+			return console.log(error);
+		}
+	},
+);
 
-export const getTransitDuration = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-	try {
-		console.log('하위요');
-		const response = await axiosGoogle.get(
-			`/directions/json?origin=${'37.5125,127.102778'}&destination=${'37.5586545,126.7944739'}&mode=transit&language=ko&key=${GOOGLE_API_KEY}`,
-		);
-		console.log(Math.floor(response.data.routes[0].legs[0].duration.value / 60));
-		return response.data;
-	} catch (error) {
-		return console.log(error);
-	}
-});
-
-export const googleDetailApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+//장소 정보 얻어오는거
+export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, thunkAPI) => {
 	try {
 		const response = await axiosGoogle.get(
 			`/place/details/json?place_id=${data.placeId}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
-		console.log('q', response.data.result);
 		//제로리절트 처리하기
 		return response.data;
 	} catch (error) {
 		return console.log(error);
 	}
 });
-export const googleKeywordApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
+
+// 탐테에서 눌렀을때 검색이 아니라 이름으로 장소 찾는 거
+export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, thunkAPI) => {
 	try {
-		console.log('하위요');
 		const response = await axiosGoogle.get(
 			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
-		// const q = await dispatch(googleKeywordApi());
-		// const qwe = await dispatch(googleDetailApi({placeId: q.payload.results[0].place_id}));
-		// console.log(qwe.payload.result);
-		// console.log(response.data.results[0].place_id);
-		//제로리절트 처리하기
-		return response.data;
-	} catch (error) {
-		return console.log(error);
-	}
-});
-
-export const recommendApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-	try {
-		console.log('하위요');
-		const response = await axiosKakao.get(
-			`/category.json?category_group_code=FD6&x=126.94098402134308&y=37.50739041068636&radius=2000`,
+		const a = await axiosGoogle.get(
+			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
-		console.log(response.data);
-		// const q = await dispatch(googleKeywordApi());
-		// const qwe = await dispatch(googleDetailApi({placeId: q.payload.results[0].place_id}));
-		// console.log(qwe.payload.result);
-		// console.log(response.data.results[0].place_id);
 		//제로리절트 처리하기
-		return response.data;
+		return a.data.result;
 	} catch (error) {
 		return console.log(error);
 	}
 });
 
-// export const googleImageApi = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-// 	try {
-// 		console.log('하위요');
-// 		const response = await axiosGoogle.get(
-// 			`/place/photo?maxwidth=400&photoreference=${data.photoReference}&key=${GOOGLE_API_KEY}`,
-// 		);
-// 		console.log(response.data.results[0].place_id);
-// 		//제로리절트 처리하기
-// 		return response.data;
-// 	} catch (error) {
-// 		return console.log(error);
-// 	}
-// });
+//카카오 식당,카페 등 추천 장소 얻는 거
+export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, thunkAPI) => {
+	try {
+		const response = await axiosKakao.get(
+			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
+		);
 
-// export const tourApiTest = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-// 	try {
-// 		console.log('하위요');
-// 		const response = await axiosAuth.get(
-// 			`http://apis.data.go.kr/B551011/KorService1/searchKeyword1?MobileOS=AND&MobileApp=Danim&serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&keyword=롯데월드타워&contentTypeId=12`,
-// 		);
-// 		console.log(response.data);
-// 		return response.data;
-// 	} catch (error) {
-// 		return console.log(error);
-// 	}
-// });
-// export const tourTourApiTest = createAsyncThunk('/li', async (data: any, thunkAPI) => {
-// 	try {
-// 		console.log('하위ㅇ요');
-// 		const response = await axiosAuth.get(
-// 			`http://apis.data.go.kr/B551011/KorService1/detailInfo1?MobileOS=AND&MobileApp=Danim&serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&contentId=2003909&contentTypeId=12`,
-// 		);
-// 		console.log(response.data);
-// 		return response.data;
-// 	} catch (error) {
-// 		return console.log(error);
-// 	}
-// });
+		//제로리절트 처리하기
+		return response.data.documents;
+	} catch (error) {
+		return console.log(error);
+	}
+});
 
 export const travelSlice = createSlice({
 	name: 'travel',
@@ -164,9 +132,10 @@ export const travelSlice = createSlice({
 		selectRegion: (state, {payload}) => {
 			state.region = payload;
 		},
-		setCityName: (state, {payload}) => {
-			state.cityName = payload;
+		enrollCityIndex: (state, {payload}) => {
+			state.cityIndex = payload;
 		},
+
 		setNDay: (state, {payload}) => {
 			state.nDay = payload;
 		},
@@ -204,13 +173,58 @@ export const travelSlice = createSlice({
 			state.accommodations = payload.accommodations;
 			state.season = payload.season;
 		},
+		enrollPreset: (state, {payload}) => {
+			state.presetDatas = payload;
+		},
+		enrollTimetable: (state, {payload}) => {
+			state.timetable = state.presetDatas[payload];
+		},
+		drawTimetable: state => {
+			let copy = [...state.timetable];
+			state.timetable.map((item, idx) => {
+				let time = 8;
+				item.map((value, index) => {
+					copy[idx][index].x = idx;
+					copy[idx][index].y = time;
+					copy[idx][index].id = shortId.generate();
+					time += value.takenTime / 30;
+					index != item.length - 1 && (time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+				});
+			});
+			state.timetable = copy;
+		},
+		editModeChange: (state, {payload}) => {
+			state.editMode = payload;
+		},
+		changeTimetable: (state, {payload}) => {
+			state.timetable = payload;
+			state.editMode = '';
+		},
+		setMakeMode: (state, {payload}) => {
+			state.makeMode = payload;
+		},
+		setSingleMode: state => {
+			state.timetable = [...Array(5)].map(item => []);
+			state.day = [...Array(5)].map((item, idx) => moment().add(idx, 'day'));
+			state.nDay = 4;
+			state.makeMode = false;
+		},
 	},
-	// extraReducers: builder => {
-	// 	builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
-	// 		console.log('하');
-	// 		googleDetailApi({placeId: payload.results[0].place_id});
-	// 	});
-	// },
+	extraReducers: builder => {
+		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
+			let list: number[] = [];
+			payload.waypoints &&
+				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
+			list.push(payload.duration);
+			state.moveTimeList.push(list);
+		});
+		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
+			state.courseDetail = payload;
+		});
+		builder.addCase(recommendApi.fulfilled, (state, {payload}) => {
+			state.recommendList = payload;
+		});
+	},
 });
 
 export const travelSliceActions = travelSlice.actions;
@@ -218,18 +232,25 @@ export default travelSlice.reducer;
 
 interface LiteState {
 	region: string[];
-	cityName: string;
-	day: string[];
+	cityIndex: number;
+	day: Moment[];
 	nDay: number;
 	Place: PlaceType;
 	accommodations: PlaceType[];
 	essentialPlaces: EssentialPlaceType[];
 	distance: number;
 	transit: number;
-	tendency: boolean[][];
+	tendency: number[][];
 	timeLimitArray: number[];
 	minuteLimitArray: number[];
 	season: boolean[];
+	presetDatas: TimetableType[][][];
+	timetable: TimetableType[][];
+	moveTimeList: number[][] | [];
+	courseDetail: CourseDetail;
+	editMode: string;
+	recommendList: RecommendList[];
+	makeMode: boolean;
 }
 
 interface PlaceType {
@@ -239,6 +260,12 @@ interface PlaceType {
 	category: number;
 	takenTime: number;
 	imageUrl: string;
+	popular: number;
+	partner: number[];
+	concept: number[];
+	play: number[];
+	tour: number[];
+	season: number[];
 }
 
 export interface EssentialPlaceType {
@@ -250,4 +277,68 @@ export interface EssentialPlaceType {
 	takenTime: number;
 	id: string;
 	imageUrl: string;
+}
+export interface TimetableType {
+	category: number;
+	concept: number[];
+	lat: number;
+	lng: number;
+	name: string;
+	partner: number[];
+	play: number[];
+	popular: number;
+	season: number[];
+	takenTime: number;
+	tour: number[];
+	x?: number;
+	y?: number;
+	id?: string;
+}
+
+export interface CourseDetail {
+	name: string;
+	rating: number;
+	reviews: Reviews[];
+	photos: Photos[];
+	editorial_summary: EditorialSummary;
+}
+
+interface Reviews {
+	author_name: string;
+	author_url: string;
+	language: string;
+	original_language: string;
+	profile_photo_url: string;
+	rating: number;
+	relative_time_description: string;
+	text: string;
+	time: number;
+	translated: boolean;
+}
+
+interface Photos {
+	height: number;
+	html_attributions: string;
+	photo_reference: string;
+	width: number;
+}
+
+interface EditorialSummary {
+	language: string;
+	overview: string;
+}
+
+interface RecommendList {
+	address_name: string;
+	category_group_code: string;
+	category_group_name: string;
+	category_name: string;
+	distance: number;
+	id: number;
+	phone: string;
+	place_name: string;
+	place_url: string;
+	road_address_name: string;
+	x: number;
+	y: number;
 }

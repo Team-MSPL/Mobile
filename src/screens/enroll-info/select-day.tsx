@@ -1,8 +1,7 @@
 import {useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-
-import DateTimePicker from 'react-native-modal-datetime-picker';
+import DatePicker from 'react-native-date-picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
@@ -15,7 +14,8 @@ export default function SelectDay({navigation}: any) {
 	const dispatch = useAppDispatch();
 
 	const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-	const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+	const [selectedStartDate, setSelectedStartDate] = useState(moment());
 	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
 	const onConfirm = (selectedDate: Date) => {
 		// 날짜 또는 시간 선택 시
@@ -42,11 +42,20 @@ export default function SelectDay({navigation}: any) {
 			return Place;
 		});
 		let season = Array(4).fill(false);
-		let index = Math.floor((moment(selectedStartDate).month() + 1) / 3) - 1;
+		let index = Math.floor((selectedStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = true) : (season[index] = true);
+		let dateArray = [];
+		let count = 0;
+		console.log(nDay);
+		while (nDay > 4 ? selectedStartDate.isSameOrBefore(selectedEndDate) : count < 5) {
+			dateArray.push(selectedStartDate.clone());
+			selectedStartDate.add(1, 'day');
+			count += 1;
+		}
+		console.log(dateArray);
 		dispatch(
 			travelSliceActions.enrollDayInfo({
-				day: [moment(selectedStartDate).format('YY-MM-DD'), moment(selectedEndDate).format('YY-MM-DD')],
+				day: dateArray,
 				nDay: nDay,
 				accommodations: data,
 				season: season,
@@ -78,9 +87,9 @@ export default function SelectDay({navigation}: any) {
 	const nowTime = new Date();
 
 	const viewDate =
-		moment(selectedStartDate).format('YY-MM-DD') +
+		selectedStartDate.format('YY-MM-DD') +
 		'>' +
-		moment(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
+		(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
 
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
@@ -109,33 +118,44 @@ export default function SelectDay({navigation}: any) {
 				</Box>
 				<Box>
 					<HStack>
-						{day.map((item, idx) => {
-							return (
-								<Box w='1/2' key={idx}>
-									<Text bold fontSize='lg' mb='2'>
-										{idx == 0 ? '시작 시간' : '종료 시간'}
-									</Text>
-									<Pressable
-										onPress={() => {
-											onPressTime(idx);
-										}}
-										borderWidth='1px'
-										alignItems='center'
-										w='80%'
-										borderColor='grey'
-										borderRadius='3px'>
-										<Text fontSize='xl'>
-											{timeLimitArray[idx] + '시' + minuteLimitArray[idx] + '분'}
-										</Text>
-									</Pressable>
-								</Box>
-							);
-						})}
+						<Box w='1/2'>
+							<Text bold fontSize='lg' mb='2'>
+								시작 시간
+							</Text>
+							<Pressable
+								onPress={() => {
+									onPressTime(0);
+								}}
+								borderWidth='1px'
+								alignItems='center'
+								w='80%'
+								borderColor='grey'
+								borderRadius='3px'>
+								<Text fontSize='xl'>{timeLimitArray[0] + '시' + minuteLimitArray[0] + '분'}</Text>
+							</Pressable>
+						</Box>
+						<Box w='1/2'>
+							<Text bold fontSize='lg' mb='2'>
+								종료 시간
+							</Text>
+							<Pressable
+								onPress={() => {
+									onPressTime(1);
+								}}
+								borderWidth='1px'
+								alignItems='center'
+								w='80%'
+								borderColor='grey'
+								borderRadius='3px'>
+								<Text fontSize='xl'>{timeLimitArray[1] + '시' + minuteLimitArray[1] + '분'}</Text>
+							</Pressable>
+						</Box>
 					</HStack>
 				</Box>
 				<Divider my='1' />
 				<CalendarPicker
 					weekdays={weekdays}
+					months={months}
 					startFromMonday={true}
 					allowRangeSelection={true}
 					onDateChange={onDateChange}
@@ -143,19 +163,25 @@ export default function SelectDay({navigation}: any) {
 					showDayStragglers={true}
 					previousTitle='이전 달'
 					nextTitle='다음 달'
+					allowBackwardRangeSelect={true}
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>
-			<DateTimePicker
-				isVisible={visible}
+			<DatePicker
+				modal
+				open={visible}
 				mode='time'
-				onConfirm={onConfirm}
-				onCancel={onCancel}
-				minuteInterval={30}
 				date={moment()
 					.hours(timeLimitArray[dateFlag.current])
 					.minutes(minuteLimitArray[dateFlag.current])
-					.toDate()}></DateTimePicker>
+					.toDate()}
+				onConfirm={onConfirm}
+				onCancel={onCancel}
+				minuteInterval={30}
+				title={dateFlag.current ? '종료 시간' : '시작 시간'}
+				cancelText='취소'
+				confirmText='확인'
+			/>
 		</ScrollView>
 	);
 }
