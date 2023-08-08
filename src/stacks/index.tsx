@@ -10,7 +10,6 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
-
 //import LocalSearchAI from '../ai/local_search_ai';
 import LocalSearchAITest from '../ai/local_search_ai_test';
 import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
