@@ -1,40 +1,48 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
 	View,
-	TextInput,
-	Button,
-	StyleSheet,
 	Text,
+	TextInput,
 	TouchableOpacity,
+	FlatList,
 	Image,
+	Modal,
 	Alert,
 	ScrollView,
-	Modal,
+	Button,
+	StyleSheet,
+	Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import shortid from 'shortid';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {useAppSelector} from '../../redux';
+import moment from 'moment';
 
 export default function CommunityWritingScreen({navigation}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
-
 	const [title, setTitle] = useState<string>('');
 	const [content, setContent] = useState<string>('');
 	const [images, setImages] = useState<string[]>([]);
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+	const {jwtToken} = useAppSelector(state => state.loginSlice);
 
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			multiple: true,
 			mediaType: 'photo',
 			cropping: true,
-			maxFiles: 10 - images.length,
+			maxFiles: 10,
+			includeBase64: Platform.OS === 'android',
 		}).then(response => {
-			for (var i = 0; i < response.length; i++) {
+			if (response.length > 10) {
+				Alert.alert('사진은 최대 10장까지 가능합니다.');
+				return;
+			}
+			for (let i = 0; i < response.length; i++) {
 				if (response[i].size > 10000000) {
 					Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
 					return;
@@ -46,6 +54,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 			}
 			const selectedImageUris = response.map(image => image.path);
 			setImages(prevImages => [...prevImages, ...selectedImageUris]);
+			console.log('이미지 주소', images);
 		});
 	};
 
@@ -73,11 +82,12 @@ export default function CommunityWritingScreen({navigation}: any) {
 				.collection('커뮤니티')
 				.doc(title) // 제목을 문서 ID로 사용
 				.set({
+					posterToken: jwtToken,
 					postTitle: title,
 					postContent: content,
 					postKey: shortid.generate(),
-					createdAt: firestore.FieldValue.serverTimestamp(),
-					postPhoto: images,
+					createdAt: moment(Date()).format('yy/MM/DD HH:mm'),
+					postImageList: images,
 					// 여러 필드값 추가 가능
 					// 예: author: 'John Doe', views: 0, likes: 0, ...
 				})

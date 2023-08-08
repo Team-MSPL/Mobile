@@ -17,7 +17,7 @@ import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpa
 import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
 import React, {useState} from 'react';
 import {DrawerLayoutAndroidComponent} from 'react-native';
-import CommunityBottomPopupSheet from '../utill/component/community-bottom-popup-sheet';
+import CommunityBottomPopupSheet from '../screens/community/community-main-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import FinalCheck from '../screens/enroll-info/final-check';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
@@ -29,7 +29,7 @@ import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 import Recommend from '../screens/timetable/recommend';
 import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
-
+import CommunityReadingBottomPopupSheet from '../screens/community/community-reading-bottom-popup-sheet';
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -124,6 +124,7 @@ export default function StackNavigator() {
 						headerBackTitleVisible: true,
 						headerTitle: '커뮤니티',
 						headerTitleAlign: 'center',
+						headerRight: () => <CommunityReadingBottomPopupSheet></CommunityReadingBottomPopupSheet>,
 					}}
 				/>
 				<Stack.Screen

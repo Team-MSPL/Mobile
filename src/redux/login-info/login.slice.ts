@@ -54,6 +54,7 @@ export const loginSlice = createSlice({
 		builder.addCase(socialLogin.fulfilled, (state, {payload}) => {
 			console.log(payload);
 			//setStorage('token', payload.userJwtToken);
+			setStorage('test', '1234');
 			state.jwtToken = payload.userJwtToken;
 		});
 	},

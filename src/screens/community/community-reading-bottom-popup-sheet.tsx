@@ -9,17 +9,24 @@ import {useState} from 'react';
 import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
 import CommunityWriteScreen from '../../screens/community/community-writing-screen';
 
-export default function CommunityBottomPopSheet() {
+export default function CommunityReadingBottomPopSheet({navigation}: any) {
 	const goNext = () => {
 		navigation.navigate('CommunityWritingScreen');
 	};
-	const navigation = useNavigation();
 
 	const [modalVisible, setModalVisibile] = useState(false);
 	const deviceHeight = Dimensions.get('window').height;
-	const communityMenuList = [
+	const communityReadingMenuList = [
 		{
-			title: '글 쓰기',
+			title: '수정',
+			onPress: () => {
+				console.log('글 수정 페이지로 이동');
+				setModalVisibile(!modalVisible);
+				goNext();
+			},
+		},
+		{
+			title: '삭제',
 			onPress: () => {
 				console.log('글쓰기 페이지로 이동');
 				setModalVisibile(!modalVisible);
@@ -31,6 +38,7 @@ export default function CommunityBottomPopSheet() {
 			onPress: () => console.log('신고 페이지로 이동'),
 		},
 	];
+
 	return (
 		<SafeAreaView>
 			<TouchableOpacity
@@ -72,7 +80,7 @@ export default function CommunityBottomPopSheet() {
 								게시판 메뉴
 							</Text>
 							<FlatList
-								data={communityMenuList}
+								data={communityReadingMenuList}
 								renderItem={({item}) => (
 									<Button title={item.title} onPress={item.onPress}></Button>
 								)}></FlatList>
