@@ -39,15 +39,14 @@ export default function SelectCity({navigation}: any) {
 	};
 
 	const goNext = () => {
-		const a = region.map(item => viewList[select].title + ' ' + item);
-		dispatch(travelSliceActions.selectRegion(a));
+		dispatch(travelSliceActions.enrollCityIndex(select));
 		navigation.navigate('SelectDay');
 	};
 
 	//검색 관련
 	const searchData =
 		search &&
-		viewList.find(item =>
+		cityViewList.find(item =>
 			item.sub.some(
 				subItem =>
 					(subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
@@ -91,7 +90,7 @@ export default function SelectCity({navigation}: any) {
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
 							<ScrollView nestedScrollEnabled={true}>
-								{viewList.map((item, idx) => {
+								{cityViewList.map((item, idx) => {
 									return (
 										<TouchableOpacity
 											key={idx}
@@ -116,7 +115,7 @@ export default function SelectCity({navigation}: any) {
 						</Text>
 						<Box h='full' borderWidth='1px' borderColor='grey'>
 							<ScrollView nestedScrollEnabled={true}>
-								{viewList[select]?.sub.map((item, idx) => {
+								{cityViewList[select]?.sub.map((item, idx) => {
 									return (
 										<TouchableOpacity
 											key={idx}
@@ -156,7 +155,7 @@ export default function SelectCity({navigation}: any) {
 	);
 }
 
-const viewList = [
+export const cityViewList = [
 	{id: 0, title: '서울', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 1, title: '부산', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 2, title: '대구', sub: [{id: 0, subTitle: '전체'}]},

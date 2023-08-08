@@ -7,13 +7,14 @@ import MapView, {Polyline, Marker} from 'react-native-maps';
 import SelectButton from '../../utill/component/select-button';
 import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {cityViewList} from '../enroll-info/select-city';
 
 export default function Preset({navigation}: any) {
 	const {
 		region,
 		accommodations,
 		nDay,
-		day,
+		cityIndex,
 		essentialPlaces,
 		tendency,
 		timeLimitArray,
@@ -27,8 +28,15 @@ export default function Preset({navigation}: any) {
 
 	const getAi = async () => {
 		try {
+			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+				a = cityViewList[cityIndex].sub.map(
+					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+				);
+				a.shift();
+			}
 			const data = await localSearchAI({
-				regionList: region,
+				regionList: a,
 				accomodationList: accommodations,
 				selectList: tendency,
 				essentialPlaceList: essentialPlaces,

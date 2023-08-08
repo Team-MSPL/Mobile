@@ -1,24 +1,19 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {Text, Box, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
-
 import {GOOGLE_API_KEY} from '@env';
-import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
 	const newY = useRef(0);
 	const goRecommend = (category: string) => {
-		//앞뒤 아무것도 없을때도 생각해야함
-		console.log(route.params.x);
-		if (timetable[route.params.x].length == 0) {
-			console.log('참고할거없음');
-		} else {
-			if (newY.current == timetable[route.params.x].length) {
+		switch (newY.current) {
+			case timetable[route.params.x].length:
 				dispatch(
 					recommendApi({
 						category: category,
@@ -27,7 +22,8 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						radius: 2000,
 					}),
 				);
-			} else if (newY.current == 0) {
+				break;
+			case 0:
 				dispatch(
 					recommendApi({
 						category: category,
@@ -36,7 +32,11 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						radius: 2000,
 					}),
 				);
-			} else {
+				break;
+			case -1:
+				console.log('비교할게없네유');
+				return 0;
+			default:
 				const dLat =
 					(timetable[route.params.x][newY.current - 1].lat - timetable[route.params.x][newY.current].lat) *
 					(Math.PI / 180);
@@ -52,7 +52,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						Math.sin(dLon / 2);
 				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
-				console.log(Math.ceil(distance));
 				dispatch(
 					recommendApi({
 						category: category,
@@ -67,21 +66,21 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						radius: distance >= 20 ? 20000 : distance * 1000,
 					}),
 				);
-			}
-			const categoryIndex = category == 'AD5' ? 4 : 'FD6' ? 1 : 3;
-			navigation.navigate('Recommend', {
-				x: route.params.x,
-				index: newY.current,
-				y: route.params.y,
-				category: categoryIndex,
-			});
+				break;
 		}
+		const categoryIndex = category == 'AD5' ? 4 : 'FD6' ? 1 : 3;
+		navigation.navigate('Recommend', {
+			x: route.params.x,
+			index: newY.current,
+			y: route.params.y,
+			category: categoryIndex,
+		});
 	};
 	const addTimetable = () => {
 		console.log(getInfo);
 		const updateItem = {
 			...getInfo,
-			category: 0,
+			category: 5,
 			concept: [0],
 			partner: [0],
 			play: [0],
@@ -94,23 +93,22 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			takenTime: route.params.y.length * 30,
 		};
 		let copy = [...timetable];
-
-		console.log('1', copy);
 		let xArrayCopy = [...copy[route.params.x]];
-
-		console.log('2', xArrayCopy);
 		xArrayCopy.splice(newY.current, 0, updateItem);
-
-		console.log('3', xArrayCopy);
 		copy[route.params.x] = xArrayCopy;
-
-		console.log('3', copy);
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.goBack();
 	};
 	useEffect(() => {
 		newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
-		newY.current == -1 && (newY.current = timetable[route.params.x].length);
+		if (newY.current == -1) {
+			if (timetable[route.params.x].length == 0) {
+				newY.current = -1;
+			} else {
+				newY.current = timetable[route.params.x].length;
+			}
+		}
+		console.log(newY.current);
 	}, []);
 	return (
 		<Box flex='1'>
@@ -180,11 +178,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					styles={{textInputContainer: {zIndex: 1}, textInput: {zIndex: 1}}}
 					fetchDetails={true}
 					onPress={async (data, details) => {
-						console.log(details?.geometry.location.lat);
 						setGetInfo({
-							lat: details?.geometry.location.lat,
-							lng: details?.geometry.location.lng,
-							name: details?.name,
+							lat: details?.geometry.location.lat ?? 0,
+							lng: details?.geometry.location.lng ?? 0,
+							name: details?.name ?? '검색불가',
 						});
 					}}
 					onFail={error => console.log(error)}

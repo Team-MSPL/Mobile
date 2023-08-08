@@ -1,8 +1,7 @@
 import {useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-
-import DateTimePicker from 'react-native-modal-datetime-picker';
+import DatePicker from 'react-native-date-picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
@@ -119,28 +118,38 @@ export default function SelectDay({navigation}: any) {
 				</Box>
 				<Box>
 					<HStack>
-						{day.map((item, idx) => {
-							return (
-								<Box w='1/2' key={idx}>
-									<Text bold fontSize='lg' mb='2'>
-										{idx == 0 ? '시작 시간' : '종료 시간'}
-									</Text>
-									<Pressable
-										onPress={() => {
-											onPressTime(idx);
-										}}
-										borderWidth='1px'
-										alignItems='center'
-										w='80%'
-										borderColor='grey'
-										borderRadius='3px'>
-										<Text fontSize='xl'>
-											{timeLimitArray[idx] + '시' + minuteLimitArray[idx] + '분'}
-										</Text>
-									</Pressable>
-								</Box>
-							);
-						})}
+						<Box w='1/2'>
+							<Text bold fontSize='lg' mb='2'>
+								시작 시간
+							</Text>
+							<Pressable
+								onPress={() => {
+									onPressTime(0);
+								}}
+								borderWidth='1px'
+								alignItems='center'
+								w='80%'
+								borderColor='grey'
+								borderRadius='3px'>
+								<Text fontSize='xl'>{timeLimitArray[0] + '시' + minuteLimitArray[0] + '분'}</Text>
+							</Pressable>
+						</Box>
+						<Box w='1/2'>
+							<Text bold fontSize='lg' mb='2'>
+								종료 시간
+							</Text>
+							<Pressable
+								onPress={() => {
+									onPressTime(1);
+								}}
+								borderWidth='1px'
+								alignItems='center'
+								w='80%'
+								borderColor='grey'
+								borderRadius='3px'>
+								<Text fontSize='xl'>{timeLimitArray[1] + '시' + minuteLimitArray[1] + '분'}</Text>
+							</Pressable>
+						</Box>
 					</HStack>
 				</Box>
 				<Divider my='1' />
@@ -158,16 +167,21 @@ export default function SelectDay({navigation}: any) {
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>
-			<DateTimePicker
-				isVisible={visible}
+			<DatePicker
+				modal
+				open={visible}
 				mode='time'
-				onConfirm={onConfirm}
-				onCancel={onCancel}
-				minuteInterval={30}
 				date={moment()
 					.hours(timeLimitArray[dateFlag.current])
 					.minutes(minuteLimitArray[dateFlag.current])
-					.toDate()}></DateTimePicker>
+					.toDate()}
+				onConfirm={onConfirm}
+				onCancel={onCancel}
+				minuteInterval={30}
+				title={dateFlag.current ? '종료 시간' : '시작 시간'}
+				cancelText='취소'
+				confirmText='확인'
+			/>
 		</ScrollView>
 	);
 }

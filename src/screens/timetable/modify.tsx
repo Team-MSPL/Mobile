@@ -2,14 +2,15 @@ import {useState, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {TouchableOpacity, Image} from 'react-native';
-
-import DateTimePicker from 'react-native-modal-datetime-picker';
+import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 export default function Modify({navigation, route}: any) {
-	const {courseDetail, timetable} = useAppSelector(state => state.travelSlice);
+	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
+
+	const [changeDay, setChangeDay] = useState(route.params.item.value.x);
 	const onConfirm = (data: any) => {
 		console.log(data.getHours());
 		flag.current
@@ -33,7 +34,7 @@ export default function Modify({navigation, route}: any) {
 		//console.log('d', startTime.current.minute);
 		const newY = (startTime.current.hours * 60 - 360) / 30 + startTime.current.minute / 30;
 		const newEnd = (endTime.current.hours * 60 - 360) / 30 + endTime.current.minute / 30;
-		let copy = [...timetable[route.params.item.value.x]];
+		let copy = [...timetable[changeDay]];
 		let changeCopy = [...timetable];
 		let changeFlag = null;
 		//부터 가능
@@ -48,20 +49,45 @@ export default function Modify({navigation, route}: any) {
 				break;
 			}
 		}
-		changeFlag
-			? console.log(changeFlag.name, '이랑 겹친다')
-			: ((copy[route.params.item.index] = {
-					...copy[route.params.item.index],
-					y: newY,
-					takenTime: (newEnd - newY) * 30,
-			  }),
-			  (changeCopy[route.params.item.value.x] = copy),
-			  dispatch(travelSliceActions.changeTimetable(changeCopy)),
-			  navigation.goBack());
+		let changeInputIndex = copy.findIndex(item => item.y >= newY);
+		changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+		if (changeFlag) {
+			console.log(changeFlag.name, '이랑 겹친다');
+		} else {
+			let copyValue = {
+				...changeCopy[route.params.item.value.x][route.params.item.index],
+				y: newY,
+				x: changeDay,
+				takenTime: (newEnd - newY) * 30,
+			};
+			let deleteCopy = [...timetable[route.params.item.value.x]];
+			deleteCopy.splice(route.params.item.index, 1);
+			changeCopy[route.params.item.value.x] = deleteCopy;
+			console.log(changeCopy, '1');
+			let addCopy = [...changeCopy[changeDay]];
+			addCopy.splice(changeInputIndex, 0, copyValue);
+			console.log('2', addCopy);
+			changeCopy[changeDay] = addCopy;
+			dispatch(travelSliceActions.changeTimetable(changeCopy));
+			navigation.goBack();
+		}
 	};
+
 	return (
 		<Box>
 			<Text>{route.params.item.value.name}</Text>
+			{[...Array(nDay + 1)].map((item, idx) => (
+				<TouchableOpacity
+					style={{height: 100, alignItems: 'center'}}
+					onPress={() => {
+						setChangeDay(idx);
+					}}>
+					<Text>{visible ? 'dd' : 'ww'}</Text>
+					<Text>날짜도 바꿔볼랭?</Text>
+					<Text>{day[idx].format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
+				</TouchableOpacity>
+			))}
+
 			<TouchableOpacity
 				style={{height: 100, alignItems: 'center'}}
 				onPress={() => {
@@ -70,7 +96,7 @@ export default function Modify({navigation, route}: any) {
 				}}>
 				<Text>{visible ? 'dd' : 'ww'}</Text>
 				<Text>
-					앞에 시간 {startTime.current.hours}시 {startTime.current.minute}{' '}
+					앞에 시간 {startTime.current.hours}시 {startTime.current.minute}
 				</Text>
 				<Text>눌러서 수정 ㄱ</Text>
 			</TouchableOpacity>
@@ -85,17 +111,23 @@ export default function Modify({navigation, route}: any) {
 				</Text>
 				<Text>눌러서 수정 ㄱ</Text>
 			</TouchableOpacity>
-			<DateTimePicker
-				isVisible={visible}
+			<DatePicker
+				modal
+				open={visible}
 				mode='time'
-				onConfirm={onConfirm}
-				onCancel={onCancel}
-				minuteInterval={30}
 				date={
 					flag.current
 						? moment().hours(startTime.current.hours).minutes(startTime.current.minute).toDate()
 						: moment().hours(endTime.current.hours).minutes(endTime.current.minute).toDate()
-				}></DateTimePicker>
+				}
+				onConfirm={onConfirm}
+				onCancel={onCancel}
+				minuteInterval={30}
+				title={flag.current ? '시작 시간' : '종료 시간'}
+				cancelText='취소'
+				confirmText='확인'
+			/>
+
 			<TouchableOpacity onPress={goModify}>
 				<Text>수정이요</Text>
 			</TouchableOpacity>

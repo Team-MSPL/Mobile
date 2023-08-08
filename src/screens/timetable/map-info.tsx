@@ -55,12 +55,20 @@ export default function MapInfo({navigation}: any) {
 	useLayoutEffect(() => {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
-				setSelect(i);
 				a.current = true;
+				setSelect(i);
 				break;
 			}
 		}
+		console.log(a.current, 'ㅋㅋ');
 	}, []);
+	if (polylineCoordinates.length == 0) {
+		return (
+			<Box>
+				<Text>보여줄거 없음 ㅋ</Text>
+			</Box>
+		);
+	}
 	return (
 		<ScrollView bgColor='#EFFBFB' px='2'>
 			<VStack space='5'>

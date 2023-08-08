@@ -7,9 +7,10 @@ import {tendencyList} from './select-tendency';
 import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {useEffect} from 'react';
+import {cityViewList} from './select-city';
 
 export default function FinalCheck({navigation}: any) {
-	const {region, accommodations, nDay, day, essentialPlaces, tendency, timeLimitArray, transit} = useAppSelector(
+	const {region, accommodations, nDay, day, essentialPlaces, tendency, cityIndex} = useAppSelector(
 		state => state.travelSlice,
 	);
 	const dispatch = useAppDispatch();
@@ -28,7 +29,7 @@ export default function FinalCheck({navigation}: any) {
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
 
-			<Text>{region}</Text>
+			<Text>{cityViewList[cityIndex].title + region}</Text>
 			<Text>출발: {day[0].format('YY-MM-DD')}</Text>
 			<Text>종료: {day[nDay].format('YY-MM-DD')}</Text>
 			{accommodations.map((item, idx) => {

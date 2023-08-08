@@ -95,7 +95,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											style={{
 												width: 70,
 												height: 35 * Math.ceil(value.takenTime / 30),
-												top: value?.y && 35 * value?.y,
+												top: 35 * (value.y ?? 1),
 												left: value?.x && 70 * (idx - viewDayIndex),
 												backgroundColor:
 													editMode == 'delete' && deleteList.includes(value.id)

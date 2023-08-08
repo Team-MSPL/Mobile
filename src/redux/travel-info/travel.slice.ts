@@ -4,7 +4,8 @@ import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
 const initialState: LiteState = {
-	region: [], //지역이름
+	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
+	cityIndex: 0, //지역이름 ex)경남
 	day: [], //타임테이블 용날짜 리스트
 	nDay: 0, // 몇박인지 5박6일이면 5
 	Place: {
@@ -131,6 +132,9 @@ export const travelSlice = createSlice({
 		selectRegion: (state, {payload}) => {
 			state.region = payload;
 		},
+		enrollCityIndex: (state, {payload}) => {
+			state.cityIndex = payload;
+		},
 
 		setNDay: (state, {payload}) => {
 			state.nDay = payload;
@@ -210,7 +214,7 @@ export const travelSlice = createSlice({
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
 			let list: number[] = [];
 			payload.waypoints &&
-				((list = payload.waypoints.map((item, idx) => item.duration)), list.push(payload.goal.duration));
+				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
 			list.push(payload.duration);
 			state.moveTimeList.push(list);
 		});
@@ -228,6 +232,7 @@ export default travelSlice.reducer;
 
 interface LiteState {
 	region: string[];
+	cityIndex: number;
 	day: Moment[];
 	nDay: number;
 	Place: PlaceType;
