@@ -10,7 +10,6 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectTendency from '../screens/enroll-info/select-tendency';
-
 //import LocalSearchAI from '../ai/local_search_ai';
 import LocalSearchAITest from '../ai/local_search_ai_test';
 import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
@@ -23,14 +22,13 @@ import FinalCheck from '../screens/enroll-info/final-check';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import Preset from '../screens/timetable/preset';
-import MapInfo from '../screens/timetable/map-info';
-import Modify from '../screens/timetable/modify';
-import Recommend from '../screens/timetable/recommend';
-import TimetableAddPlace from '../screens/timetable/timetable-add-place';
-import CourseDetail from '../screens/timetable/course-detail';
 import Timetable from '../screens/timetable/timetable';
+import CourseDetail from '../screens/timetable/course-detail';
+import TimetableAddPlace from '../screens/timetable/timetable-add-place';
+import Recommend from '../screens/timetable/recommend';
+import Modify from '../screens/timetable/modify';
+import MapInfo from '../screens/timetable/map-info';
 import CommunityReadingBottomPopupSheet from '../screens/community/community-reading-bottom-popup-sheet';
-
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (

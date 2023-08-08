@@ -1162,6 +1162,8 @@ PODS:
   - React-jsinspector (0.72.3)
   - React-logger (0.72.3):
     - glog
+  - react-native-date-picker (4.2.13):
+    - React-Core
   - react-native-maps (1.7.1):
     - React-Core
   - react-native-safe-area-context (3.4.1):
@@ -1278,8 +1280,6 @@ PODS:
     - React-perflogger (= 0.72.3)
   - RNCAsyncStorage (1.19.1):
     - React-Core
-  - RNDateTimePicker (7.4.1):
-    - React-Core
   - RNFBApp (18.3.0):
     - Firebase/CoreOnly (= 10.12.0)
     - React-Core
@@ -1346,6 +1346,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -1366,7 +1367,6 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
-  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
@@ -1461,6 +1461,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-safe-area-context:
@@ -1501,8 +1503,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
-  RNDateTimePicker:
-    :path: "../node_modules/@react-native-community/datetimepicker"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
@@ -1578,6 +1578,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 59d1eb03af7d30b7d66589c410f13151271e8006
   React-jsinspector: b511447170f561157547bc0bef3f169663860be7
   React-logger: c5b527272d5f22eaa09bb3c3a690fee8f237ae95
+  react-native-date-picker: 04e866ba4e7857f83abd504ad42e787f0f02ae00
   react-native-maps: 667f9b975549c6fa9b1631bf859440f68ebd3b8f
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
   React-NativeModulesApple: 9329de92c3bf1be4034c7940eabe59900fdd4039
@@ -1598,7 +1599,6 @@ SPEC CHECKSUMS:
   React-utils: 1d9b285f51e33f0480abce93cc285612f9e51946
   ReactCommon: 54b9b73b9cb7028f24126a6d3e14b9aaf5d6c3f4
   RNCAsyncStorage: f47fe18526970a69c34b548883e1aeceb115e3e1
-  RNDateTimePicker: 9b4091348e53f540180abdc54984d839a556f593
   RNFBApp: f0b5cf917b0b91a0ae890fbbaec0fb5d3285ea46
   RNFBAuth: e3f51b2e4acc39e4664b24117f9106af493b2dd3
   RNFBFirestore: f595eeb9f796c3ddfbe05bc850dc4c2a5fef96d3
