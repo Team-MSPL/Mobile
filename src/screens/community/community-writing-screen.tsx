@@ -82,12 +82,15 @@ export default function CommunityWritingScreen({navigation}: any) {
 				.collection('커뮤니티')
 				.doc(title) // 제목을 문서 ID로 사용
 				.set({
-					posterToken: jwtToken,
 					postTitle: title,
 					postContent: content,
-					postKey: shortid.generate(),
-					createdAt: moment(Date()).format('yy/MM/DD HH:mm'),
-					postImageList: images,
+					postImage: images,
+					// TODO 작성자 닉네임 가져와서 반영해주기
+					postWriter: '작성자 이름 추가하기',
+					// TODO 작성자 다님 고유 아이디 값 가져와서 반영해주기
+					postWriterUserId: '작성자의 다님 고유 id',
+					postedAt: moment(Date()).format('yy/MM/DD HH:mm'),
+					postId: shortid,
 					// 여러 필드값 추가 가능
 					// 예: author: 'John Doe', views: 0, likes: 0, ...
 				})

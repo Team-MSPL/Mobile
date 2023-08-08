@@ -1,6 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import {Heading, Center, StatusBar, Row, HStack, Icon} from 'native-base';
 import {useEffect, useRef, useState} from 'react';
+import {RefreshControl} from 'react-native';
 
 import {
 	View,
@@ -43,6 +44,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
 	const [likeCount, setLikeCount] = useState(0);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
+	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -71,8 +73,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				console.log(postImageList);
 
 				const likeList = data?.likeList ?? [];
-				if (likeList.some((item: string) => item === '123')) {
-					setIsLiked(isLiked);
+				if (likeList.some((item: string) => item === '신제원')) {
+					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
 				console.log('좋아요 수 ', likeCount);
@@ -192,17 +194,23 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			if (isLiked) {
 				// TODO shortid 대신에 userid로 수정해야 함.
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove('123123'),
+					likeList: firestore.FieldValue.arrayRemove('신제원'),
 				});
 			} else {
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion('123123'),
+					likeList: firestore.FieldValue.arrayUnion('신제원'),
 				});
 			}
 			fetchPostData();
 		} catch (error) {
 			console.log('좋아요에 오류가 발생했습니다:', error);
 		}
+	};
+
+	// 새로 고침
+	const handleRefresh = () => {
+		setIsRefreshing(true); // 새로고침 시작
+		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
 	return (
@@ -212,7 +220,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			keyboardVerticalOffset={statusBarHeight + 44}>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 				<View style={styles.container}>
-					<ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollViewContainer}>
+					<ScrollView
+						ref={scrollViewRef}
+						contentContainerStyle={styles.scrollViewContainer}
+						refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}>
 						<View onStartShouldSetResponder={() => true}>
 							<Text>제목: {route.params.postTitle}</Text>
 							<Text>본문</Text>
