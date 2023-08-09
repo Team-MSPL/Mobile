@@ -2,7 +2,12 @@ import {useState, memo, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native';
-import {googleKeywordApi, recommendApi, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {
+	googleKeywordApi,
+	recommendApi,
+	TimetableType,
+	travelSliceActions,
+} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode} = useAppSelector(state => state.travelSlice);
@@ -13,8 +18,41 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 		dispatch(googleKeywordApi(e.value));
 		navigation.navigate('CourseDetail');
 	};
-	const indexRef = useRef({value: '', index: 0});
+	const indexRef = useRef<{value: TimetableType; index: number}>({value: timetable[0][0], index: 0});
 	const [visible, setVisible] = useState(false);
+	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
+		//앞이 아예 없거나 앞이 저녁 추천이면 ..? 그럴수가없넹
+		e.index != 0
+			? dispatch(
+					recommendApi({
+						category: 'AD5',
+						lat: timetable[e.idx][e.index - 1].lat,
+						lng: timetable[e.idx][e.index - 1].lng,
+						radius: 2000,
+					}),
+			  )
+			: dispatch(
+					recommendApi({
+						category: 'AD5',
+						lat: timetable[e.idx][e.index + 1].lat,
+						lng: timetable[e.idx][e.index + 1].lng,
+						radius: 2000,
+					}),
+			  );
+		const startNumber = e.value.y; // 시작 숫자
+		const count = e.value.takenTime / 30; // 원하는 갯수
+
+		const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+		console.log(sequentialArray); // [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+		navigation.navigate('Recommend', {
+			name: '숙소 추천',
+			x: e.value.x,
+			index: e.index,
+			y: sequentialArray,
+			category: e.value.category,
+		});
+	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
 		if (timetable[e.idx].length == 0) {
 			console.log('한개밖에 없어서 못해여');
@@ -70,10 +108,11 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			console.log(sequentialArray); // [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
 			navigation.navigate('Recommend', {
+				name: '식당 추천',
 				x: e.value.x,
 				index: e.index,
 				y: sequentialArray,
-				category: 3,
+				category: e.value.category,
 			});
 		}
 	};
@@ -119,8 +158,14 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 												} else {
 													//지금 임시로 카페를 식당으로 치환 카테고리=음식점이고 경도없을떄.
 													console.log(value.category);
-													if (value.category == 1 && !value.lat) {
-														restaurantRecommend({value, index, idx});
+													if (
+														value.name == '점심 추천' ||
+														value.name == '저녁 추천' ||
+														value.name == '숙소 추천'
+													) {
+														value.category == 1
+															? restaurantRecommend({value, index, idx})
+															: accommodationRecommend({value, index, idx});
 													} else {
 														setVisible(true);
 													}

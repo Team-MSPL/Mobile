@@ -70,6 +70,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		}
 		const categoryIndex = category == 'AD5' ? 4 : 'FD6' ? 1 : 3;
 		navigation.navigate('Recommend', {
+			name: '',
 			x: route.params.x,
 			index: newY.current,
 			y: route.params.y,

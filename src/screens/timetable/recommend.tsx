@@ -7,14 +7,14 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
 import {GOOGLE_API_KEY} from '@env';
-import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
 	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
-	const [recommendItem, setRecommendItem] = useState([...timetable[route.params.x]]);
+	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 
 	const polylineCoordinates = recommendItem.map((item, value) => ({latitude: item.lat, longitude: item.lng}));
 	const markers = recommendItem.map((value, idx) => (
@@ -47,9 +47,18 @@ export default function Recommend({navigation, route}: any) {
 			id: shortId.generate(),
 			takenTime: route.params.y.length * 30,
 		};
-		select == -1 && route.params.category != 1
-			? copy.splice(route.params.index, 0, updateItem)
-			: (copy[route.params.index] = updateItem);
+		if (route.params.name === '숙소 추천' || route.params.name === '식당 추천') {
+			copy[route.params.index] = updateItem;
+		} else {
+			if (select === -1) {
+				copy.splice(route.params.index, 0, updateItem);
+			} else {
+				copy[route.params.index] = updateItem;
+			}
+		}
+		// select == -1 && route.params.category != 1
+		// 	? copy.splice(route.params.index, 0, updateItem)
+		// 	: (copy[route.params.index] = updateItem);
 		setRecommendItem(copy);
 		setSelect(idx);
 		console.log(copy[idx]);
@@ -68,8 +77,30 @@ export default function Recommend({navigation, route}: any) {
 	const addRecommend = () => {
 		let copy = [...timetable];
 		copy[route.params.x] = recommendItem;
-
-		console.log(copy);
+		if (route.params.name === '숙소 추천') {
+			if (route.params.index != 0) {
+				console.log('ㅋㅋㅋㅋ다온다');
+				let updateitem = {
+					...recommendItem.at(-1),
+					x: copy[route.params.x + 1][0].x,
+					y: copy[route.params.x + 1][0].y,
+					takenTime: copy[route.params.x + 1][0].takenTime,
+				};
+				let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
+				itemCopy[0] = updateitem;
+				copy[route.params.x + 1] = itemCopy;
+			} else {
+				let updateitem = {
+					...recommendItem[0],
+					x: copy[route.params.x - 1].at(-1).x,
+					y: copy[route.params.x - 1].at(-1).y,
+					takenTime: copy[route.params.x - 1].at(-1).takenTime,
+				};
+				let itemCopy = [...copy[route.params.x - 1]];
+				itemCopy.splice(itemCopy.length - 1, 1, updateitem);
+				copy[route.params.x - 1] = itemCopy;
+			}
+		}
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.navigate('Timetable');
 	};

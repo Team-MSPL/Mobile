@@ -17,6 +17,7 @@ export default function Timetable({navigation}: any) {
 	const [viewDayIndex, setViewDayIndex] = useState(0);
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
 	const getDuration = async () => {
+		console.log('오긴함');
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 1) {
 				for (let j = 0; j < timetable[i].length; j++) {
@@ -55,6 +56,7 @@ export default function Timetable({navigation}: any) {
 	};
 	useLayoutEffect(() => {
 		makeMode || getDuration();
+		console.log(makeMode);
 	}, []);
 	return (
 		<Box bgColor='#EFFBFB'>
@@ -71,7 +73,7 @@ export default function Timetable({navigation}: any) {
 					<TouchableOpacity
 						onPress={() => {
 							const a = timetable.map((item, idx) =>
-								item.filter(value => !deleteList.includes(value?.id)),
+								item.filter(value => !deleteList.includes(value?.id ?? 'no')),
 							);
 							setDeleteList([]);
 							dispatch(travelSliceActions.changeTimetable(a));
@@ -97,7 +99,7 @@ export default function Timetable({navigation}: any) {
 					<Text>노노</Text>
 				</Box>
 			)}
-			<ScrollView position='relative'>
+			<ScrollView position='relative' mb='230'>
 				<InfoView
 					navigation={navigation}
 					setDeleteList={setDeleteList}

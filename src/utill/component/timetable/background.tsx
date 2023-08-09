@@ -48,13 +48,13 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 			console.log('거긴...');
 		}
 	};
-
+	//테스트에서는 36개로 했음
 	return (
 		<View style={{flexDirection: 'row'}}>
 			<TimeView />
 			{[...Array(5)].map((item, inx) => (
 				<View key={inx}>
-					{[...Array(36)].map((value, index) => (
+					{[...Array(48)].map((value, index) => (
 						<TouchableOpacity
 							key={index}
 							style={{
@@ -63,7 +63,7 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 								borderLeftWidth: 1,
 								borderTopWidth: index % 2 ? 0 : 1,
 								borderRightWidth: inx === 4 ? 1 : 0,
-								borderBottomWidth: index === 35 ? 1 : 0,
+								borderBottomWidth: index === 47 ? 1 : 0,
 								backgroundColor:
 									editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white',
 							}}

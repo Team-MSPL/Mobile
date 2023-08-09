@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Center} from 'native-base';
-import MapView, {Polyline, Marker} from 'react-native-maps';
+import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import SelectButton from '../../utill/component/select-button';
 import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -68,15 +68,16 @@ export default function Preset({navigation}: any) {
 		navigation.popToTop();
 		navigation.navigate('Timetable');
 	};
+	let positions: {latitude: number; longitude: number}[] = [];
 
 	const change = (idx: number) => {
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(
 				{
-					latitude: presetDatas[idx][0][0].lat, // 목표 지점의 위도
-					longitude: presetDatas[idx][0][0].lng, // 목표 지점의 경도
-					latitudeDelta: 0.6,
-					longitudeDelta: 0.6,
+					latitude: centerLatitude,
+					longitude: centerLongitude,
+					latitudeDelta: deltaLatitude + 0.01,
+					longitudeDelta: deltaLongitude + 0.01,
 				},
 				1000,
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
@@ -100,16 +101,21 @@ export default function Preset({navigation}: any) {
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
 		}));
-
-		markers.push(
-			value.map((vvalue, iindex) => (
-				<Marker
-					key={`marker_${index}_${iindex}`}
-					coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-					title={vvalue.name}
-				/>
-			)),
-		);
+		value.map(vvalue =>
+			positions.push({
+				latitude: vvalue.lat,
+				longitude: vvalue.lng,
+			}),
+		),
+			markers.push(
+				value.map((vvalue, iindex) => (
+					<Marker
+						key={`marker_${index}_${iindex}`}
+						coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
+						title={vvalue.name}
+					/>
+				)),
+			);
 
 		polylines.push(
 			<Polyline
@@ -120,6 +126,23 @@ export default function Preset({navigation}: any) {
 			/>,
 		);
 	});
+	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
+	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
+	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
+	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
+
+	// 경계 상자의 중심 좌표 계산
+	const centerLatitude = (maxLatitude + minLatitude) / 2;
+	const centerLongitude = (maxLongitude + minLongitude) / 2;
+
+	// 경계 상자의 너비와 높이 계산
+	const deltaLatitude = maxLatitude - minLatitude;
+	const deltaLongitude = maxLongitude - minLongitude;
+
+	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
+	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
+	const zoomLevel = Math.log2(360 / maxDelta) + 1;
+
 	if (isLoading) {
 		return (
 			<Box>
@@ -141,11 +164,13 @@ export default function Preset({navigation}: any) {
 				<MapView
 					ref={mapRef}
 					style={{width: '100%', height: 300}}
+					provider={PROVIDER_GOOGLE}
+					showsMyLocationButton={true}
 					region={{
-						latitude: presetDatas[select][0][0].lat,
-						longitude: presetDatas[select][0][0].lng,
-						latitudeDelta: 0.6,
-						longitudeDelta: 0.6,
+						latitude: centerLatitude,
+						longitude: centerLongitude,
+						latitudeDelta: deltaLatitude + 0.03,
+						longitudeDelta: deltaLongitude + 0.03,
 					}}>
 					{markers}
 					{polylines}

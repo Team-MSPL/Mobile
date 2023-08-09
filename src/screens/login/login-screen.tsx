@@ -22,6 +22,7 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = KakaoLogin.getProfile();
+			console.log((await userInfo).nickname, 'ㅇㅇㅋ');
 			const data = {
 				userName: (await userInfo).nickname,
 				userProfileImage: (await userInfo).profileImageUrl,

@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useRef, useState, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import DatePicker from 'react-native-date-picker';
@@ -6,6 +6,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
 import moment, {Moment} from 'moment';
+import {Alert} from 'react-native';
 
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
@@ -17,14 +18,20 @@ export default function SelectDay({navigation}: any) {
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 	const [selectedStartDate, setSelectedStartDate] = useState(moment());
 	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
+
 	const onConfirm = (selectedDate: Date) => {
-		// 날짜 또는 시간 선택 시
-		setVisible(false); // 모달 close
-		let timeCopy = [...timeLimitArray];
-		timeCopy[dateFlag.current] = selectedDate.getHours();
-		let minuteCopy = [...minuteLimitArray];
-		minuteCopy[dateFlag.current] = selectedDate.getMinutes();
-		dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+		if (selectedDate.getHours() < 6) {
+			Alert.alert('놉');
+		} else {
+			console.log(selectedDate.getHours());
+			// 날짜 또는 시간 선택 시
+			setVisible(false); // 모달 close
+			let timeCopy = [...timeLimitArray];
+			timeCopy[dateFlag.current] = selectedDate.getHours();
+			let minuteCopy = [...minuteLimitArray];
+			minuteCopy[dateFlag.current] = selectedDate.getMinutes();
+			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+		}
 	};
 
 	const onCancel = () => {
@@ -46,13 +53,12 @@ export default function SelectDay({navigation}: any) {
 		index < 0 ? (season[3] = true) : (season[index] = true);
 		let dateArray = [];
 		let count = 0;
-		console.log(nDay);
-		while (nDay > 4 ? selectedStartDate.isSameOrBefore(selectedEndDate) : count < 5) {
-			dateArray.push(selectedStartDate.clone());
-			selectedStartDate.add(1, 'day');
+		let copySelectedStartDate = moment({...selectedStartDate});
+		while (nDay > 4 ? copySelectedStartDate.isSameOrBefore(selectedEndDate) : count < 5) {
+			dateArray.push(copySelectedStartDate.clone());
+			copySelectedStartDate.add(1, 'day');
 			count += 1;
 		}
-		console.log(dateArray);
 		dispatch(
 			travelSliceActions.enrollDayInfo({
 				day: dateArray,
@@ -90,7 +96,6 @@ export default function SelectDay({navigation}: any) {
 		selectedStartDate.format('YY-MM-DD') +
 		'>' +
 		(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
-
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}

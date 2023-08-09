@@ -1,9 +1,9 @@
-import {JSX, JSXElementConstructor, ReactElement, useLayoutEffect, useRef, useState} from 'react';
+import {JSX, JSXElementConstructor, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Center} from 'native-base';
-import MapView, {Polyline, Marker, AnimatedRegion} from 'react-native-maps';
+import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {TouchableOpacity, Linking} from 'react-native';
 import SelectButton from '../../utill/component/select-button';
 
@@ -12,7 +12,7 @@ export default function MapInfo({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
-
+	const viewRef = useRef(0);
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
@@ -52,7 +52,25 @@ export default function MapInfo({navigation}: any) {
 			strokeWidth={5} // You can change the width of the line here
 		/>
 	));
-	useLayoutEffect(() => {
+
+	const minLatitude = Math.min(...polylineCoordinates.map(marker => marker.latitude));
+	const maxLatitude = Math.max(...polylineCoordinates.map(marker => marker.latitude));
+	const minLongitude = Math.min(...polylineCoordinates.map(marker => marker.longitude));
+	const maxLongitude = Math.max(...polylineCoordinates.map(marker => marker.longitude));
+
+	// 경계 상자의 중심 좌표 계산
+	const centerLatitude = (maxLatitude + minLatitude) / 2;
+	const centerLongitude = (maxLongitude + minLongitude) / 2;
+
+	// 경계 상자의 너비와 높이 계산
+	const deltaLatitude = maxLatitude - minLatitude;
+	const deltaLongitude = maxLongitude - minLongitude;
+
+	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
+	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
+	const zoomLevel = Math.log2(360 / maxDelta) + 1;
+
+	useEffect(() => {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
@@ -84,20 +102,42 @@ export default function MapInfo({navigation}: any) {
 							),
 					)}
 				</Box>
-				{a.current && (
+				{timetable.map(
+					(item, idx) =>
+						select == idx && (
+							<MapView
+								ref={mapRef}
+								provider={PROVIDER_GOOGLE}
+								showsMyLocationButton={true}
+								style={{width: '100%', height: 300}}
+								showsUserLocation={true}
+								region={{
+									latitude: centerLatitude,
+									longitude: centerLongitude,
+									latitudeDelta: deltaLatitude + 0.03,
+									longitudeDelta: deltaLongitude + 0.03,
+								}}>
+								{markers}
+								{polylines}
+							</MapView>
+						),
+				)}
+				{/* {a.current && (
 					<MapView
 						ref={mapRef}
 						style={{width: '100%', height: 300}}
+						provider={PROVIDER_GOOGLE}
+						showsMyLocationButton={true}
 						region={{
-							latitude: timetable[select][0].lat,
-							longitude: timetable[select][0].lng,
-							latitudeDelta: 0.4,
-							longitudeDelta: 0.4,
+							latitude: centerLatitude,
+							longitude: centerLongitude,
+							latitudeDelta: deltaLatitude + 0.01,
+							longitudeDelta: deltaLongitude + 0.01,
 						}}>
 						{markers}
 						{polylines}
 					</MapView>
-				)}
+				)} */}
 				{timetable[select].map((value, index) =>
 					index != timetable[select].length - 1 ? (
 						<Box key={index}>

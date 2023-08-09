@@ -71,8 +71,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				console.log(postImageList);
 
 				const likeList = data?.likeList ?? [];
-				if (likeList.some((item: string) => item === '123')) {
-					setIsLiked(isLiked);
+				if (likeList.some((item: string) => item === '456456')) {
+					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
 				console.log('좋아요 수 ', likeCount);
@@ -192,11 +192,11 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			if (isLiked) {
 				// TODO shortid 대신에 userid로 수정해야 함.
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove('123123'),
+					likeList: firestore.FieldValue.arrayRemove('456456'),
 				});
 			} else {
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion('123123'),
+					likeList: firestore.FieldValue.arrayUnion('456456'),
 				});
 			}
 			fetchPostData();
