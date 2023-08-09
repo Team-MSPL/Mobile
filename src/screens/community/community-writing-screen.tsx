@@ -1,35 +1,33 @@
-import React, {useEffect, useState} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
+import React, {useState} from 'react';
 import {
-	View,
+	Alert,
+	Image,
+	Modal,
+	Platform,
+	ScrollView,
+	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
-	FlatList,
-	Image,
-	Modal,
-	Alert,
-	ScrollView,
-	Button,
-	StyleSheet,
-	Platform,
+	View,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-import shortid from 'shortid';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import shortid from 'shortid';
 import {useAppSelector} from '../../redux';
-import moment from 'moment';
 
 export default function CommunityWritingScreen({navigation}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
-	const [title, setTitle] = useState<string>('');
-	const [content, setContent] = useState<string>('');
-	const [images, setImages] = useState<string[]>([]);
+	const [postTitle, setPostTitle] = useState<string>('');
+	const [postContent, setPostContent] = useState<string>('');
+	const [postImage, setPostImage] = useState<string[]>([]);
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 	const {jwtToken} = useAppSelector(state => state.loginSlice);
 
+	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			multiple: true,
@@ -53,25 +51,26 @@ export default function CommunityWritingScreen({navigation}: any) {
 				return;
 			}
 			const selectedImageUris = response.map(image => image.path);
-			setImages(prevImages => [...prevImages, ...selectedImageUris]);
-			console.log('이미지 주소', images);
+			setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+			console.log('이미지 주소', postImage);
 		});
 	};
 
+	// 게시글 등록
 	const handlePostSubmit = () => {
-		if (title.trim() === '') {
+		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
 			console.log('제목을 입력해주세요.');
 			return;
 		}
 
-		if (content.trim() === '') {
+		if (postContent.trim() === '') {
 			Alert.alert('내용을 입력해주세요');
 			console.log('내용을 입력해주세요.');
 			return;
 		}
 
-		if (images.length > 10) {
+		if (postImage.length > 10) {
 			Alert.alert('최대 10장까지만 사진을 업로드할 수 있습니다.');
 			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
 			return;
@@ -80,17 +79,18 @@ export default function CommunityWritingScreen({navigation}: any) {
 		try {
 			firestore()
 				.collection('커뮤니티')
-				.doc(title) // 제목을 문서 ID로 사용
+				.doc(postTitle) // 제목을 문서 ID로 사용
 				.set({
-					postTitle: title,
-					postContent: content,
-					postImage: images,
+					postTitle: postTitle,
+					postContent: postContent,
+					postImage: postImage,
 					// TODO 작성자 닉네임 가져와서 반영해주기
-					postWriter: '작성자 이름 추가하기',
+					postWriter: '작성자 1',
 					// TODO 작성자 다님 고유 아이디 값 가져와서 반영해주기
 					postWriterUserId: '작성자의 다님 고유 id',
-					postedAt: moment(Date()).format('yy/MM/DD HH:mm'),
-					postId: shortid,
+					postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+					// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
+					postId: shortid.generate(),
 					// 여러 필드값 추가 가능
 					// 예: author: 'John Doe', views: 0, likes: 0, ...
 				})
@@ -100,10 +100,8 @@ export default function CommunityWritingScreen({navigation}: any) {
 				.catch(error => {
 					console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
 				});
-
-			console.log('게시글이 등록되었습니다.');
+			Alert.alert('게시글이 등록되었습니다.');
 			goBack();
-			// 게시글 등록 완료 후 필요한 처리를 추가하면 됩니다.
 		} catch (error) {
 			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
 		}
@@ -119,19 +117,19 @@ export default function CommunityWritingScreen({navigation}: any) {
 
 	return (
 		<ScrollView style={styles.container}>
-			<TextInput style={styles.titleInput} placeholder='제목' value={title} onChangeText={setTitle} />
+			<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
 			<TextInput
 				style={styles.contentInput}
 				placeholder='내용'
-				value={content}
-				onChangeText={setContent}
+				value={postContent}
+				onChangeText={setPostContent}
 				multiline
 			/>
 			<View style={styles.imageContainer}>
-				{images.slice(0, 8).map((uri, index) => (
+				{postImage.slice(0, 8).map((uri, index) => (
 					<Image key={index} source={{uri}} style={styles.uploadedImage} />
 				))}
-				{images.length > 8 && (
+				{postImage.length > 8 && (
 					<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
 						<Text style={styles.moreButtonText}>더보기</Text>
 					</TouchableOpacity>
@@ -145,7 +143,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 			</TouchableOpacity>
 			<Modal visible={isModalVisible} onRequestClose={handleModalClose}>
 				<ScrollView contentContainerStyle={styles.modalContainer}>
-					{images.map((uri, index) => (
+					{postImage.map((uri, index) => (
 						<Image key={index} source={{uri}} style={styles.modalImage} />
 					))}
 				</ScrollView>
