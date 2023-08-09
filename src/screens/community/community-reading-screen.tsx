@@ -68,7 +68,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 				const likeList = data?.likeList ?? [];
 				// TODO 유저 닉네임으로 적용시켜야 함.
-				if (likeList.some((item: string) => item === '신제원')) {
+				if (likeList.some((item: string) => item === '아이폰13미니')) {
 					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
@@ -127,9 +127,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			// db의 comment에 들어갈 정보들
 			const newCommentData = {
 				// TODO commenter에 유저 닉네임 적용시켜야 함.
-				commenter: '사용자 1',
+				commenter: '아이폰13미니',
 				// TODO userid에 다님에서 발급해주는 고유 id값 적용시켜야 함.
-				userid: 'danim123',
+				userid: 'danim박호동',
 				commentContent: newCommentContent,
 				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
 				_id: shortid.generate(),
@@ -191,12 +191,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			if (isLiked) {
 				// TODO shortid 대신에 userid로 수정해야 함.
+				// TODO 유저 닉네임으로 수정해야함.
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove('신제원'),
+					likeList: firestore.FieldValue.arrayRemove('아이폰13미니'),
 				});
 			} else {
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion('신제원'),
+					likeList: firestore.FieldValue.arrayUnion('아이폰13미니'),
 				});
 			}
 			fetchPostData();

@@ -75,7 +75,6 @@ export default function CommunityWritingScreen({navigation}: any) {
 			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
 			return;
 		}
-
 		try {
 			firestore()
 				.collection('커뮤니티')
@@ -85,7 +84,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 					postContent: postContent,
 					postImage: postImage,
 					// TODO 작성자 닉네임 가져와서 반영해주기
-					postWriter: '작성자 1',
+					postWriter: '아이폰13미니',
 					// TODO 작성자 다님 고유 아이디 값 가져와서 반영해주기
 					postWriterUserId: '작성자의 다님 고유 id',
 					postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),

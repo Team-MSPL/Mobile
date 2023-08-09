@@ -60,6 +60,7 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	// 가져온 게시글 목록 보여주기
 	const renderPostItem = ({item}: {item: any}) => {
+		console.log(item);
 		return (
 			<View style={styles.postItemContainer}>
 				<TouchableOpacity
@@ -74,7 +75,6 @@ export default function CommunityMainScreen({navigation}: any) {
 					</Text>
 					<HStack alignItems={'center'}>
 						<Icon name={'hearto'} size={12} color='red' />
-						<Text>{item.likeList}</Text>
 						<Text style={styles.postedAtText}>
 							{item.postedAt.slice(0, 16)} | {item.postWriter}
 						</Text>
