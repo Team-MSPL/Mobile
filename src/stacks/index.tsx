@@ -1,34 +1,31 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import AddEssential from '../screens/enroll-info/add-essential';
 import AddAccommodation from '../screens/enroll-info/add-accommodation';
+import AddEssential from '../screens/enroll-info/add-essential';
 import SearchPlace from '../screens/enroll-info/search-place';
 import SelectCity from '../screens/enroll-info/select-city';
 import SelectDay from '../screens/enroll-info/select-day';
+import SelectDistance from '../screens/enroll-info/select-distance';
 import SelectMulti from '../screens/enroll-info/select-multi';
+import SelectTendency from '../screens/enroll-info/select-tendency';
 import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
-import SelectDistance from '../screens/enroll-info/select-distance';
-import SelectTendency from '../screens/enroll-info/select-tendency';
 //import LocalSearchAI from '../ai/local_search_ai';
+import React from 'react';
 import LocalSearchAITest from '../ai/local_search_ai_test';
-import {Alert, Button, Dimensions, Modal, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
-import {Box, Center, ChevronDownIcon, ChevronLeftIcon, FlatList, IconButton, ThreeDotsIcon} from 'native-base';
-import React, {useState} from 'react';
-import {DrawerLayoutAndroidComponent} from 'react-native';
 import CommunityBottomPopupSheet from '../screens/community/community-main-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
-import FinalCheck from '../screens/enroll-info/final-check';
-import CommunityWritingScreen from '../screens/community/community-writing-screen';
-import CommunityReadingScreen from '../screens/community/community-reading-screen';
-import Preset from '../screens/timetable/preset';
-import Timetable from '../screens/timetable/timetable';
-import CourseDetail from '../screens/timetable/course-detail';
-import TimetableAddPlace from '../screens/timetable/timetable-add-place';
-import Recommend from '../screens/timetable/recommend';
-import Modify from '../screens/timetable/modify';
-import MapInfo from '../screens/timetable/map-info';
 import CommunityReadingBottomPopupSheet from '../screens/community/community-reading-bottom-popup-sheet';
+import CommunityReadingScreen from '../screens/community/community-reading-screen';
+import CommunityWritingScreen from '../screens/community/community-writing-screen';
+import FinalCheck from '../screens/enroll-info/final-check';
+import CourseDetail from '../screens/timetable/course-detail';
+import MapInfo from '../screens/timetable/map-info';
+import Modify from '../screens/timetable/modify';
+import Preset from '../screens/timetable/preset';
+import Recommend from '../screens/timetable/recommend';
+import Timetable from '../screens/timetable/timetable';
+import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
 	return (
@@ -119,6 +116,7 @@ export default function StackNavigator() {
 					name='CommunityReadingScreen'
 					component={CommunityReadingScreen}
 					options={{
+						headerShown: false,
 						headerBackVisible: true,
 						headerBackTitleVisible: true,
 						headerTitle: '커뮤니티',

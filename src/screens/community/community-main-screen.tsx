@@ -18,6 +18,14 @@ export default function CommunityMainScreen({navigation}: any) {
 		console.log(item.postKey);
 	};
 
+	interface postDataType {
+		postTitle: string;
+		postContent: string;
+		postedAt: string;
+		postWriter: string;
+		likeList: string[];
+	}
+
 	// CommunityMainScreen으로 올 경우 새로 고침
 	useFocusEffect(
 		useCallback(() => {
@@ -29,10 +37,10 @@ export default function CommunityMainScreen({navigation}: any) {
 	const fetchCommunityData = async () => {
 		try {
 			const communitySnapshot = await firestore().collection('커뮤니티').orderBy('postedAt', 'desc').get();
-			const data: any[] = [];
+			const data: postDataType[] = [];
 
 			communitySnapshot.forEach(doc => {
-				const docData = doc.data();
+				const docData = doc.data() as postDataType;
 				data.push(docData);
 			});
 			setCommunityData(data);
@@ -59,8 +67,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	};
 
 	// 가져온 게시글 목록 보여주기
-	const renderPostItem = ({item}: {item: any}) => {
-		console.log(item);
+	const renderPostItem = ({item}: {item: postDataType}) => {
 		return (
 			<View style={styles.postItemContainer}>
 				<TouchableOpacity

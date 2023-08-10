@@ -1,27 +1,31 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Text, Center, IconButton, ThreeDotsIcon} from 'native-base';
-import {color} from 'native-base/lib/typescript/theme/styled-system';
-import LinearGradient from 'react-native-linear-gradient';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import * as KakaoLogin from '@react-native-seoul/kakao-login';
-import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
+import {Text, ThreeDotsIcon} from 'native-base';
 import {useState} from 'react';
-import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
-import CommunityWriteScreen from '../../screens/community/community-writing-screen';
+import {
+	Button,
+	Dimensions,
+	FlatList,
+	Modal,
+	SafeAreaView,
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 
-export default function CommunityReadingBottomPopSheet({navigation}: any) {
+export default function CommunityReadingBottomPopSheet() {
+	const navigation = useNavigation();
 	const goNext = () => {
 		navigation.navigate('CommunityWritingScreen');
 	};
 
-	const [modalVisible, setModalVisibile] = useState(false);
+	const [menuModalVisible, setMenuModalVisibile] = useState(false);
 	const deviceHeight = Dimensions.get('window').height;
 	const communityReadingMenuList = [
 		{
 			title: '수정',
 			onPress: () => {
 				console.log('글 수정 페이지로 이동');
-				setModalVisibile(!modalVisible);
+				setMenuModalVisibile(!menuModalVisible);
 				goNext();
 			},
 		},
@@ -29,7 +33,7 @@ export default function CommunityReadingBottomPopSheet({navigation}: any) {
 			title: '삭제',
 			onPress: () => {
 				console.log('글쓰기 페이지로 이동');
-				setModalVisibile(!modalVisible);
+				setMenuModalVisibile(!menuModalVisible);
 				goNext();
 			},
 		},
@@ -39,11 +43,23 @@ export default function CommunityReadingBottomPopSheet({navigation}: any) {
 		},
 	];
 
+	const flatListItemSeperator = () => {
+		return (
+			<View
+				style={{
+					height: 1,
+					width: '100%',
+					backgroundColor: 'blue',
+				}}
+			/>
+		);
+	};
+
 	return (
-		<SafeAreaView>
+		<View>
 			<TouchableOpacity
 				onPress={() => {
-					setModalVisibile(!modalVisible);
+					setMenuModalVisibile(true);
 				}}>
 				<View>
 					<ThreeDotsIcon></ThreeDotsIcon>
@@ -52,42 +68,49 @@ export default function CommunityReadingBottomPopSheet({navigation}: any) {
 			<Modal
 				animationType={'fade'}
 				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => setModalVisibile(!modalVisible)}>
-				<View
-					style={{
-						flex: 1,
-						backgroundColor: '#000000AA',
-						justifyContent: 'flex-end',
-					}}>
+				visible={menuModalVisible}
+				onRequestClose={() => setMenuModalVisibile(false)}>
+				<TouchableWithoutFeedback onPress={() => setMenuModalVisibile(false)}>
 					<View
 						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderTopRightRadius: 10,
-							borderTopLeftRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
+							flex: 1,
+							backgroundColor: '#000000AA',
+							justifyContent: 'flex-end',
 						}}>
-						<View>
-							<Text
+						<SafeAreaView>
+							<View
 								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
+									backgroundColor: '#FFFFFFFF',
+									width: '100%',
+									borderRadius: 10,
+									paddingHorizontal: 10,
+									maxHeight: deviceHeight * 0.4,
+									padding: 24,
 								}}>
-								게시판 메뉴
-							</Text>
-							<FlatList
-								data={communityReadingMenuList}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
+								<View>
+									<Text
+										style={{
+											color: '#182E44',
+											fontSize: 20,
+											fontWeight: '500',
+											margin: 15,
+										}}>
+										게시판 메뉴
+									</Text>
+									<FlatList
+										data={communityReadingMenuList}
+										renderItem={({item}) => (
+											<Button title={item.title} onPress={item.onPress}></Button>
+										)}
+										ItemSeparatorComponent={flatListItemSeperator}
+										scrollEnabled={false}
+									/>
+								</View>
+							</View>
+						</SafeAreaView>
 					</View>
-				</View>
+				</TouchableWithoutFeedback>
 			</Modal>
-		</SafeAreaView>
+		</View>
 	);
 }

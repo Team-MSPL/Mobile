@@ -8,7 +8,6 @@ import {
 	FlatList,
 	Image,
 	Keyboard,
-	KeyboardAvoidingView,
 	Modal,
 	NativeModules,
 	Platform,
@@ -41,6 +40,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [likeCount, setLikeCount] = useState(0);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+	const [statusBarHeight, setStatusBarHeight] = useState(0);
+	const scrollViewRef = useRef<ScrollView>(null);
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -54,10 +55,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			if (docSnapshot.exists) {
 				const data = docSnapshot.data();
 				const comment = data?.comment ?? [];
-				// const commentDataList = originCommentDataList.map((data: any) => ({
-				// 	...data,
-				// 	commentedAt: moment(data.commentedAt).format('yy/MM/DD HH:mm'),
-				// }));
 				setComment(comment);
 
 				const postContent = data?.postContent ?? '';
@@ -68,7 +65,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 				const likeList = data?.likeList ?? [];
 				// TODO 유저 닉네임으로 적용시켜야 함.
-				if (likeList.some((item: string) => item === '아이폰13미니')) {
+				if (likeList.some((item: string) => item === '아이폰xs')) {
 					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
@@ -87,8 +84,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				setStatusBarHeight(statusBarFrameData.height);
 			});
 	}, []);
-	const [statusBarHeight, setStatusBarHeight] = useState(0);
-	const scrollViewRef = useRef<ScrollView>(null);
 
 	// 댓글 등록 버튼 활성 및 비활성화
 	useEffect(() => {
@@ -127,9 +122,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			// db의 comment에 들어갈 정보들
 			const newCommentData = {
 				// TODO commenter에 유저 닉네임 적용시켜야 함.
-				commenter: '아이폰13미니',
+				commenter: '아이폰xs',
 				// TODO userid에 다님에서 발급해주는 고유 id값 적용시켜야 함.
-				userid: 'danim박호동',
+				userid: 'danim신제원',
 				commentContent: newCommentContent,
 				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
 				_id: shortid.generate(),
@@ -193,11 +188,11 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				// TODO shortid 대신에 userid로 수정해야 함.
 				// TODO 유저 닉네임으로 수정해야함.
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove('아이폰13미니'),
+					likeList: firestore.FieldValue.arrayRemove('아이폰xs'),
 				});
 			} else {
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion('아이폰13미니'),
+					likeList: firestore.FieldValue.arrayUnion('아이폰xs'),
 				});
 			}
 			fetchPostData();
@@ -213,73 +208,68 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	return (
-		<KeyboardAvoidingView
-			style={styles.keyboardContainer}
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			keyboardVerticalOffset={statusBarHeight + 44}>
-			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<View style={styles.container}>
-					<ScrollView
-						ref={scrollViewRef}
-						contentContainerStyle={styles.scrollViewContainer}
-						refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}>
-						<View onStartShouldSetResponder={() => true}>
-							<Text>제목: {route.params.postTitle}</Text>
-							<Text>본문</Text>
-							<Text style={styles.postContentText}>{postContent}</Text>
-							<Text>사진 목록</Text>
-							<View style={styles.imageContainer}>
-								{postImage.slice(0, 8).map((uri, index) => (
-									<Image key={index} source={{uri}} style={styles.image} />
-								))}
-								{postImage.length > 8 && (
-									<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-										<Text style={styles.moreButtonText}>더보기</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-							<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
-								<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-								<ScrollView contentContainerStyle={styles.modalContainer}>
-									{postImage.map((uri, index) => (
-										<Image key={index} source={{uri}} style={styles.modalImage} />
-									))}
-								</ScrollView>
-							</Modal>
-							<View style={styles.likeContainer}>
-								<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-									<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
-									<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
+		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<View style={styles.container}>
+				<ScrollView
+					ref={scrollViewRef}
+					contentContainerStyle={styles.scrollViewContainer}
+					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}>
+					<View onStartShouldSetResponder={() => true}>
+						<Text>제목: {route.params.postTitle}</Text>
+						<Text>본문</Text>
+						<Text style={styles.postContentText}>{postContent}</Text>
+						<Text>사진 목록</Text>
+						<View style={styles.imageContainer}>
+							{postImage.slice(0, 8).map((uri, index) => (
+								<Image key={index} source={{uri}} style={styles.image} />
+							))}
+							{postImage.length > 8 && (
+								<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+									<Text style={styles.moreButtonText}>더보기</Text>
 								</TouchableOpacity>
-								<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
-							</View>
-							<Text>댓글</Text>
-							<FlatList
-								data={commentDataList}
-								renderItem={renderCommentItem}
-								keyExtractor={(item, index) => index.toString()}
-								initialNumToRender={10}
-								ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
-							/>
+							)}
 						</View>
-					</ScrollView>
-					<View style={styles.inputContainer}>
-						<TextInput
-							style={styles.input}
-							value={newCommentContent}
-							onChangeText={text => setNewComment(text)}
-							placeholder='댓글을 입력하세요...'
+						<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
+							<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+							<ScrollView contentContainerStyle={styles.modalContainer}>
+								{postImage.map((uri, index) => (
+									<Image key={index} source={{uri}} style={styles.modalImage} />
+								))}
+							</ScrollView>
+						</Modal>
+						<View style={styles.likeContainer}>
+							<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+								<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
+								<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
+							</TouchableOpacity>
+							<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
+						</View>
+						<Text>댓글</Text>
+						<FlatList
+							data={commentDataList}
+							renderItem={renderCommentItem}
+							keyExtractor={(item, index) => index.toString()}
+							initialNumToRender={10}
+							ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
 						/>
-						<TouchableOpacity
-							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-							disabled={isCommentButtonDisabled}
-							onPress={handleCommentSubmit}>
-							<Text style={styles.submitButtonText}>등록</Text>
-						</TouchableOpacity>
 					</View>
+				</ScrollView>
+				<View style={styles.inputContainer}>
+					<TextInput
+						style={styles.input}
+						value={newCommentContent}
+						onChangeText={text => setNewComment(text)}
+						placeholder='댓글을 입력하세요...'
+					/>
+					<TouchableOpacity
+						style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+						disabled={isCommentButtonDisabled}
+						onPress={handleCommentSubmit}>
+						<Text style={styles.submitButtonText}>등록</Text>
+					</TouchableOpacity>
 				</View>
-			</TouchableWithoutFeedback>
-		</KeyboardAvoidingView>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 }
 

@@ -34,7 +34,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 			mediaType: 'photo',
 			cropping: true,
 			maxFiles: 10,
-			includeBase64: Platform.OS === 'android',
+			includeBase64: true,
 		}).then(response => {
 			if (response.length > 10) {
 				Alert.alert('사진은 최대 10장까지 가능합니다.');
@@ -50,7 +50,9 @@ export default function CommunityWritingScreen({navigation}: any) {
 				console.log('사진 선택을 취소하였습니다.');
 				return;
 			}
-			const selectedImageUris = response.map(image => image.path);
+			const selectedImageUris = response.map(image =>
+				Platform.OS === 'android' ? 'file://' + image.path : image.path,
+			);
 			setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
 			console.log('이미지 주소', postImage);
 		});
@@ -84,7 +86,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 					postContent: postContent,
 					postImage: postImage,
 					// TODO 작성자 닉네임 가져와서 반영해주기
-					postWriter: '아이폰13미니',
+					postWriter: '아이폰xs',
 					// TODO 작성자 다님 고유 아이디 값 가져와서 반영해주기
 					postWriterUserId: '작성자의 다님 고유 id',
 					postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
