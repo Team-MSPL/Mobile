@@ -7,17 +7,16 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
-	Keyboard,
+	InputAccessoryView,
 	Modal,
 	NativeModules,
 	Platform,
-	RefreshControl,
+	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
-	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -208,72 +207,93 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	return (
-		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-			<View style={styles.container}>
-				<ScrollView
-					ref={scrollViewRef}
-					contentContainerStyle={styles.scrollViewContainer}
-					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}>
-					<View onStartShouldSetResponder={() => true}>
-						<Text>제목: {route.params.postTitle}</Text>
-						<Text>본문</Text>
-						<Text style={styles.postContentText}>{postContent}</Text>
-						<Text>사진 목록</Text>
-						<View style={styles.imageContainer}>
-							{postImage.slice(0, 8).map((uri, index) => (
-								<Image key={index} source={{uri}} style={styles.image} />
-							))}
-							{postImage.length > 8 && (
-								<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-									<Text style={styles.moreButtonText}>더보기</Text>
-								</TouchableOpacity>
-							)}
-						</View>
-						<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
-							<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-							<ScrollView contentContainerStyle={styles.modalContainer}>
-								{postImage.map((uri, index) => (
-									<Image key={index} source={{uri}} style={styles.modalImage} />
+		<View style={styles.container}>
+			<View style={styles.postNCommentContainer}>
+				<FlatList
+					ListHeaderComponent={
+						<View>
+							<Text>제목: {route.params.postTitle}</Text>
+							<Text>본문</Text>
+							<Text style={styles.postContentText}>{postContent}</Text>
+							<Text>사진 목록</Text>
+							<View style={styles.imageContainer}>
+								{postImage.slice(0, 8).map((uri, index) => (
+									<Image key={index} source={{uri}} style={styles.image} />
 								))}
-							</ScrollView>
-						</Modal>
-						<View style={styles.likeContainer}>
-							<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-								<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
-								<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
-							</TouchableOpacity>
-							<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
+								{postImage.length > 8 && (
+									<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+										<Text style={styles.moreButtonText}>더보기</Text>
+									</TouchableOpacity>
+								)}
+							</View>
+							<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
+								<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+								<ScrollView contentContainerStyle={styles.modalContainer}>
+									{postImage.map((uri, index) => (
+										<Image key={index} source={{uri}} style={styles.modalImage} />
+									))}
+								</ScrollView>
+							</Modal>
+							<View style={styles.likeContainer}>
+								<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+									<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
+									<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
+								</TouchableOpacity>
+								<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
+							</View>
+							<Text>댓글</Text>
 						</View>
-						<Text>댓글</Text>
-						<FlatList
-							data={commentDataList}
-							renderItem={renderCommentItem}
-							keyExtractor={(item, index) => index.toString()}
-							initialNumToRender={10}
-							ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
-						/>
-					</View>
-				</ScrollView>
-				<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
-						value={newCommentContent}
-						onChangeText={text => setNewComment(text)}
-						placeholder='댓글을 입력하세요...'
-					/>
-					<TouchableOpacity
-						style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-						disabled={isCommentButtonDisabled}
-						onPress={handleCommentSubmit}>
-						<Text style={styles.submitButtonText}>등록</Text>
-					</TouchableOpacity>
-				</View>
+					}
+					data={commentDataList}
+					renderItem={renderCommentItem}
+					keyExtractor={(item, index) => index.toString()}
+					initialNumToRender={10}
+					ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
+				/>
 			</View>
-		</TouchableWithoutFeedback>
+			<SafeAreaView>
+				<InputAccessoryView>
+					<View style={styles.inputContainer}>
+						<TextInput
+							style={styles.commentInputField}
+							value={newCommentContent}
+							onChangeText={text => setNewComment(text)}
+							placeholder='댓글을 입력하세요...'
+						/>
+						<TouchableOpacity
+							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+							disabled={isCommentButtonDisabled}
+							onPress={handleCommentSubmit}>
+							<Text style={styles.submitButtonText}>등록</Text>
+						</TouchableOpacity>
+					</View>
+				</InputAccessoryView>
+			</SafeAreaView>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
+	container: {
+		height: Dimensions.get('window').height,
+		padding: 16,
+	},
+	postNCommentContainer: {
+		flex: 1,
+	},
+	postContentText: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginBottom: 16,
+	},
+	commentItemContainer: {
+		height: Dimensions.get('window').height * 0.1,
+		borderWidth: 1,
+		borderColor: '#ccc',
+		borderRadius: 8,
+		padding: 8,
+		marginBottom: 8,
+	},
 	commentProfileImage: {
 		width: 24,
 		height: 24,
@@ -283,41 +303,30 @@ const styles = StyleSheet.create({
 		borderColor: '#5DC3DB',
 		resizeMode: 'contain',
 	},
-	scrollViewContainer: {
-		flexGrow: 1,
-	},
-	container: {
-		flex: 1,
-		padding: 16,
-	},
-	postContentText: {
-		fontSize: 16,
-		fontWeight: 'bold',
-		marginBottom: 16,
-	},
-	commentItemContainer: {
-		borderWidth: 1,
-		borderColor: '#ccc',
-		borderRadius: 8,
-		padding: 8,
-		marginBottom: 8,
-	},
 	inputContainer: {
+		padding: 4,
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginTop: 16,
+		height: Dimensions.get('window').height * 0.08,
+		width: Dimensions.get('window').width,
+		backgroundColor: 'white',
 	},
-	input: {
-		flex: 1,
+	commentInputField: {
+		flex: 7,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
 		padding: 8,
+		margin: 4,
 	},
 	submitButton: {
+		flex: 1,
 		backgroundColor: 'blue',
-		padding: 10,
+		padding: 8,
+		justifyContent: 'center',
+		alignItems: 'center',
 		borderRadius: 8,
+		margin: 4,
 	},
 	submitButtonText: {
 		color: 'white',
@@ -367,7 +376,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ffffff',
 	},
 	likeContainer: {
-		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'flex-start',
 		marginBottom: 48,
