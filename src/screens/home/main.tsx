@@ -6,12 +6,16 @@ import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/tra
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
+		dispatch(travelSliceActions.setMakeMode(true));
 		navigation.navigate('SelectCity');
 	};
 	const dispatch = useAppDispatch();
 	const zxc = () => {
 		dispatch(travelSliceActions.setSingleMode());
 		navigation.navigate('Timetable');
+	};
+	const regionRecommend = () => {
+		navigation.navigate('RegionSelectTendency');
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
@@ -28,6 +32,17 @@ export default function Main({navigation}: any) {
 					</Button>
 					<Text mt='4' bold>
 						새로운 일정 만들기
+					</Text>
+					<Text>새로운 여정을 추가해보세요</Text>
+				</Center>
+			</Center>
+			<Center my='5'>
+				<Center bgColor='white' w='300' h='200' borderRadius='10px' borderWidth='1px' borderColor='grey'>
+					<Button w='100' h='100' borderRadius='99px' bgColor='#58D3F7' onPress={regionRecommend}>
+						+{/* 플러스는 아이콘이나 svg하면 될듯 지금은 그냥 이걸로함 */}
+					</Button>
+					<Text mt='4' bold>
+						지역 추천이요
 					</Text>
 					<Text>새로운 여정을 추가해보세요</Text>
 				</Center>

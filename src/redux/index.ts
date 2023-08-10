@@ -4,11 +4,13 @@ import travelSliceReducer from './travel-info/travel.slice';
 import loginSliceReducer from './login-info/login.slice';
 import loadingSliceReducer from './loading/loading.slice';
 import communitySliceReducer from './community/community.slice';
+import RegionRecommendSliceReducer from './travel-info/region-recommend.slice';
 const appReducer = combineReducers({
 	travelSlice: travelSliceReducer,
 	loginSlice: loginSliceReducer,
 	loadingSlice: loadingSliceReducer,
 	communitySlice: communitySliceReducer,
+	RegionRecommendSlice: RegionRecommendSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {

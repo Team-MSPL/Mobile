@@ -1,16 +1,27 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {TouchableOpacity, Image} from 'react-native';
-import {googleKeywordApi} from '../../redux/travel-info/travel.slice';
+import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
-export default function CourseDetail({navigation}: any) {
-	const {courseDetail} = useAppSelector(state => state.travelSlice);
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+export default function CourseDetail({navigation, route}: any) {
+	const [courseDetail, setCourseDetail] = useState<CourseDetailType>();
 	const dispatch = useAppDispatch();
-	const viewDetail = (e: any) => {
-		dispatch(googleKeywordApi(e));
-		navigation.navigate('CourseDetail');
+	const getDetail = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
+			setCourseDetail(a);
+		} catch (err) {
+			console.log('에러요', err);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
 	};
+	useEffect(() => {
+		getDetail();
+	}, []);
 	if (courseDetail?.name)
 		return (
 			<ScrollView>

@@ -4,8 +4,9 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Center} from 'native-base';
 import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {TouchableOpacity, Linking} from 'react-native';
+import {TouchableOpacity, Linking, Platform} from 'react-native';
 import SelectButton from '../../utill/component/select-button';
+import BaseModal from '../../utill/base-modal';
 
 export default function MapInfo({navigation}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
@@ -16,6 +17,7 @@ export default function MapInfo({navigation}: any) {
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
+	const [visible, setVisible] = useState(true);
 	const moveRegion = (e: number) => {
 		console.log(timetable[select][e]);
 		if (mapRef.current) {
@@ -30,14 +32,24 @@ export default function MapInfo({navigation}: any) {
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
 		}
 	};
-	const goNavigation = (e: number) => {
-		Linking.openURL(
-			`nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${
-				timetable[select][e].name
-			}&dlat=${timetable[select][e + 1].lat}&dlng=${timetable[select][e + 1].lng}&dname=${
-				timetable[select][e + 1].name
-			}&appname=com.example.myapp`,
-		);
+	const goNavigation = async (e: number) => {
+		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${
+			timetable[select][e].name
+		}&dlat=${timetable[select][e + 1].lat}&dlng=${timetable[select][e + 1].lng}&dname=${
+			timetable[select][e + 1].name
+		}&appname=다님`;
+		const supported = await Linking.canOpenURL(url);
+		if (supported) {
+			await Linking.openURL(url);
+		} else {
+			if (Platform.OS === 'android') {
+				const GOOGLE_PLAY_STORE_LINK = 'market://details?id=com.nhn.android.nmap';
+				await Linking.openURL(GOOGLE_PLAY_STORE_LINK);
+			} else {
+				const APPLE_APP_STORE_LINK = 'http://itunes.apple.com/app/id311867728?mt=8';
+				await Linking.openURL(APPLE_APP_STORE_LINK);
+			}
+		}
 	};
 	const mapRef = useRef<MapView>(null);
 	const polylineCoordinates = timetable[select].map((item, value) => ({latitude: item.lat, longitude: item.lng}));
@@ -74,16 +86,19 @@ export default function MapInfo({navigation}: any) {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
+				setVisible(false);
 				setSelect(i);
 				break;
 			}
 		}
-		console.log(a.current, 'ㅋㅋ');
 	}, []);
+	const goBack = () => {
+		navigation.goBack();
+	};
 	if (polylineCoordinates.length == 0) {
 		return (
 			<Box>
-				<Text>보여줄거 없음 ㅋ</Text>
+				<BaseModal visible={visible} title={'보여줄거없음'} right={goBack} />
 			</Box>
 		);
 	}
@@ -106,6 +121,7 @@ export default function MapInfo({navigation}: any) {
 					(item, idx) =>
 						select == idx && (
 							<MapView
+								key={idx}
 								ref={mapRef}
 								provider={PROVIDER_GOOGLE}
 								showsMyLocationButton={true}
@@ -122,22 +138,7 @@ export default function MapInfo({navigation}: any) {
 							</MapView>
 						),
 				)}
-				{/* {a.current && (
-					<MapView
-						ref={mapRef}
-						style={{width: '100%', height: 300}}
-						provider={PROVIDER_GOOGLE}
-						showsMyLocationButton={true}
-						region={{
-							latitude: centerLatitude,
-							longitude: centerLongitude,
-							latitudeDelta: deltaLatitude + 0.01,
-							longitudeDelta: deltaLongitude + 0.01,
-						}}>
-						{markers}
-						{polylines}
-					</MapView>
-				)} */}
+
 				{timetable[select].map((value, index) =>
 					index != timetable[select].length - 1 ? (
 						<Box key={index}>

@@ -36,7 +36,7 @@ const initialState: LiteState = {
 	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
 	editMode: '', // 삭제모드=delete, 추가모드=add
 	recommendList: [], //추천할때 쓰이는 리스트
-	makeMode: false, //true=추천모드, fasle==혼자짤래요
+	makeMode: true, //true=추천모드, fasle==혼자짤래요
 };
 
 const axiosAuth = axios.create({
@@ -211,7 +211,7 @@ export const travelSlice = createSlice({
 					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
 						copy[idx].push({
 							...updateItem,
-							name: eatTimeList[0] == 8 ? '점심 추천' : '저녁추천',
+							name: eatTimeList[0] == 8 ? '점심 추천' : '저녁 추천',
 							y: time,
 							takenTime: 60,
 							id: shortId.generate(),
@@ -296,7 +296,7 @@ interface LiteState {
 	presetDatas: TimetableType[][][];
 	timetable: TimetableType[][];
 	moveTimeList: number[][] | [];
-	courseDetail: CourseDetail;
+	courseDetail: CourseDetailType;
 	editMode: string;
 	recommendList: RecommendList[];
 	makeMode: boolean;
@@ -344,7 +344,7 @@ export interface TimetableType {
 	id?: string;
 }
 
-export interface CourseDetail {
+export interface CourseDetailType {
 	name: string;
 	rating: number;
 	reviews: Reviews[];

@@ -12,26 +12,18 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
 	const newY = useRef(0);
 	const goRecommend = (category: string) => {
+		let lat = 0;
+		let lng = 0;
+		let radius = 2000;
 		switch (newY.current) {
 			case timetable[route.params.x].length:
-				dispatch(
-					recommendApi({
-						category: category,
-						lat: timetable[route.params.x][timetable[route.params.x].length - 1].lat,
-						lng: timetable[route.params.x][timetable[route.params.x].length - 1].lng,
-						radius: 2000,
-					}),
-				);
+				lat = timetable[route.params.x][timetable[route.params.x].length - 1].lat;
+				lng = timetable[route.params.x][timetable[route.params.x].length - 1].lng;
+
 				break;
 			case 0:
-				dispatch(
-					recommendApi({
-						category: category,
-						lat: timetable[route.params.x][0].lat,
-						lng: timetable[route.params.x][0].lng,
-						radius: 2000,
-					}),
-				);
+				lat = timetable[route.params.x][0].lat;
+				lng = timetable[route.params.x][0].lng;
 				break;
 			case -1:
 				console.log('비교할게없네유');
@@ -52,29 +44,27 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						Math.sin(dLon / 2);
 				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
-				dispatch(
-					recommendApi({
-						category: category,
-						lat:
-							(timetable[route.params.x][newY.current - 1].lat +
-								timetable[route.params.x][newY.current].lat) /
-							2,
-						lng:
-							(timetable[route.params.x][newY.current - 1].lng +
-								timetable[route.params.x][newY.current].lng) /
-							2,
-						radius: distance >= 20 ? 20000 : distance * 1000,
-					}),
-				);
+				lat =
+					(timetable[route.params.x][newY.current - 1].lat + timetable[route.params.x][newY.current].lat) / 2;
+				lng =
+					(timetable[route.params.x][newY.current - 1].lng + timetable[route.params.x][newY.current].lng) / 2;
+				console.log();
+				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				console.log('zzzz', radius);
+
 				break;
 		}
-		const categoryIndex = category == 'AD5' ? 4 : 'FD6' ? 1 : 3;
+		const categoryIndex = category == 'AD5' ? 4 : category == 'FD6' ? 1 : 3;
 		navigation.navigate('Recommend', {
 			name: '',
 			x: route.params.x,
 			index: newY.current,
 			y: route.params.y,
 			category: categoryIndex,
+			lat: lat,
+			lng: lng,
+			apiCategory: category,
+			radius: radius,
 		});
 	};
 	const addTimetable = () => {

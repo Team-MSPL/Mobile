@@ -8,10 +8,12 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import MapView, {Polyline, Marker} from 'react-native-maps';
 import {GOOGLE_API_KEY} from '@env';
 import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import BaseModal from '../../utill/base-modal';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
+	const [visible, setVisible] = useState(false);
 	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
@@ -74,6 +76,9 @@ export default function Recommend({navigation, route}: any) {
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
 		}
 	};
+	const checkMessage = () => {
+		setVisible(true);
+	};
 	const addRecommend = () => {
 		let copy = [...timetable];
 		copy[route.params.x] = recommendItem;
@@ -104,7 +109,38 @@ export default function Recommend({navigation, route}: any) {
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.navigate('Timetable');
 	};
-
+	const getRecommendList = () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			console.log(
+				'띵',
+				route.params.apiCategory,
+				'ㅂㅈ',
+				route.params.lat,
+				'ㄴ',
+				route.params.lng,
+				'qwe',
+				route.params.radius,
+				'에',
+				route.params.category,
+			);
+			dispatch(
+				recommendApi({
+					category: route.params.apiCategory,
+					lat: route.params.lat,
+					lng: route.params.lng,
+					radius: route.params.radius,
+				}),
+			);
+		} catch (err) {
+			console.log(err, '에러요');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		getRecommendList();
+	}, []);
 	const mapRef = useRef<MapView>(null);
 	if (!recommendList) {
 		return (
@@ -142,12 +178,28 @@ export default function Recommend({navigation, route}: any) {
 				))}
 			</ScrollView>
 			<TouchableOpacity
-				onPress={addRecommend}
-				style={{width: '100%', height: 50, margin: 5, backgroundColor: 'orange', alignItems: 'center'}}>
-				<Text bold fontSize='lg' disabled={select == -1}>
+				onPress={checkMessage}
+				disabled={select == -1}
+				style={{
+					width: '100%',
+					height: 50,
+					margin: 5,
+					backgroundColor: 'orange',
+					alignItems: 'center',
+					opacity: select == -1 ? 0.5 : 1,
+				}}>
+				<Text bold fontSize='lg'>
 					선택이요
 				</Text>
 			</TouchableOpacity>
+			<BaseModal
+				title={'바로 추가됩니다!'}
+				visible={visible}
+				left={() => {
+					setVisible(false);
+				}}
+				right={addRecommend}
+			/>
 		</Box>
 	);
 }

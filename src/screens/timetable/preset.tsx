@@ -28,6 +28,7 @@ export default function Preset({navigation}: any) {
 
 	const getAi = async () => {
 		try {
+			dispatch(LoadingSliceActions.onLoading());
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
 			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(

@@ -13,37 +13,19 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	const {timetable, editMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const viewDetail = (e: any) => {
-		console.log(e.lat);
-		console.log(e.lng);
-		dispatch(googleKeywordApi(e.value));
-		navigation.navigate('CourseDetail');
+		navigation.navigate('CourseDetail', {value: e.value});
 	};
 	const indexRef = useRef<{value: TimetableType; index: number}>({value: timetable[0][0], index: 0});
 	const [visible, setVisible] = useState(false);
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
-		//앞이 아예 없거나 앞이 저녁 추천이면 ..? 그럴수가없넹
+		let lat = 0;
+		let lng = 0;
 		e.index != 0
-			? dispatch(
-					recommendApi({
-						category: 'AD5',
-						lat: timetable[e.idx][e.index - 1].lat,
-						lng: timetable[e.idx][e.index - 1].lng,
-						radius: 2000,
-					}),
-			  )
-			: dispatch(
-					recommendApi({
-						category: 'AD5',
-						lat: timetable[e.idx][e.index + 1].lat,
-						lng: timetable[e.idx][e.index + 1].lng,
-						radius: 2000,
-					}),
-			  );
+			? ((lat = timetable[e.idx][e.index - 1].lat), (lng = timetable[e.idx][e.index - 1].lng))
+			: ((lat = timetable[e.idx][e.index + 1].lat), (lng = timetable[e.idx][e.index + 1].lng));
 		const startNumber = e.value.y; // 시작 숫자
 		const count = e.value.takenTime / 30; // 원하는 갯수
-
 		const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-		console.log(sequentialArray); // [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
 		navigation.navigate('Recommend', {
 			name: '숙소 추천',
@@ -51,32 +33,25 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			index: e.index,
 			y: sequentialArray,
 			category: e.value.category,
+			lat: lat,
+			lng: lng,
+			apiCategory: 'AD5',
+			radius: 2000,
 		});
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
 		if (timetable[e.idx].length == 0) {
 			console.log('한개밖에 없어서 못해여');
 		} else {
-			console.log(e.index, timetable[e.idx].length);
-			//혼자일때도 처리
+			let lat = 0;
+			let lng = 0;
+			let radius = 2000;
 			if (e.index == timetable[e.idx].length - 1) {
-				dispatch(
-					recommendApi({
-						category: 'FD6',
-						lat: timetable[e.idx][timetable[e.idx].length - 2].lat,
-						lng: timetable[e.idx][timetable[e.idx].length - 2].lng,
-						radius: 2000,
-					}),
-				);
+				lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
+				lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
 			} else if (e.index == 0) {
-				dispatch(
-					recommendApi({
-						category: 'FD6',
-						lat: timetable[e.idx][1].lat,
-						lng: timetable[e.idx][1].lng,
-						radius: 2000,
-					}),
-				);
+				lat = timetable[e.idx][1].lat;
+				lng = timetable[e.idx][1].lng;
 			} else {
 				const dLat = (timetable[e.idx][e.index - 1].lat - timetable[e.idx][e.index + 1].lat) * (Math.PI / 180);
 				const dLon = (timetable[e.idx][e.index - 1].lng - timetable[e.idx][e.index + 1].lng) * (Math.PI / 180);
@@ -89,23 +64,14 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 						Math.sin(dLon / 2);
 				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
-				console.log(Math.ceil(distance));
-				console.log('dd');
-
-				dispatch(
-					recommendApi({
-						category: 'FD6',
-						lat: (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2,
-						lng: (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2,
-						radius: distance * 1000,
-					}),
-				);
+				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
+				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
+				radius = distance * 1000;
 			}
 			const startNumber = e.value.y; // 시작 숫자
 			const count = e.value.takenTime / 30; // 원하는 갯수
 
 			const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-			console.log(sequentialArray); // [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
 			navigation.navigate('Recommend', {
 				name: '식당 추천',
@@ -113,11 +79,14 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				index: e.index,
 				y: sequentialArray,
 				category: e.value.category,
+				lat: lat,
+				lng: lng,
+				apiCategory: 'FD6',
+				radius: radius,
 			});
 		}
 	};
 	const categortColors = ['blue', 'orange', 'green', 'pink', 'purple', 'gray'];
-	const [deleteMode, setDeleteMode] = useState(false);
 
 	return (
 		<Box>
