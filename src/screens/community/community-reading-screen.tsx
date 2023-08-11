@@ -1,7 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-import { HStack } from 'native-base';
-import { useEffect, useRef, useState } from 'react';
+import {HStack} from 'native-base';
+import {useEffect, useRef, useState} from 'react';
 import {
 	Alert,
 	Dimensions,
@@ -146,9 +146,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			<View style={styles.commentItemContainer}>
 				<HStack space={1} alignItems='center'>
 					{/* TODO: 이미지를 유저 개인 프로필 사진 가져오는 걸로 바꿔야 함.*/}
-					<Image
+					{/* <Image
 						source={require('/Users/sjw/Danim_RN/Mobile/public/images/danim_logo.png')}
-						style={styles.commentProfileImage}></Image>
+						style={styles.commentProfileImage}></Image> */}
 					<Text>{item.commenter}</Text>
 				</HStack>
 				<Text>{item.commentContent}</Text>

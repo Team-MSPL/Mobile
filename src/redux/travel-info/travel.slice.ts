@@ -39,16 +39,16 @@ const initialState: LiteState = {
 	makeMode: true, //true=추천모드, fasle==혼자짤래요
 };
 
-const axiosAuth = axios.create({
+export const axiosAuth = axios.create({
 	baseURL: API_ROUTE,
 	headers: {'content-type': 'application/json'},
 });
 
-const axiosGoogle = axios.create({
+export const axiosGoogle = axios.create({
 	baseURL: 'https://maps.googleapis.com/maps/api',
 	headers: {'content-type': 'application/json'},
 });
-const axiosKakao = axios.create({
+export const axiosKakao = axios.create({
 	baseURL: 'https://dapi.kakao.com/v2/local/search',
 	headers: {
 		'content-type': 'application/json',

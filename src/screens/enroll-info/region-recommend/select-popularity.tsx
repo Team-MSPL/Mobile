@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {useAppDispatch} from '../../../redux';
+import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider} from 'native-base';
 import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
@@ -7,40 +7,44 @@ import {RegionRecommendSliceActions} from '../../../redux/travel-info/region-rec
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 
+	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.RegionRecommendSlice);
 	const [selectedId, setSelectedId] = useState<string | undefined>();
 	const goNext = () => {
-		dispatch(RegionRecommendSliceActions.enrollPopularity(selectedId));
+		let data = Number(selectedId) * 20;
+		dispatch(RegionRecommendSliceActions.enrollPopularity([data, data + 20]));
+		//사실 전역안쓰고 보내버려도 되긴함.
+		let datas = {
+			selectList: tendency,
+			selectPopular: [data, data + 20],
+			recentPosition: {lat: lat, lng: lng},
+			distanceSensitivity: distance,
+		};
+
 		navigation.navigate('RegionViewResult');
 	};
 	const radioButtons: RadioButtonProps[] = useMemo(
 		() => [
 			{
 				id: '1',
-				label: '완전 유명하지않은',
+				label: '유명하지않은',
 				value: 'option1',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '2',
-				label: '조금 유명하지않은',
+				label: '아리까리한',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '3',
-				label: '보통',
+				label: '알확률 있는',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '4',
-				label: '적당히 유명한',
-				value: 'option2',
-				labelStyle: {color: 'black', fontSize: 18},
-			},
-			{
-				id: '5',
-				label: '굉장히 유명한',
+				label: ' 유명한',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
