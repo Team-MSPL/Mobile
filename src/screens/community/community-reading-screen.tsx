@@ -1,17 +1,16 @@
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-import { HStack } from 'native-base';
-import { useEffect, useRef, useState } from 'react';
+import {HStack, KeyboardAvoidingView} from 'native-base';
+import {useEffect, useState} from 'react';
 import {
 	Alert,
 	Dimensions,
 	FlatList,
 	Image,
-	InputAccessoryView,
 	Modal,
 	NativeModules,
 	Platform,
-	SafeAreaView,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -21,6 +20,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
+import ReportModal from '../../utill/component/community/report-modal';
 
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
@@ -34,13 +34,11 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [postImage, setPostImage] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
 	const [isMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
-	const [isDetailImageModalVisible, setIsDetailImageModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
 	const [likeCount, setLikeCount] = useState(0);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [statusBarHeight, setStatusBarHeight] = useState(0);
-	const scrollViewRef = useRef<ScrollView>(null);
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -103,16 +101,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			resizeSubscription.remove();
 		};
 	}, []);
-
-	const handleTextInputFocus = () => {
-		// 텍스트 입력 창이 포커스되면 스크롤 뷰를 해당 입력 창 위치로 스크롤
-		scrollViewRef.current?.scrollToEnd({animated: true});
-	};
-
-	const handleResize = () => {
-		const newSize = Dimensions.get('window').width / 4 - 16;
-		setImageSize(newSize);
-	};
 
 	// *댓글 등록 버튼 눌렀을 때
 	const handleCommentSubmit = async () => {
@@ -206,10 +194,23 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
+	// 앱 바 우측 더보기 버튼
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => {
+				return <ReportModal></ReportModal>;
+			},
+		});
+	}, []);
+
 	return (
-		<View style={styles.container}>
+		<KeyboardAvoidingView
+			style={styles.container}
+			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+			keyboardVerticalOffset={statusBarHeight + 44}>
 			<View style={styles.postNCommentContainer}>
 				<FlatList
+					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 					ListHeaderComponent={
 						<View>
 							<Text>제목: {route.params.postTitle}</Text>
@@ -251,34 +252,38 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
 				/>
 			</View>
-			<SafeAreaView>
-				<InputAccessoryView>
-					<View style={styles.inputContainer}>
-						<TextInput
-							style={styles.commentInputField}
-							value={newCommentContent}
-							onChangeText={text => setNewComment(text)}
-							placeholder='댓글을 입력하세요...'
-						/>
-						<TouchableOpacity
-							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-							disabled={isCommentButtonDisabled}
-							onPress={handleCommentSubmit}>
-							<Text style={styles.submitButtonText}>등록</Text>
-						</TouchableOpacity>
-					</View>
-				</InputAccessoryView>
-			</SafeAreaView>
-		</View>
+
+			<View style={styles.inputContainer}>
+				<TextInput
+					style={styles.commentInputField}
+					value={newCommentContent}
+					onChangeText={text => setNewComment(text)}
+					placeholder='댓글을 입력하세요...'
+				/>
+				<TouchableOpacity
+					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+					disabled={isCommentButtonDisabled}
+					onPress={handleCommentSubmit}>
+					<Text style={styles.submitButtonText}>등록</Text>
+				</TouchableOpacity>
+			</View>
+		</KeyboardAvoidingView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		height: Dimensions.get('window').height,
+		flex: 1,
 	},
 	postNCommentContainer: {
+		flex: 9,
+	},
+	inputContainer: {
 		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'white',
 	},
 	postContentText: {
 		fontSize: 16,
@@ -301,14 +306,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#5DC3DB',
 		resizeMode: 'contain',
-	},
-	inputContainer: {
-		padding: 4,
-		flexDirection: 'row',
-		alignItems: 'center',
-		height: Dimensions.get('window').height * 0.08,
-		width: Dimensions.get('window').width,
-		backgroundColor: 'white',
 	},
 	commentInputField: {
 		flex: 7,
