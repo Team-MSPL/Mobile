@@ -276,7 +276,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 const styles = StyleSheet.create({
 	container: {
 		height: Dimensions.get('window').height,
-		padding: 16,
 	},
 	postNCommentContainer: {
 		flex: 1,
@@ -292,7 +291,7 @@ const styles = StyleSheet.create({
 		borderColor: '#ccc',
 		borderRadius: 8,
 		padding: 8,
-		marginBottom: 8,
+		margin: 8,
 	},
 	commentProfileImage: {
 		width: 24,
