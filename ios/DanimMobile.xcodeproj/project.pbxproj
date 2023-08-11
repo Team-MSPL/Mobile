@@ -10,12 +10,12 @@
 		00E356F31AD99517003FC87E /* DanimMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* DanimMobileTests.m */; };
 		0ED1FC30A91837CB6A18E9C9 /* Pods_DanimMobile_DanimMobileTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F52BBD6DFF2005D77C42206 /* Pods_DanimMobile_DanimMobileTests.framework */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
-		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		24898BBA054EC4C84F0CABBE /* Pods_DanimMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E06AFEE820299F9D13EA69 /* Pods_DanimMobile.framework */; };
 		6B11C9022A7A420C00A32397 /* Swift Bridging Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */; };
 		6B14E63E2A7B4ED10021332D /* AppDelegate.h in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FAF1A68108700A75B9A /* AppDelegate.h */; };
-		6B3316DF2A78A59A009AFDCC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B3316DE2A78A59A009AFDCC /* GoogleService-Info.plist */; };
+		6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1D4B442A839D1E00920AAA /* Assets.xcassets */; };
+		6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -36,15 +36,34 @@
 		13B07F961A680F5B00A75B9A /* DanimMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DanimMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = DanimMobile/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AppDelegate.mm; path = DanimMobile/AppDelegate.mm; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DanimMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DanimMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DanimMobile/main.m; sourceTree = "<group>"; };
 		1806795ABFA7922C91013BE4 /* Pods-DanimMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2F52BBD6DFF2005D77C42206 /* Pods_DanimMobile_DanimMobileTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DanimMobile_DanimMobileTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AA2825828FC86D4BC587BFE /* Pods-DanimMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.release.xcconfig"; sourceTree = "<group>"; };
 		6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Swift Bridging Header.swift"; sourceTree = "<group>"; };
-		6B3316DE2A78A59A009AFDCC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6B1D4B442A839D1E00920AAA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6B38229C2A8248D700A1F0CF /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		6B38229D2A8248D700A1F0CF /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Solid.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
+		6B38229E2A8248D700A1F0CF /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
+		6B38229F2A8248D700A1F0CF /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Brands.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
+		6B3822A02A8248D700A1F0CF /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Brands.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf"; sourceTree = "<group>"; };
+		6B3822A12A8248D700A1F0CF /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		6B3822A22A8248D700A1F0CF /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Regular.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf"; sourceTree = "<group>"; };
+		6B3822A32A8248D700A1F0CF /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Regular.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
+		6B3822A42A8248D700A1F0CF /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Entypo.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
+		6B3822A52A8248D700A1F0CF /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Solid.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
+		6B3822A62A8248D700A1F0CF /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		6B3822A72A8248D700A1F0CF /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Octicons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
+		6B3822A82A8248D700A1F0CF /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Feather.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		6B3822A92A8248D700A1F0CF /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Fontisto.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
+		6B3822AA2A8248D700A1F0CF /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Zocial.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		6B3822AB2A8248D700A1F0CF /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = SimpleLineIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		6B3822AC2A8248D700A1F0CF /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = EvilIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		6B3822AD2A8248D700A1F0CF /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		6B3822AE2A8248D700A1F0CF /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		6B83D4462A7B6B2300CBCBB3 /* RCTAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RCTAppDelegate.h; path = "../node_modules/react-native/Libraries/AppDelegate/RCTAppDelegate.h"; sourceTree = "<group>"; };
+		6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "DanimMobile/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DanimMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89D831737463844134328E87 /* Pods-DanimMobile-DanimMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6E427EBAF0F157A7DF7C3E /* Pods-DanimMobile-DanimMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -92,11 +111,11 @@
 		13B07FAE1A68108700A75B9A /* DanimMobile */ = {
 			isa = PBXGroup;
 			children = (
+				6B1D4B462A839D2600920AAA /* Images.xcassets */,
+				6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
-				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */,
-				6B3316DE2A78A59A009AFDCC /* GoogleService-Info.plist */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
@@ -114,6 +133,40 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6B1D4B462A839D2600920AAA /* Images.xcassets */ = {
+			isa = PBXGroup;
+			children = (
+				6B1D4B442A839D1E00920AAA /* Assets.xcassets */,
+			);
+			name = Images.xcassets;
+			sourceTree = "<group>";
+		};
+		6B38229B2A8248C700A1F0CF /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				6B3822AD2A8248D700A1F0CF /* AntDesign.ttf */,
+				6B3822A42A8248D700A1F0CF /* Entypo.ttf */,
+				6B3822AC2A8248D700A1F0CF /* EvilIcons.ttf */,
+				6B3822A82A8248D700A1F0CF /* Feather.ttf */,
+				6B38229E2A8248D700A1F0CF /* FontAwesome.ttf */,
+				6B38229F2A8248D700A1F0CF /* FontAwesome5_Brands.ttf */,
+				6B3822A32A8248D700A1F0CF /* FontAwesome5_Regular.ttf */,
+				6B3822A52A8248D700A1F0CF /* FontAwesome5_Solid.ttf */,
+				6B3822A02A8248D700A1F0CF /* FontAwesome6_Brands.ttf */,
+				6B3822A22A8248D700A1F0CF /* FontAwesome6_Regular.ttf */,
+				6B38229D2A8248D700A1F0CF /* FontAwesome6_Solid.ttf */,
+				6B3822A92A8248D700A1F0CF /* Fontisto.ttf */,
+				6B3822AE2A8248D700A1F0CF /* Foundation.ttf */,
+				6B3822A12A8248D700A1F0CF /* Ionicons.ttf */,
+				6B3822A62A8248D700A1F0CF /* MaterialCommunityIcons.ttf */,
+				6B38229C2A8248D700A1F0CF /* MaterialIcons.ttf */,
+				6B3822A72A8248D700A1F0CF /* Octicons.ttf */,
+				6B3822AB2A8248D700A1F0CF /* SimpleLineIcons.ttf */,
+				6B3822AA2A8248D700A1F0CF /* Zocial.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +177,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				6B38229B2A8248C700A1F0CF /* Fonts */,
 				6B83D4462A7B6B2300CBCBB3 /* RCTAppDelegate.h */,
 				13B07FAE1A68108700A75B9A /* DanimMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -210,7 +264,8 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -253,8 +308,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				6B3316DF2A78A59A009AFDCC /* GoogleService-Info.plist in Resources */,
+				6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */,
+				6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,11 +567,13 @@
 			baseConfigurationReference = 1806795ABFA7922C91013BE4 /* Pods-DanimMobile.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H9ZG4XZ5WB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DanimMobile/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "다님";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -541,10 +598,12 @@
 			baseConfigurationReference = 5AA2825828FC86D4BC587BFE /* Pods-DanimMobile.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H9ZG4XZ5WB;
 				INFOPLIST_FILE = DanimMobile/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "다님";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -714,6 +773,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
