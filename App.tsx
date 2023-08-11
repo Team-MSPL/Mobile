@@ -13,9 +13,12 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import StackNavigator from './src/stacks';
 import {NativeBaseProvider} from 'native-base';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {RootState, useAppSelector} from './src/redux';
+import Loading from './src/utill/loading';
 
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
+	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -30,6 +33,7 @@ function App(): JSX.Element {
 			/>
 			<NativeBaseProvider>
 				<StackNavigator />
+				{Boolean(isLoading) && <Loading />}
 			</NativeBaseProvider>
 		</SafeAreaProvider>
 	);

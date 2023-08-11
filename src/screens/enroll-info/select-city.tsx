@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {TextInput, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -62,7 +62,9 @@ export default function SelectCity({navigation}: any) {
 		const data = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
 		dispatch(travelSliceActions.selectRegion([data]));
 	};
-
+	useEffect(() => {
+		dispatch(travelSliceActions.reset());
+	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}

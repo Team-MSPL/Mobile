@@ -34,7 +34,7 @@ export default function SelectEssential({navigation}: any) {
 						key={idx}
 						style={{marginVertical: 10}}
 						onPress={() => {
-							goSearchPlace(idx + 1);
+							filteredPlaces.length < 3 ? goSearchPlace(idx + 1) : console.log('3개까지만 가능');
 						}}>
 						<Text fontSize='lg' bold>
 							day {idx + 1}

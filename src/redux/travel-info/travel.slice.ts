@@ -27,7 +27,7 @@ const initialState: LiteState = {
 	distance: 0, //거리민감도
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: [[]], //성향
-	timeLimitArray: [10, 20], //시작시간과 끝시간
+	timeLimitArray: [8, 20], //시작시간과 끝시간
 	minuteLimitArray: [0, 0], //시작시간 분과 끝분
 	season: [false, false, false, false], //계절
 	presetDatas: [[[]]], //프리셋 저장하는곳
@@ -36,7 +36,7 @@ const initialState: LiteState = {
 	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
 	editMode: '', // 삭제모드=delete, 추가모드=add
 	recommendList: [], //추천할때 쓰이는 리스트
-	makeMode: false, //true=추천모드, fasle==혼자짤래요
+	makeMode: true, //true=추천모드, fasle==혼자짤래요
 };
 
 const axiosAuth = axios.create({
@@ -180,15 +180,64 @@ export const travelSlice = createSlice({
 			state.timetable = state.presetDatas[payload];
 		},
 		drawTimetable: state => {
-			let copy = [...state.timetable];
+			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			state.timetable.map((item, idx) => {
-				let time = 8;
+				let time = 6;
+				let eatTimeList = [8, 15, 22, 29];
+				const updateItem = {
+					name: '', //넣을거
+					lat: 0,
+					lng: 0,
+					category: 0, //넣을거
+					concept: [0],
+					partner: [0],
+					play: [0],
+					popular: 0,
+					season: [0],
+					tour: [0],
+					x: idx,
+					y: 0, //넣을거
+					id: 0, //넣을거
+					takenTime: 0, //넣을거
+				};
 				item.map((value, index) => {
-					copy[idx][index].x = idx;
-					copy[idx][index].y = time;
-					copy[idx][index].id = shortId.generate();
+					if (idx == 0 && index == 0) {
+						time = state.timeLimitArray[0] / 2 + state.minuteLimitArray[0] / 30;
+					}
+					if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
+						copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
+						time += 2;
+					}
+					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
+						copy[idx].push({
+							...updateItem,
+							name: eatTimeList[0] == 8 ? '점심 추천' : '저녁 추천',
+							y: time,
+							takenTime: 60,
+							id: shortId.generate(),
+							category: 1,
+							lat: value.lat,
+							lng: value.lng,
+						});
+						eatTimeList.shift();
+						eatTimeList.shift();
+						time += 3;
+					}
+					copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
 					time += value.takenTime / 30;
 					index != item.length - 1 && (time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+					if (index == item.length - 1 && idx != state.timetable.length - 1 && value.category != 4) {
+						copy[idx].push({
+							...updateItem,
+							name: '숙소 추천',
+							y: time < 36 ? 36 : time,
+							takenTime: time < 36 ? 360 : (48 - time) * 30,
+							id: shortId.generate(),
+							category: 4,
+							lat: value.lat,
+							lng: value.lng,
+						});
+					}
 				});
 			});
 			state.timetable = copy;
@@ -247,7 +296,7 @@ interface LiteState {
 	presetDatas: TimetableType[][][];
 	timetable: TimetableType[][];
 	moveTimeList: number[][] | [];
-	courseDetail: CourseDetail;
+	courseDetail: CourseDetailType;
 	editMode: string;
 	recommendList: RecommendList[];
 	makeMode: boolean;
@@ -295,7 +344,7 @@ export interface TimetableType {
 	id?: string;
 }
 
-export interface CourseDetail {
+export interface CourseDetailType {
 	name: string;
 	rating: number;
 	reviews: Reviews[];

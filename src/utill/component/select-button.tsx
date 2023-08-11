@@ -15,6 +15,7 @@ export default function SelectButton({label, onPress, isDisabled, bgColor}: Cust
 				alignItems: 'center',
 				justifyContent: 'center',
 				marginHorizontal: 5,
+				opacity: isDisabled ? 0.5 : 1,
 			}}
 			disabled={isDisabled}>
 			<Text color='black' bold>

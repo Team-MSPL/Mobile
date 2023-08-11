@@ -15,7 +15,6 @@ export default function FinalCheck({navigation}: any) {
 	);
 	const dispatch = useAppDispatch();
 	const goNext = () => {
-		dispatch(LoadingSliceActions.onLoading());
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		navigation.popToTop();
 		navigation.navigate('Preset');

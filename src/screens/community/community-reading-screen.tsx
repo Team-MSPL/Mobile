@@ -1,7 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-import {HStack} from 'native-base';
-import {useEffect, useRef, useState} from 'react';
+import { HStack } from 'native-base';
+import { useEffect, useRef, useState } from 'react';
 import {
 	Alert,
 	Dimensions,

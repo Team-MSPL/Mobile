@@ -49,11 +49,13 @@ export default function AddEssential({navigation, route}: any) {
 				alt='Place Image'
 			/>
 			{[...Array(nDay + 1)].map((item, idx) => {
+				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 				return (
 					<SelectButton
 						key={idx}
 						label={idx + 1 + '일 차'}
 						onPress={() => selectDay(idx)}
+						isDisabled={filteredPlaces.length >= 3}
 						bgColor={select[idx]}></SelectButton>
 				);
 			})}
