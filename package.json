@@ -42,6 +42,7 @@
 		"react-native-svg": "^12.1.1",
 		"react-native-vector-icons": "^10.0.0",
 		"react-redux": "^8.1.1",
+		"redux-persist": "^6.0.0",
 		"shortid": "^2.2.16",
 		"styled-components": "^6.0.7"
 	},

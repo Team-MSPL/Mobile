@@ -7,11 +7,14 @@ import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-googl
 import {useAppDispatch} from '../../redux';
 import {Alert} from 'react-native';
 import {Google_Signin_Key} from '@env';
-import {socialLogin} from '../../redux/login-info/login.slice';
+import {loginSliceActions, socialConnect} from '../../redux/user/login.slice';
+import {logout} from '../../redux/user/user.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
-		navigation.navigate('Home');
+		//dispatch(logout());
+		dispatch(loginSliceActions.setAnonymous(true));
+		// /navigation.replace('Home');
 	};
 	const goAI = () => {
 		navigation.navigate('LocalSearchAITest');
@@ -20,15 +23,18 @@ export default function LoginScreen({navigation}: any) {
 
 	const kakaoLogin = async () => {
 		try {
-			await KakaoLogin.login();
-			const userInfo = KakaoLogin.getProfile();
-			console.log((await userInfo).nickname, 'ㅇㅇㅋ');
-			const data = {
-				userName: (await userInfo).nickname,
-				userProfileImage: (await userInfo).profileImageUrl,
-				userToken: (await userInfo).id,
-			};
-			dispatch(socialLogin(data));
+			// await KakaoLogin.login();
+			// const userInfo = await KakaoLogin.getProfile();
+			// const data = {
+			// 	userName: userInfo.nickname,
+			// 	userId: userInfo.id,
+			// 	socialloginProvider: 'kakao',
+			// };
+			//const res = await dispatch(socialConnect(data));
+			navigation.navigate('Join1');
+			// if (res == '회원가입') {
+			// 	navigation.replace('Join1');
+			// }
 		} catch {
 			Alert.alert('카카오 로그인에 실패하였습니다.');
 		}
@@ -43,10 +49,10 @@ export default function LoginScreen({navigation}: any) {
 			const userInfo = await GoogleSignin.signIn();
 			const data = {
 				userName: userInfo.user.name,
-				userProfileImage: userInfo.user.photo,
-				userToken: userInfo.user.id,
+				userId: userInfo.user.id,
+				socialloginProvider: 'google',
 			};
-			dispatch(socialLogin(data));
+			dispatch(socialConnect(data));
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				console.log('구글 로그인 취소됨', error);
@@ -100,7 +106,6 @@ export default function LoginScreen({navigation}: any) {
 							shadow={2}
 							onPress={() => {
 								platform.onPress();
-								goNext();
 							}}>
 							<Image source={platform.image} width={12} height={12} resizeMode='contain' />
 						</Button>

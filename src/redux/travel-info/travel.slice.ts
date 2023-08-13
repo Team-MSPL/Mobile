@@ -41,7 +41,7 @@ const initialState: LiteState = {
 
 export const axiosAuth = axios.create({
 	baseURL: API_ROUTE,
-	headers: {'content-type': 'application/json'},
+	headers: {'content-type': 'application/json', Authorization: 'Bearer ' + 'token'},
 });
 
 export const axiosGoogle = axios.create({
@@ -55,22 +55,23 @@ export const axiosKakao = axios.create({
 		Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
 	},
 });
+export const axiosNaver = axios.create({
+	baseURL: 'https://naveropenapi.apigw.ntruss.com',
+	headers: {
+		'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
+		'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
+	},
+});
 
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',
 	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
 		try {
-			const response = await axiosAuth.get(
-				`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${data.start}&goal=${data.goal}${
+			const response = await axiosNaver.get(
+				`/map-direction/v1/driving?start=${data.start}&goal=${data.goal}${
 					data.wayPoint && `&waypoints=${data.wayPoint}`
 				}&option=trafast`,
-				{
-					headers: {
-						'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
-						'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
-					},
-				},
 			);
 			return response.data.route.trafast[0].summary;
 		} catch (error) {
@@ -257,6 +258,11 @@ export const travelSlice = createSlice({
 			state.day = [...Array(5)].map((item, idx) => moment().add(idx, 'day'));
 			state.nDay = 4;
 			state.makeMode = false;
+		},
+		setRecommendRegion: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
 		},
 	},
 	extraReducers: builder => {

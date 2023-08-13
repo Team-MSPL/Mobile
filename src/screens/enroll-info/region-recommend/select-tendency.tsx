@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import SelectButton from '../../../utill/component/select-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Button} from 'native-base';
-import {RegionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 
 export default function SelectTendency({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ export default function SelectTendency({navigation}: any) {
 				return data ? 1 : 0;
 			});
 		});
-		dispatch(RegionRecommendSliceActions.enrollTendency(copy));
+		dispatch(regionRecommendSliceActions.enrollTendency(copy));
 		navigation.navigate('RegionSelectDistance');
 	};
 	const selectData = ({index, idx}: {index: number; idx: number}) => {

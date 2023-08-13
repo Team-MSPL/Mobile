@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
 import {
-	RegionRecommendSliceActions,
+	regionRecommendSliceActions,
 	reverseGeocoding,
 	geocoding,
 } from '../../../redux/travel-info/region-recommend.slice';
@@ -16,7 +16,7 @@ export default function SelectDistance({navigation}: any) {
 
 	const goNext = () => {
 		const data = {distance: range, lat: geoInfo.lat, lng: geoInfo.lng};
-		dispatch(RegionRecommendSliceActions.enrollDistanceAndLatLng(data));
+		dispatch(regionRecommendSliceActions.enrollDistanceAndLatLng(data));
 		navigation.navigate('RegionSelectPopularity');
 	};
 	const requestPermission = async () => {

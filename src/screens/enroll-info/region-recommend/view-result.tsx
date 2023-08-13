@@ -1,28 +1,51 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import CustomButton from '../../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
 import {Platform, TouchableOpacity, PermissionsAndroid} from 'react-native';
 import {cityViewList} from '../select-city';
+import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
+import {regionSearch} from '../../../ai/region_search';
+//import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const [range, setRange] = useState(5);
-
+	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
+	const [recommendList, setRecommendList] = useState<string[]>([]);
 	const goEnrollInfo = (e: string) => {
 		let region: string[] = [];
-		let city = '';
 		if (e.includes(' ')) {
 			region = e.split(' ');
 		} else {
 			region = [e, '전체'];
 		}
 		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		console.log(cityIndex, region[1]);
-		//dispatch(travelSliceActions.selectRegion(['전체']));
+		const data = {cityIndex: cityIndex, region: [region[1]]};
+		dispatch(travelSliceActions.setRecommendRegion(data));
 
 		navigation.navigate('SelectDay');
 	};
+	const getRegionRecommend = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let datas = {
+				selectList: tendency,
+				selectPopular: popularity,
+				recentPosition: {lat: lat, lng: lng},
+				distanceSensitivity: distance,
+			};
+			const result = await regionSearch(datas);
+			setRecommendList(result);
+			//dispatch(regionSearch());
+		} catch (err) {
+			console.log(err);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		getRegionRecommend();
+	}, []);
 
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
@@ -30,7 +53,7 @@ export default function ViewResult({navigation}: any) {
 				<Text fontSize='2xl' bold color='black'>
 					결과요
 				</Text>
-				{temporary.map((item, idx) => (
+				{recommendList.map((item, idx) => (
 					<TouchableOpacity
 						onPress={() => {
 							goEnrollInfo(item);
@@ -43,16 +66,3 @@ export default function ViewResult({navigation}: any) {
 		</ScrollView>
 	);
 }
-
-const temporary = [
-	'경기 수원시',
-	'전북 전주시',
-	'경북 안동시',
-	'경남 통영시',
-	'경기 파주시',
-	'충북 충주시',
-	'충남 아산시',
-	'대전',
-	'경기 시흥시',
-	'경기 용인시',
-];

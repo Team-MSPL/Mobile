@@ -3,23 +3,14 @@ import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Divider} from 'native-base';
 import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
-import {RegionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 
-	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.RegionRecommendSlice);
 	const [selectedId, setSelectedId] = useState<string | undefined>();
 	const goNext = () => {
 		let data = Number(selectedId) * 20;
-		dispatch(RegionRecommendSliceActions.enrollPopularity([data, data + 20]));
-		//사실 전역안쓰고 보내버려도 되긴함.
-		let datas = {
-			selectList: tendency,
-			selectPopular: [data, data + 20],
-			recentPosition: {lat: lat, lng: lng},
-			distanceSensitivity: distance,
-		};
-
+		dispatch(regionRecommendSliceActions.enrollPopularity([data, data + 20]));
 		navigation.navigate('RegionViewResult');
 	};
 	const radioButtons: RadioButtonProps[] = useMemo(

@@ -66,7 +66,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
 				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
 				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
-				radius = distance * 1000;
+				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
 			}
 			const startNumber = e.value.y; // 시작 숫자
 			const count = e.value.takenTime / 30; // 원하는 갯수

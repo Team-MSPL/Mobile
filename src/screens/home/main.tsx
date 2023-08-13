@@ -1,5 +1,6 @@
 import moment from 'moment';
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
+import {useEffect} from 'react';
 import {Touchable, TouchableOpacity, Linking} from 'react-native';
 import {useAppDispatch} from '../../redux';
 import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -17,6 +18,18 @@ export default function Main({navigation}: any) {
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
 	};
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity
+					onPress={() => {
+						navigation.navigate('MoreInfo');
+					}}>
+					<Text>고</Text>
+				</TouchableOpacity>
+			),
+		});
+	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>

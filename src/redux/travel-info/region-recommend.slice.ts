@@ -1,6 +1,6 @@
 import {GOOGLE_API_KEY} from '@env';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {axiosGoogle} from './travel.slice';
+import {axiosAuth, axiosGoogle} from './travel.slice';
 const initialState: LiteState = {
 	tendency: [[]],
 	distance: 0,
@@ -9,7 +9,7 @@ const initialState: LiteState = {
 	lng: 0,
 };
 
-export const RegionRecommendSlice = createSlice({
+export const regionRecommendSlice = createSlice({
 	name: 'loading',
 	initialState,
 	reducers: {
@@ -26,7 +26,17 @@ export const RegionRecommendSlice = createSlice({
 		},
 	},
 });
+//여행 지역 추천 알고리즘
+export const regionSearch = createAsyncThunk('/regionSearch', async (data: any, thunkAPI) => {
+	try {
+		const response = await axiosAuth.get(`/regionSearch/run`);
 
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		return console.log(error);
+	}
+});
 //이름으로 좌표 얻는거
 export const geocoding = createAsyncThunk('/googleDetailApi', async (data: any, thunkAPI) => {
 	try {
@@ -57,8 +67,8 @@ export const reverseGeocoding = createAsyncThunk('/googleDetailApi', async (data
 	}
 });
 
-export const RegionRecommendSliceActions = RegionRecommendSlice.actions;
-export default RegionRecommendSlice.reducer;
+export const regionRecommendSliceActions = regionRecommendSlice.actions;
+export default regionRecommendSlice.reducer;
 
 interface LiteState {
 	tendency: boolean[][];
