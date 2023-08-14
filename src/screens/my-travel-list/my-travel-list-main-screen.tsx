@@ -1,3 +1,5 @@
+import {View} from 'react-native';
+
 export default function MyTravelListMainScreen() {
-	return <view></view>;
+	return <View></View>;
 }
