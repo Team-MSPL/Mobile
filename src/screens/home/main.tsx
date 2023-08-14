@@ -1,4 +1,5 @@
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
+import {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {useAppDispatch} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -16,6 +17,18 @@ export default function Main({navigation}: any) {
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
 	};
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity
+					onPress={() => {
+						navigation.navigate('MoreInfo');
+					}}>
+					<Text>고</Text>
+				</TouchableOpacity>
+			),
+		});
+	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>

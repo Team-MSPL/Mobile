@@ -5,11 +5,15 @@ import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAppDispatch} from '../../redux';
-import {socialLogin} from '../../redux/login-info/login.slice';
+import {socialConnect, temporarySignUp} from '../../redux/user/login.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
-		navigation.navigate('Home');
+		//로그인 후 로그아웃은 지금 안됩니다. 왜냐 귀찮기 때문입니다. 아시겠죠?
+		//dispatch(logout());
+		//dispatch(temporarySignUp());
+		//dispatch(loginSliceActions.setAnonymous(true));
+		// /navigation.replace('Home');
 	};
 	const goAI = () => {
 		navigation.navigate('LocalSearchAITest');
@@ -19,14 +23,26 @@ export default function LoginScreen({navigation}: any) {
 	const kakaoLogin = async () => {
 		try {
 			await KakaoLogin.login();
-			const userInfo = KakaoLogin.getProfile();
-			console.log((await userInfo).nickname, 'ㅇㅇㅋ');
+			const userInfo = await KakaoLogin.getProfile();
 			const data = {
-				userName: (await userInfo).nickname,
-				userProfileImage: (await userInfo).profileImageUrl,
-				userToken: (await userInfo).id,
+				userName: userInfo.nickname,
+				userToken: userInfo.id,
+				userProfileImage: userInfo.profileImageUrl,
+				socialloginProvider: 'kakao',
 			};
-			dispatch(socialLogin(data));
+			dispatch(temporarySignUp(data));
+			// await KakaoLogin.login();
+			// const userInfo = await KakaoLogin.getProfile();
+			// const data = {
+			// 	userName: userInfo.nickname,
+			// 	userId: userInfo.id,
+			// 	socialloginProvider: 'kakao',
+			// };
+			//const res = await dispatch(socialConnect(data));
+			//navigation.navigate('Join1');
+			// if (res == '회원가입') {
+			// 	navigation.replace('Join1');
+			// }
 		} catch {
 			Alert.alert('카카오 로그인에 실패하였습니다.');
 		}
@@ -41,10 +57,10 @@ export default function LoginScreen({navigation}: any) {
 			const userInfo = await GoogleSignin.signIn();
 			const data = {
 				userName: userInfo.user.name,
-				userProfileImage: userInfo.user.photo,
-				userToken: userInfo.user.id,
+				userId: userInfo.user.id,
+				socialloginProvider: 'google',
 			};
-			dispatch(socialLogin(data));
+			dispatch(socialConnect(data));
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				console.log('구글 로그인 취소됨', error);
@@ -99,7 +115,6 @@ export default function LoginScreen({navigation}: any) {
 							shadow={2}
 							onPress={() => {
 								platform.onPress();
-								goNext();
 							}}>
 							<Image source={platform.image} width={12} height={12} resizeMode='contain' />
 						</Button>

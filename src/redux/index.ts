@@ -1,16 +1,26 @@
 import {configureStore, combineReducers, Reducer, AnyAction} from '@reduxjs/toolkit';
 import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
+import {persistReducer} from 'redux-persist';
 import travelSliceReducer from './travel-info/travel.slice';
-import loginSliceReducer from './login-info/login.slice';
+import loginSliceReducer from './user/login.slice';
 import loadingSliceReducer from './loading/loading.slice';
 import communitySliceReducer from './community/community.slice';
-import RegionRecommendSliceReducer from './travel-info/region-recommend.slice';
+import regionRecommendSliceReducer from './travel-info/region-recommend.slice';
+import userSliceReducer from './user/user.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const persistConfig = {
+	key: 'root',
+	// version: 1,
+	storage: AsyncStorage,
+};
 const appReducer = combineReducers({
 	travelSlice: travelSliceReducer,
 	loginSlice: loginSliceReducer,
 	loadingSlice: loadingSliceReducer,
 	communitySlice: communitySliceReducer,
-	RegionRecommendSlice: RegionRecommendSliceReducer,
+	regionRecommendSlice: regionRecommendSliceReducer,
+	userSlice: persistReducer(persistConfig, userSliceReducer),
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
