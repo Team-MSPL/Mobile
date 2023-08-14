@@ -1,9 +1,8 @@
-import moment from 'moment';
-import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
+import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
-import {Touchable, TouchableOpacity, Linking} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {useAppDispatch} from '../../redux';
-import {googleDetailApi, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
@@ -87,6 +86,9 @@ export default function Main({navigation}: any) {
 			<Text fontSize='sm' color='grey'>
 				다님이 성향에 맞는 추천 코스를 찾아봤어요
 			</Text>
+			<TouchableOpacity onPress={() => navigation.navigate('MyTravelListMainScreen')}>
+				<Text>내 여행</Text>
+			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.navigate('CommunityMainScreen')}>
 				<Text>커뮤니티</Text>
 			</TouchableOpacity>

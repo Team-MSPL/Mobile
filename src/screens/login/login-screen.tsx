@@ -1,14 +1,11 @@
-import {useNavigation} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
-import {Heading, Text, Center, Image, HStack, Button, Spacer} from 'native-base';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import * as KakaoLogin from '@react-native-seoul/kakao-login';
-import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
-import {useAppDispatch} from '../../redux';
-import {Alert} from 'react-native';
 import {Google_Signin_Key} from '@env';
-import {loginSliceActions, socialConnect, temporarySignUp} from '../../redux/user/login.slice';
-import {logout} from '../../redux/user/user.slice';
+import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
+import * as KakaoLogin from '@react-native-seoul/kakao-login';
+import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
+import {Alert} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useAppDispatch} from '../../redux';
+import {socialConnect, temporarySignUp} from '../../redux/user/login.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -107,8 +104,9 @@ export default function LoginScreen({navigation}: any) {
 					alt='icon'
 				/>
 				<HStack marginTop={16} space={8}>
-					{platforms.map(platform => (
+					{platforms.map((platform, index) => (
 						<Button
+							key={index}
 							marginTop={4}
 							rounded={'full'}
 							w={60}

@@ -7,6 +7,7 @@ import LoginScreen from '../screens/login/login-screen';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
+import MyTravelListStack from './my-travel-list-stack';
 import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
 const Stack = createNativeStackNavigator();
@@ -33,6 +34,7 @@ export default function StackNavigator() {
 				{TimetableStack()}
 				{CommunityStack()}
 				{RegionRecommendStack()}
+				{MyTravelListStack()}
 				{MoreStack()}
 				{JoinStack()}
 			</Stack.Navigator>
