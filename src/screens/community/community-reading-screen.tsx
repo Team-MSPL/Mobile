@@ -29,6 +29,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	const [commentDataList, setComment] = useState<string[]>([]);
+	const [postId, setPostId] = useState<string>('');
 	const [postContent, setPostContent] = useState<string>('');
 	const [newCommentContent, setNewComment] = useState<string>('');
 	const [postImage, setPostImage] = useState<string[]>([]);
@@ -44,35 +45,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	useEffect(() => {
 		fetchPostData();
 	}, []);
-
-	const fetchPostData = async () => {
-		try {
-			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
-			const docSnapshot = await docRef.get();
-			if (docSnapshot.exists) {
-				const data = docSnapshot.data();
-				const comment = data?.comment ?? [];
-				setComment(comment);
-
-				const postContent = data?.postContent ?? '';
-				setPostContent(postContent);
-
-				const postImage = data?.postImage ?? [];
-				setPostImage(postImage);
-
-				const likeList = data?.likeList ?? [];
-				// TODO 유저 닉네임으로 적용시켜야 함.
-				if (likeList.some((item: string) => item === '아이폰xs')) {
-					setIsLiked(true);
-				}
-				setLikeCount(likeList.length);
-			} else {
-				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
-			}
-		} catch (error) {
-			console.log('데이터를 가져오는 중에 오류가 발생했습니다:', error);
-		}
-	};
 
 	// iOS에서 키보드 활성화시 TextInput이 안 보이는 이슈를 위한 코드
 	useEffect(() => {
@@ -101,6 +73,49 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			resizeSubscription.remove();
 		};
 	}, []);
+
+	// 앱 바 우측 더보기 버튼 및 postId 값 가져오기
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => {
+				return <ReportModal postId={postId}></ReportModal>;
+			},
+		});
+	}, [postId]);
+
+	// 게시글 정보 가져오기
+	const fetchPostData = async () => {
+		try {
+			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			const docSnapshot = await docRef.get();
+			if (docSnapshot.exists) {
+				const data = docSnapshot.data();
+
+				const postId = data?.postId ?? '';
+				setPostId(postId);
+
+				const comment = data?.comment ?? [];
+				setComment(comment);
+
+				const postContent = data?.postContent ?? '';
+				setPostContent(postContent);
+
+				const postImage = data?.postImage ?? [];
+				setPostImage(postImage);
+
+				const likeList = data?.likeList ?? [];
+				// TODO 유저 닉네임으로 적용시켜야 함.
+				if (likeList.some((item: string) => item === '아이폰xs')) {
+					setIsLiked(true);
+				}
+				setLikeCount(likeList.length);
+			} else {
+				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
+			}
+		} catch (error) {
+			console.log('데이터를 가져오는 중에 오류가 발생했습니다:', error);
+		}
+	};
 
 	// *댓글 등록 버튼 눌렀을 때
 	const handleCommentSubmit = async () => {
@@ -193,15 +208,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		setIsRefreshing(true); // 새로고침 시작
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
-
-	// 앱 바 우측 더보기 버튼
-	useEffect(() => {
-		navigation.setOptions({
-			headerRight: () => {
-				return <ReportModal></ReportModal>;
-			},
-		});
-	}, []);
 
 	return (
 		<KeyboardAvoidingView
