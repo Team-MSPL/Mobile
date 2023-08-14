@@ -3,17 +3,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_ROUTE, GOOGLE_API_KEY} from '@env';
 import {userActions} from './user.slice';
+import {axiosAuth} from '../travel-info/travel.slice';
 const initialState: LiteState = {
 	login: [],
 	userInfo: [],
 	jwtToken: '',
 	anonymous: false,
 };
-
-const axiosAuth = axios.create({
-	baseURL: API_ROUTE,
-	headers: {'content-type': 'application/json'},
-});
 
 export const socialConnect = createAsyncThunk('/user/connect', async (data: LoginType, thunkAPI) => {
 	try {
@@ -51,10 +47,25 @@ export const socialConnect = createAsyncThunk('/user/connect', async (data: Logi
 		return thunkAPI.rejectWithValue(error);
 	}
 });
-export const tete = createAsyncThunk('/tete', async thunkAPI => {
+export const temporarySignUp = createAsyncThunk('/temporarySignUp', async (data: temporaryType, thunkAPI) => {
 	try {
-		const response = await axiosAuth.get(
-			'http://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=J7laKTTThB5SZdBdab6YA4Nam%2BgRrYc%2FXdqAzSQ%2FDUhLxMWFSUxBVbrn6WDpvTauz4oW2phb3ojdk9YmlZMPww%3D%3D&MobileApp=다님&MobileOS=AND&arrange=A&keyword=$창덕궁',
+		const response = await axiosAuth.post('user/signUp', {
+			userName: data.userName,
+			userProfileImage: data.userProfileImage,
+			userToken: data.userToken,
+		});
+
+		await AsyncStorage.setItem('userName', response.data.userName);
+		await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
+		await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
+		await AsyncStorage.setItem('socialloginProvider', data.socialloginProvider.toString());
+		thunkAPI.dispatch(userActions.login());
+		thunkAPI.dispatch(
+			userActions.setUserInfo({
+				userName: response.data.userName,
+				userId: response.data.userId,
+				socialloginProvider: data.socialloginProvider,
+			}),
 		);
 		console.log(response.data);
 		return response.data;
@@ -63,6 +74,34 @@ export const tete = createAsyncThunk('/tete', async thunkAPI => {
 		return error;
 	}
 });
+export const temporarySignIn = createAsyncThunk(
+	'/temporarySignIn',
+	async (data: {userName: string; userToken: string}, thunkAPI) => {
+		try {
+			const response = await axiosAuth.post('/user/signIn', {
+				userName: data.userName,
+				userToken: data.userToken,
+			});
+			await AsyncStorage.setItem('userName', response.data.userName);
+			await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
+			await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
+			const socialloginProvider = await AsyncStorage.getItem('socialloginProvider');
+			thunkAPI.dispatch(userActions.login());
+			thunkAPI.dispatch(
+				userActions.setUserInfo({
+					userName: response.data.userName,
+					userId: response.data.userId,
+					socialloginProvider: socialloginProvider,
+				}),
+			);
+			console.log(response.data);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
 
 export const loginSlice = createSlice({
 	name: 'login',
@@ -82,6 +121,12 @@ export const loginSlice = createSlice({
 		// 	// setStorage('test', '1234');
 		// 	state.jwtToken = payload.userJwtToken;
 		// });
+		builder.addCase(temporarySignUp.fulfilled, (state, {payload}) => {
+			console.log(payload);
+			// setStorage('token', payload.userJwtToken);
+			// setStorage('test', '1234');
+			state.jwtToken = payload.userJwtToken;
+		});
 	},
 });
 
@@ -117,4 +162,11 @@ interface LoginType {
 	//userProfileImage: string | null;
 	userId: string | null;
 	socialloginProvider: string | null;
+}
+interface temporaryType {
+	userName: string | null;
+	//userProfileImage: string | null;
+	userProfileImage: string | null;
+	userToken: string | null;
+	socialloginProvider: string;
 }

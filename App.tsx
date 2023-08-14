@@ -16,7 +16,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import Loading from './src/utill/loading';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
-import {loginSliceActions, socialConnect} from './src/redux/user/login.slice';
+import {loginSliceActions, socialConnect, temporarySignIn} from './src/redux/user/login.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function App(): JSX.Element {
@@ -29,12 +29,20 @@ function App(): JSX.Element {
 	const getAllKeys = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const provider = await AsyncStorage.getItem('provider'); //플랫폼
+			// const q = await AsyncStorage.getAllKeys();
+			// AsyncStorage.multiRemove(q);
 			const userId = await AsyncStorage.getItem('userId'); //소셜아이디
 			const userName = await AsyncStorage.getItem('userName'); //사용자이름
-			console.log('pp', provider, 'yy', userId, 'na', userName);
-			if (provider && userId && userName) {
-				dispatch(socialConnect({userName: userName, userId: userId, socialloginProvider: provider}));
+
+			const popop = await AsyncStorage.getItem('socialloginProvider'); //사용자이름
+			console.log(userName, userId);
+			console.log('토토토ㅗ토', popop);
+			// const provider = await AsyncStorage.getItem('provider'); //플랫폼
+			// const userId = await AsyncStorage.getItem('userId'); //소셜아이디
+			// const userName = await AsyncStorage.getItem('userName'); //사용자이름
+			//console.log('pp', userJwtToken, 'yy', userId, 'na', userName);
+			if (userId && userName) {
+				dispatch(temporarySignIn({userName: userName, userToken: userId}));
 			}
 		} catch (err) {
 			Alert.alert('로그인 오류', '로그인을 하는 도중 오류가 발생하였습니다.');

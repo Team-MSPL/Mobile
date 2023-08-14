@@ -24,8 +24,9 @@ export default function MoreInfo({navigation}: any) {
 		});
 	}, []);
 	const goLogout = () => {
-		dispatch(logout());
-		navigation.popToTop();
+		console.log(socialloginProvider);
+		// dispatch(logout());
+		// navigation.popToTop();
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
@@ -34,10 +35,10 @@ export default function MoreInfo({navigation}: any) {
 					<Text>
 						{userName ?? '익명'} 님 반갑고 {socialloginProvider ?? '익명'} 로그인임
 					</Text>
-					{anonymous ? (
+					{/* {anonymous ? (
 						<TouchableOpacity
 							onPress={() => {
-								dispatch(loginSliceActions.setAnonymous(false), navigation.popToTop());
+								dispatch(loginSliceActions.setAnonymous(false)), navigation.popToTop();
 							}}>
 							<Text>익명 나가기</Text>
 						</TouchableOpacity>
@@ -45,7 +46,7 @@ export default function MoreInfo({navigation}: any) {
 						<TouchableOpacity onPress={goLogout}>
 							<Text>로그아웃</Text>
 						</TouchableOpacity>
-					)}
+					)} */}
 				</Box>
 			) : (
 				<TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
@@ -69,7 +70,7 @@ export default function MoreInfo({navigation}: any) {
 				<TouchableOpacity onPress={() => navigation.popToTop()}>
 					<Text>서비스 이용약관</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => navigation.popToTop()}>
+				<TouchableOpacity onPress={goLogout}>
 					<Text>개인정보 처리방침</Text>
 				</TouchableOpacity>
 			</Box>

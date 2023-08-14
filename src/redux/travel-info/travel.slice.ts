@@ -40,8 +40,8 @@ const initialState: LiteState = {
 };
 
 export const axiosAuth = axios.create({
-	baseURL: API_ROUTE,
-	headers: {'content-type': 'application/json', Authorization: 'Bearer ' + 'token'},
+	baseURL: 'http://54.180.92.25',
+	headers: {'content-type': 'application/json', withCredentials: true, Authorization: 'Bearer ' + 'token'},
 });
 
 export const axiosGoogle = axios.create({
@@ -63,6 +63,20 @@ export const axiosNaver = axios.create({
 	},
 });
 
+export const tete = createAsyncThunk(
+	'/qwe',
+	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+		try {
+			console.log('ㅁㄴㅇ');
+			const response = await axiosAuth.get(`/user/all`);
+			console.log('qwe', response);
+			console.log('케케케', response.data);
+			return response;
+		} catch (error) {
+			return console.log('에러요', error);
+		}
+	},
+);
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',

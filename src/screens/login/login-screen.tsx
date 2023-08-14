@@ -7,13 +7,15 @@ import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-googl
 import {useAppDispatch} from '../../redux';
 import {Alert} from 'react-native';
 import {Google_Signin_Key} from '@env';
-import {loginSliceActions, socialConnect} from '../../redux/user/login.slice';
+import {loginSliceActions, socialConnect, temporarySignUp} from '../../redux/user/login.slice';
 import {logout} from '../../redux/user/user.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
+		//로그인 후 로그아웃은 지금 안됩니다. 왜냐 귀찮기 때문입니다. 아시겠죠?
 		//dispatch(logout());
-		dispatch(loginSliceActions.setAnonymous(true));
+		//dispatch(temporarySignUp());
+		//dispatch(loginSliceActions.setAnonymous(true));
 		// /navigation.replace('Home');
 	};
 	const goAI = () => {
@@ -23,6 +25,15 @@ export default function LoginScreen({navigation}: any) {
 
 	const kakaoLogin = async () => {
 		try {
+			await KakaoLogin.login();
+			const userInfo = await KakaoLogin.getProfile();
+			const data = {
+				userName: userInfo.nickname,
+				userToken: userInfo.id,
+				userProfileImage: userInfo.profileImageUrl,
+				socialloginProvider: 'kakao',
+			};
+			dispatch(temporarySignUp(data));
 			// await KakaoLogin.login();
 			// const userInfo = await KakaoLogin.getProfile();
 			// const data = {
@@ -31,7 +42,7 @@ export default function LoginScreen({navigation}: any) {
 			// 	socialloginProvider: 'kakao',
 			// };
 			//const res = await dispatch(socialConnect(data));
-			navigation.navigate('Join1');
+			//navigation.navigate('Join1');
 			// if (res == '회원가입') {
 			// 	navigation.replace('Join1');
 			// }
