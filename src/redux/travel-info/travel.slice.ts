@@ -15,12 +15,6 @@ const initialState: LiteState = {
 		category: 4,
 		takenTime: 30,
 		imageUrl: '',
-		popular: 0,
-		partner: [0, 0, 0, 0, 0, 0, 0],
-		concept: [0, 0, 0, 0],
-		play: [0, 0, 0, 0, 0, 0],
-		tour: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-		season: [0, 0, 0, 0],
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
@@ -41,7 +35,13 @@ const initialState: LiteState = {
 
 export const axiosAuth = axios.create({
 	baseURL: 'http://54.180.92.25',
-	headers: {'content-type': 'application/json', withCredentials: true, Authorization: 'Bearer ' + 'token'},
+	headers: {
+		'content-type': 'application/json',
+		withCredentials: true,
+		Authorization:
+			'Bearer ' +
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IuusuOyEseykgCIsInVzZXJQcm9maWxlSW1hZ2UiOiJodHRwczovL2sua2FrYW9jZG4ubmV0L2RuL2NrZjV6aC9idHNtV216dlpnaC91cFpjazd3eFBXMUNJckJLbzFBNDQxL2ltZ182NDB4NjQwLmpwZyIsInVzZXJUb2tlbiI6IjI5MTY5MTE1MDgiLCJfaWQiOiI2NGQ5ZWU2OWMzMTQyMGU5ZjE0MDYyMjciLCJpYXQiOjE2OTIwMDM5NDUsImV4cCI6MTcwNzU1NTk0NX0.qc45_QxxEOx1BI-F-4CAmsWXR1AWOWgh90TxC64OOmo',
+	},
 });
 
 export const axiosGoogle = axios.create({
@@ -63,20 +63,19 @@ export const axiosNaver = axios.create({
 	},
 });
 
-export const tete = createAsyncThunk(
-	'/qwe',
-	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
-		try {
-			console.log('ㅁㄴㅇ');
-			const response = await axiosAuth.get(`/user/all`);
-			console.log('qwe', response);
-			console.log('케케케', response.data);
-			return response;
-		} catch (error) {
-			return console.log('에러요', error);
-		}
-	},
-);
+export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, thunkAPI) => {
+	try {
+		console.log('ㅁㄴㅇ');
+		const response = await axiosAuth.post(`/ai/run`, data);
+		console.log('qwe', response);
+		console.log('케케케', response.data);
+		thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data));
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',
@@ -293,6 +292,9 @@ export const travelSlice = createSlice({
 		builder.addCase(recommendApi.fulfilled, (state, {payload}) => {
 			state.recommendList = payload;
 		});
+		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
+			state.presetDatas = payload;
+		});
 	},
 });
 
@@ -329,12 +331,6 @@ interface PlaceType {
 	category: number;
 	takenTime: number;
 	imageUrl: string;
-	popular: number;
-	partner: number[];
-	concept: number[];
-	play: number[];
-	tour: number[];
-	season: number[];
 }
 
 export interface EssentialPlaceType {
@@ -410,4 +406,15 @@ interface RecommendList {
 	road_address_name: string;
 	x: number;
 	y: number;
+}
+
+interface travelAiType {
+	regionList: string[];
+	accomodationList: PlaceType[];
+	selectList: number[][];
+	essentialPlaceList: EssentialPlaceType[];
+	timeLimitArray: number[];
+	nDay: number;
+	transit: number;
+	distanceSensitivity: number;
 }

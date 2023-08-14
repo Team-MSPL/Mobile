@@ -1,6 +1,6 @@
 import {Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
@@ -10,14 +10,43 @@ import {useEffect} from 'react';
 import {cityViewList} from './select-city';
 
 export default function FinalCheck({navigation}: any) {
-	const {region, accommodations, nDay, day, essentialPlaces, tendency, cityIndex} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {day, region, accommodations, nDay, cityIndex, essentialPlaces, tendency, timeLimitArray, transit, distance} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const goNext = () => {
+	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
-		navigation.popToTop();
-		navigation.navigate('Preset');
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+				a = cityViewList[cityIndex].sub.map(
+					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+				);
+				a.shift();
+			}
+			const result = await dispatch(
+				getTravelAi({
+					regionList: a,
+					accomodationList: accommodations,
+					selectList: tendency,
+					essentialPlaceList: essentialPlaces,
+					timeLimitArray: timeLimitArray,
+					nDay: nDay + 1,
+					transit: transit,
+					distanceSensitivity: distance,
+				}),
+			);
+			console.log('넹?', result);
+			if (result) {
+				navigation.popToTop();
+				navigation.navigate('Preset');
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
+			dispatch(LoadingSliceActions.offLoading());
+		}
 	};
 
 	const goReset = () => {

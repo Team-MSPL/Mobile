@@ -15,8 +15,6 @@ export default function SelectAccommodation({navigation}: any) {
 
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
-
-		//타입스크립트 빨간줄 추후 백엔드 연결시 성향 지울거라 사라질 예정
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, imageUrl: ''};
 		dispatch(travelSliceActions.enrollAccommodations(copy));
 	};

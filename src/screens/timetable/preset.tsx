@@ -1,6 +1,6 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useState, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, Center} from 'native-base';
 import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
@@ -36,24 +36,18 @@ export default function Preset({navigation}: any) {
 				);
 				a.shift();
 			}
-			const data = await localSearchAI({
-				regionList: a,
-				accomodationList: accommodations,
-				selectList: tendency,
-				essentialPlaceList: essentialPlaces,
-				timeLimitArray: timeLimitArray,
-				nDay: nDay + 1,
-				transit: transit,
-				distanceSensitivity: distance,
-			});
-			if (!enoughPlace) {
-				console.log('관광지 부족');
-			} else {
-				console.log('다시다시');
-				if (data) {
-					dispatch(travelSliceActions.enrollPreset(data));
-				}
-			}
+			await dispatch(
+				getTravelAi({
+					regionList: a,
+					accomodationList: accommodations,
+					selectList: tendency,
+					essentialPlaceList: essentialPlaces,
+					timeLimitArray: timeLimitArray,
+					nDay: nDay + 1,
+					transit: transit,
+					distanceSensitivity: distance,
+				}),
+			);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -61,9 +55,9 @@ export default function Preset({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useEffect(() => {
-		getAi();
-	}, []);
+	// useEffect(() => {
+	// 	getAi();
+	// }, []);
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTimetable(select));
 		navigation.popToTop();

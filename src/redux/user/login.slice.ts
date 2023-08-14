@@ -55,6 +55,7 @@ export const temporarySignUp = createAsyncThunk('/temporarySignUp', async (data:
 			userToken: data.userToken,
 		});
 
+		await AsyncStorage.setItem('userProfileImage', response.data.userProfileImage);
 		await AsyncStorage.setItem('userName', response.data.userName);
 		await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
 		await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
@@ -65,6 +66,7 @@ export const temporarySignUp = createAsyncThunk('/temporarySignUp', async (data:
 				userName: response.data.userName,
 				userId: response.data.userId,
 				socialloginProvider: data.socialloginProvider,
+				userProfileImage: response.data.userProfileImage,
 			}),
 		);
 		console.log(response.data);
@@ -82,6 +84,8 @@ export const temporarySignIn = createAsyncThunk(
 				userName: data.userName,
 				userToken: data.userToken,
 			});
+
+			await AsyncStorage.setItem('userProfileImage', response.data.userProfileImage);
 			await AsyncStorage.setItem('userName', response.data.userName);
 			await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
 			await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
@@ -92,6 +96,7 @@ export const temporarySignIn = createAsyncThunk(
 					userName: response.data.userName,
 					userId: response.data.userId,
 					socialloginProvider: socialloginProvider,
+					userProfileImage: response.data.userProfileImage,
 				}),
 			);
 			console.log(response.data);
