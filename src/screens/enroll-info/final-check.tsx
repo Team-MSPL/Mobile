@@ -36,7 +36,7 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 				}),
 			);
-			console.log('넹?', result);
+			console.log('넹?', result.meta);
 			if (result) {
 				navigation.popToTop();
 				navigation.navigate('Preset');

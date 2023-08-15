@@ -55,9 +55,12 @@ export default function Preset({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	// useEffect(() => {
-	// 	getAi();
-	// }, []);
+	useEffect(() => {
+		//getAi();
+		console.log('덥다', presetDatas.length);
+
+		console.log('덥다1', presetDatas);
+	}, []);
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTimetable(select));
 		navigation.popToTop();

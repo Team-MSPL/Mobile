@@ -2,6 +2,7 @@ import {useState, memo} from 'react';
 import {Text, Box, Center, HStack, Spacer} from 'native-base';
 import {useAppSelector} from '../../../redux';
 import {TouchableOpacity} from 'react-native';
+import moment from 'moment';
 const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
 	const {day, nDay} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
@@ -23,6 +24,7 @@ const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
 					{day[0].format('YYYY-MM-DD') + '~' + day[nDay].format('YYYY-MM-DD')}
 				</Text>
 				<Spacer />
+
 				<TouchableOpacity disabled={viewDayIndex + 4 == nDay} onPress={goRight}>
 					<Text>오른쪽 </Text>
 				</TouchableOpacity>

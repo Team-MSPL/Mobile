@@ -1,4 +1,4 @@
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, Alert} from 'react-native';
 import {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
@@ -6,17 +6,32 @@ import {useAppDispatch} from '../../redux';
 import {loginSliceActions, socialConnect} from '../../redux/user/login.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {colors} from '../../utill/colors';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
-export default function Join1({navigation}: any) {
-	const goNext = () => {
-		//dispatch(logout());
-		//dispatch(loginSliceActions.setAnonymous(true));
-		// /navigation.replace('Home');
-	};
+export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
 	const dispatch = useAppDispatch();
 	const [nickname, setNickname] = useState('');
+	const goSignUp = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				userName: nickname,
+				userProfileImage: 'qwe',
+				userToken: route.params.userToken,
+				loginProvider: route.params.loginProvider,
+				signUpFlag: true,
+			};
+			const result = await dispatch(socialConnect(data));
+			console.log(navigation);
+			navigation.replace('Home');
+		} catch (err) {
+			Alert.alert('회원가입중 에러가 발생했습니다');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	const chageNickname = (e: string) => {
 		setNickname(e);
 	};
@@ -94,7 +109,7 @@ export default function Join1({navigation}: any) {
 						</TouchableOpacity>
 					</CheckContainer>
 				</TermsContainer>
-				<CustomButton label={'회원가입'} onPress={goNext} isDisabled={!(allCheck && nickname.length != 0)} />
+				<CustomButton label={'회원가입'} onPress={goSignUp} isDisabled={!(allCheck && nickname.length != 0)} />
 			</InputProfileContainer>
 		</SafeAreaView>
 	);

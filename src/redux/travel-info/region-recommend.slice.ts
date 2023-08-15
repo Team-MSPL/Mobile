@@ -29,7 +29,8 @@ export const regionRecommendSlice = createSlice({
 //여행 지역 추천 알고리즘
 export const regionSearch = createAsyncThunk('/regionSearch', async (data: any, thunkAPI) => {
 	try {
-		const response = await axiosAuth.get(`/regionSearch/run`);
+		console.log('왔엉');
+		const response = await axiosAuth.post(`/regionSearch/run`, data);
 
 		console.log(response.data);
 		return response.data;

@@ -11,6 +11,7 @@ export default function SelectPopularity({navigation}: any) {
 	const goNext = () => {
 		let data = Number(selectedId) * 20;
 		dispatch(regionRecommendSliceActions.enrollPopularity([data, data + 20]));
+		navigation.popToTop();
 		navigation.navigate('RegionViewResult');
 	};
 	const radioButtons: RadioButtonProps[] = useMemo(

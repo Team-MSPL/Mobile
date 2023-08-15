@@ -28,11 +28,16 @@ export default function LoginScreen({navigation}: any) {
 			console.log(userInfo.id, '세');
 			const data = {
 				userName: userInfo.nickname,
-				userToken: userInfo.id,
 				userProfileImage: userInfo.profileImageUrl,
-				socialloginProvider: 'kakao',
+				userToken: userInfo.id,
+				loginProvider: 'kakao',
+				signUpFlag: false,
 			};
-			dispatch(temporarySignUp(data));
+			const result = await dispatch(socialConnect(data)).unwrap();
+			console.log('qwe', result);
+			if (result == 202) {
+				navigation.navigate('Join1', {userToken: userInfo.id, loginProvider: 'kakao'});
+			}
 			// await KakaoLogin.login();
 			// const userInfo = await KakaoLogin.getProfile();
 			// const data = {
