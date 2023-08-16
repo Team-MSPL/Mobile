@@ -1,10 +1,9 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {API_ROUTE, GOOGLE_API_KEY} from '@env';
+
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Alert} from 'react-native';
 import {axiosAuth} from '../travel-info/travel.slice';
 import {userSliceActions} from './user.slice';
-import {Alert} from 'react-native';
 const initialState: LiteState = {
 	login: [],
 	userInfo: [],
@@ -32,24 +31,11 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			thunkAPI.dispatch(userSliceActions.setUserInfo({...userData, userToken: data.userToken}));
 			await AsyncStorage.setItem('provider', userData.loginProvider);
 			await AsyncStorage.setItem('userName', userData.userName);
-			await AsyncStorage.setItem('userToken', data.userToken);
+			await AsyncStorage.setItem('userToken', data.userToken?.toString());
 			await AsyncStorage.setItem('userId', userData.userId); //스트링 아니면 toStrign() userToken을 계속 가지고 있어야한다!
 			await AsyncStorage.setItem('userJwtToken', userData.userJwtToken);
 		}
 		return response.status;
-		thunkAPI.dispatch(userSliceActions.login());
-		thunkAPI.dispatch(
-			userSliceActions.setUserInfo({
-				socialloginProvider: data.socialloginProvider,
-				userName: data.userName,
-				userId: data.userId,
-			}),
-		);
-		await AsyncStorage.setItem('provider', 'kakao'); //밑에부분들은 response로세팅하믄됨
-		await AsyncStorage.setItem('userName', '문성준'); //지금은 토큰으로 처리하게 되어있어서 토큰인데 추후에는 userId로 ㄱ
-		await AsyncStorage.setItem('userId', 'moon5381'); //스트링 아니면 toStrign()
-		await AsyncStorage.setItem('userJwtToken', 'jmtzzzz');
-		return 0;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
 	}
@@ -134,10 +120,10 @@ export const loginSlice = createSlice({
 	},
 	extraReducers: builder => {
 		// builder.addCase(socialConnect.fulfilled, (state, {payload}) => {
-		// 	console.log(payload);
-		// 	// setStorage('token', payload.userJwtToken);
-		// 	// setStorage('test', '1234');
-		// 	state.jwtToken = payload.userJwtToken;
+		//    console.log(payload);
+		//    // setStorage('token', payload.userJwtToken);
+		//    // setStorage('test', '1234');
+		//    state.jwtToken = payload.userJwtToken;
 		// });
 		builder.addCase(temporarySignUp.fulfilled, (state, {payload}) => {
 			console.log(payload);

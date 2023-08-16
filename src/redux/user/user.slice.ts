@@ -11,6 +11,7 @@ const initialUserState: UserState = {
 	isLogin: false,
 	functionToken: 0,
 	userProfileImage: '',
+
 	userToken: '',
 };
 

@@ -25,7 +25,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 	const [postContent, setPostContent] = useState<string>('');
 	const [postImage, setPostImage] = useState<string[]>([]);
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-	const {jwtToken} = useAppSelector(state => state.loginSlice);
+	const {userId, userName} = useAppSelector(state => state.userSlice);
 
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
@@ -85,15 +85,11 @@ export default function CommunityWritingScreen({navigation}: any) {
 					postTitle: postTitle,
 					postContent: postContent,
 					postImage: postImage,
-					// TODO 작성자 닉네임 가져와서 반영해주기
-					postWriter: '아이폰xs',
-					// TODO 작성자 다님 고유 아이디 값 가져와서 반영해주기
-					postWriterUserId: '작성자의 다님 고유 id',
+					postWriter: userName,
+					postWriterUserId: userId,
 					postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 					// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
 					postId: shortid.generate(),
-					// 여러 필드값 추가 가능
-					// 예: author: 'John Doe', views: 0, likes: 0, ...
 				})
 				.then(() => {
 					console.log('글이 성공적으로 저장되었습니다.');

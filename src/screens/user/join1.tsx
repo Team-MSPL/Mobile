@@ -1,12 +1,12 @@
-import {TouchableOpacity, Alert} from 'react-native';
 import {useState} from 'react';
+import {Alert, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
-import {loginSliceActions, socialConnect} from '../../redux/user/login.slice';
-import CustomButton from '../../utill/component/custom-button';
-import {colors} from '../../utill/colors';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {socialConnect} from '../../redux/user/login.slice';
+import {colors} from '../../utill/colors';
+import CustomButton from '../../utill/component/custom-button';
 
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
@@ -18,7 +18,7 @@ export default function Join1({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const data = {
 				userName: nickname,
-				userProfileImage: 'qwe',
+				userProfileImage: route.params.profileImage,
 				userToken: route.params.userToken,
 				loginProvider: route.params.loginProvider,
 				signUpFlag: true,
@@ -27,6 +27,7 @@ export default function Join1({navigation, route}: any) {
 			console.log(navigation);
 			navigation.replace('Home');
 		} catch (err) {
+			console.log('왜 이래', err);
 			Alert.alert('회원가입중 에러가 발생했습니다');
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());

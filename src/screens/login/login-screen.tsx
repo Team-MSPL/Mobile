@@ -5,7 +5,7 @@ import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAppDispatch} from '../../redux';
-import {socialConnect, temporarySignUp} from '../../redux/user/login.slice';
+import {socialConnect} from '../../redux/user/login.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -36,19 +36,23 @@ export default function LoginScreen({navigation}: any) {
 			const result = await dispatch(socialConnect(data)).unwrap();
 			console.log('qwe', result);
 			if (result == 202) {
-				navigation.navigate('Join1', {userToken: userInfo.id, loginProvider: 'kakao'});
+				navigation.navigate('Join1', {
+					userToken: userInfo.id,
+					loginProvider: 'kakao',
+					profileImage: userInfo.profileImageUrl,
+				});
 			}
 			// await KakaoLogin.login();
 			// const userInfo = await KakaoLogin.getProfile();
 			// const data = {
-			// 	userName: userInfo.nickname,
-			// 	userId: userInfo.id,
-			// 	socialloginProvider: 'kakao',
+			//    userName: userInfo.nickname,
+			//    userId: userInfo.id,
+			//    socialloginProvider: 'kakao',
 			// };
 			//const res = await dispatch(socialConnect(data));
 			//navigation.navigate('Join1');
 			// if (res == '회원가입') {
-			// 	navigation.replace('Join1');
+			//    navigation.replace('Join1');
 			// }
 		} catch {
 			Alert.alert('카카오 로그인에 실패하였습니다.');

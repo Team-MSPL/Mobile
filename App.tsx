@@ -6,18 +6,17 @@
  */
 
 import React, {useEffect} from 'react';
-import {Alert, SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import {Alert, StatusBar, useColorScheme} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import StackNavigator from './src/stacks';
-import {NativeBaseProvider} from 'native-base';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {RootState, useAppDispatch, useAppSelector} from './src/redux';
-import Loading from './src/utill/loading';
-import {LoadingSliceActions} from './src/redux/loading/loading.slice';
-import {loginSliceActions, socialConnect, temporarySignIn} from './src/redux/user/login.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NativeBaseProvider} from 'native-base';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {RootState, useAppDispatch, useAppSelector} from './src/redux';
+import {LoadingSliceActions} from './src/redux/loading/loading.slice';
+import {socialConnect} from './src/redux/user/login.slice';
+import StackNavigator from './src/stacks';
+import Loading from './src/utill/loading';
 
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';

@@ -43,6 +43,16 @@ export default function CommunityReadingBottomPopSheet() {
 		},
 	];
 
+	const filterCommunityReadingMenuList = ({userId, postId}: string) => {
+		if (userId == postId) {
+			return communityReadingMenuList.filter(
+				item => item.title === '수정' || item.title === '삭제' || item.title === '신고',
+			);
+		} else {
+			return communityReadingMenuList.filter(item => item.title === '신고');
+		}
+	};
+
 	const flatListItemSeperator = () => {
 		return (
 			<View
