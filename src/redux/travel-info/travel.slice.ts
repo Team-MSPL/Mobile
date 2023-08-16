@@ -44,7 +44,7 @@ export const axiosAuth = axios.create({
 		withCredentials: true,
 		Authorization:
 			'Bearer ' +
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ikpvb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI0YzQzYTAxMmI2NDc3YjU5NGU3MyIsImlhdCI6MTY5MjA5MzUwNywiZXhwIjoxNzA3NjQ1NTA3fQ.uB4R4F6YaNZzOfIu9A1PTJl3LrfggaOJHYGmJVYPdng',
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik1vb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI1NmUzYTAxMmI2NDc3YjU5NGVkMyIsImlhdCI6MTY5MjA5NjIyNywiZXhwIjoxNzA3NjQ4MjI3fQ.59IaNH_XwrRGauDzh6fohNmrZoKe1EIE7TovNh3yp6k',
 	},
 });
 
@@ -121,7 +121,7 @@ export const deleteTravelCourse = createAsyncThunk(
 			console.log('ㅋ?', data.travelId);
 			let q = {travelId: data.travelId};
 			console.log(q);
-			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, q);
+			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
 			console.log(response.data);
 
 			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));

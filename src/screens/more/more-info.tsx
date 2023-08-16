@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {Image, Text, Center, Box, ScrollView, Button, VStack} from 'native-base';
 import {useEffect} from 'react';
@@ -8,9 +9,7 @@ import {deleteTravelCourse, getOneTravelCourse} from '../../redux/travel-info/tr
 import {loginSliceActions} from '../../redux/user/login.slice';
 import {logout, updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 export default function MoreInfo({navigation}: any) {
-	const {isLogin, userName, socialloginProvider, functionToken, userId, userToken} = useAppSelector(
-		state => state.userSlice,
-	);
+	const {isLogin, userName, socialloginProvider, functionToken, userId} = useAppSelector(state => state.userSlice);
 
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const {myTravelList} = useAppSelector(state => state.travelSlice);
@@ -29,18 +28,21 @@ export default function MoreInfo({navigation}: any) {
 			),
 		});
 	}, []);
-	const goLogout = () => {
-		console.log(socialloginProvider);
-		// dispatch(logout());
+	const goLogout = async () => {
+		await AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList)); //TODO 로그아웃시 지금은 다 날려버림
+		dispatch(userSliceActions.reset());
+		navigation.popToTop();
+		Alert.alert('로그아웃 성공이요');
 		// navigation.popToTop();
 	};
 	const goWithdraw = () => {
 		try {
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
-			const data = {userToken: userToken, signUpFirebase: !signUpFirebase};
+			const data = {userId: userId, signUpFirebase: !signUpFirebase};
 			console.log(data);
 			dispatch(userWithdraw(data));
 			navigation.popToTop();
+			Alert.alert('탈퇴 성공이요');
 		} catch (err) {
 			Alert.alert('회원탈퇴중 에러요');
 		}
@@ -79,7 +81,7 @@ export default function MoreInfo({navigation}: any) {
 					<TouchableOpacity onPress={goWithdraw}>
 						<Text>회원탈퇴{}</Text>
 					</TouchableOpacity>
-					{/* {anonymous ? (
+					{anonymous ? (
 						<TouchableOpacity
 							onPress={() => {
 								dispatch(loginSliceActions.setAnonymous(false)), navigation.popToTop();
@@ -90,7 +92,7 @@ export default function MoreInfo({navigation}: any) {
 						<TouchableOpacity onPress={goLogout}>
 							<Text>로그아웃</Text>
 						</TouchableOpacity>
-					)} */}
+					)}
 				</Box>
 			) : (
 				<TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>

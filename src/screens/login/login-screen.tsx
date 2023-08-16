@@ -5,7 +5,7 @@ import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAppDispatch} from '../../redux';
-import {socialConnect, temporarySignUp} from '../../redux/user/login.slice';
+import {socialConnect} from '../../redux/user/login.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -24,8 +24,6 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log(typeof userInfo.id);
-			console.log(userInfo.id, '세');
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
@@ -34,9 +32,12 @@ export default function LoginScreen({navigation}: any) {
 				signUpFlag: false,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
-			console.log('qwe', result);
 			if (result == 202) {
-				navigation.navigate('Join1', {userToken: userInfo.id, loginProvider: 'kakao'});
+				navigation.navigate('Join1', {
+					userToken: userInfo.id,
+					loginProvider: 'kakao',
+					profileImage: userInfo.profileImageUrl,
+				});
 			}
 			// await KakaoLogin.login();
 			// const userInfo = await KakaoLogin.getProfile();

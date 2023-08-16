@@ -18,7 +18,7 @@ export default function Join1({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const data = {
 				userName: nickname,
-				userProfileImage: 'qwe',
+				userProfileImage: route.params.profileImage,
 				userToken: route.params.userToken,
 				loginProvider: route.params.loginProvider,
 				signUpFlag: true,
