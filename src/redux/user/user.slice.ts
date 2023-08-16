@@ -9,6 +9,7 @@ const initialUserState: UserState = {
 	socialloginProvider: undefined,
 	isLogin: false,
 	functionToken: 0,
+	userProfileImage: '',
 };
 
 // 로그아웃
@@ -32,6 +33,7 @@ const userSlice = createSlice({
 			state.socialloginProvider = payload.socialloginProvider;
 			state.userName = payload.userName;
 			state.userId = payload.userId;
+			state.userProfileImage = payload.userProfileImage;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -67,4 +69,5 @@ export interface UserState {
 	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
 	isLogin: boolean;
 	functionToken: number;
+	userProfileImage: string;
 }

@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
+import {useAppSelector} from '../../redux';
 import ReportModal from '../../utill/component/community/report-modal';
 
 const {StatusBarManager} = NativeModules;
@@ -41,6 +42,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [statusBarHeight, setStatusBarHeight] = useState(0);
+	const {userId, userName, userProfileImage} = useAppSelector(state => state.userSlice);
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -105,8 +107,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				setPostImage(postImage);
 
 				const likeList = data?.likeList ?? [];
-				// TODO 유저 닉네임으로 적용시켜야 함.
-				if (likeList.some((item: string) => item === '아이폰xs')) {
+				if (likeList.some((item: string) => item === userName)) {
 					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
@@ -124,10 +125,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			// db의 comment에 들어갈 정보들
 			const newCommentData = {
-				// TODO commenter에 유저 닉네임 적용시켜야 함.
-				commenter: '아이폰xs',
-				// TODO userid에 다님에서 발급해주는 고유 id값 적용시켜야 함.
-				userid: 'danim신제원',
+				commenter: userName,
+				userid: userId,
 				commentContent: newCommentContent,
 				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
 				_id: shortid.generate(),
@@ -149,11 +148,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		return (
 			<View style={styles.commentItemContainer}>
 				<HStack space={1} alignItems='center'>
-					{/* TODO: 이미지를 유저 개인 프로필 사진 가져오는 걸로 바꿔야 함.*/}
-					{/* <Image
-						source={require('/Users/sjw/Danim_RN/Mobile/public/images/danim_logo.png')}
-						style={styles.commentProfileImage}></Image> */}
-					<Text>{item.commenter}</Text>
+					<Image source={{uri: userProfileImage}} style={styles.commentProfileImage}></Image>
+					<Text style={{fontWeight: 'bold'}}>{item.commenter}</Text>
 				</HStack>
 				<Text>{item.commentContent}</Text>
 				<Text style={{fontSize: 8}}>{item.commentedAt}</Text>
@@ -188,14 +184,12 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		try {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			if (isLiked) {
-				// TODO shortid 대신에 userid로 수정해야 함.
-				// TODO 유저 닉네임으로 수정해야함.
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove('아이폰xs'),
+					likeList: firestore.FieldValue.arrayRemove(userName),
 				});
 			} else {
 				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion('아이폰xs'),
+					likeList: firestore.FieldValue.arrayUnion(userName),
 				});
 			}
 			fetchPostData();
@@ -298,21 +292,24 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 	},
 	commentItemContainer: {
-		height: Dimensions.get('window').height * 0.1,
+		width: Dimensions.get('window').width * 0.95,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
 		padding: 8,
 		margin: 8,
+		alignSelf: 'center',
+		flexDirection: 'column',
+		backgroundColor: 'rgba(200, 200, 200, 0.8)',
 	},
 	commentProfileImage: {
-		width: 24,
-		height: 24,
+		width: 36,
+		height: 36,
 		marginBottom: 8,
 		borderRadius: 8,
 		borderWidth: 1,
 		borderColor: '#5DC3DB',
-		resizeMode: 'contain',
+		resizeMode: 'cover',
 	},
 	commentInputField: {
 		flex: 7,

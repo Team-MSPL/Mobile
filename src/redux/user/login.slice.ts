@@ -1,9 +1,7 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {API_ROUTE, GOOGLE_API_KEY} from '@env';
-import {userActions} from './user.slice';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {axiosAuth} from '../travel-info/travel.slice';
+import {userActions} from './user.slice';
 const initialState: LiteState = {
 	login: [],
 	userInfo: [],
@@ -14,20 +12,20 @@ const initialState: LiteState = {
 export const socialConnect = createAsyncThunk('/user/connect', async (data: LoginType, thunkAPI) => {
 	try {
 		// const response = await axiosAuth.post('/user/connect', {
-		// 	userName: data.userName,
-		// 	userId: data.userId,
-		// 	socialloginProvider: data.socialloginProvider,
+		//    userName: data.userName,
+		//    userId: data.userId,
+		//    socialloginProvider: data.socialloginProvider,
 		// });
 		// //데이터일거얌 jwt는 헤더에!
 		// let userData = response.data;
 		// //성공했을때
 		// if (response.status == 200) {
-		// 	thunkAPI.dispatch(userActions.login());
-		// 	thunkAPI.dispatch(userActions.setUserInfo(userData));
-		// 	await AsyncStorage.setItem('provider', userData.socialloginProvider);
-		// 	await AsyncStorage.setItem('userName', userData.userName);
-		// 	await AsyncStorage.setItem('userId', userData.userId); //스트링 아니면 toStrign()
-		// 	await AsyncStorage.setItem('userJwtToken', userData.userJwtToken);
+		//    thunkAPI.dispatch(userActions.login());
+		//    thunkAPI.dispatch(userActions.setUserInfo(userData));
+		//    await AsyncStorage.setItem('provider', userData.socialloginProvider);
+		//    await AsyncStorage.setItem('userName', userData.userName);
+		//    await AsyncStorage.setItem('userId', userData.userId); //스트링 아니면 toStrign()
+		//    await AsyncStorage.setItem('userJwtToken', userData.userJwtToken);
 		// }
 		// return response.data;
 		thunkAPI.dispatch(userActions.login());
@@ -55,6 +53,7 @@ export const temporarySignUp = createAsyncThunk('/temporarySignUp', async (data:
 			userToken: data.userToken,
 		});
 
+		await AsyncStorage.setItem('userProfileImage', response.data.userProfileImage);
 		await AsyncStorage.setItem('userName', response.data.userName);
 		await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
 		await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
@@ -65,6 +64,7 @@ export const temporarySignUp = createAsyncThunk('/temporarySignUp', async (data:
 				userName: response.data.userName,
 				userId: response.data.userId,
 				socialloginProvider: data.socialloginProvider,
+				userProfileImage: response.data.userProfileImage,
 			}),
 		);
 		console.log(response.data);
@@ -82,6 +82,8 @@ export const temporarySignIn = createAsyncThunk(
 				userName: data.userName,
 				userToken: data.userToken,
 			});
+
+			await AsyncStorage.setItem('userProfileImage', response.data.userProfileImage);
 			await AsyncStorage.setItem('userName', response.data.userName);
 			await AsyncStorage.setItem('userId', response.data.userToken); //스트링 아니면 toStrign()
 			await AsyncStorage.setItem('userJwtToken', response.data.userJwtToken);
@@ -92,6 +94,7 @@ export const temporarySignIn = createAsyncThunk(
 					userName: response.data.userName,
 					userId: response.data.userId,
 					socialloginProvider: socialloginProvider,
+					userProfileImage: response.data.userProfileImage,
 				}),
 			);
 			console.log(response.data);
@@ -116,10 +119,10 @@ export const loginSlice = createSlice({
 	},
 	extraReducers: builder => {
 		// builder.addCase(socialConnect.fulfilled, (state, {payload}) => {
-		// 	console.log(payload);
-		// 	// setStorage('token', payload.userJwtToken);
-		// 	// setStorage('test', '1234');
-		// 	state.jwtToken = payload.userJwtToken;
+		//    console.log(payload);
+		//    // setStorage('token', payload.userJwtToken);
+		//    // setStorage('test', '1234');
+		//    state.jwtToken = payload.userJwtToken;
 		// });
 		builder.addCase(temporarySignUp.fulfilled, (state, {payload}) => {
 			console.log(payload);

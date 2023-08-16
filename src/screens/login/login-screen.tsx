@@ -24,9 +24,10 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
+			console.log(typeof userInfo.id);
 			const data = {
 				userName: userInfo.nickname,
-				userToken: userInfo.id,
+				userToken: userInfo.id.toString(),
 				userProfileImage: userInfo.profileImageUrl,
 				socialloginProvider: 'kakao',
 			};
