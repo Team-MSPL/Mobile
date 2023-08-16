@@ -1,11 +1,9 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Alert} from 'react-native';
 import {axiosAuth} from '../travel-info/travel.slice';
 import {userSliceActions} from './user.slice';
-import {Alert} from 'react-native';
 const initialState: LiteState = {
-	login: [],
 	anonymous: false,
 };
 //로그인&회원가입
@@ -41,9 +39,6 @@ export const loginSlice = createSlice({
 	name: 'login',
 	initialState,
 	reducers: {
-		setLoginInfo: (state, {payload}) => {
-			state.login = payload;
-		},
 		setAnonymous: (state, {payload}) => {
 			state.anonymous = payload;
 		},
@@ -71,7 +66,6 @@ export const loginSliceActions = loginSlice.actions;
 export default loginSlice.reducer;
 
 interface LiteState {
-	login: LoginType[];
 	anonymous: boolean;
 }
 

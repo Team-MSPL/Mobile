@@ -42,14 +42,14 @@ export default function LoginScreen({navigation}: any) {
 			// await KakaoLogin.login();
 			// const userInfo = await KakaoLogin.getProfile();
 			// const data = {
-			// 	userName: userInfo.nickname,
-			// 	userId: userInfo.id,
-			// 	socialloginProvider: 'kakao',
+			//    userName: userInfo.nickname,
+			//    userId: userInfo.id,
+			//    socialloginProvider: 'kakao',
 			// };
 			//const res = await dispatch(socialConnect(data));
 			//navigation.navigate('Join1');
 			// if (res == '회원가입') {
-			// 	navigation.replace('Join1');
+			//    navigation.replace('Join1');
 			// }
 		} catch {
 			Alert.alert('카카오 로그인에 실패하였습니다.');
