@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import CustomButton from '../../../utill/component/custom-button';
@@ -6,10 +6,12 @@ import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-bas
 import {Platform, TouchableOpacity, PermissionsAndroid} from 'react-native';
 import {cityViewList} from '../select-city';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {regionSearch} from '../../../ai/region_search';
+import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
+
 //import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
 	const [recommendList, setRecommendList] = useState<string[]>([]);
 	const goEnrollInfo = (e: string) => {
@@ -34,19 +36,23 @@ export default function ViewResult({navigation}: any) {
 				recentPosition: {lat: lat, lng: lng},
 				distanceSensitivity: distance,
 			};
-			const result = await regionSearch(datas);
+			const result = await dispatch(regionSearch(datas)).unwrap();
 			setRecommendList(result);
-			//dispatch(regionSearch());
 		} catch (err) {
 			console.log(err);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useEffect(() => {
+	useLayoutEffect(() => {
 		getRegionRecommend();
 	}, []);
-
+	if (isLoading)
+		return (
+			<ScrollView>
+				<Text>스ㅔ</Text>
+			</ScrollView>
+		);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<VStack space='5'>
@@ -55,6 +61,7 @@ export default function ViewResult({navigation}: any) {
 				</Text>
 				{recommendList.map((item, idx) => (
 					<TouchableOpacity
+						key={idx}
 						onPress={() => {
 							goEnrollInfo(item);
 						}}>

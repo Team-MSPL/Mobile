@@ -1,14 +1,15 @@
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
-import {useAppDispatch} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
 		navigation.navigate('SelectCity');
 	};
+	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const zxc = () => {
 		dispatch(travelSliceActions.setSingleMode());
@@ -29,12 +30,16 @@ export default function Main({navigation}: any) {
 			),
 		});
 	}, []);
+	useEffect(() => {
+		console.log('ㅂㅈㅈㅈㅈㅈㅈㅈㅈ', userId);
+		dispatch(getMyTravelList({userId: userId}));
+	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>
 				나그네
 				<Text fontSize='2xl' color={colors.TextPrimary}>
-					님,{'\n'}다님과 떠나볼까요?
+					님,{'\n'}다님과 떠나볼까요?{userId}
 				</Text>
 			</Text>
 			<Center my='5'>
@@ -67,7 +72,7 @@ export default function Main({navigation}: any) {
 					다님에서 최대 검색지를 찾아봤어요
 				</Text>
 			</VStack>
-			<ScrollView horizontal>
+			{/* <ScrollView horizontal>
 				{viewList.map(item => {
 					return (
 						<Center m='5' key={item.id}>
@@ -78,7 +83,7 @@ export default function Main({navigation}: any) {
 						</Center>
 					);
 				})}
-			</ScrollView>
+			</ScrollView> */}
 
 			<Text fontSize='md' bold>
 				여행 성향별 추천 코스

@@ -1,15 +1,23 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getDrivingDuration, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	getDrivingDuration,
+	saveTravel,
+	travelSliceActions,
+	updateTravelCourse,
+} from '../../redux/travel-info/travel.slice';
 import shortId from 'shortid';
-import {TouchableOpacity} from 'react-native';
+import {Alert, TouchableOpacity} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
 import Background from '../../utill/component/timetable/background';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 export default function Timetable({navigation}: any) {
-	const {timetable, day, makeMode, editMode} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId} = useAppSelector(
+		state => state.travelSlice,
+	);
+	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const [deleteList, setDeleteList] = useState<string[]>([]);
@@ -20,6 +28,7 @@ export default function Timetable({navigation}: any) {
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			console.log(timetable.length);
 			for (let i = 0; i < timetable.length; i++) {
 				if (timetable[i].length != 1) {
 					for (let j = 0; j < timetable[i].length; j++) {
@@ -36,7 +45,9 @@ export default function Timetable({navigation}: any) {
 					wayPoint = {start: '', goal: '', wayPoint: ''};
 				}
 			}
-			dispatch(travelSliceActions.drawTimetable());
+			if (travelId == '') {
+				dispatch(travelSliceActions.drawTimetable());
+			}
 		} catch (err) {
 			console.log('에러요', err);
 		} finally {
@@ -48,16 +59,30 @@ export default function Timetable({navigation}: any) {
 	};
 	const goSave = () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
-		// const a = {
-		// 	userId: userId,
-		// 	travelId: travelId,
-		// 	region: region,
-		// 	day: day,
-		// 	nDay: nDay,
-		// 	transit: transit,
-		// 	timetable: timetable,
-		// 	tendency:tendency,
-		// };
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			if (travelId == '') {
+				const data = {
+					userId: userId,
+					region: region,
+					day: day,
+					nDay: nDay + 1,
+					transit: transit,
+					timetable: timetable,
+					tendency: tendency,
+				};
+				dispatch(saveTravel(data));
+			} else {
+				console.log('여기구여', travelId);
+				const data = {travelId: travelId, timetable: timetable};
+				dispatch(updateTravelCourse(data));
+			}
+		} catch (err) {
+			Alert.alert('저장중 에러가 발생했습니다');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
@@ -98,7 +123,7 @@ export default function Timetable({navigation}: any) {
 							<TouchableOpacity onPress={goMapInfo}>
 								<Text>지도 함 볼래?</Text>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={goMapInfo}>
+							<TouchableOpacity onPress={goSave}>
 								<Text>저장 함 해볼래?</Text>
 							</TouchableOpacity>
 						</Box>

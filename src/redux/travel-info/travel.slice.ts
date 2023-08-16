@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
+import userSlice from '../user/user.slice';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -15,12 +16,6 @@ const initialState: LiteState = {
 		category: 4,
 		takenTime: 30,
 		imageUrl: '',
-		popular: 0,
-		partner: [0, 0, 0, 0, 0, 0, 0],
-		concept: [0, 0, 0, 0],
-		play: [0, 0, 0, 0, 0, 0],
-		tour: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-		season: [0, 0, 0, 0],
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
@@ -37,11 +32,20 @@ const initialState: LiteState = {
 	editMode: '', // 삭제모드=delete, 추가모드=add
 	recommendList: [], //추천할때 쓰이는 리스트
 	makeMode: true, //true=추천모드, fasle==혼자짤래요
+	//----------------------------------------------------
+	myTravelList: [],
+	travelId: '',
 };
 
 export const axiosAuth = axios.create({
-	baseURL: 'http://54.180.92.25',
-	headers: {'content-type': 'application/json', withCredentials: true, Authorization: 'Bearer ' + 'token'},
+	baseURL: 'http://3.35.24.224',
+	headers: {
+		'content-type': 'application/json',
+		withCredentials: true,
+		Authorization:
+			'Bearer ' +
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ikpvb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI0YzQzYTAxMmI2NDc3YjU5NGU3MyIsImlhdCI6MTY5MjA5MzUwNywiZXhwIjoxNzA3NjQ1NTA3fQ.uB4R4F6YaNZzOfIu9A1PTJl3LrfggaOJHYGmJVYPdng',
+	},
 });
 
 export const axiosGoogle = axios.create({
@@ -63,20 +67,104 @@ export const axiosNaver = axios.create({
 	},
 });
 
-export const tete = createAsyncThunk(
-	'/qwe',
-	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+//-------------------------------------------------------------
+//내 여행 목록 가져오는거
+export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data, thunkAPI) => {
+	try {
+		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
+		console.log(response.data);
+		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+		return response.data.travelCourseList;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
+//여행 코스 하나 가져오기
+export const getOneTravelCourse = createAsyncThunk(
+	'/getOneTravelCourse',
+	async (data: {travelId: string}, thunkAPI) => {
 		try {
-			console.log('ㅁㄴㅇ');
-			const response = await axiosAuth.get(`/user/all`);
-			console.log('qwe', response);
-			console.log('케케케', response.data);
-			return response;
+			const response = await axiosAuth.get(`/travelCourse/getOneTravelCourse?travelId=${data.travelId}`);
+			console.log(response.data);
+
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response.data;
 		} catch (error) {
-			return console.log('에러요', error);
+			console.log(error);
+			return error;
 		}
 	},
 );
+//코스 수정하기
+export const updateTravelCourse = createAsyncThunk(
+	'/updateTravelCourse',
+	async (data: updateTravelCourseType, thunkAPI) => {
+		try {
+			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourse`, data);
+			console.log(response.data);
+
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
+
+//코스 삭제하기
+export const deleteTravelCourse = createAsyncThunk(
+	'/deleteTravelCourse',
+	async (data: {travelId: string}, thunkAPI) => {
+		try {
+			console.log('ㅋ?', data.travelId);
+			let q = {travelId: data.travelId};
+			console.log(q);
+			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, q);
+			console.log(response.data);
+
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
+
+//-------------------------------------------------------------
+
+//여행 코스 추천 ai
+export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, thunkAPI) => {
+	try {
+		console.log('ㅁㄴㅇ');
+		const response = await axiosAuth.post(`/ai/run`, data);
+		console.log('qwe', response);
+		console.log('케케케', response.data);
+		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data);
+		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
+		return response.data.data.resultData;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
+//여행 코스 저장
+export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, thunkAPI) => {
+	try {
+		console.log('ㅁㄴㅇ');
+		const response = await axiosAuth.post(`/travelCourse/saveTravelCourse`, data);
+		console.log('qwe', response);
+		console.log('케케케', response.data);
+		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data.data);
+		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',
@@ -293,6 +381,24 @@ export const travelSlice = createSlice({
 		builder.addCase(recommendApi.fulfilled, (state, {payload}) => {
 			state.recommendList = payload;
 		});
+		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
+			state.presetDatas = payload;
+		});
+		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
+			console.log('페페', payload);
+			state.myTravelList = payload;
+		});
+		builder.addCase(getOneTravelCourse.fulfilled, (state, {payload}) => {
+			console.log('목아파', payload.timetable);
+			const dayToMoment = payload.day.map(item => moment(item));
+			state.day = dayToMoment;
+			state.nDay = payload.nDay - 1;
+			state.region = payload.region;
+			state.timetable = payload.timetable;
+			state.transit = payload.transit;
+			state.travelId = payload._id;
+			//state.myTravelList = payload;
+		});
 	},
 });
 
@@ -320,6 +426,9 @@ interface LiteState {
 	editMode: string;
 	recommendList: RecommendList[];
 	makeMode: boolean;
+	//----------------------------------------
+	myTravelList: myTravelListType[];
+	travelId: string;
 }
 
 interface PlaceType {
@@ -329,12 +438,6 @@ interface PlaceType {
 	category: number;
 	takenTime: number;
 	imageUrl: string;
-	popular: number;
-	partner: number[];
-	concept: number[];
-	play: number[];
-	tour: number[];
-	season: number[];
 }
 
 export interface EssentialPlaceType {
@@ -349,16 +452,10 @@ export interface EssentialPlaceType {
 }
 export interface TimetableType {
 	category: number;
-	concept: number[];
 	lat: number;
 	lng: number;
 	name: string;
-	partner: number[];
-	play: number[];
-	popular: number;
-	season: number[];
 	takenTime: number;
-	tour: number[];
 	x?: number;
 	y?: number;
 	id?: string;
@@ -372,6 +469,15 @@ export interface CourseDetailType {
 	editorial_summary: EditorialSummary;
 }
 
+export interface SaveTravelType {
+	userId: string;
+	region: string[];
+	day: Moment[];
+	nDay: number;
+	transit: number;
+	tendency: number[][];
+	timetable: TimetableType[][];
+}
 interface Reviews {
 	author_name: string;
 	author_url: string;
@@ -410,4 +516,27 @@ interface RecommendList {
 	road_address_name: string;
 	x: number;
 	y: number;
+}
+
+interface travelAiType {
+	regionList: string[];
+	accomodationList: PlaceType[];
+	selectList: number[][];
+	essentialPlaceList: EssentialPlaceType[];
+	timeLimitArray: number[];
+	nDay: number;
+	transit: number;
+	distanceSensitivity: number;
+}
+
+interface myTravelListType {
+	_id: string;
+	region: string[];
+	day: Moment[];
+	nDay: number;
+}
+
+interface updateTravelCourseType {
+	travelId: string;
+	timetable: TimetableType[][];
 }

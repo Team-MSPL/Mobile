@@ -6,18 +6,17 @@
  */
 
 import React, {useEffect} from 'react';
-import {Alert, SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import {Alert, StatusBar, useColorScheme} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import StackNavigator from './src/stacks';
-import {NativeBaseProvider} from 'native-base';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {RootState, useAppDispatch, useAppSelector} from './src/redux';
-import Loading from './src/utill/loading';
-import {LoadingSliceActions} from './src/redux/loading/loading.slice';
-import {loginSliceActions, socialConnect, temporarySignIn} from './src/redux/user/login.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NativeBaseProvider} from 'native-base';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {RootState, useAppDispatch, useAppSelector} from './src/redux';
+import {LoadingSliceActions} from './src/redux/loading/loading.slice';
+import {socialConnect} from './src/redux/user/login.slice';
+import StackNavigator from './src/stacks';
+import Loading from './src/utill/loading';
 
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -33,16 +32,26 @@ function App(): JSX.Element {
 			// AsyncStorage.multiRemove(q);
 			const userId = await AsyncStorage.getItem('userId'); //소셜아이디
 			const userName = await AsyncStorage.getItem('userName'); //사용자이름
+			const userJwtToken = await AsyncStorage.getItem('userJwtToken');
+			const userToken = await AsyncStorage.getItem('userToken');
 
-			const popop = await AsyncStorage.getItem('socialloginProvider'); //사용자이름
+			const popop = await AsyncStorage.getItem('loginProvider'); //사용자이름
 			console.log(userName, userId);
 			console.log('토토토ㅗ토', popop);
 			// const provider = await AsyncStorage.getItem('provider'); //플랫폼
 			// const userId = await AsyncStorage.getItem('userId'); //소셜아이디
 			// const userName = await AsyncStorage.getItem('userName'); //사용자이름
-			//console.log('pp', userJwtToken, 'yy', userId, 'na', userName);
+			console.log('pp', userJwtToken, 'yy', userId, 'na', userName);
 			if (userId && userName) {
-				dispatch(temporarySignIn({userName: userName, userToken: userId}));
+				dispatch(
+					socialConnect({
+						userName: userName,
+						userToken: userToken,
+						loginProvider: popop,
+						signUpFlag: false,
+						userProfileImage: 'qwe',
+					}),
+				);
 			}
 		} catch (err) {
 			Alert.alert('로그인 오류', '로그인을 하는 도중 오류가 발생하였습니다.');

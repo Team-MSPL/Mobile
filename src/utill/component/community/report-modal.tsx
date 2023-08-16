@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import shortid from 'shortid';
 
-export default function ReportModal({navigation, postId}: any) {
+export default function ReportModal({navigation, postId, userName}: any) {
 	const [isReportModalVisible, setIsReportModalVisibile] = useState<boolean>(false);
 	//const [reportReason, setReportReason] = useState<string>('신고 사유');
 
@@ -85,10 +85,9 @@ export default function ReportModal({navigation, postId}: any) {
 			// db의 comment에 들어갈 정보들
 			const reportData = {
 				// TODO reportWriter 유저 닉네임 적용시켜야 함.
-				reportWriter: '아이폰xs',
+				reportWriter: userName,
 				reportReason: reason,
 				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-				// TODO userid에 다님에서 발급해주는 고유 id값 적용시켜야 함.
 				postId: postId,
 			};
 			// 새로운 댓글 정보들을 comment에 추가

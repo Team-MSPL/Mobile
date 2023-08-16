@@ -81,7 +81,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => {
-				return <ReportModal postId={postId}></ReportModal>;
+				return <ReportModal postId={postId} userName={userName}></ReportModal>;
 			},
 		});
 	}, [postId]);

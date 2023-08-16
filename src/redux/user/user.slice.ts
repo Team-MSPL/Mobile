@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {axiosAuth} from '../travel-info/travel.slice';
 
 const name = 'user';
 
@@ -10,6 +11,8 @@ const initialUserState: UserState = {
 	isLogin: false,
 	functionToken: 0,
 	userProfileImage: '',
+
+	userToken: '',
 };
 
 // 로그아웃
@@ -25,15 +28,47 @@ export const logout = createAsyncThunk('user/logout', async (_, {rejectWithValue
 	}
 });
 
+//회원탈퇴
+export const userWithdraw = createAsyncThunk(
+	'/user/withdraw',
+	async (data: {userToken: string; signUpFirebase: boolean}, thunkAPI) => {
+		try {
+			const response = await axiosAuth.delete('/user/withdraw', {data});
+			console.log(response);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
+
+//기능토큰관리
+export const updateFunctionToken = createAsyncThunk(
+	'/user/updateFunctionToken',
+	async (data: {functionToken: number}, thunkAPI) => {
+		try {
+			console.log('왔엉', data);
+			const response = await axiosAuth.patch('/user/updateFunctionToken', data);
+			console.log('안뇽', response);
+			return data;
+		} catch (error) {
+			console.log('에러에유', error);
+			return error;
+		}
+	},
+);
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,
 	reducers: {
 		setUserInfo(state, {payload}) {
-			state.socialloginProvider = payload.socialloginProvider;
+			state.socialloginProvider = payload.loginProvider;
 			state.userName = payload.userName;
 			state.userId = payload.userId;
 			state.userProfileImage = payload.userProfileImage;
+			state.functionToken = payload.functionToken;
+			state.userToken = payload.userToken;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -57,10 +92,25 @@ const userSlice = createSlice({
 			//userSlice.actions.reset();
 			return {...initialUserState};
 		});
+		builder.addCase(userWithdraw.fulfilled, state => {
+			AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
+			// console.log('왔는딩?');
+			// state.functionToken = 0;
+			// console.log('허허허?');
+			// state.isLogin = false;
+			// state.socialloginProvider = null;
+			// state.userId = '';
+			// state.userName = '';
+			//userSlice.actions.reset();
+			return {...initialUserState};
+		});
+		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {
+			state.functionToken = payload.functionToken;
+		});
 	},
 });
 
-export const userActions = userSlice.actions;
+export const userSliceActions = userSlice.actions;
 export default userSlice.reducer;
 
 export interface UserState {
@@ -70,4 +120,5 @@ export interface UserState {
 	isLogin: boolean;
 	functionToken: number;
 	userProfileImage: string;
+	userToken: string;
 }
