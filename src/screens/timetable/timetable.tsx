@@ -131,7 +131,7 @@ export default function Timetable({navigation}: any) {
 				</Box>
 			),
 		});
-	}, [editMode]);
+	}, [editMode, timetable]);
 	return (
 		<Box bgColor='#EFFBFB'>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} />

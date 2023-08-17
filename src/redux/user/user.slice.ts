@@ -57,6 +57,23 @@ export const updateFunctionToken = createAsyncThunk(
 		}
 	},
 );
+
+//사용자 프로필 변경하기
+export const updateProfile = createAsyncThunk(
+	'/updateProfile',
+	async (data: {userName: string; userProfileImage: string}, thunkAPI) => {
+		try {
+			const response = await axiosAuth.patch(`/user/updateProfile`, data);
+			console.log(response.data);
+
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,

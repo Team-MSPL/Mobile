@@ -28,6 +28,7 @@ function App(): JSX.Element {
 	};
 	const getAllKeys = async () => {
 		try {
+			// await AsyncStorage.clear();
 			dispatch(LoadingSliceActions.onLoading());
 			const [userName, userProfileImage, userToken, loginProvider] = await AsyncStorage.multiGet([
 				'userName',

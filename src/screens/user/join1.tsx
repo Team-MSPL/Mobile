@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
@@ -53,6 +53,9 @@ export default function Join1({navigation, route}: any) {
 		}
 		setCheck(copy);
 	};
+	useEffect(() => {
+		setNickname(route.params.nickname);
+	}, []);
 	return (
 		<SafeAreaView style={{backgroundColor: colors.main}}>
 			<Text>닉네임이요</Text>
@@ -60,10 +63,10 @@ export default function Join1({navigation, route}: any) {
 				<InputWrap>
 					<CustomTextInput
 						text={nickname}
-						placeholder='ex)홍길동 최대 6자이내 '
+						placeholder='ex)홍길동 최대 8자이내 '
 						value={nickname}
 						onChangeText={(value: string) => chageNickname(value)}
-						maxLength={6}
+						maxLength={8}
 						clearButtonMode='while-editing'
 					/>
 					{nickname && (
@@ -72,7 +75,7 @@ export default function Join1({navigation, route}: any) {
 							onPress={() => {
 								setNickname('');
 							}}>
-							<Text>claer</Text>
+							<Text>clear</Text>
 						</TouchableOpacity>
 					)}
 				</InputWrap>

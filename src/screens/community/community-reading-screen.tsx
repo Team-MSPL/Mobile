@@ -129,6 +129,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				userid: userId,
 				commentContent: newCommentContent,
 				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
+				profileImage: userProfileImage,
 				_id: shortid.generate(),
 			};
 			// 새로운 댓글 정보들을 comment에 추가
@@ -148,7 +149,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		return (
 			<View style={styles.commentItemContainer}>
 				<HStack space={1} alignItems='center'>
-					<Image source={{uri: userProfileImage}} style={styles.commentProfileImage}></Image>
+					<Image source={{uri: item.profileImage}} style={styles.commentProfileImage}></Image>
 					<Text style={{fontWeight: 'bold'}}>{item.commenter}</Text>
 				</HStack>
 				<Text>{item.commentContent}</Text>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
-import userSlice from '../user/user.slice';
+import userSlice, {userSliceActions} from '../user/user.slice';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -35,6 +35,7 @@ const initialState: LiteState = {
 	//----------------------------------------------------
 	myTravelList: [],
 	travelId: '',
+	postList: [],
 };
 
 export const axiosAuth = axios.create({
@@ -42,9 +43,9 @@ export const axiosAuth = axios.create({
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,
-		Authorization:
-			'Bearer ' +
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik1vb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI1NmUzYTAxMmI2NDc3YjU5NGVkMyIsImlhdCI6MTY5MjA5NjIyNywiZXhwIjoxNzA3NjQ4MjI3fQ.59IaNH_XwrRGauDzh6fohNmrZoKe1EIE7TovNh3yp6k',
+		// Authorization:
+		// 	'Bearer ' +
+		// 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik1vb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI1NmUzYTAxMmI2NDc3YjU5NGVkMyIsImlhdCI6MTY5MjA5NjIyNywiZXhwIjoxNzA3NjQ4MjI3fQ.59IaNH_XwrRGauDzh6fohNmrZoKe1EIE7TovNh3yp6k',
 	},
 });
 
@@ -71,7 +72,9 @@ export const axiosNaver = axios.create({
 //내 여행 목록 가져오는거
 export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data, thunkAPI) => {
 	try {
+		console.log('여행옴', thunkAPI.getState().userSlice.userId);
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
+		console.log('여행안오');
 		console.log(response.data);
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data.travelCourseList;
@@ -86,7 +89,7 @@ export const getOneTravelCourse = createAsyncThunk(
 	async (data: {travelId: string}, thunkAPI) => {
 		try {
 			const response = await axiosAuth.get(`/travelCourse/getOneTravelCourse?travelId=${data.travelId}`);
-			console.log(response.data);
+			console.log('실패허락해줘', response.data);
 
 			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
@@ -153,7 +156,7 @@ export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelA
 //여행 코스 저장
 export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, thunkAPI) => {
 	try {
-		console.log('ㅁㄴㅇ');
+		console.log('ㅁㄴㅇ', thunkAPI.getState().travelSlice.timetable);
 		const response = await axiosAuth.post(`/travelCourse/saveTravelCourse`, data);
 		console.log('qwe', response);
 		console.log('케케케', response.data);
@@ -343,6 +346,7 @@ export const travelSlice = createSlice({
 					}
 				});
 			});
+			console.log('문제느없는데요,', copy);
 			state.timetable = copy;
 		},
 		editModeChange: (state, {payload}) => {
@@ -429,6 +433,7 @@ interface LiteState {
 	//----------------------------------------
 	myTravelList: myTravelListType[];
 	travelId: string;
+	postList: postListType[];
 }
 
 interface PlaceType {
@@ -539,4 +544,13 @@ interface myTravelListType {
 interface updateTravelCourseType {
 	travelId: string;
 	timetable: TimetableType[][];
+}
+
+interface postListType {
+	postId: string;
+	postTitle: string;
+	postWriter: string;
+	postedAt: string;
+	likerLength: string;
+	commentLength: string;
 }

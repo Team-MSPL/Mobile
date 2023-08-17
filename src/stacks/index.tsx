@@ -1,3 +1,4 @@
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
@@ -11,6 +12,7 @@ import MyTravelListStack from './my-travel-list-stack';
 import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
 const Stack = createNativeStackNavigator();
+const Tab = createMaterialTopTabNavigator();
 export default function StackNavigator() {
 	const {isLogin} = useAppSelector(state => state.userSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
@@ -37,6 +39,11 @@ export default function StackNavigator() {
 				{MyTravelListStack()}
 				{MoreStack()}
 				{JoinStack()}
+				{/* <Tab.Navigator>
+					<Tab.Screen name='First' component={LoginScreen} />
+					<Tab.Screen name='Second' component={LoginScreen} />
+					<Tab.Screen name='Third' component={LoginScreen} />
+				</Tab.Navigator> */}
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
