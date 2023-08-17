@@ -1,7 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-import {ThreeDotsIcon} from 'native-base';
-import {useState} from 'react';
 import {
 	Alert,
 	Dimensions,
@@ -16,15 +14,21 @@ import {
 } from 'react-native';
 import shortid from 'shortid';
 
-export default function ReportModal({navigation, postId, userName}: any) {
-	const [isReportModalVisible, setIsReportModalVisibile] = useState<boolean>(false);
-	//const [reportReason, setReportReason] = useState<string>('신고 사유');
-
+export default function ReportModal({
+	postId,
+	userName,
+	isVisible,
+	closeReportModal,
+}: {
+	postId: string;
+	userName: string;
+	isVisible: boolean;
+	closeReportModal: () => void;
+}) {
 	const reportMenuList = [
 		{
 			title: '무분별한 도배',
 			onPress: () => {
-				//setReportReason('무분별한 도배');
 				handleReport('무분별한 도배');
 				console.log('무분별한 도배 신고');
 			},
@@ -32,7 +36,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '정당/정치인 비하 및 선거 운동',
 			onPress: () => {
-				//setReportReason('정당/정치인 비하 및 선거 운동');
 				handleReport('정당/정치인 비하 및 선거 운동');
 				console.log('정당/정치인 비하 및 선거 운동');
 			},
@@ -40,7 +43,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '욕설/비하',
 			onPress: () => {
-				//setReportReason('욕설/비하');
 				handleReport('욕설/비하');
 				console.log('욕설/비하');
 			},
@@ -48,7 +50,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '상업적 광고 및 판매',
 			onPress: () => {
-				//setReportReason('상업적 광고 및 판매');
 				handleReport('상업적 광고 및 판매');
 				console.log('상업적 광고 및 판매');
 			},
@@ -56,7 +57,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '음란물/불건전한 만남 및 대화',
 			onPress: () => {
-				//setReportReason('음란물/불건전한 만남 및 대화');
 				handleReport('음란물/불건전한 만남 및 대화');
 				console.log('음란물/불건전한 만남 및 대화');
 			},
@@ -64,7 +64,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '유출/사칭/사기',
 			onPress: () => {
-				//setReportReason('유출/사칭/사기');
 				handleReport('유출/사칭/사기');
 				console.log('유출/사칭/사기');
 			},
@@ -72,7 +71,6 @@ export default function ReportModal({navigation, postId, userName}: any) {
 		{
 			title: '기타 - 사유 작성',
 			onPress: () => {
-				//setReportReason('기타 - 사유 작성');
 				handleReport('기타 - 사유 작성');
 				console.log('기타');
 			},
@@ -93,7 +91,7 @@ export default function ReportModal({navigation, postId, userName}: any) {
 			// 새로운 댓글 정보들을 comment에 추가
 			await docRef.doc(shortid.generate()).set(reportData);
 			Alert.alert('신고가 접수되었습니다.');
-			setIsReportModalVisibile(false);
+			closeReportModal();
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
 		}
@@ -121,62 +119,52 @@ export default function ReportModal({navigation, postId, userName}: any) {
 	};
 
 	return (
-		<View>
-			<TouchableOpacity
-				onPress={() => {
-					setIsReportModalVisibile(true);
-				}}>
-				<View>
-					<ThreeDotsIcon></ThreeDotsIcon>
-				</View>
-			</TouchableOpacity>
-			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={isReportModalVisible}
-				onRequestClose={() => setIsReportModalVisibile(false)}
-				style={styles.modalContainer}>
-				<TouchableWithoutFeedback onPress={() => setIsReportModalVisibile(false)}>
-					<View
-						style={{
-							flex: 1,
-							backgroundColor: '#000000AA',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-						<SafeAreaView>
-							<View
-								style={{
-									backgroundColor: '#FFFFFFFF',
-									borderRadius: 10,
-									paddingHorizontal: 10,
-									height: Dimensions.get('window').height * 0.5,
-									padding: 24,
-									width: Dimensions.get('window').width * 0.9,
-								}}>
-								<View>
-									<Text
-										style={{
-											color: '#182E44',
-											fontSize: 20,
-											fontWeight: '500',
-											marginBottom: 24,
-										}}>
-										신고 사유 선택
-									</Text>
-									<FlatList
-										data={reportMenuList}
-										renderItem={renderReportMenuItem}
-										ItemSeparatorComponent={flatListItemSeperator}
-										scrollEnabled={false}
-									/>
-								</View>
+		<Modal
+			animationType={'fade'}
+			transparent={true}
+			visible={isVisible}
+			onRequestClose={() => closeReportModal()}
+			style={styles.modalContainer}>
+			<TouchableWithoutFeedback onPress={() => closeReportModal()}>
+				<View
+					style={{
+						flex: 1,
+						backgroundColor: '#000000AA',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}>
+					<SafeAreaView>
+						<View
+							style={{
+								backgroundColor: '#FFFFFFFF',
+								borderRadius: 10,
+								paddingHorizontal: 10,
+								height: Dimensions.get('window').height * 0.5,
+								padding: 24,
+								width: Dimensions.get('window').width * 0.9,
+							}}>
+							<View>
+								<Text
+									style={{
+										color: '#182E44',
+										fontSize: 20,
+										fontWeight: '500',
+										marginBottom: 24,
+									}}>
+									신고 사유 선택
+								</Text>
+								<FlatList
+									data={reportMenuList}
+									renderItem={renderReportMenuItem}
+									ItemSeparatorComponent={flatListItemSeperator}
+									scrollEnabled={false}
+								/>
 							</View>
-						</SafeAreaView>
-					</View>
-				</TouchableWithoutFeedback>
-			</Modal>
-		</View>
+						</View>
+					</SafeAreaView>
+				</View>
+			</TouchableWithoutFeedback>
+		</Modal>
 	);
 }
 

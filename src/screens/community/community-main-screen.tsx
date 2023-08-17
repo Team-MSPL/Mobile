@@ -2,13 +2,21 @@ import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {HStack, Text} from 'native-base';
 import React, {useCallback, useState} from 'react';
-import {Dimensions, FlatList, RefreshControl, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+	ActivityIndicator,
+	Dimensions,
+	FlatList,
+	RefreshControl,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [communityData, setCommunityData] = useState<any[]>([]);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const goNext = (item: any) => {
 		navigation.navigate('CommunityReadingScreen', {
@@ -44,9 +52,9 @@ export default function CommunityMainScreen({navigation}: any) {
 				data.push(docData);
 			});
 			setCommunityData(data);
-			setLoading(false);
+			setIsLoading(false);
 		} catch (error) {
-			setLoading(false);
+			setIsLoading(false);
 			console.log('커뮤니티 컬렉션을 읽어오는 중에 오류가 발생했습니다:', error);
 		}
 	};
@@ -59,7 +67,7 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	// 화면 아래쪽 끝에서 정보 더 가져오기
 	const onEndReached = () => {
-		if (loading) {
+		if (isLoading) {
 			return;
 		} else {
 			fetchCommunityData();
@@ -105,17 +113,21 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	return (
 		<View style={styles.postListContainer}>
-			<FlatList
-				data={communityData}
-				renderItem={renderPostItem}
-				keyExtractor={(item, index) => index.toString()}
-				initialNumToRender={10}
-				ListEmptyComponent={<Text>등록된 게시글이 없습니다.</Text>}
-				ItemSeparatorComponent={flatListItemSeperator}
-				onEndReached={onEndReached}
-				onEndReachedThreshold={0.8}
-				refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-			/>
+			{isLoading ? (
+				<ActivityIndicator size='large' color='#0000ff' />
+			) : (
+				<FlatList
+					data={communityData}
+					renderItem={renderPostItem}
+					keyExtractor={(item, index) => index.toString()}
+					initialNumToRender={10}
+					ListEmptyComponent={<Text>등록된 게시글이 없습니다.</Text>}
+					ItemSeparatorComponent={flatListItemSeperator}
+					onEndReached={onEndReached}
+					onEndReachedThreshold={0.8}
+					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+				/>
+			)}
 		</View>
 	);
 }
