@@ -1,10 +1,11 @@
 import firestore from '@react-native-firebase/firestore';
-import moment from 'moment';
-import {HStack, KeyboardAvoidingView} from 'native-base';
+import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
 import {useEffect, useState} from 'react';
 
+import moment from 'moment';
 import {
 	Alert,
+	Button,
 	Dimensions,
 	FlatList,
 	Image,
@@ -12,18 +13,18 @@ import {
 	NativeModules,
 	Platform,
 	RefreshControl,
+	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
 import {useAppSelector} from '../../redux';
-import ReportModal from '../../utill/component/community/report-modal';
-
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -32,6 +33,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	const [commentDataList, setComment] = useState<string[]>([]);
 	const [postId, setPostId] = useState<string>('');
+	const [postWriterUserId, setPostWriterUserId] = useState<string>('postWriterUserId');
 	const [postContent, setPostContent] = useState<string>('');
 	const [newCommentContent, setNewComment] = useState<string>('');
 	const [postImage, setPostImage] = useState<string[]>([]);
@@ -43,6 +45,135 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [statusBarHeight, setStatusBarHeight] = useState(0);
 	const {userId, userName, userProfileImage} = useAppSelector(state => state.userSlice);
+
+	// 모달 관리
+	const [isMenuModalVisible, setIsMenuModalVisible] = useState<boolean>(false);
+	const [isReportModalVisible, setIsReportModalVisibile] = useState<boolean>(false);
+	const [isPostDeleteMdoalVisible, setIsPostDeleteMdoalVisible] = useState<boolean>(false);
+
+	const deviceHeight = Dimensions.get('window').height;
+	const communityReadingMenuList = [
+		{
+			title: '수정',
+			onPress: () => {
+				console.log('글 수정 페이지로 이동');
+				closeModal('menu');
+			},
+		},
+		{
+			title: '삭제',
+			onPress: () => {
+				console.log('삭제 페이지로 이동');
+				closeModal('menu');
+				deleteCheckAlert();
+			},
+		},
+		{
+			title: '신고',
+			onPress: () => {
+				console.log('신고 페이지로 이동');
+				closeModal('menu');
+				reportAlert();
+			},
+		},
+	];
+
+	const deleteCheckAlert = () => {
+		Alert.alert(
+			'게시글을 삭제하시겠습니까?',
+			'',
+			[
+				{
+					text: '취소',
+					onPress: () => console.log('취소 버튼 누름'),
+				},
+				{
+					text: '삭제',
+					onPress: () => {
+						deletePost();
+					},
+					style: 'destructive',
+				},
+			],
+			{
+				cancelable: false,
+			},
+		);
+	};
+
+	const reportAlert = () => {
+		Alert.alert('신고 사유를 선택해주세요.', '', [
+			{
+				text: '무분별한 도배',
+				onPress: () => {
+					handleReport('무분별한 도배');
+					console.log('무분별한 도배 신고');
+				},
+			},
+			{
+				text: '정당/정치인 비하 및 선거 운동',
+				onPress: () => {
+					handleReport('정당/정치인 비하 및 선거 운동');
+					console.log('정당/정치인 비하 및 선거 운동');
+				},
+			},
+			{
+				text: '욕설/비하',
+				onPress: () => {
+					handleReport('욕설/비하');
+					console.log('욕설/비하');
+				},
+			},
+			{
+				text: '상업적 광고 및 판매',
+				onPress: () => {
+					handleReport('상업적 광고 및 판매');
+					console.log('상업적 광고 및 판매');
+				},
+			},
+			{
+				text: '음란물/불건전한 만남 및 대화',
+				onPress: () => {
+					handleReport('음란물/불건전한 만남 및 대화');
+					console.log('음란물/불건전한 만남 및 대화');
+				},
+			},
+			{
+				text: '유출/사칭/사기',
+				onPress: () => {
+					handleReport('유출/사칭/사기');
+					console.log('유출/사칭/사기');
+				},
+			},
+			{
+				text: '취소',
+				onPress: () => {
+					console.log('취소');
+				},
+				style: 'destructive',
+			},
+		]);
+	};
+
+	// 신고 기능
+	const handleReport = async (reason: string) => {
+		try {
+			const docRef = firestore().collection('게시글 신고');
+			// db의 comment에 들어갈 정보들
+			const reportData = {
+				// TODO reportWriter 유저 닉네임 적용시켜야 함.
+				reportWriter: userName,
+				reportReason: reason,
+				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				postId: postId,
+			};
+			// 새로운 댓글 정보들을 comment에 추가
+			await docRef.doc(shortid.generate()).set(reportData);
+			Alert.alert('신고가 접수되었습니다.');
+		} catch (error) {
+			console.log('신고 접수 중에 오류가 발생했습니다:', error);
+		}
+	};
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -77,14 +208,26 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		};
 	}, []);
 
-	// 앱 바 우측 더보기 버튼 및 postId 값 가져오기
+	// 앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => {
-				return <ReportModal postId={postId} userName={userName}></ReportModal>;
+				return (
+					<View>
+						<TouchableOpacity
+							onPress={() => {
+								openModal('menu');
+								//setIsMenuModalVisible(true);
+							}}>
+							<ThreeDotsIcon></ThreeDotsIcon>
+						</TouchableOpacity>
+					</View>
+				);
 			},
 		});
-	}, [postId]);
+	}, [postId, postWriterUserId]);
+
+	// ------------------ firebase 쓴 부분(시작) ----------------------
 
 	// 게시글 정보 가져오기
 	const fetchPostData = async () => {
@@ -93,6 +236,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			const docSnapshot = await docRef.get();
 			if (docSnapshot.exists) {
 				const data = docSnapshot.data();
+
+				const postWriterUserId = data?.postWriterUserId ?? '';
+				setPostWriterUserId(postWriterUserId);
 
 				const postId = data?.postId ?? '';
 				setPostId(postId);
@@ -144,7 +290,39 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	// 가져온 댓글 보여주기
+	// 좋아요 버튼을 눌렀을 때
+	const handleLikePress = async () => {
+		setIsLiked(!isLiked);
+		try {
+			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			if (isLiked) {
+				await docRef.update({
+					likeList: firestore.FieldValue.arrayRemove(userName),
+				});
+			} else {
+				await docRef.update({
+					likeList: firestore.FieldValue.arrayUnion(userName),
+				});
+			}
+			fetchPostData();
+		} catch (error) {
+			console.log('좋아요에 오류가 발생했습니다:', error);
+		}
+	};
+
+	const deletePost = async () => {
+		const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+		try {
+			await docRef.delete();
+			goBack();
+		} catch (e) {
+			console.log('삭제에 실패했습니다', e);
+		}
+	};
+
+	// ------------------ firebase 쓴 부분(끝) ----------------------
+
+	// 가져온 댓글 UI
 	const renderCommentItem = ({item}: {item: any}) => {
 		return (
 			<View style={styles.commentItemContainer}>
@@ -178,31 +356,32 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		setMoreModalVisible(false);
 	};
 
-	// 좋아요 버튼을 눌렀을 때
-	const handleLikePress = async () => {
-		setIsLiked(!isLiked);
-		console.log('좋아요 버튼 안 눌러졌나요? ', isLiked);
-		try {
-			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
-			if (isLiked) {
-				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove(userName),
-				});
-			} else {
-				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion(userName),
-				});
-			}
-			fetchPostData();
-		} catch (error) {
-			console.log('좋아요에 오류가 발생했습니다:', error);
-		}
-	};
-
 	// 새로 고침
 	const handleRefresh = () => {
 		setIsRefreshing(true); // 새로고침 시작
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
+	};
+
+	// 모달 열기 관리
+	const openModal = (type: string) => {
+		if (type == 'menu') {
+			setIsMenuModalVisible(true);
+		} else if (type == 'report') {
+			setIsReportModalVisibile(true);
+		} else if (type == 'deletePost') {
+			setIsPostDeleteMdoalVisible(true);
+		}
+	};
+
+	// 모달 닫기 관리
+	const closeModal = (type: string) => {
+		if (type == 'menu') {
+			setIsMenuModalVisible(false);
+		} else if (type == 'report') {
+			setIsReportModalVisibile(false);
+		} else if (type == 'deletePost') {
+			setIsPostDeleteMdoalVisible(false);
+		}
 	};
 
 	return (
@@ -210,6 +389,53 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			style={styles.container}
 			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			keyboardVerticalOffset={statusBarHeight + 44}>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={isMenuModalVisible}
+				onRequestClose={() => closeModal('menu')}>
+				<TouchableWithoutFeedback onPress={() => closeModal('menu')}>
+					<View
+						style={{
+							flex: 1,
+							backgroundColor: '#000000AA',
+							justifyContent: 'flex-end',
+						}}>
+						<SafeAreaView>
+							<View
+								style={{
+									backgroundColor: '#FFFFFFFF',
+									width: '100%',
+									borderRadius: 10,
+									paddingHorizontal: 10,
+									maxHeight: deviceHeight * 0.4,
+								}}>
+								<View>
+									<Text
+										style={{
+											color: '#182E44',
+											fontSize: 20,
+											fontWeight: '500',
+											margin: 15,
+										}}>
+										게시판 메뉴
+									</Text>
+									<FlatList
+										data={
+											userId == postWriterUserId
+												? communityReadingMenuList
+												: communityReadingMenuList.filter(item => item.title == '신고')
+										}
+										renderItem={({item}) => (
+											<Button title={item.title} onPress={item.onPress}></Button>
+										)}></FlatList>
+								</View>
+							</View>
+						</SafeAreaView>
+					</View>
+				</TouchableWithoutFeedback>
+			</Modal>
+
 			<View style={styles.postNCommentContainer}>
 				<FlatList
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
