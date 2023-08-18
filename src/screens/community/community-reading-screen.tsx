@@ -25,9 +25,6 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
 import {useAppSelector} from '../../redux';
-import DeleteCheckModal from '../../utill/component/community/delete-check-modal';
-import ReportModal from '../../utill/component/community/report-modal';
-
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -61,7 +58,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			onPress: () => {
 				console.log('글 수정 페이지로 이동');
 				closeModal('menu');
-				//setIsMenuModalVisible(false);
 			},
 		},
 		{
@@ -69,23 +65,115 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			onPress: () => {
 				console.log('삭제 페이지로 이동');
 				closeModal('menu');
-				openModal('deletePost');
-				//setIsMenuModalVisible(false);
-				//Alert.alert('게시물이 삭제되었습니다.');
-				//goBack();
+				deleteCheckAlert();
 			},
 		},
 		{
 			title: '신고',
 			onPress: () => {
 				console.log('신고 페이지로 이동');
-				//setIsMenuModalVisible(false);
 				closeModal('menu');
-				//setIsReportModalVisibile(true);
-				openModal('report');
+				reportAlert();
 			},
 		},
 	];
+
+	const deleteCheckAlert = () => {
+		Alert.alert(
+			'게시글을 삭제하시겠습니까?',
+			'게시글을 삭제하시겠습니까?',
+			[
+				{
+					text: '취소',
+					onPress: () => console.log('취소 버튼 누름'),
+				},
+				{
+					text: '삭제',
+					onPress: () => {
+						deletePost();
+					},
+					style: 'destructive',
+				},
+			],
+			{
+				cancelable: false,
+			},
+		);
+	};
+
+	const reportAlert = () => {
+		Alert.alert('신고', '해당하는 항목을 선택해주세요.', [
+			{
+				text: '무분별한 도배',
+				onPress: () => {
+					handleReport('무분별한 도배');
+					console.log('무분별한 도배 신고');
+				},
+			},
+			{
+				text: '정당/정치인 비하 및 선거 운동',
+				onPress: () => {
+					handleReport('정당/정치인 비하 및 선거 운동');
+					console.log('정당/정치인 비하 및 선거 운동');
+				},
+			},
+			{
+				text: '욕설/비하',
+				onPress: () => {
+					handleReport('욕설/비하');
+					console.log('욕설/비하');
+				},
+			},
+			{
+				text: '상업적 광고 및 판매',
+				onPress: () => {
+					handleReport('상업적 광고 및 판매');
+					console.log('상업적 광고 및 판매');
+				},
+			},
+			{
+				text: '음란물/불건전한 만남 및 대화',
+				onPress: () => {
+					handleReport('음란물/불건전한 만남 및 대화');
+					console.log('음란물/불건전한 만남 및 대화');
+				},
+			},
+			{
+				text: '유출/사칭/사기',
+				onPress: () => {
+					handleReport('유출/사칭/사기');
+					console.log('유출/사칭/사기');
+				},
+			},
+			{
+				text: '취소',
+				onPress: () => {
+					console.log('취소');
+				},
+				style: 'destructive',
+			},
+		]);
+	};
+
+	// 신고 기능
+	const handleReport = async (reason: string) => {
+		try {
+			const docRef = firestore().collection('게시글 신고');
+			// db의 comment에 들어갈 정보들
+			const reportData = {
+				// TODO reportWriter 유저 닉네임 적용시켜야 함.
+				reportWriter: userName,
+				reportReason: reason,
+				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				postId: postId,
+			};
+			// 새로운 댓글 정보들을 comment에 추가
+			await docRef.doc(shortid.generate()).set(reportData);
+			Alert.alert('신고가 접수되었습니다.');
+		} catch (error) {
+			console.log('신고 접수 중에 오류가 발생했습니다:', error);
+		}
+	};
 
 	// firestore로부터 데이터 가져옴
 	useEffect(() => {
@@ -225,6 +313,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 		try {
 			await docRef.delete();
+			goBack();
 		} catch (e) {
 			console.log('삭제에 실패했습니다', e);
 		}
@@ -232,7 +321,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// ------------------ firebase 쓴 부분(끝) ----------------------
 
-	// 가져온 댓글 보여주기
+	// 가져온 댓글 UI
 	const renderCommentItem = ({item}: {item: any}) => {
 		return (
 			<View style={styles.commentItemContainer}>
@@ -272,6 +361,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
+	// 모달 열기 관리
 	const openModal = (type: string) => {
 		if (type == 'menu') {
 			setIsMenuModalVisible(true);
@@ -282,6 +372,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
+	// 모달 닫기 관리
 	const closeModal = (type: string) => {
 		if (type == 'menu') {
 			setIsMenuModalVisible(false);
@@ -343,15 +434,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					</View>
 				</TouchableWithoutFeedback>
 			</Modal>
-			<ReportModal
-				postId={postId}
-				userName={userName}
-				isVisible={isReportModalVisible}
-				closeReportModal={() => closeModal('report')}></ReportModal>
-			<DeleteCheckModal
-				isVisible={isPostDeleteMdoalVisible}
-				closePostDeleteModal={() => closeModal('deletePost')}
-				onPressDeleteBtn={() => deletePost()}></DeleteCheckModal>
 
 			<View style={styles.postNCommentContainer}>
 				<FlatList
