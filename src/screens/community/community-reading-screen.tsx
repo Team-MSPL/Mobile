@@ -81,7 +81,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const deleteCheckAlert = () => {
 		Alert.alert(
 			'게시글을 삭제하시겠습니까?',
-			'게시글을 삭제하시겠습니까?',
+			'',
 			[
 				{
 					text: '취소',
@@ -102,7 +102,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	const reportAlert = () => {
-		Alert.alert('신고', '해당하는 항목을 선택해주세요.', [
+		Alert.alert('신고 사유를 선택해주세요.', '', [
 			{
 				text: '무분별한 도배',
 				onPress: () => {
@@ -292,6 +292,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 좋아요 버튼을 눌렀을 때
 	const handleLikePress = async () => {
+		setIsLiked(!isLiked);
 		try {
 			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
 			if (isLiked) {
