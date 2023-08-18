@@ -24,8 +24,6 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log(typeof userInfo.id);
-			console.log(userInfo.id, '세');
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
@@ -34,26 +32,14 @@ export default function LoginScreen({navigation}: any) {
 				signUpFlag: false,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
-			console.log('qwe', result);
 			if (result == 202) {
 				navigation.navigate('Join1', {
 					userToken: userInfo.id,
 					loginProvider: 'kakao',
 					profileImage: userInfo.profileImageUrl,
+					nickname: userInfo.nickname,
 				});
 			}
-			// await KakaoLogin.login();
-			// const userInfo = await KakaoLogin.getProfile();
-			// const data = {
-			//    userName: userInfo.nickname,
-			//    userId: userInfo.id,
-			//    socialloginProvider: 'kakao',
-			// };
-			//const res = await dispatch(socialConnect(data));
-			//navigation.navigate('Join1');
-			// if (res == '회원가입') {
-			//    navigation.replace('Join1');
-			// }
 		} catch {
 			Alert.alert('카카오 로그인에 실패하였습니다.');
 		}
@@ -68,10 +54,20 @@ export default function LoginScreen({navigation}: any) {
 			const userInfo = await GoogleSignin.signIn();
 			const data = {
 				userName: userInfo.user.name,
-				userId: userInfo.user.id,
-				socialloginProvider: 'google',
+				userProfileImage: userInfo.user.photo,
+				userToken: userInfo.user.id,
+				loginProvider: 'google',
+				signUpFlag: false,
 			};
-			dispatch(socialConnect(data));
+			const result = await dispatch(socialConnect(data)).unwrap();
+			if (result == 202) {
+				navigation.navigate('Join1', {
+					userToken: userInfo.user.id,
+					loginProvider: 'google',
+					profileImage: userInfo.user.photo,
+					nickname: userInfo.user.name,
+				});
+			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				console.log('구글 로그인 취소됨', error);

@@ -7,12 +7,11 @@ const name = 'user';
 const initialUserState: UserState = {
 	userId: '',
 	userName: '',
+	userProfileImage: '',
+	userJwtToken: '',
+	functionToken: 0,
 	socialloginProvider: undefined,
 	isLogin: false,
-	functionToken: 0,
-	userProfileImage: '',
-
-	userToken: '',
 };
 
 // 로그아웃
@@ -31,7 +30,7 @@ export const logout = createAsyncThunk('user/logout', async (_, {rejectWithValue
 //회원탈퇴
 export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
-	async (data: {userToken: string; signUpFirebase: boolean}, thunkAPI) => {
+	async (data: {userId: string; signUpFirebase: boolean}, thunkAPI) => {
 		try {
 			const response = await axiosAuth.delete('/user/withdraw', {data});
 			console.log(response);
@@ -58,17 +57,34 @@ export const updateFunctionToken = createAsyncThunk(
 		}
 	},
 );
+
+//사용자 프로필 변경하기
+export const updateProfile = createAsyncThunk(
+	'/updateProfile',
+	async (data: {userName: string; userProfileImage: string}, thunkAPI) => {
+		try {
+			const response = await axiosAuth.patch(`/user/updateProfile`, data);
+			console.log(response.data);
+
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,
 	reducers: {
 		setUserInfo(state, {payload}) {
-			state.socialloginProvider = payload.loginProvider;
-			state.userName = payload.userName;
 			state.userId = payload.userId;
+			state.userName = payload.userName;
 			state.userProfileImage = payload.userProfileImage;
+			state.userJwtToken = payload.userjwtToken;
 			state.functionToken = payload.functionToken;
-			state.userToken = payload.userToken;
+			state.socialloginProvider = payload.loginProvider;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -76,6 +92,10 @@ const userSlice = createSlice({
 		},
 		login(state) {
 			state.isLogin = true;
+		},
+		setNicknameAndImage(state, {payload}) {
+			state.userProfileImage = payload.userProfileImage;
+			state.userName = payload.userName;
 		},
 	},
 	extraReducers: builder => {
@@ -117,8 +137,8 @@ export interface UserState {
 	userId: string;
 	userName: string;
 	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
+	userJwtToken: string | null;
 	isLogin: boolean;
 	functionToken: number;
 	userProfileImage: string;
-	userToken: string;
 }

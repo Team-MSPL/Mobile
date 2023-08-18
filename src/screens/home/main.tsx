@@ -2,14 +2,15 @@ import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base'
 import {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getPostList} from '../../redux/community/community.slice';
+import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
 		navigation.navigate('SelectCity');
 	};
-	const {userId} = useAppSelector(state => state.userSlice);
+	const {userProfileImage, userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const zxc = () => {
 		dispatch(travelSliceActions.setSingleMode());
@@ -31,15 +32,17 @@ export default function Main({navigation}: any) {
 		});
 	}, []);
 	useEffect(() => {
-		console.log('ㅂㅈㅈㅈㅈㅈㅈㅈㅈ', userId);
-		dispatch(getMyTravelList({userId: userId}));
+		//axiosAuth.defaults.headers.Authorization = `Bearer qwe`;
+		dispatch(getMyTravelList());
+		dispatch(getPostList());
 	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
+			<Image source={{uri: userProfileImage}} style={{width: 100, height: 100}}></Image>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>
-				나그네
+				{userName}
 				<Text fontSize='2xl' color={colors.TextPrimary}>
-					님,{'\n'}다님과 떠나볼까요?{userId}
+					님,{'\n'}다님과 떠나볼까요?
 				</Text>
 			</Text>
 			<Center my='5'>
