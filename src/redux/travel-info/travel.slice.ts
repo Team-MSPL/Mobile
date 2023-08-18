@@ -39,7 +39,7 @@ const initialState: LiteState = {
 };
 
 export const axiosAuth = axios.create({
-	baseURL: 'http://3.35.24.224',
+	baseURL: 'http://13.125.225.79',
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,

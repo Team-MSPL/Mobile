@@ -93,6 +93,10 @@ const userSlice = createSlice({
 		login(state) {
 			state.isLogin = true;
 		},
+		setNicknameAndImage(state, {payload}) {
+			state.userProfileImage = payload.userProfileImage;
+			state.userName = payload.userName;
+		},
 	},
 	extraReducers: builder => {
 		// 로그아웃 지금은 다 지워버리지만 추후 처음런치때나 그런거 체크도해야할듯

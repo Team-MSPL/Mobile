@@ -25,7 +25,7 @@ export default function Join1({navigation, route}: any) {
 			};
 			const result = await dispatch(socialConnect(data));
 			console.log(navigation);
-			navigation.replace('Home');
+			navigation.replace('Tab');
 		} catch (err) {
 			console.log('왜 이래', err);
 			Alert.alert('회원가입중 에러가 발생했습니다');

@@ -1,5 +1,6 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
+import ChangeProfile from '../screens/more/change-profile';
 import MoreInfo from '../screens/more/more-info';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
@@ -10,6 +11,15 @@ export default function MoreStack() {
 				component={MoreInfo}
 				options={{
 					title: '마이페이지',
+					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerShadowVisible: false,
+				}}
+			/>
+			<Stack.Screen
+				name='ChangeProfile'
+				component={ChangeProfile}
+				options={{
+					title: '프로필변경',
 					headerStyle: {backgroundColor: '#EFFBFB'},
 					headerShadowVisible: false,
 				}}
