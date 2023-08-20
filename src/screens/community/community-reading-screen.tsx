@@ -27,12 +27,25 @@ import shortid from 'shortid';
 import {useAppSelector} from '../../redux';
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
+	// 뒤로 가기
 	const goBack = () => {
 		navigation.goBack();
 	};
 
+	// 글 작성 화면으로 가기
+	const goCommunityWritingScreen = () => {
+		navigation.navigate('CommunityWritingScreen', {
+			title: postTitle,
+			content: postContent,
+			images: postImage,
+			postId: postId,
+			isNewPost: false,
+		});
+	};
+
+	const [postTitle, setPostTitle] = useState<string>('');
 	const [commentDataList, setComment] = useState<string[]>([]);
-	const [postId, setPostId] = useState<string>('');
+	const [postId, setPostId] = useState<string>(route.params.postId);
 	const [postWriterUserId, setPostWriterUserId] = useState<string>('postWriterUserId');
 	const [postContent, setPostContent] = useState<string>('');
 	const [newCommentContent, setNewComment] = useState<string>('');
@@ -58,6 +71,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			onPress: () => {
 				console.log('글 수정 페이지로 이동');
 				closeModal('menu');
+				goCommunityWritingScreen();
 			},
 		},
 		{
@@ -232,10 +246,19 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// 게시글 정보 가져오기
 	const fetchPostData = async () => {
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			const docRef = firestore().collection('커뮤니티').doc(postId);
 			const docSnapshot = await docRef.get();
 			if (docSnapshot.exists) {
 				const data = docSnapshot.data();
+
+				const postTitle = data?.postTitle ?? '';
+				setPostTitle(postTitle);
+
+				const postContent = data?.postContent ?? '';
+				setPostContent(postContent);
+
+				const postImage = data?.postImage ?? [];
+				setPostImage(postImage);
 
 				const postWriterUserId = data?.postWriterUserId ?? '';
 				setPostWriterUserId(postWriterUserId);
@@ -246,19 +269,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				const comment = data?.comment ?? [];
 				setComment(comment);
 
-				const postContent = data?.postContent ?? '';
-				setPostContent(postContent);
-
-				const postImage = data?.postImage ?? [];
-				setPostImage(postImage);
-
 				const likeList = data?.likeList ?? [];
 				if (likeList.some((item: string) => item === userName)) {
 					setIsLiked(true);
 				}
 				setLikeCount(likeList.length);
 			} else {
-				console.log(route.params.postTitle, '문서가 존재하지 않습니다.');
+				console.log(route.params.postId, '문서가 존재하지 않습니다.');
 			}
 		} catch (error) {
 			console.log('데이터를 가져오는 중에 오류가 발생했습니다:', error);
@@ -268,7 +285,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// *댓글 등록 버튼 눌렀을 때
 	const handleCommentSubmit = async () => {
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			const docRef = firestore().collection('커뮤니티').doc(postId);
 			// db의 comment에 들어갈 정보들
 			const newCommentData = {
 				commenter: userName,
@@ -294,7 +311,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const handleLikePress = async () => {
 		setIsLiked(!isLiked);
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+			const docRef = firestore().collection('커뮤니티').doc(postId);
 			if (isLiked) {
 				await docRef.update({
 					likeList: firestore.FieldValue.arrayRemove(userName),
@@ -311,7 +328,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	const deletePost = async () => {
-		const docRef = firestore().collection('커뮤니티').doc(route.params.postTitle);
+		const docRef = firestore().collection('커뮤니티').doc(postId);
 		try {
 			await docRef.delete();
 			goBack();
@@ -441,7 +458,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 					ListHeaderComponent={
 						<View>
-							<Text>제목: {route.params.postTitle}</Text>
+							<Text>제목: {postTitle}</Text>
 							<Text>본문</Text>
 							<Text style={styles.postContentText}>{postContent}</Text>
 							<Text>사진 목록</Text>
