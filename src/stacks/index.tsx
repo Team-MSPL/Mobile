@@ -7,6 +7,7 @@ import CommunityMainScreen from '../screens/community/community-main-screen';
 import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
+import MyTravelList from '../screens/my-travel-list/my-travel-list';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -57,11 +58,11 @@ function TabBar() {
 				}}
 			/>
 			<Tab.Screen
-				name='TravelList'
-				component={Main}
+				name='MyTravelListStack'
+				component={MyTravelList}
 				options={{
 					title: '내여행',
-					headerShown: false,
+					headerShown: true,
 					// tabBarIcon: ({color, size}) => (
 					//   <Icon name="search" color={color} size={size} />
 					// ),

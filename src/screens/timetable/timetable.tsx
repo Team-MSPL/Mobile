@@ -19,7 +19,6 @@ export default function Timetable({navigation}: any) {
 	);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const [select, setSelect] = useState(0);
 	const [deleteList, setDeleteList] = useState<string[]>([]);
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
@@ -57,26 +56,35 @@ export default function Timetable({navigation}: any) {
 	const goMapInfo = () => {
 		navigation.navigate('MapInfo');
 	};
-	const goSave = () => {
+	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			if (travelId == '') {
 				const data = {
 					userId: userId,
-					region: region,
+					region: makeMode ? region : ['자유여행'],
 					day: day,
 					nDay: nDay + 1,
 					transit: transit,
 					timetable: timetable,
 					tendency: tendency,
 				};
-				dispatch(saveTravel(data));
+				await dispatch(saveTravel(data));
 			} else {
 				console.log('여기구여', travelId);
 				const data = {travelId: travelId, timetable: timetable};
-				dispatch(updateTravelCourse(data));
+				await dispatch(updateTravelCourse(data));
 			}
+			Alert.alert(travelId == '' ? '저장 완료요 ' : '수정완료요', undefined, [
+				{
+					text: '저장리스트보기',
+					onPress: () => {
+						navigation.popToTop(), navigation.navigate('MyTravelListStack');
+					},
+				},
+				{text: '계속보기'},
+			]);
 		} catch (err) {
 			Alert.alert('저장중 에러가 발생했습니다');
 		} finally {
@@ -111,6 +119,7 @@ export default function Timetable({navigation}: any) {
 						<Box w='100%' h='60' alignItems='center'>
 							<TouchableOpacity
 								onPress={() => {
+									//console.log(addList);
 									navigation.navigate('TimetableAddPlace', {x: x, y: addList});
 									setAddList([]);
 									console.log('다음페이지');
@@ -119,31 +128,33 @@ export default function Timetable({navigation}: any) {
 							</TouchableOpacity>
 						</Box>
 					) : (
-						<Box w='100%' h='60'>
+						<HStack w='100%' h='60'>
 							<TouchableOpacity onPress={goMapInfo}>
 								<Text>지도 함 볼래?</Text>
 							</TouchableOpacity>
 							<TouchableOpacity onPress={goSave}>
 								<Text>저장 함 해볼래?</Text>
 							</TouchableOpacity>
-						</Box>
+						</HStack>
 					)}
 				</Box>
 			),
 		});
-	}, [editMode, timetable]);
+	}, [editMode, timetable, addList, deleteList, x]);
 	return (
 		<Box bgColor='#EFFBFB'>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} />
-			<ScrollView position='relative' mb='230'>
-				<InfoView
-					navigation={navigation}
-					setDeleteList={setDeleteList}
-					deleteList={deleteList}
-					viewDayIndex={viewDayIndex}
-				/>
-				<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
-			</ScrollView>
+			<Box>
+				<ScrollView position='relative' mb='230'>
+					<InfoView
+						navigation={navigation}
+						setDeleteList={setDeleteList}
+						deleteList={deleteList}
+						viewDayIndex={viewDayIndex}
+					/>
+					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
+				</ScrollView>
+			</Box>
 		</Box>
 	);
 }
