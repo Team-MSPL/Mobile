@@ -1,10 +1,12 @@
 import firestore from '@react-native-firebase/firestore';
 import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
+import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {
 	Alert,
+	AlertButton,
 	Button,
 	Dimensions,
 	FlatList,
@@ -61,8 +63,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 모달 관리
 	const [isMenuModalVisible, setIsMenuModalVisible] = useState<boolean>(false);
-	const [isReportModalVisible, setIsReportModalVisibile] = useState<boolean>(false);
-	const [isPostDeleteMdoalVisible, setIsPostDeleteMdoalVisible] = useState<boolean>(false);
+	const [isCommentMenuModalVisible, setIsCommentMenuModalVisible] = useState<boolean>(false);
 
 	const deviceHeight = Dimensions.get('window').height;
 	const communityReadingMenuList = [
@@ -190,9 +191,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	// firestore로부터 데이터 가져옴
-	useEffect(() => {
-		fetchPostData();
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			console.log('뭔데');
+			console.log(userId);
+			console.log(postWriterUserId);
+			fetchPostData();
+			console.log('CommunityReadingScreen 갱신됨');
+		}, [postId, postWriterUserId]),
+	);
 
 	// iOS에서 키보드 활성화시 TextInput이 안 보이는 이슈를 위한 코드
 	useEffect(() => {
@@ -239,7 +246,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				);
 			},
 		});
-	}, [postId, postWriterUserId]);
+	}, []);
 
 	// ------------------ firebase 쓴 부분(시작) ----------------------
 
@@ -282,7 +289,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	// *댓글 등록 버튼 눌렀을 때
+	// 댓글 등록 버튼 눌렀을 때
 	const handleCommentSubmit = async () => {
 		try {
 			const docRef = firestore().collection('커뮤니티').doc(postId);
@@ -305,6 +312,44 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		} catch (error) {
 			console.log('댓글 등록 중에 오류가 발생했습니다:', error);
 		}
+	};
+
+	// 댓글 삭제
+	const deleteComment = async (commentId: string) => {
+		// '커뮤니티' 컬렉션의 '킹태운' 문서 가져오기
+		const docRef = firestore().collection('커뮤니티').doc(postId);
+		// 문서 가져오기
+		docRef
+			.get()
+			.then(doc => {
+				interface commentDataType {
+					_id: string;
+					commentContent: string;
+					commentedAt: string;
+					commenter: string;
+					profileImage: string;
+					userId: string;
+				}
+				if (doc.exists) {
+					// 'comment' 필드의 현재 배열 가져오기
+					const comments: commentDataType[] = doc.data()?.comment || [];
+					// _id 를 가진 요소를 제거할 인덱스 찾기
+					const indexToRemove = comments.findIndex(comment => comment._id === commentId);
+
+					if (indexToRemove !== -1) {
+						// _id 를 가진 요소를 배열에서 제거
+						comments.splice(indexToRemove, 1);
+						// 업데이트된 'comment' 필드를 문서에 저장
+						console.log('댓글이 성공적으로 삭제되었습니다');
+						Alert.alert('댓글이 삭제되었습니다.');
+						fetchPostData();
+						return docRef.update({comment: comments});
+					}
+				}
+			})
+			.catch(error => {
+				console.error('Error updating document:', error);
+			});
 	};
 
 	// 좋아요 버튼을 눌렀을 때
@@ -340,13 +385,64 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// ------------------ firebase 쓴 부분(끝) ----------------------
 
 	// 가져온 댓글 UI
-	const renderCommentItem = ({item}: {item: any}) => {
+	const renderCommentItem = ({item}: any) => {
 		return (
 			<View style={styles.commentItemContainer}>
-				<HStack space={1} alignItems='center'>
-					<Image source={{uri: item.profileImage}} style={styles.commentProfileImage}></Image>
-					<Text style={{fontWeight: 'bold'}}>{item.commenter}</Text>
-				</HStack>
+				<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+					<View style={{flex: 8}}>
+						<HStack space={1} alignItems='center'>
+							<Image source={{uri: item.profileImage}} style={styles.commentProfileImage}></Image>
+							<Text style={{fontWeight: 'bold'}}>{item.commenter}</Text>
+						</HStack>
+					</View>
+					<View
+						style={{
+							flexDirection: 'row',
+							justifyContent: 'space-around',
+							alignItems: 'center',
+							flex: 2,
+							backgroundColor: 'red',
+						}}>
+						<TouchableOpacity
+							onPress={() => {
+								console.log('삭제 버튼 누름');
+								deleteComment(item._id);
+							}}>
+							<Text>삭제</Text>
+						</TouchableOpacity>
+
+						{/* 더보기 버튼 */}
+						<TouchableOpacity
+							onPress={() => {
+								console.log('더보기 버튼');
+								const commentMenuList: AlertButton[] = [
+									{
+										text: '삭제',
+										onPress: () => {
+											deleteComment(item._id);
+										},
+										style: 'destructive',
+									},
+									{
+										text: '수정',
+										onPress: () => {
+											console.log('수정 기능');
+										},
+									},
+									{
+										text: '취소',
+										onPress: () => {
+											console.log('취소');
+										},
+										style: 'cancel',
+									},
+								];
+								Alert.alert('더보기', '', commentMenuList);
+							}}>
+							<Text>더보기</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
 				<Text>{item.commentContent}</Text>
 				<Text style={{fontSize: 8}}>{item.commentedAt}</Text>
 			</View>
@@ -383,10 +479,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const openModal = (type: string) => {
 		if (type == 'menu') {
 			setIsMenuModalVisible(true);
-		} else if (type == 'report') {
-			setIsReportModalVisibile(true);
-		} else if (type == 'deletePost') {
-			setIsPostDeleteMdoalVisible(true);
+		} else if (type == 'commentMenu') {
+			setIsCommentMenuModalVisible(true);
 		}
 	};
 
@@ -394,10 +488,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const closeModal = (type: string) => {
 		if (type == 'menu') {
 			setIsMenuModalVisible(false);
-		} else if (type == 'report') {
-			setIsReportModalVisibile(false);
-		} else if (type == 'deletePost') {
-			setIsPostDeleteMdoalVisible(false);
+		} else if (type == 'commentMenu') {
+			setIsCommentMenuModalVisible(false);
 		}
 	};
 
@@ -406,6 +498,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			style={styles.container}
 			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			keyboardVerticalOffset={statusBarHeight + 44}>
+			{/* 게시글 메뉴 모달 */}
 			<Modal
 				animationType={'fade'}
 				transparent={true}
