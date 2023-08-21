@@ -1,38 +1,87 @@
 import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
-import {HStack, Text} from 'native-base';
-import React, {useCallback, useState} from 'react';
+import {HStack, Text, ThreeDotsIcon} from 'native-base';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
 	ActivityIndicator,
+	Button,
 	Dimensions,
 	FlatList,
+	Modal,
 	RefreshControl,
+	SafeAreaView,
 	StyleSheet,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import shortid from 'shortid';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [communityData, setCommunityData] = useState<any[]>([]);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isMenuModalVisible, setIsMenuModalVisible] = useState(false);
 
-	const goNext = (item: any) => {
+	interface postDataType {
+		postTitle: string;
+		postContent: string;
+		postId: string;
+		postedAt: string;
+		postWriter: string;
+		likeList: string[];
+	}
+
+	const deviceHeight = Dimensions.get('window').height;
+	const communityMenuList = [
+		{
+			title: '글 쓰기',
+			onPress: () => {
+				console.log('글쓰기 페이지로 이동');
+				closeModal();
+				goCommunityWritingScreen();
+			},
+		},
+	];
+
+	// 게시글 읽는 화면으로 이동
+	const goCommunityReadingScreen = (item: any) => {
 		navigation.navigate('CommunityReadingScreen', {
-			postTitle: item.postTitle,
+			postId: item.postId,
 			key: item.postKey,
 		});
 		console.log(item.postKey);
 	};
 
-	interface postDataType {
-		postTitle: string;
-		postContent: string;
-		postedAt: string;
-		postWriter: string;
-		likeList: string[];
-	}
+	// 게시글 작성하는 화면으로 이동
+	const goCommunityWritingScreen = () => {
+		navigation.navigate('CommunityWritingScreen', {
+			postId: shortid.generate(),
+			title: '',
+			content: '',
+			images: [],
+			isNewPost: true,
+		});
+	};
+
+	// 앱 바 우측 더보기
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => {
+				return (
+					<View>
+						<TouchableOpacity
+							onPress={() => {
+								openModal();
+							}}>
+							<ThreeDotsIcon></ThreeDotsIcon>
+						</TouchableOpacity>
+					</View>
+				);
+			},
+		});
+	}, []);
 
 	// CommunityMainScreen으로 올 경우 새로 고침
 	useFocusEffect(
@@ -41,6 +90,8 @@ export default function CommunityMainScreen({navigation}: any) {
 		}, []),
 	);
 
+	// --------------------- firebase 쓰는 곳(시작)  -------------------------
+	// 커뮤니티 정보 가져오기
 	const fetchCommunityData = async () => {
 		try {
 			const communitySnapshot = await firestore().collection('커뮤니티').orderBy('postedAt', 'desc').get();
@@ -58,6 +109,8 @@ export default function CommunityMainScreen({navigation}: any) {
 		}
 	};
 
+	// --------------------- firebase 쓰는 곳(끝)  -------------------------
+
 	// 밀어서 새로고침
 	const handleRefresh = () => {
 		setIsRefreshing(true); // 새로고침 시작
@@ -73,13 +126,13 @@ export default function CommunityMainScreen({navigation}: any) {
 		}
 	};
 
-	// 가져온 게시글 목록 보여주기
+	// 가져온 게시글 목록 UI
 	const renderPostItem = ({item}: {item: postDataType}) => {
 		return (
 			<View style={styles.postItemContainer}>
 				<TouchableOpacity
 					onPress={() => {
-						goNext(item);
+						goCommunityReadingScreen(item);
 					}}>
 					<Text style={styles.postTitleText} numberOfLines={1} ellipsizeMode='tail'>
 						{item.postTitle}
@@ -98,6 +151,7 @@ export default function CommunityMainScreen({navigation}: any) {
 		);
 	};
 
+	// 메뉴 모달창 아이템 구분선
 	const flatListItemSeperator = () => {
 		return (
 			<View
@@ -108,6 +162,16 @@ export default function CommunityMainScreen({navigation}: any) {
 				}}
 			/>
 		);
+	};
+
+	// 모달 열기 관리
+	const openModal = () => {
+		setIsMenuModalVisible(true);
+	};
+
+	// 모달 닫기 관리
+	const closeModal = () => {
+		setIsMenuModalVisible(false);
 	};
 
 	return (
@@ -127,6 +191,48 @@ export default function CommunityMainScreen({navigation}: any) {
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 				/>
 			)}
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={isMenuModalVisible}
+				onRequestClose={() => closeModal()}>
+				<TouchableWithoutFeedback onPress={() => closeModal()}>
+					<View
+						style={{
+							flex: 1,
+							backgroundColor: '#000000AA',
+							justifyContent: 'flex-end',
+						}}>
+						<SafeAreaView>
+							<View
+								style={{
+									backgroundColor: '#FFFFFFFF',
+									width: '100%',
+									borderRadius: 10,
+									paddingHorizontal: 10,
+									maxHeight: deviceHeight * 0.4,
+								}}>
+								<View>
+									<Text
+										style={{
+											color: '#182E44',
+											fontSize: 20,
+											fontWeight: '500',
+											margin: 15,
+										}}>
+										게시판 메뉴
+									</Text>
+									<FlatList
+										data={communityMenuList}
+										renderItem={({item}) => (
+											<Button title={item.title} onPress={item.onPress}></Button>
+										)}></FlatList>
+								</View>
+							</View>
+						</SafeAreaView>
+					</View>
+				</TouchableWithoutFeedback>
+			</Modal>
 		</View>
 	);
 }

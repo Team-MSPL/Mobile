@@ -14,16 +14,17 @@ import {
 	View,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import shortid from 'shortid';
 import {useAppSelector} from '../../redux';
 
-export default function CommunityWritingScreen({navigation}: any) {
+export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
-	const [postTitle, setPostTitle] = useState<string>('');
-	const [postContent, setPostContent] = useState<string>('');
-	const [postImage, setPostImage] = useState<string[]>([]);
+	const [postTitle, setPostTitle] = useState<string>(route.params.title);
+	const [postContent, setPostContent] = useState<string>(route.params.content);
+	const [postImage, setPostImage] = useState<string[]>(route.params.images);
+	const [postId, setPostId] = useState<string>(route.params.postId);
+	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 
@@ -58,7 +59,7 @@ export default function CommunityWritingScreen({navigation}: any) {
 		});
 	};
 
-	// 게시글 등록
+	// 게시글 새로 등록
 	const handlePostSubmit = () => {
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
@@ -78,26 +79,50 @@ export default function CommunityWritingScreen({navigation}: any) {
 			return;
 		}
 		try {
-			firestore()
-				.collection('커뮤니티')
-				.doc(postTitle) // 제목을 문서 ID로 사용
-				.set({
-					postTitle: postTitle,
-					postContent: postContent,
-					postImage: postImage,
-					postWriter: userName,
-					postWriterUserId: userId,
-					postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-					// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
-					postId: shortid.generate(),
-				})
-				.then(() => {
-					console.log('글이 성공적으로 저장되었습니다.');
-				})
-				.catch(error => {
-					console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
-				});
-			Alert.alert('게시글이 등록되었습니다.');
+			const db = firestore();
+			const collection = db.collection('커뮤니티');
+
+			const newPostData = {
+				postTitle: postTitle,
+				postContent: postContent,
+				postImage: postImage,
+				postWriter: userName,
+				postWriterUserId: userId,
+				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
+				postId: postId,
+			};
+
+			const updatePostData = {
+				postTitle: postTitle,
+				postContent: postContent,
+				postImage: postImage,
+				postWriter: userName,
+				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+			};
+			if (isNewPost) {
+				collection
+					.doc(postId)
+					.set(newPostData)
+					.then(() => {
+						Alert.alert('게시글이 등록되었습니다.');
+						console.log('글이 성공적으로 저장되었습니다.');
+					})
+					.catch(error => {
+						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+					});
+			} else {
+				collection
+					.doc(postId)
+					.update(updatePostData)
+					.then(() => {
+						Alert.alert('게시글이 수정되었습니다.');
+						console.log('글이 성공적으로 저장되었습니다.');
+					})
+					.catch(error => {
+						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+					});
+			}
 			goBack();
 		} catch (error) {
 			console.log('게시글 등록 중에 오류가 발생했습니다:', error);

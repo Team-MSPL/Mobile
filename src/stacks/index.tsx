@@ -69,11 +69,11 @@ function TabBar() {
 				}}
 			/>
 			<Tab.Screen
-				name='Cummunity'
+				name='Community'
 				component={CommunityMainScreen}
 				options={{
 					title: '커뮤니티',
-					headerShown: false,
+					headerShown: true,
 					// tabBarIcon: ({color, size}) => (
 					//   <Icon name="search" color={color} size={size} />
 					// ),

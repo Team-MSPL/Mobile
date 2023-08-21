@@ -1,6 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
-import CommunityBottomPopupSheet from '../screens/community/community-main-bottom-popup-sheet';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
@@ -14,9 +13,9 @@ export default function CommunityStack() {
 				options={{
 					headerBackVisible: true,
 					headerBackTitleVisible: true,
+					headerShown: true,
 					headerTitle: '커뮤니티',
 					headerTitleAlign: 'center',
-					headerRight: () => <CommunityBottomPopupSheet></CommunityBottomPopupSheet>,
 				}}
 			/>
 			<Stack.Screen
@@ -27,7 +26,6 @@ export default function CommunityStack() {
 					headerBackTitleVisible: true,
 					headerTitle: '커뮤니티',
 					headerTitleAlign: 'center',
-					//headerRight: () => <CommunityReadingBottomPopupSheet></CommunityReadingBottomPopupSheet>,
 				}}
 			/>
 			<Stack.Screen
