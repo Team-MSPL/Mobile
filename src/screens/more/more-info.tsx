@@ -69,18 +69,18 @@ export default function MoreInfo({navigation}: any) {
 					<Text bold fontSize='xl'>
 						이용안내
 					</Text>
-					<TouchableOpacity onPress={() => navigation.popToTop()} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>공지사항</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => navigation.popToTop()} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>이벤트 모아보기</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity onPress={() => navigation.popToTop()} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>문의하기</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity onPress={() => navigation.popToTop()} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>서비스 이용약관</Text>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>

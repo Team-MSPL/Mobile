@@ -3,32 +3,43 @@ import moment from 'moment';
 import styled from 'styled-components/native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
+import {Touchable, TouchableOpacity, Image, Alert, Platform} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
+import ImageCropPicker from 'react-native-image-crop-picker';
 export default function ChangeProfile({navigation}: any) {
 	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
-
+	const [image, setImage] = useState('');
 	const dispatch = useAppDispatch();
-
+	//애뮬레이터 확인 불가
+	const handleImagePickerLaunch = () => {
+		ImageCropPicker.openPicker({
+			multiple: false,
+			mediaType: 'photo',
+			cropping: true,
+			includeBase64: Platform.OS == 'android',
+		}).then(response => {
+			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+			setImage(response.path);
+			console.log('이미지 주소', response.path);
+		});
+	};
 	const goChangeProfile = () => {
 		try {
 			dispatch(
 				updateProfile({
 					userName: nickname,
-					userProfileImage:
-						'https://naverpa-phinf.pstatic.net/MjAyMzA1MjZfMjI2/MDAxNjg1MDMwMTg5MDU2.zej54mE4TStb2IrcE-vLsXWayvuo8nTvAGhOVWiDUAsg.qzYeQ7uNjoGe5k9xNtA6tbdop3jPIX9VOMu0t6wdUp4g.JPEG/%EB%B0%95%EC%A7%84%ED%9D%AC-%EC%9F%81%EC%97%AC%EB%91%90%EB%8A%94-342x228_16850301890417666851636843119293.jpg',
+					userProfileImage: image,
 				}),
 			);
 			dispatch(
 				userSliceActions.setNicknameAndImage({
 					userName: nickname,
-					userProfileImage:
-						'https://naverpa-phinf.pstatic.net/MjAyMzA1MjZfMjI2/MDAxNjg1MDMwMTg5MDU2.zej54mE4TStb2IrcE-vLsXWayvuo8nTvAGhOVWiDUAsg.qzYeQ7uNjoGe5k9xNtA6tbdop3jPIX9VOMu0t6wdUp4g.JPEG/%EB%B0%95%EC%A7%84%ED%9D%AC-%EC%9F%81%EC%97%AC%EB%91%90%EB%8A%94-342x228_16850301890417666851636843119293.jpg',
+					userProfileImage: image,
 				}),
 			);
 
@@ -66,7 +77,10 @@ export default function ChangeProfile({navigation}: any) {
 				</InputWrap>
 
 				<Text>사진 바꾸세유유유ㅜ우</Text>
-
+				<TouchableOpacity onPress={handleImagePickerLaunch}>
+					<Text>사진이요</Text>
+				</TouchableOpacity>
+				{image && <Image source={{uri: image}} style={{width: 100, height: 100}}></Image>}
 				<CustomButton label={'변경'} onPress={goChangeProfile} />
 			</InputProfileContainer>
 		</SafeAreaView>

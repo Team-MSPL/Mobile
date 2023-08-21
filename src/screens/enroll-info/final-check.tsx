@@ -36,6 +36,7 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 				}),
 			);
+			dispatch(travelSliceActions.selectRegion(a));
 			console.log('넹?', result.meta);
 			if (result) {
 				navigation.popToTop();

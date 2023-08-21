@@ -36,6 +36,9 @@ const initialState: LiteState = {
 	myTravelList: [],
 	travelId: '',
 	postList: [],
+	diary: '',
+	picture: [],
+	reviewCheck: false,
 };
 
 export const axiosAuth = axios.create({
@@ -135,7 +138,37 @@ export const deleteTravelCourse = createAsyncThunk(
 		}
 	},
 );
+//여행일기 저장,수정
+export const updateDiary = createAsyncThunk(
+	'/updateDiary',
+	async (data: {travelId: string; diary: string; picture: string[]}, thunkAPI) => {
+		try {
+			console.log('안녕ㅎ세요', data);
+			const response = await axiosAuth.patch(`/travelCourse/updateDiary`, data);
+			console.log(response.data);
 
+			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+			return response;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	},
+);
+
+//여행 리뷰, 별점 저장
+export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: reviewAndPointType, thunkAPI) => {
+	try {
+		const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
+		console.log(response.data);
+
+		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
@@ -360,6 +393,7 @@ export const travelSlice = createSlice({
 			state.makeMode = payload;
 		},
 		setSingleMode: state => {
+			Object.assign(state, initialState);
 			state.timetable = [...Array(5)].map(item => []);
 			state.day = [...Array(5)].map((item, idx) => moment().add(idx, 'day'));
 			state.nDay = 4;
@@ -400,7 +434,17 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.timetable = payload.timetable;
 			state.transit = payload.transit;
+			state.tendency = payload.tendency;
 			state.travelId = payload._id;
+			state.diary = payload.diary;
+			state.picture = payload.picture;
+			state.reviewCheck = payload.reviewCheck;
+			//state.myTravelList = payload;
+		});
+		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
+			console.log(payload, 'qwe');
+			state.diary = payload.diary;
+			state.picture = payload.picture;
 			//state.myTravelList = payload;
 		});
 	},
@@ -434,6 +478,9 @@ interface LiteState {
 	myTravelList: myTravelListType[];
 	travelId: string;
 	postList: postListType[];
+	diary: string;
+	picture: string[];
+	reviewCheck: boolean;
 }
 
 interface PlaceType {
@@ -553,4 +600,11 @@ interface postListType {
 	postedAt: string;
 	likerLength: string;
 	commentLength: string;
+}
+
+interface reviewAndPointType {
+	travelId: string;
+	review: string;
+	point: number;
+	tendencyPoint: number[][];
 }

@@ -95,7 +95,8 @@ export default function SelectDistance({navigation}: any) {
 					</Slider>
 				</Center>
 
-				<CustomButton label='다음 단계' onPress={goNext} isDisabled={geoInfo.lat == 0}></CustomButton>
+				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+				{/* isDisabled={geoInfo.lat == 0} */}
 			</VStack>
 		</ScrollView>
 	);

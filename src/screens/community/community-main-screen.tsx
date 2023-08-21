@@ -87,7 +87,6 @@ export default function CommunityMainScreen({navigation}: any) {
 	useFocusEffect(
 		useCallback(() => {
 			fetchCommunityData();
-			console.log('CommunityMainScreen 갱신됨');
 		}, []),
 	);
 
