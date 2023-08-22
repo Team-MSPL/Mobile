@@ -1,12 +1,24 @@
-import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
+import moment from 'moment';
 import {HStack, Text, ThreeDotsIcon} from 'native-base';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Dimensions, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+	ActivityIndicator,
+	Button,
+	Dimensions,
+	FlatList,
+	Modal,
+	RefreshControl,
+	SafeAreaView,
+	StyleSheet,
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getPostList} from '../../redux/community/community.slice';
+import {getPostList, postListType, savePost} from '../../redux/community/community.slice';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [communityData, setCommunityData] = useState<any[]>([]);
@@ -89,26 +101,17 @@ export default function CommunityMainScreen({navigation}: any) {
 		}, []),
 	);
 
-	// --------------------- firebase 쓰는 곳(시작)  -------------------------
 	// 커뮤니티 정보 가져오기
 	const fetchCommunityData = async () => {
 		try {
-			const communitySnapshot = await firestore().collection('커뮤니티').orderBy('postedAt', 'desc').get();
-			const data: postDataType[] = [];
-
-			communitySnapshot.forEach(doc => {
-				const docData = doc.data() as postDataType;
-				data.push(docData);
-			});
-			setCommunityData(data);
+			dispatch(getPostList());
+			console.log('DB로부터 게시글을 가져오는데 성공했습니다.');
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
-			console.log('커뮤니티 컬렉션을 읽어오는 중에 오류가 발생했습니다:', error);
+			console.log('DB로부터 게시글을 읽어오는 중에 오류가 발생했습니다:', error);
 		}
 	};
-
-	// --------------------- firebase 쓰는 곳(끝)  -------------------------
 
 	// 밀어서 새로고침
 	const handleRefresh = () => {
@@ -126,23 +129,21 @@ export default function CommunityMainScreen({navigation}: any) {
 	};
 
 	// 가져온 게시글 목록 UI
-	const renderPostItem = ({item}: {item: postDataType}) => {
+	const renderPostItem = (data: {item: postListType}) => {
 		return (
 			<View style={styles.postItemContainer}>
 				<TouchableOpacity
 					onPress={() => {
-						goCommunityReadingScreen(item);
+						console.log('게시글 읽는 화면으로 가는 함수 구현해야 함');
+						//goCommunityReadingScreen(item);
 					}}>
 					<Text style={styles.postTitleText} numberOfLines={1} ellipsizeMode='tail'>
-						{item.postTitle}
-					</Text>
-					<Text style={styles.postContentText} numberOfLines={1} ellipsizeMode='tail'>
-						{item.postContent}
+						{data.item.postTitle}
 					</Text>
 					<HStack alignItems={'center'}>
 						<Icon name={'hearto'} size={12} color='red' />
 						<Text style={styles.postedAtText}>
-							{item.postedAt.slice(0, 16)} | {item.postWriter}
+							{data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
 						</Text>
 					</HStack>
 				</TouchableOpacity>
@@ -175,9 +176,78 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	return (
 		<View style={styles.postListContainer}>
-			{postList.map((item, index) => (
-				<Text key={index}>{item.postTitle}</Text>
-			))}
+			{isLoading ? (
+				<ActivityIndicator size='large' color='#0000ff' />
+			) : (
+				<FlatList
+					data={postList}
+					renderItem={renderPostItem}
+					initialNumToRender={10}
+					ListEmptyComponent={<Text>등록된 게시글이 없습니다.</Text>}
+					ItemSeparatorComponent={flatListItemSeperator}
+					onEndReached={onEndReached}
+					onEndReachedThreshold={0.8}
+					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+				/>
+			)}
+
+			<TouchableOpacity
+				onPress={() => {
+					dispatch(
+						savePost({
+							postTitle: '테스트1',
+							postContent: '테스트 본문',
+							postImage: [],
+							postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+						}),
+					);
+				}}>
+				<Text>버튼</Text>
+			</TouchableOpacity>
+
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={isMenuModalVisible}
+				onRequestClose={() => closeModal()}>
+				<TouchableWithoutFeedback onPress={() => closeModal()}>
+					<View
+						style={{
+							flex: 1,
+							backgroundColor: '#000000AA',
+							justifyContent: 'flex-end',
+						}}>
+						<SafeAreaView>
+							<View
+								style={{
+									backgroundColor: '#FFFFFFFF',
+									width: '100%',
+									borderRadius: 10,
+									paddingHorizontal: 10,
+									maxHeight: deviceHeight * 0.4,
+								}}>
+								<View>
+									<Text
+										style={{
+											color: '#182E44',
+											fontSize: 20,
+											fontWeight: '500',
+											margin: 15,
+										}}>
+										게시판 메뉴
+									</Text>
+									<FlatList
+										data={communityMenuList}
+										renderItem={({item}) => (
+											<Button title={item.title} onPress={item.onPress}></Button>
+										)}></FlatList>
+								</View>
+							</View>
+						</SafeAreaView>
+					</View>
+				</TouchableWithoutFeedback>
+			</Modal>
+
 			{/* {isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (

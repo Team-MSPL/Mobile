@@ -1,5 +1,5 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {axiosAuth} from '../travel-info/travel.slice';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { axiosAuth } from '../travel-info/travel.slice';
 const initialState: LiteState = {
 	postInfo: [],
 	postList: [],
@@ -191,7 +191,7 @@ interface postInfoType {
 	createdAt: Date | null;
 }
 
-interface postListType {
+export interface postListType {
 	postId: string;
 	postTitle: string;
 	postWriter: string;
