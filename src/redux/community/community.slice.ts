@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { axiosAuth } from '../travel-info/travel.slice';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {axiosAuth} from '../travel-info/travel.slice';
 const initialState: LiteState = {
 	postInfo: [],
 	postList: [],
@@ -228,7 +228,7 @@ interface saveCommentType {
 	};
 }
 
-interface savePostType {
+export interface savePostType {
 	postTitle: string;
 	postContent: string;
 	postImage: string[];

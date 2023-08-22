@@ -21,7 +21,6 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList, postListType, savePost} from '../../redux/community/community.slice';
 
 export default function CommunityMainScreen({navigation}: any) {
-	const [communityData, setCommunityData] = useState<any[]>([]);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isMenuModalVisible, setIsMenuModalVisible] = useState(false);
@@ -34,15 +33,6 @@ export default function CommunityMainScreen({navigation}: any) {
 			dispatch(getPostList());
 		}, []),
 	);
-
-	interface postDataType {
-		postTitle: string;
-		postContent: string;
-		postId: string;
-		postedAt: string;
-		postWriter: string;
-		likeList: string[];
-	}
 
 	const deviceHeight = Dimensions.get('window').height;
 	const communityMenuList = [
