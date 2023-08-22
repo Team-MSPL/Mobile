@@ -2,27 +2,26 @@ import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {HStack, Text, ThreeDotsIcon} from 'native-base';
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-	ActivityIndicator,
-	Button,
-	Dimensions,
-	FlatList,
-	Modal,
-	RefreshControl,
-	SafeAreaView,
-	StyleSheet,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import {Dimensions, StyleSheet, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {getPostList} from '../../redux/community/community.slice';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [communityData, setCommunityData] = useState<any[]>([]);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isMenuModalVisible, setIsMenuModalVisible] = useState(false);
+
+	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
+	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
+
+	useFocusEffect(
+		useCallback(() => {
+			dispatch(getPostList());
+		}, []),
+	);
 
 	interface postDataType {
 		postTitle: string;
@@ -176,7 +175,10 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	return (
 		<View style={styles.postListContainer}>
-			{isLoading ? (
+			{postList.map((item, index) => (
+				<Text key={index}>{item.postTitle}</Text>
+			))}
+			{/* {isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (
 				<FlatList
@@ -232,7 +234,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						</SafeAreaView>
 					</View>
 				</TouchableWithoutFeedback>
-			</Modal>
+			</Modal> */}
 		</View>
 	);
 }
