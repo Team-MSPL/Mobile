@@ -1,10 +1,11 @@
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {Alert, Linking, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
+
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
@@ -18,6 +19,53 @@ export default function Main({navigation}: any) {
 	};
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
+	};
+	const zkrhdrhrh = async () => {
+		try {
+			const message = {
+				defaultTemplate: 'feed',
+				content: {
+					title: '카카오 공유 테스트',
+					imageUrl:
+						'https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png',
+					link: {
+						webUrl: 'http://danim.me/',
+						mobileWebUrl: 'http://danim.me/',
+					},
+					attachment: {
+						linkver: '4.0', // 사용 중인 카카오 링크 API 버전 정보
+					},
+					description: '카카오 링크로 공유합니다.',
+				},
+			};
+
+			const encodedMessage = encodeURIComponent(JSON.stringify(message));
+			await Linking.openURL(`kakaolink://send?${encodedMessage}`);
+
+			// const response = await KaKaoShareLink.sendFeed({
+			// 	content: {
+			// 		title: '다님인데용',
+			// 		imageUrl: 'http://danim.me/logo.png',
+			// 		link: {
+			// 			webUrl: 'http://danim.me/',
+			// 			mobileWebUrl: 'http://danim.me/',
+			// 		},
+			// 		description: '다님인가?',
+			// 	},
+			// 	buttons: [
+			// 		{
+			// 			title: '앱에서 보기',
+			// 			link: {
+			// 				androidExecutionParams: [],
+			// 				iosExecutionParams: [{key: 'openUrl', value: 'http://danim.me/'}],
+			// 			},
+			// 		},
+			// 	],
+			// });
+		} catch (err) {
+			console.log(err);
+			Alert.alert('카공중에 에러가 뜨다니');
+		}
 	};
 	useEffect(() => {
 		navigation.setOptions({
@@ -105,6 +153,9 @@ export default function Main({navigation}: any) {
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.goBack()}>
 				<Text>로그아웃</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={zkrhdrhrh}>
+				<Text>카공</Text>
 			</TouchableOpacity>
 			<Box h='10'></Box>
 		</ScrollView>

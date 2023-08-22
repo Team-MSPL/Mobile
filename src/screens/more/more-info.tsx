@@ -21,6 +21,7 @@ export default function MoreInfo({navigation}: any) {
 		try {
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase};
+			console.log('사인업', signUpFirebase);
 			dispatch(userWithdraw(data));
 			await AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList)); //TODO 로그아웃시 지금은 다 날려버림
 			dispatch(userSliceActions.reset());

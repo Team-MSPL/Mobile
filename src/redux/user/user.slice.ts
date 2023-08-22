@@ -32,6 +32,7 @@ export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
 	async (data: {userId: string; signUpFirebase: boolean}, thunkAPI) => {
 		try {
+			console.log('ㅇ헝허', data.signUpFirebase);
 			const response = await axiosAuth.delete('/user/withdraw', {data});
 			console.log(response);
 			return response.data;

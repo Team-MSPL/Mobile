@@ -25,6 +25,7 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 						copy = [index];
 					}
 				}
+				copy.length == 0 && dispatch(travelSliceActions.editModeChange(''));
 				setAddList(copy);
 			} else {
 				setX(inx);

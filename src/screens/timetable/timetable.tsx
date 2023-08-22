@@ -42,8 +42,11 @@ export default function Timetable({navigation}: any) {
 					wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
 					await dispatch(getDrivingDuration(wayPoint));
 					wayPoint = {start: '', goal: '', wayPoint: ''};
+				} else {
+					dispatch(travelSliceActions.pushMoveTimeList());
 				}
 			}
+			console.log('여기는 왓군요?');
 			if (travelId == '') {
 				dispatch(travelSliceActions.drawTimetable());
 			}

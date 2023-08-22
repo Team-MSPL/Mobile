@@ -341,7 +341,8 @@ export const travelSlice = createSlice({
 				};
 				item.map((value, index) => {
 					if (idx == 0 && index == 0) {
-						time = state.timeLimitArray[0] / 2 + state.minuteLimitArray[0] / 30;
+						time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+						console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
 					}
 					if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
 						copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
@@ -404,14 +405,19 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 		},
+		pushMoveTimeList: state => {
+			state.moveTimeList.push([]);
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
+			console.log('1', payload);
 			let list: number[] = [];
 			payload.waypoints &&
 				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
 			list.push(payload.duration);
 			state.moveTimeList.push(list);
+			console.log('2');
 		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
