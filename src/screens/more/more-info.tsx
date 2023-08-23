@@ -35,6 +35,9 @@ export default function MoreInfo({navigation}: any) {
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};
+	const goPayment = () => {
+		navigation.navigate('Payment');
+	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{isLogin || anonymous ? (
@@ -60,6 +63,9 @@ export default function MoreInfo({navigation}: any) {
 						onPress={() => dispatch(updateFunctionToken({functionToken: 4}))}
 						style={{marginVertical: 10}}>
 						<Text>너님 토큰 갯수{functionToken}</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={goPayment} style={{marginVertical: 10}}>
+						<Text>토큰 구매하쉴?</Text>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={changeInfo} style={{marginVertical: 10}}>
 						<Text>정보 변경이요</Text>

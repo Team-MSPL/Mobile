@@ -13,7 +13,7 @@ export default function ChangeProfile({navigation}: any) {
 	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
-	const [image, setImage] = useState('');
+	const [image, setImage] = useState(userProfileImage);
 	const dispatch = useAppDispatch();
 	//애뮬레이터 확인 불가
 	const handleImagePickerLaunch = () => {
@@ -81,7 +81,7 @@ export default function ChangeProfile({navigation}: any) {
 					<Text>사진이요</Text>
 				</TouchableOpacity>
 				{image && <Image source={{uri: image}} style={{width: 100, height: 100}}></Image>}
-				<CustomButton label={'변경'} onPress={goChangeProfile} />
+				<CustomButton label={'변경'} isDisabled={nickname == ''} onPress={goChangeProfile} />
 			</InputProfileContainer>
 		</SafeAreaView>
 	);

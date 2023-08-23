@@ -69,7 +69,7 @@ export default function MyTravelList({navigation}: any) {
 						<Text>
 							{moment(item.day[0]).format('YY-MM-DD') +
 								'~' +
-								moment(item.day[item.day.length - 1]).format('YY-MM-DD')}
+								moment(item.day[item.nDay - 1]).format('YY-MM-DD')}
 						</Text>
 						<Text>{item.region}</Text>
 					</TouchableOpacity>

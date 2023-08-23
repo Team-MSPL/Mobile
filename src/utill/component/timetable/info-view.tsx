@@ -90,7 +90,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 
 	return (
 		<Box>
-			<HStack position='absolute' zIndex='1'>
+			<HStack position='absolute'>
 				<Box w='60px'></Box>
 				{timetable.map(
 					(item, idx) =>
@@ -110,6 +110,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 														? 'red'
 														: categortColors[value.category],
 												position: 'absolute',
+												zIndex: 1,
 											}}
 											key={index}
 											onPress={() => {
