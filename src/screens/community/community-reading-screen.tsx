@@ -5,6 +5,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {
+	ActivityIndicator,
 	Alert,
 	AlertButton,
 	Button,
@@ -27,7 +28,7 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {clickLike, commentType, getOnePost, unclickLike} from '../../redux/community/community.slice';
+import {clickLike, commentType, deletePost, getOnePost, unclickLike} from '../../redux/community/community.slice';
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -56,6 +57,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
 	const [isImageMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
+
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -109,7 +112,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				{
 					text: '삭제',
 					onPress: () => {
-						deletePost();
+						handleDeletePost();
 					},
 					style: 'destructive',
 				},
@@ -194,15 +197,12 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	// firestore로부터 데이터 가져옴
+	// 화면 갱신
 	useFocusEffect(
 		useCallback(() => {
-			console.log('뭔데');
-			console.log(userId);
-			console.log(postWriterUserId);
 			fetchPostData();
 			console.log('CommunityReadingScreen 갱신됨');
-		}, [postId, postWriterUserId]),
+		}, []),
 	);
 
 	// iOS에서 키보드 활성화시 TextInput이 안 보이는 이슈를 위한 코드
@@ -257,12 +257,14 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// * 게시글 정보 가져오기
 	const fetchPostData = async () => {
 		try {
-			dispatch(getOnePost({postId: route.params.postId}));
+			await dispatch(getOnePost({postId: route.params.postId}));
 			if (postData.liker.includes(userId)) {
 				setIsLiked(true);
 			}
+			setIsLoading(false);
 			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
+			setIsLoading(false);
 			console.log('DB로부터 데이터를 가져오는 중에 오류가 발생했습니다:', error);
 		}
 	};
@@ -347,10 +349,11 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	const deletePost = async () => {
-		const docRef = firestore().collection('커뮤니티').doc(postId);
+	// 게시글 삭제
+	const handleDeletePost = async () => {
 		try {
-			await docRef.delete();
+			dispatch(deletePost({postId: route.params.postId}));
+			console.log(postData.postTitle, '게시글 삭제를 완료했습니다');
 			goBack();
 		} catch (e) {
 			console.log('삭제에 실패했습니다', e);
@@ -512,7 +515,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 									</Text>
 									<FlatList
 										data={
-											userId == postWriterUserId
+											userId == postData.postWriterUserId
 												? communityReadingMenuList
 												: communityReadingMenuList.filter(item => item.title == '신고')
 										}
@@ -527,47 +530,51 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</Modal>
 
 			<View style={styles.postNCommentContainer}>
-				<FlatList
-					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-					ListHeaderComponent={
-						<View>
-							<Text>제목: {postData.postTitle}</Text>
-							<Text>본문</Text>
-							<Text style={styles.postContentText}>{postData.postContent}</Text>
-							<Text>사진 목록</Text>
-							<View style={styles.imageContainer}>
-								{postData.postImage.slice(0, 8).map((uri, index) => (
-									<Image key={index} source={{uri}} style={styles.image} />
-								))}
-								{postData.postImage.length > 8 && (
-									<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-										<Text style={styles.moreButtonText}>더보기</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-							<Modal visible={isImageMoreModalVisible} onRequestClose={handleMoreModalClose}>
-								<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-								<ScrollView contentContainerStyle={styles.modalContainer}>
-									{postData.postImage.map((uri, index) => (
-										<Image key={index} source={{uri}} style={styles.modalImage} />
+				{isLoading ? (
+					<ActivityIndicator size='large' color='#0000ff' />
+				) : (
+					<FlatList
+						refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+						ListHeaderComponent={
+							<View>
+								<Text>제목: {postData.postTitle}</Text>
+								<Text>본문</Text>
+								<Text style={styles.postContentText}>{postData.postContent}</Text>
+								<Text>사진 목록</Text>
+								<View style={styles.imageContainer}>
+									{postData.postImage.slice(0, 8).map((uri, index) => (
+										<Image key={index} source={{uri}} style={styles.image} />
 									))}
-								</ScrollView>
-							</Modal>
-							<View style={styles.likeContainer}>
-								<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-									<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
-									<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
-								</TouchableOpacity>
-								<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
+									{postData.postImage.length > 8 && (
+										<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+											<Text style={styles.moreButtonText}>더보기</Text>
+										</TouchableOpacity>
+									)}
+								</View>
+								<Modal visible={isImageMoreModalVisible} onRequestClose={handleMoreModalClose}>
+									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+									<ScrollView contentContainerStyle={styles.modalContainer}>
+										{postData.postImage.map((uri, index) => (
+											<Image key={index} source={{uri}} style={styles.modalImage} />
+										))}
+									</ScrollView>
+								</Modal>
+								<View style={styles.likeContainer}>
+									<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+										<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
+										<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
+									</TouchableOpacity>
+									<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
+								</View>
+								<Text>댓글</Text>
 							</View>
-							<Text>댓글</Text>
-						</View>
-					}
-					data={postData.comment}
-					renderItem={renderCommentItem}
-					initialNumToRender={10}
-					ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
-				/>
+						}
+						data={postData.comment}
+						renderItem={renderCommentItem}
+						initialNumToRender={10}
+						ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
+					/>
+				)}
 			</View>
 
 			<View style={styles.inputContainer}>

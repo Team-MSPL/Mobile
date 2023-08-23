@@ -95,11 +95,11 @@ export default function CommunityMainScreen({navigation}: any) {
 	const fetchCommunityData = async () => {
 		try {
 			dispatch(getPostList());
-			console.log('DB로부터 게시글을 가져오는데 성공했습니다.');
+			console.log('DB로부터 게시글들을 가져오는데 성공했습니다.');
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
-			console.log('DB로부터 게시글을 읽어오는 중에 오류가 발생했습니다:', error);
+			console.log('DB로부터 게시글들을 읽어오는 중에 오류가 발생했습니다:', error);
 		}
 	};
 
@@ -135,8 +135,11 @@ export default function CommunityMainScreen({navigation}: any) {
 					</Text>
 					<HStack alignItems={'center'}>
 						<Icon name={'hearto'} size={12} color='red' />
+						<Text style={styles.postLikesPostedAtPostWriterText}>{data.item.likerLength}</Text>
+						<Icon name={'message1'} size={12} color='green' />
+						<Text style={styles.postLikesPostedAtPostWriterText}>{data.item.commentLength}</Text>
 						<Text style={styles.postLikesPostedAtPostWriterText}>
-							{data.item.likerLength} | {data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
+							| {data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
 						</Text>
 					</HStack>
 				</TouchableOpacity>
