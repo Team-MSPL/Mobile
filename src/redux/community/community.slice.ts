@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {axiosAuth} from '../travel-info/travel.slice';
 const initialState: LiteState = {
 	postData: {
-		postId: '',
+		_id: '',
 		postTitle: '',
 		postContent: '',
 		postImage: [],
@@ -195,7 +195,7 @@ interface LiteState {
 }
 
 interface postDataType {
-	postId: string;
+	_id: string;
 	postTitle: string;
 	postContent: string;
 	postImage: string[];
@@ -216,14 +216,14 @@ export interface postListType {
 	commentLength: number;
 }
 
-interface updatePostType {
+export interface updatePostType {
 	postId: string;
 	postTitle: string;
 	postContent: string;
 	postImage: string[];
 }
 
-interface reportPostType {
+export interface reportPostType {
 	postId: string;
 	reportReason: string;
 	reportedAt: string;

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {savePost, savePostType} from '../../redux/community/community.slice';
+import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -59,7 +59,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		});
 	};
 
-	// 게시글 새로 등록
+	// * 게시글 등록
 	const handlePostSubmit = () => {
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
@@ -83,18 +83,16 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				//postWriter: userName,
-				//postWriterUserId: userId,
 				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-				// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
 			};
 
-			const updatePostData: savePostType = {
+			const updatePostData: updatePostType = {
+				postId: route.params.postId,
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				//postWriter: userName,
-				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
+				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 			if (isNewPost) {
 				dispatch(savePost(newPostData))
@@ -106,7 +104,9 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
 					});
 			} else {
-				dispatch(savePost(updatePostData))
+				console.log('여기 왔나');
+				console.log(route.params.postId);
+				dispatch(updatePost(updatePostData))
 					.then(() => {
 						Alert.alert('게시글이 수정되었습니다.');
 						console.log('글이 성공적으로 저장되었습니다.');

@@ -16,7 +16,6 @@ import {
 	View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList, postListType, savePost} from '../../redux/community/community.slice';
 
@@ -58,7 +57,6 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 게시글 작성하는 화면으로 이동
 	const goCommunityWritingScreen = () => {
 		navigation.navigate('CommunityWritingScreen', {
-			postId: shortid.generate(),
 			title: '',
 			content: '',
 			images: [],

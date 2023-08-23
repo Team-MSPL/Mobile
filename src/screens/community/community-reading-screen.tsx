@@ -28,7 +28,15 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {clickLike, commentType, deletePost, getOnePost, unclickLike} from '../../redux/community/community.slice';
+import {
+	clickLike,
+	commentType,
+	deletePost,
+	getOnePost,
+	reportPost,
+	reportPostType,
+	unclickLike,
+} from '../../redux/community/community.slice';
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -39,12 +47,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// 글 작성 화면으로 가기
 	const goCommunityWritingScreen = () => {
 		navigation.navigate('CommunityWritingScreen', {
-			title: postTitle,
-			content: postContent,
-			images: postImage,
-			postId: postId,
+			title: postData.postTitle,
+			content: postData.postContent,
+			images: postData.postImage,
+			postId: postData._id,
 			isNewPost: false,
 		});
+		console.log('자 넘어가라', postData._id);
 	};
 
 	const [postTitle, setPostTitle] = useState<string>('');
@@ -128,42 +137,42 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			{
 				text: '무분별한 도배',
 				onPress: () => {
-					handleReport('무분별한 도배');
+					handleReportPost('무분별한 도배');
 					console.log('무분별한 도배 신고');
 				},
 			},
 			{
 				text: '정당/정치인 비하 및 선거 운동',
 				onPress: () => {
-					handleReport('정당/정치인 비하 및 선거 운동');
+					handleReportPost('정당/정치인 비하 및 선거 운동');
 					console.log('정당/정치인 비하 및 선거 운동');
 				},
 			},
 			{
 				text: '욕설/비하',
 				onPress: () => {
-					handleReport('욕설/비하');
+					handleReportPost('욕설/비하');
 					console.log('욕설/비하');
 				},
 			},
 			{
 				text: '상업적 광고 및 판매',
 				onPress: () => {
-					handleReport('상업적 광고 및 판매');
+					handleReportPost('상업적 광고 및 판매');
 					console.log('상업적 광고 및 판매');
 				},
 			},
 			{
 				text: '음란물/불건전한 만남 및 대화',
 				onPress: () => {
-					handleReport('음란물/불건전한 만남 및 대화');
+					handleReportPost('음란물/불건전한 만남 및 대화');
 					console.log('음란물/불건전한 만남 및 대화');
 				},
 			},
 			{
 				text: '유출/사칭/사기',
 				onPress: () => {
-					handleReport('유출/사칭/사기');
+					handleReportPost('유출/사칭/사기');
 					console.log('유출/사칭/사기');
 				},
 			},
@@ -177,27 +186,24 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		]);
 	};
 
-	// 신고 기능
-	const handleReport = async (reason: string) => {
+	// * 게시글 신고 기능
+	const handleReportPost = async (reason: string) => {
 		try {
-			const docRef = firestore().collection('게시글 신고');
 			// db의 comment에 들어갈 정보들
-			const reportData = {
-				// TODO reportWriter 유저 닉네임 적용시켜야 함.
-				reportWriter: userName,
+			const reportData: reportPostType = {
+				postId: postData._id,
 				reportReason: reason,
 				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-				postId: postId,
+				reportWriter: userName,
 			};
-			// 새로운 댓글 정보들을 comment에 추가
-			await docRef.doc(shortid.generate()).set(reportData);
+			dispatch(reportPost(reportData));
 			Alert.alert('신고가 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
 		}
 	};
 
-	// 화면 갱신
+	// * 화면 갱신
 	useFocusEffect(
 		useCallback(() => {
 			fetchPostData();
@@ -332,7 +338,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			});
 	};
 
-	// 좋아요 버튼을 눌렀을 때
+	// * 좋아요 버튼을 눌렀을 때
 	const handleLikePress = async () => {
 		try {
 			if (isLiked) {
@@ -349,7 +355,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	// 게시글 삭제
+	// * 게시글 삭제
 	const handleDeletePost = async () => {
 		try {
 			dispatch(deletePost({postId: route.params.postId}));
@@ -362,7 +368,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// ------------------ firebase 쓴 부분(끝) ----------------------
 
-	// 가져온 댓글 UI
+	// * 가져온 댓글 UI
 	const renderCommentItem = (data: {item: commentType}) => {
 		return (
 			<View style={styles.commentItemContainer}>
