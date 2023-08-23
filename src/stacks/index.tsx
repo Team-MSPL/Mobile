@@ -20,26 +20,24 @@ export default function StackNavigator() {
 	const {isLogin} = useAppSelector(state => state.userSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	return (
-		<NavigationContainer>
-			<Stack.Navigator>
-				{isLogin || anonymous ? (
-					<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
-				) : (
-					<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
-				)}
-				{TimetableStack()}
-				{CommunityStack()}
-				{RegionRecommendStack()}
-				{MyTravelListStack()}
-				{MoreStack()}
-				{JoinStack()}
-				{/* <Tab.Navigator>
+		<Stack.Navigator>
+			{isLogin || anonymous ? (
+				<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
+			) : (
+				<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
+			)}
+			{TimetableStack()}
+			{CommunityStack()}
+			{RegionRecommendStack()}
+			{MyTravelListStack()}
+			{MoreStack()}
+			{JoinStack()}
+			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />
 					<Tab.Screen name='Third' component={LoginScreen} />
 				</Tab.Navigator> */}
-			</Stack.Navigator>
-		</NavigationContainer>
+		</Stack.Navigator>
 	);
 }
 

@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-
+import KakaoShareLink from 'react-native-kakao-share-link';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
@@ -22,46 +22,23 @@ export default function Main({navigation}: any) {
 	};
 	const zkrhdrhrh = async () => {
 		try {
-			const message = {
-				defaultTemplate: 'feed',
-				content: {
-					title: '카카오 공유 테스트',
-					imageUrl:
-						'https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png',
-					link: {
-						webUrl: 'http://danim.me/',
-						mobileWebUrl: 'http://danim.me/',
-					},
-					attachment: {
-						linkver: '4.0', // 사용 중인 카카오 링크 API 버전 정보
-					},
-					description: '카카오 링크로 공유합니다.',
+			const response = await KakaoShareLink.sendText({
+				text: '타타타타',
+				link: {
+					webUrl: 'http://danim.me',
+					mobileWebUrl: 'http://danim.me',
 				},
-			};
-
-			const encodedMessage = encodeURIComponent(JSON.stringify(message));
-			await Linking.openURL(`kakaolink://send?${encodedMessage}`);
-
-			// const response = await KaKaoShareLink.sendFeed({
-			// 	content: {
-			// 		title: '다님인데용',
-			// 		imageUrl: 'http://danim.me/logo.png',
-			// 		link: {
-			// 			webUrl: 'http://danim.me/',
-			// 			mobileWebUrl: 'http://danim.me/',
-			// 		},
-			// 		description: '다님인가?',
-			// 	},
-			// 	buttons: [
-			// 		{
-			// 			title: '앱에서 보기',
-			// 			link: {
-			// 				androidExecutionParams: [],
-			// 				iosExecutionParams: [{key: 'openUrl', value: 'http://danim.me/'}],
-			// 			},
-			// 		},
-			// 	],
-			// });
+				buttons: [
+					{
+						title: '앱에서 볼래',
+						link: {
+							androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
+							iosExecutionParams: [{key: 'key1', value: 'value1'}],
+						},
+					},
+				],
+			});
+			console.log(response);
 		} catch (err) {
 			console.log(err);
 			Alert.alert('카공중에 에러가 뜨다니');

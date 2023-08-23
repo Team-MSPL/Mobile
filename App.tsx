@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
-import {Alert, SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Alert, SafeAreaView, StatusBar, useColorScheme, Linking} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -18,7 +18,8 @@ import Loading from './src/utill/loading';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {loginSliceActions, socialConnect} from './src/redux/user/login.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {KAKAO_NATIVE_KEY} from '@env';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -53,10 +54,33 @@ function App(): JSX.Element {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const getDeepLink = async () => {
+		console.log('별별별별별별별별별별별별별별별별별별별별별별별별별별별별별별');
+		console.log(await Linking.getInitialURL());
+		Linking.getInitialURL().then(res => {
+			if (res == null || res == undefined || res == '') {
+				console.log('베베ㅔ');
+				return;
+			} else {
+				console.log('하이요');
+			}
+		});
+		Linking.addEventListener('url', e => {
+			console.log('왔섭');
+		});
+	};
 	useEffect(() => {
 		getAllKeys();
+		getDeepLink();
 	}, []);
-
+	const linking = {
+		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],
+		config: {
+			screens: {
+				Timetable: 'kakaolink',
+			},
+		},
+	};
 	return (
 		<SafeAreaProvider>
 			<StatusBar
@@ -65,8 +89,10 @@ function App(): JSX.Element {
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
 			<NativeBaseProvider>
-				<StackNavigator />
-				{Boolean(isLoading) && <Loading />}
+				<NavigationContainer linking={linking}>
+					<StackNavigator />
+					{Boolean(isLoading) && <Loading />}
+				</NavigationContainer>
 			</NativeBaseProvider>
 		</SafeAreaProvider>
 	);
