@@ -1,22 +1,32 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {axiosAuth} from '../travel-info/travel.slice';
 const initialState: LiteState = {
-	postInfo: [],
+	postData: {
+		postId: '',
+		postTitle: '',
+		postContent: '',
+		postImage: [],
+		postWriter: '',
+		postWriterUserId: '',
+		postedAt: '',
+		liker: [],
+		comment: [],
+	},
 	postList: [],
 };
 
 export const communitySlice = createSlice({
 	name: 'community',
 	initialState,
-	reducers: {
-		setPostInfo: (state, {payload}) => {
-			state.postInfo = payload;
-		},
-	},
+	reducers: {},
 	extraReducers: builder => {
 		builder.addCase(getPostList.fulfilled, (state, {payload}) => {
-			console.log('페페', payload);
+			console.log('게시글 목록 가져오기', payload);
 			state.postList = payload;
+		});
+		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
+			console.log('게시글 하나 가져오기', payload);
+			state.postData = payload;
 		});
 	},
 });
@@ -90,6 +100,7 @@ export const deletePost = createAsyncThunk('/deletePost', async (data: {postId: 
 		return error;
 	}
 });
+
 //좋아요 추가하기
 export const clickLike = createAsyncThunk('/clickLike', async (data: {postId: string}, thunkAPI) => {
 	try {
@@ -179,16 +190,20 @@ export const communitySliceActions = communitySlice.actions;
 export default communitySlice.reducer;
 
 interface LiteState {
-	postInfo: postInfoType[];
+	postData: postDataType;
 	postList: postListType[];
 }
 
-interface postInfoType {
-	postTitle: string | null;
-	postContent: string | null;
-	postImageList: string[] | null;
-	posterToken: string | null;
-	createdAt: Date | null;
+interface postDataType {
+	postId: string;
+	postTitle: string;
+	postContent: string;
+	postImage: string[];
+	postWriter: string;
+	postWriterUserId: string;
+	postedAt: string;
+	liker: string[];
+	comment: commentType[];
 }
 
 export interface postListType {
@@ -196,6 +211,7 @@ export interface postListType {
 	postTitle: string;
 	postWriter: string;
 	postedAt: string;
+	postContent: string;
 	likerLength: number;
 	commentLength: number;
 }
@@ -226,6 +242,15 @@ interface saveCommentType {
 		commentWriterUserId: string;
 		commentWriterProfile: string;
 	};
+}
+
+export interface commentType {
+	commentContent: string;
+	commentedAt: string;
+	commentWriter: string;
+	commentWriterUserId: string;
+	commentWriterProfile: string;
+	postId: string;
 }
 
 export interface savePostType {

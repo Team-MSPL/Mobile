@@ -26,7 +26,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import shortid from 'shortid';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {clickLike, commentType, getOnePost, unclickLike} from '../../redux/community/community.slice';
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -53,9 +54,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [newCommentContent, setNewComment] = useState<string>('');
 	const [postImage, setPostImage] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
-	const [isMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
+	const [isImageMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
-	const [likeCount, setLikeCount] = useState(0);
+
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [statusBarHeight, setStatusBarHeight] = useState(0);
@@ -64,6 +65,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// 모달 관리
 	const [isMenuModalVisible, setIsMenuModalVisible] = useState<boolean>(false);
 	const [isCommentMenuModalVisible, setIsCommentMenuModalVisible] = useState<boolean>(false);
+
+	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
+	const {postData} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 
 	const deviceHeight = Dimensions.get('window').height;
 	const communityReadingMenuList = [
@@ -250,42 +254,16 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// ------------------ firebase 쓴 부분(시작) ----------------------
 
-	// 게시글 정보 가져오기
+	// * 게시글 정보 가져오기
 	const fetchPostData = async () => {
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(postId);
-			const docSnapshot = await docRef.get();
-			if (docSnapshot.exists) {
-				const data = docSnapshot.data();
-
-				const postTitle = data?.postTitle ?? '';
-				setPostTitle(postTitle);
-
-				const postContent = data?.postContent ?? '';
-				setPostContent(postContent);
-
-				const postImage = data?.postImage ?? [];
-				setPostImage(postImage);
-
-				const postWriterUserId = data?.postWriterUserId ?? '';
-				setPostWriterUserId(postWriterUserId);
-
-				const postId = data?.postId ?? '';
-				setPostId(postId);
-
-				const comment = data?.comment ?? [];
-				setComment(comment);
-
-				const likeList = data?.likeList ?? [];
-				if (likeList.some((item: string) => item === userName)) {
-					setIsLiked(true);
-				}
-				setLikeCount(likeList.length);
-			} else {
-				console.log(route.params.postId, '문서가 존재하지 않습니다.');
+			dispatch(getOnePost({postId: route.params.postId}));
+			if (postData.liker.includes(userId)) {
+				setIsLiked(true);
 			}
+			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
-			console.log('데이터를 가져오는 중에 오류가 발생했습니다:', error);
+			console.log('DB로부터 데이터를 가져오는 중에 오류가 발생했습니다:', error);
 		}
 	};
 
@@ -354,19 +332,16 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 좋아요 버튼을 눌렀을 때
 	const handleLikePress = async () => {
-		setIsLiked(!isLiked);
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(postId);
 			if (isLiked) {
-				await docRef.update({
-					likeList: firestore.FieldValue.arrayRemove(userName),
-				});
+				await dispatch(unclickLike({postId: route.params.postId}));
+				console.log('좋아요 취소를 하였습니다.');
 			} else {
-				await docRef.update({
-					likeList: firestore.FieldValue.arrayUnion(userName),
-				});
+				await dispatch(clickLike({postId: route.params.postId}));
+				console.log('좋아요를 했습니다.');
 			}
 			fetchPostData();
+			setIsLiked(!isLiked);
 		} catch (error) {
 			console.log('좋아요에 오류가 발생했습니다:', error);
 		}
@@ -385,14 +360,16 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// ------------------ firebase 쓴 부분(끝) ----------------------
 
 	// 가져온 댓글 UI
-	const renderCommentItem = ({item}: any) => {
+	const renderCommentItem = (data: {item: commentType}) => {
 		return (
 			<View style={styles.commentItemContainer}>
 				<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
 					<View style={{flex: 8}}>
 						<HStack space={1} alignItems='center'>
-							<Image source={{uri: item.profileImage}} style={styles.commentProfileImage}></Image>
-							<Text style={{fontWeight: 'bold'}}>{item.commenter}</Text>
+							<Image
+								source={{uri: data.item.commentWriterProfile}}
+								style={styles.commentProfileImage}></Image>
+							<Text style={{fontWeight: 'bold'}}>{data.item.commentWriter}</Text>
 						</HStack>
 					</View>
 					<View
@@ -406,7 +383,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						<TouchableOpacity
 							onPress={() => {
 								console.log('삭제 버튼 누름');
-								deleteComment(item._id);
+								// TODO 본인의 댓글이라면 삭제할 수 있게 해야함.
+								//deleteComment(item._id);
 							}}>
 							<Text>삭제</Text>
 						</TouchableOpacity>
@@ -419,7 +397,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 									{
 										text: '삭제',
 										onPress: () => {
-											deleteComment(item._id);
+											console.log('삭제 버튼 누름');
+											// TODO 본인의 댓글이라면 삭제할 수 있게 해야함.
+											//deleteComment(item._id);
 										},
 										style: 'destructive',
 									},
@@ -443,8 +423,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						</TouchableOpacity>
 					</View>
 				</View>
-				<Text>{item.commentContent}</Text>
-				<Text style={{fontSize: 8}}>{item.commentedAt}</Text>
+				<Text>{data.item.commentContent}</Text>
+				<Text style={{fontSize: 8}}>{data.item.commentedAt}</Text>
 			</View>
 		);
 	};
@@ -551,24 +531,24 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 					ListHeaderComponent={
 						<View>
-							<Text>제목: {postTitle}</Text>
+							<Text>제목: {postData.postTitle}</Text>
 							<Text>본문</Text>
-							<Text style={styles.postContentText}>{postContent}</Text>
+							<Text style={styles.postContentText}>{postData.postContent}</Text>
 							<Text>사진 목록</Text>
 							<View style={styles.imageContainer}>
-								{postImage.slice(0, 8).map((uri, index) => (
+								{postData.postImage.slice(0, 8).map((uri, index) => (
 									<Image key={index} source={{uri}} style={styles.image} />
 								))}
-								{postImage.length > 8 && (
+								{postData.postImage.length > 8 && (
 									<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
 										<Text style={styles.moreButtonText}>더보기</Text>
 									</TouchableOpacity>
 								)}
 							</View>
-							<Modal visible={isMoreModalVisible} onRequestClose={handleMoreModalClose}>
+							<Modal visible={isImageMoreModalVisible} onRequestClose={handleMoreModalClose}>
 								<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
 								<ScrollView contentContainerStyle={styles.modalContainer}>
-									{postImage.map((uri, index) => (
+									{postData.postImage.map((uri, index) => (
 										<Image key={index} source={{uri}} style={styles.modalImage} />
 									))}
 								</ScrollView>
@@ -578,14 +558,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 									<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
 									<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
 								</TouchableOpacity>
-								<Text style={styles.likesCount}>{likeCount}명이 좋아합니다</Text>
+								<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
 							</View>
 							<Text>댓글</Text>
 						</View>
 					}
-					data={commentDataList}
+					data={postData.comment}
 					renderItem={renderCommentItem}
-					keyExtractor={(item, index) => index.toString()}
 					initialNumToRender={10}
 					ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
 				/>

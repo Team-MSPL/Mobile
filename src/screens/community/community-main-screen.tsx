@@ -35,6 +35,8 @@ export default function CommunityMainScreen({navigation}: any) {
 	);
 
 	const deviceHeight = Dimensions.get('window').height;
+
+	// 앱 바 우측의 더보기 버튼 메뉴 리스트
 	const communityMenuList = [
 		{
 			title: '글 쓰기',
@@ -47,12 +49,10 @@ export default function CommunityMainScreen({navigation}: any) {
 	];
 
 	// 게시글 읽는 화면으로 이동
-	const goCommunityReadingScreen = (item: any) => {
+	const goCommunityReadingScreen = (item: string) => {
 		navigation.navigate('CommunityReadingScreen', {
-			postId: item.postId,
-			key: item.postKey,
+			postId: item,
 		});
-		console.log(item.postKey);
 	};
 
 	// 게시글 작성하는 화면으로 이동
@@ -125,15 +125,18 @@ export default function CommunityMainScreen({navigation}: any) {
 				<TouchableOpacity
 					onPress={() => {
 						console.log('게시글 읽는 화면으로 가는 함수 구현해야 함');
-						//goCommunityReadingScreen(item);
+						goCommunityReadingScreen(data.item.postId);
 					}}>
 					<Text style={styles.postTitleText} numberOfLines={1} ellipsizeMode='tail'>
 						{data.item.postTitle}
 					</Text>
+					<Text style={styles.postContentText} numberOfLines={1} ellipsizeMode='tail'>
+						{data.item.postContent}
+					</Text>
 					<HStack alignItems={'center'}>
 						<Icon name={'hearto'} size={12} color='red' />
-						<Text style={styles.postedAtText}>
-							{data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
+						<Text style={styles.postLikesPostedAtPostWriterText}>
+							{data.item.likerLength} | {data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
 						</Text>
 					</HStack>
 				</TouchableOpacity>
@@ -318,8 +321,8 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontWeight: '400',
 	},
-	postedAtText: {
-		width: Dimensions.get('window').width,
+	postLikesPostedAtPostWriterText: {
+		margin: 4,
 		fontSize: 12,
 		fontWeight: '400',
 		color: 'gray',
