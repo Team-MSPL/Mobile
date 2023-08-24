@@ -10,9 +10,12 @@ export default function MoreInfo({navigation}: any) {
 
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
-
+	const exceptionKeys = ['isFirstLaunch'];
 	const goLogout = async () => {
-		await AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList)); //TODO 로그아웃시 지금은 다 날려버림
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
 		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
 		Alert.alert('로그아웃 성공이요');
@@ -21,8 +24,12 @@ export default function MoreInfo({navigation}: any) {
 		try {
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase};
+			console.log('사인업', signUpFirebase);
 			dispatch(userWithdraw(data));
-			await AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList)); //TODO 로그아웃시 지금은 다 날려버림
+			await AsyncStorage.getAllKeys().then(allKeys => {
+				const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+				AsyncStorage.multiRemove(removeList);
+			});
 			dispatch(userSliceActions.reset());
 			navigation.replace('LoginScreen');
 			Alert.alert('탈퇴 성공이요');
@@ -33,6 +40,9 @@ export default function MoreInfo({navigation}: any) {
 
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
+	};
+	const goPayment = () => {
+		navigation.navigate('Payment');
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
@@ -59,6 +69,9 @@ export default function MoreInfo({navigation}: any) {
 						onPress={() => dispatch(updateFunctionToken({functionToken: 4}))}
 						style={{marginVertical: 10}}>
 						<Text>너님 토큰 갯수{functionToken}</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={goPayment} style={{marginVertical: 10}}>
+						<Text>토큰 구매하쉴?</Text>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={changeInfo} style={{marginVertical: 10}}>
 						<Text>정보 변경이요</Text>

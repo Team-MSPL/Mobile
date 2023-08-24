@@ -42,7 +42,7 @@ export default function AddAccommodation({navigation, route}: any) {
 			</Text>
 			<Image
 				source={{
-					uri: Place.imageUrl,
+					uri: Place.photo,
 				}}
 				style={{width: '100%', height: 300}}
 				alt='Place Image'

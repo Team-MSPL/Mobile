@@ -9,7 +9,7 @@ const initialState: LiteState = {
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
-		console.log('왔긴한데');
+		console.log('왔긴한데', data.userProfileImage);
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,
 			userProfileImage: data.userProfileImage,

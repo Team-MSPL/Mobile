@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
       <queries>
+          <package android:name="com.kakao.talk" />
     <intent>
       <action android:name="android.intent.action.SEND_MULTIPLE" />
       <data android:mimeType="*/*" />
@@ -55,6 +56,7 @@
           <!-- Redirect URI: "kakao{NATIVE_APP_KEY}://oauth“ -->
           <data android:host="oauth"
             android:scheme="kakao1059586e7b1423286b1a1a37606f9786" />
+            <data android:host="kakaolink" android:scheme="kakao1059586e7b1423286b1a1a37606f9786" />
         </intent-filter>
       </activity>
     </application>

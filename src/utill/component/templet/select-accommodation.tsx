@@ -15,7 +15,7 @@ export default function SelectAccommodation({navigation}: any) {
 
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
-		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, imageUrl: ''};
+		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
 		dispatch(travelSliceActions.enrollAccommodations(copy));
 	};
 	return (
@@ -39,10 +39,10 @@ export default function SelectAccommodation({navigation}: any) {
 						<HStack>
 							{accommodations[idx + 1].name && (
 								<>
-									{accommodations[idx + 1].imageUrl && (
+									{accommodations[idx + 1].photo && (
 										<Image
 											source={{
-												uri: accommodations[idx + 1].imageUrl,
+												uri: accommodations[idx + 1].photo,
 											}}
 											style={{width: 50, height: 50}}
 											alt='Place Image'

@@ -15,7 +15,7 @@ const initialState: LiteState = {
 		lng: 0,
 		category: 4,
 		takenTime: 30,
-		imageUrl: '',
+		photo: '',
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
@@ -328,12 +328,6 @@ export const travelSlice = createSlice({
 					lat: 0,
 					lng: 0,
 					category: 0, //넣을거
-					concept: [0],
-					partner: [0],
-					play: [0],
-					popular: 0,
-					season: [0],
-					tour: [0],
 					x: idx,
 					y: 0, //넣을거
 					id: 0, //넣을거
@@ -341,7 +335,8 @@ export const travelSlice = createSlice({
 				};
 				item.map((value, index) => {
 					if (idx == 0 && index == 0) {
-						time = state.timeLimitArray[0] / 2 + state.minuteLimitArray[0] / 30;
+						time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+						console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
 					}
 					if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
 						copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
@@ -357,6 +352,7 @@ export const travelSlice = createSlice({
 							category: 1,
 							lat: value.lat,
 							lng: value.lng,
+							photo: '',
 						});
 						eatTimeList.shift();
 						eatTimeList.shift();
@@ -375,6 +371,7 @@ export const travelSlice = createSlice({
 							category: 4,
 							lat: value.lat,
 							lng: value.lng,
+							photo: '',
 						});
 					}
 				});
@@ -404,14 +401,19 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 		},
+		pushMoveTimeList: state => {
+			state.moveTimeList.push([]);
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
+			console.log('1', payload);
 			let list: number[] = [];
 			payload.waypoints &&
 				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
 			list.push(payload.duration);
 			state.moveTimeList.push(list);
+			console.log('2');
 		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
@@ -489,7 +491,7 @@ interface PlaceType {
 	lng: number;
 	category: number;
 	takenTime: number;
-	imageUrl: string;
+	photo: string;
 }
 
 export interface EssentialPlaceType {
@@ -500,7 +502,7 @@ export interface EssentialPlaceType {
 	category: number;
 	takenTime: number;
 	id: string;
-	imageUrl: string;
+	photo: string;
 }
 export interface TimetableType {
 	category: number;
@@ -511,6 +513,7 @@ export interface TimetableType {
 	x?: number;
 	y?: number;
 	id?: string;
+	photo: string;
 }
 
 export interface CourseDetailType {

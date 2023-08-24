@@ -1,10 +1,11 @@
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {Alert, Linking, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
+import KakaoShareLink from 'react-native-kakao-share-link';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
@@ -18,6 +19,30 @@ export default function Main({navigation}: any) {
 	};
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
+	};
+	const zkrhdrhrh = async () => {
+		try {
+			const response = await KakaoShareLink.sendText({
+				text: '타타타타',
+				link: {
+					webUrl: 'http://danim.me',
+					mobileWebUrl: 'http://danim.me',
+				},
+				buttons: [
+					{
+						title: '앱에서 볼래',
+						link: {
+							androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
+							iosExecutionParams: [{key: 'key1', value: 'value1'}],
+						},
+					},
+				],
+			});
+			console.log(response);
+		} catch (err) {
+			console.log(err);
+			Alert.alert('카공중에 에러가 뜨다니');
+		}
 	};
 	useEffect(() => {
 		navigation.setOptions({
@@ -105,6 +130,9 @@ export default function Main({navigation}: any) {
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.goBack()}>
 				<Text>로그아웃</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={zkrhdrhrh}>
+				<Text>카공</Text>
 			</TouchableOpacity>
 			<Box h='10'></Box>
 		</ScrollView>

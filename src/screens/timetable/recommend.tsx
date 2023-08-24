@@ -38,12 +38,6 @@ export default function Recommend({navigation, route}: any) {
 			lat: Number(recommendList[idx].y),
 			lng: Number(recommendList[idx].x),
 			category: route.params.category,
-			concept: [0],
-			partner: [0],
-			play: [0],
-			popular: 0,
-			season: [0],
-			tour: [0],
 			x: route.params.x,
 			y: route.params.y[0],
 			id: shortId.generate(),
@@ -63,18 +57,18 @@ export default function Recommend({navigation, route}: any) {
 		// 	: (copy[route.params.index] = updateItem);
 		setRecommendItem(copy);
 		setSelect(idx);
-		console.log(copy[idx]);
-		if (mapRef.current) {
-			mapRef.current.animateToRegion(
-				{
-					latitude: updateItem.lat, // 목표 지점의 위도
-					longitude: updateItem.lng, // 목표 지점의 경도
-					latitudeDelta: 0.04,
-					longitudeDelta: 0.04,
+		console.log('ㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂ');
+		mapRef.current?.animateCamera(
+			{
+				center: {
+					latitude: updateItem.lat,
+					longitude: updateItem.lng,
 				},
-				1000,
-			); // 1000ms 동안 목표 지점으로 애니메이션 이동
-		}
+			},
+			{duration: 1000},
+		);
+
+		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ');
 	};
 	const checkMessage = () => {
 		setVisible(true);
@@ -157,8 +151,8 @@ export default function Recommend({navigation, route}: any) {
 				region={{
 					latitude: recommendItem[0].lat,
 					longitude: recommendItem[0].lng,
-					latitudeDelta: 0.4,
-					longitudeDelta: 0.4,
+					latitudeDelta: 0.04,
+					longitudeDelta: 0.04,
 				}}>
 				{markers}
 				{polylines}

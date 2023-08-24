@@ -16,19 +16,16 @@ export default function MapInfo({navigation}: any) {
 		setSelect(idx);
 	};
 	const [visible, setVisible] = useState(true);
-	const moveRegion = (e: number) => {
-		console.log(timetable[select][e]);
-		if (mapRef.current) {
-			mapRef.current.animateToRegion(
-				{
-					latitude: timetable[select][e].lat, // 목표 지점의 위도
-					longitude: timetable[select][e].lng, // 목표 지점의 경도
-					latitudeDelta: 0.04,
-					longitudeDelta: 0.04,
+	const moveRegion = async (e: number) => {
+		mapRef.current?.animateCamera(
+			{
+				center: {
+					latitude: timetable[select][e].lat,
+					longitude: timetable[select][e].lng,
 				},
-				1000,
-			); // 1000ms 동안 목표 지점으로 애니메이션 이동
-		}
+			},
+			{duration: 1000},
+		);
 	};
 	const goNavigation = async (e: number) => {
 		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${

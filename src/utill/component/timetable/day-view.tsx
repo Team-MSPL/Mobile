@@ -25,7 +25,7 @@ const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
 				</Text>
 				<Spacer />
 
-				<TouchableOpacity disabled={viewDayIndex + 4 == nDay} onPress={goRight}>
+				<TouchableOpacity disabled={viewDayIndex + 5 > nDay} onPress={goRight}>
 					<Text>오른쪽 </Text>
 				</TouchableOpacity>
 			</HStack>
