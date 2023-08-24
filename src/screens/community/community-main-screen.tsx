@@ -1,5 +1,4 @@
 import {useFocusEffect} from '@react-navigation/native';
-import moment from 'moment';
 import {HStack, Text, ThreeDotsIcon} from 'native-base';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
@@ -7,17 +6,17 @@ import {
 	Button,
 	Dimensions,
 	FlatList,
-	Modal,
 	RefreshControl,
 	SafeAreaView,
 	StyleSheet,
 	TouchableOpacity,
-	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getPostList, postListType, savePost} from '../../redux/community/community.slice';
+import {getOnePost, getPostList, postListType} from '../../redux/community/community.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -33,8 +32,6 @@ export default function CommunityMainScreen({navigation}: any) {
 		}, []),
 	);
 
-	const deviceHeight = Dimensions.get('window').height;
-
 	// 앱 바 우측의 더보기 버튼 메뉴 리스트
 	const communityMenuList = [
 		{
@@ -45,13 +42,28 @@ export default function CommunityMainScreen({navigation}: any) {
 				goCommunityWritingScreen();
 			},
 		},
+		{
+			title: '취소',
+			onPress: () => {
+				console.log('취소');
+				closeModal();
+			},
+		},
 	];
 
 	// 게시글 읽는 화면으로 이동
-	const goCommunityReadingScreen = (item: string) => {
-		navigation.navigate('CommunityReadingScreen', {
-			postId: item,
-		});
+	const goCommunityReadingScreen = async (item: string) => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			await dispatch(getOnePost({postId: item}));
+			navigation.navigate('CommunityReadingScreen', {
+				postId: item,
+			});
+		} catch (err) {
+			console.log('게시글 읽는 화면으로 넘어가는 도중 에러가 발생했습니다.');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
 	};
 
 	// 게시글 작성하는 화면으로 이동
@@ -185,120 +197,38 @@ export default function CommunityMainScreen({navigation}: any) {
 				/>
 			)}
 
-			<TouchableOpacity
-				onPress={() => {
-					dispatch(
-						savePost({
-							postTitle: '테스트1',
-							postContent: '테스트 본문',
-							postImage: [],
-							postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-						}),
-					);
-				}}>
-				<Text>버튼</Text>
-			</TouchableOpacity>
-
 			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={isMenuModalVisible}
-				onRequestClose={() => closeModal()}>
-				<TouchableWithoutFeedback onPress={() => closeModal()}>
+				animationIn='bounce'
+				isVisible={isMenuModalVisible}
+				backdropOpacity={0.3}
+				useNativeDriverForBackdrop={true}
+				onBackdropPress={closeModal}
+				onBackButtonPress={closeModal}
+				style={{margin: 8, justifyContent: 'flex-end'}}>
+				<SafeAreaView>
 					<View
 						style={{
-							flex: 1,
-							backgroundColor: '#000000AA',
-							justifyContent: 'flex-end',
+							backgroundColor: '#FFFFFFFF',
+							borderRadius: 10,
+							paddingHorizontal: 10,
 						}}>
-						<SafeAreaView>
-							<View
-								style={{
-									backgroundColor: '#FFFFFFFF',
-									width: '100%',
-									borderRadius: 10,
-									paddingHorizontal: 10,
-									maxHeight: deviceHeight * 0.4,
-								}}>
-								<View>
-									<Text
-										style={{
-											color: '#182E44',
-											fontSize: 20,
-											fontWeight: '500',
-											margin: 15,
-										}}>
-										게시판 메뉴
-									</Text>
-									<FlatList
-										data={communityMenuList}
-										renderItem={({item}) => (
-											<Button title={item.title} onPress={item.onPress}></Button>
-										)}></FlatList>
-								</View>
-							</View>
-						</SafeAreaView>
+						<Text
+							style={{
+								color: '#182E44',
+								fontSize: 20,
+								fontWeight: '500',
+								margin: 12,
+							}}>
+							게시판 메뉴
+						</Text>
+						<FlatList
+							data={communityMenuList}
+							renderItem={({item}) => (
+								<Button title={item.title} onPress={item.onPress}></Button>
+							)}></FlatList>
 					</View>
-				</TouchableWithoutFeedback>
+				</SafeAreaView>
 			</Modal>
-
-			{/* {isLoading ? (
-				<ActivityIndicator size='large' color='#0000ff' />
-			) : (
-				<FlatList
-					data={communityData}
-					renderItem={renderPostItem}
-					keyExtractor={(item, index) => index.toString()}
-					initialNumToRender={10}
-					ListEmptyComponent={<Text>등록된 게시글이 없습니다.</Text>}
-					ItemSeparatorComponent={flatListItemSeperator}
-					onEndReached={onEndReached}
-					onEndReachedThreshold={0.8}
-					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-				/>
-			)}
-			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={isMenuModalVisible}
-				onRequestClose={() => closeModal()}>
-				<TouchableWithoutFeedback onPress={() => closeModal()}>
-					<View
-						style={{
-							flex: 1,
-							backgroundColor: '#000000AA',
-							justifyContent: 'flex-end',
-						}}>
-						<SafeAreaView>
-							<View
-								style={{
-									backgroundColor: '#FFFFFFFF',
-									width: '100%',
-									borderRadius: 10,
-									paddingHorizontal: 10,
-									maxHeight: deviceHeight * 0.4,
-								}}>
-								<View>
-									<Text
-										style={{
-											color: '#182E44',
-											fontSize: 20,
-											fontWeight: '500',
-											margin: 15,
-										}}>
-										게시판 메뉴
-									</Text>
-									<FlatList
-										data={communityMenuList}
-										renderItem={({item}) => (
-											<Button title={item.title} onPress={item.onPress}></Button>
-										)}></FlatList>
-								</View>
-							</View>
-						</SafeAreaView>
-					</View>
-				</TouchableWithoutFeedback>
-			</Modal> */}
 		</View>
 	);
 }

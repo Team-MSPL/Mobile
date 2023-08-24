@@ -25,7 +25,7 @@ export const communitySlice = createSlice({
 			state.postList = payload;
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
-			console.log('게시글 하나 가져오기', payload);
+			//console.log('게시글 하나 가져오기', payload);
 			state.postData = payload;
 		});
 	},
@@ -49,7 +49,7 @@ export const getPostList = createAsyncThunk('/getPostList', async () => {
 export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: string}, thunkAPI) => {
 	try {
 		const response = await axiosAuth.get(`/post/getOnePost?postId=${data.postId}`);
-		console.log(response.data);
+		//console.log('게시글 하나 가져오기가 실행됐을 때의 결과', response.data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
@@ -233,7 +233,7 @@ interface reportCommentType extends reportPostType {
 	commentId: string;
 }
 
-interface saveCommentType {
+export interface saveCommentType {
 	postId: string;
 	comment: {
 		commentContent: string;
@@ -250,7 +250,7 @@ export interface commentType {
 	commentWriter: string;
 	commentWriterUserId: string;
 	commentWriterProfile: string;
-	postId: string;
+	_id: string;
 }
 
 export interface savePostType {

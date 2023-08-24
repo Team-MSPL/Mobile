@@ -1,5 +1,4 @@
-import firestore from '@react-native-firebase/firestore';
-import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
+import {HStack, ThreeDotsIcon} from 'native-base';
 import {useCallback, useEffect, useState} from 'react';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -12,9 +11,7 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
-	Modal,
 	NativeModules,
-	Platform,
 	RefreshControl,
 	SafeAreaView,
 	ScrollView,
@@ -22,21 +19,25 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
-	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
+import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
-import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	clickLike,
 	commentType,
+	deleteComment,
 	deletePost,
 	getOnePost,
 	reportPost,
 	reportPostType,
+	saveComment,
+	saveCommentType,
 	unclickLike,
 } from '../../redux/community/community.slice';
+
 const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -56,12 +57,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		console.log('자 넘어가라', postData._id);
 	};
 
-	const [postTitle, setPostTitle] = useState<string>('');
-	const [commentDataList, setComment] = useState<string[]>([]);
-	const [postId, setPostId] = useState<string>(route.params.postId);
-	const [postWriterUserId, setPostWriterUserId] = useState<string>('postWriterUserId');
-	const [postContent, setPostContent] = useState<string>('');
-	const [newCommentContent, setNewComment] = useState<string>('');
+	const [commentContent, setCommentContent] = useState<string>('');
 	const [postImage, setPostImage] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
 	const [isImageMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
@@ -76,6 +72,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 모달 관리
 	const [isMenuModalVisible, setIsMenuModalVisible] = useState<boolean>(false);
+	const [isReportPostModalVisible, setIsReportPostModalVisible] = useState<boolean>(false);
 	const [isCommentMenuModalVisible, setIsCommentMenuModalVisible] = useState<boolean>(false);
 
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
@@ -96,7 +93,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			onPress: () => {
 				console.log('삭제 페이지로 이동');
 				closeModal('menu');
-				deleteCheckAlert();
+				postDeleteCheckAlert();
 			},
 		},
 		{
@@ -104,12 +101,100 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			onPress: () => {
 				console.log('신고 페이지로 이동');
 				closeModal('menu');
-				reportAlert();
+				openModal('reportPost');
+			},
+		},
+		{
+			title: '취소',
+			onPress: () => {
+				console.log('취소');
+				closeModal('menu');
 			},
 		},
 	];
 
-	const deleteCheckAlert = () => {
+	// 게시글 신고 메뉴
+	const postReportMenuList = [
+		{
+			title: '무분별한 도배',
+			onPress: () => {
+				handlePostReport('무분별한 도배');
+				console.log('무분별한 도배 신고');
+			},
+		},
+		{
+			title: '정당/정치인 비하 및 선거 운동',
+			onPress: () => {
+				handlePostReport('정당/정치인 비하 및 선거 운동');
+				console.log('정당/정치인 비하 및 선거 운동');
+			},
+		},
+		{
+			title: '욕설/비하',
+			onPress: () => {
+				handlePostReport('욕설/비하');
+				console.log('욕설/비하');
+			},
+		},
+		{
+			title: '상업적 광고 및 판매',
+			onPress: () => {
+				handlePostReport('상업적 광고 및 판매');
+				console.log('상업적 광고 및 판매');
+			},
+		},
+		{
+			title: '음란물/불건전한 만남 및 대화',
+			onPress: () => {
+				handlePostReport('음란물/불건전한 만남 및 대화');
+				console.log('음란물/불건전한 만남 및 대화');
+			},
+		},
+		{
+			title: '유출/사칭/사기',
+			onPress: () => {
+				handlePostReport('유출/사칭/사기');
+				console.log('유출/사칭/사기');
+			},
+		},
+		{
+			title: '취소',
+			onPress: () => {
+				console.log('취소');
+			},
+			style: 'destructive',
+		},
+	];
+
+	const commentMenuList: AlertButton[] = [
+		{
+			text: '수정',
+			onPress: () => {
+				console.log('글 수정 페이지로 이동');
+				closeModal('menu');
+				//goCommunityWritingScreen();
+			},
+		},
+		{
+			text: '삭제',
+			onPress: () => {
+				console.log('삭제 페이지로 이동');
+				closeModal('menu');
+				postDeleteCheckAlert();
+			},
+		},
+		{
+			text: '신고',
+			onPress: () => {
+				console.log('신고 페이지로 이동');
+				closeModal('menu');
+				postReportAlert();
+			},
+		},
+	];
+
+	// 게시글 지우기 확인창
+	const postDeleteCheckAlert = () => {
 		Alert.alert(
 			'게시글을 삭제하시겠습니까?',
 			'',
@@ -132,47 +217,48 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		);
 	};
 
-	const reportAlert = () => {
+	// 게시글 신고창
+	const postReportAlert = () => {
 		Alert.alert('신고 사유를 선택해주세요.', '', [
 			{
 				text: '무분별한 도배',
 				onPress: () => {
-					handleReportPost('무분별한 도배');
+					handlePostReport('무분별한 도배');
 					console.log('무분별한 도배 신고');
 				},
 			},
 			{
 				text: '정당/정치인 비하 및 선거 운동',
 				onPress: () => {
-					handleReportPost('정당/정치인 비하 및 선거 운동');
+					handlePostReport('정당/정치인 비하 및 선거 운동');
 					console.log('정당/정치인 비하 및 선거 운동');
 				},
 			},
 			{
 				text: '욕설/비하',
 				onPress: () => {
-					handleReportPost('욕설/비하');
+					handlePostReport('욕설/비하');
 					console.log('욕설/비하');
 				},
 			},
 			{
 				text: '상업적 광고 및 판매',
 				onPress: () => {
-					handleReportPost('상업적 광고 및 판매');
+					handlePostReport('상업적 광고 및 판매');
 					console.log('상업적 광고 및 판매');
 				},
 			},
 			{
 				text: '음란물/불건전한 만남 및 대화',
 				onPress: () => {
-					handleReportPost('음란물/불건전한 만남 및 대화');
+					handlePostReport('음란물/불건전한 만남 및 대화');
 					console.log('음란물/불건전한 만남 및 대화');
 				},
 			},
 			{
 				text: '유출/사칭/사기',
 				onPress: () => {
-					handleReportPost('유출/사칭/사기');
+					handlePostReport('유출/사칭/사기');
 					console.log('유출/사칭/사기');
 				},
 			},
@@ -187,7 +273,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	// * 게시글 신고 기능
-	const handleReportPost = async (reason: string) => {
+	const handlePostReport = async (reason: string) => {
 		try {
 			// db의 comment에 들어갈 정보들
 			const reportData: reportPostType = {
@@ -196,12 +282,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 				reportWriter: userName,
 			};
-			dispatch(reportPost(reportData));
+			await dispatch(reportPost(reportData));
 			Alert.alert('신고가 접수되었습니다.');
+			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
 		}
 	};
+
+	// ---------------- useEffect 모음(시작) -------------------
 
 	// * 화면 갱신
 	useFocusEffect(
@@ -211,18 +300,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}, []),
 	);
 
-	// iOS에서 키보드 활성화시 TextInput이 안 보이는 이슈를 위한 코드
-	useEffect(() => {
-		if (Platform.OS === 'ios')
-			StatusBarManager.getHeight((statusBarFrameData: any) => {
-				setStatusBarHeight(statusBarFrameData.height);
-			});
-	}, []);
-
 	// 댓글 등록 버튼 활성 및 비활성화
 	useEffect(() => {
-		setCommentButtonDisabled(newCommentContent.trim() === '');
-	}, [newCommentContent]);
+		setCommentButtonDisabled(commentContent.trim() === '');
+	}, [commentContent]);
 
 	useEffect(() => {
 		// 화면 크기 변경 시 사진 크기 조정
@@ -258,13 +339,14 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		});
 	}, []);
 
-	// ------------------ firebase 쓴 부분(시작) ----------------------
+	// ---------------- useEffect 모음(끝) -------------------
 
 	// * 게시글 정보 가져오기
 	const fetchPostData = async () => {
 		try {
 			await dispatch(getOnePost({postId: route.params.postId}));
 			if (postData.liker.includes(userId)) {
+				console.log('게시글 정보 가져오기에서의 좋아요 변화');
 				setIsLiked(true);
 			}
 			setIsLoading(false);
@@ -275,67 +357,43 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
-	// 댓글 등록 버튼 눌렀을 때
+	// * 댓글 등록 (새로운 댓글 및 댓글 수정)
+	// TODO 댓글 수정 기능 추가해야함.
 	const handleCommentSubmit = async () => {
 		try {
-			const docRef = firestore().collection('커뮤니티').doc(postId);
 			// db의 comment에 들어갈 정보들
-			const newCommentData = {
-				commenter: userName,
-				userid: userId,
-				commentContent: newCommentContent,
-				commentedAt: moment(Date()).format('yy/MM/DD HH:mm'),
-				profileImage: userProfileImage,
-				_id: shortid.generate(),
+			const newCommentData: saveCommentType = {
+				postId: postData._id,
+				comment: {
+					commentContent: commentContent,
+					commentedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+					commentWriter: userName,
+					commentWriterUserId: userId,
+					commentWriterProfile: userProfileImage,
+				},
 			};
-			// 새로운 댓글 정보들을 comment에 추가
-			const updatedCommentDataList = [...commentDataList, newCommentData];
-			await docRef.update({comment: updatedCommentDataList});
+			await dispatch(saveComment(newCommentData));
+			console.log(commentContent, '댓글이 성공적으로 등록되었습니다.');
 			// 댓글 등록 후 입력창 초기화
-			setNewComment('');
+			setCommentContent('');
 			Alert.alert('댓글이 등록되었습니다.');
-			fetchPostData();
+			await fetchPostData();
 		} catch (error) {
 			console.log('댓글 등록 중에 오류가 발생했습니다:', error);
 		}
 	};
 
-	// 댓글 삭제
-	const deleteComment = async (commentId: string) => {
-		// '커뮤니티' 컬렉션의 '킹태운' 문서 가져오기
-		const docRef = firestore().collection('커뮤니티').doc(postId);
-		// 문서 가져오기
-		docRef
-			.get()
-			.then(doc => {
-				interface commentDataType {
-					_id: string;
-					commentContent: string;
-					commentedAt: string;
-					commenter: string;
-					profileImage: string;
-					userId: string;
-				}
-				if (doc.exists) {
-					// 'comment' 필드의 현재 배열 가져오기
-					const comments: commentDataType[] = doc.data()?.comment || [];
-					// _id 를 가진 요소를 제거할 인덱스 찾기
-					const indexToRemove = comments.findIndex(comment => comment._id === commentId);
-
-					if (indexToRemove !== -1) {
-						// _id 를 가진 요소를 배열에서 제거
-						comments.splice(indexToRemove, 1);
-						// 업데이트된 'comment' 필드를 문서에 저장
-						console.log('댓글이 성공적으로 삭제되었습니다');
-						Alert.alert('댓글이 삭제되었습니다.');
-						fetchPostData();
-						return docRef.update({comment: comments});
-					}
-				}
-			})
-			.catch(error => {
-				console.error('Error updating document:', error);
-			});
+	// * 댓글 삭제
+	// TODO 본인의 댓글만 삭제할 수 있도록 하기
+	const handleDeleteComment = async (commentId: string) => {
+		try {
+			await dispatch(deleteComment({postId: postData._id, commentId: commentId}));
+			Alert.alert('댓글이 삭제되었습니다.');
+			console.log('댓글을 성공적으로 삭제했습니다.');
+			await fetchPostData();
+		} catch (error) {
+			console.log('댓글을 삭제하는 도중 에러가 발생했습니다.', error);
+		}
 	};
 
 	// * 좋아요 버튼을 눌렀을 때
@@ -348,7 +406,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				await dispatch(clickLike({postId: route.params.postId}));
 				console.log('좋아요를 했습니다.');
 			}
-			fetchPostData();
+			await fetchPostData();
 			setIsLiked(!isLiked);
 		} catch (error) {
 			console.log('좋아요에 오류가 발생했습니다:', error);
@@ -358,15 +416,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// * 게시글 삭제
 	const handleDeletePost = async () => {
 		try {
-			dispatch(deletePost({postId: route.params.postId}));
+			await dispatch(deletePost({postId: route.params.postId}));
 			console.log(postData.postTitle, '게시글 삭제를 완료했습니다');
 			goBack();
 		} catch (e) {
 			console.log('삭제에 실패했습니다', e);
 		}
 	};
-
-	// ------------------ firebase 쓴 부분(끝) ----------------------
 
 	// * 가져온 댓글 UI
 	const renderCommentItem = (data: {item: commentType}) => {
@@ -393,7 +449,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							onPress={() => {
 								console.log('삭제 버튼 누름');
 								// TODO 본인의 댓글이라면 삭제할 수 있게 해야함.
-								//deleteComment(item._id);
+								handleDeleteComment(data.item._id);
 							}}>
 							<Text>삭제</Text>
 						</TouchableOpacity>
@@ -470,6 +526,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			setIsMenuModalVisible(true);
 		} else if (type == 'commentMenu') {
 			setIsCommentMenuModalVisible(true);
+		} else if (type == 'reportPost') {
+			setIsReportPostModalVisible(true);
 		}
 	};
 
@@ -479,60 +537,100 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			setIsMenuModalVisible(false);
 		} else if (type == 'commentMenu') {
 			setIsCommentMenuModalVisible(false);
+		} else if (type == 'reportPost') {
+			setIsReportPostModalVisible(false);
 		}
 	};
 
+	const onFocusEffect = useCallback(() => {
+		AvoidSoftInput.setShouldMimicIOSBehavior(true);
+		return () => {
+			AvoidSoftInput.setShouldMimicIOSBehavior(false);
+		};
+	}, []);
+	useFocusEffect(onFocusEffect);
+
 	return (
-		<KeyboardAvoidingView
-			style={styles.container}
-			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-			keyboardVerticalOffset={statusBarHeight + 44}>
+		<View style={styles.container}>
+			<AvoidSoftInputView></AvoidSoftInputView>
 			{/* 게시글 메뉴 모달 */}
 			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={isMenuModalVisible}
-				onRequestClose={() => closeModal('menu')}>
-				<TouchableWithoutFeedback onPress={() => closeModal('menu')}>
+				animationIn='slideInUp'
+				isVisible={isMenuModalVisible}
+				backdropOpacity={0.5}
+				useNativeDriverForBackdrop={true}
+				onBackdropPress={() => closeModal('menu')}
+				onBackButtonPress={() => closeModal('menu')}
+				style={{margin: 8, justifyContent: 'flex-end'}}>
+				<SafeAreaView>
 					<View
 						style={{
-							flex: 1,
-							backgroundColor: '#000000AA',
-							justifyContent: 'flex-end',
+							backgroundColor: '#FFFFFFFF',
+							width: '100%',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							maxHeight: deviceHeight * 0.4,
 						}}>
-						<SafeAreaView>
-							<View
+						<View>
+							<Text
 								style={{
-									backgroundColor: '#FFFFFFFF',
-									width: '100%',
-									borderRadius: 10,
-									paddingHorizontal: 10,
-									maxHeight: deviceHeight * 0.4,
+									color: '#182E44',
+									fontSize: 20,
+									fontWeight: '500',
+									margin: 15,
 								}}>
-								<View>
-									<Text
-										style={{
-											color: '#182E44',
-											fontSize: 20,
-											fontWeight: '500',
-											margin: 15,
-										}}>
-										게시판 메뉴
-									</Text>
-									<FlatList
-										data={
-											userId == postData.postWriterUserId
-												? communityReadingMenuList
-												: communityReadingMenuList.filter(item => item.title == '신고')
-										}
-										renderItem={({item}) => (
-											<Button title={item.title} onPress={item.onPress}></Button>
-										)}></FlatList>
-								</View>
-							</View>
-						</SafeAreaView>
+								게시판 메뉴
+							</Text>
+							<FlatList
+								data={
+									userId == postData.postWriterUserId
+										? communityReadingMenuList
+										: communityReadingMenuList.filter(item => item.title == '신고')
+								}
+								renderItem={({item}) => (
+									<Button title={item.title} onPress={item.onPress}></Button>
+								)}></FlatList>
+						</View>
 					</View>
-				</TouchableWithoutFeedback>
+				</SafeAreaView>
+			</Modal>
+
+			{/* 신고 메뉴 모달 */}
+			<Modal
+				animationIn='slideInUp'
+				isVisible={isReportPostModalVisible}
+				backdropOpacity={0.5}
+				useNativeDriverForBackdrop={true}
+				onBackdropPress={() => closeModal('reportPost')}
+				onBackButtonPress={() => closeModal('reportPost')}
+				style={{margin: 8, justifyContent: 'center'}}>
+				<SafeAreaView>
+					<View
+						style={{
+							backgroundColor: '#FFFFFFFF',
+							width: '100%',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							maxHeight: deviceHeight * 0.4,
+						}}>
+						<View>
+							<Text
+								style={{
+									color: '#182E44',
+									fontSize: 20,
+									fontWeight: '500',
+									margin: 15,
+								}}>
+								신고 사유
+							</Text>
+							<FlatList
+								data={postReportMenuList}
+								renderItem={({item}) => (
+									<Button title={item.title} onPress={item.onPress}></Button>
+								)}></FlatList>
+						</View>
+					</View>
+				</SafeAreaView>
 			</Modal>
 
 			<View style={styles.postNCommentContainer}>
@@ -557,9 +655,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 										</TouchableOpacity>
 									)}
 								</View>
-								<Modal visible={isImageMoreModalVisible} onRequestClose={handleMoreModalClose}>
+								<Modal isVisible={isImageMoreModalVisible}>
 									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-									<ScrollView contentContainerStyle={styles.modalContainer}>
+									<ScrollView contentContainerStyle={styles.imageModalContainer}>
 										{postData.postImage.map((uri, index) => (
 											<Image key={index} source={{uri}} style={styles.modalImage} />
 										))}
@@ -584,20 +682,22 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</View>
 
 			<View style={styles.inputContainer}>
-				<TextInput
-					style={styles.commentInputField}
-					value={newCommentContent}
-					onChangeText={text => setNewComment(text)}
-					placeholder='댓글을 입력하세요...'
-				/>
-				<TouchableOpacity
-					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-					disabled={isCommentButtonDisabled}
-					onPress={handleCommentSubmit}>
-					<Text style={styles.submitButtonText}>등록</Text>
-				</TouchableOpacity>
+				<AvoidSoftInputView style={styles.inputContainer}>
+					<TextInput
+						style={styles.commentInputField}
+						value={commentContent}
+						onChangeText={text => setCommentContent(text)}
+						placeholder='댓글을 입력하세요...'
+					/>
+					<TouchableOpacity
+						style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+						disabled={isCommentButtonDisabled}
+						onPress={handleCommentSubmit}>
+						<Text style={styles.submitButtonText}>등록</Text>
+					</TouchableOpacity>
+				</AvoidSoftInputView>
 			</View>
-		</KeyboardAvoidingView>
+		</View>
 	);
 }
 
@@ -689,7 +789,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		fontSize: 18,
 	},
-	modalContainer: {
+	imageModalContainer: {
 		flexWrap: 'wrap',
 		flexDirection: 'row',
 		justifyContent: 'center',
