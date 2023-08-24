@@ -1,17 +1,6 @@
 import moment from 'moment';
 import React, {useState} from 'react';
-import {
-	Alert,
-	Image,
-	Modal,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
@@ -28,35 +17,52 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 
+	const [check1, setCheck1] = useState<string[]>();
+
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			multiple: true,
 			mediaType: 'photo',
 			cropping: true,
-			maxFiles: 10,
 			includeBase64: true,
 		}).then(response => {
-			if (response.length > 10) {
-				Alert.alert('사진은 최대 10장까지 가능합니다.');
-				return;
-			}
+			let temporaryList = [];
 			for (let i = 0; i < response.length; i++) {
-				if (response[i].size > 10000000) {
-					Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
-					return;
-				}
+				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
-			if (!response || response.length === 0) {
-				console.log('사진 선택을 취소하였습니다.');
-				return;
-			}
-			const selectedImageUris = response.map(image =>
-				Platform.OS === 'android' ? 'file://' + image.path : image.path,
-			);
-			setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			console.log('이미지 주소', postImage);
+			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+			setCheck1(temporaryList);
+			console.log('이미지 주소');
 		});
+
+		// ImageCropPicker.openPicker({
+		//    multiple: true,
+		//    mediaType: 'photo',
+		//    cropping: true,
+		//    maxFiles: 10,
+		//    includeBase64: true,
+		// }).then(response => {
+		//    if (response.length > 10) {
+		//       Alert.alert('사진은 최대 10장까지 가능합니다.');
+		//       return;
+		//    }
+		//    for (let i = 0; i < response.length; i++) {
+		//       if (response[i].size > 10000000) {
+		//          Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
+		//          return;
+		//       }
+		//    }
+		//    if (!response || response.length === 0) {
+		//       console.log('사진 선택을 취소하였습니다.');
+		//       return;
+		//    }
+		//    const selectedImageUris = response.map(image =>
+		//       Platform.OS === 'android' ? 'file://' + image.path : image.path,
+		//    );
+		//    setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+		//    console.log('이미지 주소', postImage);
+		// });
 	};
 
 	// * 게시글 등록
@@ -82,7 +88,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			const newPostData: savePostType = {
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: postImage,
+				postImage: check1,
 				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 
@@ -90,7 +96,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				postId: route.params.postId,
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: postImage,
+				postImage: check1,
 				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
 				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};

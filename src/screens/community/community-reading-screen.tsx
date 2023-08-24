@@ -1,5 +1,5 @@
 import {HStack, ThreeDotsIcon} from 'native-base';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
@@ -21,6 +21,8 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
+
 import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -100,8 +102,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			title: '신고',
 			onPress: () => {
 				console.log('신고 페이지로 이동');
-				closeModal('menu');
 				openModal('reportPost');
+				closeModal('menu');
 			},
 		},
 		{
@@ -542,6 +544,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
+	// 키보드 올라오기
 	const onFocusEffect = useCallback(() => {
 		AvoidSoftInput.setShouldMimicIOSBehavior(true);
 		return () => {
@@ -550,8 +553,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	}, []);
 	useFocusEffect(onFocusEffect);
 
+	const actionSheetRef = useRef<ActionSheetRef>(null);
+
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<AvoidSoftInputView></AvoidSoftInputView>
 			{/* 게시글 메뉴 모달 */}
 			<Modal
@@ -596,14 +601,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</Modal>
 
 			{/* 신고 메뉴 모달 */}
-			<Modal
-				animationIn='slideInUp'
-				isVisible={isReportPostModalVisible}
-				backdropOpacity={0.5}
-				useNativeDriverForBackdrop={true}
-				onBackdropPress={() => closeModal('reportPost')}
-				onBackButtonPress={() => closeModal('reportPost')}
-				style={{margin: 8, justifyContent: 'center'}}>
+			<ActionSheet ref={actionSheetRef}>
 				<SafeAreaView>
 					<View
 						style={{
@@ -631,7 +629,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						</View>
 					</View>
 				</SafeAreaView>
-			</Modal>
+			</ActionSheet>
 
 			<View style={styles.postNCommentContainer}>
 				{isLoading ? (
@@ -697,7 +695,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					</TouchableOpacity>
 				</AvoidSoftInputView>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
