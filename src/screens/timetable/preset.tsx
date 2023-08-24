@@ -1,12 +1,11 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useState, useRef} from 'react';
+import {Box, Center, ScrollView, Text, VStack} from 'native-base';
+import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import MapView, {Marker, Polyline} from 'react-native-maps';
 import {useAppDispatch, useAppSelector} from '../../redux';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, Center} from 'native-base';
-import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import SelectButton from '../../utill/component/select-button';
-import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
-import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from '../enroll-info/select-city';
 
 export default function Preset({navigation}: any) {
@@ -162,7 +161,7 @@ export default function Preset({navigation}: any) {
 				<MapView
 					ref={mapRef}
 					style={{width: '100%', height: 300}}
-					provider={PROVIDER_GOOGLE}
+					//provider={PROVIDER_GOOGLE}
 					showsMyLocationButton={true}
 					region={{
 						latitude: centerLatitude,

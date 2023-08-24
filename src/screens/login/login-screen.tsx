@@ -53,6 +53,7 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
+			console.log('구그르르르');
 			const data = {
 				userName: userInfo.user.name,
 				userProfileImage: userInfo.user.photo,

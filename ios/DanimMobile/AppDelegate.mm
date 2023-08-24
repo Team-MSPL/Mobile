@@ -3,6 +3,7 @@
 
 #import <Firebase.h>
 #import <RNKakaoLogins.h>
+#import <GoogleMaps/GoogleMaps.h>
 
 @implementation AppDelegate
 
@@ -18,6 +19,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [GMSServices provideAPIKey:@"70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com"]; // add this line using the api key obtained from Google Console
   [FIRApp configure];
   self.moduleName = @"DanimMobile";
   // You can add your custom initial props in the dictionary below.

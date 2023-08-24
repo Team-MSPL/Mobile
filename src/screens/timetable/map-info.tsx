@@ -1,12 +1,10 @@
-import {JSX, JSXElementConstructor, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {Box, ScrollView, Text, VStack} from 'native-base';
+import {useEffect, useRef, useState} from 'react';
+import {Linking, Platform, TouchableOpacity} from 'react-native';
+import MapView, {Marker, Polyline} from 'react-native-maps';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import CustomButton from '../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, Center} from 'native-base';
-import MapView, {Polyline, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {TouchableOpacity, Linking, Platform} from 'react-native';
-import SelectButton from '../../utill/component/select-button';
 import BaseModal from '../../utill/base-modal';
+import SelectButton from '../../utill/component/select-button';
 
 export default function MapInfo({navigation}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
@@ -120,7 +118,7 @@ export default function MapInfo({navigation}: any) {
 							<MapView
 								key={idx}
 								ref={mapRef}
-								provider={PROVIDER_GOOGLE}
+								//provider={PROVIDER_GOOGLE}
 								showsMyLocationButton={true}
 								style={{width: '100%', height: 300}}
 								showsUserLocation={true}

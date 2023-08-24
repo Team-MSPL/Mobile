@@ -1,4 +1,3 @@
-import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import React, {useState} from 'react';
 import {
@@ -14,7 +13,8 @@ import {
 	View,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -23,10 +23,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	const [postTitle, setPostTitle] = useState<string>(route.params.title);
 	const [postContent, setPostContent] = useState<string>(route.params.content);
 	const [postImage, setPostImage] = useState<string[]>(route.params.images);
-	const [postId, setPostId] = useState<string>(route.params.postId);
 	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
-	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+	const [isModalVisible, setIsMoreImageModalVisible] = useState<boolean>(false);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
+	const dispatch = useAppDispatch();
 
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
@@ -59,7 +59,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		});
 	};
 
-	// 게시글 새로 등록
+	// * 게시글 등록
 	const handlePostSubmit = () => {
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
@@ -79,31 +79,23 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			return;
 		}
 		try {
-			const db = firestore();
-			const collection = db.collection('커뮤니티');
-
-			const newPostData = {
+			const newPostData: savePostType = {
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				postWriter: userName,
-				postWriterUserId: userId,
 				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-				// TODO postId는 이후 백엔드에서 부여하는 것으로 변경 예정
-				postId: postId,
 			};
 
-			const updatePostData = {
+			const updatePostData: updatePostType = {
+				postId: route.params.postId,
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				postWriter: userName,
-				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
+				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 			if (isNewPost) {
-				collection
-					.doc(postId)
-					.set(newPostData)
+				dispatch(savePost(newPostData))
 					.then(() => {
 						Alert.alert('게시글이 등록되었습니다.');
 						console.log('글이 성공적으로 저장되었습니다.');
@@ -112,9 +104,9 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
 					});
 			} else {
-				collection
-					.doc(postId)
-					.update(updatePostData)
+				console.log('여기 왔나');
+				console.log(route.params.postId);
+				dispatch(updatePost(updatePostData))
 					.then(() => {
 						Alert.alert('게시글이 수정되었습니다.');
 						console.log('글이 성공적으로 저장되었습니다.');
@@ -129,12 +121,14 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		}
 	};
 
-	const handleMoreButtonPress = () => {
-		setIsModalVisible(true);
+	// 이미지 더보기 모달 열기
+	const openMoreImageModal = () => {
+		setIsMoreImageModalVisible(true);
 	};
 
-	const handleModalClose = () => {
-		setIsModalVisible(false);
+	// 이미지 더보기 모달 닫기
+	const closeMoreImageModal = () => {
+		setIsMoreImageModalVisible(false);
 	};
 
 	return (
@@ -152,7 +146,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					<Image key={index} source={{uri}} style={styles.uploadedImage} />
 				))}
 				{postImage.length > 8 && (
-					<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
+					<TouchableOpacity style={styles.moreButton} onPress={openMoreImageModal}>
 						<Text style={styles.moreButtonText}>더보기</Text>
 					</TouchableOpacity>
 				)}
@@ -163,7 +157,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
 				<Text style={styles.submitButtonText}>글 등록하기</Text>
 			</TouchableOpacity>
-			<Modal visible={isModalVisible} onRequestClose={handleModalClose}>
+			<Modal visible={isModalVisible} onRequestClose={closeMoreImageModal}>
 				<ScrollView contentContainerStyle={styles.modalContainer}>
 					{postImage.map((uri, index) => (
 						<Image key={index} source={{uri}} style={styles.modalImage} />
