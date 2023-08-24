@@ -43,7 +43,7 @@ export default function SelectEssential({navigation}: any) {
 							<HStack key={data.id}>
 								<Image
 									source={{
-										uri: data.imageUrl,
+										uri: data.photo,
 									}}
 									style={{width: 50, height: 50}}
 									alt='Place Image'

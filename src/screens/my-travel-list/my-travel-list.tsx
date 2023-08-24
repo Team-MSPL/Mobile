@@ -44,12 +44,22 @@ export default function MyTravelList({navigation}: any) {
 		navigation.navigate('Home');
 		navigation.navigate('SelectCity');
 	};
+	const getTravelLisy = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			await dispatch(getMyTravelList());
+		} catch (err) {
+			Alert.alert('내 여행 리스트를 받아오던 중 에러가 발생했습니다.');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	useEffect(() => {
 		navigation.setOptions({headerTitle: () => <Text>내 여행</Text>});
 	}, []);
 	useFocusEffect(
 		useCallback(() => {
-			dispatch(getMyTravelList());
+			getTravelLisy();
 		}, []),
 	);
 

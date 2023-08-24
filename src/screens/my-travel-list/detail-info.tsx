@@ -33,7 +33,15 @@ export default function DetailInfo({navigation}: any) {
 		navigation.navigate('InputDiary');
 	};
 	const goMyTravelDetail = async () => {
-		await dispatch(getOneTravelCourse({travelId: travelId}));
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			await dispatch(getOneTravelCourse({travelId: travelId}));
+			console.log('아니아니이요', Object.keys(picture));
+		} catch (err) {
+			Alert.alert('사진을 불러오던 중 에러가 발생했습니다.');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
 	};
 	const goRemove = async () => {
 		try {
@@ -51,7 +59,8 @@ export default function DetailInfo({navigation}: any) {
 		navigation.navigate('InputReviewAndPoint');
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
-		navigation.navigate('Timetable');
+		console.log(picture.length);
+		//navigation.navigate('Timetable');
 	};
 	useFocusEffect(
 		useCallback(() => {
@@ -73,8 +82,8 @@ export default function DetailInfo({navigation}: any) {
 					<Text>인데 수정 고?</Text>
 				</TouchableOpacity>
 			)}
-			{picture.length != 0 ? (
-				<Image source={{uri: picture && picture[0]}} style={{width: 100, height: 100}}></Image>
+			{picture && picture.length != 0 ? (
+				picture.map((item, idx) => <Image source={{uri: item}} style={{width: 100, height: 100}}></Image>)
 			) : (
 				<Text>사진 없어용</Text>
 			)}

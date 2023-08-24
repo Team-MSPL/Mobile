@@ -89,7 +89,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 			<HStack>
 				{[...Array(5)].map((item, idx) => (
 					<TouchableOpacity
-						style={{marginHorizontal: 10, backgroundColor: idx <= pointValue ? 'red' : null}}
+						style={{marginHorizontal: 10, backgroundColor: idx <= pointValue ? 'red' : 'white'}}
 						onPress={() => {
 							changePoint(idx);
 						}}>
@@ -109,7 +109,8 @@ export default function InputReviewAndPoint({navigation}: any) {
 										<TouchableOpacity
 											style={{
 												marginHorizontal: 10,
-												backgroundColor: inex <= tedencyPointList[index][iindex] ? 'red' : null,
+												backgroundColor:
+													inex <= tedencyPointList[index][iindex] ? 'red' : 'white',
 											}}
 											onPress={() => {
 												changeTendencyPoint({index: index, iindex: iindex, inex: inex});

@@ -35,7 +35,7 @@ export default function SearchPlace({navigation, route}: any) {
 						name: details?.name,
 						lat: details?.geometry.location.lat,
 						lng: details?.geometry.location.lng,
-						imageUrl: imageUrl,
+						photo: imageUrl,
 					};
 
 					dispatch(travelSliceActions.enrollPlace(datas));

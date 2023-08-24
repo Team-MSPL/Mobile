@@ -12,6 +12,7 @@ const initialUserState: UserState = {
 	functionToken: 0,
 	socialloginProvider: undefined,
 	isLogin: false,
+	isFirstLaunch: 'false',
 };
 
 // 로그아웃
@@ -75,6 +76,7 @@ export const updateProfile = createAsyncThunk(
 		}
 	},
 );
+
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,
@@ -98,6 +100,9 @@ const userSlice = createSlice({
 			state.userProfileImage = payload.userProfileImage;
 			state.userName = payload.userName;
 		},
+		setIsFirstLaunch(state, {payload}) {
+			state.isFirstLaunch = payload;
+		},
 	},
 	extraReducers: builder => {
 		// 로그아웃 지금은 다 지워버리지만 추후 처음런치때나 그런거 체크도해야할듯
@@ -114,7 +119,7 @@ const userSlice = createSlice({
 			return {...initialUserState};
 		});
 		builder.addCase(userWithdraw.fulfilled, state => {
-			AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
+			// /AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
 			// console.log('왔는딩?');
 			// state.functionToken = 0;
 			// console.log('허허허?');
@@ -142,4 +147,5 @@ export interface UserState {
 	isLogin: boolean;
 	functionToken: number;
 	userProfileImage: string;
+	isFirstLaunch: string;
 }

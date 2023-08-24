@@ -15,7 +15,7 @@ const initialState: LiteState = {
 		lng: 0,
 		category: 4,
 		takenTime: 30,
-		imageUrl: '',
+		photo: '',
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
@@ -328,12 +328,6 @@ export const travelSlice = createSlice({
 					lat: 0,
 					lng: 0,
 					category: 0, //넣을거
-					concept: [0],
-					partner: [0],
-					play: [0],
-					popular: 0,
-					season: [0],
-					tour: [0],
 					x: idx,
 					y: 0, //넣을거
 					id: 0, //넣을거
@@ -358,6 +352,7 @@ export const travelSlice = createSlice({
 							category: 1,
 							lat: value.lat,
 							lng: value.lng,
+							photo: '',
 						});
 						eatTimeList.shift();
 						eatTimeList.shift();
@@ -376,6 +371,7 @@ export const travelSlice = createSlice({
 							category: 4,
 							lat: value.lat,
 							lng: value.lng,
+							photo: '',
 						});
 					}
 				});
@@ -495,7 +491,7 @@ interface PlaceType {
 	lng: number;
 	category: number;
 	takenTime: number;
-	imageUrl: string;
+	photo: string;
 }
 
 export interface EssentialPlaceType {
@@ -506,7 +502,7 @@ export interface EssentialPlaceType {
 	category: number;
 	takenTime: number;
 	id: string;
-	imageUrl: string;
+	photo: string;
 }
 export interface TimetableType {
 	category: number;
@@ -517,6 +513,7 @@ export interface TimetableType {
 	x?: number;
 	y?: number;
 	id?: string;
+	photo: string;
 }
 
 export interface CourseDetailType {

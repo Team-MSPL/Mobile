@@ -1,12 +1,5 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	getDrivingDuration,
-	saveTravel,
-	travelSliceActions,
-	updateTravelCourse,
-} from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
 import {Alert, Platform, TextInput, TouchableOpacity, Image} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 
@@ -21,8 +14,7 @@ export default function InputDiary({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [diaryValue, setDiaryValue] = useState(diary);
 
-	const [pictureValue, setpictureValue] = useState(picture);
-
+	const [pictureValue, setpictureValue] = useState<string[]>(picture);
 	const changeDiary = (e: string) => {
 		setDiaryValue(e);
 	};
@@ -33,6 +25,7 @@ export default function InputDiary({navigation}: any) {
 			await dispatch(updateDiary(data));
 			navigation.goBack();
 		} catch (err) {
+			console.log(err);
 			Alert.alert('업로드 중 에러가 발생했습니다.');
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
@@ -40,26 +33,32 @@ export default function InputDiary({navigation}: any) {
 	};
 	const handelGetImage = async () => {
 		ImageCropPicker.openPicker({
-			multiple: false,
+			multiple: true,
 			mediaType: 'photo',
 			cropping: true,
-			includeBase64: Platform.OS == 'android',
+			includeBase64: true,
 		}).then(response => {
+			let temporaryList = [];
+			for (let i = 0; i < response.length; i++) {
+				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+			}
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setpictureValue([response.path]);
-			console.log('이미지 주소', response.path);
+			setpictureValue(temporaryList);
+			console.log('이미지 주소');
 		});
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB'>
-			<Text>입력 하면됨</Text>
+			<Text>입력 하면됨{pictureValue.length}</Text>
 			<TextInput
 				style={{borderWidth: 1}}
 				value={diaryValue}
 				onChangeText={(value: string) => changeDiary(value)}></TextInput>
 			{pictureValue.length != 0 ? (
 				<>
-					<Image source={{uri: pictureValue[0] ?? ''}} style={{width: 100, height: 100}}></Image>
+					{pictureValue.map((item, idx) => (
+						<Image source={{uri: item}} style={{width: 100, height: 100}}></Image>
+					))}
 					<TouchableOpacity onPress={handelGetImage}>
 						<Text>사진바꿔치기!</Text>
 					</TouchableOpacity>

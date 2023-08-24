@@ -24,6 +24,7 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
+			console.log('띠영', userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,

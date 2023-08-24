@@ -63,7 +63,10 @@ export default function Timetable({navigation}: any) {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
+			console.log('아디아디123벅', travelId);
 			if (travelId == '') {
+				console.log('아디아디벅', travelId);
 				const data = {
 					userId: userId,
 					region: makeMode ? region : ['자유여행'],

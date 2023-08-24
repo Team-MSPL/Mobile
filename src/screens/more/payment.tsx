@@ -14,11 +14,26 @@ export default function Payment({navigation}: any) {
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};
+	const handlePayment = (e: number) => {
+		Alert.alert(`국민 950002-00-251241 ${e}원 보내세요.`);
+	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
-			<TouchableOpacity>
-				<Text>1000원 결제! </Text>
-			</TouchableOpacity>
+			{paymentViewList.map((item, idx) => (
+				<TouchableOpacity
+					style={{marginVertical: 10}}
+					onPress={() => {
+						handlePayment(item.pay);
+					}}>
+					<Text>{item.title}</Text>
+					<Text>{item.pay}원 입니다</Text>
+				</TouchableOpacity>
+			))}
 		</ScrollView>
 	);
 }
+const paymentViewList = [
+	{title: '토큰 10개', pay: 1000},
+	{title: '토큰 50개', pay: 5000},
+	{title: '토큰 100개', pay: 10000},
+];

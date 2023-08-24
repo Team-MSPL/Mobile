@@ -66,10 +66,10 @@ export default function FinalCheck({navigation}: any) {
 					idx != 0 &&
 					idx != accommodations.length - 1 && (
 						<HStack key={idx}>
-							{item.imageUrl && (
+							{item.photo && (
 								<Image
 									source={{
-										uri: item.imageUrl,
+										uri: item.photo,
 									}}
 									style={{width: 50, height: 50}}
 									alt='Place Image'
@@ -90,7 +90,7 @@ export default function FinalCheck({navigation}: any) {
 							<HStack key={data.id}>
 								<Image
 									source={{
-										uri: data.imageUrl,
+										uri: data.photo,
 									}}
 									style={{width: 50, height: 50}}
 									alt='Place Image'

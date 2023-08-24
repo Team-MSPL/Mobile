@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, SafeAreaView, StatusBar, useColorScheme, Linking} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -20,9 +20,12 @@ import {loginSliceActions, socialConnect} from './src/redux/user/login.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {KAKAO_NATIVE_KEY} from '@env';
+import {userSliceActions} from './src/redux/user/user.slice';
+import ViewPager from './src/utill/view-pager';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
+	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -69,8 +72,23 @@ function App(): JSX.Element {
 			console.log('왔섭');
 		});
 	};
+	const checkFirstLaunch = async () => {
+		try {
+			const firstLaunch = await AsyncStorage.getItem('isFirstLaunch');
+			console.log('아니 왜 ㅋㅋㅋ ', firstLaunch);
+			if (firstLaunch == null) {
+				dispatch(userSliceActions.setIsFirstLaunch('true'));
+				return true;
+			} else {
+				return false;
+			}
+		} catch {
+			return false;
+		}
+	};
 	useEffect(() => {
 		getAllKeys();
+		checkFirstLaunch();
 		getDeepLink();
 	}, []);
 	const linking = {
@@ -90,7 +108,8 @@ function App(): JSX.Element {
 			/>
 			<NativeBaseProvider>
 				<NavigationContainer linking={linking}>
-					<StackNavigator />
+					{isFirstLaunch == 'true' ? <ViewPager /> : <StackNavigator />}
+
 					{Boolean(isLoading) && <Loading />}
 				</NavigationContainer>
 			</NativeBaseProvider>

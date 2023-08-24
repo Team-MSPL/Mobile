@@ -1,7 +1,7 @@
 import {useState, memo, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native';
+import {TouchableOpacity, Modal, Image} from 'react-native';
 import {
 	googleKeywordApi,
 	recommendApi,
@@ -9,6 +9,7 @@ import {
 	travelSliceActions,
 } from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
+import {GOOGLE_API_KEY} from '@env';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -154,6 +155,12 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											}}>
 											{/* h= takenTime top=시간위치 */}
 											<Text>{value.name}</Text>
+
+											{value.photo != '' && (
+												<Image
+													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
+													style={{width: 100, height: 100}}></Image>
+											)}
 										</TouchableOpacity>
 									);
 								})}

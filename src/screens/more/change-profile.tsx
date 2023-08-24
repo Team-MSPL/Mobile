@@ -21,10 +21,10 @@ export default function ChangeProfile({navigation}: any) {
 			multiple: false,
 			mediaType: 'photo',
 			cropping: true,
-			includeBase64: Platform.OS == 'android',
+			includeBase64: true,
 		}).then(response => {
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setImage(response.path);
+			setImage(`data:${response.mime};base64,${response?.data}`);
 			console.log('이미지 주소', response.path);
 		});
 	};
