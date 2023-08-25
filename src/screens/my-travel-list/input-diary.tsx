@@ -6,8 +6,8 @@ import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
 import CustomButton from '../../utill/component/custom-button';
-import {updateDiary} from '../../redux/community/community.slice';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import {updateDiary} from '../../redux/travel-info/travel.slice';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);

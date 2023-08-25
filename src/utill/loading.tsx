@@ -1,6 +1,8 @@
 import {Box, Center, Image} from 'native-base';
 import React from 'react';
 import {WithLocalSvg} from 'react-native-svg';
+import LottieView from 'lottie-react-native';
+import LoadingSplash from './loading-splash';
 export default function Loading() {
 	return (
 		<Center position='absolute' display='flex' bgColor='rgba(0, 0, 0, 0.4)' w='100%' h='100%'>
@@ -11,6 +13,7 @@ export default function Loading() {
 				height={24}
 				alt='icon'
 			/>
+			{/* <LoadingSplash /> */}
 		</Center>
 	);
 }

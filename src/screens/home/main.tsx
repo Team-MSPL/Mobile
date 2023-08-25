@@ -6,6 +6,7 @@ import {getPostList} from '../../redux/community/community.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import KakaoShareLink from 'react-native-kakao-share-link';
+import {KAKAO_NATIVE_KEY} from '@env';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		dispatch(travelSliceActions.setMakeMode(true));
@@ -22,23 +23,44 @@ export default function Main({navigation}: any) {
 	};
 	const zkrhdrhrh = async () => {
 		try {
-			const response = await KakaoShareLink.sendText({
-				text: '타타타타',
+			const message = {
+				title: '카카오톡 공유 테스트',
+				description: '카카오톡으로 메시지를 공유합니다!',
+				image_url: '이미지_URL',
 				link: {
-					webUrl: 'http://danim.me',
-					mobileWebUrl: 'http://danim.me',
+					web_url: '링크_URL',
+					mobile_web_url: '모바일_링크_URL',
 				},
-				buttons: [
-					{
-						title: '앱에서 볼래',
-						link: {
-							androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
-							iosExecutionParams: [{key: 'key1', value: 'value1'}],
-						},
-					},
-				],
-			});
-			console.log(response);
+			};
+
+			const link = `kakaolink://send?linkver=4.0&appkey=${KAKAO_NATIVE_KEY}&appver=1.0.0&template_id=97605&template_args=${encodeURIComponent(
+				JSON.stringify(message),
+			)}`;
+
+			const canOpen = await Linking.canOpenURL(link);
+
+			if (canOpen) {
+				Linking.openURL(link);
+			} else {
+				console.log('카카오톡이 설치되어 있지 않습니다.');
+			}
+			// const response = await KakaoShareLink.sendText({
+			// 	text: '타타타타',
+			// 	link: {
+			// 		webUrl: 'http://danim.me',
+			// 		mobileWebUrl: 'http://danim.me',
+			// 	},
+			// 	buttons: [
+			// 		{
+			// 			title: '앱에서 볼래',
+			// 			link: {
+			// 				androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
+			// 				iosExecutionParams: [{key: 'key1', value: 'value1'}],
+			// 			},
+			// 		},
+			// 	],
+			// });
+			// console.log(response);
 		} catch (err) {
 			console.log(err);
 			Alert.alert('카공중에 에러가 뜨다니');

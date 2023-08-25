@@ -76,6 +76,7 @@ export const axiosNaver = axios.create({
 export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data, thunkAPI) => {
 	try {
 		console.log('여행옴', thunkAPI.getState().userSlice.userId);
+		console.log('왜왜오왜ㅜㅠㅜㅠㅜㅜㅠㅜㅠㅜㅠㅜㅠ', axiosAuth.defaults.headers);
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
 		console.log('여행안오');
 		console.log(response.data);

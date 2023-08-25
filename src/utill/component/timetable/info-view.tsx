@@ -159,7 +159,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											{value.photo != '' && (
 												<Image
 													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
-													style={{width: 100, height: 100}}></Image>
+													style={{width: 30, height: 30}}></Image>
 											)}
 										</TouchableOpacity>
 									);

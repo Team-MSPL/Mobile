@@ -59,8 +59,7 @@ export default function DetailInfo({navigation}: any) {
 		navigation.navigate('InputReviewAndPoint');
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
-		console.log(picture.length);
-		//navigation.navigate('Timetable');
+		navigation.navigate('Timetable');
 	};
 	useFocusEffect(
 		useCallback(() => {
