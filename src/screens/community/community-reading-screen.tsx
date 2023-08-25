@@ -7,7 +7,6 @@ import {
 	ActivityIndicator,
 	Alert,
 	AlertButton,
-	Button,
 	Dimensions,
 	FlatList,
 	Image,
@@ -21,8 +20,8 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
 
+import ActionSheet from 'react-native-actionsheet';
 import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -80,40 +79,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postData} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 
-	const deviceHeight = Dimensions.get('window').height;
-	const communityReadingMenuList = [
-		{
-			title: '수정',
-			onPress: () => {
-				console.log('글 수정 페이지로 이동');
-				closeModal('menu');
-				goCommunityWritingScreen();
-			},
-		},
-		{
-			title: '삭제',
-			onPress: () => {
-				console.log('삭제 페이지로 이동');
-				closeModal('menu');
-				postDeleteCheckAlert();
-			},
-		},
-		{
-			title: '신고',
-			onPress: () => {
-				console.log('신고 페이지로 이동');
-				openModal('reportPost');
-				closeModal('menu');
-			},
-		},
-		{
-			title: '취소',
-			onPress: () => {
-				console.log('취소');
-				closeModal('menu');
-			},
-		},
-	];
+	const communityReadingMenuActionSheet = useRef<ActionSheet>(null);
+	const reportPostActionSheet = useRef<ActionSheet>(null);
+
+	const showCommunityReadingMenuActionSheet = () => {
+		communityReadingMenuActionSheet.current?.show();
+	};
+
+	const showReportActionSheet = () => {
+		console.log('sadfasfasf');
+		reportPostActionSheet.current?.show();
+	};
 
 	// 게시글 신고 메뉴
 	const postReportMenuList = [
@@ -330,8 +306,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					<View>
 						<TouchableOpacity
 							onPress={() => {
-								openModal('menu');
+								//openModal('menu');
 								//setIsMenuModalVisible(true);
+								showCommunityReadingMenuActionSheet();
 							}}>
 							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
@@ -553,84 +530,56 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	}, []);
 	useFocusEffect(onFocusEffect);
 
-	const actionSheetRef = useRef<ActionSheetRef>(null);
+	function doNothing(): any {
+		// 아무것도 하지 않음
+	}
+
+	const communityReadingMenuOptionList: {options: string[]; onPress: (() => void)[]} = {
+		options: ['수정', '삭제', '신고', '취소'],
+		onPress: [goCommunityWritingScreen, postDeleteCheckAlert, showReportActionSheet, doNothing],
+	};
+
+	const reportPostOptionList: {options: string[]; onPress: (() => Promise<void>)[]} = {
+		options: [
+			'무분별한 도배',
+			'정당/정치인 비하 및 선거운동',
+			'욕설/비하',
+			'상업적 광고 및 판매',
+			'음란물/불건전한 만남 및 대화',
+			'유출/사칭/사기',
+			'취소',
+		],
+		onPress: [
+			() => handlePostReport('무분별한 도배'),
+			() => handlePostReport('정당/정치인 비하 및 선거운동'),
+			() => handlePostReport('욕설/비하'),
+			() => handlePostReport('상업적 광고 및 판매'),
+			() => handlePostReport('음란물/불건전한 만남 및 대화'),
+			() => handlePostReport('유출/사칭/사기'),
+			doNothing,
+		],
+	};
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<AvoidSoftInputView></AvoidSoftInputView>
-			{/* 게시글 메뉴 모달 */}
-			<Modal
-				animationIn='slideInUp'
-				isVisible={isMenuModalVisible}
-				backdropOpacity={0.5}
-				useNativeDriverForBackdrop={true}
-				onBackdropPress={() => closeModal('menu')}
-				onBackButtonPress={() => closeModal('menu')}
-				style={{margin: 8, justifyContent: 'flex-end'}}>
-				<SafeAreaView>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
-						}}>
-						<View>
-							<Text
-								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
-								}}>
-								게시판 메뉴
-							</Text>
-							<FlatList
-								data={
-									userId == postData.postWriterUserId
-										? communityReadingMenuList
-										: communityReadingMenuList.filter(item => item.title == '신고')
-								}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
-					</View>
-				</SafeAreaView>
-			</Modal>
-
-			{/* 신고 메뉴 모달 */}
-			<ActionSheet ref={actionSheetRef}>
-				<SafeAreaView>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
-						}}>
-						<View>
-							<Text
-								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
-								}}>
-								신고 사유
-							</Text>
-							<FlatList
-								data={postReportMenuList}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
-					</View>
-				</SafeAreaView>
-			</ActionSheet>
-
+			<ActionSheet
+				ref={communityReadingMenuActionSheet}
+				title={'글 메뉴'}
+				options={communityReadingMenuOptionList.options}
+				cancelButtonIndex={3}
+				onPress={(index: number) => {
+					communityReadingMenuOptionList.onPress[index]();
+				}}
+			/>
+			<ActionSheet
+				ref={reportPostActionSheet}
+				title={'신고 사유 선택'}
+				options={reportPostOptionList.options}
+				cancelButtonIndex={6}
+				onPress={(index: number) => {
+					reportPostOptionList.onPress[index]();
+				}}
+			/>
 			<View style={styles.postNCommentContainer}>
 				{isLoading ? (
 					<ActivityIndicator size='large' color='#0000ff' />
