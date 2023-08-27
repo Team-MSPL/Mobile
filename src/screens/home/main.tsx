@@ -5,11 +5,9 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import KakaoShareLink from 'react-native-kakao-share-link';
-import {KAKAO_NATIVE_KEY} from '@env';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		dispatch(travelSliceActions.setMakeMode(true));
+		//dispatch(travelSliceActions.setMakeMode('recommend'));
 		navigation.navigate('SelectCity');
 	};
 	const {userProfileImage, userName} = useAppSelector(state => state.userSlice);
@@ -21,51 +19,7 @@ export default function Main({navigation}: any) {
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
 	};
-	const zkrhdrhrh = async () => {
-		try {
-			const message = {
-				title: '카카오톡 공유 테스트',
-				description: '카카오톡으로 메시지를 공유합니다!',
-				image_url: '이미지_URL',
-				link: {
-					web_url: '링크_URL',
-					mobile_web_url: '모바일_링크_URL',
-				},
-			};
 
-			const link = `kakaolink://send?linkver=4.0&appkey=${KAKAO_NATIVE_KEY}&appver=1.0.0&template_id=97605&template_args=${encodeURIComponent(
-				JSON.stringify(message),
-			)}`;
-
-			const canOpen = await Linking.canOpenURL(link);
-
-			if (canOpen) {
-				Linking.openURL(link);
-			} else {
-				console.log('카카오톡이 설치되어 있지 않습니다.');
-			}
-			// const response = await KakaoShareLink.sendText({
-			// 	text: '타타타타',
-			// 	link: {
-			// 		webUrl: 'http://danim.me',
-			// 		mobileWebUrl: 'http://danim.me',
-			// 	},
-			// 	buttons: [
-			// 		{
-			// 			title: '앱에서 볼래',
-			// 			link: {
-			// 				androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
-			// 				iosExecutionParams: [{key: 'key1', value: 'value1'}],
-			// 			},
-			// 		},
-			// 	],
-			// });
-			// console.log(response);
-		} catch (err) {
-			console.log(err);
-			Alert.alert('카공중에 에러가 뜨다니');
-		}
-	};
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -78,11 +32,7 @@ export default function Main({navigation}: any) {
 			),
 		});
 	}, []);
-	useEffect(() => {
-		//axiosAuth.defaults.headers.Authorization = `Bearer qwe`;
-		dispatch(getMyTravelList());
-		dispatch(getPostList());
-	}, []);
+
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Image source={{uri: userProfileImage}} style={{width: 100, height: 100}}></Image>
@@ -152,9 +102,6 @@ export default function Main({navigation}: any) {
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.goBack()}>
 				<Text>로그아웃</Text>
-			</TouchableOpacity>
-			<TouchableOpacity onPress={zkrhdrhrh}>
-				<Text>카공</Text>
 			</TouchableOpacity>
 			<Box h='10'></Box>
 		</ScrollView>

@@ -1,7 +1,7 @@
 import {useState, memo, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Modal, Image} from 'react-native';
+import {TouchableOpacity, Modal, Image, Alert} from 'react-native';
 import {
 	googleKeywordApi,
 	recommendApi,
@@ -42,7 +42,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
 		if (timetable[e.idx].length == 0) {
-			console.log('한개밖에 없어서 못해여');
+			Alert.alert('참고할게 한개밖에 없어서 못해요');
 		} else {
 			let lat = 0;
 			let lng = 0;
@@ -124,11 +124,9 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 													} else {
 														copy.push(value.id);
 													}
-													console.log(value.id);
 													setDeleteList(copy);
 												} else {
 													//지금 임시로 카페를 식당으로 치환 카테고리=음식점이고 경도없을떄.
-													console.log(value.category);
 													if (
 														value.name == '점심 추천' ||
 														value.name == '저녁 추천' ||
@@ -195,7 +193,6 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 						<TouchableOpacity
 							style={{height: 60}}
 							onPress={() => {
-								console.log(indexRef.current);
 								const a = timetable.map((item, idx) =>
 									item.filter(value => value.id != indexRef.current.value?.id),
 								);

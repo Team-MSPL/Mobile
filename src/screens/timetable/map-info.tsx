@@ -27,12 +27,11 @@ export default function MapInfo({navigation}: any) {
 			{duration: 1000},
 		);
 	};
+	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
-		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${
-			timetable[select][e].name
-		}&dlat=${timetable[select][e + 1].lat}&dlng=${timetable[select][e + 1].lng}&dname=${
-			timetable[select][e + 1].name
-		}&appname=다님`;
+		let navigationIndex = e + 1;
+		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
+		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
 		const supported = await Linking.canOpenURL(url);
 		if (supported) {
 			await Linking.openURL(url);
@@ -134,34 +133,32 @@ export default function MapInfo({navigation}: any) {
 						),
 				)}
 
-				{timetable[select].map((value, index) =>
-					index != timetable[select].length - 1 ? (
-						<Box key={index}>
-							<TouchableOpacity
-								onPress={() => {
-									moveRegion(index);
-								}}>
-								<Text>{value.name}</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								onPress={() => {
-									goNavigation(index);
-								}}
-								style={{marginTop: 20}}>
-								<Text>이동</Text>
-							</TouchableOpacity>
-						</Box>
-					) : (
-						<Box key={index}>
-							<TouchableOpacity
-								onPress={() => {
-									moveRegion(index);
-								}}>
-								<Text>{value.name}</Text>
-							</TouchableOpacity>
-						</Box>
-					),
-				)}
+				{timetable[select].map((value, index) => {
+					if (!excludeNames.includes(value.name)) {
+						return (
+							<Box key={index}>
+								<TouchableOpacity
+									onPress={() => {
+										moveRegion(index);
+									}}>
+									<Text>{value.name}</Text>
+								</TouchableOpacity>
+								{index !== timetable[select].length - 1 &&
+									timetable[select][index + 1].name != '숙소 추천' && (
+										<TouchableOpacity
+											onPress={() => {
+												goNavigation(index);
+											}}
+											style={{marginTop: 20}}>
+											<Text>이동</Text>
+										</TouchableOpacity>
+									)}
+							</Box>
+						);
+					} else {
+						return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
+					}
+				})}
 			</VStack>
 		</ScrollView>
 	);

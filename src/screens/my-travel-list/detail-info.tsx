@@ -15,8 +15,10 @@ import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
+
+import KakaoShareLink from 'react-native-kakao-share-link';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
+	const {travelId, nDay, day, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -59,7 +61,43 @@ export default function DetailInfo({navigation}: any) {
 		navigation.navigate('InputReviewAndPoint');
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
+		dispatch(travelSliceActions.setMakeMode('modify'));
 		navigation.navigate('Timetable');
+	};
+
+	const goKakaoShare = async () => {
+		try {
+			const response = await KakaoShareLink.sendFeed({
+				content: {
+					title: region[0],
+					imageUrl: 'http://danim.me/moon.jpeg',
+					link: {
+						webUrl: 'http://danim.me',
+						mobileWebUrl: 'http://danim.me',
+					},
+					description: moment(day[0]).format('YY-MM-DD') + '~' + moment(day[nDay]).format('YY-MM-DD'),
+				},
+				buttons: [
+					{
+						title: '앱에서 보기',
+						link: {
+							androidExecutionParams: [
+								{key: 'kakaolink', value: 'Timetable'},
+								{key: 'whatId', value: travelId},
+							],
+							iosExecutionParams: [
+								{key: 'key1', value: 'value1'},
+								{key: 'key2', value: 'value2'},
+							],
+						},
+					},
+				],
+			});
+			console.log(response);
+		} catch (err) {
+			console.log(err);
+			Alert.alert('카공중에 에러가 뜨다니');
+		}
 	};
 	useFocusEffect(
 		useCallback(() => {
@@ -82,7 +120,9 @@ export default function DetailInfo({navigation}: any) {
 				</TouchableOpacity>
 			)}
 			{picture && picture.length != 0 ? (
-				picture.map((item, idx) => <Image source={{uri: item}} style={{width: 100, height: 100}}></Image>)
+				picture.map((item, idx) => (
+					<Image key={idx} source={{uri: item}} style={{width: 100, height: 100}}></Image>
+				))
 			) : (
 				<Text>사진 없어용</Text>
 			)}
@@ -100,6 +140,12 @@ export default function DetailInfo({navigation}: any) {
 			<TouchableOpacity style={{marginVertical: 10}} onPress={goTimetable}>
 				<Text bold fontSize='lg'>
 					탐테구경 레츠고!
+				</Text>
+			</TouchableOpacity>
+
+			<TouchableOpacity style={{marginVertical: 10}} onPress={goKakaoShare}>
+				<Text bold fontSize='lg'>
+					카카오톡 공유 레츠고!
 				</Text>
 			</TouchableOpacity>
 

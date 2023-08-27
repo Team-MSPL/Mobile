@@ -64,6 +64,7 @@ export default function SelectCity({navigation}: any) {
 	};
 	useEffect(() => {
 		dispatch(travelSliceActions.reset());
+		dispatch(travelSliceActions.setMakeMode('recommend'));
 	}, []);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>

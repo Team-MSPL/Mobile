@@ -2,6 +2,7 @@ import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, us
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	getDrivingDuration,
+	getOneTravelCourse,
 	saveTravel,
 	travelSliceActions,
 	updateTravelCourse,
@@ -13,7 +14,7 @@ import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
 import Background from '../../utill/component/timetable/background';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-export default function Timetable({navigation}: any) {
+export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId} = useAppSelector(
 		state => state.travelSlice,
 	);
@@ -47,9 +48,8 @@ export default function Timetable({navigation}: any) {
 				}
 			}
 			console.log('여기는 왓군요?');
-			if (travelId == '') {
-				dispatch(travelSliceActions.drawTimetable());
-			}
+
+			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
 			console.log('에러요', err);
 		} finally {
@@ -69,7 +69,7 @@ export default function Timetable({navigation}: any) {
 				console.log('아디아디벅', travelId);
 				const data = {
 					userId: userId,
-					region: makeMode ? region : ['자유여행'],
+					region: makeMode == 'recommend' ? region : ['자유여행'],
 					day: day,
 					nDay: nDay + 1,
 					transit: transit,
@@ -100,8 +100,10 @@ export default function Timetable({navigation}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		makeMode && getDuration();
+		console.log('케케케ㅔ케케');
+		makeMode == 'recommend' && getDuration();
 		console.log(makeMode ? '옴' : '혼자');
+		console.log('지다지', makeMode);
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
