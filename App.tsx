@@ -25,6 +25,7 @@ import ViewPager from './src/utill/view-pager';
 import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
 import usePermission from './src/utill/hooks/usePermisson';
 import NeedPermissions from './src/utill/need-permissions';
+import LottieSplashScreen from 'react-native-lottie-splash-screen';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -123,6 +124,7 @@ function App(): JSX.Element {
 	useEffect(() => {
 		getAllKeys();
 		checkFirstLaunch();
+		LottieSplashScreen.hide();
 	}, []);
 	const linking = {
 		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],

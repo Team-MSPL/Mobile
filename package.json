@@ -41,6 +41,7 @@
 		"react-native-google-places-autocomplete": "^2.5.1",
 		"react-native-image-crop-picker": "^0.40.0",
 		"react-native-kakao-share-link": "^1.0.10",
+		"react-native-lottie-splash-screen": "^1.1.2",
 		"react-native-maps": "^1.7.1",
 		"react-native-modal": "^13.0.1",
 		"react-native-permissions": "^3.8.4",

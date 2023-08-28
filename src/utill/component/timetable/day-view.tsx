@@ -4,7 +4,7 @@ import {useAppSelector} from '../../../redux';
 import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
-	const {day, nDay} = useAppSelector(state => state.travelSlice);
+	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
 
 	const goRight = () => {
@@ -14,7 +14,9 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 		viewDayIndex - 5 < 0 ? setViewDayIndex(0) : setViewDayIndex(viewDayIndex - 4);
 	};
 	const goMapInfo = (e: number) => {
-		nDay < e ? Alert.alert('보여줄게없어유') : navigation.navigate('MapInfo', {mapIndex: e});
+		nDay < e || timetable[e].length == 0
+			? Alert.alert('보여줄게없어유')
+			: navigation.navigate('MapInfo', {mapIndex: e});
 	};
 	return (
 		<Box>

@@ -1,4 +1,4 @@
-import {Image} from 'react-native';
+import {Alert, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -35,15 +35,18 @@ export default function FinalCheck({navigation}: any) {
 					transit: transit,
 					distanceSensitivity: distance,
 				}),
-			);
+			).unwrap();
+			console.log('하하하', result);
 			dispatch(travelSliceActions.selectRegion(a));
-			console.log('넹?', result.meta);
 			if (result) {
 				navigation.popToTop();
 				navigation.navigate('Preset');
+				!result.data.enoughPlace && Alert.alert('관광지가 좀 부족하네유 ㅠ');
+			} else {
+				Alert.alert('추천을 받는 중 에러가 발생했습니다.');
 			}
 		} catch (error) {
-			console.log(error);
+			Alert.alert('추천을 받는 중 에러가 발생했습니다.');
 		} finally {
 			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
 			dispatch(LoadingSliceActions.offLoading());

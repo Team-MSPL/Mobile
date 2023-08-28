@@ -182,7 +182,7 @@ export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelA
 		console.log('케케케', response.data);
 		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data);
 		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
-		return response.data.data.resultData;
+		return response.data;
 	} catch (error) {
 		console.log(error);
 		return error;
@@ -318,7 +318,7 @@ export const travelSlice = createSlice({
 			state.presetDatas = payload;
 		},
 		enrollTimetable: (state, {payload}) => {
-			state.timetable = state.presetDatas[payload];
+			state.timetable = payload;
 			state.tableShowFlag = true;
 		},
 		drawTimetable: state => {
@@ -426,7 +426,7 @@ export const travelSlice = createSlice({
 			state.recommendList = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
-			state.presetDatas = payload;
+			state.presetDatas = payload.data.resultData;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
 			console.log('페페', payload);

@@ -13,6 +13,8 @@ const initialUserState: UserState = {
 	socialloginProvider: undefined,
 	isLogin: false,
 	isFirstLaunch: 'false',
+	dailyReward: false,
+	signUpReward: false,
 };
 
 // 로그아웃
@@ -82,12 +84,14 @@ const userSlice = createSlice({
 	initialState: initialUserState,
 	reducers: {
 		setUserInfo(state, {payload}) {
+			console.log('에에에에에에에에에에', payload);
 			state.userId = payload.userId;
 			state.userName = payload.userName;
 			state.userProfileImage = payload.userProfileImage;
 			state.userJwtToken = payload.userjwtToken;
 			state.functionToken = payload.functionToken;
 			state.socialloginProvider = payload.loginProvider;
+			state.dailyReward = payload.dailyReward;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -102,6 +106,9 @@ const userSlice = createSlice({
 		},
 		setIsFirstLaunch(state, {payload}) {
 			state.isFirstLaunch = payload;
+		},
+		setSignUpReward(state, {payload}) {
+			state.signUpReward = payload;
 		},
 	},
 	extraReducers: builder => {
@@ -148,4 +155,6 @@ export interface UserState {
 	functionToken: number;
 	userProfileImage: string;
 	isFirstLaunch: string;
+	dailyReward: boolean;
+	signUpReward: boolean;
 }

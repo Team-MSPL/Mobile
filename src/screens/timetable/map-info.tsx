@@ -46,10 +46,29 @@ export default function MapInfo({navigation, route}: any) {
 		}
 	};
 	const mapRef = useRef<MapView>(null);
-	const polylineCoordinates = timetable[select].map((item, value) => ({latitude: item.lat, longitude: item.lng}));
-	const markers = timetable[select].map((value, idx) => (
-		<Marker key={`marker_${idx}`} coordinate={{latitude: value.lat, longitude: value.lng}} title={value.name} />
-	));
+
+	const polylineCoordinates = timetable[select]
+		.map((item, value) => {
+			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+				return {latitude: item.lat, longitude: item.lng};
+			}
+			return null;
+		})
+		.filter(items => items !== null);
+	const markers = timetable[select]
+		.map((value, idx) => {
+			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				return (
+					<Marker
+						key={`marker_${idx}`}
+						coordinate={{latitude: value.lat, longitude: value.lng}}
+						title={value.name}
+					/>
+				);
+			}
+			return null;
+		})
+		.filter(marker => marker !== null);
 	const polylines = timetable[select].map((val, ind) => (
 		<Polyline
 			key={`polyline_${ind}`}
@@ -92,6 +111,7 @@ export default function MapInfo({navigation, route}: any) {
 		}
 		console.log(route.params.mapIndex);
 		console.log(select);
+		console.log('하이이이', markers);
 	}, []);
 	const goBack = () => {
 		navigation.goBack();

@@ -18,10 +18,29 @@ export default function Recommend({navigation, route}: any) {
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 
-	const polylineCoordinates = recommendItem.map((item, value) => ({latitude: item.lat, longitude: item.lng}));
-	const markers = recommendItem.map((value, idx) => (
-		<Marker key={`marker_${idx}`} coordinate={{latitude: value.lat, longitude: value.lng}} title={value.name} />
-	));
+	const polylineCoordinates = recommendItem
+		.map((item, value) => {
+			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+				return {latitude: item.lat, longitude: item.lng};
+			}
+			return null;
+		})
+		.filter(items => items !== null);
+	const markers = recommendItem
+		.map((value, idx) => {
+			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				return (
+					<Marker
+						key={`marker_${idx}`}
+						coordinate={{latitude: value.lat, longitude: value.lng}}
+						title={value.name}
+					/>
+				);
+			}
+			return null;
+		})
+		.filter(marker => marker !== null);
+
 	const polylines = recommendItem.map((val, ind) => (
 		<Polyline
 			key={`polyline_${ind}`}

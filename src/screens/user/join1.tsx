@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {socialConnect} from '../../redux/user/login.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 
@@ -24,6 +25,7 @@ export default function Join1({navigation, route}: any) {
 				signUpFlag: true,
 			};
 			const result = await dispatch(socialConnect(data));
+			dispatch(userSliceActions.setSignUpReward(true));
 			console.log(navigation);
 			navigation.replace('Tab');
 		} catch (err) {

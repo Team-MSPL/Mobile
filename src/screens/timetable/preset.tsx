@@ -25,7 +25,15 @@ export default function Preset({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const goNext = () => {
-		dispatch(travelSliceActions.enrollTimetable(select));
+		let copy = [...presetDatas[select]];
+		if (presetDatas[select].length != nDay + 1) {
+			const check = nDay + 1 - presetDatas[select].length;
+
+			for (let i = 0; i < check; i++) {
+				copy.push([]);
+			}
+		}
+		dispatch(travelSliceActions.enrollTimetable(copy));
 		navigation.popToTop();
 		navigation.navigate('Timetable');
 	};

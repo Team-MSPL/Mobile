@@ -29,7 +29,7 @@ export default function Timetable({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			console.log(timetable.length);
 			for (let i = 0; i < timetable.length; i++) {
-				if (timetable[i].length != 1) {
+				if (timetable[i].length > 1) {
 					for (let j = 0; j < timetable[i].length; j++) {
 						if (j === 0) {
 							wayPoint.start = `${timetable[i][j].lng},${timetable[i][j].lat}`;

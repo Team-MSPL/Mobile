@@ -12,11 +12,7 @@ const usePermission = () => {
 		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
 		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
 	];
-	const iosPermissions = [
-		PERMISSIONS.IOS.CAMERA,
-		PERMISSIONS.IOS.PHOTO_LIBRARY,
-		PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-	];
+	const iosPermissions = [PERMISSIONS.IOS.PHOTO_LIBRARY, PERMISSIONS.IOS.LOCATION_WHEN_IN_USE];
 	const androidSDKVersion = Platform.Version;
 	const needPermission =
 		Platform.OS === 'android'
