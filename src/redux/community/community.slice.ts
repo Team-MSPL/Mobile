@@ -229,7 +229,7 @@ export interface reportPostType {
 	reportedAt: string;
 	reportWriter: string;
 }
-interface reportCommentType extends reportPostType {
+export interface reportCommentType extends reportPostType {
 	commentId: string;
 }
 

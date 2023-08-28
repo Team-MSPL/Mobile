@@ -1,17 +1,14 @@
 import {HStack, ThreeDotsIcon} from 'native-base';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {
 	ActivityIndicator,
 	Alert,
-	AlertButton,
-	Button,
 	Dimensions,
 	FlatList,
 	Image,
-	NativeModules,
 	RefreshControl,
 	SafeAreaView,
 	ScrollView,
@@ -21,7 +18,9 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import ActionSheet from 'react-native-actionsheet';
 import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
+
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -31,6 +30,7 @@ import {
 	deleteComment,
 	deletePost,
 	getOnePost,
+	reportCommentType,
 	reportPost,
 	reportPostType,
 	saveComment,
@@ -38,7 +38,6 @@ import {
 	unclickLike,
 } from '../../redux/community/community.slice';
 
-const {StatusBarManager} = NativeModules;
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
 	const goBack = () => {
@@ -54,7 +53,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			postId: postData._id,
 			isNewPost: false,
 		});
-		console.log('자 넘어가라', postData._id);
 	};
 
 	const [commentContent, setCommentContent] = useState<string>('');
@@ -62,136 +60,41 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
 	const [isImageMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
-
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-	const [statusBarHeight, setStatusBarHeight] = useState(0);
 	const {userId, userName, userProfileImage} = useAppSelector(state => state.userSlice);
-
-	// 모달 관리
-	const [isMenuModalVisible, setIsMenuModalVisible] = useState<boolean>(false);
-	const [isReportPostModalVisible, setIsReportPostModalVisible] = useState<boolean>(false);
-	const [isCommentMenuModalVisible, setIsCommentMenuModalVisible] = useState<boolean>(false);
+	const [commentData, setCommentData] = useState<commentType>({
+		commentContent: '',
+		commentedAt: '',
+		commentWriter: '',
+		commentWriterUserId: '',
+		commentWriterProfile: '',
+		_id: '',
+	});
 
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postData} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 
-	const deviceHeight = Dimensions.get('window').height;
-	const communityReadingMenuList = [
-		{
-			title: '수정',
-			onPress: () => {
-				console.log('글 수정 페이지로 이동');
-				closeModal('menu');
-				goCommunityWritingScreen();
-			},
-		},
-		{
-			title: '삭제',
-			onPress: () => {
-				console.log('삭제 페이지로 이동');
-				closeModal('menu');
-				postDeleteCheckAlert();
-			},
-		},
-		{
-			title: '신고',
-			onPress: () => {
-				console.log('신고 페이지로 이동');
-				closeModal('menu');
-				openModal('reportPost');
-			},
-		},
-		{
-			title: '취소',
-			onPress: () => {
-				console.log('취소');
-				closeModal('menu');
-			},
-		},
-	];
+	const communityReadingOptionActionSheet = useRef<ActionSheet>(null);
+	const reportPostActionSheet = useRef<ActionSheet>(null);
+	const commentOptionActionSheet = useRef<ActionSheet>(null);
+	const actionSheetType = useRef<string>('게시글');
 
-	// 게시글 신고 메뉴
-	const postReportMenuList = [
-		{
-			title: '무분별한 도배',
-			onPress: () => {
-				handlePostReport('무분별한 도배');
-				console.log('무분별한 도배 신고');
-			},
-		},
-		{
-			title: '정당/정치인 비하 및 선거 운동',
-			onPress: () => {
-				handlePostReport('정당/정치인 비하 및 선거 운동');
-				console.log('정당/정치인 비하 및 선거 운동');
-			},
-		},
-		{
-			title: '욕설/비하',
-			onPress: () => {
-				handlePostReport('욕설/비하');
-				console.log('욕설/비하');
-			},
-		},
-		{
-			title: '상업적 광고 및 판매',
-			onPress: () => {
-				handlePostReport('상업적 광고 및 판매');
-				console.log('상업적 광고 및 판매');
-			},
-		},
-		{
-			title: '음란물/불건전한 만남 및 대화',
-			onPress: () => {
-				handlePostReport('음란물/불건전한 만남 및 대화');
-				console.log('음란물/불건전한 만남 및 대화');
-			},
-		},
-		{
-			title: '유출/사칭/사기',
-			onPress: () => {
-				handlePostReport('유출/사칭/사기');
-				console.log('유출/사칭/사기');
-			},
-		},
-		{
-			title: '취소',
-			onPress: () => {
-				console.log('취소');
-			},
-			style: 'destructive',
-		},
-	];
+	// 게시글 메뉴 액션 시트 보이기
+	const showCommunityReadingOptionActionSheet = () => {
+		communityReadingOptionActionSheet.current?.show();
+	};
 
-	const commentMenuList: AlertButton[] = [
-		{
-			text: '수정',
-			onPress: () => {
-				console.log('글 수정 페이지로 이동');
-				closeModal('menu');
-				//goCommunityWritingScreen();
-			},
-		},
-		{
-			text: '삭제',
-			onPress: () => {
-				console.log('삭제 페이지로 이동');
-				closeModal('menu');
-				postDeleteCheckAlert();
-			},
-		},
-		{
-			text: '신고',
-			onPress: () => {
-				console.log('신고 페이지로 이동');
-				closeModal('menu');
-				postReportAlert();
-			},
-		},
-	];
+	// 게시글 신고 액션 시트 보이기
+	const showReportActionSheet = () => {
+		reportPostActionSheet.current?.show();
+	};
+
+	// 게시글 신고 액션 시트 보이기
+	const showCommentOptionActionSheet = () => {
+		commentOptionActionSheet.current?.show();
+	};
 
 	// 게시글 지우기 확인창
 	const postDeleteCheckAlert = () => {
@@ -217,61 +120,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		);
 	};
 
-	// 게시글 신고창
-	const postReportAlert = () => {
-		Alert.alert('신고 사유를 선택해주세요.', '', [
-			{
-				text: '무분별한 도배',
-				onPress: () => {
-					handlePostReport('무분별한 도배');
-					console.log('무분별한 도배 신고');
-				},
-			},
-			{
-				text: '정당/정치인 비하 및 선거 운동',
-				onPress: () => {
-					handlePostReport('정당/정치인 비하 및 선거 운동');
-					console.log('정당/정치인 비하 및 선거 운동');
-				},
-			},
-			{
-				text: '욕설/비하',
-				onPress: () => {
-					handlePostReport('욕설/비하');
-					console.log('욕설/비하');
-				},
-			},
-			{
-				text: '상업적 광고 및 판매',
-				onPress: () => {
-					handlePostReport('상업적 광고 및 판매');
-					console.log('상업적 광고 및 판매');
-				},
-			},
-			{
-				text: '음란물/불건전한 만남 및 대화',
-				onPress: () => {
-					handlePostReport('음란물/불건전한 만남 및 대화');
-					console.log('음란물/불건전한 만남 및 대화');
-				},
-			},
-			{
-				text: '유출/사칭/사기',
-				onPress: () => {
-					handlePostReport('유출/사칭/사기');
-					console.log('유출/사칭/사기');
-				},
-			},
-			{
-				text: '취소',
-				onPress: () => {
-					console.log('취소');
-				},
-				style: 'destructive',
-			},
-		]);
-	};
-
 	// * 게시글 신고 기능
 	const handlePostReport = async (reason: string) => {
 		try {
@@ -287,6 +135,25 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
+		}
+	};
+
+	// 댓글 신고 기능
+	const handleCommentReport = async (reason: string, commentId: string) => {
+		try {
+			// db의 comment에 들어갈 정보들
+			const reportData: reportCommentType = {
+				postId: postData._id,
+				commentId: commentId,
+				reportReason: reason,
+				reportedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				reportWriter: userName,
+			};
+			await dispatch(reportPost(reportData));
+			Alert.alert('신고가 접수되었습니다.');
+			console.log(`"${reason}"`, '사유로 댓글 신고가 성공적으로 접수되었습니다.');
+		} catch (error) {
+			console.log('댓글 신고 접수 중에 오류가 발생했습니다:', error);
 		}
 	};
 
@@ -328,8 +195,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					<View>
 						<TouchableOpacity
 							onPress={() => {
-								openModal('menu');
-								//setIsMenuModalVisible(true);
+								actionSheetType.current = '게시글';
+								showCommunityReadingOptionActionSheet();
 							}}>
 							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
@@ -338,6 +205,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			},
 		});
 	}, []);
+
+	// const mounted = useRef<boolean>(false);
+	// useEffect(() => {
+	// 	if (!mounted.current) {
+	// 		mounted.current = true;
+	// 	} else {
+	// 		showCommentOptionActionSheet();
+	// 	}
+	// }, [commentData]);
 
 	// ---------------- useEffect 모음(끝) -------------------
 
@@ -443,48 +319,18 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							justifyContent: 'space-around',
 							alignItems: 'center',
 							flex: 2,
-							backgroundColor: 'red',
 						}}>
-						<TouchableOpacity
-							onPress={() => {
-								console.log('삭제 버튼 누름');
-								// TODO 본인의 댓글이라면 삭제할 수 있게 해야함.
-								handleDeleteComment(data.item._id);
-							}}>
-							<Text>삭제</Text>
-						</TouchableOpacity>
-
 						{/* 더보기 버튼 */}
 						<TouchableOpacity
 							onPress={() => {
-								console.log('더보기 버튼');
-								const commentMenuList: AlertButton[] = [
-									{
-										text: '삭제',
-										onPress: () => {
-											console.log('삭제 버튼 누름');
-											// TODO 본인의 댓글이라면 삭제할 수 있게 해야함.
-											//deleteComment(item._id);
-										},
-										style: 'destructive',
-									},
-									{
-										text: '수정',
-										onPress: () => {
-											console.log('수정 기능');
-										},
-									},
-									{
-										text: '취소',
-										onPress: () => {
-											console.log('취소');
-										},
-										style: 'cancel',
-									},
-								];
-								Alert.alert('더보기', '', commentMenuList);
+								setCommentData(data.item);
+								actionSheetType.current = '댓글';
+								console.log('더보기 버튼', commentData.commentContent);
+								console.log('userId', userId);
+								console.log('댓글 작성자 Id', commentData.commentWriterUserId);
+								showCommentOptionActionSheet();
 							}}>
-							<Text>더보기</Text>
+							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -520,28 +366,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
-	// 모달 열기 관리
-	const openModal = (type: string) => {
-		if (type == 'menu') {
-			setIsMenuModalVisible(true);
-		} else if (type == 'commentMenu') {
-			setIsCommentMenuModalVisible(true);
-		} else if (type == 'reportPost') {
-			setIsReportPostModalVisible(true);
-		}
-	};
-
-	// 모달 닫기 관리
-	const closeModal = (type: string) => {
-		if (type == 'menu') {
-			setIsMenuModalVisible(false);
-		} else if (type == 'commentMenu') {
-			setIsCommentMenuModalVisible(false);
-		} else if (type == 'reportPost') {
-			setIsReportPostModalVisible(false);
-		}
-	};
-
+	// 키보드 올라오기
 	const onFocusEffect = useCallback(() => {
 		AvoidSoftInput.setShouldMimicIOSBehavior(true);
 		return () => {
@@ -550,88 +375,99 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	}, []);
 	useFocusEffect(onFocusEffect);
 
-	return (
-		<View style={styles.container}>
-			<AvoidSoftInputView></AvoidSoftInputView>
-			{/* 게시글 메뉴 모달 */}
-			<Modal
-				animationIn='slideInUp'
-				isVisible={isMenuModalVisible}
-				backdropOpacity={0.5}
-				useNativeDriverForBackdrop={true}
-				onBackdropPress={() => closeModal('menu')}
-				onBackButtonPress={() => closeModal('menu')}
-				style={{margin: 8, justifyContent: 'flex-end'}}>
-				<SafeAreaView>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
-						}}>
-						<View>
-							<Text
-								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
-								}}>
-								게시판 메뉴
-							</Text>
-							<FlatList
-								data={
-									userId == postData.postWriterUserId
-										? communityReadingMenuList
-										: communityReadingMenuList.filter(item => item.title == '신고')
-								}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
-					</View>
-				</SafeAreaView>
-			</Modal>
+	function doNothing(): any {
+		// 아무것도 하지 않음
+	}
 
-			{/* 신고 메뉴 모달 */}
-			<Modal
-				animationIn='slideInUp'
-				isVisible={isReportPostModalVisible}
-				backdropOpacity={0.5}
-				useNativeDriverForBackdrop={true}
-				onBackdropPress={() => closeModal('reportPost')}
-				onBackButtonPress={() => closeModal('reportPost')}
-				style={{margin: 8, justifyContent: 'center'}}>
-				<SafeAreaView>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							width: '100%',
-							borderRadius: 10,
-							paddingHorizontal: 10,
-							maxHeight: deviceHeight * 0.4,
-						}}>
-						<View>
-							<Text
-								style={{
-									color: '#182E44',
-									fontSize: 20,
-									fontWeight: '500',
-									margin: 15,
-								}}>
-								신고 사유
-							</Text>
-							<FlatList
-								data={postReportMenuList}
-								renderItem={({item}) => (
-									<Button title={item.title} onPress={item.onPress}></Button>
-								)}></FlatList>
-						</View>
-					</View>
-				</SafeAreaView>
-			</Modal>
+	const communityReadingMenuOptionList: {options: string[]; onPress: (() => void)[]} = {
+		options: ['수정', '삭제', '신고', '취소'],
+		onPress: [goCommunityWritingScreen, postDeleteCheckAlert, showReportActionSheet, doNothing],
+	};
+
+	const reportOptionList: {
+		options: string[];
+		reportPost: (() => Promise<void>)[];
+		reportComment: (() => Promise<void>)[];
+	} = {
+		options: [
+			'무분별한 도배',
+			'정당/정치인 비하 및 선거운동',
+			'욕설/비하',
+			'상업적 광고 및 판매',
+			'음란물/불건전한 만남 및 대화',
+			'유출/사칭/사기',
+			'취소',
+		],
+		reportPost: [
+			() => handlePostReport('무분별한 도배'),
+			() => handlePostReport('정당/정치인 비하 및 선거운동'),
+			() => handlePostReport('욕설/비하'),
+			() => handlePostReport('상업적 광고 및 판매'),
+			() => handlePostReport('음란물/불건전한 만남 및 대화'),
+			() => handlePostReport('유출/사칭/사기'),
+			doNothing,
+		],
+		reportComment: [
+			() => handleCommentReport('무분별한 도배', commentData._id),
+			() => handleCommentReport('정당/정치인 비하 및 선거운동', commentData._id),
+			() => handleCommentReport('욕설/비하', commentData._id),
+			() => handleCommentReport('상업적 광고 및 판매', commentData._id),
+			() => handleCommentReport('음란물/불건전한 만남 및 대화', commentData._id),
+			() => handleCommentReport('유출/사칭/사기', commentData._id),
+			doNothing,
+		],
+	};
+
+	const commentOptionList: {options: string[]; onPress: (() => Promise<void>)[]} = {
+		options: ['삭제', '신고', '취소'],
+		onPress: [() => handleDeleteComment(commentData._id), () => showReportActionSheet(), doNothing],
+	};
+
+	return (
+		<SafeAreaView style={styles.container}>
+			<ActionSheet
+				ref={communityReadingOptionActionSheet}
+				title={'글 메뉴'}
+				options={
+					userId === postData.postWriterUserId
+						? communityReadingMenuOptionList.options
+						: communityReadingMenuOptionList.options.filter(item => item === '신고' || item === '취소')
+				}
+				cancelButtonIndex={userId == postData.postWriterUserId ? 3 : 1}
+				onPress={(index: number) => {
+					userId === postData.postWriterUserId
+						? communityReadingMenuOptionList.onPress[index]()
+						: communityReadingMenuOptionList.onPress.slice(2, 4)[index]();
+				}}
+			/>
+			<ActionSheet
+				ref={reportPostActionSheet}
+				title={'신고 사유 선택'}
+				options={reportOptionList.options}
+				cancelButtonIndex={6}
+				onPress={(index: number) => {
+					if (actionSheetType.current == '게시글') {
+						reportOptionList.reportPost[index]();
+					} else if (actionSheetType.current == '댓글') {
+						reportOptionList.reportComment[index]();
+					}
+				}}
+			/>
+			<ActionSheet
+				ref={commentOptionActionSheet}
+				title={'댓글 메뉴'}
+				options={
+					userId === commentData.commentWriterUserId
+						? commentOptionList.options
+						: commentOptionList.options.filter(item => item === '신고' || item === '취소')
+				}
+				cancelButtonIndex={userId === commentData.commentWriterUserId ? 2 : 1}
+				onPress={(index: number) => {
+					userId == commentData.commentWriterUserId
+						? commentOptionList.onPress[index]()
+						: commentOptionList.onPress.slice(1, 3)[index]();
+				}}
+			/>
 
 			<View style={styles.postNCommentContainer}>
 				{isLoading ? (
@@ -682,7 +518,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</View>
 
 			<View style={styles.inputContainer}>
-				<AvoidSoftInputView style={styles.inputContainer}>
+				<AvoidSoftInputView style={styles.commentInputFieldContainer}>
 					<TextInput
 						style={styles.commentInputField}
 						value={commentContent}
@@ -697,7 +533,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					</TouchableOpacity>
 				</AvoidSoftInputView>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -706,14 +542,21 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	postNCommentContainer: {
-		flex: 9,
+		flex: 8,
+		backgroundColor: 'red',
 	},
 	inputContainer: {
-		flex: 1,
+		flex: 2,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'white',
+		backgroundColor: 'blue',
+	},
+	commentInputFieldContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'green',
 	},
 	postContentText: {
 		fontSize: 16,
@@ -729,7 +572,7 @@ const styles = StyleSheet.create({
 		margin: 8,
 		alignSelf: 'center',
 		flexDirection: 'column',
-		backgroundColor: 'rgba(200, 200, 200, 0.8)',
+		backgroundColor: 'rgba(200, 200, 200, 0.2)',
 	},
 	commentProfileImage: {
 		width: 36,
@@ -741,15 +584,13 @@ const styles = StyleSheet.create({
 		resizeMode: 'cover',
 	},
 	commentInputField: {
-		flex: 7,
+		flex: 8,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
-		padding: 8,
-		margin: 4,
 	},
 	submitButton: {
-		flex: 1,
+		flex: 2,
 		backgroundColor: 'blue',
 		padding: 8,
 		justifyContent: 'center',
@@ -799,10 +640,6 @@ const styles = StyleSheet.create({
 		width: 100,
 		height: 100,
 		margin: 8,
-	},
-	keyboardContainer: {
-		flex: 1,
-		backgroundColor: '#ffffff',
 	},
 	likeContainer: {
 		justifyContent: 'center',
