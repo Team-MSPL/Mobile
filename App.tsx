@@ -62,25 +62,40 @@ function App(): JSX.Element {
 	};
 	const getDeepLink = async () => {
 		Linking.getInitialURL().then(async res => {
-			if (res == null || res == undefined || res == '') {
-				// 그냥 앱을 켰을때
+			try {
+				if (res == null || res == undefined || res == '') {
+					// 그냥 앱을 켰을때
 
-				return;
-			} else {
-				//앱이 꺼져있는데 켰을때
-				const pattern = /whatId=([a-zA-Z0-9]+)/;
-				const match = res.match(pattern) ?? '';
-				dispatch(travelSliceActions.setMakeMode('share'));
-				await dispatch(getOneTravelCourse({travelId: match[1]}));
+					return;
+				} else {
+					//앱이 꺼져있는데 켰을때
+					const pattern = /whatId=([a-zA-Z0-9]+)/;
+					const match = res.match(pattern) ?? '';
+					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+					if (q.payload == 0) {
+						Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+					} else {
+						dispatch(travelSliceActions.setMakeMode('share'));
+					}
+				}
+			} catch (err) {
+				Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
 			}
 		});
 		Linking.addEventListener('url', async e => {
-			//앱이 켜져있는데 켰을때
-			const pattern = /whatId=([a-zA-Z0-9]+)/;
-			const match = e.url.match(pattern) ?? '';
-
-			dispatch(travelSliceActions.setMakeMode('share'));
-			await dispatch(getOneTravelCourse({travelId: match[1]}));
+			try {
+				//앱이 켜져있는데 켰을때
+				const pattern = /whatId=([a-zA-Z0-9]+)/;
+				const match = e.url.match(pattern) ?? '';
+				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+				if (q.payload == 0) {
+					Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+				} else {
+					dispatch(travelSliceActions.setMakeMode('share'));
+				}
+			} catch (err) {
+				Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+			}
 		});
 	};
 	const checkFirstLaunch = async () => {

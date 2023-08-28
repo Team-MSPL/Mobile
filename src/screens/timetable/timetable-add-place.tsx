@@ -6,6 +6,7 @@ import {Text, Box, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
 import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import moment from 'moment';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -99,7 +100,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	}, []);
 	return (
 		<Box flex='1'>
-			<Text>날짜는 {day[route.params.x].format('YY-MM-DD')}</Text>
+			<Text>날짜는 {moment(day[route.params.x]).format('YY-MM-DD')}</Text>
 			<Text>
 				시간은! {(route.params.y[0] * 30 + 360) / 60}시 ~
 				{((route.params.y[route.params.y.length - 1] + 1) * 30 + 360) / 60}

@@ -7,20 +7,27 @@ const usePermission = () => {
 	const dispatch = useAppDispatch();
 	// OS별 필수 권한
 	const androidPermissions = [
+		PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, //33버전 이후부터는 얘만
 		PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-		PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
-		// PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-		// PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
+		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
 	];
 	const iosPermissions = [
 		PERMISSIONS.IOS.CAMERA,
 		PERMISSIONS.IOS.PHOTO_LIBRARY,
 		PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
 	];
-	const needPermission = Platform.OS === 'android' ? androidPermissions : iosPermissions;
+	const androidSDKVersion = Platform.Version;
+	const needPermission =
+		Platform.OS === 'android'
+			? androidSDKVersion >= 33
+				? androidPermissions.splice(0, 2)
+				: androidPermissions.splice(1, 3)
+			: iosPermissions;
 
 	// 앱 실행했을 때 혹은 로그아웃 이후 권한 체크
 	const checkInitialPermission = async () => {
+		console.log('ddddddddddddddddddddddddddddddddddddddd', androidSDKVersion);
 		const {hasBlocked, deniedList} = await checkPermissions();
 		if (hasBlocked || deniedList.length) dispatch(setPermission(false));
 		else dispatch(setPermission(true));

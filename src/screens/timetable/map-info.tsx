@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import BaseModal from '../../utill/base-modal';
 import SelectButton from '../../utill/component/select-button';
 
-export default function MapInfo({navigation}: any) {
+export default function MapInfo({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -77,14 +77,21 @@ export default function MapInfo({navigation}: any) {
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 
 	useEffect(() => {
-		for (let i = 0; i < timetable.length; i++) {
-			if (timetable[i].length != 0) {
-				a.current = true;
-				setVisible(false);
-				setSelect(i);
-				break;
+		if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
+			setSelect(route.params.mapIndex);
+			setVisible(false);
+		} else {
+			for (let i = 0; i < timetable.length; i++) {
+				if (timetable[i].length != 0) {
+					a.current = true;
+					setVisible(false);
+					setSelect(i);
+					break;
+				}
 			}
 		}
+		console.log(route.params.mapIndex);
+		console.log(select);
 	}, []);
 	const goBack = () => {
 		navigation.goBack();

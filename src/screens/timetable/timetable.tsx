@@ -15,9 +15,8 @@ import InfoView from '../../utill/component/timetable/info-view';
 import Background from '../../utill/component/timetable/background';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 export default function Timetable({navigation, route}: any) {
-	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag} =
+		useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [deleteList, setDeleteList] = useState<string[]>([]);
@@ -57,7 +56,7 @@ export default function Timetable({navigation, route}: any) {
 		}
 	};
 	const goMapInfo = () => {
-		navigation.navigate('MapInfo');
+		navigation.navigate('MapInfo', {mapIndex: -1});
 	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
@@ -109,49 +108,64 @@ export default function Timetable({navigation, route}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<Box>
-					{editMode == 'delete' ? (
-						<Box w='100%' h='60' alignItems='center'>
-							<TouchableOpacity
-								onPress={() => {
-									const a = timetable.map((item, idx) =>
-										item.filter(value => !deleteList.includes(value?.id ?? 'no')),
-									);
-									setDeleteList([]);
-									dispatch(travelSliceActions.changeTimetable(a));
-									console.log(a);
-								}}>
-								<Text>삭제요</Text>
-							</TouchableOpacity>
-						</Box>
-					) : editMode == 'add' ? (
-						<Box w='100%' h='60' alignItems='center'>
-							<TouchableOpacity
-								onPress={() => {
-									//console.log(addList);
-									navigation.navigate('TimetableAddPlace', {x: x, y: addList});
-									setAddList([]);
-									console.log('다음페이지');
-								}}>
-								<Text>추가요</Text>
-							</TouchableOpacity>
-						</Box>
+					{makeMode == 'share' ? (
+						<TouchableOpacity onPress={goMapInfo}>
+							<Text>지도 함 볼래?</Text>
+						</TouchableOpacity>
 					) : (
-						<HStack w='100%' h='60'>
-							<TouchableOpacity onPress={goMapInfo}>
-								<Text>지도 함 볼래?</Text>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={goSave}>
-								<Text>저장 함 해볼래?</Text>
-							</TouchableOpacity>
-						</HStack>
+						<>
+							{editMode == 'delete' ? (
+								<Box w='100%' h='60' alignItems='center'>
+									<TouchableOpacity
+										onPress={() => {
+											const a = timetable.map((item, idx) =>
+												item.filter(value => !deleteList.includes(value?.id ?? 'no')),
+											);
+											setDeleteList([]);
+											dispatch(travelSliceActions.changeTimetable(a));
+											console.log(a);
+										}}>
+										<Text>삭제요</Text>
+									</TouchableOpacity>
+								</Box>
+							) : editMode == 'add' ? (
+								<Box w='100%' h='60' alignItems='center'>
+									<TouchableOpacity
+										onPress={() => {
+											//console.log(addList);
+											navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+											setAddList([]);
+											console.log('다음페이지');
+										}}>
+										<Text>추가요</Text>
+									</TouchableOpacity>
+								</Box>
+							) : (
+								<HStack w='100%' h='60'>
+									<TouchableOpacity onPress={goMapInfo}>
+										<Text>지도 함 볼래?</Text>
+									</TouchableOpacity>
+									<TouchableOpacity onPress={goSave}>
+										<Text>저장 함 해볼래?</Text>
+									</TouchableOpacity>
+								</HStack>
+							)}
+						</>
 					)}
 				</Box>
 			),
 		});
-	}, [editMode, timetable, addList, deleteList, x]);
+	}, [editMode, timetable, addList, deleteList, x, makeMode]);
+
+	if (!tableShowFlag)
+		return (
+			<Box>
+				<Text>보여줄수없음</Text>
+			</Box>
+		);
 	return (
 		<Box bgColor='#EFFBFB'>
-			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} />
+			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
 			<Box>
 				<ScrollView position='relative' mb='230'>
 					<InfoView

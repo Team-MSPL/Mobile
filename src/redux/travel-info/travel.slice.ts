@@ -39,6 +39,7 @@ const initialState: LiteState = {
 	diary: '',
 	picture: [],
 	reviewCheck: false,
+	tableShowFlag: false,
 };
 
 export const axiosAuth = axios.create({
@@ -99,7 +100,7 @@ export const getOneTravelCourse = createAsyncThunk(
 			return response.data;
 		} catch (error) {
 			console.log(error);
-			return error;
+			return 0;
 		}
 	},
 );
@@ -318,6 +319,7 @@ export const travelSlice = createSlice({
 		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = state.presetDatas[payload];
+			state.tableShowFlag = true;
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
@@ -389,6 +391,7 @@ export const travelSlice = createSlice({
 		},
 		setMakeMode: (state, {payload}) => {
 			state.makeMode = payload;
+			state.tableShowFlag = true;
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);
@@ -431,8 +434,7 @@ export const travelSlice = createSlice({
 		});
 		builder.addCase(getOneTravelCourse.fulfilled, (state, {payload}) => {
 			console.log('목아파', payload.timetable);
-			const dayToMoment = payload.day.map(item => moment(item));
-			state.day = dayToMoment;
+			state.day = payload.day;
 			state.nDay = payload.nDay - 1;
 			state.region = payload.region;
 			state.timetable = payload.timetable;
@@ -484,6 +486,7 @@ interface LiteState {
 	diary: string;
 	picture: string[];
 	reviewCheck: boolean;
+	tableShowFlag: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

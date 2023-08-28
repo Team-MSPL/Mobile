@@ -81,7 +81,7 @@ export default function Modify({navigation, route}: any) {
 					}}>
 					<Text>{visible ? 'dd' : 'ww'}</Text>
 					<Text>날짜도 바꿔볼랭?</Text>
-					<Text>{day[idx].format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
+					<Text>{moment(day[idx]).format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
 				</TouchableOpacity>
 			))}
 
