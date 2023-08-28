@@ -15,6 +15,8 @@
 		6B11C9022A7A420C00A32397 /* Swift Bridging Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */; };
 		6B14E63E2A7B4ED10021332D /* AppDelegate.h in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FAF1A68108700A75B9A /* AppDelegate.h */; };
 		6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1D4B442A839D1E00920AAA /* Assets.xcassets */; };
+		6B7561B12A9C982900AB6832 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7561B02A9C982900AB6832 /* Dynamic.swift */; };
+		6B7561B62A9C9AA700AB6832 /* splash_mobile.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B7561B52A9C9AA700AB6832 /* splash_mobile.json */; };
 		6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -62,6 +64,9 @@
 		6B3822AC2A8248D700A1F0CF /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = EvilIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		6B3822AD2A8248D700A1F0CF /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		6B3822AE2A8248D700A1F0CF /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		6B45F0542A9C9D8700583285 /* DanimMobile-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DanimMobile-Bridging-Header.h"; sourceTree = "<group>"; };
+		6B7561B02A9C982900AB6832 /* Dynamic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dynamic.swift; sourceTree = "<group>"; };
+		6B7561B52A9C9AA700AB6832 /* splash_mobile.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = splash_mobile.json; path = ../../../Downloads/splash_mobile.json; sourceTree = "<group>"; };
 		6B83D4462A7B6B2300CBCBB3 /* RCTAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RCTAppDelegate.h; path = "../node_modules/react-native/Libraries/AppDelegate/RCTAppDelegate.h"; sourceTree = "<group>"; };
 		6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "DanimMobile/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DanimMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -111,11 +116,14 @@
 		13B07FAE1A68108700A75B9A /* DanimMobile */ = {
 			isa = PBXGroup;
 			children = (
+				6B45F0542A9C9D8700583285 /* DanimMobile-Bridging-Header.h */,
+				6B7561B52A9C9AA700AB6832 /* splash_mobile.json */,
 				6B1D4B462A839D2600920AAA /* Images.xcassets */,
 				6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */,
+				6B7561B02A9C982900AB6832 /* Dynamic.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
@@ -307,6 +315,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B7561B62A9C9AA700AB6832 /* splash_mobile.json in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */,
 				6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */,
@@ -492,6 +501,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B14E63E2A7B4ED10021332D /* AppDelegate.h in Sources */,
+				6B7561B12A9C982900AB6832 /* Dynamic.swift in Sources */,
 				6B11C9022A7A420C00A32397 /* Swift Bridging Header.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
