@@ -1,6 +1,8 @@
 import {Google_Signin_Key} from '@env';
+import {AppleButton, appleAuth} from '@invertase/react-native-apple-authentication';
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
+import jwtDecode from 'jwt-decode';
 import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -15,6 +17,22 @@ export default function LoginScreen({navigation}: any) {
 		//dispatch(loginSliceActions.setAnonymous(true));
 		// /navigation.replace('Home');
 	};
+
+	interface appleTokenType {
+		aud: string;
+		auth_time: number;
+		c_hash: string;
+		email: string;
+		email_verified: string;
+		exp: number;
+		iat: number;
+		is_private_email: string;
+		iss: string;
+		nonce: string;
+		nonce_supported: boolean;
+		sub: string;
+	}
+
 	const goAI = () => {
 		navigation.navigate('LocalSearchAITest');
 	};
@@ -87,10 +105,40 @@ export default function LoginScreen({navigation}: any) {
 		}
 	};
 
+	const appleLogin = async () => {
+		try {
+			// 1). 로그인 요청 수행
+			const appleAuthRequestResponse = await appleAuth.performRequest({
+				requestedOperation: appleAuth.Operation.LOGIN,
+				requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+			});
+
+			// get current authentication state for user
+			const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+			// use credentialState response to ensure the user is authenticated
+			if (credentialState === appleAuth.State.AUTHORIZED) {
+				// user is authenticated
+				const {identityToken, email, user} = appleAuthRequestResponse;
+				const decodedToken: appleTokenType = jwtDecode(identityToken!);
+				// TODO 애플 로그인 성공 후 slice에 저장하는 것 해야함.
+				console.log('email_from_decodedToken', decodedToken.email);
+				console.log('email', email);
+				console.log('user', user);
+			}
+		} catch (error: any) {
+			if (error.code === appleAuth.Error.CANCELED) {
+				// login canceled
+			} else {
+				// login error
+			}
+		}
+	};
+
 	const platforms = [
 		{color: 'yellow.300', image: require('../../../public/images/kakao_logo.png'), onPress: kakaoLogin},
 		{color: 'white', image: require('../../../public/images/google_logo.png'), onPress: googleLogin},
-		{color: 'black', image: require('../../../public/images/apple_logo.png'), onPress: kakaoLogin},
+		// {color: 'black', image: require('../../../public/images/apple_logo.png'), onPress: kakaoLogin},
 	];
 	return (
 		<SafeAreaView>
@@ -128,6 +176,15 @@ export default function LoginScreen({navigation}: any) {
 							<Image source={platform.image} width={12} height={12} resizeMode='contain' />
 						</Button>
 					))}
+					<AppleButton
+						buttonStyle={AppleButton.Style.WHITE}
+						buttonType={AppleButton.Type.SIGN_IN}
+						style={{
+							width: 160, // You must specify a width
+							height: 45, // You must specify a height
+						}}
+						onPress={() => appleLogin()}
+					/>
 				</HStack>
 				<Button
 					marginTop={24}
