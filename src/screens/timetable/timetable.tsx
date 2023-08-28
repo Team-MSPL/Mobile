@@ -2,6 +2,7 @@ import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, us
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	getDrivingDuration,
+	getOneTravelCourse,
 	saveTravel,
 	travelSliceActions,
 	updateTravelCourse,
@@ -13,10 +14,9 @@ import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
 import Background from '../../utill/component/timetable/background';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-export default function Timetable({navigation}: any) {
-	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId} = useAppSelector(
-		state => state.travelSlice,
-	);
+export default function Timetable({navigation, route}: any) {
+	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag} =
+		useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [deleteList, setDeleteList] = useState<string[]>([]);
@@ -29,7 +29,7 @@ export default function Timetable({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			console.log(timetable.length);
 			for (let i = 0; i < timetable.length; i++) {
-				if (timetable[i].length != 1) {
+				if (timetable[i].length > 1) {
 					for (let j = 0; j < timetable[i].length; j++) {
 						if (j === 0) {
 							wayPoint.start = `${timetable[i][j].lng},${timetable[i][j].lat}`;
@@ -47,9 +47,8 @@ export default function Timetable({navigation}: any) {
 				}
 			}
 			console.log('여기는 왓군요?');
-			if (travelId == '') {
-				dispatch(travelSliceActions.drawTimetable());
-			}
+
+			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
 			console.log('에러요', err);
 		} finally {
@@ -57,7 +56,7 @@ export default function Timetable({navigation}: any) {
 		}
 	};
 	const goMapInfo = () => {
-		navigation.navigate('MapInfo');
+		navigation.navigate('MapInfo', {mapIndex: -1});
 	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
@@ -69,7 +68,7 @@ export default function Timetable({navigation}: any) {
 				console.log('아디아디벅', travelId);
 				const data = {
 					userId: userId,
-					region: makeMode ? region : ['자유여행'],
+					region: makeMode == 'recommend' ? region : ['자유여행'],
 					day: day,
 					nDay: nDay + 1,
 					transit: transit,
@@ -100,56 +99,73 @@ export default function Timetable({navigation}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		makeMode && getDuration();
+		console.log('케케케ㅔ케케');
+		makeMode == 'recommend' && getDuration();
 		console.log(makeMode ? '옴' : '혼자');
+		console.log('지다지', makeMode);
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
 				<Box>
-					{editMode == 'delete' ? (
-						<Box w='100%' h='60' alignItems='center'>
-							<TouchableOpacity
-								onPress={() => {
-									const a = timetable.map((item, idx) =>
-										item.filter(value => !deleteList.includes(value?.id ?? 'no')),
-									);
-									setDeleteList([]);
-									dispatch(travelSliceActions.changeTimetable(a));
-									console.log(a);
-								}}>
-								<Text>삭제요</Text>
-							</TouchableOpacity>
-						</Box>
-					) : editMode == 'add' ? (
-						<Box w='100%' h='60' alignItems='center'>
-							<TouchableOpacity
-								onPress={() => {
-									//console.log(addList);
-									navigation.navigate('TimetableAddPlace', {x: x, y: addList});
-									setAddList([]);
-									console.log('다음페이지');
-								}}>
-								<Text>추가요</Text>
-							</TouchableOpacity>
-						</Box>
+					{makeMode == 'share' ? (
+						<TouchableOpacity onPress={goMapInfo}>
+							<Text>지도 함 볼래?</Text>
+						</TouchableOpacity>
 					) : (
-						<HStack w='100%' h='60'>
-							<TouchableOpacity onPress={goMapInfo}>
-								<Text>지도 함 볼래?</Text>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={goSave}>
-								<Text>저장 함 해볼래?</Text>
-							</TouchableOpacity>
-						</HStack>
+						<>
+							{editMode == 'delete' ? (
+								<Box w='100%' h='60' alignItems='center'>
+									<TouchableOpacity
+										onPress={() => {
+											const a = timetable.map((item, idx) =>
+												item.filter(value => !deleteList.includes(value?.id ?? 'no')),
+											);
+											setDeleteList([]);
+											dispatch(travelSliceActions.changeTimetable(a));
+											console.log(a);
+										}}>
+										<Text>삭제요</Text>
+									</TouchableOpacity>
+								</Box>
+							) : editMode == 'add' ? (
+								<Box w='100%' h='60' alignItems='center'>
+									<TouchableOpacity
+										onPress={() => {
+											//console.log(addList);
+											navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+											setAddList([]);
+											console.log('다음페이지');
+										}}>
+										<Text>추가요</Text>
+									</TouchableOpacity>
+								</Box>
+							) : (
+								<HStack w='100%' h='60'>
+									<TouchableOpacity onPress={goMapInfo}>
+										<Text>지도 함 볼래?</Text>
+									</TouchableOpacity>
+									<TouchableOpacity onPress={goSave}>
+										<Text>저장 함 해볼래?</Text>
+									</TouchableOpacity>
+								</HStack>
+							)}
+						</>
 					)}
 				</Box>
 			),
 		});
-	}, [editMode, timetable, addList, deleteList, x]);
+	}, [editMode, timetable, addList, deleteList, x, makeMode]);
+
+	if (!tableShowFlag)
+		return (
+			<Box>
+				<Text>보여줄수없음</Text>
+			</Box>
+		);
 	return (
 		<Box bgColor='#EFFBFB'>
-			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} />
+			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
 			<Box>
 				<ScrollView position='relative' mb='230'>
 					<InfoView

@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {TouchableOpacity, Image} from 'react-native';
+import {TouchableOpacity, Image, Alert} from 'react-native';
 import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -14,7 +14,7 @@ export default function CourseDetail({navigation, route}: any) {
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
 		} catch (err) {
-			console.log('에러요', err);
+			Alert.alert('에러가 발생했습니다');
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

@@ -5,6 +5,7 @@ import {TouchableOpacity, Image} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {Alert} from 'react-native';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -12,7 +13,6 @@ export default function Modify({navigation, route}: any) {
 
 	const [changeDay, setChangeDay] = useState(route.params.item.value.x);
 	const onConfirm = (data: any) => {
-		console.log(data.getHours());
 		flag.current
 			? ((startTime.current.hours = data.getHours()), (startTime.current.minute = data.getMinutes()))
 			: ((endTime.current.hours = data.getHours()), (endTime.current.minute = data.getMinutes()));
@@ -31,7 +31,6 @@ export default function Modify({navigation, route}: any) {
 	});
 	const flag = useRef(false);
 	const goModify = () => {
-		//console.log('d', startTime.current.minute);
 		const newY = (startTime.current.hours * 60 - 360) / 30 + startTime.current.minute / 30;
 		const newEnd = (endTime.current.hours * 60 - 360) / 30 + endTime.current.minute / 30;
 		let copy = [...timetable[changeDay]];
@@ -52,7 +51,7 @@ export default function Modify({navigation, route}: any) {
 		let changeInputIndex = copy.findIndex(item => item.y >= newY);
 		changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
 		if (changeFlag) {
-			console.log(changeFlag.name, '이랑 겹친다');
+			Alert.alert(changeFlag.name, '이랑 겹쳐요');
 		} else {
 			let copyValue = {
 				...changeCopy[route.params.item.value.x][route.params.item.index],
@@ -63,10 +62,8 @@ export default function Modify({navigation, route}: any) {
 			let deleteCopy = [...timetable[route.params.item.value.x]];
 			deleteCopy.splice(route.params.item.index, 1);
 			changeCopy[route.params.item.value.x] = deleteCopy;
-			console.log(changeCopy, '1');
 			let addCopy = [...changeCopy[changeDay]];
 			addCopy.splice(changeInputIndex, 0, copyValue);
-			console.log('2', addCopy);
 			changeCopy[changeDay] = addCopy;
 			dispatch(travelSliceActions.changeTimetable(changeCopy));
 			navigation.goBack();
@@ -74,7 +71,7 @@ export default function Modify({navigation, route}: any) {
 	};
 
 	return (
-		<Box>
+		<ScrollView>
 			<Text>{route.params.item.value.name}</Text>
 			{[...Array(nDay + 1)].map((item, idx) => (
 				<TouchableOpacity
@@ -84,7 +81,7 @@ export default function Modify({navigation, route}: any) {
 					}}>
 					<Text>{visible ? 'dd' : 'ww'}</Text>
 					<Text>날짜도 바꿔볼랭?</Text>
-					<Text>{day[idx].format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
+					<Text>{moment(day[idx]).format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
 				</TouchableOpacity>
 			))}
 
@@ -131,6 +128,6 @@ export default function Modify({navigation, route}: any) {
 			<TouchableOpacity onPress={goModify}>
 				<Text>수정이요</Text>
 			</TouchableOpacity>
-		</Box>
+		</ScrollView>
 	);
 }

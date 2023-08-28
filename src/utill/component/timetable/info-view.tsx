@@ -1,22 +1,23 @@
 import {useState, memo, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Modal, Image} from 'react-native';
-import {
-	googleKeywordApi,
-	recommendApi,
-	TimetableType,
-	travelSliceActions,
-} from '../../../redux/travel-info/travel.slice';
+import {TouchableOpacity, Modal, Image, Alert} from 'react-native';
+import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
 import {GOOGLE_API_KEY} from '@env';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
-	const {timetable, editMode} = useAppSelector(state => state.travelSlice);
+	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const viewDetail = (e: any) => {
 		navigation.navigate('CourseDetail', {value: e.value});
 	};
-	const indexRef = useRef<{value: TimetableType; index: number}>({value: timetable[0][0], index: 0});
+	const indexRef = useRef<{value: TimetableType; index: number; idx: number; category: number; flag: boolean}>({
+		value: timetable[0][0],
+		index: 0,
+		idx: 0,
+		category: 0,
+		flag: false,
+	});
 	const [visible, setVisible] = useState(false);
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
 		let lat = 0;
@@ -42,7 +43,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
 		if (timetable[e.idx].length == 0) {
-			console.log('한개밖에 없어서 못해여');
+			Alert.alert('참고할게 한개밖에 없어서 못해요');
 		} else {
 			let lat = 0;
 			let lng = 0;
@@ -115,7 +116,18 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											}}
 											key={index}
 											onPress={() => {
-												indexRef.current = {value: value, index: index};
+												indexRef.current = {
+													value: value,
+													index: index,
+													idx: idx,
+													category: value.category,
+													flag:
+														value.name == '점심 추천' ||
+														value.name == '저녁 추천' ||
+														value.name == '숙소 추천'
+															? true
+															: false,
+												};
 
 												if (editMode == 'delete') {
 													let copy = [...deleteList];
@@ -124,33 +136,22 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 													} else {
 														copy.push(value.id);
 													}
-													console.log(value.id);
 													setDeleteList(copy);
 												} else {
-													//지금 임시로 카페를 식당으로 치환 카테고리=음식점이고 경도없을떄.
-													console.log(value.category);
-													if (
-														value.name == '점심 추천' ||
-														value.name == '저녁 추천' ||
-														value.name == '숙소 추천'
-													) {
-														value.category == 1
-															? restaurantRecommend({value, index, idx})
-															: accommodationRecommend({value, index, idx});
-													} else {
-														setVisible(true);
-													}
+													setVisible(true);
 												}
 											}}
 											onLongPress={() => {
-												if (editMode == 'delete') {
-													setDeleteList([]);
-													dispatch(travelSliceActions.editModeChange(''));
-												} else {
-													let copy = [...deleteList];
-													copy.push(value.id);
-													setDeleteList(copy);
-													dispatch(travelSliceActions.editModeChange('delete'));
+												if (makeMode != 'share') {
+													if (editMode == 'delete') {
+														setDeleteList([]);
+														dispatch(travelSliceActions.editModeChange(''));
+													} else {
+														let copy = [...deleteList];
+														copy.push(value.id);
+														setDeleteList(copy);
+														dispatch(travelSliceActions.editModeChange('delete'));
+													}
 												}
 											}}>
 											{/* h= takenTime top=시간위치 */}
@@ -159,7 +160,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											{value.photo != '' && (
 												<Image
 													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
-													style={{width: 100, height: 100}}></Image>
+													style={{width: 30, height: 30}}></Image>
 											)}
 										</TouchableOpacity>
 									);
@@ -176,34 +177,81 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				onRequestClose={() => setVisible(false)}>
 				<Box flex='0.5' bgColor='orange.100' backgroundColor='gray.100' opacity='1'>
 					<VStack my='50'>
-						<TouchableOpacity
-							style={{height: 60}}
-							onPress={() => {
-								viewDetail(indexRef.current);
-								setVisible(false);
-							}}>
-							<Text>정보 보기</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={{height: 60}}
-							onPress={() => {
-								navigation.navigate('Modify', {item: indexRef.current});
-								setVisible(false);
-							}}>
-							<Text>수정하기</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={{height: 60}}
-							onPress={() => {
-								console.log(indexRef.current);
-								const a = timetable.map((item, idx) =>
-									item.filter(value => value.id != indexRef.current.value?.id),
-								);
-								dispatch(travelSliceActions.changeTimetable(a));
-								setVisible(false);
-							}}>
-							<Text>삭제하기</Text>
-						</TouchableOpacity>
+						{makeMode == 'share' ? (
+							<>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										viewDetail(indexRef.current);
+										setVisible(false);
+									}}>
+									<Text>정보 보기</Text>
+								</TouchableOpacity>
+							</>
+						) : indexRef.current.flag ? (
+							<>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										indexRef.current.category == 1
+											? restaurantRecommend({
+													value: indexRef.current.value,
+													index: indexRef.current.index,
+													idx: indexRef.current.idx,
+											  })
+											: accommodationRecommend({
+													value: indexRef.current.value,
+													index: indexRef.current.index,
+													idx: indexRef.current.idx,
+											  });
+										setVisible(false);
+									}}>
+									<Text>추천받기</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										const a = timetable.map((item, idx) =>
+											item.filter(value => value.id != indexRef.current.value?.id),
+										);
+										dispatch(travelSliceActions.changeTimetable(a));
+										setVisible(false);
+									}}>
+									<Text>삭제하기</Text>
+								</TouchableOpacity>
+							</>
+						) : (
+							<>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										viewDetail(indexRef.current);
+										setVisible(false);
+									}}>
+									<Text>정보 보기</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										navigation.navigate('Modify', {item: indexRef.current});
+										setVisible(false);
+									}}>
+									<Text>수정하기</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={{height: 60}}
+									onPress={() => {
+										const a = timetable.map((item, idx) =>
+											item.filter(value => value.id != indexRef.current.value?.id),
+										);
+										dispatch(travelSliceActions.changeTimetable(a));
+										setVisible(false);
+									}}>
+									<Text>삭제하기</Text>
+								</TouchableOpacity>
+							</>
+						)}
+
 						<TouchableOpacity
 							style={{height: 60}}
 							onPress={() => {

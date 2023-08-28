@@ -18,8 +18,13 @@ export default function ChangeProfile({navigation}: any) {
 	//애뮬레이터 확인 불가
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
+			width: 300,
+			height: 400,
+			size: 1000,
 			multiple: false,
 			mediaType: 'photo',
+			croppingQuality: 0.6,
+			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {

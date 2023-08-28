@@ -24,44 +24,16 @@ export default function Preset({navigation}: any) {
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
-
-	const getAi = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
-				a = cityViewList[cityIndex].sub.map(
-					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
-				);
-				a.shift();
-			}
-			await dispatch(
-				getTravelAi({
-					regionList: a,
-					accomodationList: accommodations,
-					selectList: tendency,
-					essentialPlaceList: essentialPlaces,
-					timeLimitArray: timeLimitArray,
-					nDay: nDay + 1,
-					transit: transit,
-					distanceSensitivity: distance,
-				}),
-			);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
-	useEffect(() => {
-		//getAi();
-		console.log('덥다', presetDatas.length);
-
-		console.log('덥다1', presetDatas);
-	}, []);
 	const goNext = () => {
-		dispatch(travelSliceActions.enrollTimetable(select));
+		let copy = [...presetDatas[select]];
+		if (presetDatas[select].length != nDay + 1) {
+			const check = nDay + 1 - presetDatas[select].length;
+
+			for (let i = 0; i < check; i++) {
+				copy.push([]);
+			}
+		}
+		dispatch(travelSliceActions.enrollTimetable(copy));
 		navigation.popToTop();
 		navigation.navigate('Timetable');
 	};

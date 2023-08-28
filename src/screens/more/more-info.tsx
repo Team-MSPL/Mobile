@@ -24,7 +24,6 @@ export default function MoreInfo({navigation}: any) {
 		try {
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase};
-			console.log('사인업', signUpFirebase);
 			dispatch(userWithdraw(data));
 			await AsyncStorage.getAllKeys().then(allKeys => {
 				const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
@@ -65,9 +64,7 @@ export default function MoreInfo({navigation}: any) {
 					<Text bold fontSize='xl'>
 						계정
 					</Text>
-					<TouchableOpacity
-						onPress={() => dispatch(updateFunctionToken({functionToken: 4}))}
-						style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>너님 토큰 갯수{functionToken}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={goPayment} style={{marginVertical: 10}}>
@@ -105,10 +102,34 @@ export default function MoreInfo({navigation}: any) {
 					<Text bold fontSize='xl'>
 						기타
 					</Text>
-					<TouchableOpacity onPress={goWithdraw} style={{marginVertical: 10}}>
+					<TouchableOpacity
+						onPress={() => {
+							Alert.alert('회원탈퇴 하시겠습니까?', undefined, [
+								{
+									text: '아니요',
+								},
+								{
+									text: '네',
+									onPress: goWithdraw,
+								},
+							]);
+						}}
+						style={{marginVertical: 10}}>
 						<Text>회원탈퇴</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={goLogout} style={{marginVertical: 10}}>
+					<TouchableOpacity
+						onPress={() => {
+							Alert.alert('로그아웃 하시겠습니까?', undefined, [
+								{
+									text: '아니요',
+								},
+								{
+									text: '네',
+									onPress: goLogout,
+								},
+							]);
+						}}
+						style={{marginVertical: 10}}>
 						<Text>로그아웃</Text>
 					</TouchableOpacity>
 				</VStack>

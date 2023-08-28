@@ -1,17 +1,20 @@
+import moment from 'moment';
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
 import {Alert, Linking, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import KakaoShareLink from 'react-native-kakao-share-link';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		dispatch(travelSliceActions.setMakeMode(true));
+		//dispatch(travelSliceActions.setMakeMode('recommend'));
 		navigation.navigate('SelectCity');
 	};
-	const {userProfileImage, userName} = useAppSelector(state => state.userSlice);
+	const {userProfileImage, userName, dailyReward, functionToken, signUpReward} = useAppSelector(
+		state => state.userSlice,
+	);
 	const dispatch = useAppDispatch();
 	const zxc = () => {
 		dispatch(travelSliceActions.setSingleMode());
@@ -19,30 +22,6 @@ export default function Main({navigation}: any) {
 	};
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
-	};
-	const zkrhdrhrh = async () => {
-		try {
-			const response = await KakaoShareLink.sendText({
-				text: '타타타타',
-				link: {
-					webUrl: 'http://danim.me',
-					mobileWebUrl: 'http://danim.me',
-				},
-				buttons: [
-					{
-						title: '앱에서 볼래',
-						link: {
-							androidExecutionParams: [{key: 'testKey', value: 'testValue1'}],
-							iosExecutionParams: [{key: 'key1', value: 'value1'}],
-						},
-					},
-				],
-			});
-			console.log(response);
-		} catch (err) {
-			console.log(err);
-			Alert.alert('카공중에 에러가 뜨다니');
-		}
 	};
 	useEffect(() => {
 		navigation.setOptions({
@@ -57,10 +36,17 @@ export default function Main({navigation}: any) {
 		});
 	}, []);
 	useEffect(() => {
-		//axiosAuth.defaults.headers.Authorization = `Bearer qwe`;
-		dispatch(getMyTravelList());
-		dispatch(getPostList());
+		//dispatch(LoadingSliceActions.onLoading());
+		if (signUpReward) {
+			Alert.alert(`회원가입 축하드립니다. 회원가입 기념 토큰 드렸습니다. ${functionToken} 개 입니다.`);
+		} else {
+			dailyReward && Alert.alert(`데일리보상! 토큰이 하나 추가됐네융 ${functionToken} 개 입니다.`);
+		}
 	}, []);
+
+	const ppppppp = () => {
+		console.log(dailyReward, '에에ㅔ');
+	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<Image source={{uri: userProfileImage}} style={{width: 100, height: 100}}></Image>
@@ -128,11 +114,8 @@ export default function Main({navigation}: any) {
 			<TouchableOpacity onPress={zxc}>
 				<Text>ㅂㅈㅂ</Text>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.goBack()}>
+			<TouchableOpacity onPress={ppppppp}>
 				<Text>로그아웃</Text>
-			</TouchableOpacity>
-			<TouchableOpacity onPress={zkrhdrhrh}>
-				<Text>카공</Text>
 			</TouchableOpacity>
 			<Box h='10'></Box>
 		</ScrollView>

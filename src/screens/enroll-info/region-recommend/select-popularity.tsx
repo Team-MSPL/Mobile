@@ -10,7 +10,7 @@ export default function SelectPopularity({navigation}: any) {
 	const [selectedId, setSelectedId] = useState<string | undefined>();
 	const goNext = () => {
 		let data = Number(selectedId) * 20;
-		dispatch(regionRecommendSliceActions.enrollPopularity([data, data + 20]));
+		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
 		navigation.popToTop();
 		navigation.navigate('RegionViewResult');
 	};
@@ -18,25 +18,31 @@ export default function SelectPopularity({navigation}: any) {
 		() => [
 			{
 				id: '1',
-				label: '유명하지않은',
+				label: '완전 유명하지않은',
 				value: 'option1',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '2',
-				label: '아리까리한',
+				label: '조금 유명하지않은',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '3',
-				label: '알확률 있는',
+				label: '적당한',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},
 			{
 				id: '4',
-				label: ' 유명한',
+				label: ' 조금 유명한',
+				value: 'option2',
+				labelStyle: {color: 'black', fontSize: 18},
+			},
+			{
+				id: '5',
+				label: ' 많이 유명한',
 				value: 'option2',
 				labelStyle: {color: 'black', fontSize: 18},
 			},

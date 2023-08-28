@@ -1,11 +1,12 @@
 import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {TouchableOpacity} from 'react-native';
+import {Alert, TouchableOpacity} from 'react-native';
 import {Text, Box, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
 import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import moment from 'moment';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -26,7 +27,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				lng = timetable[route.params.x][0].lng;
 				break;
 			case -1:
-				console.log('비교할게없네유');
+				Alert.alert('참고할게없어서 보여줄게 없네유');
 				return 0;
 			default:
 				const dLat =
@@ -48,9 +49,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					(timetable[route.params.x][newY.current - 1].lat + timetable[route.params.x][newY.current].lat) / 2;
 				lng =
 					(timetable[route.params.x][newY.current - 1].lng + timetable[route.params.x][newY.current].lng) / 2;
-				console.log();
 				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
-				console.log('zzzz', radius);
 
 				break;
 		}
@@ -68,7 +67,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		});
 	};
 	const addTimetable = () => {
-		console.log(getInfo);
 		const updateItem = {
 			...getInfo,
 			category: 5,
@@ -99,11 +97,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				newY.current = timetable[route.params.x].length;
 			}
 		}
-		console.log(newY.current);
 	}, []);
 	return (
 		<Box flex='1'>
-			<Text>날짜는 {day[route.params.x].format('YY-MM-DD')}</Text>
+			<Text>날짜는 {moment(day[route.params.x]).format('YY-MM-DD')}</Text>
 			<Text>
 				시간은! {(route.params.y[0] * 30 + 360) / 60}시 ~
 				{((route.params.y[route.params.y.length - 1] + 1) * 30 + 360) / 60}

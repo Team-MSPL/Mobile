@@ -6,8 +6,8 @@ import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
 import CustomButton from '../../utill/component/custom-button';
-import {updateDiary} from '../../redux/community/community.slice';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import {updateDiary} from '../../redux/travel-info/travel.slice';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -25,7 +25,6 @@ export default function InputDiary({navigation}: any) {
 			await dispatch(updateDiary(data));
 			navigation.goBack();
 		} catch (err) {
-			console.log(err);
 			Alert.alert('업로드 중 에러가 발생했습니다.');
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
@@ -33,8 +32,13 @@ export default function InputDiary({navigation}: any) {
 	};
 	const handelGetImage = async () => {
 		ImageCropPicker.openPicker({
+			width: 300,
+			height: 400,
+			size: 1000,
 			multiple: true,
 			mediaType: 'photo',
+			croppingQuality: 0.6,
+			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
@@ -44,7 +48,6 @@ export default function InputDiary({navigation}: any) {
 			}
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
 			setpictureValue(temporaryList);
-			console.log('이미지 주소');
 		});
 	};
 	return (
@@ -57,7 +60,7 @@ export default function InputDiary({navigation}: any) {
 			{pictureValue.length != 0 ? (
 				<>
 					{pictureValue.map((item, idx) => (
-						<Image source={{uri: item}} style={{width: 100, height: 100}}></Image>
+						<Image key={idx} source={{uri: item}} style={{width: 100, height: 100}}></Image>
 					))}
 					<TouchableOpacity onPress={handelGetImage}>
 						<Text>사진바꿔치기!</Text>

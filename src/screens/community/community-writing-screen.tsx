@@ -1,9 +1,9 @@
 import moment from 'moment';
-import React, {useState} from 'react';
-import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {useAppDispatch, useAppSelector} from '../../redux';
-import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import { useAppDispatch, useAppSelector } from '../../redux';
+import { savePost, savePostType, updatePost, updatePostType } from '../../redux/community/community.slice';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -35,34 +35,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			setCheck1(temporaryList);
 			console.log('이미지 주소');
 		});
-
-		// ImageCropPicker.openPicker({
-		//    multiple: true,
-		//    mediaType: 'photo',
-		//    cropping: true,
-		//    maxFiles: 10,
-		//    includeBase64: true,
-		// }).then(response => {
-		//    if (response.length > 10) {
-		//       Alert.alert('사진은 최대 10장까지 가능합니다.');
-		//       return;
-		//    }
-		//    for (let i = 0; i < response.length; i++) {
-		//       if (response[i].size > 10000000) {
-		//          Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
-		//          return;
-		//       }
-		//    }
-		//    if (!response || response.length === 0) {
-		//       console.log('사진 선택을 취소하였습니다.');
-		//       return;
-		//    }
-		//    const selectedImageUris = response.map(image =>
-		//       Platform.OS === 'android' ? 'file://' + image.path : image.path,
-		//    );
-		//    setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-		//    console.log('이미지 주소', postImage);
-		// });
 	};
 
 	// * 게시글 등록

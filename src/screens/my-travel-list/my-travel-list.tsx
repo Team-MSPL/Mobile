@@ -72,6 +72,7 @@ export default function MyTravelList({navigation}: any) {
 			) : (
 				myTravelList.map((item, idx) => (
 					<TouchableOpacity
+						key={idx}
 						style={{marginVertical: 10, borderWidth: 1}}
 						onPress={() => {
 							goMyTravelDetail(item._id);
