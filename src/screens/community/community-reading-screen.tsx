@@ -18,9 +18,9 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-
 import ActionSheet from 'react-native-actionsheet';
 import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
+
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -453,7 +453,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					}
 				}}
 			/>
-
 			<ActionSheet
 				ref={commentOptionActionSheet}
 				title={'댓글 메뉴'}
@@ -519,7 +518,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</View>
 
 			<View style={styles.inputContainer}>
-				<AvoidSoftInputView style={styles.inputContainer}>
+				<AvoidSoftInputView style={styles.commentInputFieldContainer}>
 					<TextInput
 						style={styles.commentInputField}
 						value={commentContent}
@@ -543,14 +542,21 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	postNCommentContainer: {
-		flex: 9,
+		flex: 8,
+		backgroundColor: 'red',
 	},
 	inputContainer: {
-		flex: 1,
+		flex: 2,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'white',
+		backgroundColor: 'blue',
+	},
+	commentInputFieldContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'green',
 	},
 	postContentText: {
 		fontSize: 16,
@@ -566,7 +572,7 @@ const styles = StyleSheet.create({
 		margin: 8,
 		alignSelf: 'center',
 		flexDirection: 'column',
-		backgroundColor: 'rgba(200, 200, 200, 0.8)',
+		backgroundColor: 'rgba(200, 200, 200, 0.2)',
 	},
 	commentProfileImage: {
 		width: 36,
@@ -578,15 +584,13 @@ const styles = StyleSheet.create({
 		resizeMode: 'cover',
 	},
 	commentInputField: {
-		flex: 7,
+		flex: 8,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
-		padding: 8,
-		margin: 4,
 	},
 	submitButton: {
-		flex: 1,
+		flex: 2,
 		backgroundColor: 'blue',
 		padding: 8,
 		justifyContent: 'center',
@@ -636,10 +640,6 @@ const styles = StyleSheet.create({
 		width: 100,
 		height: 100,
 		margin: 8,
-	},
-	keyboardContainer: {
-		flex: 1,
-		backgroundColor: '#ffffff',
 	},
 	likeContainer: {
 		justifyContent: 'center',
