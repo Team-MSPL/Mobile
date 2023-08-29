@@ -19,8 +19,8 @@ import {
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
 
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -366,15 +366,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
-	// 키보드 올라오기
-	const onFocusEffect = useCallback(() => {
-		AvoidSoftInput.setShouldMimicIOSBehavior(true);
-		return () => {
-			AvoidSoftInput.setShouldMimicIOSBehavior(false);
-		};
-	}, []);
-	useFocusEffect(onFocusEffect);
-
 	function doNothing(): any {
 		// 아무것도 하지 않음
 	}
@@ -516,11 +507,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					/>
 				)}
 			</View>
-
 			<View style={styles.inputContainer}>
-				<AvoidSoftInputView style={styles.commentInputFieldContainer}>
+				<KeyboardAwareScrollView contentContainerStyle={styles.commentInputFieldContainer}>
 					<TextInput
-						style={styles.commentInputField}
+						style={[styles.commentInputField]}
 						value={commentContent}
 						onChangeText={text => setCommentContent(text)}
 						placeholder='댓글을 입력하세요...'
@@ -531,7 +521,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						onPress={handleCommentSubmit}>
 						<Text style={styles.submitButtonText}>등록</Text>
 					</TouchableOpacity>
-				</AvoidSoftInputView>
+				</KeyboardAwareScrollView>
 			</View>
 		</SafeAreaView>
 	);
@@ -542,11 +532,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	postNCommentContainer: {
-		flex: 8,
-		backgroundColor: 'red',
+		flex: 9,
+		backgroundColor: 'white',
 	},
 	inputContainer: {
-		flex: 2,
+		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -556,7 +546,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'green',
+		backgroundColor: 'white',
 	},
 	postContentText: {
 		fontSize: 16,
