@@ -25,6 +25,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>kakao1059586e7b1423286b1a1a37606f9786</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao1059586e7b1423286b1a1a37606f9786</string>
@@ -49,7 +51,6 @@
 	<array>
 		<string>nmap</string>
 		<string>kakaokompassauth</string>
-		<string>storykompassauth</string>
 		<string>kakaolink</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>

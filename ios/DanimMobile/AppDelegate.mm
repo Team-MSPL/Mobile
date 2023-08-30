@@ -1,5 +1,6 @@
 #import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
+#import <React/RCTLinkingManager.h>
 
 #import <Firebase.h>
 #import <RNKakaoLogins.h>
@@ -10,13 +11,15 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)app
+- (BOOL)application:(UIApplication *)application
      openURL:(NSURL *)url
      options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
  if([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
     return [RNKakaoLogins handleOpenUrl: url];
  }
-
+  if ([RCTLinkingManager application:application openURL:url sourceApplication:nil annotation:nil]) {
+     return YES;
+   }
  return NO;
 }
 

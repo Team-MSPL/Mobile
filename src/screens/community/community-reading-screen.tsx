@@ -1,4 +1,4 @@
-import {HStack, ThreeDotsIcon} from 'native-base';
+import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -9,6 +9,9 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
+	Modal,
+	NativeModules,
+	Platform,
 	RefreshControl,
 	SafeAreaView,
 	ScrollView,
@@ -19,9 +22,6 @@ import {
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -37,6 +37,8 @@ import {
 	saveCommentType,
 	unclickLike,
 } from '../../redux/community/community.slice';
+
+const {StatusBarManager} = NativeModules;
 
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -205,6 +207,16 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			},
 		});
 	}, []);
+
+	useEffect(() => {
+		Platform.OS == 'ios'
+			? StatusBarManager.getHeight((statusBarFrameData: {height: number}) => {
+					setStatusBarHeight(statusBarFrameData.height);
+			  })
+			: null;
+	}, []);
+
+	const [statusBarHeight, setStatusBarHeight] = useState(0);
 
 	// const mounted = useRef<boolean>(false);
 	// useEffect(() => {
@@ -482,7 +494,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 										</TouchableOpacity>
 									)}
 								</View>
-								<Modal isVisible={isImageMoreModalVisible}>
+								<Modal visible={isImageMoreModalVisible}>
 									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
 									<ScrollView contentContainerStyle={styles.imageModalContainer}>
 										{postData.postImage.map((uri, index) => (
@@ -507,22 +519,23 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					/>
 				)}
 			</View>
-			<View style={styles.inputContainer}>
-				<KeyboardAwareScrollView contentContainerStyle={styles.commentInputFieldContainer}>
-					<TextInput
-						style={[styles.commentInputField]}
-						value={commentContent}
-						onChangeText={text => setCommentContent(text)}
-						placeholder='댓글을 입력하세요...'
-					/>
-					<TouchableOpacity
-						style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-						disabled={isCommentButtonDisabled}
-						onPress={handleCommentSubmit}>
-						<Text style={styles.submitButtonText}>등록</Text>
-					</TouchableOpacity>
-				</KeyboardAwareScrollView>
-			</View>
+			<KeyboardAvoidingView
+				style={styles.commentInputFieldContainer}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				keyboardVerticalOffset={statusBarHeight + 52}>
+				<TextInput
+					style={[styles.commentTextInputField]}
+					value={commentContent}
+					onChangeText={text => setCommentContent(text)}
+					placeholder='댓글을 입력하세요...'
+				/>
+				<TouchableOpacity
+					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+					disabled={isCommentButtonDisabled}
+					onPress={handleCommentSubmit}>
+					<Text style={styles.submitButtonText}>등록</Text>
+				</TouchableOpacity>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }
@@ -533,19 +546,6 @@ const styles = StyleSheet.create({
 	},
 	postNCommentContainer: {
 		flex: 9,
-		backgroundColor: 'white',
-	},
-	inputContainer: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: 'blue',
-	},
-	commentInputFieldContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
 		backgroundColor: 'white',
 	},
 	postContentText: {
@@ -573,14 +573,27 @@ const styles = StyleSheet.create({
 		borderColor: '#5DC3DB',
 		resizeMode: 'cover',
 	},
-	commentInputField: {
-		flex: 8,
+	commentInputFieldContainer: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-evenly',
+		alignSelf: 'center',
+		backgroundColor: 'white',
+		paddingVertical: 8,
+	},
+	commentTextInputField: {
+		flex: 9,
+		margin: 8,
+		padding: 8,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
+		height: 40,
+		alignContent: 'center',
 	},
 	submitButton: {
-		flex: 2,
+		flex: 1,
 		backgroundColor: 'blue',
 		padding: 8,
 		justifyContent: 'center',
