@@ -9,7 +9,6 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
-	Modal,
 	NativeModules,
 	Platform,
 	RefreshControl,
@@ -22,6 +21,7 @@ import {
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -494,7 +494,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 										</TouchableOpacity>
 									)}
 								</View>
-								<Modal visible={isImageMoreModalVisible}>
+								<Modal isVisible={isImageMoreModalVisible}>
 									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
 									<ScrollView contentContainerStyle={styles.imageModalContainer}>
 										{postData.postImage.map((uri, index) => (

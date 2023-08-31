@@ -1,9 +1,20 @@
 import moment from 'moment';
-import React, { useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, {useState} from 'react';
+import {
+	Alert,
+	Image,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { useAppDispatch, useAppSelector } from '../../redux';
-import { savePost, savePostType, updatePost, updatePostType } from '../../redux/community/community.slice';
+import {default as ImageView} from 'react-native-image-viewing';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -13,11 +24,9 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	const [postContent, setPostContent] = useState<string>(route.params.content);
 	const [postImage, setPostImage] = useState<string[]>(route.params.images);
 	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
-	const [isModalVisible, setIsMoreImageModalVisible] = useState<boolean>(false);
+	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-
-	const [check1, setCheck1] = useState<string[]>();
 
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
@@ -27,13 +36,12 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
-			let temporaryList = [];
+			const temporaryList = [];
 			for (let i = 0; i < response.length; i++) {
 				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setCheck1(temporaryList);
-			console.log('이미지 주소');
+			setPostImage(temporaryList);
 		});
 	};
 
@@ -60,7 +68,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			const newPostData: savePostType = {
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: check1,
+				postImage: postImage,
 				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 
@@ -68,7 +76,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				postId: route.params.postId,
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: check1,
+				postImage: postImage,
 				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
 				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
@@ -100,13 +108,21 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	};
 
 	// 이미지 더보기 모달 열기
-	const openMoreImageModal = () => {
-		setIsMoreImageModalVisible(true);
+	const openImageModal = () => {
+		setIsImageModalVisible(true);
 	};
 
 	// 이미지 더보기 모달 닫기
-	const closeMoreImageModal = () => {
-		setIsMoreImageModalVisible(false);
+	const closeImageModal = () => {
+		setIsImageModalVisible(false);
+	};
+
+	const [currentImageIndex, setImageIndex] = useState(0);
+	const [images, setImages] = useState<string>('');
+	const onSelect = (images: string, index: number) => {
+		setImageIndex(index);
+		setImages(images);
+		setIsImageModalVisible(true);
 	};
 
 	return (
@@ -119,29 +135,49 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				onChangeText={setPostContent}
 				multiline
 			/>
-			<View style={styles.imageContainer}>
-				{postImage.slice(0, 8).map((uri, index) => (
-					<Image key={index} source={{uri}} style={styles.uploadedImage} />
-				))}
-				{postImage.length > 8 && (
-					<TouchableOpacity style={styles.moreButton} onPress={openMoreImageModal}>
-						<Text style={styles.moreButtonText}>더보기</Text>
-					</TouchableOpacity>
-				)}
+			<Text>사진 목록</Text>
+			<View style={styles.container}>
+				{postImage.map((uri, index) => {
+					return (
+						<View key={index} style={{alignItems: 'center'}}>
+							<TouchableOpacity onPress={() => onSelect(uri, index)}>
+								<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+							</TouchableOpacity>
+						</View>
+					);
+				})}
+
+				<ImageView
+					images={postImage.map(uri => ({uri}))}
+					imageIndex={currentImageIndex}
+					visible={isImageModalVisible}
+					onImageIndexChange={index => setImageIndex(index)}
+					onRequestClose={() => {
+						setIsImageModalVisible(false);
+						console.log('모달 꺼짐요');
+					}}
+					FooterComponent={() => (
+						<SafeAreaView style={{alignItems: 'center'}}>
+							<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${postImage.length}`}</Text>
+						</SafeAreaView>
+					)}
+				/>
 			</View>
+			{/* <Modal isVisible={isModalVisible}>
+				<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
+				<ScrollView contentContainerStyle={styles.modalContainer}>
+					{postImage.map((uri, index) => (
+						<Image key={index} source={{uri}} style={styles.modalImage} />
+					))}
+				</ScrollView>
+			</Modal> */}
+
 			<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
 				<Text style={styles.attachButtonText}>사진 선택하기</Text>
 			</TouchableOpacity>
 			<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
 				<Text style={styles.submitButtonText}>글 등록하기</Text>
 			</TouchableOpacity>
-			<Modal visible={isModalVisible} onRequestClose={closeMoreImageModal}>
-				<ScrollView contentContainerStyle={styles.modalContainer}>
-					{postImage.map((uri, index) => (
-						<Image key={index} source={{uri}} style={styles.modalImage} />
-					))}
-				</ScrollView>
-			</Modal>
 		</ScrollView>
 	);
 }

@@ -1207,8 +1207,6 @@ PODS:
     - KakaoSDKShare (= 2.11.1)
     - KakaoSDKTemplate (= 2.11.1)
     - React-Core
-  - react-native-keyboard-controller (1.6.0):
-    - React-Core
   - react-native-lottie-splash-screen (1.1.2):
     - React
   - react-native-maps (1.7.1):
@@ -1437,7 +1435,6 @@ DEPENDENCIES:
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-kakao-share-link (from `../node_modules/react-native-kakao-share-link`)
-  - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - react-native-lottie-splash-screen (from `../node_modules/react-native-lottie-splash-screen`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1575,8 +1572,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-maps"
   react-native-kakao-share-link:
     :path: "../node_modules/react-native-kakao-share-link"
-  react-native-keyboard-controller:
-    :path: "../node_modules/react-native-keyboard-controller"
   react-native-lottie-splash-screen:
     :path: "../node_modules/react-native-lottie-splash-screen"
   react-native-maps:
@@ -1718,7 +1713,6 @@ SPEC CHECKSUMS:
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-google-maps: dd12cdd86b8e3fedbbb671676aedaa2f656e2ccd
   react-native-kakao-share-link: f9be590aec95928451f6ce1a622ef9c91a48d79b
-  react-native-keyboard-controller: b671e25e13a530083ee6fcfd914efcbc0158d973
   react-native-lottie-splash-screen: 4e1b1fd9d6633f9cd2106d6877eb5ba0147f3e2b
   react-native-maps: 667f9b975549c6fa9b1631bf859440f68ebd3b8f
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
