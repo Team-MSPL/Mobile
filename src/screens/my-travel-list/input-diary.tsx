@@ -8,6 +8,7 @@ import moment from 'moment';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {updateDiary} from '../../redux/travel-info/travel.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -25,7 +26,11 @@ export default function InputDiary({navigation}: any) {
 			await dispatch(updateDiary(data));
 			navigation.goBack();
 		} catch (err) {
-			Alert.alert('업로드 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '다이어리 저장 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

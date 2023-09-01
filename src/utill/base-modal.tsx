@@ -1,34 +1,40 @@
 import styled from 'styled-components/native';
 import {TouchableOpacity, Modal, Text} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useAppDispatch, useAppSelector} from '../redux';
+import {modalSliceActions} from '../redux/modal/modalSlice';
+import {TitleText, SubText} from './component/policy/policy1';
 
-export default function BaseModal({visible, close, title, left, right}: ModalProps) {
-	const navigation = useNavigation();
-	const goBack = () => {
-		navigation.goBack();
+export default function BaseModal() {
+	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction} = useAppSelector(state => state.modalSlice);
+	const dispatch = useAppDispatch();
+	const handleModalFunction = () => {
+		close();
+		modalFunction();
+	};
+	const close = () => {
+		dispatch(modalSliceActions.setCloseModal());
 	};
 	return (
 		<Modal
 			animationType={'fade'}
 			presentationStyle={'formSheet'}
 			transparent={true}
-			visible={visible}
+			visible={modalOpen}
 			onRequestClose={close}>
-			<ModalContainer>
+			<ModalContainer onPress={close}>
 				<ViewContaniner>
-					<Header>
-						<Text>알리미</Text>
-					</Header>
 					<Body>
-						<Text>{title}</Text>
+						<TitleText>{modalTitle}</TitleText>
 					</Body>
-					<Footer left={Boolean(left)}>
-						{left && (
-							<TouchableOpacity onPress={left}>
+					{modalSubTitle && <SubText>{modalSubTitle}</SubText>}
+
+					<Footer left={Boolean(modalLeft)}>
+						{modalLeft && (
+							<TouchableOpacity onPress={close}>
 								<Text>취소</Text>
 							</TouchableOpacity>
 						)}
-						<TouchableOpacity onPress={Boolean(right) ? right : goBack}>
+						<TouchableOpacity onPress={handleModalFunction}>
 							<Text>확인</Text>
 						</TouchableOpacity>
 					</Footer>
@@ -38,12 +44,12 @@ export default function BaseModal({visible, close, title, left, right}: ModalPro
 	);
 }
 
-const ModalContainer = styled.View`
+const ModalContainer = styled.Pressable`
 	align-items: center;
 	justify-content: center;
 	flex-directrion: row;
 	flex: 1;
-	background-color: rgba(255, 255, 255, 0.5);
+	background-color: rgba(255, 255, 255, 0.8);
 `;
 
 const ViewContaniner = styled.View`
@@ -70,12 +76,3 @@ const Footer = styled.View<{left: boolean}>`
 	margin-top: 30px;
 	margin-bottom: 20px;
 `;
-
-interface ModalProps {
-	visible?: boolean;
-	close?: () => void;
-	title: string;
-	children?: JSX.Element | JSX.Element[];
-	left?: () => void;
-	right?: () => void;
-}

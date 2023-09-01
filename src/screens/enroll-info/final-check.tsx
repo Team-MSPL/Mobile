@@ -1,18 +1,58 @@
-import {Alert, Image} from 'react-native';
+import {Alert, BackHandler, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
-import {localSearchAI, enoughPlace} from '../../ai/local_search_ai';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {useEffect} from 'react';
 import {cityViewList} from './select-city';
+import {updateFunctionToken} from '../../redux/user/user.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {useEffect} from 'react';
 
 export default function FinalCheck({navigation}: any) {
 	const {day, region, accommodations, nDay, cityIndex, essentialPlaces, tendency, timeLimitArray, transit, distance} =
 		useAppSelector(state => state.travelSlice);
+	const {functionToken} = useAppSelector(state => state.userSlice);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
+	const goPayment = async () => {
+		Alert.alert('결제창');
+	};
+
+	const checkToken = () => {
+		functionToken >= 1
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
+						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+						modalFunction: goNext,
+						modalLeft: true,
+					}),
+			  )
+			: dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
+						modalFunction: goPayment,
+						modalLeft: true,
+					}),
+			  );
+	};
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused() && isLoading) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: 'ai가 돌아가고 있습니다 조금만 기다려주세요',
+						modalFunction: () => {},
+					}),
+				);
+				return true;
+			}
+		};
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+		return () => backHandler.remove();
+	}, [isLoading]);
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		try {
@@ -41,14 +81,28 @@ export default function FinalCheck({navigation}: any) {
 			if (result) {
 				navigation.popToTop();
 				navigation.navigate('Preset');
-				!result.data.enoughPlace && Alert.alert('관광지가 좀 부족하네유 ㅠ');
+				!result.data.enoughPlace &&
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+						}),
+					);
+
+				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
-				Alert.alert('추천을 받는 중 에러가 발생했습니다.');
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+					}),
+				);
 			}
 		} catch (error) {
-			Alert.alert('추천을 받는 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
-			console.log('ㅇㅇㅂㅇㅂㅈㅈㄷ');
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
@@ -115,7 +169,7 @@ export default function FinalCheck({navigation}: any) {
 				);
 			})}
 			<CustomButton label='다시 만들래' onPress={goReset}></CustomButton>
-			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+			<CustomButton label='다음 단계' onPress={checkToken}></CustomButton>
 		</ScrollView>
 	);
 }

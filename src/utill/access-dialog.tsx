@@ -16,7 +16,7 @@ export default function AccessDialog({type, open, onClose, onRequestAgain, onOpe
 				</Section>
 				<Section>
 					<Text>
-						{`아래와 같은 이유로 권한 허용이 필요합니다.\n⦁ 저장공간\n\t\t출간에 필요한 파일 업로드\n⦁ 사진/카메라\n\t\t채팅, 문의에서 사진 업로드\n`}
+						{`아래와 같은 이유로 권한 허용이 필요합니다.\n⦁ 위치\n\t\t여행 추천 받을때 \n⦁ 사진/카메라\n\t\t 내여행, 커뮤니티 사진 업로드\n`}
 					</Text>
 					{type === 'blocked' && <Text>권한 허용을 위해 설정화면으로 이동합니다.</Text>}
 				</Section>

@@ -1,6 +1,7 @@
 import React, {useEffect, useLayoutEffect, useState, useRef, memo} from 'react';
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import TimeView from './time-view';
 
@@ -46,7 +47,11 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 				dispatch(travelSliceActions.editModeChange('add'));
 			}
 		} else {
-			Alert.alert('니가 선택한 시간이 아니잖아');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '선택한 날짜가 아니라 불가합니다.',
+				}),
+			);
 		}
 	};
 	//테스트에서는 36개로 했음

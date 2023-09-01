@@ -14,6 +14,7 @@ import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
 import Background from '../../utill/component/timetable/background';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag} =
 		useAppSelector(state => state.travelSlice);
@@ -50,13 +51,21 @@ export default function Timetable({navigation, route}: any) {
 
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
-			console.log('에러요', err);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '타임테이블 로딩 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	const goMapInfo = () => {
 		navigation.navigate('MapInfo', {mapIndex: -1});
+	};
+	const goMyTravelList = () => {
+		navigation.popToTop();
+		navigation.navigate('MyTravelListStack');
 	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
@@ -81,17 +90,19 @@ export default function Timetable({navigation, route}: any) {
 				const data = {travelId: travelId, timetable: timetable};
 				await dispatch(updateTravelCourse(data));
 			}
-			Alert.alert(travelId == '' ? '저장 완료요 ' : '수정완료요', undefined, [
-				{
-					text: '저장리스트보기',
-					onPress: () => {
-						navigation.popToTop(), navigation.navigate('MyTravelListStack');
-					},
-				},
-				{text: '계속보기'},
-			]);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: travelId == '' ? '저장 완료' : '수정 완료',
+					modalSubTitle: '내 여행 리스트로 이동합니다.',
+					modalFunction: goMyTravelList,
+				}),
+			);
 		} catch (err) {
-			Alert.alert('저장중 에러가 발생했습니다');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 저장 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -99,10 +110,7 @@ export default function Timetable({navigation, route}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		console.log('케케케ㅔ케케');
 		makeMode == 'recommend' && getDuration();
-		console.log(makeMode ? '옴' : '혼자');
-		console.log('지다지', makeMode);
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({

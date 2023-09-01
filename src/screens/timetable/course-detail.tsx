@@ -5,6 +5,7 @@ import {TouchableOpacity, Image, Alert} from 'react-native';
 import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<CourseDetailType>();
 	const dispatch = useAppDispatch();
@@ -14,7 +15,11 @@ export default function CourseDetail({navigation, route}: any) {
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
 		} catch (err) {
-			Alert.alert('에러가 발생했습니다');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

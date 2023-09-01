@@ -9,11 +9,10 @@ import MapView, {Polyline, Marker} from 'react-native-maps';
 import {GOOGLE_API_KEY} from '@env';
 import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import BaseModal from '../../utill/base-modal';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [visible, setVisible] = useState(false);
 	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
@@ -87,7 +86,13 @@ export default function Recommend({navigation, route}: any) {
 		);
 	};
 	const checkMessage = () => {
-		setVisible(true);
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '바로 추가됩니다!',
+				modalFunction: addRecommend,
+				modalLeft: true,
+			}),
+		);
 	};
 	const addRecommend = () => {
 		let copy = [...timetable];
@@ -130,7 +135,11 @@ export default function Recommend({navigation, route}: any) {
 				}),
 			);
 		} catch (err) {
-			Alert.alert('에러가 발생했습니다');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천 관광지를 받아오는 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -189,14 +198,6 @@ export default function Recommend({navigation, route}: any) {
 					선택이요
 				</Text>
 			</TouchableOpacity>
-			<BaseModal
-				title={'바로 추가됩니다!'}
-				visible={visible}
-				left={() => {
-					setVisible(false);
-				}}
-				right={addRecommend}
-			/>
 		</Box>
 	);
 }

@@ -1,6 +1,5 @@
 import React, {memo} from 'react';
 import {Text, Box, VStack} from 'native-base';
-import {useAppDispatch, useAppSelector} from '../../../redux';
 
 const TimeView = () => {
 	return (

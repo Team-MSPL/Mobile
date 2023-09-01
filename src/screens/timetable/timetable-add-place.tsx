@@ -7,6 +7,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
 import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import moment from 'moment';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -27,7 +28,12 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				lng = timetable[route.params.x][0].lng;
 				break;
 			case -1:
-				Alert.alert('참고할게없어서 보여줄게 없네유');
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '참고할 관광지가 없어서 보여줄 수 없습니다!',
+						modalSubTitle: '동일한 날짜에 아무것도 없으면 추천을 해줄 수 없습니다.',
+					}),
+				);
 				return 0;
 			default:
 				const dLat =

@@ -7,6 +7,7 @@ import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAppDispatch} from '../../redux';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 
 export default function LoginScreen({navigation}: any) {
@@ -60,7 +61,11 @@ export default function LoginScreen({navigation}: any) {
 				});
 			}
 		} catch {
-			Alert.alert('카카오 로그인에 실패하였습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 로그인에 실패했습니다.',
+				}),
+			);
 		}
 	};
 
