@@ -1,12 +1,13 @@
 import {useState, memo} from 'react';
 import {Text, Box, Center, HStack, Spacer} from 'native-base';
-import {useAppSelector} from '../../../redux';
+import {useAppDispatch, useAppSelector} from '../../../redux';
 import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
-
+	const dispatch = useAppDispatch();
 	const goRight = () => {
 		viewDayIndex + 10 > nDay ? setViewDayIndex(nDay - 4) : setViewDayIndex(viewDayIndex + 5);
 	};
@@ -15,7 +16,11 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	};
 	const goMapInfo = (e: number) => {
 		nDay < e || timetable[e].length == 0
-			? Alert.alert('보여줄게없어유')
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '볼수있는 관광지가 없습니다.',
+					}),
+			  )
 			: navigation.navigate('MapInfo', {mapIndex: e});
 	};
 	return (

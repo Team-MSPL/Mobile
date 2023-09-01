@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import {Linking, Platform, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import BaseModal from '../../utill/base-modal';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import SelectButton from '../../utill/component/select-button';
 
 export default function MapInfo({navigation, route}: any) {
@@ -112,16 +112,22 @@ export default function MapInfo({navigation, route}: any) {
 		console.log(route.params.mapIndex);
 		console.log(select);
 		console.log('하이이이', markers);
+		if (polylineCoordinates.length == 0) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '보여줄게 없습니다.',
+					modalFunction: goBack,
+				}),
+			);
+		}
+		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
 	const goBack = () => {
 		navigation.goBack();
 	};
+
 	if (polylineCoordinates.length == 0) {
-		return (
-			<Box>
-				<BaseModal visible={visible} title={'보여줄거없음'} right={goBack} />
-			</Box>
-		);
+		return <Box></Box>;
 	}
 	return (
 		<ScrollView bgColor='#EFFBFB' px='2'>

@@ -1,14 +1,6 @@
-import {JSX, JSXElementConstructor, ReactElement, useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	deleteTravelCourse,
-	getDrivingDuration,
-	getOneTravelCourse,
-	saveTravel,
-	travelSliceActions,
-	updateTravelCourse,
-} from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
+import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert, TouchableOpacity, Image} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 
@@ -17,20 +9,11 @@ import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const [select, setSelect] = useState(0);
-	const [deleteList, setDeleteList] = useState<string[]>([]);
-	const [addList, setAddList] = useState<number[]>([]);
-	const [x, setX] = useState(-1);
-	const [viewDayIndex, setViewDayIndex] = useState(0);
-	let wayPoint = {start: '', goal: '', wayPoint: ''};
 
-	const goMapInfo = () => {
-		navigation.navigate('MapInfo');
-	};
 	const goInputDiary = () => {
 		navigation.navigate('InputDiary');
 	};
@@ -40,7 +23,11 @@ export default function DetailInfo({navigation}: any) {
 			await dispatch(getOneTravelCourse({travelId: travelId}));
 			console.log('아니아니이요', Object.keys(picture));
 		} catch (err) {
-			Alert.alert('사진을 불러오던 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -51,7 +38,11 @@ export default function DetailInfo({navigation}: any) {
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
 		} catch (err) {
-			Alert.alert('삭제중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 삭제 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -86,8 +77,8 @@ export default function DetailInfo({navigation}: any) {
 								{key: 'whatId', value: travelId},
 							],
 							iosExecutionParams: [
-								{key: 'key1', value: 'value1'},
-								{key: 'key2', value: 'value2'},
+								{key: 'kakaolink', value: 'Timetable'},
+								{key: 'whatId', value: travelId},
 							],
 						},
 					},
@@ -96,7 +87,11 @@ export default function DetailInfo({navigation}: any) {
 			console.log(response);
 		} catch (err) {
 			console.log(err);
-			Alert.alert('카공중에 에러가 뜨다니');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 공유 중 에러가 발생했습니다.',
+				}),
+			);
 		}
 	};
 	useFocusEffect(

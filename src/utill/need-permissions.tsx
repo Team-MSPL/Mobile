@@ -8,6 +8,7 @@ import usePermission from './hooks/usePermisson';
 import {setPermission} from '../redux/setting/settingSlice';
 import {Box, Text} from 'native-base';
 import AccessDialog from './access-dialog';
+import {modalSliceActions} from '../redux/modal/modalSlice';
 
 /**
  * 필수 권한 허용 요청 페이지
@@ -45,7 +46,11 @@ export default function NeedPermissions() {
 			console.log(status);
 			showDialogModal(status, checkResult.deniedList);
 		} catch (e) {
-			Alert.alert('오류발생', '권한 요청 중 오류가 발생하였습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '권한요청 중 에러가 발생했습니다.',
+				}),
+			);
 		}
 	};
 

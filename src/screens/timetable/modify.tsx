@@ -6,6 +6,7 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert} from 'react-native';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -51,7 +52,11 @@ export default function Modify({navigation, route}: any) {
 		let changeInputIndex = copy.findIndex(item => item.y >= newY);
 		changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
 		if (changeFlag) {
-			Alert.alert(changeFlag.name, '이랑 겹쳐요');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+				}),
+			);
 		} else {
 			let copyValue = {
 				...changeCopy[route.params.item.value.x][route.params.item.index],

@@ -399,11 +399,13 @@ export const travelSlice = createSlice({
 			state.day = [...Array(5)].map((item, idx) => moment().add(idx, 'day'));
 			state.nDay = 4;
 			state.makeMode = 'solo';
+			state.tableShowFlag = true;
 		},
 		setRecommendRegion: (state, {payload}) => {
 			Object.assign(state, initialState);
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
+			state.makeMode = 'recommend';
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -414,8 +416,9 @@ export const travelSlice = createSlice({
 			console.log('1', payload);
 			let list: number[] = [];
 			payload.waypoints &&
-				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
-			list.push(payload.duration);
+				((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
+				list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
+			list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			state.moveTimeList.push(list);
 			console.log('2');
 		});

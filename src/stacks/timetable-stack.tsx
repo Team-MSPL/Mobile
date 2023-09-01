@@ -100,6 +100,7 @@ export default function TimetableStack() {
 					title: '다님의 제안이에요',
 					headerStyle: {backgroundColor: '#EFFBFB'},
 					headerShadowVisible: false,
+					headerBackVisible: false,
 				}}
 			/>
 			<Stack.Screen

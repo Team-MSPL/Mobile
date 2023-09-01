@@ -22,6 +22,7 @@ export default function Payment({navigation}: any) {
 			<Text>출석시 하루마다 무료로 1개씩 추가됩니다! </Text>
 			{paymentViewList.map((item, idx) => (
 				<TouchableOpacity
+					key={idx}
 					style={{marginVertical: 10}}
 					onPress={() => {
 						handlePayment(item.pay);

@@ -1,26 +1,16 @@
 import {Box, Center, ScrollView, Text, VStack} from 'native-base';
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {BackHandler, Alert} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
 import {cityViewList} from '../enroll-info/select-city';
 
 export default function Preset({navigation}: any) {
-	const {
-		region,
-		accommodations,
-		nDay,
-		cityIndex,
-		essentialPlaces,
-		tendency,
-		timeLimitArray,
-		transit,
-		presetDatas,
-		distance,
-	} = useAppSelector(state => state.travelSlice);
+	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -34,7 +24,7 @@ export default function Preset({navigation}: any) {
 			}
 		}
 		dispatch(travelSliceActions.enrollTimetable(copy));
-		navigation.popToTop();
+		// navigation.popToTop();
 		navigation.navigate('Timetable');
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -45,8 +35,8 @@ export default function Preset({navigation}: any) {
 				{
 					latitude: centerLatitude,
 					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + 0.01,
-					longitudeDelta: deltaLongitude + 0.01,
+					latitudeDelta: deltaLatitude + 0.03,
+					longitudeDelta: deltaLongitude + 0.03,
 				},
 				1000,
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
@@ -111,7 +101,27 @@ export default function Preset({navigation}: any) {
 	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused()) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '뒤로 이동시 데이터는 날라갑니다.',
+						modalSubTitle: '그래도 나가시겠습니까?',
+						modalFunction: () => {
+							navigation.popToTop();
+						},
+						modalLeft: true,
+					}),
+				);
+				return true;
+			}
+		};
 
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, []);
 	if (isLoading) {
 		return (
 			<Box>
@@ -161,4 +171,4 @@ export default function Preset({navigation}: any) {
 	);
 }
 
-const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
+const mapColor = ['red', 'orange', 'yellow', 'green', 'blue'];

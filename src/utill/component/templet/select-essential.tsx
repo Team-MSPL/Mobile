@@ -4,6 +4,7 @@ import {EssentialPlaceType, travelSliceActions} from '../../../redux/travel-info
 
 import {Text, Box, HStack, Button} from 'native-base';
 import CustomButton from '../custom-button';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 
 export default function SelectEssential({navigation}: any) {
 	const {nDay, essentialPlaces} = useAppSelector(state => state.travelSlice);
@@ -34,7 +35,13 @@ export default function SelectEssential({navigation}: any) {
 						key={idx}
 						style={{marginVertical: 10}}
 						onPress={() => {
-							filteredPlaces.length < 3 ? goSearchPlace(idx + 1) : Alert.alert('3개까지만 가능합니다.');
+							filteredPlaces.length < 3
+								? goSearchPlace(idx + 1)
+								: dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '최대 3개까지만 추가가 가능합니다.',
+										}),
+								  );
 						}}>
 						<Text fontSize='lg' bold>
 							day {idx + 1}

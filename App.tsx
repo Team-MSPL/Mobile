@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useLayoutEffect} from 'react';
-import {Alert, Linking, StatusBar, useColorScheme} from 'react-native';
+import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
 import {KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,13 +14,14 @@ import {NavigationContainer} from '@react-navigation/native';
 import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
+import {modalSliceActions} from './src/redux/modal/modalSlice';
 import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
 import {socialConnect} from './src/redux/user/login.slice';
 import {userSliceActions} from './src/redux/user/user.slice';
 import StackNavigator from './src/stacks';
+import BaseModal from './src/utill/base-modal';
 import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
@@ -55,14 +56,22 @@ function App(): JSX.Element {
 				);
 			}
 		} catch (err) {
-			Alert.alert('로그인 오류', '로그인을 하는 도중 오류가 발생하였습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '로그인 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const goOffApp = () => {
+		BackHandler.exitApp();
+	};
 	const getDeepLink = async () => {
 		Linking.getInitialURL().then(async res => {
 			try {
+				console.log(res);
 				if (res == null || res == undefined || res == '') {
 					console.log('첫번째 if요', res);
 					// 그냥 앱을 켰을때
@@ -73,18 +82,27 @@ function App(): JSX.Element {
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
+					console.log(match);
 					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
 					if (q.payload == 0) {
-						console.log('두번쨰 if요', res);
-						Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+								modalFunction: goOffApp,
+							}),
+						);
 					} else {
 						console.log('두번쨰 else요', res);
 						dispatch(travelSliceActions.setMakeMode('share'));
 					}
 				}
 			} catch (err) {
-				console.log('첫번쨰 catch요', err);
-				Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+						modalFunction: goOffApp,
+					}),
+				);
 			}
 		});
 		Linking.addEventListener('url', async e => {
@@ -95,15 +113,23 @@ function App(): JSX.Element {
 				const match = e.url.match(pattern) ?? '';
 				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
 				if (q.payload == 0) {
-					console.log('2', e);
-					Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+							modalFunction: goOffApp,
+						}),
+					);
 				} else {
 					console.log('3', e);
 					dispatch(travelSliceActions.setMakeMode('share'));
 				}
 			} catch (err) {
-				console.log('errr', err);
-				Alert.alert('타임테이블 로딩 중 에러가 발생했습니다.');
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+						modalFunction: goOffApp,
+					}),
+				);
 			}
 		});
 	};
@@ -123,6 +149,9 @@ function App(): JSX.Element {
 	const {checkInitialPermission} = usePermission();
 
 	const {hasPermission} = useAppSelector((state: RootState) => state.settingSlice);
+	const lottieHide = () => {
+		setTimeout(() => LottieSplashScreen.hide(), 3000);
+	};
 	useEffect(() => {
 		checkInitialPermission();
 	}, [hasPermission]);
@@ -132,7 +161,7 @@ function App(): JSX.Element {
 	useEffect(() => {
 		getAllKeys();
 		checkFirstLaunch();
-		LottieSplashScreen.hide();
+		lottieHide();
 	}, []);
 	const linking = {
 		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],
@@ -152,7 +181,7 @@ function App(): JSX.Element {
 			<NativeBaseProvider>
 				<NavigationContainer linking={linking}>
 					{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
-
+					{<BaseModal />}
 					{Boolean(isLoading) && <Loading />}
 				</NavigationContainer>
 			</NativeBaseProvider>

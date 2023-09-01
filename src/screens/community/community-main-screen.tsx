@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getOnePost, getPostList, postListType} from '../../redux/community/community.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -164,7 +165,7 @@ export default function CommunityMainScreen({navigation}: any) {
 		options: ['게시글 작성', '취소'],
 		onPress: [goCommunityWritingScreen, doNothing],
 	};
-
+	useBackHandler();
 	return (
 		<View style={styles.postListContainer}>
 			{isLoading ? (

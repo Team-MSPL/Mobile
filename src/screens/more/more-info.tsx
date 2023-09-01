@@ -2,7 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Image, Text, Center, Box, ScrollView, Button, VStack, HStack} from 'native-base';
 import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function MoreInfo({navigation}: any) {
 	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -18,7 +21,11 @@ export default function MoreInfo({navigation}: any) {
 		});
 		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
-		Alert.alert('로그아웃 성공이요');
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '로그아웃에 성공했습니다.',
+			}),
+		);
 	};
 	const goWithdraw = async () => {
 		try {
@@ -31,18 +38,36 @@ export default function MoreInfo({navigation}: any) {
 			});
 			dispatch(userSliceActions.reset());
 			navigation.replace('LoginScreen');
-			Alert.alert('탈퇴 성공이요');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '회원탈퇴가 완료됐습니다.',
+				}),
+			);
 		} catch (err) {
-			Alert.alert('회원탈퇴중 에러요');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '회원 탈퇴 중 에러가 발생했습니다.',
+				}),
+			);
 		}
 	};
-
+	useBackHandler();
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};
 	const goPayment = () => {
 		navigation.navigate('Payment');
 	};
+	const goTerms = () => {
+		navigation.navigate('Terms');
+	};
+	const goPolicy = () => {
+		navigation.navigate('PolicyMain');
+	};
+	const goCrack = () => {
+		dispatch(updateFunctionToken({functionToken: 100}));
+	};
+
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{isLogin || anonymous ? (
@@ -90,10 +115,10 @@ export default function MoreInfo({navigation}: any) {
 						<Text>문의하기</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={goPolicy} style={{marginVertical: 10}}>
 						<Text>서비스 이용약관</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={goTerms} style={{marginVertical: 10}}>
 						<Text>개인정보 처리방침</Text>
 					</TouchableOpacity>
 					<Text>앱버전 0.0</Text>
@@ -104,36 +129,35 @@ export default function MoreInfo({navigation}: any) {
 					</Text>
 					<TouchableOpacity
 						onPress={() => {
-							Alert.alert('회원탈퇴 하시겠습니까?', undefined, [
-								{
-									text: '아니요',
-								},
-								{
-									text: '네',
-									onPress: goWithdraw,
-								},
-							]);
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '회원 탈퇴 하시겠습니까?',
+									modalFunction: goWithdraw,
+									modalLeft: true,
+								}),
+							);
 						}}
 						style={{marginVertical: 10}}>
 						<Text>회원탈퇴</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
-							Alert.alert('로그아웃 하시겠습니까?', undefined, [
-								{
-									text: '아니요',
-								},
-								{
-									text: '네',
-									onPress: goLogout,
-								},
-							]);
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '로그 아웃 하시겠습니까?',
+									modalFunction: goLogout,
+									modalLeft: true,
+								}),
+							);
 						}}
 						style={{marginVertical: 10}}>
 						<Text>로그아웃</Text>
 					</TouchableOpacity>
 				</VStack>
 			</Box>
+			<TouchableOpacity onPress={goCrack} style={{marginVertical: 10}}>
+				<Text>크랙버전</Text>
+			</TouchableOpacity>
 		</ScrollView>
 	);
 }
