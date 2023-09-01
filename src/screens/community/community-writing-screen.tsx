@@ -40,7 +40,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			for (let i = 0; i < response.length; i++) {
 				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
-			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
 			setPostImage(temporaryList);
 		});
 	};
@@ -107,85 +106,74 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		}
 	};
 
-	// 이미지 더보기 모달 열기
-	const openImageModal = () => {
-		setIsImageModalVisible(true);
-	};
-
-	// 이미지 더보기 모달 닫기
-	const closeImageModal = () => {
-		setIsImageModalVisible(false);
-	};
-
-	const [currentImageIndex, setImageIndex] = useState(0);
-	const [images, setImages] = useState<string>('');
-	const onSelect = (images: string, index: number) => {
-		setImageIndex(index);
-		setImages(images);
-		setIsImageModalVisible(true);
+	// 변화되는 인덱스
+	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+	// 초기 인덱스
+	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
+	const onSelect = (index: number) => {
+		setInitialImageIndex(index);
+		setCurrentImageIndex(index);
+		setIsImageModalVisible(index === 0 || !!index);
 	};
 
 	return (
-		<ScrollView style={styles.container}>
-			<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
-			<TextInput
-				style={styles.contentInput}
-				placeholder='내용'
-				value={postContent}
-				onChangeText={setPostContent}
-				multiline
-			/>
-			<Text>사진 목록</Text>
-			<View style={styles.container}>
-				{postImage.map((uri, index) => {
-					return (
-						<View key={index} style={{alignItems: 'center'}}>
-							<TouchableOpacity onPress={() => onSelect(uri, index)}>
-								<Image source={{uri: uri}} style={{width: 100, height: 100}} />
-							</TouchableOpacity>
-						</View>
-					);
-				})}
-
-				<ImageView
-					images={postImage.map(uri => ({uri}))}
-					imageIndex={currentImageIndex}
-					visible={isImageModalVisible}
-					onImageIndexChange={index => setImageIndex(index)}
-					onRequestClose={() => {
-						setIsImageModalVisible(false);
-						console.log('모달 꺼짐요');
-					}}
-					FooterComponent={() => (
-						<SafeAreaView style={{alignItems: 'center'}}>
-							<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${postImage.length}`}</Text>
-						</SafeAreaView>
-					)}
+		<SafeAreaView style={{flex: 1}}>
+			<ScrollView style={styles.container}>
+				<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
+				<TextInput
+					style={styles.contentInput}
+					placeholder='내용'
+					value={postContent}
+					onChangeText={setPostContent}
+					multiline
 				/>
-			</View>
-			{/* <Modal isVisible={isModalVisible}>
-				<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-				<ScrollView contentContainerStyle={styles.modalContainer}>
-					{postImage.map((uri, index) => (
-						<Image key={index} source={{uri}} style={styles.modalImage} />
-					))}
-				</ScrollView>
-			</Modal> */}
+				<Text>사진 목록</Text>
+				<View style={styles.container}>
+					{postImage.map((uri, index) => {
+						return (
+							<View key={index} style={{alignItems: 'center'}}>
+								<TouchableOpacity
+									onPress={() => {
+										onSelect(index);
+										console.log('파이팅', currentImageIndex);
+									}}>
+									<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+								</TouchableOpacity>
+							</View>
+						);
+					})}
 
-			<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
-				<Text style={styles.attachButtonText}>사진 선택하기</Text>
-			</TouchableOpacity>
-			<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
-				<Text style={styles.submitButtonText}>글 등록하기</Text>
-			</TouchableOpacity>
-		</ScrollView>
+					<ImageView
+						images={postImage.map(uri => ({uri}))}
+						imageIndex={initialImageIndex || 0}
+						visible={isImageModalVisible}
+						onImageIndexChange={setCurrentImageIndex}
+						onRequestClose={() => {
+							setIsImageModalVisible(false);
+						}}
+						HeaderComponent={() => (
+							<SafeAreaView style={{alignItems: 'center'}}>
+								<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${postImage.length}`}</Text>
+							</SafeAreaView>
+						)}
+					/>
+				</View>
+
+				<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
+					<Text style={styles.attachButtonText}>사진 선택하기</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
+					<Text style={styles.submitButtonText}>글 등록하기</Text>
+				</TouchableOpacity>
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 16,
+		paddingHorizontal: '4%',
 	},
 	titleInput: {
 		fontSize: 18,

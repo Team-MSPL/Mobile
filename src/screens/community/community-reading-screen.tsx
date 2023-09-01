@@ -13,7 +13,6 @@ import {
 	Platform,
 	RefreshControl,
 	SafeAreaView,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -21,7 +20,7 @@ import {
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import Modal from 'react-native-modal';
+import ImageView from 'react-native-image-viewing';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -426,6 +425,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		onPress: [() => handleDeleteComment(commentData._id), () => showReportActionSheet(), doNothing],
 	};
 
+	// 변화되는 인덱스
+	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+	// 초기 인덱스
+	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
+	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
+	const onSelect = (index: number) => {
+		setInitialImageIndex(index);
+		setCurrentImageIndex(index);
+		setIsImageModalVisible(index === 0 || !!index);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ActionSheet
@@ -483,7 +493,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 								<Text>제목: {postData.postTitle}</Text>
 								<Text>본문</Text>
 								<Text style={styles.postContentText}>{postData.postContent}</Text>
-								<Text>사진 목록</Text>
+								{/* <Text>사진 목록</Text>
 								<View style={styles.imageContainer}>
 									{postData.postImage.slice(0, 8).map((uri, index) => (
 										<Image key={index} source={{uri}} style={styles.image} />
@@ -501,7 +511,40 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 											<Image key={index} source={{uri}} style={styles.modalImage} />
 										))}
 									</ScrollView>
-								</Modal>
+								</Modal> */}
+								<Text>사진 목록</Text>
+								<View style={styles.container}>
+									{postData.postImage.map((uri, index) => {
+										return (
+											<View key={index} style={{alignItems: 'center'}}>
+												<TouchableOpacity
+													onPress={() => {
+														onSelect(index);
+														console.log('파이팅', currentImageIndex);
+													}}>
+													<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+												</TouchableOpacity>
+											</View>
+										);
+									})}
+
+									<ImageView
+										images={postData.postImage.map(uri => ({uri}))}
+										imageIndex={initialImageIndex || 0}
+										visible={isImageModalVisible}
+										onImageIndexChange={setCurrentImageIndex}
+										onRequestClose={() => {
+											setIsImageModalVisible(false);
+										}}
+										HeaderComponent={() => (
+											<SafeAreaView style={{alignItems: 'center'}}>
+												<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${
+													postData.postImage.length
+												}`}</Text>
+											</SafeAreaView>
+										)}
+									/>
+								</View>
 								<View style={styles.likeContainer}>
 									<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
 										<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
