@@ -6,27 +6,26 @@
  */
 
 import React, {useEffect, useLayoutEffect} from 'react';
-import {Alert, BackHandler, StatusBar, useColorScheme, Linking} from 'react-native';
+import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import StackNavigator from './src/stacks';
-import {NativeBaseProvider} from 'native-base';
-import {RootState, useAppDispatch, useAppSelector} from './src/redux';
-import Loading from './src/utill/loading';
-import {LoadingSliceActions} from './src/redux/loading/loading.slice';
-import {socialConnect} from './src/redux/user/login.slice';
+import {KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
-import {KAKAO_NATIVE_KEY} from '@env';
-import {userSliceActions} from './src/redux/user/user.slice';
-import ViewPager from './src/utill/view-pager';
-import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
-import usePermission from './src/utill/hooks/usePermisson';
-import NeedPermissions from './src/utill/need-permissions';
+import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
-import BaseModal from './src/utill/base-modal';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {RootState, useAppDispatch, useAppSelector} from './src/redux';
+import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {modalSliceActions} from './src/redux/modal/modalSlice';
+import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
+import {socialConnect} from './src/redux/user/login.slice';
+import {userSliceActions} from './src/redux/user/user.slice';
+import StackNavigator from './src/stacks';
+import BaseModal from './src/utill/base-modal';
+import usePermission from './src/utill/hooks/usePermisson';
+import Loading from './src/utill/loading';
+import NeedPermissions from './src/utill/need-permissions';
+import ViewPager from './src/utill/view-pager';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -74,10 +73,12 @@ function App(): JSX.Element {
 			try {
 				console.log(res);
 				if (res == null || res == undefined || res == '') {
+					console.log('첫번째 if요', res);
 					// 그냥 앱을 켰을때
 
 					return;
 				} else {
+					console.log('첫번쨰 else요', res);
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
@@ -91,6 +92,7 @@ function App(): JSX.Element {
 							}),
 						);
 					} else {
+						console.log('두번쨰 else요', res);
 						dispatch(travelSliceActions.setMakeMode('share'));
 					}
 				}
@@ -106,6 +108,7 @@ function App(): JSX.Element {
 		Linking.addEventListener('url', async e => {
 			try {
 				//앱이 켜져있는데 켰을때
+				console.log('1', e);
 				const pattern = /whatId=([a-zA-Z0-9]+)/;
 				const match = e.url.match(pattern) ?? '';
 				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
@@ -117,6 +120,7 @@ function App(): JSX.Element {
 						}),
 					);
 				} else {
+					console.log('3', e);
 					dispatch(travelSliceActions.setMakeMode('share'));
 				}
 			} catch (err) {

@@ -1,18 +1,16 @@
 import {useFocusEffect} from '@react-navigation/native';
 import {HStack, Text, ThreeDotsIcon} from 'native-base';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
 	ActivityIndicator,
-	Button,
 	Dimensions,
 	FlatList,
 	RefreshControl,
-	SafeAreaView,
 	StyleSheet,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import Modal from 'react-native-modal';
+import ActionSheet from 'react-native-actionsheet';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getOnePost, getPostList, postListType} from '../../redux/community/community.slice';
@@ -22,8 +20,7 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [isMenuModalVisible, setIsMenuModalVisible] = useState(false);
-
+	const menuActionSheet = useRef<ActionSheet>(null);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 
@@ -33,24 +30,18 @@ export default function CommunityMainScreen({navigation}: any) {
 		}, []),
 	);
 
-	// 앱 바 우측의 더보기 버튼 메뉴 리스트
-	const communityMenuList = [
-		{
-			title: '글 쓰기',
-			onPress: () => {
-				console.log('글쓰기 페이지로 이동');
-				closeModal();
-				goCommunityWritingScreen();
-			},
-		},
-		{
-			title: '취소',
-			onPress: () => {
-				console.log('취소');
-				closeModal();
-			},
-		},
-	];
+	// 아이템 구분선
+	const flatListItemSeperator = () => {
+		return (
+			<View
+				style={{
+					height: 1,
+					width: '100%',
+					backgroundColor: 'gray',
+				}}
+			/>
+		);
+	};
 
 	// 게시글 읽는 화면으로 이동
 	const goCommunityReadingScreen = async (item: string) => {
@@ -77,6 +68,10 @@ export default function CommunityMainScreen({navigation}: any) {
 		});
 	};
 
+	const showCommentOptionActionSheet = () => {
+		menuActionSheet.current?.show();
+	};
+
 	// 앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
@@ -85,7 +80,7 @@ export default function CommunityMainScreen({navigation}: any) {
 					<View>
 						<TouchableOpacity
 							onPress={() => {
-								openModal();
+								showCommentOptionActionSheet();
 							}}>
 							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
@@ -158,27 +153,17 @@ export default function CommunityMainScreen({navigation}: any) {
 		);
 	};
 
-	// 메뉴 모달창 아이템 구분선
-	const flatListItemSeperator = () => {
-		return (
-			<View
-				style={{
-					height: 1,
-					width: '100%',
-					backgroundColor: 'gray',
-				}}
-			/>
-		);
-	};
+	function doNothing(): any {
+		// 아무것도 하지 않음
+	}
 
-	// 모달 열기 관리
-	const openModal = () => {
-		setIsMenuModalVisible(true);
-	};
-
-	// 모달 닫기 관리
-	const closeModal = () => {
-		setIsMenuModalVisible(false);
+	// 메뉴의 옵션 및 실행 리스트
+	const menuOptionList: {
+		options: string[];
+		onPress: (() => void)[];
+	} = {
+		options: ['게시글 작성', '취소'],
+		onPress: [goCommunityWritingScreen, doNothing],
 	};
 	useBackHandler();
 	return (
@@ -197,39 +182,15 @@ export default function CommunityMainScreen({navigation}: any) {
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 				/>
 			)}
-
-			<Modal
-				animationIn='bounce'
-				isVisible={isMenuModalVisible}
-				backdropOpacity={0.3}
-				useNativeDriverForBackdrop={true}
-				onBackdropPress={closeModal}
-				onBackButtonPress={closeModal}
-				style={{margin: 8, justifyContent: 'flex-end'}}>
-				<SafeAreaView>
-					<View
-						style={{
-							backgroundColor: '#FFFFFFFF',
-							borderRadius: 10,
-							paddingHorizontal: 10,
-						}}>
-						<Text
-							style={{
-								color: '#182E44',
-								fontSize: 20,
-								fontWeight: '500',
-								margin: 12,
-							}}>
-							게시판 메뉴
-						</Text>
-						<FlatList
-							data={communityMenuList}
-							renderItem={({item}) => (
-								<Button title={item.title} onPress={item.onPress}></Button>
-							)}></FlatList>
-					</View>
-				</SafeAreaView>
-			</Modal>
+			<ActionSheet
+				ref={menuActionSheet}
+				title={'메뉴 선택'}
+				options={menuOptionList.options}
+				cancelButtonIndex={1}
+				onPress={(index: number) => {
+					menuOptionList.onPress[index]();
+				}}
+			/>
 		</View>
 	);
 }
