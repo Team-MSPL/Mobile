@@ -1,12 +1,11 @@
-import {useState, memo, useRef} from 'react';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
-import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Modal, Image, Pressable} from 'react-native';
-import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import {colors} from '../../colors';
 import {GOOGLE_API_KEY} from '@env';
-import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {Box, HStack, Text, VStack} from 'native-base';
+import {memo, useRef, useState} from 'react';
+import {Image, Modal, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();

@@ -4,7 +4,6 @@ import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-sign
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import jwtDecode from 'jwt-decode';
 import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
-import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAppDispatch} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -112,6 +111,7 @@ export default function LoginScreen({navigation}: any) {
 
 	const appleLogin = async () => {
 		try {
+			console.log('asdㅁㅁㄴㄹ');
 			// 1). 로그인 요청 수행
 			const appleAuthRequestResponse = await appleAuth.performRequest({
 				requestedOperation: appleAuth.Operation.LOGIN,

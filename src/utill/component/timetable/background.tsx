@@ -1,5 +1,5 @@
-import React, {useEffect, useLayoutEffect, useState, useRef, memo} from 'react';
-import {Alert, TouchableOpacity, View} from 'react-native';
+import React, {memo} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';

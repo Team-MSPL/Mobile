@@ -14,6 +14,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {modalSliceActions} from './src/redux/modal/modalSlice';
