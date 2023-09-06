@@ -56,7 +56,7 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 	};
 	//테스트에서는 36개로 했음
 	return (
-		<View style={{flexDirection: 'row'}}>
+		<View style={{flexDirection: 'row', zIndex: 2}}>
 			<TimeView />
 			{[...Array(5)].map((item, inx) => (
 				<View key={inx}>
@@ -72,6 +72,10 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 								borderBottomWidth: index === 47 ? 1 : 0,
 								backgroundColor:
 									editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white',
+								position: 'absolute',
+								top: 35 * (index ?? 1),
+								left: inx && 70 * inx,
+								zIndex: 2,
 							}}
 							activeOpacity={makeMode == 'share' ? 1 : 0.2}
 							onPress={() => makeMode != 'share' && handleCellPress(inx, index)}

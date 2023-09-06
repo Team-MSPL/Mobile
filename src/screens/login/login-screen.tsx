@@ -133,8 +133,10 @@ export default function LoginScreen({navigation}: any) {
 			}
 		} catch (error: any) {
 			if (error.code === appleAuth.Error.CANCELED) {
+				console.log('로그인하다가 생긴 에러', error);
 				// login canceled
 			} else {
+				console.log('에러', error);
 				// login error
 			}
 		}

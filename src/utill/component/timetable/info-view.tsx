@@ -1,7 +1,7 @@
 import {GOOGLE_API_KEY} from '@env';
 import {Box, HStack, Text, VStack} from 'native-base';
 import {memo, useRef, useState} from 'react';
-import {Image, Modal, TouchableOpacity} from 'react-native';
+import {Image, Modal, TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
@@ -101,7 +101,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	const categortColors = ['blue', 'orange', 'green', 'pink', 'purple', 'gray'];
 
 	return (
-		<Box>
+		<View style={{zIndex: 3}}>
 			<HStack position='absolute'>
 				<Box w='60px'></Box>
 				{timetable.map(
@@ -122,7 +122,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 														? 'red'
 														: categortColors[value.category],
 												position: 'absolute',
-												zIndex: 1,
+												zIndex: 3,
 											}}
 											key={index}
 											onPress={() => {
@@ -156,17 +156,17 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											}}
 											// onLongPress={() => {
 
-											// 	if (makeMode != 'share') {
-											// 		if (editMode == 'delete') {
-											// 			setDeleteList([]);
-											// 			dispatch(travelSliceActions.editModeChange(''));
-											// 		} else {
-											// 			let copy = [...deleteList];
-											// 			copy.push(value.id);
-											// 			setDeleteList(copy);
-											// 			dispatch(travelSliceActions.editModeChange('delete'));
-											// 		}
-											// 	}
+											//    if (makeMode != 'share') {
+											//       if (editMode == 'delete') {
+											//          setDeleteList([]);
+											//          dispatch(travelSliceActions.editModeChange(''));
+											//       } else {
+											//          let copy = [...deleteList];
+											//          copy.push(value.id);
+											//          setDeleteList(copy);
+											//          dispatch(travelSliceActions.editModeChange('delete'));
+											//       }
+											//    }
 											// }}
 										>
 											{/* h= takenTime top=시간위치 */}
@@ -270,7 +270,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 					</InfoModalContainer>
 				</ModalContainer>
 			</Modal>
-		</Box>
+		</View>
 	);
 };
 
