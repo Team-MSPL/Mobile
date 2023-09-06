@@ -12,6 +12,11 @@ export default function SelectCity({navigation}: any) {
 	const {region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
+	const [regionMode, setRegionMode] = useState(true);
+	const [popularitySelect, setPopularitySelect] = useState(-1);
+	const handlePopularity = (e: number) => {
+		setPopularitySelect(e);
+	};
 
 	const selectRegion = (e: string) => {
 		if (e === '전체' || region.includes('전체')) {
@@ -39,7 +44,17 @@ export default function SelectCity({navigation}: any) {
 	};
 
 	const goNext = () => {
-		dispatch(travelSliceActions.enrollCityIndex(select));
+		if (regionMode) {
+			dispatch(travelSliceActions.enrollCityIndex(select));
+		} else {
+			const index = popularityList[popularitySelect];
+			dispatch(
+				travelSliceActions.enrollPoplurarityRegion({
+					region: [cityViewList[index.id].sub[index.subId].subTitle],
+					cityIndex: index.id,
+				}),
+			);
+		}
 		navigation.navigate('SelectDay');
 	};
 
@@ -78,86 +93,150 @@ export default function SelectCity({navigation}: any) {
 				</Text>
 			</VStack>
 			<Divider my='5' />
-			<TextInput
-				style={{backgroundColor: 'red'}}
-				value={search}
-				onChangeText={text => changeSearch(text)}></TextInput>
-			<TouchableOpacity onPress={addCity}>
-				<Text>{searchData && searchData?.title}</Text>
-			</TouchableOpacity>
-			<VStack space='10'>
-				<HStack>
-					<Box w='1/2' h='300'>
-						<Text fontSize='xl' color='grey'>
-							지역
-						</Text>
-						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView nestedScrollEnabled={true}>
-								{cityViewList.map((item, idx) => {
+			<HStack>
+				<TouchableOpacity
+					style={{
+						width: 50,
+						height: 100,
+						backgroundColor: regionMode ? 'red' : 'white',
+						marginHorizontal: 10,
+					}}
+					onPress={() => setRegionMode(true)}>
+					<Text>그냥</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={{
+						width: 50,
+						height: 100,
+						backgroundColor: regionMode ? 'white' : 'red',
+						marginHorizontal: 10,
+					}}
+					onPress={() => setRegionMode(false)}>
+					<Text>인기</Text>
+				</TouchableOpacity>
+			</HStack>
+			{regionMode ? (
+				<>
+					<TextInput
+						style={{backgroundColor: 'red'}}
+						value={search}
+						onChangeText={text => changeSearch(text)}></TextInput>
+					<TouchableOpacity onPress={addCity}>
+						<Text>{searchData && searchData?.title}</Text>
+					</TouchableOpacity>
+					<VStack space='10'>
+						<HStack>
+							<Box w='1/2' h='300'>
+								<Text fontSize='xl' color='grey'>
+									지역
+								</Text>
+								<Box h='full' borderWidth='1px' borderColor='grey'>
+									<ScrollView nestedScrollEnabled={true}>
+										{cityViewList.map((item, idx) => {
+											return (
+												<TouchableOpacity
+													key={idx}
+													style={{
+														backgroundColor: select == item.id ? '#ABD9FF' : '#EFFBFB',
+														height: 40,
+														justifyContent: 'center',
+													}}
+													onPress={() => selectCity(item.id)}>
+													<Text color={select == item.id ? 'blue.500' : 'black'} bold>
+														{item.title}
+													</Text>
+												</TouchableOpacity>
+											);
+										})}
+									</ScrollView>
+								</Box>
+							</Box>
+							<Box w='1/2' h='300'>
+								<Text fontSize='xl' color='grey'>
+									상세 지역
+								</Text>
+								<Box h='full' borderWidth='1px' borderColor='grey'>
+									<ScrollView nestedScrollEnabled={true}>
+										{cityViewList[select]?.sub.map((item, idx) => {
+											return (
+												<TouchableOpacity
+													key={idx}
+													style={{
+														backgroundColor: region.includes(item.subTitle)
+															? '#ABD9FF'
+															: '#EFFBFB',
+														justifyContent: 'center',
+														height: 40,
+													}}
+													onPress={() => {
+														selectRegion(item.subTitle);
+													}}>
+													<Text
+														color={region.includes(item.subTitle) ? 'blue.500' : 'black'}
+														bold>
+														{item.subTitle}
+													</Text>
+												</TouchableOpacity>
+											);
+										})}
+									</ScrollView>
+								</Box>
+							</Box>
+						</HStack>
+						<Box w='full' h='20' bgColor='#B0B0B0'>
+							<Text color='white' bold ml='3'>
+								{region?.length}개
+							</Text>
+							<ScrollView flexDir='row' horizontal>
+								{region?.map((item, idx) => {
 									return (
-										<TouchableOpacity
+										<SelectButton
 											key={idx}
-											style={{
-												backgroundColor: select == item.id ? '#ABD9FF' : '#EFFBFB',
-												height: 40,
-												justifyContent: 'center',
-											}}
-											onPress={() => selectCity(item.id)}>
-											<Text color={select == item.id ? 'blue.500' : 'black'} bold>
-												{item.title}
-											</Text>
-										</TouchableOpacity>
+											label={item}
+											onPress={() => deleteRegion(item)}></SelectButton>
 									);
 								})}
 							</ScrollView>
 						</Box>
-					</Box>
-					<Box w='1/2' h='300'>
-						<Text fontSize='xl' color='grey'>
-							상세 지역
-						</Text>
-						<Box h='full' borderWidth='1px' borderColor='grey'>
-							<ScrollView nestedScrollEnabled={true}>
-								{cityViewList[select]?.sub.map((item, idx) => {
-									return (
-										<TouchableOpacity
-											key={idx}
-											style={{
-												backgroundColor: region.includes(item.subTitle) ? '#ABD9FF' : '#EFFBFB',
-												justifyContent: 'center',
-												height: 40,
-											}}
-											onPress={() => {
-												selectRegion(item.subTitle);
-											}}>
-											<Text color={region.includes(item.subTitle) ? 'blue.500' : 'black'} bold>
-												{item.subTitle}
-											</Text>
-										</TouchableOpacity>
-									);
-								})}
-							</ScrollView>
-						</Box>
-					</Box>
-				</HStack>
-				<Box w='full' h='20' bgColor='#B0B0B0'>
-					<Text color='white' bold ml='3'>
-						{region?.length}개
-					</Text>
-					<ScrollView flexDir='row' horizontal>
-						{region?.map((item, idx) => {
-							return (
-								<SelectButton key={idx} label={item} onPress={() => deleteRegion(item)}></SelectButton>
-							);
-						})}
-					</ScrollView>
-				</Box>
-				<CustomButton label='다음단계' onPress={goNext} isDisabled={!region.length} />
-			</VStack>
+					</VStack>
+				</>
+			) : (
+				<>
+					{popularityList.map((item, value) => (
+						<TouchableOpacity
+							key={value}
+							style={{
+								width: 100,
+								height: 50,
+								backgroundColor: popularitySelect == value ? 'red' : 'white',
+								borderRadius: 10,
+								marginVertical: 10,
+							}}
+							onPress={() => {
+								handlePopularity(value);
+							}}>
+							<Text>{item.title}</Text>
+						</TouchableOpacity>
+					))}
+				</>
+			)}
+
+			<CustomButton
+				label='다음단계'
+				onPress={goNext}
+				isDisabled={regionMode ? !region.length : popularitySelect == -1}
+			/>
 		</ScrollView>
 	);
 }
-
+const popularityList = [
+	{id: 0, title: '서울', subId: 0},
+	{id: 1, title: '부산', subId: 0},
+	{id: 2, title: '대구', subId: 0},
+	{id: 9, title: '강원 강릉 ', subId: 1},
+	{id: 10, title: '충북 단양', subId: 2},
+];
 export const cityViewList = [
 	{id: 0, title: '서울', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 1, title: '부산', sub: [{id: 0, subTitle: '전체'}]},

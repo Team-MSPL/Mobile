@@ -140,7 +140,9 @@ export default function MapInfo({navigation, route}: any) {
 									key={idx}
 									label={idx + 1 + '일차요'}
 									bgColor={idx === select}
-									onPress={() => change(idx)}></SelectButton>
+									onPress={() => {
+										console.log(deltaLatitude, deltaLongitude), change(idx);
+									}}></SelectButton>
 							),
 					)}
 				</Box>
@@ -157,8 +159,8 @@ export default function MapInfo({navigation, route}: any) {
 								region={{
 									latitude: centerLatitude,
 									longitude: centerLongitude,
-									latitudeDelta: deltaLatitude + 0.03,
-									longitudeDelta: deltaLongitude + 0.03,
+									latitudeDelta: deltaLatitude + deltaLatitude,
+									longitudeDelta: deltaLongitude + deltaLongitude,
 								}}>
 								{markers}
 								{polylines}

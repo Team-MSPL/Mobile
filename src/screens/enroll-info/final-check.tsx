@@ -39,6 +39,7 @@ export default function FinalCheck({navigation}: any) {
 			  );
 	};
 	useEffect(() => {
+		console.log('하위용', accommodations);
 		const backAction = () => {
 			if (navigation.isFocused() && isLoading) {
 				dispatch(

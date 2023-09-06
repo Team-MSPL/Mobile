@@ -52,7 +52,7 @@ const ModalContainer = styled.Pressable`
 	background-color: rgba(255, 255, 255, 0.8);
 `;
 
-const ViewContaniner = styled.View`
+const ViewContaniner = styled.Pressable`
 	background-color: white;
 	width: 80%;
 	border-radius: 5px;

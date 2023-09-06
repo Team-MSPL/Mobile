@@ -35,8 +35,8 @@ export default function Preset({navigation}: any) {
 				{
 					latitude: centerLatitude,
 					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + 0.03,
-					longitudeDelta: deltaLongitude + 0.03,
+					latitudeDelta: deltaLatitude + deltaLatitude / 2,
+					longitudeDelta: deltaLongitude + deltaLongitude / 5,
 				},
 				1000,
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
@@ -148,8 +148,8 @@ export default function Preset({navigation}: any) {
 					region={{
 						latitude: centerLatitude,
 						longitude: centerLongitude,
-						latitudeDelta: deltaLatitude + 0.03,
-						longitudeDelta: deltaLongitude + 0.03,
+						latitudeDelta: deltaLatitude + deltaLatitude / 2,
+						longitudeDelta: deltaLongitude + deltaLongitude / 5,
 					}}>
 					{markers}
 					{polylines}

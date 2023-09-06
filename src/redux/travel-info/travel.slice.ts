@@ -2,8 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
-import {API_ROUTE, NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
-import userSlice, {userSliceActions} from '../user/user.slice';
+import {NAVER_API_KEY, NAVER_API_KEY_id, GOOGLE_API_KEY, KAKAO_REST_API_KEY} from '@env';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -22,7 +21,7 @@ const initialState: LiteState = {
 	distance: 0, //거리민감도
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: [[]], //성향
-	timeLimitArray: [8, 20], //시작시간과 끝시간
+	timeLimitArray: [9, 20], //시작시간과 끝시간
 	minuteLimitArray: [0, 0], //시작시간 분과 끝분
 	season: [false, false, false, false], //계절
 	presetDatas: [[[]]], //프리셋 저장하는곳
@@ -40,6 +39,8 @@ const initialState: LiteState = {
 	picture: [],
 	reviewCheck: false,
 	tableShowFlag: false,
+	selectStartDate: moment(),
+	selectEndDate: null,
 };
 
 export const axiosAuth = axios.create({
@@ -47,9 +48,6 @@ export const axiosAuth = axios.create({
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,
-		// Authorization:
-		// 	'Bearer ' +
-		// 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik1vb24iLCJ1c2VyUHJvZmlsZUltYWdlIjoicXdlIiwidXNlclRva2VuIjoiMjkxNjkxMTUwOCIsIl9pZCI6IjY0ZGI1NmUzYTAxMmI2NDc3YjU5NGVkMyIsImlhdCI6MTY5MjA5NjIyNywiZXhwIjoxNzA3NjQ4MjI3fQ.59IaNH_XwrRGauDzh6fohNmrZoKe1EIE7TovNh3yp6k',
 	},
 });
 
@@ -76,12 +74,7 @@ export const axiosNaver = axios.create({
 //내 여행 목록 가져오는거
 export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data, thunkAPI) => {
 	try {
-		console.log('여행옴', thunkAPI.getState().userSlice.userId);
-		console.log('왜왜오왜ㅜㅠㅜㅠㅜㅜㅠㅜㅠㅜㅠㅜㅠ', axiosAuth.defaults.headers);
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
-		console.log('여행안오');
-		console.log(response.data);
-		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data.travelCourseList;
 	} catch (error) {
 		console.log(error);
@@ -94,9 +87,6 @@ export const getOneTravelCourse = createAsyncThunk(
 	async (data: {travelId: string}, thunkAPI) => {
 		try {
 			const response = await axiosAuth.get(`/travelCourse/getOneTravelCourse?travelId=${data.travelId}`);
-			console.log('실패허락해줘', response.data);
-
-			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
 		} catch (error) {
 			console.log(error);
@@ -110,9 +100,6 @@ export const updateTravelCourse = createAsyncThunk(
 	async (data: updateTravelCourseType, thunkAPI) => {
 		try {
 			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourse`, data);
-			console.log(response.data);
-
-			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
 		} catch (error) {
 			console.log(error);
@@ -122,34 +109,21 @@ export const updateTravelCourse = createAsyncThunk(
 );
 
 //코스 삭제하기
-export const deleteTravelCourse = createAsyncThunk(
-	'/deleteTravelCourse',
-	async (data: {travelId: string}, thunkAPI) => {
-		try {
-			console.log('ㅋ?', data.travelId);
-			let q = {travelId: data.travelId};
-			console.log(q);
-			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
-			console.log(response.data);
-
-			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
-			return response.data;
-		} catch (error) {
-			console.log(error);
-			return error;
-		}
-	},
-);
+export const deleteTravelCourse = createAsyncThunk('/deleteTravelCourse', async (data: {travelId: string}) => {
+	try {
+		const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
+		return response.data;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+});
 //여행일기 저장,수정
 export const updateDiary = createAsyncThunk(
 	'/updateDiary',
-	async (data: {travelId: string; diary: string; picture: string[]}, thunkAPI) => {
+	async (data: {travelId: string; diary: string; picture: string[]}) => {
 		try {
-			console.log('안녕ㅎ세요', data);
 			const response = await axiosAuth.patch(`/travelCourse/updateDiary`, data);
-			console.log(response.data);
-
-			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response;
 		} catch (error) {
 			console.log(error);
@@ -159,12 +133,9 @@ export const updateDiary = createAsyncThunk(
 );
 
 //여행 리뷰, 별점 저장
-export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: reviewAndPointType, thunkAPI) => {
+export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: reviewAndPointType) => {
 	try {
 		const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
-		console.log(response.data);
-
-		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -174,14 +145,9 @@ export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: r
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
-export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, thunkAPI) => {
+export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType) => {
 	try {
-		console.log('ㅁㄴㅇ');
 		const response = await axiosAuth.post(`/ai/run`, data);
-		console.log('qwe', response);
-		console.log('케케케', response.data);
-		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data);
-		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -191,12 +157,7 @@ export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelA
 //여행 코스 저장
 export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, thunkAPI) => {
 	try {
-		console.log('ㅁㄴㅇ', thunkAPI.getState().travelSlice.timetable);
 		const response = await axiosAuth.post(`/travelCourse/saveTravelCourse`, data);
-		console.log('qwe', response);
-		console.log('케케케', response.data);
-		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data.data);
-		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -308,6 +269,17 @@ export const travelSlice = createSlice({
 			state.timeLimitArray = payload.time;
 			state.minuteLimitArray = payload.minute;
 		},
+		enrollPoplurarityRegion: (state, {payload}) => {
+			state.region = payload.region;
+			state.cityIndex = payload.cityIndex;
+		},
+		enrollSelectStartDate: (state, {payload}) => {
+			state.selectStartDate = payload;
+			state.selectEndDate = null;
+		},
+		enrollSelectEndDate: (state, {payload}) => {
+			state.selectEndDate = payload;
+		},
 		enrollDayInfo: (state, {payload}) => {
 			state.day = payload.day;
 			state.nDay = payload.nDay;
@@ -323,7 +295,7 @@ export const travelSlice = createSlice({
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
-			state.timetable.map((item, idx) => {
+			state.timetable.forEach((item, idx) => {
 				let time = 6;
 				let eatTimeList = [8, 15, 22, 29];
 				const updateItem = {
@@ -336,15 +308,22 @@ export const travelSlice = createSlice({
 					id: 0, //넣을거
 					takenTime: 0, //넣을거
 				};
-				item.map((value, index) => {
-					if (idx == 0 && index == 0) {
-						time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-						console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
+				item.forEach((value, index) => {
+					if (index == 0) {
+						if (idx == 0) {
+							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+						} else if (copy[idx - 1].at(-1).name == '숙소 추천') {
+							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
+						}
 					}
-					if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
-						copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
-						time += 2;
-					}
+					// if (idx == 0 && index == 0) {
+					// 	time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+					// 	console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
+					// }
+					// if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
+					// 	copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
+					// 	time += 2;
+					// }
 					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
 						copy[idx].push({
 							...updateItem,
@@ -379,7 +358,6 @@ export const travelSlice = createSlice({
 					}
 				});
 			});
-			console.log('문제느없는데요,', copy);
 			state.timetable = copy;
 		},
 		editModeChange: (state, {payload}) => {
@@ -415,10 +393,14 @@ export const travelSlice = createSlice({
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
 			console.log('1', payload);
 			let list: number[] = [];
-			payload.waypoints &&
-				((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
-				list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
-			list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
+			if (payload == undefined) {
+				list.push(30);
+			} else {
+				payload.waypoints &&
+					((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
+					list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
+				list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
+			}
 			state.moveTimeList.push(list);
 			console.log('2');
 		});
@@ -490,10 +472,12 @@ interface LiteState {
 	picture: string[];
 	reviewCheck: boolean;
 	tableShowFlag: boolean;
+	selectStartDate: Moment;
+	selectEndDate: Moment | null;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
-interface PlaceType {
+export interface PlaceType {
 	name: string;
 	lat: number;
 	lng: number;

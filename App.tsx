@@ -26,6 +26,7 @@ import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);

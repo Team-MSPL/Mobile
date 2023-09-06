@@ -22,6 +22,7 @@ export default function AddAccommodation({navigation, route}: any) {
 	};
 
 	const selectDay = (idx: number) => {
+		console.log(accommodations);
 		let copy = [...select];
 		copy[idx] = !copy[idx];
 		setSelect(copy);

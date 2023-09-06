@@ -7,7 +7,6 @@ import CustomButton from '../../utill/component/custom-button';
 export default function SelectMulti({navigation}: any) {
 	const [accommodation, setAccommodation] = useState(false);
 	const [essential, setEssential] = useState(false);
-
 	const goNext = () => {
 		navigation.navigate('SelectDistance');
 	};
