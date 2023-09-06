@@ -4,7 +4,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 
@@ -24,11 +26,16 @@ export default function Join1({navigation, route}: any) {
 				signUpFlag: true,
 			};
 			const result = await dispatch(socialConnect(data));
+			dispatch(userSliceActions.setSignUpReward(true));
 			console.log(navigation);
 			navigation.replace('Tab');
 		} catch (err) {
 			console.log('왜 이래', err);
-			Alert.alert('회원가입중 에러가 발생했습니다');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '회원가입 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -52,6 +59,12 @@ export default function Join1({navigation, route}: any) {
 			setAllCheck(false);
 		}
 		setCheck(copy);
+	};
+	const goPolicy = () => {
+		navigation.navigate('PolicyMain');
+	};
+	const goTerms = () => {
+		navigation.navigate('Terms');
 	};
 	useEffect(() => {
 		setNickname(route.params.nickname);
@@ -96,7 +109,7 @@ export default function Join1({navigation, route}: any) {
 							}}>
 							<Text>ㅇㅇ</Text>
 						</TouchableOpacity>
-						<TouchableOpacity onPress={() => {}}>
+						<TouchableOpacity onPress={goPolicy}>
 							<Text>이용 약관 동의 더보기</Text>
 						</TouchableOpacity>
 					</CheckContainer>
@@ -108,8 +121,8 @@ export default function Join1({navigation, route}: any) {
 							}}>
 							<Text>ㅇㅇ</Text>
 						</TouchableOpacity>
-						<TouchableOpacity onPress={() => {}}>
-							<Text>개인정보 더보기</Text>
+						<TouchableOpacity onPress={goTerms}>
+							<Text>개인정보처리방침 더보기</Text>
 						</TouchableOpacity>
 					</CheckContainer>
 				</TermsContainer>

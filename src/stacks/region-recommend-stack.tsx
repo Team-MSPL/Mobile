@@ -42,6 +42,7 @@ export default function RegionRecommendStack() {
 					title: '추천 결과',
 					headerStyle: {backgroundColor: '#EFFBFB'},
 					headerShadowVisible: false,
+					headerBackVisible: false,
 				}}
 			/>
 		</Fragment>

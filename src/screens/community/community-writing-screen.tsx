@@ -1,7 +1,18 @@
 import moment from 'moment';
 import React, {useState} from 'react';
-import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+	Alert,
+	Image,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import {default as ImageView} from 'react-native-image-viewing';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
 
@@ -13,11 +24,9 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	const [postContent, setPostContent] = useState<string>(route.params.content);
 	const [postImage, setPostImage] = useState<string[]>(route.params.images);
 	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
-	const [isModalVisible, setIsMoreImageModalVisible] = useState<boolean>(false);
+	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-
-	const [check1, setCheck1] = useState<string[]>();
 
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
@@ -27,42 +36,12 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
-			let temporaryList = [];
+			const temporaryList = [];
 			for (let i = 0; i < response.length; i++) {
 				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
-			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setCheck1(temporaryList);
-			console.log('이미지 주소');
+			setPostImage(temporaryList);
 		});
-
-		// ImageCropPicker.openPicker({
-		//    multiple: true,
-		//    mediaType: 'photo',
-		//    cropping: true,
-		//    maxFiles: 10,
-		//    includeBase64: true,
-		// }).then(response => {
-		//    if (response.length > 10) {
-		//       Alert.alert('사진은 최대 10장까지 가능합니다.');
-		//       return;
-		//    }
-		//    for (let i = 0; i < response.length; i++) {
-		//       if (response[i].size > 10000000) {
-		//          Alert.alert('10Mb보다 작은 사진만 업로드 가능합니다.');
-		//          return;
-		//       }
-		//    }
-		//    if (!response || response.length === 0) {
-		//       console.log('사진 선택을 취소하였습니다.');
-		//       return;
-		//    }
-		//    const selectedImageUris = response.map(image =>
-		//       Platform.OS === 'android' ? 'file://' + image.path : image.path,
-		//    );
-		//    setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-		//    console.log('이미지 주소', postImage);
-		// });
 	};
 
 	// * 게시글 등록
@@ -88,7 +67,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			const newPostData: savePostType = {
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: check1,
+				postImage: postImage,
 				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 
@@ -96,7 +75,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				postId: route.params.postId,
 				postTitle: postTitle,
 				postContent: postContent,
-				postImage: check1,
+				postImage: postImage,
 				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
 				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
@@ -127,57 +106,74 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		}
 	};
 
-	// 이미지 더보기 모달 열기
-	const openMoreImageModal = () => {
-		setIsMoreImageModalVisible(true);
-	};
-
-	// 이미지 더보기 모달 닫기
-	const closeMoreImageModal = () => {
-		setIsMoreImageModalVisible(false);
+	// 변화되는 인덱스
+	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+	// 초기 인덱스
+	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
+	const onSelect = (index: number) => {
+		setInitialImageIndex(index);
+		setCurrentImageIndex(index);
+		setIsImageModalVisible(index === 0 || !!index);
 	};
 
 	return (
-		<ScrollView style={styles.container}>
-			<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
-			<TextInput
-				style={styles.contentInput}
-				placeholder='내용'
-				value={postContent}
-				onChangeText={setPostContent}
-				multiline
-			/>
-			<View style={styles.imageContainer}>
-				{postImage.slice(0, 8).map((uri, index) => (
-					<Image key={index} source={{uri}} style={styles.uploadedImage} />
-				))}
-				{postImage.length > 8 && (
-					<TouchableOpacity style={styles.moreButton} onPress={openMoreImageModal}>
-						<Text style={styles.moreButtonText}>더보기</Text>
-					</TouchableOpacity>
-				)}
-			</View>
-			<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
-				<Text style={styles.attachButtonText}>사진 선택하기</Text>
-			</TouchableOpacity>
-			<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
-				<Text style={styles.submitButtonText}>글 등록하기</Text>
-			</TouchableOpacity>
-			<Modal visible={isModalVisible} onRequestClose={closeMoreImageModal}>
-				<ScrollView contentContainerStyle={styles.modalContainer}>
-					{postImage.map((uri, index) => (
-						<Image key={index} source={{uri}} style={styles.modalImage} />
-					))}
-				</ScrollView>
-			</Modal>
-		</ScrollView>
+		<SafeAreaView style={{flex: 1}}>
+			<ScrollView style={styles.container}>
+				<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
+				<TextInput
+					style={styles.contentInput}
+					placeholder='내용'
+					value={postContent}
+					onChangeText={setPostContent}
+					multiline
+				/>
+				<Text>사진 목록</Text>
+				<View style={styles.container}>
+					{postImage.map((uri, index) => {
+						return (
+							<View key={index} style={{alignItems: 'center'}}>
+								<TouchableOpacity
+									onPress={() => {
+										onSelect(index);
+										console.log('파이팅', currentImageIndex);
+									}}>
+									<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+								</TouchableOpacity>
+							</View>
+						);
+					})}
+
+					<ImageView
+						images={postImage.map(uri => ({uri}))}
+						imageIndex={initialImageIndex || 0}
+						visible={isImageModalVisible}
+						onImageIndexChange={setCurrentImageIndex}
+						onRequestClose={() => {
+							setIsImageModalVisible(false);
+						}}
+						HeaderComponent={() => (
+							<SafeAreaView style={{alignItems: 'center'}}>
+								<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${postImage.length}`}</Text>
+							</SafeAreaView>
+						)}
+					/>
+				</View>
+
+				<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
+					<Text style={styles.attachButtonText}>사진 선택하기</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
+					<Text style={styles.submitButtonText}>글 등록하기</Text>
+				</TouchableOpacity>
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 16,
+		paddingHorizontal: '4%',
 	},
 	titleInput: {
 		fontSize: 18,

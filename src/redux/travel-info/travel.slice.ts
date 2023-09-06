@@ -31,7 +31,7 @@ const initialState: LiteState = {
 	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
 	editMode: '', // 삭제모드=delete, 추가모드=add
 	recommendList: [], //추천할때 쓰이는 리스트
-	makeMode: true, //true=추천모드, fasle==혼자짤래요
+	makeMode: 'solo', //true=추천모드, fasle==혼자짤래요    추천,혼자,수정,친구 recommend, solo, modify,share
 	//----------------------------------------------------
 	myTravelList: [],
 	travelId: '',
@@ -39,6 +39,7 @@ const initialState: LiteState = {
 	diary: '',
 	picture: [],
 	reviewCheck: false,
+	tableShowFlag: false,
 };
 
 export const axiosAuth = axios.create({
@@ -76,6 +77,7 @@ export const axiosNaver = axios.create({
 export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data, thunkAPI) => {
 	try {
 		console.log('여행옴', thunkAPI.getState().userSlice.userId);
+		console.log('왜왜오왜ㅜㅠㅜㅠㅜㅜㅠㅜㅠㅜㅠㅜㅠ', axiosAuth.defaults.headers);
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
 		console.log('여행안오');
 		console.log(response.data);
@@ -98,7 +100,7 @@ export const getOneTravelCourse = createAsyncThunk(
 			return response.data;
 		} catch (error) {
 			console.log(error);
-			return error;
+			return 0;
 		}
 	},
 );
@@ -180,7 +182,7 @@ export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelA
 		console.log('케케케', response.data);
 		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋ', response.data);
 		//thunkAPI.dispatch(travelSliceActions.enrollPreset(response.data.data.resultData));
-		return response.data.data.resultData;
+		return response.data;
 	} catch (error) {
 		console.log(error);
 		return error;
@@ -316,7 +318,8 @@ export const travelSlice = createSlice({
 			state.presetDatas = payload;
 		},
 		enrollTimetable: (state, {payload}) => {
-			state.timetable = state.presetDatas[payload];
+			state.timetable = payload;
+			state.tableShowFlag = true;
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
@@ -388,18 +391,21 @@ export const travelSlice = createSlice({
 		},
 		setMakeMode: (state, {payload}) => {
 			state.makeMode = payload;
+			state.tableShowFlag = true;
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);
 			state.timetable = [...Array(5)].map(item => []);
 			state.day = [...Array(5)].map((item, idx) => moment().add(idx, 'day'));
 			state.nDay = 4;
-			state.makeMode = false;
+			state.makeMode = 'solo';
+			state.tableShowFlag = true;
 		},
 		setRecommendRegion: (state, {payload}) => {
 			Object.assign(state, initialState);
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
+			state.makeMode = 'recommend';
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -410,8 +416,9 @@ export const travelSlice = createSlice({
 			console.log('1', payload);
 			let list: number[] = [];
 			payload.waypoints &&
-				((list = payload.waypoints.map(item => item.duration)), list.push(payload.goal.duration));
-			list.push(payload.duration);
+				((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
+				list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
+			list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			state.moveTimeList.push(list);
 			console.log('2');
 		});
@@ -422,7 +429,7 @@ export const travelSlice = createSlice({
 			state.recommendList = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
-			state.presetDatas = payload;
+			state.presetDatas = payload.data.resultData;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
 			console.log('페페', payload);
@@ -430,8 +437,7 @@ export const travelSlice = createSlice({
 		});
 		builder.addCase(getOneTravelCourse.fulfilled, (state, {payload}) => {
 			console.log('목아파', payload.timetable);
-			const dayToMoment = payload.day.map(item => moment(item));
-			state.day = dayToMoment;
+			state.day = payload.day;
 			state.nDay = payload.nDay - 1;
 			state.region = payload.region;
 			state.timetable = payload.timetable;
@@ -475,7 +481,7 @@ interface LiteState {
 	courseDetail: CourseDetailType;
 	editMode: string;
 	recommendList: RecommendList[];
-	makeMode: boolean;
+	makeMode: MakeModeType;
 	//----------------------------------------
 	myTravelList: myTravelListType[];
 	travelId: string;
@@ -483,8 +489,10 @@ interface LiteState {
 	diary: string;
 	picture: string[];
 	reviewCheck: boolean;
+	tableShowFlag: boolean;
 }
 
+type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
 interface PlaceType {
 	name: string;
 	lat: number;

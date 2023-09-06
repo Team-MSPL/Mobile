@@ -1,7 +1,7 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {TouchableOpacity} from 'react-native';
+import {Alert, TouchableOpacity} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
@@ -9,19 +9,37 @@ import MapView, {Polyline, Marker} from 'react-native-maps';
 import {GOOGLE_API_KEY} from '@env';
 import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import BaseModal from '../../utill/base-modal';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [visible, setVisible] = useState(false);
 	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 
-	const polylineCoordinates = recommendItem.map((item, value) => ({latitude: item.lat, longitude: item.lng}));
-	const markers = recommendItem.map((value, idx) => (
-		<Marker key={`marker_${idx}`} coordinate={{latitude: value.lat, longitude: value.lng}} title={value.name} />
-	));
+	const polylineCoordinates = recommendItem
+		.map((item, value) => {
+			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+				return {latitude: item.lat, longitude: item.lng};
+			}
+			return null;
+		})
+		.filter(items => items !== null);
+	const markers = recommendItem
+		.map((value, idx) => {
+			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				return (
+					<Marker
+						key={`marker_${idx}`}
+						coordinate={{latitude: value.lat, longitude: value.lng}}
+						title={value.name}
+					/>
+				);
+			}
+			return null;
+		})
+		.filter(marker => marker !== null);
+
 	const polylines = recommendItem.map((val, ind) => (
 		<Polyline
 			key={`polyline_${ind}`}
@@ -57,7 +75,6 @@ export default function Recommend({navigation, route}: any) {
 		// 	: (copy[route.params.index] = updateItem);
 		setRecommendItem(copy);
 		setSelect(idx);
-		console.log('ㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂ');
 		mapRef.current?.animateCamera(
 			{
 				center: {
@@ -67,18 +84,21 @@ export default function Recommend({navigation, route}: any) {
 			},
 			{duration: 1000},
 		);
-
-		console.log('ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ');
 	};
 	const checkMessage = () => {
-		setVisible(true);
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '바로 추가됩니다!',
+				modalFunction: addRecommend,
+				modalLeft: true,
+			}),
+		);
 	};
 	const addRecommend = () => {
 		let copy = [...timetable];
 		copy[route.params.x] = recommendItem;
 		if (route.params.name === '숙소 추천') {
 			if (route.params.index != 0) {
-				console.log('ㅋㅋㅋㅋ다온다');
 				let updateitem = {
 					...recommendItem.at(-1),
 					x: copy[route.params.x + 1][0].x,
@@ -106,18 +126,6 @@ export default function Recommend({navigation, route}: any) {
 	const getRecommendList = () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log(
-				'띵',
-				route.params.apiCategory,
-				'ㅂㅈ',
-				route.params.lat,
-				'ㄴ',
-				route.params.lng,
-				'qwe',
-				route.params.radius,
-				'에',
-				route.params.category,
-			);
 			dispatch(
 				recommendApi({
 					category: route.params.apiCategory,
@@ -127,7 +135,11 @@ export default function Recommend({navigation, route}: any) {
 				}),
 			);
 		} catch (err) {
-			console.log(err, '에러요');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천 관광지를 받아오는 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -186,14 +198,6 @@ export default function Recommend({navigation, route}: any) {
 					선택이요
 				</Text>
 			</TouchableOpacity>
-			<BaseModal
-				title={'바로 추가됩니다!'}
-				visible={visible}
-				left={() => {
-					setVisible(false);
-				}}
-				right={addRecommend}
-			/>
 		</Box>
 	);
 }

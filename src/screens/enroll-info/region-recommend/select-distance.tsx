@@ -82,7 +82,7 @@ export default function SelectDistance({navigation}: any) {
 					<Slider
 						w='4/5'
 						defaultValue={5}
-						minValue={0}
+						minValue={1}
 						maxValue={10}
 						step={1}
 						onChange={item => {

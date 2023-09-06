@@ -1,17 +1,27 @@
 import {useState, memo} from 'react';
 import {Text, Box, Center, HStack, Spacer} from 'native-base';
-import {useAppSelector} from '../../../redux';
-import {TouchableOpacity} from 'react-native';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
-const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
-	const {day, nDay} = useAppSelector(state => state.travelSlice);
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
+const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
+	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
-
+	const dispatch = useAppDispatch();
 	const goRight = () => {
 		viewDayIndex + 10 > nDay ? setViewDayIndex(nDay - 4) : setViewDayIndex(viewDayIndex + 5);
 	};
 	const goLeft = () => {
 		viewDayIndex - 5 < 0 ? setViewDayIndex(0) : setViewDayIndex(viewDayIndex - 4);
+	};
+	const goMapInfo = (e: number) => {
+		nDay < e || timetable[e].length == 0
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '볼수있는 관광지가 없습니다.',
+					}),
+			  )
+			: navigation.navigate('MapInfo', {mapIndex: e});
 	};
 	return (
 		<Box>
@@ -21,7 +31,7 @@ const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
 				</TouchableOpacity>
 				<Spacer />
 				<Text fontSize='xl' bold>
-					{day[0].format('YYYY-MM-DD') + '~' + day[nDay].format('YYYY-MM-DD')}
+					{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}
 				</Text>
 				<Spacer />
 
@@ -35,9 +45,14 @@ const DayView = ({viewDayIndex, setViewDayIndex}: any) => {
 					(item, idx) =>
 						idx >= viewDayIndex &&
 						idx <= viewDayIndex + 4 && (
-							<Center w='70px' h='70px' key={idx}>
-								<Text>{item.date() + '일 ' + dayList[item.day()]}</Text>
-							</Center>
+							<TouchableOpacity
+								onPress={() => {
+									goMapInfo(idx);
+								}}
+								style={{width: 70, height: 70, alignItems: 'center', justifyContent: 'center'}}
+								key={idx}>
+								<Text>{moment(item).date() + '일 ' + dayList[moment(item).day()]}</Text>
+							</TouchableOpacity>
 						),
 				)}
 			</HStack>

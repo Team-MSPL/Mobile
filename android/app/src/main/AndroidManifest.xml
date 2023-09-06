@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+      <!-- <uses-permission android:name="com.android.vending.BILLING"/> -->
       <queries>
           <package android:name="com.kakao.talk" />
     <intent>
@@ -44,6 +46,12 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+        <intent-filter>
++         <action android:name="android.intent.action.VIEW" />
++         <category android:name="android.intent.category.DEFAULT" />
++         <category android:name="android.intent.category.BROWSABLE" />
++         <data android:host="kakaolink" android:scheme="kakao1059586e7b1423286b1a1a37606f9786" />
++       </intent-filter>
       </activity>
       <activity
         android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -56,7 +64,6 @@
           <!-- Redirect URI: "kakao{NATIVE_APP_KEY}://oauth“ -->
           <data android:host="oauth"
             android:scheme="kakao1059586e7b1423286b1a1a37606f9786" />
-            <data android:host="kakaolink" android:scheme="kakao1059586e7b1423286b1a1a37606f9786" />
         </intent-filter>
       </activity>
     </application>

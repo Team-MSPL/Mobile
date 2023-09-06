@@ -3,10 +3,10 @@ import {useEffect, useRef, useState} from 'react';
 import {Linking, Platform, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import BaseModal from '../../utill/base-modal';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import SelectButton from '../../utill/component/select-button';
 
-export default function MapInfo({navigation}: any) {
+export default function MapInfo({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -27,12 +27,11 @@ export default function MapInfo({navigation}: any) {
 			{duration: 1000},
 		);
 	};
+	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
-		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${
-			timetable[select][e].name
-		}&dlat=${timetable[select][e + 1].lat}&dlng=${timetable[select][e + 1].lng}&dname=${
-			timetable[select][e + 1].name
-		}&appname=다님`;
+		let navigationIndex = e + 1;
+		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
+		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
 		const supported = await Linking.canOpenURL(url);
 		if (supported) {
 			await Linking.openURL(url);
@@ -47,10 +46,29 @@ export default function MapInfo({navigation}: any) {
 		}
 	};
 	const mapRef = useRef<MapView>(null);
-	const polylineCoordinates = timetable[select].map((item, value) => ({latitude: item.lat, longitude: item.lng}));
-	const markers = timetable[select].map((value, idx) => (
-		<Marker key={`marker_${idx}`} coordinate={{latitude: value.lat, longitude: value.lng}} title={value.name} />
-	));
+
+	const polylineCoordinates = timetable[select]
+		.map((item, value) => {
+			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+				return {latitude: item.lat, longitude: item.lng};
+			}
+			return null;
+		})
+		.filter(items => items !== null);
+	const markers = timetable[select]
+		.map((value, idx) => {
+			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				return (
+					<Marker
+						key={`marker_${idx}`}
+						coordinate={{latitude: value.lat, longitude: value.lng}}
+						title={value.name}
+					/>
+				);
+			}
+			return null;
+		})
+		.filter(marker => marker !== null);
 	const polylines = timetable[select].map((val, ind) => (
 		<Polyline
 			key={`polyline_${ind}`}
@@ -78,24 +96,38 @@ export default function MapInfo({navigation}: any) {
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 
 	useEffect(() => {
-		for (let i = 0; i < timetable.length; i++) {
-			if (timetable[i].length != 0) {
-				a.current = true;
-				setVisible(false);
-				setSelect(i);
-				break;
+		if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
+			setSelect(route.params.mapIndex);
+			setVisible(false);
+		} else {
+			for (let i = 0; i < timetable.length; i++) {
+				if (timetable[i].length != 0) {
+					a.current = true;
+					setVisible(false);
+					setSelect(i);
+					break;
+				}
 			}
 		}
+		console.log(route.params.mapIndex);
+		console.log(select);
+		console.log('하이이이', markers);
+		if (polylineCoordinates.length == 0) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '보여줄게 없습니다.',
+					modalFunction: goBack,
+				}),
+			);
+		}
+		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
 	const goBack = () => {
 		navigation.goBack();
 	};
+
 	if (polylineCoordinates.length == 0) {
-		return (
-			<Box>
-				<BaseModal visible={visible} title={'보여줄거없음'} right={goBack} />
-			</Box>
-		);
+		return <Box></Box>;
 	}
 	return (
 		<ScrollView bgColor='#EFFBFB' px='2'>
@@ -134,34 +166,32 @@ export default function MapInfo({navigation}: any) {
 						),
 				)}
 
-				{timetable[select].map((value, index) =>
-					index != timetable[select].length - 1 ? (
-						<Box key={index}>
-							<TouchableOpacity
-								onPress={() => {
-									moveRegion(index);
-								}}>
-								<Text>{value.name}</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								onPress={() => {
-									goNavigation(index);
-								}}
-								style={{marginTop: 20}}>
-								<Text>이동</Text>
-							</TouchableOpacity>
-						</Box>
-					) : (
-						<Box key={index}>
-							<TouchableOpacity
-								onPress={() => {
-									moveRegion(index);
-								}}>
-								<Text>{value.name}</Text>
-							</TouchableOpacity>
-						</Box>
-					),
-				)}
+				{timetable[select].map((value, index) => {
+					if (!excludeNames.includes(value.name)) {
+						return (
+							<Box key={index}>
+								<TouchableOpacity
+									onPress={() => {
+										moveRegion(index);
+									}}>
+									<Text>{value.name}</Text>
+								</TouchableOpacity>
+								{index !== timetable[select].length - 1 &&
+									timetable[select][index + 1].name != '숙소 추천' && (
+										<TouchableOpacity
+											onPress={() => {
+												goNavigation(index);
+											}}
+											style={{marginTop: 20}}>
+											<Text>이동</Text>
+										</TouchableOpacity>
+									)}
+							</Box>
+						);
+					} else {
+						return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
+					}
+				})}
 			</VStack>
 		</ScrollView>
 	);

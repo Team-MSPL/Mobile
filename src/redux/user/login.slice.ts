@@ -24,8 +24,8 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
 
 			console.log('qwe', userData.userJwtToken);
-			thunkAPI.dispatch(userSliceActions.login());
 			thunkAPI.dispatch(userSliceActions.setUserInfo(userData));
+			thunkAPI.dispatch(userSliceActions.login());
 			const loginValues: [string, string][] = [
 				['userName', userData.userName],
 				['userProfileImage', data.userProfileImage],

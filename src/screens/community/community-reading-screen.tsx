@@ -1,4 +1,4 @@
-import {HStack, ThreeDotsIcon} from 'native-base';
+import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -9,19 +9,18 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
+	NativeModules,
+	Platform,
 	RefreshControl,
 	SafeAreaView,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-
 import ActionSheet from 'react-native-actionsheet';
-import {AvoidSoftInput, AvoidSoftInputView} from 'react-native-avoid-softinput';
-import Modal from 'react-native-modal';
+import ImageView from 'react-native-image-viewing';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -37,6 +36,8 @@ import {
 	saveCommentType,
 	unclickLike,
 } from '../../redux/community/community.slice';
+
+const {StatusBarManager} = NativeModules;
 
 export default function CommunityReadingScreen({navigation, route}: any) {
 	// 뒤로 가기
@@ -206,6 +207,16 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		});
 	}, []);
 
+	useEffect(() => {
+		Platform.OS == 'ios'
+			? StatusBarManager.getHeight((statusBarFrameData: {height: number}) => {
+					setStatusBarHeight(statusBarFrameData.height);
+			  })
+			: null;
+	}, []);
+
+	const [statusBarHeight, setStatusBarHeight] = useState(0);
+
 	// const mounted = useRef<boolean>(false);
 	// useEffect(() => {
 	// 	if (!mounted.current) {
@@ -366,15 +377,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		fetchPostData().then(() => setIsRefreshing(false)); // 새로고침 완료 후 상태 변경
 	};
 
-	// 키보드 올라오기
-	const onFocusEffect = useCallback(() => {
-		AvoidSoftInput.setShouldMimicIOSBehavior(true);
-		return () => {
-			AvoidSoftInput.setShouldMimicIOSBehavior(false);
-		};
-	}, []);
-	useFocusEffect(onFocusEffect);
-
 	function doNothing(): any {
 		// 아무것도 하지 않음
 	}
@@ -423,6 +425,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		onPress: [() => handleDeleteComment(commentData._id), () => showReportActionSheet(), doNothing],
 	};
 
+	// 변화되는 인덱스
+	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+	// 초기 인덱스
+	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
+	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
+	const onSelect = (index: number) => {
+		setInitialImageIndex(index);
+		setCurrentImageIndex(index);
+		setIsImageModalVisible(index === 0 || !!index);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ActionSheet
@@ -453,7 +466,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					}
 				}}
 			/>
-
 			<ActionSheet
 				ref={commentOptionActionSheet}
 				title={'댓글 메뉴'}
@@ -482,24 +494,38 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 								<Text>본문</Text>
 								<Text style={styles.postContentText}>{postData.postContent}</Text>
 								<Text>사진 목록</Text>
-								<View style={styles.imageContainer}>
-									{postData.postImage.slice(0, 8).map((uri, index) => (
-										<Image key={index} source={{uri}} style={styles.image} />
-									))}
-									{postData.postImage.length > 8 && (
-										<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-											<Text style={styles.moreButtonText}>더보기</Text>
-										</TouchableOpacity>
-									)}
+								<View style={styles.container}>
+									{postData.postImage.map((uri, index) => {
+										return (
+											<View key={index} style={{alignItems: 'center'}}>
+												<TouchableOpacity
+													onPress={() => {
+														onSelect(index);
+														console.log('파이팅', currentImageIndex);
+													}}>
+													<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+												</TouchableOpacity>
+											</View>
+										);
+									})}
+
+									<ImageView
+										images={postData.postImage.map(uri => ({uri}))}
+										imageIndex={initialImageIndex || 0}
+										visible={isImageModalVisible}
+										onImageIndexChange={setCurrentImageIndex}
+										onRequestClose={() => {
+											setIsImageModalVisible(false);
+										}}
+										HeaderComponent={() => (
+											<SafeAreaView style={{alignItems: 'center'}}>
+												<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${
+													postData.postImage.length
+												}`}</Text>
+											</SafeAreaView>
+										)}
+									/>
 								</View>
-								<Modal isVisible={isImageMoreModalVisible}>
-									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-									<ScrollView contentContainerStyle={styles.imageModalContainer}>
-										{postData.postImage.map((uri, index) => (
-											<Image key={index} source={{uri}} style={styles.modalImage} />
-										))}
-									</ScrollView>
-								</Modal>
 								<View style={styles.likeContainer}>
 									<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
 										<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
@@ -517,23 +543,23 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					/>
 				)}
 			</View>
-
-			<View style={styles.inputContainer}>
-				<AvoidSoftInputView style={styles.inputContainer}>
-					<TextInput
-						style={styles.commentInputField}
-						value={commentContent}
-						onChangeText={text => setCommentContent(text)}
-						placeholder='댓글을 입력하세요...'
-					/>
-					<TouchableOpacity
-						style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-						disabled={isCommentButtonDisabled}
-						onPress={handleCommentSubmit}>
-						<Text style={styles.submitButtonText}>등록</Text>
-					</TouchableOpacity>
-				</AvoidSoftInputView>
-			</View>
+			<KeyboardAvoidingView
+				style={styles.commentInputFieldContainer}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				keyboardVerticalOffset={statusBarHeight + 52}>
+				<TextInput
+					style={[styles.commentTextInputField]}
+					value={commentContent}
+					onChangeText={text => setCommentContent(text)}
+					placeholder='댓글을 입력하세요...'
+				/>
+				<TouchableOpacity
+					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+					disabled={isCommentButtonDisabled}
+					onPress={handleCommentSubmit}>
+					<Text style={styles.submitButtonText}>등록</Text>
+				</TouchableOpacity>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }
@@ -544,12 +570,6 @@ const styles = StyleSheet.create({
 	},
 	postNCommentContainer: {
 		flex: 9,
-	},
-	inputContainer: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
 		backgroundColor: 'white',
 	},
 	postContentText: {
@@ -566,7 +586,7 @@ const styles = StyleSheet.create({
 		margin: 8,
 		alignSelf: 'center',
 		flexDirection: 'column',
-		backgroundColor: 'rgba(200, 200, 200, 0.8)',
+		backgroundColor: 'rgba(200, 200, 200, 0.2)',
 	},
 	commentProfileImage: {
 		width: 36,
@@ -577,13 +597,24 @@ const styles = StyleSheet.create({
 		borderColor: '#5DC3DB',
 		resizeMode: 'cover',
 	},
-	commentInputField: {
-		flex: 7,
+	commentInputFieldContainer: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-evenly',
+		alignSelf: 'center',
+		backgroundColor: 'white',
+		paddingVertical: 8,
+	},
+	commentTextInputField: {
+		flex: 9,
+		margin: 8,
+		padding: 8,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 8,
-		padding: 8,
-		margin: 4,
+		height: 40,
+		alignContent: 'center',
 	},
 	submitButton: {
 		flex: 1,
@@ -636,10 +667,6 @@ const styles = StyleSheet.create({
 		width: 100,
 		height: 100,
 		margin: 8,
-	},
-	keyboardContainer: {
-		flex: 1,
-		backgroundColor: '#ffffff',
 	},
 	likeContainer: {
 		justifyContent: 'center',

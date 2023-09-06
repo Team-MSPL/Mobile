@@ -7,6 +7,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Spacer, Pressable} from 'native-base';
 import moment, {Moment} from 'moment';
 import {Alert} from 'react-native';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
@@ -21,7 +22,12 @@ export default function SelectDay({navigation}: any) {
 
 	const onConfirm = (selectedDate: Date) => {
 		if (selectedDate.getHours() < 6) {
-			Alert.alert('놉');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '6시 이전은 불가능합니다.',
+					modalFunction: () => {},
+				}),
+			);
 		} else {
 			console.log(selectedDate.getHours());
 			// 날짜 또는 시간 선택 시
@@ -165,10 +171,11 @@ export default function SelectDay({navigation}: any) {
 					allowRangeSelection={true}
 					onDateChange={onDateChange}
 					minDate={nowTime}
-					showDayStragglers={true}
+					showDayStragglers={false}
 					previousTitle='이전 달'
 					nextTitle='다음 달'
 					allowBackwardRangeSelect={true}
+					selectYearTitle='년도 선택'
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>

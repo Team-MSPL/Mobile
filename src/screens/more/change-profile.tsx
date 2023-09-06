@@ -1,25 +1,27 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import moment from 'moment';
 import styled from 'styled-components/native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Touchable, TouchableOpacity, Image, Alert, Platform} from 'react-native';
+import {TouchableOpacity, Image, Alert} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {updateProfile, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function ChangeProfile({navigation}: any) {
-	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
-		state => state.userSlice,
-	);
+	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
 	const dispatch = useAppDispatch();
 	//애뮬레이터 확인 불가
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
+			width: 300,
+			height: 400,
+			size: 1000,
 			multiple: false,
 			mediaType: 'photo',
+			croppingQuality: 0.6,
+			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
@@ -45,7 +47,12 @@ export default function ChangeProfile({navigation}: any) {
 
 			navigation.goBack();
 		} catch (err) {
-			Alert.alert('프로필 변경 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '프로필 변경 중 에러가 발생했습니다.',
+					modalFunction: () => {},
+				}),
+			);
 		}
 	};
 	const [nickname, setNickname] = useState(userName);

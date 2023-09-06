@@ -1,34 +1,19 @@
-import {JSX, JSXElementConstructor, ReactElement, useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	deleteTravelCourse,
-	getDrivingDuration,
-	getOneTravelCourse,
-	saveTravel,
-	travelSliceActions,
-	updateTravelCourse,
-} from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
+import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert, TouchableOpacity, Image} from 'react-native';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
-	const dispatch = useAppDispatch();
-	const [select, setSelect] = useState(0);
-	const [deleteList, setDeleteList] = useState<string[]>([]);
-	const [addList, setAddList] = useState<number[]>([]);
-	const [x, setX] = useState(-1);
-	const [viewDayIndex, setViewDayIndex] = useState(0);
-	let wayPoint = {start: '', goal: '', wayPoint: ''};
 
-	const goMapInfo = () => {
-		navigation.navigate('MapInfo');
-	};
+import KakaoShareLink from 'react-native-kakao-share-link';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+export default function DetailInfo({navigation}: any) {
+	const {travelId, nDay, day, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
+
 	const goInputDiary = () => {
 		navigation.navigate('InputDiary');
 	};
@@ -38,7 +23,11 @@ export default function DetailInfo({navigation}: any) {
 			await dispatch(getOneTravelCourse({travelId: travelId}));
 			console.log('아니아니이요', Object.keys(picture));
 		} catch (err) {
-			Alert.alert('사진을 불러오던 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -49,7 +38,11 @@ export default function DetailInfo({navigation}: any) {
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
 		} catch (err) {
-			Alert.alert('삭제중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 삭제 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -59,8 +52,47 @@ export default function DetailInfo({navigation}: any) {
 		navigation.navigate('InputReviewAndPoint');
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
-		console.log(picture.length);
-		//navigation.navigate('Timetable');
+		dispatch(travelSliceActions.setMakeMode('modify'));
+		navigation.navigate('Timetable');
+	};
+
+	const goKakaoShare = async () => {
+		try {
+			const response = await KakaoShareLink.sendFeed({
+				content: {
+					title: region[0],
+					imageUrl: 'http://danim.me/moon.jpeg',
+					link: {
+						webUrl: 'http://danim.me',
+						mobileWebUrl: 'http://danim.me',
+					},
+					description: moment(day[0]).format('YY-MM-DD') + '~' + moment(day[nDay]).format('YY-MM-DD'),
+				},
+				buttons: [
+					{
+						title: '앱에서 보기',
+						link: {
+							androidExecutionParams: [
+								{key: 'kakaolink', value: 'Timetable'},
+								{key: 'whatId', value: travelId},
+							],
+							iosExecutionParams: [
+								{key: 'kakaolink', value: 'Timetable'},
+								{key: 'whatId', value: travelId},
+							],
+						},
+					},
+				],
+			});
+			console.log(response);
+		} catch (err) {
+			console.log(err);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 공유 중 에러가 발생했습니다.',
+				}),
+			);
+		}
 	};
 	useFocusEffect(
 		useCallback(() => {
@@ -83,7 +115,9 @@ export default function DetailInfo({navigation}: any) {
 				</TouchableOpacity>
 			)}
 			{picture && picture.length != 0 ? (
-				picture.map((item, idx) => <Image source={{uri: item}} style={{width: 100, height: 100}}></Image>)
+				picture.map((item, idx) => (
+					<Image key={idx} source={{uri: item}} style={{width: 100, height: 100}}></Image>
+				))
 			) : (
 				<Text>사진 없어용</Text>
 			)}
@@ -101,6 +135,12 @@ export default function DetailInfo({navigation}: any) {
 			<TouchableOpacity style={{marginVertical: 10}} onPress={goTimetable}>
 				<Text bold fontSize='lg'>
 					탐테구경 레츠고!
+				</Text>
+			</TouchableOpacity>
+
+			<TouchableOpacity style={{marginVertical: 10}} onPress={goKakaoShare}>
+				<Text bold fontSize='lg'>
+					카카오톡 공유 레츠고!
 				</Text>
 			</TouchableOpacity>
 

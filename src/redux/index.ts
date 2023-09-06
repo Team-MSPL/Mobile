@@ -6,8 +6,9 @@ import loginSliceReducer from './user/login.slice';
 import loadingSliceReducer from './loading/loading.slice';
 import communitySliceReducer from './community/community.slice';
 import regionRecommendSliceReducer from './travel-info/region-recommend.slice';
-import myTravelSilceReducer from './travel-info/my-travel.slice';
 import userSliceReducer from './user/user.slice';
+import settingSliceReducer from './setting/settingSlice';
+import modalSliceReducer from './modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const persistConfig = {
@@ -22,7 +23,8 @@ const appReducer = combineReducers({
 	communitySlice: communitySliceReducer,
 	regionRecommendSlice: regionRecommendSliceReducer,
 	userSlice: persistReducer(persistConfig, userSliceReducer),
-	myTravelSlice: myTravelSilceReducer,
+	settingSlice: settingSliceReducer,
+	modalSlice: modalSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {

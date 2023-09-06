@@ -19,8 +19,10 @@ export default function Payment({navigation}: any) {
 	};
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
+			<Text>출석시 하루마다 무료로 1개씩 추가됩니다! </Text>
 			{paymentViewList.map((item, idx) => (
 				<TouchableOpacity
+					key={idx}
 					style={{marginVertical: 10}}
 					onPress={() => {
 						handlePayment(item.pay);
@@ -33,6 +35,7 @@ export default function Payment({navigation}: any) {
 	);
 }
 const paymentViewList = [
+	{title: '토큰 1개', pay: 100},
 	{title: '토큰 10개', pay: 1000},
 	{title: '토큰 50개', pay: 5000},
 	{title: '토큰 100개', pay: 10000},

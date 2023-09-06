@@ -1,11 +1,12 @@
-import React, {useEffect, useLayoutEffect, useState, useRef, memo} from 'react';
+import React, {memo} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import TimeView from './time-view';
 
 const Background = ({navigation, addList, setAddList, x, setX}: any) => {
-	const {editMode, nDay} = useAppSelector(state => state.travelSlice);
+	const {editMode, nDay, makeMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	const handleCellPress = (inx: number, index: number) => {
@@ -46,7 +47,11 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 				dispatch(travelSliceActions.editModeChange('add'));
 			}
 		} else {
-			console.log('거긴...');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '선택한 날짜가 아니라 불가합니다.',
+				}),
+			);
 		}
 	};
 	//테스트에서는 36개로 했음
@@ -68,8 +73,9 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 								backgroundColor:
 									editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white',
 							}}
-							onPress={() => handleCellPress(inx, index)}
-							onLongPress={() => handleCellLongPress(inx, index)}
+							activeOpacity={makeMode == 'share' ? 1 : 0.2}
+							onPress={() => makeMode != 'share' && handleCellPress(inx, index)}
+							onLongPress={() => makeMode != 'share' && handleCellLongPress(inx, index)}
 						/>
 					))}
 				</View>

@@ -18,6 +18,7 @@ import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
 import CustomButton from '../../utill/component/custom-button';
 import {tendencyList} from '../enroll-info/select-tendency';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function InputReviewAndPoint({navigation}: any) {
 	const {travelId, tendency, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -32,17 +33,6 @@ export default function InputReviewAndPoint({navigation}: any) {
 	const goMyTravelDetail = async () => {
 		await dispatch(getOneTravelCourse({travelId: travelId}));
 	};
-	const goRemove = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			await dispatch(deleteTravelCourse({travelId: travelId}));
-			navigation.goBack();
-		} catch (err) {
-			Alert.alert('삭제중 에러가 발생했습니다.');
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
 	const changeReview = (e: string) => {
 		setReviewValue(e);
 	};
@@ -54,16 +44,20 @@ export default function InputReviewAndPoint({navigation}: any) {
 			const data = {travelId: travelId, review: reviewValue, point: pointValue, tendencyPoint: tedencyPointList};
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(reviewAndPoint(data));
-			Alert.alert('저장완료 했습니다', undefined, [
-				{
-					text: '확인',
-					onPress: () => {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '저장 완료 했습니다.',
+					modalFunction: () => {
 						navigation.goBack();
 					},
-				},
-			]);
+				}),
+			);
 		} catch (err) {
-			Alert.alert('리뷰 저장 중 에러가 발생했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '리뷰 저장 중 에러가 발생했습니다.',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -89,6 +83,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 			<HStack>
 				{[...Array(5)].map((item, idx) => (
 					<TouchableOpacity
+						key={idx}
 						style={{marginHorizontal: 10, backgroundColor: idx <= pointValue ? 'red' : 'white'}}
 						onPress={() => {
 							changePoint(idx);
@@ -103,10 +98,11 @@ export default function InputReviewAndPoint({navigation}: any) {
 					value.map(
 						(vvalue, iindex) =>
 							vvalue == 1 && (
-								<HStack marginY='4'>
+								<HStack marginY='4' key={iindex}>
 									<Text>{reviewTendencyList[index].list[iindex]}</Text>
 									{[...Array(5)].map((_, inex) => (
 										<TouchableOpacity
+											key={inex}
 											style={{
 												marginHorizontal: 10,
 												backgroundColor:
