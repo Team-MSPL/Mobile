@@ -23,6 +23,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	const menuActionSheet = useRef<ActionSheet>(null);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -75,8 +76,8 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () => {
-				return (
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
 					<View>
 						<TouchableOpacity
 							onPress={() => {
@@ -85,8 +86,7 @@ export default function CommunityMainScreen({navigation}: any) {
 							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
 					</View>
-				);
-			},
+				),
 		});
 	}, []);
 

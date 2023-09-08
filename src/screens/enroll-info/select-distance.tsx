@@ -1,19 +1,30 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
+import {BackHandler, TouchableOpacity} from 'react-native';
+import {Text, Box, ScrollView, VStack, Divider, Center} from 'native-base';
+import Slider from '@react-native-community/slider';
 export default function SelectDistance({navigation}: any) {
 	const {distance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [range, setRange] = useState(5);
+	const [range, setRange] = useState(distance);
 
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollDistance(range));
 		navigation.navigate('SelectTendency');
 	};
-
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused()) {
+				dispatch(travelSliceActions.enrollDistance(range));
+				navigation.goBack();
+				return true;
+			}
+		};
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+		return () => backHandler.remove();
+	}, [range]);
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			<VStack space='5'>
@@ -23,38 +34,24 @@ export default function SelectDistance({navigation}: any) {
 				<Text fontSize='md' color='grey'>
 					거리 민감도가 높아질수록 이동경로가 가까워집니다.
 				</Text>
-				<Text>{distance}</Text>
+				<Text>{range}</Text>
 				<Divider my='1' />
 				<Center>
-					{/* <Slider
-						w='4/5'
-						defaultValue={5}
-						minValue={1}
-						maxValue={10}
+					<Slider
+						style={{width: '80%', height: 40}}
+						minimumValue={1}
+						maximumValue={10}
+						minimumTrackTintColor='#123123'
+						maximumTrackTintColor='#000000'
+						value={range}
 						step={1}
-						onChange={item => {
+						onValueChange={item => {
 							setRange(item);
-						}}>
-						<Slider.Track>
-							<Slider.FilledTrack />
-						</Slider.Track>
-						<Slider.Thumb />
-					</Slider> */}
-					<TouchableOpacity
-						onPress={() => {
-							dispatch(travelSliceActions.enrollDistance(distance + 1));
-						}}>
-						<Text>더하기</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => {
-							dispatch(travelSliceActions.enrollDistance(distance - 1));
-						}}>
-						<Text>빼기</Text>
-					</TouchableOpacity>
+						}}
+					/>
 				</Center>
 				<Center>
-					<Box w={300 - distance * 3 + 'px'} h={300 - distance * 3 + 'px'} bgColor='amber.300'></Box>
+					<Box w={300 - range * 3 + 'px'} h={300 - range * 3 + 'px'} bgColor='amber.300'></Box>
 				</Center>
 
 				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>

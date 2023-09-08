@@ -64,7 +64,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-	const {userId, userName, userProfileImage} = useAppSelector(state => state.userSlice);
+	const {userId, userName, userProfileImage, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [commentData, setCommentData] = useState<commentType>({
 		commentContent: '',
 		commentedAt: '',
@@ -191,8 +191,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// 앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () => {
-				return (
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
 					<View>
 						<TouchableOpacity
 							onPress={() => {
@@ -202,8 +202,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							<ThreeDotsIcon></ThreeDotsIcon>
 						</TouchableOpacity>
 					</View>
-				);
-			},
+				),
 		});
 	}, []);
 
@@ -332,17 +331,19 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							flex: 2,
 						}}>
 						{/* 더보기 버튼 */}
-						<TouchableOpacity
-							onPress={() => {
-								setCommentData(data.item);
-								actionSheetType.current = '댓글';
-								console.log('더보기 버튼', commentData.commentContent);
-								console.log('userId', userId);
-								console.log('댓글 작성자 Id', commentData.commentWriterUserId);
-								showCommentOptionActionSheet();
-							}}>
-							<ThreeDotsIcon></ThreeDotsIcon>
-						</TouchableOpacity>
+						{socialloginProvider != 'anonymous' && (
+							<TouchableOpacity
+								onPress={() => {
+									setCommentData(data.item);
+									actionSheetType.current = '댓글';
+									console.log('더보기 버튼', commentData.commentContent);
+									console.log('userId', userId);
+									console.log('댓글 작성자 Id', commentData.commentWriterUserId);
+									showCommentOptionActionSheet();
+								}}>
+								<ThreeDotsIcon></ThreeDotsIcon>
+							</TouchableOpacity>
+						)}
 					</View>
 				</View>
 				<Text>{data.item.commentContent}</Text>
@@ -545,13 +546,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 										)}
 									/>
 								</View>
-								<View style={styles.likeContainer}>
-									<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-										<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
-										<Text style={styles.likeButtonText}>{isLiked ? '좋아요 취소' : '좋아요'}</Text>
-									</TouchableOpacity>
-									<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
-								</View>
+								{socialloginProvider != 'anonymous' && (
+									<View style={styles.likeContainer}>
+										<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+											<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
+											<Text style={styles.likeButtonText}>
+												{isLiked ? '좋아요 취소' : '좋아요'}
+											</Text>
+										</TouchableOpacity>
+										<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
+									</View>
+								)}
 								<Text>댓글</Text>
 							</View>
 						}
@@ -566,18 +571,26 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				style={styles.commentInputFieldContainer}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				keyboardVerticalOffset={statusBarHeight + 52}>
-				<TextInput
-					style={[styles.commentTextInputField]}
-					value={commentContent}
-					onChangeText={text => setCommentContent(text)}
-					placeholder='댓글을 입력하세요...'
-				/>
-				<TouchableOpacity
-					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-					disabled={isCommentButtonDisabled}
-					onPress={handleCommentSubmit}>
-					<Text style={styles.submitButtonText}>등록</Text>
-				</TouchableOpacity>
+				{socialloginProvider == 'anonymous' ? (
+					<View>
+						<Text>익명이라 불가요</Text>
+					</View>
+				) : (
+					<>
+						<TextInput
+							style={[styles.commentTextInputField]}
+							value={commentContent}
+							onChangeText={text => setCommentContent(text)}
+							placeholder='댓글을 입력하세요...'
+						/>
+						<TouchableOpacity
+							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+							disabled={isCommentButtonDisabled}
+							onPress={handleCommentSubmit}>
+							<Text style={styles.submitButtonText}>등록</Text>
+						</TouchableOpacity>
+					</>
+				)}
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

@@ -2,11 +2,13 @@ import moment from 'moment';
 import {Box, Button, Center, Image, ScrollView, Text, VStack} from 'native-base';
 import {useEffect} from 'react';
 import {Alert, BackHandler, TouchableOpacity} from 'react-native';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList} from '../../redux/community/community.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function Main({navigation}: any) {
@@ -25,25 +27,19 @@ export default function Main({navigation}: any) {
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
 	};
-	useEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<TouchableOpacity
-					onPress={() => {
-						navigation.navigate('MoreInfo');
-					}}>
-					<Text>고</Text>
-				</TouchableOpacity>
-			),
-		});
-	}, []);
+	const checkDailyReward = () => {
+		dispatch(userSliceActions.setCheckDailyReward());
+	};
+	const checkSignUpReward = () => {
+		dispatch(userSliceActions.setSignUpReward(false));
+	};
 	useEffect(() => {
 		if (signUpReward) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '회원가입 축하드립니다',
 					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-					modalFunction: () => {},
+					modalFunction: checkSignUpReward,
 				}),
 			);
 		} else {
@@ -52,7 +48,7 @@ export default function Main({navigation}: any) {
 					modalSliceActions.setOpenModal({
 						modalTitle: '데일리 보상!',
 						modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
-						modalFunction: () => {},
+						modalFunction: checkDailyReward,
 					}),
 				);
 		}
@@ -60,7 +56,14 @@ export default function Main({navigation}: any) {
 	useBackHandler();
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
-			<Image source={{uri: userProfileImage}} style={{width: 100, height: 100}}></Image>
+			<HStack>
+				<Text>qwe</Text>
+				<Text>asd</Text>
+			</HStack>
+
+			<Image
+				source={{uri: userProfileImage == '' ? 'https://danim.me/lee.jpeg' : userProfileImage}}
+				style={{width: 100, height: 100}}></Image>
 			<Text fontSize='2xl' bold color={colors.TextSecondary}>
 				{userName}
 				<Text fontSize='2xl' color={colors.TextPrimary}>
@@ -137,3 +140,8 @@ const viewList = [
 	{id: 1, url: 'https://wallpaperaccess.com/full/317501.jpg', title: '만장굴'},
 	{id: 2, url: 'https://www.w3schools.com/css/img_lights.jpg', title: '넥슨박물관'},
 ];
+
+const HStack = styled.View`
+	display: inline-block;
+	flex-direction: row;
+`;

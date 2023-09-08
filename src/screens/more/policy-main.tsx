@@ -6,6 +6,7 @@ import Policy2 from '../../utill/component/policy/policy2';
 import Policy3 from '../../utill/component/policy/policy3';
 import Policy4 from '../../utill/component/policy/policy4';
 import Policy5 from '../../utill/component/policy/policy5';
+import {FlexWrap} from '../../utill/layout/layout';
 export default function PolicyMain() {
 	const [view, setView] = useState(0);
 	const PolicyComponent = policyList[view].component;
@@ -14,7 +15,7 @@ export default function PolicyMain() {
 			<TextContainer>
 				<TitleText>전체 이용 약관</TitleText>
 			</TextContainer>
-			<TouchableOpacityContainer>
+			<FlexWrap>
 				{policyList.map((item, value) => (
 					<PolicyTouchableOpacity
 						index={value}
@@ -26,7 +27,7 @@ export default function PolicyMain() {
 						<PolicyText>{item.title}</PolicyText>
 					</PolicyTouchableOpacity>
 				))}
-			</TouchableOpacityContainer>
+			</FlexWrap>
 			{PolicyComponent && <PolicyComponent />}
 		</MainViewContainer>
 	);
@@ -58,12 +59,6 @@ const PolicyText = styled.Text`
 	color: black;
 `;
 
-const TouchableOpacityContainer = styled.View`
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	margin-bottom: 15px;
-`;
 const PolicyTouchableOpacity = styled.TouchableOpacity<{index: number; viewIndex: number}>`
 	justify-content: center;
 	align-items: center;

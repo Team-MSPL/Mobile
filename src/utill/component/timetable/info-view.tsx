@@ -1,7 +1,7 @@
 import {useState, memo, useRef} from 'react';
 import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Modal, Image, Pressable} from 'react-native';
+import {TouchableOpacity, Modal, Image, Pressable, View} from 'react-native';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
 import {GOOGLE_API_KEY} from '@env';
@@ -102,7 +102,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	const categortColors = ['blue', 'orange', 'green', 'pink', 'purple', 'gray'];
 
 	return (
-		<Box>
+		<View style={{zIndex: 3}}>
 			<HStack position='absolute'>
 				<Box w='60px'></Box>
 				{timetable.map(
@@ -112,7 +112,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 							<VStack key={idx}>
 								{item.map((value, index) => {
 									return (
-										<TouchableOpacity
+										<Pressable
 											style={{
 												width: 70,
 												height: 35 * Math.ceil(value.takenTime / 30),
@@ -123,7 +123,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 														? 'red'
 														: categortColors[value.category],
 												position: 'absolute',
-												zIndex: 1,
+												zIndex: 3,
 											}}
 											key={index}
 											onPress={() => {
@@ -178,7 +178,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
 													style={{width: 30, height: 30}}></Image>
 											)}
-										</TouchableOpacity>
+										</Pressable>
 									);
 								})}
 							</VStack>
@@ -271,7 +271,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 					</InfoModalContainer>
 				</ModalContainer>
 			</Modal>
-		</Box>
+		</View>
 	);
 };
 

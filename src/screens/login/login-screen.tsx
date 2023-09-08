@@ -4,20 +4,23 @@ import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-sign
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import jwtDecode from 'jwt-decode';
 import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
+import {useEffect} from 'react';
 import {Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {socialConnect} from '../../redux/user/login.slice';
+import {loginSliceActions, socialConnect} from '../../redux/user/login.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
-		//로그인 후 로그아웃은 지금 안됩니다. 왜냐 귀찮기 때문입니다. 아시겠죠?
-		//dispatch(logout());
-		//dispatch(temporarySignUp());
-		//dispatch(loginSliceActions.setAnonymous(true));
-		// /navigation.replace('Home');
+		dispatch(userSliceActions.setAnonymous());
+		navigation.replace('Tab');
 	};
+	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
+	useEffect(() => {
+		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
+	}, []);
 
 	interface appleTokenType {
 		aud: string;
@@ -59,6 +62,8 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.profileImageUrl,
 					nickname: userInfo.nickname,
 				});
+			} else {
+				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
 		} catch {
 			dispatch(
@@ -92,6 +97,8 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.user.photo,
 					nickname: userInfo.user.name,
 				});
+			} else {
+				navigation.replace('Tab');
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {

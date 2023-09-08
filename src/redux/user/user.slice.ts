@@ -15,6 +15,7 @@ const initialUserState: UserState = {
 	isFirstLaunch: 'false',
 	dailyReward: false,
 	signUpReward: false,
+	anonymousKeep: false,
 };
 
 // 로그아웃
@@ -110,6 +111,23 @@ const userSlice = createSlice({
 		setSignUpReward(state, {payload}) {
 			state.signUpReward = payload;
 		},
+		setAnonymousKeep(state, {payload}) {
+			state.anonymousKeep = payload;
+		},
+		setCheckDailyReward(state) {
+			state.dailyReward = false;
+		},
+		setAnonymous(state) {
+			state.isLogin = true;
+			state.userId = 'x';
+			state.userName = '익명';
+			state.userProfileImage = '';
+			state.userJwtToken = '';
+			state.functionToken = 0;
+			state.socialloginProvider = 'anonymous';
+			state.dailyReward = false;
+			axiosAuth.defaults.headers.Authorization = `Bearer x`;
+		},
 	},
 	extraReducers: builder => {
 		// 로그아웃 지금은 다 지워버리지만 추후 처음런치때나 그런거 체크도해야할듯
@@ -149,7 +167,7 @@ export default userSlice.reducer;
 export interface UserState {
 	userId: string;
 	userName: string;
-	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
+	socialloginProvider: 'apple' | 'google' | 'kakao' | 'anonymous' | null | undefined;
 	userJwtToken: string | null;
 	isLogin: boolean;
 	functionToken: number;
@@ -157,4 +175,5 @@ export interface UserState {
 	isFirstLaunch: string;
 	dailyReward: boolean;
 	signUpReward: boolean;
+	anonymousKeep: boolean;
 }

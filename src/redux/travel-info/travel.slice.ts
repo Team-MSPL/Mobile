@@ -18,7 +18,7 @@ const initialState: LiteState = {
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
-	distance: 0, //거리민감도
+	distance: 5, //거리민감도
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: [[]], //성향
 	timeLimitArray: [9, 20], //시작시간과 끝시간
@@ -44,7 +44,7 @@ const initialState: LiteState = {
 };
 
 export const axiosAuth = axios.create({
-	baseURL: 'http://13.125.225.79',
+	baseURL: 'http://15.164.164.164',
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,
@@ -370,6 +370,7 @@ export const travelSlice = createSlice({
 		setMakeMode: (state, {payload}) => {
 			state.makeMode = payload;
 			state.tableShowFlag = true;
+			state.editMode = '';
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);

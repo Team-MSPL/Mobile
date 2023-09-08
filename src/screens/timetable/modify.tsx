@@ -80,6 +80,7 @@ export default function Modify({navigation, route}: any) {
 			<Text>{route.params.item.value.name}</Text>
 			{[...Array(nDay + 1)].map((item, idx) => (
 				<TouchableOpacity
+					key={idx}
 					style={{height: 100, alignItems: 'center'}}
 					onPress={() => {
 						setChangeDay(idx);
