@@ -47,10 +47,10 @@
 							"client_type": 3
 						},
 						{
-							"client_id": "70367155908-db1etfvpmhkuorkq3va84nlsoq19s8ha.apps.googleusercontent.com",
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
 							"client_type": 2,
 							"ios_info": {
-								"bundle_id": "com.example.danim"
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
 							}
 						}
 					]
@@ -123,10 +123,10 @@
 							"client_type": 3
 						},
 						{
-							"client_id": "70367155908-db1etfvpmhkuorkq3va84nlsoq19s8ha.apps.googleusercontent.com",
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
 							"client_type": 2,
 							"ios_info": {
-								"bundle_id": "com.example.danim"
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
 							}
 						}
 					]
@@ -159,10 +159,10 @@
 							"client_type": 3
 						},
 						{
-							"client_id": "70367155908-db1etfvpmhkuorkq3va84nlsoq19s8ha.apps.googleusercontent.com",
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
 							"client_type": 2,
 							"ios_info": {
-								"bundle_id": "com.example.danim"
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
 							}
 						}
 					]

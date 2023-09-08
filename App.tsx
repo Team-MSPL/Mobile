@@ -14,6 +14,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {modalSliceActions} from './src/redux/modal/modalSlice';
@@ -26,7 +27,6 @@ import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);

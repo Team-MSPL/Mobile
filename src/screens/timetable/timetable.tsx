@@ -1,20 +1,18 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
+import {Box, HStack, ScrollView, Text} from 'native-base';
+import {useEffect, useLayoutEffect, useState} from 'react';
+import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
 	getDrivingDuration,
-	getOneTravelCourse,
 	saveTravel,
 	travelSliceActions,
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
-import {Alert, TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import Background from '../../utill/component/timetable/background';
-import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag} =
 		useAppSelector(state => state.travelSlice);

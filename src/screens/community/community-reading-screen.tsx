@@ -494,25 +494,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 								<Text>제목: {postData.postTitle}</Text>
 								<Text>본문</Text>
 								<Text style={styles.postContentText}>{postData.postContent}</Text>
-								{/* <Text>사진 목록</Text>
-								<View style={styles.imageContainer}>
-									{postData.postImage.slice(0, 8).map((uri, index) => (
-										<Image key={index} source={{uri}} style={styles.image} />
-									))}
-									{postData.postImage.length > 8 && (
-										<TouchableOpacity style={styles.moreButton} onPress={handleMoreButtonPress}>
-											<Text style={styles.moreButtonText}>더보기</Text>
-										</TouchableOpacity>
-									)}
-								</View>
-								<Modal isVisible={isImageMoreModalVisible}>
-									<Text style={{textAlign: 'center', fontSize: 20}}>전체 사진 보기</Text>
-									<ScrollView contentContainerStyle={styles.imageModalContainer}>
-										{postData.postImage.map((uri, index) => (
-											<Image key={index} source={{uri}} style={styles.modalImage} />
-										))}
-									</ScrollView>
-								</Modal> */}
 								<Text>사진 목록</Text>
 								<View style={styles.container}>
 									{postData.postImage.map((uri, index) => {

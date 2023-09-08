@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {Alert} from 'react-native';
 import {axiosAuth} from '../travel-info/travel.slice';
 import {userSliceActions} from './user.slice';
 const initialState: LiteState = {
@@ -9,7 +8,7 @@ const initialState: LiteState = {
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
-		console.log('왔긴한데', data.userProfileImage);
+		console.log('왔긴한데', data.userName, data.userProfileImage);
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,
 			userProfileImage: data.userProfileImage,
