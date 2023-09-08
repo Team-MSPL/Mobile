@@ -18,7 +18,7 @@ const initialState: LiteState = {
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
-	distance: 0, //거리민감도
+	distance: 5, //거리민감도
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: [[]], //성향
 	timeLimitArray: [9, 20], //시작시간과 끝시간
@@ -317,12 +317,12 @@ export const travelSlice = createSlice({
 						}
 					}
 					// if (idx == 0 && index == 0) {
-					//    time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-					//    console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
+					// 	time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+					// 	console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
 					// }
 					// if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
-					//    copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
-					//    time += 2;
+					// 	copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
+					// 	time += 2;
 					// }
 					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
 						copy[idx].push({
@@ -370,6 +370,7 @@ export const travelSlice = createSlice({
 		setMakeMode: (state, {payload}) => {
 			state.makeMode = payload;
 			state.tableShowFlag = true;
+			state.editMode = '';
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);

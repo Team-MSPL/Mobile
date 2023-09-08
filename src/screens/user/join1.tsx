@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {Alert, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
@@ -15,6 +15,7 @@ export default function Join1({navigation, route}: any) {
 	const [check, setCheck] = useState([false, false]);
 	const dispatch = useAppDispatch();
 	const [nickname, setNickname] = useState('');
+	const {anonymousKeep} = useAppSelector(state => state.userSlice);
 	const goSignUp = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -28,7 +29,7 @@ export default function Join1({navigation, route}: any) {
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));
 			console.log(navigation);
-			navigation.replace('Tab');
+			anonymousKeep ? (navigation.goBack(), navigation.goBack()) : navigation.replace('Tab');
 		} catch (err) {
 			console.log('왜 이래', err);
 			dispatch(

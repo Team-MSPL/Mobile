@@ -1,10 +1,9 @@
 import {GOOGLE_API_KEY} from '@env';
 import {Box, HStack, Text, VStack} from 'native-base';
 import {memo, useRef, useState} from 'react';
-import {Image, Modal, TouchableOpacity, View} from 'react-native';
+import {Image, Modal, Pressable, TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
@@ -111,7 +110,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 							<VStack key={idx}>
 								{item.map((value, index) => {
 									return (
-										<TouchableOpacity
+										<Pressable
 											style={{
 												width: 70,
 												height: 35 * Math.ceil(value.takenTime / 30),
@@ -177,7 +176,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
 													style={{width: 30, height: 30}}></Image>
 											)}
-										</TouchableOpacity>
+										</Pressable>
 									);
 								})}
 							</VStack>

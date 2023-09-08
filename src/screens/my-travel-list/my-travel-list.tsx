@@ -1,16 +1,8 @@
-import {JSX, JSXElementConstructor, ReactElement, useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	getDrivingDuration,
-	getMyTravelList,
-	getOneTravelCourse,
-	saveTravel,
-	travelSliceActions,
-	updateTravelCourse,
-} from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
-import {Alert, BackHandler, TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {getMyTravelList, getOneTravelCourse} from '../../redux/travel-info/travel.slice';
+import {TouchableOpacity} from 'react-native';
+import {Text, Box, ScrollView} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -19,18 +11,9 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const [select, setSelect] = useState(0);
-	const [deleteList, setDeleteList] = useState<string[]>([]);
-	const [addList, setAddList] = useState<number[]>([]);
-	const [x, setX] = useState(-1);
 	const [view, setView] = useState(0);
-	let wayPoint = {start: '', goal: '', wayPoint: ''};
-
-	const goMapInfo = () => {
-		navigation.navigate('MapInfo');
-	};
 	const goMyTravelDetail = async (e: string) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -68,25 +51,28 @@ export default function MyTravelList({navigation}: any) {
 	useEffect(() => {
 		navigation.setOptions({
 			headerTitle: () => <Text>내 여행</Text>,
-			headerRight: () => (
-				<TouchableOpacity
-					onPress={() => {
-						setView(view + 1);
-					}}>
-					<Text>새로고침</Text>
-				</TouchableOpacity>
-			),
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
+					<TouchableOpacity
+						onPress={() => {
+							setView(view + 1);
+						}}>
+						<Text>새로고침</Text>
+					</TouchableOpacity>
+				),
 		});
 	}, []);
 	useFocusEffect(
 		useCallback(() => {
-			getTravelList();
+			socialloginProvider != 'anonymous' && getTravelList();
 		}, []),
 	);
 
 	return (
 		<ScrollView bgColor='#EFFBFB'>
-			{myTravelList.length == 0 ? (
+			{socialloginProvider == 'anonymous' ? (
+				<Box>익명이라 보여줄게 없엉 </Box>
+			) : myTravelList.length == 0 ? (
 				<TouchableOpacity onPress={goMakeTravel}>
 					<Text>내 여행이 없네유 만들러 고고?</Text>
 				</TouchableOpacity>

@@ -1,6 +1,6 @@
 import {useRef, useState, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import DatePicker from 'react-native-date-picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
@@ -12,26 +12,29 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
-	const {day, Place, timeLimitArray, minuteLimitArray} = useAppSelector(state => state.travelSlice);
+	const {day, Place, timeLimitArray, minuteLimitArray, nDay, accommodations, selectStartDate, selectEndDate} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
-	const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-	const [selectedStartDate, setSelectedStartDate] = useState(moment());
-	const [selectedEndDate, setSelectedEndDate] = useState<null | Moment>(null);
+	// const [selectStartDate, setSelectedStartDate] = useState(day[0] ?? moment());
+	// const [selectEndDate, setSelectedEndDate] = useState<null | Moment>(day[nDay] ?? null);
+	const [stepCheck, setStepCheck] = useState(false);
 
 	const onConfirm = (selectedDate: Date) => {
-		if (selectedDate.getHours() < 6) {
+		setVisible(false); // 모달 close
+		if (selectedDate.getHours() < 13) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '6시 이전은 불가능합니다.',
+					modalTitle: '13시 이전은 불가능합니다.',
 					modalFunction: () => {},
 				}),
 			);
 		} else {
 			console.log(selectedDate.getHours());
 			// 날짜 또는 시간 선택 시
-			setVisible(false); // 모달 close
+
 			let timeCopy = [...timeLimitArray];
 			timeCopy[dateFlag.current] = selectedDate.getHours();
 			let minuteCopy = [...minuteLimitArray];
@@ -51,16 +54,40 @@ export default function SelectDay({navigation}: any) {
 	};
 
 	const goNext = () => {
-		const data = [...Array(nDay + 2)].map(item => {
-			return Place;
-		});
+		let data: PlaceType[] = [];
+		const checkDays = calculateDateDifference();
+		if (Object.keys(accommodations).length) {
+			let copy = [...accommodations];
+			if (checkDays + 2 < Object.keys(accommodations).length) {
+				copy.splice(checkDays + 2, Object.keys(accommodations).length - checkDays);
+				data = copy;
+			} else if (checkDays + 2 > Object.keys(accommodations).length) {
+				for (let i = 0; i < checkDays + 2 - Object.keys(accommodations).length; i++) {
+					copy.push({
+						name: '',
+						lat: 0,
+						lng: 0,
+						category: 4,
+						takenTime: 30,
+						photo: '',
+					});
+				}
+
+				data = copy;
+			}
+		} else {
+			data = [...Array(nDays + 2)].map(item => {
+				return Place;
+			});
+		}
+
 		let season = Array(4).fill(false);
-		let index = Math.floor((selectedStartDate.month() + 1) / 3) - 1;
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = true) : (season[index] = true);
 		let dateArray = [];
 		let count = 0;
-		let copySelectedStartDate = moment({...selectedStartDate});
-		while (nDay > 4 ? copySelectedStartDate.isSameOrBefore(selectedEndDate) : count < 5) {
+		let copySelectedStartDate = moment({...selectStartDate});
+		while (nDays > 4 ? copySelectedStartDate.isSameOrBefore(selectEndDate) : count < 5) {
 			dateArray.push(copySelectedStartDate.clone());
 			copySelectedStartDate.add(1, 'day');
 			count += 1;
@@ -68,8 +95,8 @@ export default function SelectDay({navigation}: any) {
 		dispatch(
 			travelSliceActions.enrollDayInfo({
 				day: dateArray,
-				nDay: nDay,
-				accommodations: data,
+				nDay: nDays,
+				accommodations: data.length == 0 ? accommodations : data,
 				season: season,
 			}),
 		);
@@ -78,16 +105,19 @@ export default function SelectDay({navigation}: any) {
 
 	const onDateChange = (date: any, type: string) => {
 		if (type === 'END_DATE') {
-			setSelectedEndDate(date);
+			setStepCheck(true);
+			// setSelectedEndDate(date);
+			dispatch(travelSliceActions.enrollSelectEndDate(date));
 		} else {
-			setSelectedStartDate(date);
-			setSelectedEndDate(null);
+			dispatch(travelSliceActions.enrollSelectStartDate(date));
+			// setSelectedStartDate(date);
+			// setSelectedEndDate(null);
 		}
 	};
 
 	const calculateDateDifference = () => {
-		if (selectedStartDate && selectedEndDate) {
-			const diffInMilliseconds = selectedEndDate.diff(selectedStartDate);
+		if (selectStartDate && selectEndDate) {
+			const diffInMilliseconds = selectEndDate.diff(selectStartDate);
 			const duration = moment.duration(diffInMilliseconds);
 			const days = duration.asDays();
 			return Math.abs(days); // 절대값으로 반환 (음수 값 제거)
@@ -95,13 +125,11 @@ export default function SelectDay({navigation}: any) {
 		return 0;
 	};
 
-	const nDay = calculateDateDifference();
+	const nDays = calculateDateDifference();
 	const nowTime = new Date();
 
 	const viewDate =
-		selectedStartDate.format('YY-MM-DD') +
-		'>' +
-		(selectedEndDate ? selectedEndDate : selectedStartDate).format('YY-MM-DD');
+		selectStartDate.format('YY-MM-DD') + '>' + (selectEndDate ? selectEndDate : selectStartDate).format('YY-MM-DD');
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
 			{/* 스테퍼 넣기 */}
@@ -123,7 +151,7 @@ export default function SelectDay({navigation}: any) {
 						</Text>
 						<Spacer />
 						<Text fontSize='lg' bold>
-							{nDay ? `${nDay}박 ${nDay + 1}일` : '당일'}
+							{nDays ? `${nDays}박 ${nDays + 1}일` : '당일'}
 						</Text>
 					</HStack>
 				</Box>
@@ -167,7 +195,7 @@ export default function SelectDay({navigation}: any) {
 				<CalendarPicker
 					weekdays={weekdays}
 					months={months}
-					startFromMonday={true}
+					startFromMonday={false}
 					allowRangeSelection={true}
 					onDateChange={onDateChange}
 					minDate={nowTime}
@@ -176,6 +204,8 @@ export default function SelectDay({navigation}: any) {
 					nextTitle='다음 달'
 					allowBackwardRangeSelect={true}
 					selectYearTitle='년도 선택'
+					selectedStartDate={!stepCheck && !selectEndDate ? undefined : new Date(selectStartDate.toString())}
+					selectedEndDate={selectEndDate ? new Date(selectEndDate?.toString()) : undefined}
 				/>
 				<CustomButton label='다음단계' onPress={goNext} />
 			</VStack>

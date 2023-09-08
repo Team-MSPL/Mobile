@@ -6,39 +6,72 @@ import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from './select-city';
-import {updateFunctionToken} from '../../redux/user/user.slice';
+import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function FinalCheck({navigation}: any) {
 	const {day, region, accommodations, nDay, cityIndex, essentialPlaces, tendency, timeLimitArray, transit, distance} =
 		useAppSelector(state => state.travelSlice);
-	const {functionToken} = useAppSelector(state => state.userSlice);
+	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
 		Alert.alert('결제창');
 	};
 
-	const checkToken = () => {
-		functionToken >= 1
-			? dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
-						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
-						modalFunction: goNext,
-						modalLeft: true,
-					}),
-			  )
-			: dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
-						modalFunction: goPayment,
-						modalLeft: true,
-					}),
-			  );
+	const goNewLogin = () => {
+		dispatch(userSliceActions.setAnonymousKeep(true));
+		navigation.navigate('LoginScreen');
 	};
+	const checkToken = () => {
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			functionToken >= 1
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
+							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+							modalFunction: goNext,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
+							modalFunction: goPayment,
+							modalLeft: true,
+						}),
+				  );
+		}
+	};
+	const checkSignUpReward = () => {
+		dispatch(userSliceActions.setSignUpReward(false));
+	};
+	useFocusEffect(
+		useCallback(() => {
+			if (signUpReward) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원가입 축하드립니다',
+						modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+						modalFunction: checkSignUpReward,
+					}),
+				);
+			}
+		}, [signUpReward]),
+	);
 	useEffect(() => {
+		console.log('하위용', accommodations);
 		const backAction = () => {
 			if (navigation.isFocused() && isLoading) {
 				dispatch(

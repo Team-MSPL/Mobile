@@ -21,11 +21,15 @@ export default function StackNavigator() {
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	return (
 		<Stack.Navigator>
-			{isLogin || anonymous ? (
+			{/* {isLogin ? (
 				<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			) : (
 				<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
-			)}
+			)} */}
+
+			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
+			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
+
 			{TimetableStack()}
 			{CommunityStack()}
 			{RegionRecommendStack()}

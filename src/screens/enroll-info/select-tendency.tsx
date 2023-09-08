@@ -4,7 +4,7 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
 import {Text, Box, ScrollView, VStack, HStack, Divider, Button} from 'native-base';
-
+import {FlexWrap} from '../../utill/layout/layout';
 export default function SelectTendency({navigation}: any) {
 	const {transit, season} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -63,7 +63,7 @@ export default function SelectTendency({navigation}: any) {
 							<Text fontSize='lg' bold>
 								{item.title}
 							</Text>
-							<Box flexDir='row' flexWrap='wrap'>
+							<FlexWrap>
 								{item.list.map((data, idx) => {
 									return (
 										<SelectButton
@@ -73,7 +73,7 @@ export default function SelectTendency({navigation}: any) {
 											bgColor={select[index][idx]}></SelectButton>
 									);
 								})}
-							</Box>
+							</FlexWrap>
 						</Box>
 					);
 				})}

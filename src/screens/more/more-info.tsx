@@ -70,35 +70,34 @@ export default function MoreInfo({navigation}: any) {
 
 	return (
 		<ScrollView bgColor='#EFFBFB' p='2'>
-			{isLogin || anonymous ? (
-				<Box>
-					<HStack alignItems='center'>
-						<Image source={{uri: userProfileImage}} style={{width: 100, height: 100}}></Image>
-						<Text>
-							{userName ?? '익명'} 님 반갑고 {socialloginProvider ?? '익명'} 로그인임
-						</Text>
-					</HStack>
-				</Box>
-			) : (
-				<TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
-					<Text>로그인ㄱ</Text>
-				</TouchableOpacity>
-			)}
 			<Box>
-				<VStack>
-					<Text bold fontSize='xl'>
-						계정
+				<HStack alignItems='center'>
+					<Image
+						source={{uri: userProfileImage == '' ? 'https://danim.me/lee.jpeg' : userProfileImage}}
+						style={{width: 100, height: 100}}></Image>
+					<Text>
+						{userName} 님 반갑고 {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}{' '}
+						로그인임
 					</Text>
-					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
-						<Text>너님 토큰 갯수{functionToken}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={goPayment} style={{marginVertical: 10}}>
-						<Text>토큰 구매하쉴?</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={changeInfo} style={{marginVertical: 10}}>
-						<Text>정보 변경이요</Text>
-					</TouchableOpacity>
-				</VStack>
+				</HStack>
+			</Box>
+			<Box>
+				{socialloginProvider != 'anonymous' && (
+					<VStack>
+						<Text bold fontSize='xl'>
+							계정
+						</Text>
+						<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
+							<Text>너님 토큰 갯수{functionToken}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={goPayment} style={{marginVertical: 10}}>
+							<Text>토큰 구매하쉴?</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={changeInfo} style={{marginVertical: 10}}>
+							<Text>정보 변경이요</Text>
+						</TouchableOpacity>
+					</VStack>
+				)}
 
 				<VStack>
 					<Text bold fontSize='xl'>
@@ -127,19 +126,22 @@ export default function MoreInfo({navigation}: any) {
 					<Text bold fontSize='xl'>
 						기타
 					</Text>
-					<TouchableOpacity
-						onPress={() => {
-							dispatch(
-								modalSliceActions.setOpenModal({
-									modalTitle: '회원 탈퇴 하시겠습니까?',
-									modalFunction: goWithdraw,
-									modalLeft: true,
-								}),
-							);
-						}}
-						style={{marginVertical: 10}}>
-						<Text>회원탈퇴</Text>
-					</TouchableOpacity>
+					{socialloginProvider != 'anonymous' && (
+						<TouchableOpacity
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '회원 탈퇴 하시겠습니까?',
+										modalFunction: goWithdraw,
+										modalLeft: true,
+									}),
+								);
+							}}
+							style={{marginVertical: 10}}>
+							<Text>회원탈퇴</Text>
+						</TouchableOpacity>
+					)}
+
 					<TouchableOpacity
 						onPress={() => {
 							dispatch(
