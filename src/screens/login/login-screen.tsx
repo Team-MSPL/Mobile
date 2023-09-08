@@ -19,21 +19,6 @@ export default function LoginScreen({navigation}: any) {
 		// /navigation.replace('Home');
 	};
 
-	interface appleTokenType {
-		aud: string;
-		auth_time: number;
-		c_hash: string;
-		email: string;
-		email_verified: string;
-		exp: number;
-		iat: number;
-		is_private_email: string;
-		iss: string;
-		nonce: string;
-		nonce_supported: boolean;
-		sub: string;
-	}
-
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
 		const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -121,19 +106,42 @@ export default function LoginScreen({navigation}: any) {
 
 	const appleLogin = async () => {
 		try {
-			let userInfo;
 			if (appleAuth.isSupported) {
 				console.log('ios다!!');
-				const appleCredential = await appleAuth.performRequest({
+				const appleAuthRequestResponse = await appleAuth.performRequest({
 					requestedOperation: appleAuth.Operation.LOGIN,
-					requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+					requestedScopes: [appleAuth.Scope.FULL_NAME],
 				});
-				const {identityToken, email, nonce} = appleCredential;
-				const credential = auth.AppleAuthProvider.credential(identityToken, nonce);
-
-				userInfo = await auth().signInWithCredential(credential);
-
-				console.log('애플 로그인 성공', userInfo.user);
+				// Ensure Apple returned a user identityToken
+				if (!appleAuthRequestResponse.identityToken) {
+					throw new Error('Apple Sign-In failed - no identify token returned');
+				}
+				const name = appleAuthRequestResponse.fullName;
+				const fullName = `${name?.familyName}${name?.givenName}`;
+				// Create a Firebase credential from the response
+				const {identityToken, nonce} = appleAuthRequestResponse;
+				const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+				// Sign the user in with the credential
+				const authenticate = await auth().signInWithCredential(appleCredential);
+				const userInfo = {...authenticate.user, displayName: fullName};
+				console.log('애플 로그인 성공', userInfo);
+				const data = {
+					userName: userInfo.displayName,
+					userProfileImage: '../public/images/danim_logo.png',
+					userToken: userInfo.uid,
+					loginProvider: 'apple',
+					signUpFlag: false,
+				};
+				const result = await dispatch(socialConnect(data)).unwrap();
+				if (result == 202) {
+					navigation.navigate('Join1', {
+						userToken: userInfo.uid,
+						loginProvider: 'apple',
+						profileImage: '../public/images/danim_logo.png',
+						nickname: userInfo.displayName,
+					});
+					console.log('이름, 사진', userInfo.displayName, userInfo.photoURL);
+				}
 			} else {
 				console.log('안드로이드다!!');
 				// 보안을 위해 state, nonce 랜덤으로 생성
@@ -143,7 +151,7 @@ export default function LoginScreen({navigation}: any) {
 					clientId: 'DanimMobile.example.native.reactjs.org',
 					redirectUri: 'https://danim-3439e.firebaseapp.com/__/auth/handler',
 					responseType: appleAuthAndroid.ResponseType.ALL,
-					scope: appleAuthAndroid.Scope.ALL,
+					scope: appleAuthAndroid.Scope.NAME,
 					nonce: rawNonce,
 					state,
 				});
@@ -151,26 +159,26 @@ export default function LoginScreen({navigation}: any) {
 
 				if (response.state === state) {
 					const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
-					userInfo = await auth().signInWithCredential(credential);
+					const userInfo = await auth().signInWithCredential(credential);
 					console.log('안드로이드로 애플 로그인 성공', userInfo.user);
+					const data = {
+						userName: userInfo.user.displayName,
+						userProfileImage: '../public/images/danim_logo.png',
+						userToken: userInfo.user.uid,
+						loginProvider: 'apple',
+						signUpFlag: false,
+					};
+					const result = await dispatch(socialConnect(data)).unwrap();
+					if (result == 202) {
+						navigation.navigate('Join1', {
+							userToken: userInfo.user.uid,
+							loginProvider: 'apple',
+							profileImage: '../public/images/danim_logo.png',
+							nickname: userInfo.user.displayName,
+						});
+						console.log('이름, 사진', userInfo.user.displayName, userInfo.user.photoURL);
+					}
 				}
-			}
-			const data = {
-				userName: userInfo!.user.displayName,
-				userProfileImage: userInfo!.user.photoURL,
-				userToken: userInfo!.user.uid,
-				loginProvider: 'apple',
-				signUpFlag: false,
-			};
-			const result = await dispatch(socialConnect(data)).unwrap();
-			if (result == 202) {
-				navigation.navigate('Join1', {
-					userToken: userInfo!.user.uid,
-					loginProvider: 'apple',
-					profileImage: userInfo!.user.photoURL,
-					nickname: userInfo!.user.displayName,
-				});
-				console.log('사진', userInfo?.user.photoURL);
 			}
 		} catch (error) {
 			console.error('애플 로그인 실패', error);
