@@ -1,0 +1,174 @@
+{
+	"project_info": {
+		"project_number": "70367155908",
+		"project_id": "danim-3439e",
+		"storage_bucket": "danim-3439e.appspot.com"
+	},
+	"client": [
+		{
+			"client_info": {
+				"mobilesdk_app_id": "1:70367155908:android:40ca31eccb79bc08141b91",
+				"android_client_info": {
+					"package_name": "com.danimmobile"
+				}
+			},
+			"oauth_client": [
+				{
+					"client_id": "70367155908-8alq6d6r501k7lc7u69sf6354610buva.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.danimmobile",
+						"certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+					}
+				},
+				{
+					"client_id": "70367155908-hmgeduiphldv70aopd7mfl8acvqgpjrq.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.danimmobile",
+						"certificate_hash": "01fc336672b8d7d8a588424dafb63398db3ad71c"
+					}
+				},
+				{
+					"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+					"client_type": 3
+				}
+			],
+			"api_key": [
+				{
+					"current_key": "AIzaSyAVEQpLINJPRz139TIVwmOqN-QUerr3Fms"
+				}
+			],
+			"services": {
+				"appinvite_service": {
+					"other_platform_oauth_client": [
+						{
+							"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+							"client_type": 3
+						},
+						{
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
+							"client_type": 2,
+							"ios_info": {
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
+							}
+						}
+					]
+				}
+			}
+		},
+		{
+			"client_info": {
+				"mobilesdk_app_id": "1:70367155908:android:ba936316358226d0141b91",
+				"android_client_info": {
+					"package_name": "com.example.danim"
+				}
+			},
+			"oauth_client": [
+				{
+					"client_id": "70367155908-83sid8i686g71hda0am35qmpkc4a1sk3.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.example.danim",
+						"certificate_hash": "ffe0aebec3cebf357929bd38a3a11447a4e9c20f"
+					}
+				},
+				{
+					"client_id": "70367155908-8ijfpbh160ruus4nj8fs9pmii90ppqlh.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.example.danim",
+						"certificate_hash": "79c7c9acd25e8f6aba5063b85bd805c9dd2276aa"
+					}
+				},
+				{
+					"client_id": "70367155908-cu61jnibpjeff8iov25o68mgku56t2of.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.example.danim",
+						"certificate_hash": "754d3accb4648b2dcc96ff2d5225d64decc50e1e"
+					}
+				},
+				{
+					"client_id": "70367155908-qip37gubu6548341ec97tljn1e0ldujj.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.example.danim",
+						"certificate_hash": "c5c902a28663dd9a1f060ed35ad5c5ea1d43e7f9"
+					}
+				},
+				{
+					"client_id": "70367155908-v1irlfg57kksn209803fhl48kgel7s2k.apps.googleusercontent.com",
+					"client_type": 1,
+					"android_info": {
+						"package_name": "com.example.danim",
+						"certificate_hash": "3cd472ec82226bacd747eed7c4d60a9ff80b88a2"
+					}
+				},
+				{
+					"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+					"client_type": 3
+				}
+			],
+			"api_key": [
+				{
+					"current_key": "AIzaSyAVEQpLINJPRz139TIVwmOqN-QUerr3Fms"
+				}
+			],
+			"services": {
+				"appinvite_service": {
+					"other_platform_oauth_client": [
+						{
+							"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+							"client_type": 3
+						},
+						{
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
+							"client_type": 2,
+							"ios_info": {
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
+							}
+						}
+					]
+				}
+			}
+		},
+		{
+			"client_info": {
+				"mobilesdk_app_id": "1:70367155908:android:cc9e603fb1dc9f61141b91",
+				"android_client_info": {
+					"package_name": "com.example.fbui"
+				}
+			},
+			"oauth_client": [
+				{
+					"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+					"client_type": 3
+				}
+			],
+			"api_key": [
+				{
+					"current_key": "AIzaSyAVEQpLINJPRz139TIVwmOqN-QUerr3Fms"
+				}
+			],
+			"services": {
+				"appinvite_service": {
+					"other_platform_oauth_client": [
+						{
+							"client_id": "70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com",
+							"client_type": 3
+						},
+						{
+							"client_id": "70367155908-1qc6539fvctrjafgooq775drvvrc4h13.apps.googleusercontent.com",
+							"client_type": 2,
+							"ios_info": {
+								"bundle_id": "org.reactjs.native.example.DanimMobile"
+							}
+						}
+					]
+				}
+			}
+		}
+	],
+	"configuration_version": "1"
+}
