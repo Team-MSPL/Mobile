@@ -130,25 +130,29 @@ export default function LoginScreen({navigation}: any) {
 				const {identityToken, nonce} = appleAuthRequestResponse;
 				const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
 				// Sign the user in with the credential
-				const authenticate = await auth().signInWithCredential(appleCredential);
-				const userInfo = {...authenticate.user, displayName: fullName};
-				console.log('애플 로그인 성공', userInfo);
+				const userInfo = await auth().signInWithCredential(appleCredential);
+				if (userInfo.additionalUserInfo?.isNewUser) {
+					await userInfo.user.updateProfile({
+						displayName: fullName,
+					});
+				}
 				const data = {
-					userName: userInfo.displayName,
+					userName: userInfo.user.displayName,
 					userProfileImage: '../public/images/danim_logo.png',
-					userToken: userInfo.uid,
+					userToken: userInfo.user.uid,
 					loginProvider: 'apple',
 					signUpFlag: false,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {
-						userToken: userInfo.uid,
+						userToken: userInfo.user.uid,
 						loginProvider: 'apple',
 						profileImage: '../public/images/danim_logo.png',
-						nickname: userInfo.displayName,
+						nickname: userInfo.user.displayName,
 					});
-					console.log('이름, 사진', userInfo.displayName, userInfo.photoURL);
+				} else {
+					navigation.replace('Tab');
 				}
 			} else {
 				console.log('안드로이드다!!');
