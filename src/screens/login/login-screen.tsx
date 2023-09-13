@@ -1,17 +1,32 @@
 import {Google_Signin_Key} from '@env';
 import {AppleButton, appleAuth, appleAuthAndroid} from '@invertase/react-native-apple-authentication';
-import auth from '@react-native-firebase/auth';
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 
+import jwtDecode from 'jwt-decode';
 import {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import shortid from 'shortid';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
+interface tokenType {
+	aud: string;
+	auth_time: number;
+	c_hash: string;
+	email: string;
+	email_verified: string;
+	exp: number;
+	iat: number;
+	is_private_email: string;
+	iss: string;
+	nonce: string;
+	nonce_supported: boolean;
+	sub: string;
+}
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -118,38 +133,27 @@ export default function LoginScreen({navigation}: any) {
 				console.log('ios다!!');
 				const appleAuthRequestResponse = await appleAuth.performRequest({
 					requestedOperation: appleAuth.Operation.LOGIN,
-					requestedScopes: [appleAuth.Scope.FULL_NAME],
+					//requestedScopes: [appleAuth.Scope.FULL_NAME],
 				});
 				// Ensure Apple returned a user identityToken
 				if (!appleAuthRequestResponse.identityToken) {
 					throw new Error('Apple Sign-In failed - no identify token returned');
 				}
-				const name = appleAuthRequestResponse.fullName;
-				const fullName = `${name?.familyName}${name?.givenName}`;
-				// Create a Firebase credential from the response
-				const {identityToken, nonce} = appleAuthRequestResponse;
-				const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
-				// Sign the user in with the credential
-				const userInfo = await auth().signInWithCredential(appleCredential);
-				if (userInfo.additionalUserInfo?.isNewUser) {
-					await userInfo.user.updateProfile({
-						displayName: fullName,
-					});
-				}
+				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
-					userName: userInfo.user.displayName,
+					userName: `김다님${shortid.generate()}`,
 					userProfileImage: '../public/images/danim_logo.png',
-					userToken: userInfo.user.uid,
+					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {
-						userToken: userInfo.user.uid,
+						userToken: decodeToken.sub,
 						loginProvider: 'apple',
 						profileImage: '../public/images/danim_logo.png',
-						nickname: userInfo.user.displayName,
+						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
 					navigation.replace('Tab');
@@ -163,34 +167,56 @@ export default function LoginScreen({navigation}: any) {
 					clientId: 'DanimMobile.example.native.reactjs.org',
 					redirectUri: 'https://danim-3439e.firebaseapp.com/__/auth/handler',
 					responseType: appleAuthAndroid.ResponseType.ALL,
-					scope: appleAuthAndroid.Scope.NAME,
+					//scope: appleAuthAndroid.Scope.NAME,
 					nonce: rawNonce,
 					state,
 				});
 				const response = await appleAuthAndroid.signIn();
-
-				if (response.state === state) {
-					const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
-					const userInfo = await auth().signInWithCredential(credential);
-					console.log('안드로이드로 애플 로그인 성공', userInfo.user);
-					const data = {
-						userName: userInfo.user.displayName,
-						userProfileImage: '../public/images/danim_logo.png',
-						userToken: userInfo.user.uid,
+				console.log(response);
+				const decodeToken: tokenType = jwtDecode(response.id_token!);
+				console.log('같아라!', decodeToken.sub);
+				const data = {
+					userName: `김다님${shortid.generate()}`,
+					userProfileImage: '../public/images/danim_logo.png',
+					userToken: decodeToken.sub,
+					loginProvider: 'apple',
+					signUpFlag: false,
+				};
+				const result = await dispatch(socialConnect(data)).unwrap();
+				if (result == 202) {
+					navigation.navigate('Join1', {
+						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						signUpFlag: false,
-					};
-					const result = await dispatch(socialConnect(data)).unwrap();
-					if (result == 202) {
-						navigation.navigate('Join1', {
-							userToken: userInfo.user.uid,
-							loginProvider: 'apple',
-							profileImage: '../public/images/danim_logo.png',
-							nickname: userInfo.user.displayName,
-						});
-						console.log('이름, 사진', userInfo.user.displayName, userInfo.user.photoURL);
-					}
+						profileImage: '../public/images/danim_logo.png',
+						nickname: `김다님${shortid.generate()}`,
+					});
+				} else {
+					navigation.replace('Tab');
 				}
+
+				// if (response.state === state) {
+				// 	const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
+				// 	const userInfo = await auth().signInWithCredential(credential);
+				// 	console.log('안드로이드로 애플 로그인 성공', userInfo.user);
+				// 	const data = {
+				// 		userName: `김다님${shortid.generate()}`,
+				// 		userProfileImage: '../public/images/danim_logo.png',
+				// 		userToken: userInfo.user.uid,
+				// 		loginProvider: 'apple',
+				// 		signUpFlag: false,
+				// 	};
+				// 	const result = await dispatch(socialConnect(data)).unwrap();
+				// 	if (result == 202) {
+				// 		navigation.navigate('Join1', {
+				// 			userToken: userInfo.user.uid,
+				// 			loginProvider: 'apple',
+				// 			profileImage: '../public/images/danim_logo.png',
+				// 			nickname: `김다님${shortid.generate()}`,
+				// 		});
+				// 	} else {
+				// 		navigation.replace('Tab');
+				// 	}
+				// }
 			}
 		} catch (error) {
 			console.error('애플 로그인 실패', error);
