@@ -2,17 +2,23 @@ import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {BackHandler, TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Center} from 'native-base';
+import {BackHandler, Dimensions} from 'react-native';
+import {Text, Box, Center} from 'native-base';
 import Slider from '@react-native-community/slider';
+import {MainContainer, VStack, Divider} from '../../utill/layout/layout';
+import StepText from '../../utill/component/enroll-info/step-text';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {SvgMap} from '../../utill/svg/svg';
 export default function SelectDistance({navigation}: any) {
 	const {distance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(distance);
-
+	const {width, height} = Dimensions.get('window');
 	const goNext = () => {
+		console.log(width);
 		dispatch(travelSliceActions.enrollDistance(range));
-		navigation.navigate('SelectTendency');
+		navigation.navigate('FinalCheck');
 	};
 	useEffect(() => {
 		const backAction = () => {
@@ -26,19 +32,19 @@ export default function SelectDistance({navigation}: any) {
 		return () => backHandler.remove();
 	}, [range]);
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
-			<VStack space='5'>
-				<Text fontSize='2xl' bold color='black'>
-					거리민감도 설정
-				</Text>
-				<Text fontSize='md' color='grey'>
-					거리 민감도가 높아질수록 이동경로가 가까워집니다.
-				</Text>
-				<Text>{range}</Text>
-				<Divider my='1' />
-				<Center>
+		<MainContainer showsVerticalScrollIndicator={false}>
+			<StepText mainText='거리민감도 설정' subText='다님Ai는 거리 민감도를 통해 추천 여행 코스를 짜드려요' />
+			<VStack>
+				<MapContainer>
+					<Qwe>
+						<SvgMap />
+					</Qwe>
+					<CircleContainer size={range}></CircleContainer>
+					<CircleCenter></CircleCenter>
+				</MapContainer>
+				<DistanceExplainContainer>
 					<Slider
-						style={{width: '80%', height: 40}}
+						style={{width: '100%', height: 40}}
 						minimumValue={1}
 						maximumValue={10}
 						minimumTrackTintColor='#123123'
@@ -49,13 +55,51 @@ export default function SelectDistance({navigation}: any) {
 							setRange(item);
 						}}
 					/>
-				</Center>
-				<Center>
-					<Box w={300 - range * 3 + 'px'} h={300 - range * 3 + 'px'} bgColor='amber.300'></Box>
-				</Center>
-
-				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+					<DistanceExplain>민감도가 높으면, 성향과는 조금 멀어질 수 있어요</DistanceExplain>
+				</DistanceExplainContainer>
+				<CustomButton label='결과 확인' onPress={goNext}></CustomButton>
 			</VStack>
-		</ScrollView>
+		</MainContainer>
 	);
 }
+
+const DistanceExplainContainer = styled.View`
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+`;
+
+const DistanceExplain = styled.Text`
+	font-size: 14px;
+	font-weight: bold;
+	color: black;
+`;
+const MapContainer = styled.View`
+	width: 100%;
+	height: 300px;
+	align-items: center;
+	justify-content: center;
+`;
+const Qwe = styled.View`
+	width: 100%;
+	height: 300px;
+	position: absolute;
+	align-items: center;
+	justify-content: center;
+`;
+const CircleContainer = styled.View<{size: number}>`
+	width: ${props => props.size * 20}px;
+	height: ${props => props.size * 20}px;
+	background-color: rgba(38, 152, 251, 0.3);
+	position: absolute;
+	border-radius: 99px;
+	border-color: ${colors.selectButton};
+	border-width: 1px;
+`;
+const CircleCenter = styled.View`
+	width: 6px;
+	height: 6px;
+	background-color: ${colors.selectButton};
+	position: absolute;
+	border-radius: 99px;
+`;

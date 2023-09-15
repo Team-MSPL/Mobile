@@ -1,13 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Image, Text, Center, Box, ScrollView, Button, VStack, HStack} from 'native-base';
-import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
+import {Image, Text, Box} from 'native-base';
+import {TouchableOpacity} from 'react-native';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {logout, updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import {MainContainer, VStack, HStack} from '../../utill/layout/layout';
 export default function MoreInfo({navigation}: any) {
-	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
+	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
 
@@ -67,11 +68,14 @@ export default function MoreInfo({navigation}: any) {
 	const goCrack = () => {
 		dispatch(updateFunctionToken({functionToken: 100}));
 	};
+	const handleInquire = () => {
+		dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}));
+	};
 
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
+		<MainContainer>
 			<Box>
-				<HStack alignItems='center'>
+				<HStack>
 					<Image
 						source={{uri: userProfileImage == '' ? 'https://danim.me/lee.jpeg' : userProfileImage}}
 						style={{width: 100, height: 100}}></Image>
@@ -84,9 +88,7 @@ export default function MoreInfo({navigation}: any) {
 			<Box>
 				{socialloginProvider != 'anonymous' && (
 					<VStack>
-						<Text bold fontSize='xl'>
-							계정
-						</Text>
+						<MainText>계정</MainText>
 						<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 							<Text>너님 토큰 갯수{functionToken}</Text>
 						</TouchableOpacity>
@@ -100,9 +102,7 @@ export default function MoreInfo({navigation}: any) {
 				)}
 
 				<VStack>
-					<Text bold fontSize='xl'>
-						이용안내
-					</Text>
+					<MainText>이용안내</MainText>
 					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
 						<Text>공지사항</Text>
 					</TouchableOpacity>
@@ -110,10 +110,9 @@ export default function MoreInfo({navigation}: any) {
 						<Text>이벤트 모아보기</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity onPress={() => {}} style={{marginVertical: 10}}>
+					<TouchableOpacity onPress={handleInquire} style={{marginVertical: 10}}>
 						<Text>문의하기</Text>
 					</TouchableOpacity>
-
 					<TouchableOpacity onPress={goPolicy} style={{marginVertical: 10}}>
 						<Text>서비스 이용약관</Text>
 					</TouchableOpacity>
@@ -123,9 +122,7 @@ export default function MoreInfo({navigation}: any) {
 					<Text>앱버전 0.0</Text>
 				</VStack>
 				<VStack>
-					<Text bold fontSize='xl'>
-						기타
-					</Text>
+					<MainText>기타</MainText>
 					{socialloginProvider != 'anonymous' && (
 						<TouchableOpacity
 							onPress={() => {
@@ -160,6 +157,12 @@ export default function MoreInfo({navigation}: any) {
 			<TouchableOpacity onPress={goCrack} style={{marginVertical: 10}}>
 				<Text>크랙버전</Text>
 			</TouchableOpacity>
-		</ScrollView>
+		</MainContainer>
 	);
 }
+
+const MainText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: black;
+`;

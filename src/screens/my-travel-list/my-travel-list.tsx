@@ -9,6 +9,7 @@ import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {DayViewContainer} from '../enroll-info/select-multi';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -78,19 +79,21 @@ export default function MyTravelList({navigation}: any) {
 				</TouchableOpacity>
 			) : (
 				myTravelList.map((item, idx) => (
-					<TouchableOpacity
-						key={idx}
-						style={{marginVertical: 10, borderWidth: 1}}
-						onPress={() => {
-							goMyTravelDetail(item._id);
-						}}>
-						<Text>
-							{moment(item.day[0]).format('YY-MM-DD') +
-								'~' +
-								moment(item.day[item.nDay - 1]).format('YY-MM-DD')}
-						</Text>
-						<Text>{item.region}</Text>
-					</TouchableOpacity>
+					<DayViewContainer>
+						<TouchableOpacity
+							key={idx}
+							style={{marginVertical: 10, borderWidth: 1}}
+							onPress={() => {
+								goMyTravelDetail(item._id);
+							}}>
+							<Text>
+								{moment(item.day[0]).format('YY-MM-DD') +
+									'~' +
+									moment(item.day[item.nDay - 1]).format('YY-MM-DD')}
+							</Text>
+							<Text>{item.region}</Text>
+						</TouchableOpacity>
+					</DayViewContainer>
 				))
 			)}
 		</ScrollView>

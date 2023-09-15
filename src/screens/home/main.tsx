@@ -13,8 +13,9 @@ import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		//dispatch(travelSliceActions.setMakeMode('recommend'));
-		navigation.navigate('SelectCity');
+		dispatch(travelSliceActions.reset());
+		dispatch(travelSliceActions.setMakeMode('recommend'));
+		navigation.navigate('EnrollInfo');
 	};
 	const {userProfileImage, userName, dailyReward, functionToken, signUpReward} = useAppSelector(
 		state => state.userSlice,

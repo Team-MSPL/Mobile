@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert, TouchableOpacity, Image} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {Text} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {MainContainer} from '../../utill/layout/layout';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -100,7 +101,7 @@ export default function DetailInfo({navigation}: any) {
 		}, []),
 	);
 	return (
-		<ScrollView bgColor='#EFFBFB'>
+		<MainContainer>
 			<Text bold fontSize='lg'>
 				일기
 			</Text>
@@ -149,6 +150,6 @@ export default function DetailInfo({navigation}: any) {
 					삭제할래?
 				</Text>
 			</TouchableOpacity>
-		</ScrollView>
+		</MainContainer>
 	);
 }

@@ -16,10 +16,21 @@ import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 import Recommend from '../screens/timetable/recommend';
 import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
+import EnrollInfo from '../screens/enroll-info/enroll-info';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
 		<Fragment>
+			<Stack.Screen
+				name='EnrollInfo'
+				component={EnrollInfo}
+				options={{
+					title: '새 여행',
+					headerStyle: {backgroundColor: 'white'},
+					headerShadowVisible: false,
+					headerTitleAlign: 'center',
+				}}
+			/>
 			<Stack.Screen
 				name='SelectCity'
 				component={SelectCity}
@@ -47,7 +58,16 @@ export default function TimetableStack() {
 					headerShadowVisible: false,
 				}}
 			/>
-			<Stack.Screen name='SearchPlace' component={SearchPlace} options={{headerShown: false}} />
+			<Stack.Screen
+				name='SearchPlace'
+				component={SearchPlace}
+				options={{
+					title: '숙소 추가하기',
+					headerStyle: {backgroundColor: 'white'},
+					headerShadowVisible: false,
+					headerTitleAlign: 'center',
+				}}
+			/>
 			<Stack.Screen
 				name='AddAccommodation'
 				component={AddAccommodation}
@@ -89,8 +109,9 @@ export default function TimetableStack() {
 				component={FinalCheck}
 				options={{
 					title: '선택 사항 확인',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: 'white'},
 					headerShadowVisible: false,
+					headerTitleAlign: 'center',
 				}}
 			/>
 			<Stack.Screen
