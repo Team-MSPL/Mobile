@@ -29,3 +29,14 @@ export const MainContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding: 10px;
 `;
+export const MainText = styled.Text`
+	font-size: 22px;
+	font-weight: bold;
+	color: black;
+`;
+
+export const Center = styled.View`
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+`;

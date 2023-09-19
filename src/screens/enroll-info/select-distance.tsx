@@ -10,15 +10,16 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgMap} from '../../utill/svg/svg';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SelectDistance({navigation}: any) {
-	const {distance} = useAppSelector(state => state.travelSlice);
+	const {distance, region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(distance);
 	const {width, height} = Dimensions.get('window');
 	const goNext = () => {
-		console.log(width);
-		dispatch(travelSliceActions.enrollDistance(range));
-		navigation.navigate('FinalCheck');
+		region.length == 0
+			? dispatch(modalSliceActions.setOpenModal({modalTitle: '지역 선택을 안하셨습니다.'}))
+			: (dispatch(travelSliceActions.enrollDistance(range)), navigation.navigate('FinalCheck'));
 	};
 	useEffect(() => {
 		const backAction = () => {

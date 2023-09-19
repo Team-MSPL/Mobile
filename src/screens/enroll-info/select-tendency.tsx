@@ -73,7 +73,7 @@ export default function SelectTendency({setViewComponent, viewComponent}: any) {
 							<FlexWrap>
 								{item.list.map((data, idx) => {
 									return (
-										<HStack>
+										<HStack key={idx}>
 											<SvgCheck
 												color={
 													tendency[index][idx] == 1

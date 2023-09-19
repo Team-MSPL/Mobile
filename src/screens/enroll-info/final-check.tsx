@@ -8,12 +8,13 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from './select-city';
 import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {MainContainer} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgHome, SvgPlace} from '../../utill/svg/svg';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
 export default function FinalCheck({navigation}: any) {
 	const {
@@ -32,6 +33,7 @@ export default function FinalCheck({navigation}: any) {
 	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
 		Alert.alert('결제창');
@@ -90,7 +92,7 @@ export default function FinalCheck({navigation}: any) {
 	useEffect(() => {
 		console.log('하위용', accommodations);
 		const backAction = () => {
-			if (navigation.isFocused() && isLoading) {
+			if (navigation.isFocused() && loading) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: 'ai가 돌아가고 있습니다 조금만 기다려주세요',
@@ -102,11 +104,11 @@ export default function FinalCheck({navigation}: any) {
 		};
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
-	}, [isLoading]);
+	}, [loading]);
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		try {
-			dispatch(LoadingSliceActions.onLoading());
+			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
 			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(
@@ -157,7 +159,7 @@ export default function FinalCheck({navigation}: any) {
 				}),
 			);
 		} finally {
-			dispatch(LoadingSliceActions.offLoading());
+			setLoading(false);
 		}
 	};
 
@@ -166,6 +168,7 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(travelSliceActions.reset());
 	};
 	const schedule = ['출발일', '종료일'];
+	if (loading) return <LoadingTimetable />;
 	return (
 		<MainContainer>
 			{/* 스테퍼 넣기 */}
@@ -200,7 +203,7 @@ export default function FinalCheck({navigation}: any) {
 
 					<SelectTendencyListContainer>
 						{schedule.map((element, index) => (
-							<DayContainer>
+							<DayContainer key={index}>
 								<DayText>{element}</DayText>
 								<DayElementText>
 									{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
@@ -220,7 +223,7 @@ export default function FinalCheck({navigation}: any) {
 				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
 				return (
-					<SelectListAllContainer>
+					<SelectListAllContainer key={idx}>
 						<MultiContainer first={idx == 0} last={idx == nDay}>
 							<MultiDayContainer>
 								<MultiDayText>Day {idx + 1}</MultiDayText>
@@ -258,8 +261,8 @@ export default function FinalCheck({navigation}: any) {
 									<MultiDayText>여행지</MultiDayText>
 								</HStack>
 								{filteredPlaces.length != 0 ? (
-									filteredPlaces.map(data => (
-										<PlaceContainer>
+									filteredPlaces.map((data, imageIndex) => (
+										<PlaceContainer key={imageIndex}>
 											<PlaceImage
 												source={{
 													uri: data.photo,

@@ -48,6 +48,7 @@ export default function EnrollInfo({navigation}: any) {
 				<ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
 					{enrollComponentList.map((item, idx) => (
 						<TitleContainer
+							key={idx}
 							select={viewComponent == idx}
 							onPress={() => {
 								changeComponent(idx);

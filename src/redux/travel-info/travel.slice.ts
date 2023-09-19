@@ -45,6 +45,7 @@ const initialState: LiteState = {
 	tableShowFlag: false,
 	selectStartDate: moment().startOf('day').add(12, 'hours'),
 	selectEndDate: null,
+	travelName: '',
 };
 
 export const axiosAuth = axios.create({
@@ -277,6 +278,16 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.cityIndex = payload.cityIndex;
 		},
+		setTravelStart: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.makeMode = payload.makeMode;
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+		},
+		enrollTravelName: (state, {payload}) => {
+			state.travelName = payload;
+		},
 		enrollSelectStartDate: (state, {payload}) => {
 			state.selectStartDate = payload;
 		},
@@ -437,6 +448,7 @@ export const travelSlice = createSlice({
 			state.diary = payload.diary;
 			state.picture = payload.picture;
 			state.reviewCheck = payload.reviewCheck;
+			state.travelName = payload.travelName;
 			//state.myTravelList = payload;
 		});
 		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
@@ -482,6 +494,7 @@ interface LiteState {
 	tableShowFlag: boolean;
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
+	travelName: string;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
@@ -533,6 +546,7 @@ export interface SaveTravelType {
 	transit: number;
 	tendency: number[][];
 	timetable: TimetableType[][];
+	travelName: string;
 }
 interface Reviews {
 	author_name: string;
@@ -590,6 +604,7 @@ interface myTravelListType {
 	region: string[];
 	day: Moment[];
 	nDay: number;
+	travelName: string;
 }
 
 interface updateTravelCourseType {

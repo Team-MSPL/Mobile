@@ -10,16 +10,20 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {axiosAuth, getMyTravelList, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		dispatch(travelSliceActions.reset());
-		dispatch(travelSliceActions.setMakeMode('recommend'));
+		let season = Array(4).fill(0);
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		index < 0 ? (season[3] = 1) : (season[index] = 1);
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollInfo');
 	};
 	const {userProfileImage, userName, dailyReward, functionToken, signUpReward} = useAppSelector(
 		state => state.userSlice,
 	);
+	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const zxc = () => {
 		dispatch(travelSliceActions.setSingleMode());

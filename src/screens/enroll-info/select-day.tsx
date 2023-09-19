@@ -145,7 +145,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 					<ASD>
 						{[...Array(2)].map((item, idx) => (
 							<>
-								<TimeItemContainer>
+								<TimeItemContainer key={idx}>
 									<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
 									<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
 									<HStack>

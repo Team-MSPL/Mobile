@@ -98,7 +98,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			});
 		}
 	};
-	const categortColors = ['blue', 'orange', 'green', 'pink', 'purple', 'gray'];
+	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
 
 	return (
 		<View style={{zIndex: 3}}>

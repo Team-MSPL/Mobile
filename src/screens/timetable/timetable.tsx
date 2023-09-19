@@ -81,6 +81,7 @@ export default function Timetable({navigation, route}: any) {
 					transit: transit,
 					timetable: timetable,
 					tendency: tendency,
+					travelName: '테스트용',
 				};
 				await dispatch(saveTravel(data));
 			} else {

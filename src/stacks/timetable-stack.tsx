@@ -119,9 +119,10 @@ export default function TimetableStack() {
 				component={Preset}
 				options={{
 					title: '다님의 제안이에요',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: 'white'},
 					headerShadowVisible: false,
 					headerBackVisible: false,
+					headerTitleAlign: 'center',
 				}}
 			/>
 			<Stack.Screen

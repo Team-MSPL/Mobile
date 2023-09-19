@@ -75,6 +75,7 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 										(value, index) =>
 											!(idx == nDay && index == 1) && (
 												<ElementContainer
+													key={index}
 													onPress={() => {
 														value.function({idx: idx, index: index});
 													}}>
@@ -108,8 +109,8 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 								{filteredPlaces.length != 0 && (
 									<MultiAllContainer>
 										<MultiText>여행지</MultiText>
-										{filteredPlaces.map(data => (
-											<MultiContainer>
+										{filteredPlaces.map((data, index) => (
+											<MultiContainer key={index}>
 												<SvgPlace color={colors.selectButton} />
 												<MultiElementText>{data.name}</MultiElementText>
 												<Pressable

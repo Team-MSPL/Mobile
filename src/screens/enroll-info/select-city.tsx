@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, Fragment} from 'react';
 import {TextInput, TouchableOpacity, ScrollView} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -139,7 +139,7 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 									<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
 										{cityViewList.map((item, idx) => {
 											return (
-												<>
+												<Fragment key={idx}>
 													<RegionItems
 														select={cityIndex == item.id}
 														onPress={() => {
@@ -151,9 +151,10 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 													</RegionItems>
 													{cityIndex == item.id && (
 														<CityItemContainer>
-															{cityViewList[cityIndex]?.sub.map((item, idx) => {
+															{cityViewList[cityIndex]?.sub.map((item, index) => {
 																return (
 																	<CityItems
+																		key={index}
 																		select={region.includes(item.subTitle)}
 																		onPress={() => {
 																			selectRegion(item.subTitle);
@@ -171,7 +172,7 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 															})}
 														</CityItemContainer>
 													)}
-												</>
+												</Fragment>
 											);
 										})}
 									</ScrollView>
@@ -258,10 +259,10 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 								</Text>
 							</HStack>
 							<SelectListContainer>
-								{region?.map((item, idx) => {
+								{region?.map((item, regionIndex) => {
 									return (
 										<SelectButton
-											key={idx}
+											key={regionIndex}
 											label={item}
 											onPress={() => deleteRegion(item)}></SelectButton>
 									);
