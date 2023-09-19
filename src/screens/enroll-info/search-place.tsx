@@ -1,22 +1,95 @@
-import {useState} from 'react';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {MutableRefObject, useRef, useState} from 'react';
+import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Box} from 'native-base';
+import shortId from 'shortid';
 import {GOOGLE_API_KEY} from '@env';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {HStack, VStack} from '../../utill/layout/layout';
+import {TouchableOpacity} from 'react-native';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
-	const {Place} = useAppSelector(state => state.travelSlice);
-
+	const {Place, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	const [placeState, setPlaceState] = useState<{
+		name: string | undefined;
+		lat: number | undefined;
+		lng: number | undefined;
+		photo: string;
+		category: number;
+		takenTime: number;
+		formatted_address: string | undefined;
+	}>();
+	const SearchList = [
+		{
+			title: '방문 예정인 여행지를 등록해 주세요',
+			subTitle: '여행지 검색',
+			variable: essentialPlaces,
+			function: travelSliceActions.enrollessentialPlaces,
+		},
+		{
+			title: '예정된 숙소 정보를 등록해주세요',
+			subTitle: '숙소 검색',
+			variable: accommodations,
+			function: travelSliceActions.enrollAccommodations,
+		},
+	];
+	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+	const addPlace = () => {
+		let copy = [...SearchList[route.params.id].variable];
+		route.params.id == 1
+			? placeState && (copy[route.params.idx + 1] = placeState)
+			: copy.push({...placeState, day: route.params.idx + 1, id: shortId.generate(), category: 5, takenTime: 60});
+		dispatch(SearchList[route.params.id].function(copy));
+		navigation.goBack();
+	};
+	const clearInput = () => {
+		autocompleteRef.current?.setAddressText('');
+	};
+	const clearButton = () => (
+		<SearchClearContainer>
+			<TouchableOpacity onPress={clearInput}>
+				<SearchClearButton>취소</SearchClearButton>
+			</TouchableOpacity>
+		</SearchClearContainer>
+	);
 	return (
-		<Box p='5' bgColor='#EFFBFB' flex='1'>
+		<SearchPlaceContainer>
+			<SearchPlaceText>{SearchList[route.params.id].title}</SearchPlaceText>
+			<SearchPlaceSecondText>{SearchList[route.params.id].subTitle}</SearchPlaceSecondText>
+			{placeState && (
+				<SearchPlaceElement>
+					<SearchPlaceImage
+						source={{
+							uri: placeState.photo,
+						}}
+						alt='Place Image'
+					/>
+					<VStack>
+						<SearchPlaceElementText>{placeState.name}</SearchPlaceElementText>
+						<SearchPlaceElementText>{placeState.formatted_address}</SearchPlaceElementText>
+					</VStack>
+					<SearchClearContainer>
+						<TouchableOpacity onPress={addPlace}>
+							<SearchClearButton>추가</SearchClearButton>
+						</TouchableOpacity>
+					</SearchClearContainer>
+				</SearchPlaceElement>
+			)}
 			<GooglePlacesAutocomplete
 				placeholder='장소를 검색해보세요!'
+				disableScroll={true}
+				ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
 				query={{
 					key: GOOGLE_API_KEY,
 					language: 'ko',
 					components: 'country:kr',
+				}}
+				renderRightButton={clearButton}
+				styles={{
+					textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
 				}}
 				fetchDetails={true}
 				onPress={async (data, details) => {
@@ -30,26 +103,76 @@ export default function SearchPlace({navigation, route}: any) {
 						imageUrl =
 							'https://ssl.pstatic.net/melona/libs/1458/1458328/a3d169ecc295102274f4_20230718175149113.jpg';
 					}
+					console.log('하이유', details);
 					const datas = {
 						...Place,
 						name: details?.name,
 						lat: details?.geometry.location.lat,
 						lng: details?.geometry.location.lng,
+						formatted_address: details?.formatted_address.replace('대한민국 ', ''),
 						photo: imageUrl,
 					};
+					setPlaceState(datas);
 
 					dispatch(travelSliceActions.enrollPlace(datas));
 					setSelect(!select);
-					navigation.goBack();
-					route.params.id === 0
-						? navigation.navigate('AddAccommodation', {idx: route.params.idx})
-						: navigation.navigate('AddEssential', {idx: route.params.idx});
+					// navigation.goBack();
+					// route.params.id === 0
+					// 	? navigation.navigate('AddAccommodation', {idx: route.params.idx})
+					// 	: navigation.navigate('AddEssential', {idx: route.params.idx});
 				}}
 				onFail={error => console.log(error)}
 				onNotFound={() => console.log('no results')}
 				//keepResultsAfterBlur={true}
 				//enablePoweredByContainer={false}
 			></GooglePlacesAutocomplete>
-		</Box>
+		</SearchPlaceContainer>
 	);
 }
+
+const SearchPlaceElement = styled(HStack)`
+	align-items: center;
+	margin: 10px 0px 10px 0px;
+`;
+
+const SearchPlaceImage = styled.Image`
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+`;
+const SearchPlaceContainer = styled.View`
+	width: 100%;
+	padding: 10px;
+	flex: 1;
+	background-color: white;
+`;
+const SearchPlaceText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: black;
+	margin: 20px 0px 70px 0px;
+`;
+const SearchPlaceSecondText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	margin: 0px 0px 10px 0px;
+`;
+const SearchPlaceElementText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	margin: 5px;
+	flex-wrap: wrap;
+`;
+
+const SearchClearButton = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const SearchClearContainer = styled.View`
+	align-items: center;
+	justify-content: center;
+	margin: 0px 10px 0px 0px;
+`;

@@ -2,10 +2,10 @@ import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {colors} from '../colors';
 
-export default function SelectButton({label, onPress, isDisabled, bgColor}: CustomButtonProps) {
+export default function TendencyButton({label, onPress, isDisabled, bgColor}: CustomButtonProps) {
 	return (
 		<ButtonContainer onPress={onPress}>
-			<ButtonText>{label}</ButtonText>
+			<ButtonText select={bgColor}>{label}</ButtonText>
 		</ButtonContainer>
 	);
 }
@@ -14,20 +14,16 @@ type CustomButtonProps = {
 	label: string | number;
 	onPress: () => void;
 	isDisabled?: boolean;
-	bgColor?: boolean;
+	bgColor: boolean;
 };
-const ButtonText = styled.Text`
-	color: white;
+const ButtonContainer = styled.TouchableOpacity`
+	margin: 10px 20px 10px 20px;
+	align-items: center;
+	height: 50px;
+	justify-content: center;
+`;
+const ButtonText = styled.Text<{select: boolean}>`
+	color: ${props => (props.select ? colors.selectButton : 'grey')};
 	font-size: 18px;
 	font-weight: bold;
-`;
-
-const ButtonContainer = styled.TouchableOpacity`
-	align-items: center;
-	height: 45px;
-	padding: 0px 10px 0px 10px;
-	justify-content: center;
-	background-color: ${colors.selectButton};
-	border-radius: 25px;
-	margin: 5px 10px 5px 10px;
 `;

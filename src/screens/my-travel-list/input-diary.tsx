@@ -9,6 +9,9 @@ import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {SvgPicture} from '../../utill/svg/svg';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -26,6 +29,7 @@ export default function InputDiary({navigation}: any) {
 			await dispatch(updateDiary(data));
 			navigation.goBack();
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '다이어리 저장 중 에러가 발생했습니다.',
@@ -56,27 +60,108 @@ export default function InputDiary({navigation}: any) {
 		});
 	};
 	return (
-		<ScrollView bgColor='#EFFBFB'>
-			<Text>입력 하면됨{pictureValue.length}</Text>
-			<TextInput
-				style={{borderWidth: 1}}
-				value={diaryValue}
-				onChangeText={(value: string) => changeDiary(value)}></TextInput>
-			{pictureValue.length != 0 ? (
-				<>
+		<>
+			<PictureCotainer>
+				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
+					<PictureElementContainer onPress={handelGetImage}>
+						<PictuerVstack>
+							<SvgPicture color={colors.selectButton} />
+							<PictureText>사진 변경</PictureText>
+						</PictuerVstack>
+					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
-						<Image key={idx} source={{uri: item}} style={{width: 100, height: 100}}></Image>
+						<PictureElementContainer>
+							<PictureElement key={idx} source={{uri: item}}></PictureElement>
+						</PictureElementContainer>
 					))}
-					<TouchableOpacity onPress={handelGetImage}>
-						<Text>사진바꿔치기!</Text>
-					</TouchableOpacity>
-				</>
-			) : (
-				<TouchableOpacity onPress={handelGetImage}>
-					<Text>사진추가하기요</Text>
-				</TouchableOpacity>
-			)}
-			<CustomButton label={diary == '' ? '저장' : '수정'} onPress={goSaveDiary}></CustomButton>
-		</ScrollView>
+				</PictureScroll>
+				{/* {pictureValue.length != 0 ? (
+					<>
+						<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
+							<PictureElementContainer onPress={handelGetImage}>
+								<PictuerVstack>
+									<SvgPicture color={colors.selectButton} />
+									<PictureText>사진 변경</PictureText>
+								</PictuerVstack>
+							</PictureElementContainer>
+							{pictureValue.map((item, idx) => (
+								<PictureElementContainer>
+									<PictureElement key={idx} source={{uri: item}}></PictureElement>
+								</PictureElementContainer>
+							))}
+						</PictureScroll>
+					</>
+				) : (
+					<PictureElementContainer onPress={handelGetImage}>
+						<PictuerVstack>
+							<SvgPicture color={colors.selectButton} />
+							<PictureText>사진 추가</PictureText>
+						</PictuerVstack>
+					</PictureElementContainer>
+				)} */}
+			</PictureCotainer>
+			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
+			<DiaryTextInput
+				value={diaryValue}
+				multiline={true}
+				placeholder='여행 일기로 추억을 기록해보세요'
+				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
+
+			<CustomButton
+				width={40}
+				label={diary == '' ? '일기 저장' : '일기 수정'}
+				onPress={goSaveDiary}></CustomButton>
+		</>
 	);
 }
+
+const DiaryText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: black;
+`;
+export const DiaryTextInput = styled.TextInput`
+	width: 100%;
+	height: 150px;
+	border-width: 1px;
+	border-radius: 10px;
+	border-color: ${colors.selectButton};
+	margin: 10px 0px 0px 0px;
+	text-align-vertical: top;
+	padding: 10px;
+`;
+const PictureCotainer = styled.View`
+	height: 180;
+	width: 100%;
+	align-items: center;
+	margin: 15px 0px 15px 0px;
+	flex-direction: row;
+`;
+const PictureScroll = styled.ScrollView`
+	flex-direction: row;
+`;
+const PictureElementContainer = styled.TouchableOpacity`
+	width: 135px;
+	height: 180px;
+	border-radius: 10px;
+	border-width: 1px;
+	border-color: ${colors.selectButton};
+	align-items: center;
+	justify-content: center;
+	margin: 0px 5px 0px 0px;
+`;
+const PictureText = styled.Text`
+	margin: 10px 0px 0px 0px;
+	font-size: 15px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const PictuerVstack = styled(VStack)`
+	align-items: center;
+	justify-content: center;
+`;
+const PictureElement = styled.Image`
+	width: 135px;
+	height: 180px;
+	border-radius: 10px;
+`;
