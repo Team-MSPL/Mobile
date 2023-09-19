@@ -1,8 +1,8 @@
+import {Modal, Text, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
-import {TouchableOpacity, Modal, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../redux';
 import {modalSliceActions} from '../redux/modal/modalSlice';
-import {TitleText, SubText} from './component/policy/policy1';
+import {SubText, TitleText} from './component/policy/policy1';
 
 export default function BaseModal() {
 	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction} = useAppSelector(state => state.modalSlice);
@@ -18,7 +18,7 @@ export default function BaseModal() {
 		<Modal
 			animationType={'fade'}
 			presentationStyle={'formSheet'}
-			transparent={true}
+			//transparent={true}
 			visible={modalOpen}
 			onRequestClose={close}>
 			<ModalContainer onPress={close}>
