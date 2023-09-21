@@ -66,7 +66,7 @@ export default function InputDiary({navigation}: any) {
 					<PictureElementContainer onPress={handelGetImage}>
 						<PictuerVstack>
 							<SvgPicture color={colors.selectButton} />
-							<PictureText>사진 변경</PictureText>
+							<PictureText>{pictureValue.length == 0 ? '사진 추가' : '사진 변경'}</PictureText>
 						</PictuerVstack>
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (

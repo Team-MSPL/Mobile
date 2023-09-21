@@ -1,6 +1,7 @@
 import {Box, HStack, ScrollView, Text} from 'native-base';
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -10,11 +11,13 @@ import {
 	travelSliceActions,
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
+import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
+import {SvgMapIcon} from '../../utill/svg/svg';
 export default function Timetable({navigation, route}: any) {
-	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag} =
+	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -81,7 +84,7 @@ export default function Timetable({navigation, route}: any) {
 					transit: transit,
 					timetable: timetable,
 					tendency: tendency,
-					travelName: '테스트용',
+					travelName: travelName,
 				};
 				await dispatch(saveTravel(data));
 			} else {
@@ -150,10 +153,10 @@ export default function Timetable({navigation, route}: any) {
 							) : (
 								<HStack w='100%' h='60'>
 									<TouchableOpacity onPress={goMapInfo}>
-										<Text>지도 함 볼래?</Text>
+										<SvgMapIcon color={colors.selectButton} />
 									</TouchableOpacity>
 									<TouchableOpacity onPress={goSave}>
-										<Text>저장 함 해볼래?</Text>
+										<Text>저장</Text>
 									</TouchableOpacity>
 								</HStack>
 							)}
@@ -171,10 +174,10 @@ export default function Timetable({navigation, route}: any) {
 			</Box>
 		);
 	return (
-		<Box bgColor='#EFFBFB'>
+		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
-			<Box>
-				<ScrollView position='relative' mb='230'>
+			<ScrollVIewContainer>
+				<TimetableScrollView>
 					<InfoView
 						navigation={navigation}
 						setDeleteList={setDeleteList}
@@ -182,8 +185,22 @@ export default function Timetable({navigation, route}: any) {
 						viewDayIndex={viewDayIndex}
 					/>
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
-				</ScrollView>
-			</Box>
-		</Box>
+				</TimetableScrollView>
+			</ScrollVIewContainer>
+		</TimeTableContainer>
 	);
 }
+
+const TimeTableContainer = styled.View`
+	width: 100%;
+	background-color: white;
+	flex: 1;
+	padding: 10px;
+`;
+const ScrollVIewContainer = styled.View`
+	width: 100%;
+	flex: 0.8;
+`;
+const TimetableScrollView = styled.ScrollView`
+	position: relative;
+`;

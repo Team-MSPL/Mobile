@@ -185,7 +185,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 						<PreviewBoldText>
 							{nDays == 0 ? '당일치기' : nDays + '박' + Number(nDays + 1) + '일'}
 						</PreviewBoldText>
-						{nDays == 0 ? ' ' : '동안'}여행할거에요
+						{nDays == 0 ? ' ' : '동안'}여행할거에요 ✈
 					</PreviewText>
 					<PreviewText>
 						<PreviewBoldText>
@@ -194,7 +194,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 								String(timeLimitArray[0]).padStart(2, '0') +
 								'시'}
 						</PreviewBoldText>
-						에 출발하고
+						에 출발하고 👉
 					</PreviewText>
 					<PreviewText>
 						<PreviewBoldText>
@@ -208,7 +208,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 								  String(timeLimitArray[1]).padStart(2, '0') +
 								  '시'}
 						</PreviewBoldText>
-						에 돌아와요
+						에 돌아와요 👈
 					</PreviewText>
 				</PreviewContainer>
 				<CustomButton
@@ -277,14 +277,14 @@ const CalendarContainer = styled.View<{x: number; y: number; when: number}>`
 	top: ${props => props.y + 40};
 	left: ${props => (props.when == 0 ? props.x : props.x - 130)};
 `;
-const TimeContainer = styled.View`
+export const TimeContainer = styled.View`
 	width: 100%;
 	margin: 50px 0px 0px 0px;
 `;
-const TimeItemContainer = styled.View`
+export const TimeItemContainer = styled.View`
 	width: 50%;
 `;
-const TimeItemText = styled.Text`
+export const TimeItemText = styled.Text`
 	font-size: 16px;
 	color: black;
 	font-weight: bold;
@@ -299,7 +299,7 @@ const TimePressable = styled.Pressable`
 	height: 40px;
 	margin: 5px 0px 0px 0px;
 `;
-const DayPressable = styled.Pressable`
+export const DayPressable = styled.Pressable`
 	border-width: 1px;
 	align-items: center;
 	justify-content: center;
@@ -309,7 +309,7 @@ const DayPressable = styled.Pressable`
 	height: 40px;
 	margin: 5px 2px 0px 0px;
 `;
-const TimeStepText = styled.Text`
+export const TimeStepText = styled.Text`
 	color: ${colors.selectButton};
 	font-size: 16px;
 	font-weight: bold;
@@ -337,7 +337,7 @@ const SelectDivide = styled.View`
 	margin: 0px 0px 0px 0px;
 `;
 
-const ASD = styled.View`
+export const ASD = styled.View`
 	display: inline-block;
 	flex-direction: row;
 	align-items: center;

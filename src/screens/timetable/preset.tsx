@@ -1,12 +1,15 @@
-import {Box, Center, ScrollView, Text, VStack} from 'native-base';
+import {Box, Text} from 'native-base';
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
 import {BackHandler, Alert} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
+import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
 
 export default function Preset({navigation}: any) {
@@ -122,53 +125,65 @@ export default function Preset({navigation}: any) {
 
 		return () => backHandler.remove();
 	}, []);
-	if (isLoading) {
-		return (
-			<Box>
-				<Text>로딩중인데용?</Text>
-			</Box>
-		);
-	}
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
-			<VStack space='5'>
-				<Center>
-					<Text fontSize='xl' bold color='black'>
-						아래의 여행 코스 중 하나를 골라주세요!
-					</Text>
-					<Text fontSize='md' color='grey'>
-						마커를 눌러 관광지를 확인해보세요
-					</Text>
-				</Center>
-				<MapView
-					ref={mapRef}
-					style={{width: '100%', height: 300}}
-					//provider={PROVIDER_GOOGLE}
-					showsMyLocationButton={true}
-					region={{
-						latitude: centerLatitude,
-						longitude: centerLongitude,
-						latitudeDelta: deltaLatitude + deltaLatitude / 2,
-						longitudeDelta: deltaLongitude + deltaLongitude / 5,
-					}}>
-					{markers}
-					{polylines}
-				</MapView>
-				<Box flexDir='row' flexWrap='wrap'>
-					{presetDatas.map((item, idx) => (
-						<SelectButton
-							key={idx}
-							label={idx + 1 + '번 후보'}
-							bgColor={idx === select}
-							onPress={() => change(idx)}></SelectButton>
-					))}
-				</Box>
-				{presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text key={asd}>{qwe.name}</Text>))}
+		<MainContainer>
+			<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
+			<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
 
-				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
-			</VStack>
-		</ScrollView>
+			<MapView
+				ref={mapRef}
+				style={{width: '100%', height: 300}}
+				//provider={PROVIDER_GOOGLE}
+				showsMyLocationButton={true}
+				region={{
+					latitude: centerLatitude,
+					longitude: centerLongitude,
+					latitudeDelta: deltaLatitude + deltaLatitude / 2,
+					longitudeDelta: deltaLongitude + deltaLongitude / 5,
+				}}>
+				{markers}
+				{polylines}
+			</MapView>
+			<PresetContainer>
+				{presetDatas.map((item, idx) => (
+					<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
+						<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
+					</PresetButton>
+					// <SelectButton
+					// 	key={idx}
+					// 	label={idx + 1 + '번 후보'}
+					// 	bgColor={idx === select}
+					// 	onPress={() => change(idx)}></SelectButton>
+				))}
+			</PresetContainer>
+			{/* {presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text key={asd}>{qwe.name}</Text>))} */}
+
+			<CustomButton label='코스 선택' width={40} onPress={goNext}></CustomButton>
+		</MainContainer>
 	);
 }
 
 const mapColor = ['red', 'orange', 'yellow', 'green', 'blue'];
+const PresetContainer = styled.View`
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+`;
+const PresetButton = styled.TouchableOpacity<{select: boolean}>`
+	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
+	border-radius: 20px;
+	padding: 10px;
+	margin: 10px 5px 0px 5px;
+`;
+const PresetText = styled.Text<{select: boolean}>`
+	font-size: 17px;
+	font-weight: bold;
+	color: ${props => (props.select ? 'white' : colors.selectButton)};
+`;
+const PresetMainText = styled(MainText)`
+	font-size: 20px;
+`;
+const PresetSubText = styled(MainText)`
+	font-size: 15px;
+	margin: 0px 0px 10px 0px;
+`;

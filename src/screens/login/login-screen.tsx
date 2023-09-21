@@ -4,14 +4,18 @@ import auth from '@react-native-firebase/auth';
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
-import {Button, Center, HStack, Heading, Image, Text} from 'native-base';
 
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
+import {Animated, Easing} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
+import {colors} from '../../utill/colors';
+import {HStack, Center, MainContainer} from '../../utill/layout/layout';
+import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
@@ -194,47 +198,96 @@ export default function LoginScreen({navigation}: any) {
 	};
 
 	const platforms = [
-		{color: 'yellow.300', image: require('../../../public/images/kakao_logo.png'), onPress: kakaoLogin},
-		{color: 'white', image: require('../../../public/images/google_logo.png'), onPress: googleLogin},
-		// {color: 'black', image: require('../../../public/images/apple_logo.png'), onPress: kakaoLogin},
+		{title: 'Google', color: 'white', image: <SvgGoogle />, onPress: googleLogin},
+		{title: 'Kakao', color: colors.reviewBackground, image: <SvgKakao />, onPress: kakaoLogin},
+		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: kakaoLogin},
 	];
+
+	const [view, setView] = useState(0);
+	const viewList = [
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/danim_logo.png'),
+		require('../../../public/images/apple_logo.png'),
+		require('../../../public/images/kakao_logo.png'),
+	];
+	const [backgroundImageIndex, setBackgroundImageIndex] = useState(0);
+	const [fadeAnim] = useState(new Animated.Value(1));
+
+	const startBackgroundAnimation = () => {
+		const backgroundImages = [
+			require('../../../public/images/login1.png'),
+			require('../../../public/images/login1.png'),
+			require('../../../public/images/login1.png'),
+			require('../../../public/images/kakao_logo.png'),
+		];
+		Animated.timing(fadeAnim, {
+			toValue: 0,
+			duration: 4000,
+			// easing: Easing.linear,
+			useNativeDriver: false, // useNativeDriver를 false로 설정
+		}).start(() => {
+			// 애니메이션 완료 후 호출되는 콜백
+			console.log(fadeAnim);
+			console.log('헤헤');
+			setBackgroundImageIndex(prevIndex => (prevIndex + 1) % backgroundImages.length);
+			// 다음 애니메이션 시작
+			fadeAnim.setValue(0); // fadeAnim 초기화
+		});
+	};
+
+	useEffect(() => {
+		const interval = setInterval(startBackgroundAnimation, 5000);
+		return () => {
+			clearInterval(interval);
+		};
+	}, []);
 	return (
 		<SafeAreaView>
-			<Center>
-				<Heading marginTop={16} fontWeight={'extrabold'} fontSize={'3xl'}>
-					다님
-				</Heading>
-				<Heading marginTop={4} fontWeight={'medium'} fontSize={'2xl'}>
-					여행을 편하게, 쉽게
-				</Heading>
-				<Text marginTop={4} fontWeight={'hairline'}>
-					인기 여행지, 특이 여행지, 콘텐츠까지
-				</Text>
-				<Text fontWeight={'hairline'}>여행 일정의 모든 것</Text>
-				<Image
-					marginTop={8}
-					source={require('../../../public/images/danim_logo.png')}
-					width={24}
-					height={24}
-					alt='icon'
-				/>
-				<HStack marginTop={16} space={8}>
-					{platforms.map((platform, index) => (
-						<Button
+			<BackgroundImage source={viewList[backgroundImageIndex]}>
+				<LoginSCreenContainer>
+					<TitleTextContainer>
+						<LoginText>여행 일정을 이렇게</LoginText>
+						<TextContainer>
+							<LoginText>쉽게 짤 수 있</LoginText>
+							<SvgDanimText color='white' />
+						</TextContainer>
+					</TitleTextContainer>
+					<SvgLoginLogo color='white' />
+					<CircleContainer>
+						{platforms.map((platform, index) => (
+							<LongCircleButton
+								key={index}
+								bgColor={platform.color}
+								onPress={() => {
+									platform.onPress();
+								}}>
+								<HStack>
+									{platform.image}
+									<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
+										{platform.title} 아이디로 로그인
+									</LogoText>
+								</HStack>
+							</LongCircleButton>
+						))}
+						<LongCircleButton bgColor={colors.selectButton} onPress={goNext}>
+							<HStack>
+								<SvgGuest />
+								<LogoText color={'white'}>게스트로 로그인</LogoText>
+							</HStack>
+						</LongCircleButton>
+					</CircleContainer>
+					<HStack>
+						{/* {platforms.map((platform, index) => (
+						<CircleButton
 							key={index}
-							marginTop={4}
-							rounded={'full'}
-							w={60}
-							h={60}
 							bgColor={platform.color}
-							shadow={2}
 							onPress={() => {
 								platform.onPress();
 							}}>
-							<Image source={platform.image} width={12} height={12} resizeMode='contain' />
-						</Button>
-					))}
-					<AppleButton
+							{platform.image}
+						</CircleButton>
+					))} */}
+						{/* <AppleButton
 						buttonStyle={AppleButton.Style.WHITE}
 						buttonType={AppleButton.Type.SIGN_IN}
 						style={{
@@ -242,29 +295,63 @@ export default function LoginScreen({navigation}: any) {
 							height: 45, // You must specify a height
 						}}
 						onPress={() => appleLogin()}
-					/>
-				</HStack>
-				<Button
-					marginTop={24}
-					variant={'link'}
-					_text={{
-						color: '#58AEF3',
-						fontSize: '16',
-					}}
-					onPress={goNext}>
-					로그인 없이 다님 이용하기
-				</Button>
-				<Button
-					marginTop={24}
-					variant={'link'}
-					_text={{
-						color: '#58AEF3',
-						fontSize: '16',
-					}}
-					onPress={goAI}>
-					AI 테스트하기s
-				</Button>
-			</Center>
+					/> */}
+					</HStack>
+				</LoginSCreenContainer>
+			</BackgroundImage>
 		</SafeAreaView>
 	);
 }
+
+const LoginSCreenContainer = styled.View`
+	width: 100%;
+	padding: 20px;
+	align-items: center;
+	justify-content: center;
+`;
+const BackgroundImage = styled.ImageBackground`
+	width: 100%;
+	height: 100%;
+`;
+const TextContainer = styled(HStack)`
+	align-items: flex-start;
+`;
+const TitleTextContainer = styled.View`
+	align-items: flex-start;
+	margin: 0% 0% 15% 0%;
+`;
+const LoginText = styled.Text`
+	font-size: 23px;
+	font-weight: bold;
+	color: white;
+	margin: 0px 10px 0px 0px;
+`;
+
+const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
+	width: 50px;
+	height: 50px;
+	border-radius: 99px;
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+	margin: 0px 10px 0px 10px;
+	background-color: ${props => props.bgColor};
+`;
+const CircleContainer = styled.View`
+	width: 100%;
+	margin: 10% 0% 0% 0%;
+`;
+const LongCircleButton = styled(CircleButton)`
+	width: 100%;
+	margin: 5% 0% 0% 0%;
+	elevation: 3;
+	shadow-color: black;
+	shadow-opacity: 0.5;
+`;
+const LogoText = styled.Text<{color: string}>`
+	font-size: 15px;
+	color: ${props => props.color};
+`;
+const LogoLeft = styled.View`
+	justify-content: start;
+`;

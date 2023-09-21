@@ -1,13 +1,16 @@
 import {GOOGLE_API_KEY} from '@env';
-import {Box, HStack, Text, VStack} from 'native-base';
+import {Box, Text} from 'native-base';
 import {memo, useRef, useState} from 'react';
-import {Image, Modal, Pressable, TouchableOpacity, View} from 'react-native';
+import {Image, Modal, Pressable, TouchableOpacity, View, Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {HStack, VStack} from '../../layout/layout';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
+	const WINDOW_WIDTH = Dimensions.get('window').width;
+	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	const dispatch = useAppDispatch();
 	const viewDetail = (e: any) => {
 		navigation.navigate('CourseDetail', {value: e.value});
@@ -101,89 +104,80 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
 
 	return (
-		<View style={{zIndex: 3}}>
-			<HStack position='absolute'>
-				<Box w='60px'></Box>
-				{timetable.map(
-					(item, idx) =>
-						idx >= viewDayIndex &&
-						idx <= viewDayIndex + 4 && (
-							<VStack key={idx}>
-								{item.map((value, index) => {
-									return (
-										<Pressable
-											style={{
-												width: 70,
-												height: 35 * Math.ceil(value.takenTime / 30),
-												top: 35 * (value.y ?? 1),
-												left: value?.x && 70 * (idx - viewDayIndex),
-												backgroundColor:
-													editMode == 'delete' && deleteList.includes(value.id)
-														? 'red'
-														: categortColors[value.category],
-												position: 'absolute',
-												zIndex: 3,
-											}}
-											key={index}
-											onPress={() => {
-												indexRef.current = {
-													value: value,
-													index: index,
-													idx: idx,
-													category: value.category,
-													flag:
-														value.name == '점심 추천' ||
-														value.name == '저녁 추천' ||
-														value.name == '숙소 추천'
-															? true
-															: false,
-												};
-												if (makeMode == 'share') {
-													viewDetail(indexRef.current);
-												} else {
-													if (editMode == 'delete') {
-														let copy = [...deleteList];
-														if (deleteList.includes(value.id)) {
-															copy = copy.filter(item => item != value.id);
-														} else {
-															copy.push(value.id);
-														}
-														setDeleteList(copy);
+		<InfoViewContainter>
+			<SpacerView />
+			{timetable.map(
+				(item, idx) =>
+					idx >= viewDayIndex &&
+					idx <= viewDayIndex + 4 && (
+						<InfoVStack key={idx}>
+							{item.map((value, index) => {
+								return (
+									<InfoPressable
+										backgroundColor={
+											editMode == 'delete' && deleteList.includes(value.id)
+												? 'red'
+												: categortColors[value.category]
+										}
+										height={35 * Math.ceil(value.takenTime / 30)}
+										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+										key={index}
+										onPress={() => {
+											indexRef.current = {
+												value: value,
+												index: index,
+												idx: idx,
+												category: value.category,
+												flag:
+													value.name == '점심 추천' ||
+													value.name == '저녁 추천' ||
+													value.name == '숙소 추천'
+														? true
+														: false,
+											};
+											if (makeMode == 'share') {
+												viewDetail(indexRef.current);
+											} else {
+												if (editMode == 'delete') {
+													let copy = [...deleteList];
+													if (deleteList.includes(value.id)) {
+														copy = copy.filter(item => item != value.id);
 													} else {
-														setVisible(true);
+														copy.push(value.id);
 													}
+													setDeleteList(copy);
+												} else {
+													setVisible(true);
 												}
-											}}
-											// onLongPress={() => {
+											}
+										}}
+										// onLongPress={() => {
 
-											//    if (makeMode != 'share') {
-											//       if (editMode == 'delete') {
-											//          setDeleteList([]);
-											//          dispatch(travelSliceActions.editModeChange(''));
-											//       } else {
-											//          let copy = [...deleteList];
-											//          copy.push(value.id);
-											//          setDeleteList(copy);
-											//          dispatch(travelSliceActions.editModeChange('delete'));
-											//       }
-											//    }
-											// }}
-										>
-											{/* h= takenTime top=시간위치 */}
-											<Text>{value.name}</Text>
+										//    if (makeMode != 'share') {
+										//       if (editMode == 'delete') {
+										//          setDeleteList([]);
+										//          dispatch(travelSliceActions.editModeChange(''));
+										//       } else {
+										//          let copy = [...deleteList];
+										//          copy.push(value.id);
+										//          setDeleteList(copy);
+										//          dispatch(travelSliceActions.editModeChange('delete'));
+										//       }
+										//    }
+										// }}
+									>
+										{/* h= takenTime top=시간위치 */}
+										<InfoText>{value.name}</InfoText>
 
-											{value.photo != '' && (
-												<Image
-													source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}}
-													style={{width: 30, height: 30}}></Image>
-											)}
-										</Pressable>
-									);
-								})}
-							</VStack>
-						),
-				)}
-			</HStack>
+										{value.photo != '' && (
+											<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
+										)}
+									</InfoPressable>
+								);
+							})}
+						</InfoVStack>
+					),
+			)}
 			<Modal
 				visible={visible}
 				animationType={'slide'}
@@ -192,7 +186,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				onRequestClose={() => setVisible(false)}>
 				<ModalContainer onPress={() => setVisible(false)}>
 					<InfoModalContainer>
-						<VStack my='50'>
+						<VStack>
 							{indexRef.current.flag ? (
 								<>
 									<TouchableOpacity
@@ -270,10 +264,13 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 					</InfoModalContainer>
 				</ModalContainer>
 			</Modal>
-		</View>
+		</InfoViewContainter>
 	);
 };
 
+const InfoVStack = styled(VStack)`
+	flex: 0.18;
+`;
 const ModalContainer = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.4);
@@ -284,5 +281,35 @@ const InfoModalContainer = styled.View`
 	bottom: 0px;
 	background-color: gray;
 	width: 100%;
+`;
+const InfoViewContainter = styled.View`
+	z-index: 3;
+	flex: 1;
+	flex-direction: row;
+`;
+const SpacerView = styled.View`
+	flex: 0.1;
+	z-index: 10;
+	background-color: black;
+`;
+
+const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number}>`
+	width: 100%;
+	height: ${props => props.height};
+	top: ${props => props.top};
+	backgroundcolor: ${props => props.backgroundColor};
+	position: absolute;
+	z-index: 3;
+	border-radius: 10px;
+	padding: 4px;
+`;
+const InfoText = styled.Text`
+	font-size: 13px;
+	color: black;
+`;
+const InfoImage = styled.Image`
+	margin: 5px 0px 0px 0px;
+	width: 100%;
+	height: 50%;
 `;
 export default memo(InfoView);

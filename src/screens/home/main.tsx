@@ -12,13 +12,14 @@ import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import EnrollTravelTitle from '../enroll-info/enroll-travel-title';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
-		navigation.navigate('EnrollInfo');
+		navigation.navigate('EnrollTravelTitle');
 	};
 	const {userProfileImage, userName, dailyReward, functionToken, signUpReward} = useAppSelector(
 		state => state.userSlice,
@@ -26,6 +27,12 @@ export default function Main({navigation}: any) {
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const zxc = () => {
+		// dispatch(
+		// 	modalSliceActions.setOpenModal({
+		// 		modalTitle: '안내창',
+		// 		modalSubTitle: '지역 선택을 안하셨습니다.',
+		// 	}),
+		// );
 		dispatch(travelSliceActions.setSingleMode());
 		navigation.navigate('Timetable');
 	};
