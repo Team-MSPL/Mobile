@@ -1,5 +1,4 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {useAppSelector} from '../redux';
@@ -8,7 +7,7 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
-import {SvgCalendar, SvgAirplain, SvgCommunity, SvgProfile, SvgPlace} from '../utill/svg/svg';
+import {SvgAirplain, SvgCalendar, SvgCommunity, SvgProfile} from '../utill/svg/svg';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -53,8 +52,8 @@ function TabBar() {
 				name='Home'
 				component={Main}
 				options={{
-					title: '홈',
-					headerShown: false,
+					title: '다님',
+					headerShown: true,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
