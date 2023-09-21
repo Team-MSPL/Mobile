@@ -14,6 +14,9 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
+import {colors} from '../../utill/colors';
+import {HStack} from '../../utill/layout/layout';
+import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -28,10 +31,6 @@ interface tokenType {
 	nonce_supported: boolean;
 	sub: string;
 }
-
-import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
-import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 
 export default function LoginScreen({navigation}: any) {
 	const goNext = () => {
