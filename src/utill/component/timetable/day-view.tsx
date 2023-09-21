@@ -1,9 +1,11 @@
 import {useState, memo} from 'react';
-import {Text, Box, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {HStack} from '../../layout/layout';
+import {colors} from '../../colors';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
@@ -24,40 +26,71 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 			: navigation.navigate('MapInfo', {mapIndex: e});
 	};
 	return (
-		<Box>
-			<HStack bgColor='blue.400'>
+		<DayViewContainer>
+			<TimetableDayContainer>
 				<TouchableOpacity disabled={viewDayIndex == 0} onPress={goLeft}>
-					<Text>왼쪽 </Text>
+					<DayText>왼쪽 </DayText>
 				</TouchableOpacity>
-				<Spacer />
-				<Text fontSize='xl' bold>
-					{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}
-				</Text>
-				<Spacer />
-
+				<DayText>{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}</DayText>
 				<TouchableOpacity disabled={viewDayIndex + 5 > nDay} onPress={goRight}>
-					<Text>오른쪽 </Text>
+					<DayText>오른쪽 </DayText>
 				</TouchableOpacity>
-			</HStack>
-			<HStack>
-				<Box w='60px'></Box>
+			</TimetableDayContainer>
+			<DayHStack>
+				<EmptyView></EmptyView>
 				{day.map(
 					(item, idx) =>
 						idx >= viewDayIndex &&
 						idx <= viewDayIndex + 4 && (
-							<TouchableOpacity
+							<DayTouchableOpacity
 								onPress={() => {
 									goMapInfo(idx);
 								}}
-								style={{width: 70, height: 70, alignItems: 'center', justifyContent: 'center'}}
 								key={idx}>
-								<Text>{moment(item).date() + '일 ' + dayList[moment(item).day()]}</Text>
-							</TouchableOpacity>
+								<DaySubText>{dayList[moment(item).day()]}</DaySubText>
+								<DayText>{moment(item).date()}</DayText>
+							</DayTouchableOpacity>
 						),
 				)}
-			</HStack>
-		</Box>
+			</DayHStack>
+		</DayViewContainer>
 	);
 };
 
 export default memo(DayView);
+const EmptyView = styled.View`
+	flex: 0.1;
+	background-color: red;
+`;
+const DayViewContainer = styled.View`
+	flex: 0.15;
+`;
+const TimetableDayContainer = styled.View`
+	display: inline-block;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 10px;
+	padding: 10px;
+	background-color: ${colors.selectButton};
+	width: 100%;
+`;
+
+const DayHStack = styled(HStack)`
+	flex: 1;
+`;
+const DayTouchableOpacity = styled.TouchableOpacity`
+	flex: 0.18;
+	height: 70;
+	align-items: center;
+	justify-content: center;
+`;
+
+const DayText = styled.Text`
+	font-size: 14px;
+	font-weight: bold;
+	color: black;
+`;
+const DaySubText = styled(DayText)`
+	font-weight: 500;
+`;

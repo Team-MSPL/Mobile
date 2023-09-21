@@ -1,5 +1,4 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {useAppSelector} from '../redux';
@@ -8,6 +7,7 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
+import {SvgAirplain, SvgCalendar, SvgCommunity, SvgProfile} from '../utill/svg/svg';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -52,11 +52,9 @@ function TabBar() {
 				name='Home'
 				component={Main}
 				options={{
-					title: '홈',
-					headerShown: false,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					title: '다님',
+					headerShown: true,
+					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -65,9 +63,7 @@ function TabBar() {
 				options={{
 					title: '내여행',
 					headerShown: true,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -76,9 +72,7 @@ function TabBar() {
 				options={{
 					title: '커뮤니티',
 					headerShown: true,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -87,9 +81,7 @@ function TabBar() {
 				options={{
 					title: '내정보',
 					headerShown: false,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}
 			/>
 		</Tab.Navigator>

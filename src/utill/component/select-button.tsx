@@ -1,27 +1,12 @@
-import {Text} from 'native-base';
 import {TouchableOpacity} from 'react-native';
+import styled from 'styled-components/native';
+import {colors} from '../colors';
 
 export default function SelectButton({label, onPress, isDisabled, bgColor}: CustomButtonProps) {
 	return (
-		<TouchableOpacity
-			onPress={onPress}
-			style={{
-				backgroundColor: bgColor ? 'yellow' : 'white',
-				borderRadius: 99,
-				borderWidth: 1,
-				marginVertical: 4,
-				width: 100,
-				height: 50,
-				alignItems: 'center',
-				justifyContent: 'center',
-				marginHorizontal: 5,
-				opacity: isDisabled ? 0.5 : 1,
-			}}
-			disabled={isDisabled}>
-			<Text color='black' bold>
-				{label}
-			</Text>
-		</TouchableOpacity>
+		<ButtonContainer onPress={onPress}>
+			<ButtonText>{label}</ButtonText>
+		</ButtonContainer>
 	);
 }
 
@@ -31,3 +16,18 @@ type CustomButtonProps = {
 	isDisabled?: boolean;
 	bgColor?: boolean;
 };
+const ButtonText = styled.Text`
+	color: white;
+	font-size: 18px;
+	font-weight: bold;
+`;
+
+const ButtonContainer = styled.TouchableOpacity`
+	align-items: center;
+	height: 45px;
+	padding: 0px 10px 0px 10px;
+	justify-content: center;
+	background-color: ${colors.selectButton};
+	border-radius: 25px;
+	margin: 5px 10px 5px 10px;
+`;

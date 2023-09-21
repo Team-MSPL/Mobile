@@ -1,8 +1,8 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {Alert, TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {Alert, Linking, TouchableOpacity, ScrollView} from 'react-native';
+import {Text, Box} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
@@ -10,6 +10,10 @@ import {GOOGLE_API_KEY} from '@env';
 import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {HStack} from '../../utill/layout/layout';
+import CustomButton from '../../utill/component/custom-button';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -156,7 +160,7 @@ export default function Recommend({navigation, route}: any) {
 		);
 	}
 	return (
-		<Box flex='1'>
+		<RecommendContainer>
 			<MapView
 				ref={mapRef}
 				style={{width: '100%', height: 300}}
@@ -169,21 +173,29 @@ export default function Recommend({navigation, route}: any) {
 				{markers}
 				{polylines}
 			</MapView>
-			<ScrollView>
+			<RecommendScrollView>
 				{recommendList.map((item, idx) => (
-					<TouchableOpacity
-						onPress={() => {
-							changeRecommend(idx);
-						}}
-						key={idx}
-						style={{width: '100%', margin: 10, backgroundColor: idx == select ? 'red' : 'white'}}>
-						<Text>
-							{item.category_name}/{item.place_name}
-						</Text>
-					</TouchableOpacity>
+					<ListHStack color={idx == select ? colors.selectButton : 'white'}>
+						<RecommendTouchableOpacity
+							onPress={() => {
+								changeRecommend(idx);
+							}}
+							key={idx}>
+							<RecommendElementText color={idx == select ? 'white' : 'black'}>
+								{item.place_name}
+							</RecommendElementText>
+						</RecommendTouchableOpacity>
+						<RecommendTouchableOpacity
+							onPress={() => {
+								Linking.openURL(item.place_url);
+							}}
+							key={idx}>
+							<RecommendElementText color={idx == select ? 'white' : 'black'}>정보</RecommendElementText>
+						</RecommendTouchableOpacity>
+					</ListHStack>
 				))}
-			</ScrollView>
-			<TouchableOpacity
+			</RecommendScrollView>
+			{/* <TouchableOpacity
 				onPress={checkMessage}
 				disabled={select == -1}
 				style={{
@@ -197,7 +209,30 @@ export default function Recommend({navigation, route}: any) {
 				<Text bold fontSize='lg'>
 					선택이요
 				</Text>
-			</TouchableOpacity>
-		</Box>
+			</TouchableOpacity> */}
+			<CustomButton label='선택완료' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
+		</RecommendContainer>
 	);
 }
+
+const RecommendContainer = styled.View`
+	flex: 1;
+	background-color: white;
+`;
+const RecommendTouchableOpacity = styled.TouchableOpacity`
+	margin: 5px 0px 0px 0px;
+	padding: 1%;
+`;
+const RecommendElementText = styled.Text<{color: string}>`
+	font-size: 17px;
+	font-weight: bold;
+	color: ${props => props.color};
+`;
+const RecommendScrollView = styled.ScrollView`
+	padding: 10px;
+`;
+const ListHStack = styled(HStack)<{color: string}>`
+	justify-content: space-between;
+	flex-wrap: wrap;
+	background-color: ${props => props.color};
+`;

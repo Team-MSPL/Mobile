@@ -4,7 +4,6 @@ import DetailInfo from '../screens/my-travel-list/detail-info';
 import InputDiary from '../screens/my-travel-list/input-diary';
 import InputReviewAndPoint from '../screens/my-travel-list/input-review-and-point';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
-import MyTravelListMainScreen from '../screens/my-travel-list/my-travel-list-main-screen';
 const Stack = createNativeStackNavigator();
 export default function MyTravelListStack() {
 	return (

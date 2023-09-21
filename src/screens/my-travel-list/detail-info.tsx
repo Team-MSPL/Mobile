@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert, TouchableOpacity, Image} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
+import {Text} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -10,8 +10,14 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {DayText} from './my-travel-list';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {SvgMilestone, SvgPicture, SvgReview} from '../../utill/svg/svg';
+import InputDiary from './input-diary';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
+	const {travelId, nDay, day, region, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	const goInputDiary = () => {
@@ -48,8 +54,13 @@ export default function DetailInfo({navigation}: any) {
 		}
 	};
 	const goReviewAndRating = () => {
-		console.log(picture);
-		navigation.navigate('InputReviewAndPoint');
+		reviewCheck
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '이미 리뷰작성을 하셨습니다.',
+					}),
+			  )
+			: navigation.navigate('InputReviewAndPoint');
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
 		dispatch(travelSliceActions.setMakeMode('modify'));
@@ -84,9 +95,7 @@ export default function DetailInfo({navigation}: any) {
 					},
 				],
 			});
-			console.log(response);
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 공유 중 에러가 발생했습니다.',
@@ -100,43 +109,39 @@ export default function DetailInfo({navigation}: any) {
 		}, []),
 	);
 	return (
-		<ScrollView bgColor='#EFFBFB'>
-			<Text bold fontSize='lg'>
-				일기
-			</Text>
-			{diary == '' ? (
-				<TouchableOpacity onPress={goInputDiary}>
-					<Text>일기적으러 고 </Text>
-				</TouchableOpacity>
-			) : (
-				<TouchableOpacity onPress={goInputDiary}>
-					<Text>{diary}</Text>
-					<Text>인데 수정 고?</Text>
-				</TouchableOpacity>
-			)}
-			{picture && picture.length != 0 ? (
-				picture.map((item, idx) => (
-					<Image key={idx} source={{uri: item}} style={{width: 100, height: 100}}></Image>
-				))
-			) : (
-				<Text>사진 없어용</Text>
-			)}
-
-			<Text bold fontSize='lg'>
-				리뷰랑 별점
-			</Text>
-			{reviewCheck ? (
-				<Text>남긴거 확인 했구연 감사루</Text>
-			) : (
-				<TouchableOpacity onPress={goReviewAndRating}>
-					<Text>남기기 고고 </Text>
-				</TouchableOpacity>
-			)}
-			<TouchableOpacity style={{marginVertical: 10}} onPress={goTimetable}>
-				<Text bold fontSize='lg'>
-					탐테구경 레츠고!
-				</Text>
-			</TouchableOpacity>
+		<MainContainer>
+			<DayText>
+				{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay - 1]).format('MM월-DD일')}
+			</DayText>
+			{/* <PictureCotainer>
+				<PictureElementContainer>
+					<PictuerVstack>
+						<SvgPicture color={colors.selectButton} />
+						<PictureText>사진 추가</PictureText>
+					</PictuerVstack>
+				</PictureElementContainer>
+			</PictureCotainer> */}
+			<InputDiary navigation={navigation} />
+			<CourseAndReview>
+				<CourseContainer onPress={goTimetable}>
+					<VStack>
+						<CourseTitleText>여행 코스 확인</CourseTitleText>
+						<CourseSubTitleText>지난 여행 코스를 확인해보세요</CourseSubTitleText>
+					</VStack>
+					<IconContainer>
+						<SvgMilestone color='white' />
+					</IconContainer>
+				</CourseContainer>
+				<ReviewContainer onPress={goReviewAndRating}>
+					<VStack>
+						<ReviewTitleText>리뷰 작성</ReviewTitleText>
+						<ReviewSubTitleText>다른 여행자들에게 도움이 되는 리뷰를 작성해주세요</ReviewSubTitleText>
+					</VStack>
+					<IconContainer>
+						<SvgReview color={colors.selectButton} />
+					</IconContainer>
+				</ReviewContainer>
+			</CourseAndReview>
 
 			<TouchableOpacity style={{marginVertical: 10}} onPress={goKakaoShare}>
 				<Text bold fontSize='lg'>
@@ -149,6 +154,66 @@ export default function DetailInfo({navigation}: any) {
 					삭제할래?
 				</Text>
 			</TouchableOpacity>
-		</ScrollView>
+		</MainContainer>
 	);
 }
+
+const PictureCotainer = styled.View`
+	height: 180;
+	width: 100%;
+	align-items: center;
+	margin: 15px 0px 15px 0px;
+`;
+const PictureElementContainer = styled.TouchableOpacity`
+	width: 135px;
+	height: 180px;
+	border-radius: 10px;
+	border-width: 1px;
+	border-color: ${colors.selectButton};
+	align-items: center;
+	justify-content: center;
+`;
+const PictureText = styled.Text`
+	margin: 10px 0px 0px 0px;
+	font-size: 15px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const PictuerVstack = styled(VStack)`
+	align-items: center;
+	justify-content: center;
+`;
+export const IconContainer = styled.View`
+	width: 100%;
+	align-items: flex-end;
+`;
+export const CourseAndReview = styled(HStack)`
+	width: 100%;
+	justify-content: space-between;
+`;
+export const CourseContainer = styled.TouchableOpacity`
+	width: 45%;
+	padding: 15px;
+	border-radius: 10px;
+	background: ${colors.selectButton};
+	justify-content: space-between;
+`;
+export const CourseTitleText = styled.Text`
+	font-size: 22px;
+	font-weight: bold;
+	color: white;
+`;
+export const CourseSubTitleText = styled.Text`
+	font-size: 15px;
+	color: white;
+`;
+
+const ReviewContainer = styled(CourseContainer)`
+	background: ${colors.reviewBackground};
+`;
+const ReviewTitleText = styled(CourseTitleText)`
+	color: ${colors.selectButton};
+`;
+const ReviewSubTitleText = styled(CourseSubTitleText)`
+	color: ${colors.selectButton};
+`;
