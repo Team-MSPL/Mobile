@@ -1,9 +1,11 @@
 import {useState, memo} from 'react';
-import {Text, Box, Center, HStack, Spacer} from 'native-base';
+import {Text, Box} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {HStack} from '../../layout/layout';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
@@ -25,20 +27,17 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	};
 	return (
 		<Box>
-			<HStack bgColor='blue.400'>
+			<TimetableDayContainer>
 				<TouchableOpacity disabled={viewDayIndex == 0} onPress={goLeft}>
 					<Text>왼쪽 </Text>
 				</TouchableOpacity>
-				<Spacer />
 				<Text fontSize='xl' bold>
 					{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}
 				</Text>
-				<Spacer />
-
 				<TouchableOpacity disabled={viewDayIndex + 5 > nDay} onPress={goRight}>
 					<Text>오른쪽 </Text>
 				</TouchableOpacity>
-			</HStack>
+			</TimetableDayContainer>
 			<HStack>
 				<Box w='60px'></Box>
 				{day.map(
@@ -61,3 +60,13 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 };
 
 export default memo(DayView);
+
+const TimetableDayContainer = styled.View`
+	display: inline-block;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	background-color: red;
+	width: 100%;
+	height: 30px;
+`;

@@ -8,6 +8,11 @@ import {GOOGLE_API_KEY} from '@env';
 import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import moment from 'moment';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {Center, VStack} from '../../utill/layout/layout';
+import {CourseAndReview, CourseContainer, CourseTitleText, CourseSubTitleText} from '../my-travel-list/detail-info';
+import {SvgCoffee, SvgHome} from '../../utill/svg/svg';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -104,9 +109,14 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			}
 		}
 	}, []);
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	return (
-		<Box flex='1'>
-			<Text>날짜는 {moment(day[route.params.x]).format('YY-MM-DD')}</Text>
+		<Center>
+			<DayContainer>
+				<DayText>
+					{moment(day[route.params.x]).format('YYYY-MM-DD')},{weekdays[moment(day[route.params.x]).day()]}요일
+				</DayText>
+			</DayContainer>
 			<Text>
 				시간은! {(route.params.y[0] * 30 + 360) / 60}시 ~
 				{((route.params.y[route.params.y.length - 1] + 1) * 30 + 360) / 60}
@@ -181,6 +191,47 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					onFail={error => console.log(error)}
 					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 			)}
-		</Box>
+			<CourseAndReview>
+				<CoffeeContainer onPress={() => goRecommend('CE7')}>
+					<VStack>
+						<CourseTitleText>카페 추천</CourseTitleText>
+						<CourseSubTitleText>지금 인기 있는 카페를 추천해드려요</CourseSubTitleText>
+					</VStack>
+					<SvgCoffee color='white' />
+				</CoffeeContainer>
+				<AccommodationsContainer
+					onPress={() => {
+						goRecommend('AD5');
+					}}>
+					<VStack>
+						<CourseTitleText>숙소 추천</CourseTitleText>
+						<CourseSubTitleText>성향에 맞는 숙소를 추천해드려요</CourseSubTitleText>
+					</VStack>
+					<SvgHome width={36} height={36} color='white' />
+				</AccommodationsContainer>
+			</CourseAndReview>
+		</Center>
 	);
 }
+
+const DayContainer = styled.View`
+	width: 80%;
+	height: 48px;
+	border-radius: 10px;
+	background-color: ${colors.selectButton};
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+`;
+const DayText = styled.Text`
+	font-size: 22px;
+	font-weight: bold;
+	color: white;
+`;
+const CoffeeContainer = styled(CourseContainer)`
+	background-color: ${colors.coffeeColor};
+`;
+
+const AccommodationsContainer = styled(CourseContainer)`
+	background-color: ${colors.accommodationColor};
+`;

@@ -3,6 +3,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
+import {tendencyList} from '../../screens/enroll-info/select-tendency';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -15,15 +16,18 @@ const initialState: LiteState = {
 		category: 4,
 		takenTime: 30,
 		photo: '',
+		formatted_address: '',
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
 	distance: 5, //거리민감도
 	transit: 0, //교통수단 0= 자차 1=대중교통
-	tendency: [[]], //성향
+	tendency: tendencyList.map(item => {
+		return Array(item.list.length).fill(0);
+	}), //성향
 	timeLimitArray: [9, 20], //시작시간과 끝시간
 	minuteLimitArray: [0, 0], //시작시간 분과 끝분
-	season: [false, false, false, false], //계절
+	season: [0, 0, 0, 0], //계절
 	presetDatas: [[[]]], //프리셋 저장하는곳
 	timetable: [[]], // 타임테이블
 	moveTimeList: [], // 이동시간
@@ -39,8 +43,9 @@ const initialState: LiteState = {
 	picture: [],
 	reviewCheck: false,
 	tableShowFlag: false,
-	selectStartDate: moment(),
+	selectStartDate: moment().startOf('day').add(12, 'hours'),
 	selectEndDate: null,
+	travelName: '',
 };
 
 export const axiosAuth = axios.create({
@@ -273,12 +278,25 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.cityIndex = payload.cityIndex;
 		},
+		setTravelStart: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.makeMode = payload.makeMode;
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+		},
+		enrollTravelName: (state, {payload}) => {
+			state.travelName = payload;
+		},
 		enrollSelectStartDate: (state, {payload}) => {
 			state.selectStartDate = payload;
-			state.selectEndDate = null;
 		},
 		enrollSelectEndDate: (state, {payload}) => {
 			state.selectEndDate = payload;
+		},
+		enrollFirstSetting: (state, {payload}) => {
+			state.day = payload.day;
+			state.accommodations = payload.accommodations;
 		},
 		enrollDayInfo: (state, {payload}) => {
 			state.day = payload.day;
@@ -430,6 +448,7 @@ export const travelSlice = createSlice({
 			state.diary = payload.diary;
 			state.picture = payload.picture;
 			state.reviewCheck = payload.reviewCheck;
+			state.travelName = payload.travelName;
 			//state.myTravelList = payload;
 		});
 		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
@@ -457,7 +476,7 @@ interface LiteState {
 	tendency: number[][];
 	timeLimitArray: number[];
 	minuteLimitArray: number[];
-	season: boolean[];
+	season: number[];
 	presetDatas: TimetableType[][][];
 	timetable: TimetableType[][];
 	moveTimeList: number[][] | [];
@@ -475,16 +494,18 @@ interface LiteState {
 	tableShowFlag: boolean;
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
+	travelName: string;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
 export interface PlaceType {
-	name: string;
-	lat: number;
-	lng: number;
+	name: string | undefined;
+	lat: number | undefined;
+	lng: number | undefined;
 	category: number;
 	takenTime: number;
 	photo: string;
+	formatted_address: string | undefined;
 }
 
 export interface EssentialPlaceType {
@@ -525,6 +546,7 @@ export interface SaveTravelType {
 	transit: number;
 	tendency: number[][];
 	timetable: TimetableType[][];
+	travelName: string;
 }
 interface Reviews {
 	author_name: string;
@@ -582,6 +604,7 @@ interface myTravelListType {
 	region: string[];
 	day: Moment[];
 	nDay: number;
+	travelName: string;
 }
 
 interface updateTravelCourseType {

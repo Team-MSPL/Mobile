@@ -4,6 +4,7 @@ import {memo, useRef, useState} from 'react';
 import {Image, Modal, Pressable, TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
@@ -97,7 +98,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			});
 		}
 	};
-	const categortColors = ['blue', 'orange', 'green', 'pink', 'purple', 'gray'];
+	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
 
 	return (
 		<View style={{zIndex: 3}}>

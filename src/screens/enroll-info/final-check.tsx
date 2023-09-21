@@ -8,19 +8,38 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from './select-city';
 import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
+import {MainContainer} from '../../utill/layout/layout';
+import styled from 'styled-components/native';
+import {colors} from '../../utill/colors';
+import {SvgHome, SvgPlace} from '../../utill/svg/svg';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
 export default function FinalCheck({navigation}: any) {
-	const {day, region, accommodations, nDay, cityIndex, essentialPlaces, tendency, timeLimitArray, transit, distance} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		day,
+		region,
+		accommodations,
+		nDay,
+		cityIndex,
+		essentialPlaces,
+		tendency,
+		timeLimitArray,
+		transit,
+		distance,
+		minuteLimitArray,
+		season,
+	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
 		Alert.alert('결제창');
 	};
 
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const goNewLogin = () => {
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
@@ -73,7 +92,7 @@ export default function FinalCheck({navigation}: any) {
 	useEffect(() => {
 		console.log('하위용', accommodations);
 		const backAction = () => {
-			if (navigation.isFocused() && isLoading) {
+			if (navigation.isFocused() && loading) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: 'ai가 돌아가고 있습니다 조금만 기다려주세요',
@@ -85,11 +104,11 @@ export default function FinalCheck({navigation}: any) {
 		};
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
-	}, [isLoading]);
+	}, [loading]);
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		try {
-			dispatch(LoadingSliceActions.onLoading());
+			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
 			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(
@@ -97,11 +116,14 @@ export default function FinalCheck({navigation}: any) {
 				);
 				a.shift();
 			}
+			let copy = [...tendency];
+			copy.push(season);
+			console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
 			const result = await dispatch(
 				getTravelAi({
 					regionList: a,
 					accomodationList: accommodations,
-					selectList: tendency,
+					selectList: copy,
 					essentialPlaceList: essentialPlaces,
 					timeLimitArray: timeLimitArray,
 					nDay: nDay + 1,
@@ -130,13 +152,14 @@ export default function FinalCheck({navigation}: any) {
 				);
 			}
 		} catch (error) {
+			console.log(error, 'qwe');
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 				}),
 			);
 		} finally {
-			dispatch(LoadingSliceActions.offLoading());
+			setLoading(false);
 		}
 	};
 
@@ -144,65 +167,242 @@ export default function FinalCheck({navigation}: any) {
 		navigation.navigate('SelectCity');
 		dispatch(travelSliceActions.reset());
 	};
+	const schedule = ['출발일', '종료일'];
+	if (loading) return <LoadingTimetable />;
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
+		<MainContainer>
 			{/* 스테퍼 넣기 */}
+			<SelectListAllContainer>
+				<SelectListContainer>
+					<SelectListText>선택 여행 성향</SelectListText>
+					<SelectTendencyListContainer>
+						{tendency.map((item, inx) => {
+							return (
+								inx !== tendency.length - 1 &&
+								item.map((q, a) => {
+									return q ? (
+										<SelectTendencyContainer key={a}>
+											<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
+										</SelectTendencyContainer>
+									) : null;
+								})
+							);
+						})}
+					</SelectTendencyListContainer>
+				</SelectListContainer>
+				<Dashed />
+				<SelectListContainer>
+					<SelectListText>여행 지역</SelectListText>
+					<SelectTendencyListContainer>
+						<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
+					</SelectTendencyListContainer>
+				</SelectListContainer>
+				<Dashed />
+				<SelectListContainer>
+					<SelectListText>여행 일정</SelectListText>
 
-			<Text>{cityViewList[cityIndex].title + region}</Text>
-			<Text>출발: {day[0].format('YY-MM-DD')}</Text>
-			<Text>종료: {day[nDay].format('YY-MM-DD')}</Text>
-			{accommodations.map((item, idx) => {
-				return (
-					idx != 0 &&
-					idx != accommodations.length - 1 && (
-						<HStack key={idx}>
-							{item.photo && (
-								<Image
-									source={{
-										uri: item.photo,
-									}}
-									style={{width: 50, height: 50}}
-									alt='Place Image'
-								/>
-							)}
-							<Text>{item.name ? idx + ' 일밤 ' + item.name : idx + '일밤 안정함 ㅋ'}</Text>
-						</HStack>
-					)
-				);
-			})}
-
-			{[...Array(nDay + 1)].map((item, indx) => {
-				const filteredPlaces = essentialPlaces.filter(place => place.day === indx + 1);
-
-				return (
-					<Box key={indx} my='3'>
-						{filteredPlaces.map(data => (
-							<HStack key={data.id}>
-								<Image
-									source={{
-										uri: data.photo,
-									}}
-									style={{width: 50, height: 50}}
-									alt='Place Image'
-								/>
-								<Text fontSize='lg' bold>
-									{data.day}일차 {data.name}
-								</Text>
-							</HStack>
+					<SelectTendencyListContainer>
+						{schedule.map((element, index) => (
+							<DayContainer key={index}>
+								<DayText>{element}</DayText>
+								<DayElementText>
+									{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
+										', ' +
+										String(timeLimitArray[index]).padStart(2, '0') +
+										':' +
+										String(minuteLimitArray[index]).padStart(2, '0')}
+								</DayElementText>
+							</DayContainer>
 						))}
-					</Box>
-				);
-			})}
-			{tendency.map((item, inx) => {
+					</SelectTendencyListContainer>
+				</SelectListContainer>
+			</SelectListAllContainer>
+			<Spacer />
+
+			{[...Array(nDay + 1)].map((item, idx) => {
+				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+
 				return (
-					inx !== tendency.length - 1 &&
-					item.map((q, a) => {
-						return q ? <Text key={a}>{tendencyList[inx]?.list[a]}</Text> : null;
-					})
+					<SelectListAllContainer key={idx}>
+						<MultiContainer first={idx == 0} last={idx == nDay}>
+							<MultiDayContainer>
+								<MultiDayText>Day {idx + 1}</MultiDayText>
+								<MultiDaySecondText>
+									{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
+								</MultiDaySecondText>
+							</MultiDayContainer>
+							<MultiAllContainer>
+								<HStack>
+									<SvgHome color={colors.selectButton} marginRight={5} />
+									<MultiDayText>숙소</MultiDayText>
+								</HStack>
+								{accommodations[idx + 1].name ? (
+									<PlaceContainer>
+										<PlaceImage
+											source={{
+												uri: accommodations[idx + 1].photo,
+											}}
+											alt='Place Image'
+										/>
+										<VStack>
+											<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
+											<MultiElementText>
+												{accommodations[idx + 1].formatted_address}
+											</MultiElementText>
+										</VStack>
+									</PlaceContainer>
+								) : (
+									<MultiElementText>선택사항 없음</MultiElementText>
+								)}
+							</MultiAllContainer>
+							<MultiAllContainer>
+								<HStack>
+									<SvgPlace color={colors.selectButton} marginRight={5} />
+									<MultiDayText>여행지</MultiDayText>
+								</HStack>
+								{filteredPlaces.length != 0 ? (
+									filteredPlaces.map((data, imageIndex) => (
+										<PlaceContainer key={imageIndex}>
+											<PlaceImage
+												source={{
+													uri: data.photo,
+												}}
+												alt='Place Image'
+											/>
+											<VStack>
+												<MultiElementText>{data.name}</MultiElementText>
+												{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
+											</VStack>
+										</PlaceContainer>
+									))
+								) : (
+									<MultiElementText>선택사항 없음</MultiElementText>
+								)}
+							</MultiAllContainer>
+						</MultiContainer>
+						<PlaceDashed />
+					</SelectListAllContainer>
 				);
 			})}
-			<CustomButton label='다시 만들래' onPress={goReset}></CustomButton>
-			<CustomButton label='다음 단계' onPress={checkToken}></CustomButton>
-		</ScrollView>
+
+			<CustomButton label='맞춤 코스 조회' onPress={checkToken}></CustomButton>
+		</MainContainer>
 	);
 }
+
+const SelectListContainer = styled.View`
+	width: 100%;
+	border-radius: 15px;
+	background-color: ${colors.selectButton};
+	border-style: dashed;
+	padding: 10px;
+`;
+const Dashed = styled.View`
+	width: 80%;
+	border: 2px dashed white;
+	margin: -2px;
+`;
+const SelectListAllContainer = styled.View`
+	width: 100%;
+	align-items: center;
+`;
+
+const SelectListText = styled.Text`
+	font-size: 14px;
+	color: white;
+	font-weight: bold;
+`;
+const SelectTendencyContainer = styled.View`
+	padding: 10px;
+	border-radius: 10px;
+	background-color: white;
+	margin: 0px 10px 10px 0px;
+`;
+const SelectTendencyListContainer = styled.View`
+	display: inline-block;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin: 10px;
+`;
+
+const SelectTendencyText = styled.Text`
+	font-size: 18px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const RegionText = styled(SelectTendencyText)`
+	font-size: 21px;
+	color: white;
+`;
+const DayContainer = styled.View`
+	border-radius: 10px;
+	border-color: white;
+	border-width: 1px;
+	padding: 10px;
+	margin: 0px 5px 0px 0px;
+`;
+const DayText = styled.Text`
+	font-size: 14px;
+	color: white;
+`;
+const DayElementText = styled.Text`
+	font-size: 16px;
+	color: white;
+	font-weight: bold;
+`;
+const MultiContainer = styled.View<{first: boolean; last: boolean}>`
+	width: 100%;
+	border: 2px ${colors.selectButton};
+	border-radius: 20px;
+	border-bottom-width: ${props => (props.last ? '2px' : '0px')};
+	border-top-width: ${props => (props.first ? '2px' : '0px')};
+	padding: 10px;
+`;
+const MultiDayContainer = styled.View`
+	width: 100%;
+	background-color: ${colors.normalButton};
+	border-radius: 8px;
+	padding: 10px;
+	flex-direction: row;
+`;
+const MultiDayText = styled.Text`
+	font-size: 14px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const MultiDaySecondText = styled.Text`
+	font-size: 14px;
+	font-weight: bold;
+	color: black;
+	margin: 0px 0px 0px 10px;
+`;
+const MultiElementText = styled.Text`
+	font-size: 16px;
+	font-weight: 900;
+	color: black;
+`;
+const PlaceImage = styled.Image`
+	width: 50px;
+	height: 50px;
+	border-radius: 10px;
+	margin: 0px 20px 0px 0px;
+`;
+const PlaceContainer = styled(HStack)`
+	align-items: center;
+	margin: 5px 0px 5px 0px;
+`;
+const Spacer = styled.View`
+	margin: 10px 0px 10px 0px;
+`;
+const PlaceDashed = styled.View`
+	width: 80%;
+	border: 2px dashed ${colors.selectButton};
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-left-width: 0px;
+	margin: -2px;
+`;
+const MultiAllContainer = styled.View`
+	width: 100%;
+	margin: 10px 0px 10px 0px;
+`;

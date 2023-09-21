@@ -8,6 +8,7 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
+import {SvgCalendar, SvgAirplain, SvgCommunity, SvgProfile, SvgPlace} from '../utill/svg/svg';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -54,9 +55,7 @@ function TabBar() {
 				options={{
 					title: '홈',
 					headerShown: false,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -65,9 +64,7 @@ function TabBar() {
 				options={{
 					title: '내여행',
 					headerShown: true,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -76,9 +73,7 @@ function TabBar() {
 				options={{
 					title: '커뮤니티',
 					headerShown: true,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -87,9 +82,7 @@ function TabBar() {
 				options={{
 					title: '내정보',
 					headerShown: false,
-					// tabBarIcon: ({color, size}) => (
-					//   <Icon name="search" color={color} size={size} />
-					// ),
+					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}
 			/>
 		</Tab.Navigator>
