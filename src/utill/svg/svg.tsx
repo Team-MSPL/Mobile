@@ -22,6 +22,11 @@ import AppleLogo from '../../../public/logo-apple.svg';
 import GoogleLogo from '../../../public/logo-google.svg';
 import KakaoLogo from '../../../public/logo-kakao.svg';
 import GuestLogo from '../../../public/ic-guest.svg';
+
+import Call from '../../../public/call.svg';
+import Location from '../../../public/location.svg';
+import Infos from '../../../public/infos.svg';
+
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -91,5 +96,14 @@ export const SvgApple = styled(AppleLogo)<{color?: string}>`
 	color: color;
 `;
 export const SvgGuest = styled(GuestLogo)<{color?: string}>`
+	color: color;
+`;
+export const SvgLocation = styled(Location)<{color?: string}>`
+	color: color;
+`;
+export const SvgCall = styled(Call)<{color?: string}>`
+	color: color;
+`;
+export const SvgInfos = styled(Infos)<{color?: string}>`
 	color: color;
 `;

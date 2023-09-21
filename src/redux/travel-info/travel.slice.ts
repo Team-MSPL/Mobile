@@ -206,8 +206,9 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
-			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
+		console.log(a);
 		//제로리절트 처리하기
 		return a.data.result;
 	} catch (error) {
@@ -537,8 +538,14 @@ export interface CourseDetailType {
 	reviews: Reviews[];
 	photos: Photos[];
 	editorial_summary: EditorialSummary;
+	formatted_phone_number: string;
+	opening_hours: OpeninHoursType;
+	formatted_address: string;
 }
-
+export interface OpeninHoursType {
+	open_now: boolean;
+	weekday_text: string[];
+}
 export interface SaveTravelType {
 	userId: string;
 	region: string[];

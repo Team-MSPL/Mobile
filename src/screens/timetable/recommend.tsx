@@ -14,6 +14,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {HStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
+import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 export default function Recommend({navigation, route}: any) {
 	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -174,26 +175,34 @@ export default function Recommend({navigation, route}: any) {
 				{polylines}
 			</MapView>
 			<RecommendScrollView>
-				{recommendList.map((item, idx) => (
-					<ListHStack color={idx == select ? colors.selectButton : 'white'}>
-						<RecommendTouchableOpacity
-							onPress={() => {
-								changeRecommend(idx);
-							}}
-							key={idx}>
-							<RecommendElementText color={idx == select ? 'white' : 'black'}>
-								{item.place_name}
-							</RecommendElementText>
-						</RecommendTouchableOpacity>
-						<RecommendTouchableOpacity
-							onPress={() => {
-								Linking.openURL(item.place_url);
-							}}
-							key={idx}>
-							<RecommendElementText color={idx == select ? 'white' : 'black'}>정보</RecommendElementText>
-						</RecommendTouchableOpacity>
-					</ListHStack>
-				))}
+				{recommendList.length != 0 ? (
+					recommendList.map((item, idx) => (
+						<ListHStack color={idx == select ? colors.selectButton : 'white'}>
+							<RecommendTouchableOpacity
+								onPress={() => {
+									changeRecommend(idx);
+								}}
+								key={idx}>
+								<RecommendElementText color={idx == select ? 'white' : 'black'}>
+									{item.place_name}
+								</RecommendElementText>
+							</RecommendTouchableOpacity>
+							<RecommendInfoTouchableOpacity
+								onPress={() => {
+									Linking.openURL(item.place_url);
+								}}
+								key={idx}>
+								<RecommendElementText color={idx == select ? 'white' : 'black'}>
+									정보
+								</RecommendElementText>
+							</RecommendInfoTouchableOpacity>
+						</ListHStack>
+					))
+				) : (
+					<RecommendInfoTouchableOpacity></RecommendInfoTouchableOpacity>
+				)}
+
+				<MarginContainder />
 			</RecommendScrollView>
 			{/* <TouchableOpacity
 				onPress={checkMessage}
@@ -210,7 +219,9 @@ export default function Recommend({navigation, route}: any) {
 					선택이요
 				</Text>
 			</TouchableOpacity> */}
-			<CustomButton label='선택완료' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
+			<ButtonContainer>
+				<CustomButton label='선택완료' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
+			</ButtonContainer>
 		</RecommendContainer>
 	);
 }
@@ -222,6 +233,12 @@ const RecommendContainer = styled.View`
 const RecommendTouchableOpacity = styled.TouchableOpacity`
 	margin: 5px 0px 0px 0px;
 	padding: 1%;
+	width: 80%;
+`;
+const RecommendInfoTouchableOpacity = styled.TouchableOpacity`
+	margin: 5px 0px 0px 0px;
+	padding: 1%;
+	width: 20%;
 `;
 const RecommendElementText = styled.Text<{color: string}>`
 	font-size: 17px;

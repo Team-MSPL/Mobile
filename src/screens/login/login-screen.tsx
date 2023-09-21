@@ -308,6 +308,7 @@ const LoginSCreenContainer = styled.View`
 	padding: 20px;
 	align-items: center;
 	justify-content: center;
+	margin: 10% 0% 0% 0%;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;

@@ -160,7 +160,7 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 		</>
 	);
 }
-const MarginContainder = styled.View`
+export const MarginContainder = styled.View`
 	margin: 0px 0px 130px 0px;
 `;
 
@@ -223,7 +223,7 @@ const MultiElementText = styled.Text`
 	font-weight: bold;
 	color: ${colors.selectButton};
 `;
-const ButtonContainer = styled.View`
+export const ButtonContainer = styled.View`
 	width: 100%;
 	background-color: rgba(255, 255, 255, 0.8);
 	position: absolute;
