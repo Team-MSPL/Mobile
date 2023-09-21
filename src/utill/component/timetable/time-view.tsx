@@ -1,16 +1,27 @@
 import React, {memo} from 'react';
-import {Text, Box, VStack} from 'native-base';
+import styled from 'styled-components/native';
+import {VStack} from '../../layout/layout';
 
 const TimeView = () => {
 	return (
-		<VStack>
+		<TimeViewVStack>
 			{[...Array(24)].map((time, times) => (
-				<Box key={times} w='60px' h='70px' alignItems='center'>
-					<Text fontSize='lg'>{times <= 18 ? times + 6 : times - 18}</Text>
-				</Box>
+				<TimeViewContainer key={times}>
+					<TimeViewText>{times <= 18 ? times + 6 : times - 18}</TimeViewText>
+				</TimeViewContainer>
 			))}
-		</VStack>
+		</TimeViewVStack>
 	);
 };
-
+const TimeViewVStack = styled(VStack)`
+	flex: 0.1;
+`;
+const TimeViewContainer = styled.View`
+	height: 70px;
+	align-items: center;
+`;
+const TimeViewText = styled.Text`
+	font-size: 15px;
+	color: black;
+`;
 export default memo(TimeView);

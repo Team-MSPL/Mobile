@@ -5,7 +5,11 @@ import {colors} from '../colors';
 export default function CustomButton({label, onPress, isDisabled, width}: CustomButtonProps) {
 	return (
 		<CustomButtonContainer>
-			<ButtonContainer onPress={onPress} width={width ?? 60}>
+			<ButtonContainer
+				disabled={isDisabled ?? false}
+				isDisabledOpacity={isDisabled ?? false}
+				onPress={onPress}
+				width={width ?? 60}>
 				<ButtonText>{label}</ButtonText>
 			</ButtonContainer>
 		</CustomButtonContainer>
@@ -25,7 +29,7 @@ const CustomButtonContainer = styled.View`
 	align-items: center;
 	margin: 10px 0px 20px 0px;
 `;
-const ButtonContainer = styled.TouchableOpacity<{width: number}>`
+const ButtonContainer = styled.TouchableOpacity<{width: number; isDisabledOpacity: boolean}>`
 	background-color: ${colors.selectButton};
 	border-radius: 30px;
 	width: ${props => props.width}%;
@@ -33,6 +37,7 @@ const ButtonContainer = styled.TouchableOpacity<{width: number}>`
 	justify-content: center;
 	align-items: center;
 	margin: 0px 10px 0px 10px;
+	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
 `;
 const ButtonText = styled.Text`
 	color: white;

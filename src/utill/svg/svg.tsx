@@ -15,6 +15,13 @@ import MileStone from '../../../public/milestone.svg';
 import Review from '../../../public/review.svg';
 import Start from '../../../public/start.svg';
 import Coffee from '../../../public/coffee.svg';
+import MapIcon from '../../../public/map-view.svg';
+import DanimText from '../../../public/danim-text.svg';
+import LoginLogo from '../../../public/login-logo.svg';
+import AppleLogo from '../../../public/logo-apple.svg';
+import GoogleLogo from '../../../public/logo-google.svg';
+import KakaoLogo from '../../../public/logo-kakao.svg';
+import GuestLogo from '../../../public/ic-guest.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -63,5 +70,26 @@ export const SvgStart = styled(Start)<{color?: string}>`
 	color: color;
 `;
 export const SvgCoffee = styled(Coffee)<{color?: string}>`
+	color: color;
+`;
+export const SvgMapIcon = styled(MapIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgDanimText = styled(DanimText)<{color?: string}>`
+	color: color;
+`;
+export const SvgLoginLogo = styled(LoginLogo)<{color?: string}>`
+	color: color;
+`;
+export const SvgKakao = styled(KakaoLogo)<{color?: string}>`
+	color: color;
+`;
+export const SvgGoogle = styled(GoogleLogo)<{color?: string}>`
+	color: color;
+`;
+export const SvgApple = styled(AppleLogo)<{color?: string}>`
+	color: color;
+`;
+export const SvgGuest = styled(GuestLogo)<{color?: string}>`
 	color: color;
 `;

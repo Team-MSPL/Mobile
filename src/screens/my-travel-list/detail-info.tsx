@@ -128,14 +128,18 @@ export default function DetailInfo({navigation}: any) {
 						<CourseTitleText>여행 코스 확인</CourseTitleText>
 						<CourseSubTitleText>지난 여행 코스를 확인해보세요</CourseSubTitleText>
 					</VStack>
-					<SvgMilestone color='white' />
+					<IconContainer>
+						<SvgMilestone color='white' />
+					</IconContainer>
 				</CourseContainer>
 				<ReviewContainer onPress={goReviewAndRating}>
 					<VStack>
 						<ReviewTitleText>리뷰 작성</ReviewTitleText>
 						<ReviewSubTitleText>다른 여행자들에게 도움이 되는 리뷰를 작성해주세요</ReviewSubTitleText>
 					</VStack>
-					<SvgReview color={colors.selectButton} />
+					<IconContainer>
+						<SvgReview color={colors.selectButton} />
+					</IconContainer>
 				</ReviewContainer>
 			</CourseAndReview>
 
@@ -179,18 +183,20 @@ const PictuerVstack = styled(VStack)`
 	align-items: center;
 	justify-content: center;
 `;
+export const IconContainer = styled.View`
+	width: 100%;
+	align-items: flex-end;
+`;
 export const CourseAndReview = styled(HStack)`
 	width: 100%;
 	justify-content: space-between;
 `;
 export const CourseContainer = styled.TouchableOpacity`
-	width: 160px;
-	height: 160px;
+	width: 45%;
 	padding: 15px;
 	border-radius: 10px;
 	background: ${colors.selectButton};
 	justify-content: space-between;
-	align-items: flex-end;
 `;
 export const CourseTitleText = styled.Text`
 	font-size: 22px;

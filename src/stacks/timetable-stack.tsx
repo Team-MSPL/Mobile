@@ -17,6 +17,7 @@ import Recommend from '../screens/timetable/recommend';
 import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
 import EnrollInfo from '../screens/enroll-info/enroll-info';
+import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -177,6 +178,16 @@ export default function TimetableStack() {
 					title: '지도요',
 					headerStyle: {backgroundColor: '#EFFBFB'},
 					headerShadowVisible: false,
+				}}
+			/>
+			<Stack.Screen
+				name='EnrollTravelTitle'
+				component={EnrollTravelTitle}
+				options={{
+					title: '새여행',
+					headerStyle: {backgroundColor: 'white'},
+					headerShadowVisible: false,
+					headerTitleAlign: 'center',
 				}}
 			/>
 		</Fragment>

@@ -221,6 +221,7 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 		const response = await axiosKakao.get(
 			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
 		);
+		console.log(response.data.documents);
 
 		//제로리절트 처리하기
 		return response.data.documents;
