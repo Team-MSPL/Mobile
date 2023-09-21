@@ -34,7 +34,11 @@ export const MainText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-
+export const SubText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: black;
+`;
 export const Center = styled.View`
 	width: 100%;
 	align-items: center;

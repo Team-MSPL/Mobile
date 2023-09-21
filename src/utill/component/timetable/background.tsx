@@ -1,13 +1,18 @@
 import React, {memo} from 'react';
 import {TouchableOpacity, View} from 'react-native';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import TimeView from './time-view';
+import {Dimensions} from 'react-native';
+import {colors} from '../../colors';
 
 const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 	const {editMode, nDay, makeMode} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const WINDOW_WIDTH = Dimensions.get('window').width;
+	const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 	const handleCellPress = (inx: number, index: number) => {
 		if (editMode === 'add' && inx <= nDay) {
@@ -56,36 +61,54 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 	};
 	//테스트에서는 36개로 했음
 	return (
-		<View style={{flexDirection: 'row', zIndex: 2}}>
+		<BackgroundContainer>
 			<TimeView />
 			{[...Array(5)].map((item, inx) => (
-				<View key={inx}>
+				<BackgroundElementContainer key={inx}>
 					{[...Array(48)].map((value, index) => (
-						<TouchableOpacity
+						<BackgroundTouchable
 							key={index}
+							background={editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white'}
+							valueIndex={index}
+							valueInx={inx}
 							style={{
-								width: 70,
-								height: 35,
-								borderLeftWidth: 1,
-								borderTopWidth: index % 2 ? 0 : 1,
-								borderRightWidth: inx === 4 ? 1 : 0,
-								borderBottomWidth: index === 47 ? 1 : 0,
-								backgroundColor:
-									editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white',
-								position: 'absolute',
-								top: 35 * (index ?? 1),
-								left: inx && 70 * inx,
-								zIndex: 2,
+								top: (WINDOW_HEIGHT / 20) * (index ?? 1),
 							}}
 							activeOpacity={makeMode == 'share' ? 1 : 0.2}
 							onPress={() => makeMode != 'share' && handleCellPress(inx, index)}
 							onLongPress={() => makeMode != 'share' && handleCellLongPress(inx, index)}
 						/>
 					))}
-				</View>
+				</BackgroundElementContainer>
 			))}
-		</View>
+		</BackgroundContainer>
 	);
 };
+const BackgroundContainer = styled.View`
+	flex-direction: row;
+	z-index: 2;
+	flex: 1;
+`;
+const BackgroundElementContainer = styled.View`
+	flex: 0.18;
+	margin: 0px 0px 0px 0px;
+`;
+
+const BackgroundTouchable = styled.TouchableOpacity<{
+	background: string;
+	valueIndex: number;
+	valueInx: number;
+}>`
+	width: 100%;
+	height: 35;
+	border-color: ${colors.regionNormal};
+	border-left-width: 1;
+	border-right-width: ${props => (props.valueInx === 4 ? 1 : 0)};
+	border-top-width: ${props => (props.valueIndex % 2 ? 0 : 1)};
+	border-bottom-width: ${props => (props.valueIndex === 47 ? 1 : 0)};
+	position: absolute;
+	z-index: 2;
+	background-color: ${props => props.background};
+`;
 
 export default memo(Background);

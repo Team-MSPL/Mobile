@@ -11,14 +11,22 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgMap} from '../../utill/svg/svg';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-export default function SelectDistance({navigation}: any) {
+export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(distance);
 	const {width, height} = Dimensions.get('window');
+	const goRegionSelect = () => {
+		setViewComponent(2);
+	};
 	const goNext = () => {
 		region.length == 0
-			? dispatch(modalSliceActions.setOpenModal({modalTitle: '지역 선택을 안하셨습니다.'}))
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '지역 선택을 안하셨습니다.',
+						modalFunction: goRegionSelect,
+					}),
+			  )
 			: (dispatch(travelSliceActions.enrollDistance(range)), navigation.navigate('FinalCheck'));
 	};
 	useEffect(() => {

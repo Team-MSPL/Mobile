@@ -10,6 +10,7 @@ import {HStack, VStack, Divider, MainContainer} from '../../utill/layout/layout'
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
+import {SvgCancel} from '../../utill/svg/svg';
 
 export default function SelectCity({setViewComponent, viewComponent}: any) {
 	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
@@ -261,10 +262,10 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 							<SelectListContainer>
 								{region?.map((item, regionIndex) => {
 									return (
-										<SelectButton
-											key={regionIndex}
-											label={item}
-											onPress={() => deleteRegion(item)}></SelectButton>
+										<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
+											<RegionElementContainerText>{item}</RegionElementContainerText>
+											<SvgCancel color='white' />
+										</RegionElementContainer>
 									);
 								})}
 							</SelectListContainer>
@@ -327,9 +328,19 @@ const CityItemContainer = styled.View`
 	width: 100%;
 	background-color: ${colors.normalButton};
 `;
-const RegionItemContainerText = styled.Text`
-	font-size: 20px;
-	color: grey;
+const RegionElementContainer = styled.TouchableOpacity`
+	background-color: ${colors.selectButton};
+	border-radius: 20px;
+	margin: 10px 5px 5px 5px;
+	padding: 5px 15px 5px 15px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+`;
+const RegionElementContainerText = styled.Text`
+	font-size: 15px;
+	color: white;
+	margin: 0px 10px 0px 0px;
 `;
 const CityCheckBox = styled.View<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.selectButton : colors.regionNormal)};
@@ -358,7 +369,7 @@ const SelectListContainer = styled.View`
 	background-color: ${colors.normalButton};
 	margin: 20px 0px 20px 0px;
 	border-radius: 10px;
-	padding: 10px;
+	padding: 5px;
 	display: inline-block;
 	flex-direction: row;
 	flex-wrap: wrap;
