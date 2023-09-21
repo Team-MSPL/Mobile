@@ -13,7 +13,6 @@ export default function CommunityStack() {
 				options={{
 					headerBackVisible: true,
 					headerBackTitleVisible: true,
-					headerShown: true,
 					headerTitle: '커뮤니티',
 					headerTitleAlign: 'center',
 				}}

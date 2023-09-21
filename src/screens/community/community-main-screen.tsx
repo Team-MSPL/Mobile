@@ -1,21 +1,16 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {HStack, Text, ThreeDotsIcon} from 'native-base';
+import {FlatList, ThreeDotsIcon} from 'native-base';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {
-	ActivityIndicator,
-	Dimensions,
-	FlatList,
-	RefreshControl,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import {ActivityIndicator, RefreshControl, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Icon from 'react-native-vector-icons/AntDesign';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getOnePost, getPostList, postListType} from '../../redux/community/community.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import {MainContainer} from '../../utill/layout/layout';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -127,29 +122,30 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 가져온 게시글 목록 UI
 	const renderPostItem = (data: {item: postListType}) => {
 		return (
-			<View style={styles.postItemContainer}>
+			<PostItemContainer>
 				<TouchableOpacity
 					onPress={() => {
-						console.log('게시글 읽는 화면으로 가는 함수 구현해야 함');
 						goCommunityReadingScreen(data.item.postId);
 					}}>
-					<Text style={styles.postTitleText} numberOfLines={1} ellipsizeMode='tail'>
+					<PostWriterInfoContainer>
+						<PostWriterProfileImage
+							source={require('../../../public/images/danim_logo2.png')}
+							resizeMode='contain'
+						/>
+						<PostWriterText>{data.item.postWriter}</PostWriterText>
+					</PostWriterInfoContainer>
+					<PostTitleText numberOfLines={1} ellipsizeMode='tail'>
 						{data.item.postTitle}
-					</Text>
-					<Text style={styles.postContentText} numberOfLines={1} ellipsizeMode='tail'>
-						{data.item.postContent}
-					</Text>
-					<HStack alignItems={'center'}>
-						<Icon name={'hearto'} size={12} color='red' />
-						<Text style={styles.postLikesPostedAtPostWriterText}>{data.item.likerLength}</Text>
-						<Icon name={'message1'} size={12} color='green' />
-						<Text style={styles.postLikesPostedAtPostWriterText}>{data.item.commentLength}</Text>
-						<Text style={styles.postLikesPostedAtPostWriterText}>
-							| {data.item.postedAt.slice(0, 16)} | {data.item.postWriter}
-						</Text>
-					</HStack>
+					</PostTitleText>
+					<PostDetailInfoContainer>
+						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
+						<HeartIcon name={'hearto'} />
+						<PostDetailInfoText>{data.item.likerLength}</PostDetailInfoText>
+						<CommentIcon name={'message1'} />
+						<PostDetailInfoText>{data.item.commentLength}</PostDetailInfoText>
+					</PostDetailInfoContainer>
 				</TouchableOpacity>
-			</View>
+			</PostItemContainer>
 		);
 	};
 
@@ -167,7 +163,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	};
 	useBackHandler();
 	return (
-		<View style={styles.postListContainer}>
+		<MainContainer>
 			{isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (
@@ -175,7 +171,6 @@ export default function CommunityMainScreen({navigation}: any) {
 					data={postList}
 					renderItem={renderPostItem}
 					initialNumToRender={10}
-					ListEmptyComponent={<Text>등록된 게시글이 없습니다.</Text>}
 					ItemSeparatorComponent={flatListItemSeperator}
 					onEndReached={onEndReached}
 					onEndReachedThreshold={0.8}
@@ -191,39 +186,50 @@ export default function CommunityMainScreen({navigation}: any) {
 					menuOptionList.onPress[index]();
 				}}
 			/>
-		</View>
+		</MainContainer>
 	);
 }
 
-const styles = StyleSheet.create({
-	postListContainer: {
-		flex: 1,
-		//width: Dimensions.get('window').width,
-	},
-	postItemContainer: {
-		alignItems: 'flex-start',
-		padding: 12,
-	},
-	postTitleText: {
-		width: Dimensions.get('window').width * 0.9,
-		fontSize: 16,
-		fontWeight: '700',
-	},
-	postContentText: {
-		width: Dimensions.get('window').width * 0.9,
-		fontSize: 12,
-		fontWeight: '400',
-	},
-	postLikesPostedAtPostWriterText: {
-		margin: 4,
-		fontSize: 12,
-		fontWeight: '400',
-		color: 'gray',
-	},
-	modalContainer: {
-		flex: 1,
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)', // Modal의 배경에 어두운 효과를 주기 위해 반투명한 배경색 사용
-	},
-});
+const PostItemContainer = styled.View`
+	alignitems: 'flex-start';
+	padding: 12px;
+`;
+const PostWriterInfoContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+`;
+const PostWriterProfileImage = styled.Image`
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	border: ${colors.border};
+	margin-right: 12px;
+`;
+const PostWriterText = styled.Text`
+	font-size: 16px;
+	font-weight: bold;
+`;
+const PostTitleText = styled.Text`
+	font-size: 16px;
+	font-weight: bold;
+	margin-vertical: 8px;
+`;
+const PostDetailInfoContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+`;
+const PostDetailInfoText = styled.Text`
+	font-size: 12px;
+	color: gray;
+	margin-right: 8px;
+`;
+const HeartIcon = styled(Icon)`
+	size: 12px;
+	color: red;
+	margin-right: 4px;
+`;
+const CommentIcon = styled(Icon)`
+	size: 12px;
+	color: green;
+	margin-right: 4px;
+`;

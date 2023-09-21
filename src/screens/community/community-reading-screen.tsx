@@ -1,27 +1,24 @@
-import {HStack, KeyboardAvoidingView, ThreeDotsIcon} from 'native-base';
-import {useCallback, useEffect, useRef, useState} from 'react';
-
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
+import {HStack, ThreeDotsIcon} from 'native-base';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
-	ActivityIndicator,
 	Alert,
 	Dimensions,
-	FlatList,
 	Image,
 	NativeModules,
 	Platform,
-	RefreshControl,
-	SafeAreaView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import ImageView from 'react-native-image-viewing';
-import Icon from 'react-native-vector-icons/AntDesign';
+import Swiper from 'react-native-swiper';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import FeathernIcon from 'react-native-vector-icons/Feather';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	clickLike,
@@ -36,6 +33,8 @@ import {
 	saveCommentType,
 	unclickLike,
 } from '../../redux/community/community.slice';
+import {colors} from '../../utill/colors';
+import {MainContainer} from '../../utill/layout/layout';
 
 const {StatusBarManager} = NativeModules;
 
@@ -438,144 +437,334 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<ActionSheet
-				ref={communityReadingOptionActionSheet}
-				title={'글 메뉴'}
-				options={
-					userId === postData.postWriterUserId
-						? communityReadingMenuOptionList.options
-						: communityReadingMenuOptionList.options.filter(item => item === '신고' || item === '취소')
-				}
-				cancelButtonIndex={userId == postData.postWriterUserId ? 3 : 1}
-				onPress={(index: number) => {
-					userId === postData.postWriterUserId
-						? communityReadingMenuOptionList.onPress[index]()
-						: communityReadingMenuOptionList.onPress.slice(2, 4)[index]();
-				}}
-			/>
-			<ActionSheet
-				ref={reportPostActionSheet}
-				title={'신고 사유 선택'}
-				options={reportOptionList.options}
-				cancelButtonIndex={6}
-				onPress={(index: number) => {
-					if (actionSheetType.current == '게시글') {
-						reportOptionList.reportPost[index]();
-					} else if (actionSheetType.current == '댓글') {
-						reportOptionList.reportComment[index]();
-					}
-				}}
-			/>
-			<ActionSheet
-				ref={commentOptionActionSheet}
-				title={'댓글 메뉴'}
-				options={
-					userId === commentData.commentWriterUserId
-						? commentOptionList.options
-						: commentOptionList.options.filter(item => item === '신고' || item === '취소')
-				}
-				cancelButtonIndex={userId === commentData.commentWriterUserId ? 2 : 1}
-				onPress={(index: number) => {
-					userId == commentData.commentWriterUserId
-						? commentOptionList.onPress[index]()
-						: commentOptionList.onPress.slice(1, 3)[index]();
-				}}
-			/>
-
-			<View style={styles.postNCommentContainer}>
-				{isLoading ? (
-					<ActivityIndicator size='large' color='#0000ff' />
-				) : (
-					<FlatList
-						refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-						ListHeaderComponent={
-							<View>
-								<Text>제목: {postData.postTitle}</Text>
-								<Text>본문</Text>
-								<Text style={styles.postContentText}>{postData.postContent}</Text>
-								<Text>사진 목록</Text>
-								<View style={styles.container}>
-									{postData.postImage.map((uri, index) => {
-										return (
-											<View key={index} style={{alignItems: 'center'}}>
-												<TouchableOpacity
-													onPress={() => {
-														onSelect(index);
-														console.log('파이팅', currentImageIndex);
-													}}>
-													<Image source={{uri: uri}} style={{width: 100, height: 100}} />
-												</TouchableOpacity>
-											</View>
-										);
-									})}
-
-									<ImageView
-										images={postData.postImage.map(uri => ({uri}))}
-										imageIndex={initialImageIndex || 0}
-										visible={isImageModalVisible}
-										onImageIndexChange={setCurrentImageIndex}
-										onRequestClose={() => {
-											setIsImageModalVisible(false);
-										}}
-										HeaderComponent={() => (
-											<SafeAreaView style={{alignItems: 'center'}}>
-												<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${
-													postData.postImage.length
-												}`}</Text>
-											</SafeAreaView>
-										)}
-									/>
-								</View>
-								{socialloginProvider != 'anonymous' && (
-									<View style={styles.likeContainer}>
-										<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-											<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
-											<Text style={styles.likeButtonText}>
-												{isLiked ? '좋아요 취소' : '좋아요'}
-											</Text>
-										</TouchableOpacity>
-										<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
-									</View>
-								)}
-								<Text>댓글</Text>
-							</View>
-						}
-						data={postData.comment}
-						renderItem={renderCommentItem}
-						initialNumToRender={10}
-						ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
+		<MainContainer>
+			<PostInfoContainer>
+				<PostWriterInfoContainer>
+					<PostWriterProfileImage
+						source={require('../../../public/images/danim_logo2.png')}
+						resizeMode='contain'
 					/>
+					<PostWriterText>{postData.postWriter}</PostWriterText>
+				</PostWriterInfoContainer>
+				<PostTitleText>{postData.postTitle}</PostTitleText>
+				<PostDetailInfoContainer>
+					<PostDetailInfoText>{postData.postedAt.slice(0, 10)}</PostDetailInfoText>
+				</PostDetailInfoContainer>
+			</PostInfoContainer>
+			<Divider></Divider>
+			{postData.postImage.length === 0 ? (
+				<BlankContainer />
+			) : (
+				<PostImageContainer>
+					<PostImageSwiper
+						dot={<Dot />}
+						activeDot={<ActiveDot />}
+						paginationStyle={{
+							marginBottom: -24,
+						}}
+						loop={false}>
+						{postData.postImage.map((uri, index) => (
+							<PostImageWrapper
+								onPress={() => {
+									onSelect(index);
+								}}
+								key={index}>
+								<PostImage source={{uri: uri}} />
+							</PostImageWrapper>
+						))}
+					</PostImageSwiper>
+				</PostImageContainer>
+			)}
+			<ImageView
+				images={postData.postImage.map(uri => ({uri}))}
+				imageIndex={initialImageIndex || 0}
+				visible={isImageModalVisible}
+				onImageIndexChange={setCurrentImageIndex}
+				onRequestClose={() => {
+					setIsImageModalVisible(false);
+				}}
+				HeaderComponent={() => (
+					<PostImageView style={{alignItems: 'center'}}>
+						<PostImageIndicatorText>{`${currentImageIndex + 1}/${
+							postData.postImage.length
+						}`}</PostImageIndicatorText>
+					</PostImageView>
 				)}
-			</View>
-			<KeyboardAvoidingView
-				style={styles.commentInputFieldContainer}
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				keyboardVerticalOffset={statusBarHeight + 52}>
-				{socialloginProvider == 'anonymous' ? (
-					<View>
-						<Text>익명이라 불가요</Text>
-					</View>
-				) : (
-					<>
-						<TextInput
-							style={[styles.commentTextInputField]}
-							value={commentContent}
-							onChangeText={text => setCommentContent(text)}
-							placeholder='댓글을 입력하세요...'
-						/>
-						<TouchableOpacity
-							style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
-							disabled={isCommentButtonDisabled}
-							onPress={handleCommentSubmit}>
-							<Text style={styles.submitButtonText}>등록</Text>
-						</TouchableOpacity>
-					</>
-				)}
-			</KeyboardAvoidingView>
-		</SafeAreaView>
+			/>
+			<PostContentContainer>
+				<PostContentText>{postData.postContent}</PostContentText>
+			</PostContentContainer>
+			<Divider></Divider>
+			{socialloginProvider != 'anonymous' && (
+				<PostLikeCommentNumContainer>
+					<LikeButton onPress={handleLikePress}>
+						<HeartIcon name={isLiked ? 'heart' : 'hearto'} selected={isLiked}></HeartIcon>
+						<LikeCommentText>{isLiked ? '좋아요 취소' : '좋아요'}</LikeCommentText>
+					</LikeButton>
+					<CommentIcon name='message-circle' />
+					<LikeCommentText>{postData.comment.length}</LikeCommentText>
+				</PostLikeCommentNumContainer>
+			)}
+			<LikeCommentText>{postData.liker.length}명이 좋아합니다</LikeCommentText>
+		</MainContainer>
+		//<SafeAreaView style={styles.container}>
+		// 	<ActionSheet
+		// 		ref={communityReadingOptionActionSheet}
+		// 		title={'글 메뉴'}
+		// 		options={
+		// 			userId === postData.postWriterUserId
+		// 				? communityReadingMenuOptionList.options
+		// 				: communityReadingMenuOptionList.options.filter(item => item === '신고' || item === '취소')
+		// 		}
+		// 		cancelButtonIndex={userId == postData.postWriterUserId ? 3 : 1}
+		// 		onPress={(index: number) => {
+		// 			userId === postData.postWriterUserId
+		// 				? communityReadingMenuOptionList.onPress[index]()
+		// 				: communityReadingMenuOptionList.onPress.slice(2, 4)[index]();
+		// 		}}
+		// 	/>
+		// 	<ActionSheet
+		// 		ref={reportPostActionSheet}
+		// 		title={'신고 사유 선택'}
+		// 		options={reportOptionList.options}
+		// 		cancelButtonIndex={6}
+		// 		onPress={(index: number) => {
+		// 			if (actionSheetType.current == '게시글') {
+		// 				reportOptionList.reportPost[index]();
+		// 			} else if (actionSheetType.current == '댓글') {
+		// 				reportOptionList.reportComment[index]();
+		// 			}
+		// 		}}
+		// 	/>
+		// 	<ActionSheet
+		// 		ref={commentOptionActionSheet}
+		// 		title={'댓글 메뉴'}
+		// 		options={
+		// 			userId === commentData.commentWriterUserId
+		// 				? commentOptionList.options
+		// 				: commentOptionList.options.filter(item => item === '신고' || item === '취소')
+		// 		}
+		// 		cancelButtonIndex={userId === commentData.commentWriterUserId ? 2 : 1}
+		// 		onPress={(index: number) => {
+		// 			userId == commentData.commentWriterUserId
+		// 				? commentOptionList.onPress[index]()
+		// 				: commentOptionList.onPress.slice(1, 3)[index]();
+		// 		}}
+		// 	/>
+
+		// 	<View style={styles.postNCommentContainer}>
+		// 		{isLoading ? (
+		// 			<ActivityIndicator size='large' color='#0000ff' />
+		// 		) : (
+		// 			<FlatList
+		// 				refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+		// 				ListHeaderComponent={
+		// 					<View>
+		// 						<Text>제목: {postData.postTitle}</Text>
+		// 						<Text>본문</Text>
+		// 						<Text style={styles.postContentText}>{postData.postContent}</Text>
+		// 						<Text>사진 목록</Text>
+		// 						<View style={styles.container}>
+		// 							{postData.postImage.map((uri, index) => {
+		// 								return (
+		// 									<View key={index} style={{alignItems: 'center'}}>
+		// 										<TouchableOpacity
+		// 											onPress={() => {
+		// 												onSelect(index);
+		// 												console.log('파이팅', currentImageIndex);
+		// 											}}>
+		// 											<Image source={{uri: uri}} style={{width: 100, height: 100}} />
+		// 										</TouchableOpacity>
+		// 									</View>
+		// 								);
+		// 							})}
+
+		// 							<ImageView
+		// 								images={postData.postImage.map(uri => ({uri}))}
+		// 								imageIndex={initialImageIndex || 0}
+		// 								visible={isImageModalVisible}
+		// 								onImageIndexChange={setCurrentImageIndex}
+		// 								onRequestClose={() => {
+		// 									setIsImageModalVisible(false);
+		// 								}}
+		// 								HeaderComponent={() => (
+		// 									<SafeAreaView style={{alignItems: 'center'}}>
+		// 										<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${
+		// 											postData.postImage.length
+		// 										}`}</Text>
+		// 									</SafeAreaView>
+		// 								)}
+		// 							/>
+		// 						</View>
+		// 						{socialloginProvider != 'anonymous' && (
+		// 							<View style={styles.likeContainer}>
+		// 								<TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
+		// 									<Icon name={isLiked ? 'heart' : 'hearto'} size={20} color='red' />
+		// 									<Text style={styles.likeButtonText}>
+		// 										{isLiked ? '좋아요 취소' : '좋아요'}
+		// 									</Text>
+		// 								</TouchableOpacity>
+		// 								<Text style={styles.likesCount}>{postData.liker.length}명이 좋아합니다</Text>
+		// 							</View>
+		// 						)}
+		// 						<Text>댓글</Text>
+		// 					</View>
+		// 				}
+		// 				data={postData.comment}
+		// 				renderItem={renderCommentItem}
+		// 				initialNumToRender={10}
+		// 				ListEmptyComponent={<Text>등록된 댓글이 없습니다.</Text>}
+		// 			/>
+		// 		)}
+		// 	</View>
+		// 	<KeyboardAvoidingView
+		// 		style={styles.commentInputFieldContainer}
+		// 		behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+		// 		keyboardVerticalOffset={statusBarHeight + 52}>
+		// 		{socialloginProvider == 'anonymous' ? (
+		// 			<View>
+		// 				<Text>익명이라 불가요</Text>
+		// 			</View>
+		// 		) : (
+		// 			<>
+		// 				<TextInput
+		// 					style={[styles.commentTextInputField]}
+		// 					value={commentContent}
+		// 					onChangeText={text => setCommentContent(text)}
+		// 					placeholder='댓글을 입력하세요...'
+		// 				/>
+		// 				<TouchableOpacity
+		// 					style={[styles.submitButton, isCommentButtonDisabled && styles.disabledButton]}
+		// 					disabled={isCommentButtonDisabled}
+		// 					onPress={handleCommentSubmit}>
+		// 					<Text style={styles.submitButtonText}>등록</Text>
+		// 				</TouchableOpacity>
+		// 			</>
+		// 		)}
+		// 	</KeyboardAvoidingView>
+		// </SafeAreaView>
 	);
 }
+
+const PostInfoContainer = styled.View`
+	padding: 12px;
+`;
+const PostItemContainer = styled.View`
+	alignitems: 'flex-start';
+	padding: 12px;
+`;
+const PostWriterInfoContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+`;
+const PostWriterProfileImage = styled.Image`
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	border: ${colors.border};
+	margin-right: 12px;
+`;
+const PostWriterText = styled.Text`
+	font-size: 12px;
+	font-weight: bold;
+`;
+const PostTitleText = styled.Text`
+	font-size: 16px;
+	font-weight: bold;
+	margin-vertical: 8px;
+`;
+const PostDetailInfoContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+`;
+const PostDetailInfoText = styled.Text`
+	font-size: 12px;
+	margin-right: 8px;
+`;
+const Divider = styled.View`
+	border-bottom-color: #ccc;
+	border-bottom-width: 1px;
+`;
+
+const BlankContainer = styled.View``;
+
+const PostImageContainer = styled.View`
+	margin-vertical: 12px;
+`;
+
+const PostImageSwiper = styled(Swiper)`
+	height: ${Dimensions.get('window').width};
+`;
+const Dot = styled.View`
+	background-color: #ccc;
+	width: 8px;
+	height: 8px;
+	border-radius: 4px;
+	margin: 4px;
+`;
+const ActiveDot = styled.View`
+	background-color: ${colors.border};
+	width: 8px;
+	height: 8px;
+	border-radius: 4px;
+	margin: 4px;
+`;
+const PostImageWrapper = styled.TouchableOpacity`
+	width: 100%;
+	aspect-ratio: 1;
+`;
+const PostImage = styled.Image`
+	width: 100%;
+	aspect-ratio: 1;
+`;
+
+// 사진 눌렀을 때 사진 보이는 화면
+const PostImageView = styled.SafeAreaView`
+	align-items: center;
+`;
+const PostImageIndicatorText = styled.Text`
+	font-size: 16px;
+	color: white;
+`;
+
+// 게시글 글 내용담는 컨테이너
+const PostContentContainer = styled.View`
+	justify-content: center;
+	padding-vertical: 8px;
+	margin-bottom: 24px;
+`;
+const PostContentText = styled.Text`
+	font-size: 16px;
+`;
+
+// 게시글 좋아요 수 및 댓글 수
+const PostLikeCommentNumContainer = styled.View`
+	align-items: center;
+	flex-direction: row;
+	padding-vertical: 8px;
+`;
+const LikeButton = styled.TouchableOpacity`
+	align-items: center;
+	flex-direction: row;
+`;
+const HeartIcon = styled(AntDesignIcon)<{selected: boolean}>`
+	color: ${props => (props.selected ? 'red' : 'black')};
+	font-size: 24px;
+	margin-right: 4px;
+`;
+const LikeCommentText = styled.Text`
+	font-size: 14px;
+	margin-right: 12px;
+`;
+const CommentIconContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+`;
+const CommentIcon = styled(FeathernIcon)`
+	color: black;
+	font-size: 24px;
+	margin-right: 4px;
+`;
 
 const styles = StyleSheet.create({
 	container: {

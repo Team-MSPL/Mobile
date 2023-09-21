@@ -230,7 +230,7 @@ export default function LoginScreen({navigation}: any) {
 	const platforms = [
 		{title: 'Google', color: 'white', image: <SvgGoogle />, onPress: googleLogin},
 		{title: 'Kakao', color: colors.reviewBackground, image: <SvgKakao />, onPress: kakaoLogin},
-		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: kakaoLogin},
+		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
 	const [view, setView] = useState(0);

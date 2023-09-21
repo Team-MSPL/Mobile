@@ -19,6 +19,7 @@ const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
 	const {isLogin} = useAppSelector(state => state.userSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
+
 	return (
 		<Stack.Navigator>
 			{/* {isLogin ? (
