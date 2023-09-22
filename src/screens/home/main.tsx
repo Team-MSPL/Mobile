@@ -6,6 +6,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {

@@ -135,9 +135,9 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 								</TouchableOpacity>
 							</HStack>
 							{searchData && (
-								<TouchableOpacity onPress={addCity}>
+								<SearchTouchableOpacity onPress={addCity}>
 									<SelectRegion>{searchData?.title}</SelectRegion>
-								</TouchableOpacity>
+								</SearchTouchableOpacity>
 							)}
 
 							<RegionViewContainer>
@@ -339,6 +339,11 @@ const RegionElementContainer = styled.TouchableOpacity`
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
+`;
+const SearchTouchableOpacity = styled.TouchableOpacity`
+	width: 100%;
+	padding: 10px;
+	align-items: center;
 `;
 const RegionElementContainerText = styled.Text`
 	font-size: 15px;

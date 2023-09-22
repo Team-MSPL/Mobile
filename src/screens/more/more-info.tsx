@@ -72,9 +72,12 @@ export default function MoreInfo({navigation}: any) {
 		navigation.replace('LoginScreen');
 	};
 	const useInfo = [
-		{title: '공지사항', function: () => console.log('qwe')},
-		{title: '도움말', function: () => console.log('qwe')},
-		{title: '문의하기', function: () => console.log('qwe')},
+		{
+			title: '공지사항',
+			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
+		},
+		// {title: '도움말', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}))},
+		// {title: '문의하기', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: ''}))},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 	];

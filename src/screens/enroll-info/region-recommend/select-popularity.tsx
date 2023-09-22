@@ -35,33 +35,33 @@ export default function SelectPopularity({navigation}: any) {
 	const radioButtons = [
 		{
 			id: 1,
-			label: '완전 유명하지않은',
+			label: '많이 이색적인',
 			value: 'option1',
-			explain: '사람들이 많이 찾지 않는 장소에요',
+			explain: '발길이 많이 닿지 않은 이색 여행 지역들이에요. \n( 강원 양구군, 경남 함안군 등 37개 지역 )',
 		},
 		{
 			id: 2,
-			label: '조금 유명하지않은',
+			label: '상당히 이색적인',
 			value: 'option2',
-			explain: '사람들이 많이 가진 않지만 조금씩 찾아보는 사람이 있어요',
+			explain: '특색있는 관광지를 가지고 있는 이색 여행 지역들이에요.\n( 경북 청송군, 전남 광양시 등 53개 지역 )',
 		},
 		{
 			id: 3,
-			label: '적당한',
+			label: '균형잡힌',
 			value: 'option2',
-			explain: '1년에 한번은 사람들이 찾아보는 곳이에요',
+			explain: '유명과 이색, 그 중간 지점에 있는 지역들이에요.\n( 강원 화천시, 경남 진주시 등 32개 지역 )',
 		},
 		{
 			id: 4,
-			label: ' 조금 유명한',
+			label: '상당히 유명한',
 			value: 'option2',
-			explain: `유명한 관광지가 있는 장소들이에요 \n예: 강원 원주시, 충북 단양군 등 `,
+			explain: `여행을 좋아한다면 자주 들어보았을 지역들이에요.\n( 강원 강릉시, 충북 단양군 등 30개 지역 )`,
 		},
 		{
 			id: 5,
-			label: ' 많이 유명한',
+			label: '많이 유명한',
 			value: 'option2',
-			explain: '사람들이 가장 많이 찾아보는 장소들이에요 \n예:서울, 제주',
+			explain: '일반적으로 가장 많이 여행가는 지역들이에요.\n( 서울, 제주 등 10개 지역 )',
 		},
 	];
 	const goNewLogin = () => {
@@ -116,6 +116,7 @@ export default function SelectPopularity({navigation}: any) {
 	return (
 		<MainContainer>
 			<StepText mainText='인기도 선택' subText='가고자 하는 여행지의 느낌을 선택해주세요.' />
+			<Info>* 인기도의 기준은 각 지역별 여행객 수 통계를 참조했어요.</Info>
 			{radioButtons.map((item, index) => (
 				<PopularButton key={index} onPress={() => changeSelectId(index)}>
 					<HStack key={index}>
@@ -127,7 +128,7 @@ export default function SelectPopularity({navigation}: any) {
 				</PopularButton>
 			))}
 			<ExplainText>{radioButtons[selectedId].explain}</ExplainText>
-			<CustomButton label='추천받기' isDisabled={selectedId ? false : true} onPress={goNext}></CustomButton>
+			<CustomButton label='추천받기' onPress={goNext}></CustomButton>
 		</MainContainer>
 	);
 }
@@ -147,4 +148,7 @@ const PopularButtonText = styled.Text<{color: string}>`
 	font-weight: bold;
 	color: ${props => props.color};
 	margin: 0px 0px 0px 20px;
+`;
+const Info = styled.Text`
+	margin: 0px 0px 10px 0px;
 `;

@@ -76,8 +76,8 @@ export default function DetailInfo({navigation}: any) {
 		try {
 			const response = await KakaoShareLink.sendFeed({
 				content: {
-					title: region[0],
-					imageUrl: 'http://danim.me/moon.jpeg',
+					title: travelName,
+					imageUrl: '',
 					link: {
 						webUrl: 'http://danim.me',
 						mobileWebUrl: 'http://danim.me',

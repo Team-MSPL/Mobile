@@ -26,19 +26,16 @@ import {
 	TimeItemText,
 	DayPressable,
 } from '../enroll-info/select-day';
-import CustomButton from '../../utill/component/custom-button';
+
 import Icon from 'react-native-vector-icons/AntDesign';
+
+import Icons from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../../utill/component/custom-button';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
 	const newY = useRef(0);
-	const DeleteIconContainer = styled(Icon)`
-		background-color: ${colors.selectButton};
-		border-radius: 5px;
-		padding: 0.6%;
-		margin: 0px 0px 0px 10px;
-	`;
 	const goRecommend = (category: string) => {
 		let lat = 0;
 		let lng = 0;
@@ -120,6 +117,17 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.goBack();
 	};
+	const DeleteIconContainer = styled(Icon)`
+		background-color: ${colors.selectButton};
+		border-radius: 5px;
+		padding: 0.6%;
+		margin: 0px 0px 0px 10px;
+	`;
+	const DeleteIconContainers = styled(Icons)`
+		border-radius: 5px;
+		padding: 0.6%;
+		margin: 0px 0px 0px 10px;
+	`;
 	useEffect(() => {
 		newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
 		if (newY.current == -1) {
@@ -252,7 +260,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						<SvgHome width={36} height={36} color='white' />
 					</IconContainer>
 				</AccommodationsContainer>
-				<AccommodationsContainer
+				<RestoaurantContainer
 					onPress={() => {
 						goRecommend('FD6');
 					}}>
@@ -261,9 +269,9 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						{/* <CourseSubTitleText>맛있는 식당을 추천해드려요</CourseSubTitleText> */}
 					</VStack>
 					<IconContainer>
-						<SvgHome width={36} height={36} color='white' />
+						<DeleteIconContainers name={'restaurant'} size={36} color={'white'} />
 					</IconContainer>
-				</AccommodationsContainer>
+				</RestoaurantContainer>
 			</CourseAndReview>
 			<CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} />
 		</MainContainer>
@@ -286,12 +294,16 @@ const DayText = styled.Text`
 `;
 const CoffeeContainer = styled(CourseContainer)`
 	width: 30%;
-	background-color: ${colors.coffeeColor};
+	background-color: #ffccb6;
 `;
 
 const AccommodationsContainer = styled(CourseContainer)`
 	width: 30%;
-	background-color: ${colors.accommodationColor};
+	background-color: #cbaacb;
+`;
+const RestoaurantContainer = styled(CourseContainer)`
+	width: 30%;
+	background-color: #abdee6;
 `;
 const MainContainer = styled.View`
 	flex: 1;

@@ -42,7 +42,6 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 		const startNumber = e.value.y; // 시작 숫자
 		const count = e.value.takenTime / 30; // 원하는 갯수
 		const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-
 		navigation.navigate('Recommend', {
 			name: '숙소 추천',
 			x: e.value.x,
@@ -53,8 +52,8 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			lng: lng,
 			apiCategory: 'AD5',
 			radius: 2000,
-			backupLat: timetable[e.idx][e.index - 1].lat,
-			backupLng: timetable[e.idx][e.index - 1].lng,
+			backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+			backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
 		});
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
