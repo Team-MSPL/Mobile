@@ -10,8 +10,6 @@ export default function JoinStack() {
 				component={Join1}
 				options={{
 					title: '회원가입',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
 				}}
 			/>
 		</Fragment>

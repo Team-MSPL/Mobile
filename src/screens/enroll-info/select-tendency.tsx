@@ -119,18 +119,18 @@ export const tendencyList = [
 	},
 ];
 
-const TendencyText = styled.Text`
+export const TendencyText = styled.Text`
 	font-size: 20px;
 	font-weight: bold;
 	color: black;
 `;
 
-const TendencyContainer = styled.View`
+export const TendencyContainer = styled.View`
 	width: 100%;
 	margin: 10px 0px 0px 0px;
 `;
 
-const TendencyStepText = styled.Text`
+export const TendencyStepText = styled.Text`
 	margin: 10px 0px 0px 0px;
 	font-size: 15px;
 	color: #2698fa;

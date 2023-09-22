@@ -33,7 +33,6 @@ const initialState: LiteState = {
 	moveTimeList: [], // 이동시간
 	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
 	editMode: '', // 삭제모드=delete, 추가모드=add
-	recommendList: [], //추천할때 쓰이는 리스트
 	makeMode: 'solo', //true=추천모드, fasle==혼자짤래요    추천,혼자,수정,친구 recommend, solo, modify,share
 	//----------------------------------------------------
 	myTravelList: [],
@@ -153,6 +152,7 @@ export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: r
 export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType) => {
 	try {
 		const response = await axiosAuth.post(`/ai/run`, data);
+		console.log(response, '애ㅔ애ㅔ에ㅔㅔㅔㅔ');
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -428,9 +428,6 @@ export const travelSlice = createSlice({
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
 		});
-		builder.addCase(recommendApi.fulfilled, (state, {payload}) => {
-			state.recommendList = payload;
-		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
 			state.presetDatas = payload.data.resultData;
 		});
@@ -484,7 +481,6 @@ interface LiteState {
 	moveTimeList: number[][] | [];
 	courseDetail: CourseDetailType;
 	editMode: string;
-	recommendList: RecommendList[];
 	makeMode: MakeModeType;
 	//----------------------------------------
 	myTravelList: myTravelListType[];
@@ -581,7 +577,7 @@ interface EditorialSummary {
 	overview: string;
 }
 
-interface RecommendList {
+export interface RecommendList {
 	address_name: string;
 	category_group_code: string;
 	category_group_name: string;

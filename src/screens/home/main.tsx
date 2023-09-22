@@ -21,15 +21,9 @@ export default function Main({navigation}: any) {
 	);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const zxc = () => {
-		// dispatch(
-		// 	modalSliceActions.setOpenModal({
-		// 		modalTitle: '안내창',
-		// 		modalSubTitle: '지역 선택을 안하셨습니다.',
-		// 	}),
-		// );
+	const soloMaking = () => {
 		dispatch(travelSliceActions.setSingleMode());
-		navigation.navigate('Timetable');
+		navigation.navigate('EnrollTravelTitle');
 	};
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
@@ -40,26 +34,26 @@ export default function Main({navigation}: any) {
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useEffect(() => {
-		if (signUpReward) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '회원가입 축하드립니다',
-					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-					modalFunction: checkSignUpReward,
-				}),
-			);
-		} else {
-			dailyReward &&
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '데일리 보상!',
-						modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
-						modalFunction: checkDailyReward,
-					}),
-				);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (signUpReward) {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '회원가입 축하드립니다',
+	// 				modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+	// 				modalFunction: checkSignUpReward,
+	// 			}),
+	// 		);
+	// 	} else {
+	// 		dailyReward &&
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '데일리 보상!',
+	// 					modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
+	// 					modalFunction: checkDailyReward,
+	// 				}),
+	// 			);
+	// 	}
+	// }, []);
 	useBackHandler();
 	return (
 		<SafeAreaView>
@@ -72,7 +66,7 @@ export default function Main({navigation}: any) {
 						</VStack>
 						<Icon name={'pluscircle'} size={20} color={'white'} />
 					</NewTravelButton>
-					<NewTravelButton>
+					<NewTravelButton onPress={soloMaking}>
 						<VStack>
 							<ButtonText>{userName}님, 자유롭게 짜고 싶나요?</ButtonText>
 							<ButtonBoldText>혼자 만들어보기</ButtonBoldText>

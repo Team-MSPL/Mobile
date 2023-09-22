@@ -70,10 +70,14 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 							key={index}
 							background={editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white'}
 							valueIndex={index}
+							borderColor={
+								editMode === 'add' && x === inx && addList.includes(index)
+									? 'black'
+									: colors.regionNormal
+							}
 							valueInx={inx}
-							style={{
-								top: (WINDOW_HEIGHT / 20) * (index ?? 1),
-							}}
+							top={(WINDOW_HEIGHT / 20) * (index ?? 1)}
+							height={WINDOW_HEIGHT / 10}
 							activeOpacity={makeMode == 'share' ? 1 : 0.2}
 							onPress={() => makeMode != 'share' && handleCellPress(inx, index)}
 							onLongPress={() => makeMode != 'share' && handleCellLongPress(inx, index)}
@@ -91,24 +95,27 @@ const BackgroundContainer = styled.View`
 `;
 const BackgroundElementContainer = styled.View`
 	flex: 0.18;
-	margin: 0px 0px 0px 0px;
 `;
 
 const BackgroundTouchable = styled.TouchableOpacity<{
 	background: string;
 	valueIndex: number;
 	valueInx: number;
+	height: number;
+	top: number;
+	borderColor: string;
 }>`
 	width: 100%;
-	height: 35;
-	border-color: ${colors.regionNormal};
-	border-left-width: 1;
-	border-right-width: ${props => (props.valueInx === 4 ? 1 : 0)};
-	border-top-width: ${props => (props.valueIndex % 2 ? 0 : 1)};
-	border-bottom-width: ${props => (props.valueIndex === 47 ? 1 : 0)};
+	height: ${props => props.height}px;
+	border-color: ${props => props.borderColor};
+	border-left-width: 1px;
+	border-right-width: ${props => (props.valueInx === 4 ? 1 : 0)}px;
+	border-top-width: ${props => (props.valueIndex % 2 ? 0 : 1)}px;
+	border-bottom-width: ${props => (props.valueIndex === 47 ? 1 : 0)}px;
 	position: absolute;
 	z-index: 2;
 	background-color: ${props => props.background};
+	top: ${props => props.top}px;
 `;
 
 export default memo(Background);

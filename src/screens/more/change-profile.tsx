@@ -1,18 +1,26 @@
 import styled from 'styled-components/native';
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {TouchableOpacity, Image, Alert} from 'react-native';
+import {TouchableOpacity, Image, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {updateProfile, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {Center, MainContainer} from '../../utill/layout/layout';
+import Icon from 'react-native-vector-icons/AntDesign';
 export default function ChangeProfile({navigation}: any) {
 	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
 	const dispatch = useAppDispatch();
 	//애뮬레이터 확인 불가
+	const IconContainer = styled(Icon)`
+		background-color: ${colors.regionNormal};
+		margin: 0px 0px 0px 0px;
+		border-radius: 10px;
+		padding: 3px;
+	`;
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			width: 300,
@@ -60,8 +68,18 @@ export default function ChangeProfile({navigation}: any) {
 		setNickname(e);
 	};
 	return (
-		<SafeAreaView style={{backgroundColor: colors.main}}>
-			<Text>닉네임이요</Text>
+		<ProfileContainer>
+			<Center>
+				<TouchableOpacity onPress={handleImagePickerLaunch}>
+					{image && <ImageElement source={{uri: image}} />}
+
+					<ImageBottom>
+						<IconContainer name={'camera'} size={20} color={'grey'} />
+					</ImageBottom>
+				</TouchableOpacity>
+			</Center>
+			<NicknameText>닉네임</NicknameText>
+
 			<InputProfileContainer>
 				<InputWrap>
 					<CustomTextInput
@@ -82,25 +100,20 @@ export default function ChangeProfile({navigation}: any) {
 						</TouchableOpacity>
 					)}
 				</InputWrap>
-
-				<Text>사진 바꾸세유유유ㅜ우</Text>
-				<TouchableOpacity onPress={handleImagePickerLaunch}>
-					<Text>사진이요</Text>
-				</TouchableOpacity>
-				{image && <Image source={{uri: image}} style={{width: 100, height: 100}}></Image>}
 				<CustomButton label={'변경'} isDisabled={nickname == ''} onPress={goChangeProfile} />
 			</InputProfileContainer>
-		</SafeAreaView>
+		</ProfileContainer>
 	);
 }
 
 const InputProfileContainer = styled.View`
 	display: flex;
-	margin-top: 24px;
 	background-color: ${colors.main};
-	padding: 10px;
 `;
-
+const ProfileContainer = styled(MainContainer).attrs({as: View})`
+	flex: 1;
+	padding: 20px;
+`;
 const InputWrap = styled.View`
 	flex-direction: row;
 	display: flex;
@@ -111,7 +124,12 @@ const Text = styled.Text`
 	line-height: 30px;
 	color: black;
 `;
-
+const NicknameText = styled.Text`
+	font-size: 15px;
+	font-weight: 900;
+	color: black;
+	margin: 0px 0px 10px 0px;
+`;
 const CustomTextInput = styled.TextInput<{text: string}>`
 	width: 100%;
 	padding: 8px;
@@ -120,4 +138,17 @@ const CustomTextInput = styled.TextInput<{text: string}>`
 	border-width: 1px;
 	border-radius: 8px;
 	border-color: ${({text}: {text: string}) => (text == '' ? 'grey' : 'black')};
+`;
+const ImageElement = styled.Image`
+	width: 100px;
+	height: 100px;
+	border-radius: 99px;
+	overflow: hidden;
+	border-width: 10px;
+	border-color: red;
+`;
+const ImageBottom = styled.View`
+	position: absolute;
+	bottom: 0;
+	right: 0;
 `;

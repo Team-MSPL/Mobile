@@ -4,7 +4,6 @@ import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slic
 import DatePicker from 'react-native-date-picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
-import {Text, Spacer} from 'native-base';
 import moment, {Moment} from 'moment';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import StepText from '../../utill/component/enroll-info/step-text';

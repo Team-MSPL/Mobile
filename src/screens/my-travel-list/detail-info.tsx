@@ -1,8 +1,7 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {Alert, TouchableOpacity, Image} from 'react-native';
-import {Text} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -14,12 +13,18 @@ import {HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgMilestone, SvgPicture, SvgReview} from '../../utill/svg/svg';
+import {SvgMilestone, SvgPicture, SvgReview, SvgShare} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
+import Icon from 'react-native-vector-icons/AntDesign';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, region, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-
+	const HeaderIconContainer = styled(Icon)`
+		background-color: ${colors.selectButton};
+		border-radius: 5px;
+		padding: 0.6%;
+		margin: 0px 0px 0px 10px;
+	`;
 	const goInputDiary = () => {
 		navigation.navigate('InputDiary');
 	};
@@ -103,6 +108,20 @@ export default function DetailInfo({navigation}: any) {
 			);
 		}
 	};
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<HeaderHStack>
+					<TouchableOpacity onPress={goKakaoShare}>
+						<SvgShare color={colors.selectButton} />
+					</TouchableOpacity>
+					<TouchableOpacity onPress={goRemove}>
+						<HeaderIconContainer name={'delete'} size={20} color={'white'} />
+					</TouchableOpacity>
+				</HeaderHStack>
+			),
+		});
+	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			goMyTravelDetail();
@@ -110,9 +129,7 @@ export default function DetailInfo({navigation}: any) {
 	);
 	return (
 		<MainContainer>
-			<DayText>
-				{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay - 1]).format('MM월-DD일')}
-			</DayText>
+			<DayText>{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay]).format('MM월-DD일')}</DayText>
 			{/* <PictureCotainer>
 				<PictureElementContainer>
 					<PictuerVstack>
@@ -142,24 +159,12 @@ export default function DetailInfo({navigation}: any) {
 					</IconContainer>
 				</ReviewContainer>
 			</CourseAndReview>
-
-			<TouchableOpacity style={{marginVertical: 10}} onPress={goKakaoShare}>
-				<Text bold fontSize='lg'>
-					카카오톡 공유 레츠고!
-				</Text>
-			</TouchableOpacity>
-
-			<TouchableOpacity onPress={goRemove}>
-				<Text bold fontSize='lg'>
-					삭제할래?
-				</Text>
-			</TouchableOpacity>
 		</MainContainer>
 	);
 }
 
 const PictureCotainer = styled.View`
-	height: 180;
+	height: 180px;
 	width: 100%;
 	align-items: center;
 	margin: 15px 0px 15px 0px;
@@ -216,4 +221,7 @@ const ReviewTitleText = styled(CourseTitleText)`
 `;
 const ReviewSubTitleText = styled(CourseSubTitleText)`
 	color: ${colors.selectButton};
+`;
+export const HeaderHStack = styled(HStack)`
+	justify-content: space-between;
 `;

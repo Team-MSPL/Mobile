@@ -1,13 +1,17 @@
-import {Box, ScrollView, Text, VStack} from 'native-base';
+import moment from 'moment';
 import {useEffect, useRef, useState} from 'react';
-import {Linking, Platform, TouchableOpacity} from 'react-native';
+import {Linking, Platform, TouchableOpacity, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {colors} from '../../utill/colors';
 import SelectButton from '../../utill/component/select-button';
+import {MainContainer, VStack} from '../../utill/layout/layout';
+import {PresetButton} from './preset';
 
 export default function MapInfo({navigation, route}: any) {
-	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -94,7 +98,7 @@ export default function MapInfo({navigation, route}: any) {
 	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
-
+	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	useEffect(() => {
 		if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
 			setSelect(route.params.mapIndex);
@@ -125,27 +129,14 @@ export default function MapInfo({navigation, route}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 	if (polylineCoordinates.length == 0) {
-		return <Box></Box>;
+		return <MainAllContainer></MainAllContainer>;
 	}
 	return (
-		<ScrollView bgColor='#EFFBFB' px='2'>
-			<VStack space='5'>
-				<Box flexDir='row' flexWrap='wrap'>
-					{timetable.map(
-						(item, idx) =>
-							item.length != 0 && (
-								<SelectButton
-									key={idx}
-									label={idx + 1 + '일차요'}
-									bgColor={idx === select}
-									onPress={() => {
-										console.log(deltaLatitude, deltaLongitude), change(idx);
-									}}></SelectButton>
-							),
-					)}
-				</Box>
+		<MainAllContainer>
+			<VStack>
 				{timetable.map(
 					(item, idx) =>
 						select == idx && (
@@ -168,35 +159,121 @@ export default function MapInfo({navigation, route}: any) {
 						),
 				)}
 
-				{timetable[select].map((value, index) => {
-					if (!excludeNames.includes(value.name)) {
-						return (
-							<Box key={index}>
-								<TouchableOpacity
+				<DayContainer>
+					{timetable.map(
+						(item, idx) =>
+							item.length != 0 && (
+								<DayButton
+									key={idx}
+									select={idx === select}
 									onPress={() => {
-										moveRegion(index);
+										console.log(deltaLatitude, deltaLongitude), change(idx);
 									}}>
-									<Text>{value.name}</Text>
-								</TouchableOpacity>
-								{index !== timetable[select].length - 1 &&
-									timetable[select][index + 1].name != '숙소 추천' && (
-										<TouchableOpacity
+									<DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
+									<DaySubTitle select={idx === select}>
+										{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+									</DaySubTitle>
+								</DayButton>
+							),
+					)}
+				</DayContainer>
+				<DayScrollView>
+					{timetable[select].map((value, index) => {
+						if (!excludeNames.includes(value.name)) {
+							return (
+								<DaysContainer key={index}>
+									<DayElementContainer>
+										<PlaceContainer
 											onPress={() => {
-												goNavigation(index);
-											}}
-											style={{marginTop: 20}}>
-											<Text>이동</Text>
-										</TouchableOpacity>
-									)}
-							</Box>
-						);
-					} else {
-						return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
-					}
-				})}
+												moveRegion(index);
+											}}>
+											<VStack>
+												<PlaceText>{categoryTitle[value.category]}</PlaceText>
+												<DayTimeText>
+													{Math.floor((value.y * 30 + 360) / 60)}:
+													{String((value.y * 30 + 360) % 60).padStart(2, '0')}~
+													{Math.floor(((value.y + value.takenTime / 30) * 30 + 360) / 60)}:
+													{String(
+														((value.y + value.takenTime / 30) * 30 + 360) % 60,
+													).padStart(2, '0')}
+												</DayTimeText>
+											</VStack>
+											<PlaceText>{value.name}</PlaceText>
+										</PlaceContainer>
+									</DayElementContainer>
+									<DayElementContainer>
+										{index !== timetable[select].length - 1 &&
+											timetable[select][index + 1].name != '숙소 추천' && (
+												<MoveContainer
+													onPress={() => {
+														goNavigation(index);
+													}}>
+													<PlaceText>이동</PlaceText>
+												</MoveContainer>
+											)}
+									</DayElementContainer>
+								</DaysContainer>
+							);
+						} else {
+							return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
+						}
+					})}
+				</DayScrollView>
 			</VStack>
-		</ScrollView>
+		</MainAllContainer>
 	);
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
+export const DayContainer = styled.View`
+	flex-direction: row;
+	flex-wrap: wrap;
+`;
+const PlaceText = styled.Text`
+	font-size: 16px;
+	font-weight: bold;
+	color: black;
+`;
+export const DayButton = styled(PresetButton)<{select: boolean}>`
+	border-radius: 15px;
+	padding: 3%;
+	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
+	align-items: center;
+`;
+
+export const DayTitle = styled(PlaceText)<{select: boolean}>`
+	color: ${props => (props.select ? 'white' : colors.selectButton)};
+`;
+export const DaySubTitle = styled(DayTitle)`
+	font-weight: 500;
+	font-size: 14px;
+`;
+export const DayElementContainer = styled.View`
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.regionNormal};
+`;
+const DaysContainer = styled.View`
+	padding: 2%;
+`;
+
+const MainAllContainer = styled(MainContainer).attrs({as: View})`
+	flex: 1;
+`;
+
+const DayScrollView = styled.ScrollView`
+	height: 40%;
+`;
+
+const MoveContainer = styled.TouchableOpacity`
+	width: 100%;
+	padding: 5%;
+	align-items: center;
+`;
+const PlaceContainer = styled(MoveContainer)`
+	flex-direction: row;
+	justify-content: space-between;
+`;
+const DayTimeText = styled.Text`
+	font-size: 14px;
+	color: ${colors.selectButton};
+`;

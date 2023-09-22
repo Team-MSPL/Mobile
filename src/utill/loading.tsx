@@ -1,10 +1,19 @@
-import {Center} from 'native-base';
 import React from 'react';
+import styled from 'styled-components/native';
 import LoadingLottie from './loading-lottie';
 export default function Loading() {
 	return (
-		<Center position='absolute' display='flex' bgColor='rgba(0, 0, 0, 0.4)' w='100%' h='100%'>
+		<LoadingContainer>
 			<LoadingLottie />
-		</Center>
+		</LoadingContainer>
 	);
 }
+
+const LoadingContainer = styled.View`
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.4);
+`;

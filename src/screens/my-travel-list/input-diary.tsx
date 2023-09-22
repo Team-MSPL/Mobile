@@ -1,7 +1,6 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {Alert, Platform, TextInput, TouchableOpacity, Image} from 'react-native';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -12,6 +11,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgPicture} from '../../utill/svg/svg';
+import {VStack} from '../../utill/layout/layout';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -131,7 +131,7 @@ export const DiaryTextInput = styled.TextInput`
 	padding: 10px;
 `;
 const PictureCotainer = styled.View`
-	height: 180;
+	height: 180px;
 	width: 100%;
 	align-items: center;
 	margin: 15px 0px 15px 0px;

@@ -26,6 +26,7 @@ import GuestLogo from '../../../public/ic-guest.svg';
 import Call from '../../../public/call.svg';
 import Location from '../../../public/location.svg';
 import Infos from '../../../public/infos.svg';
+import Share from '../../../public/share.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -44,8 +45,9 @@ export const SvgCheck = styled(Check)<{color: string}>`
 export const SvgMap = styled(Map)<{color?: string}>`
 	color: color;
 `;
-export const SvgRight = styled(Right)<{color?: string}>`
+export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
 	color: color;
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SvgAirplain = styled(AirPlain)<{color?: string}>`
 	color: color;
@@ -105,5 +107,8 @@ export const SvgCall = styled(Call)<{color?: string}>`
 	color: color;
 `;
 export const SvgInfos = styled(Infos)<{color?: string}>`
+	color: color;
+`;
+export const SvgShare = styled(Share)<{color?: string}>`
 	color: color;
 `;

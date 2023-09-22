@@ -2,26 +2,32 @@ import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, us
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {Alert, Linking, TouchableOpacity, ScrollView} from 'react-native';
-import {Text, Box} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
 import {GOOGLE_API_KEY} from '@env';
-import {googleDetailApi, recommendApi, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	googleDetailApi,
+	recommendApi,
+	RecommendList,
+	TimetableType,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, MainText} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 export default function Recommend({navigation, route}: any) {
-	const {recommendList, timetable} = useAppSelector(state => state.travelSlice);
+	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
-
+	const [recommendList, setRcommendList] = useState<RecommendList[]>();
 	const polylineCoordinates = recommendItem
 		.map((item, value) => {
 			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
@@ -31,11 +37,11 @@ export default function Recommend({navigation, route}: any) {
 		})
 		.filter(items => items !== null);
 	const markers = recommendItem
-		.map((value, idx) => {
+		.map((value, index) => {
 			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
 				return (
 					<Marker
-						key={`marker_${idx}`}
+						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
 					/>
@@ -128,17 +134,28 @@ export default function Recommend({navigation, route}: any) {
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.navigate('Timetable');
 	};
-	const getRecommendList = () => {
+	const getRecommendList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			dispatch(
+			let result = await dispatch(
 				recommendApi({
 					category: route.params.apiCategory,
 					lat: route.params.lat,
 					lng: route.params.lng,
 					radius: route.params.radius,
 				}),
-			);
+			).unwrap();
+			if (result.length == 0) {
+				result = await dispatch(
+					recommendApi({
+						category: route.params.apiCategory,
+						lat: route.params.backupLat,
+						lng: route.params.backupLng,
+						radius: 20000,
+					}),
+				).unwrap();
+			}
+			setRcommendList(result);
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -149,16 +166,13 @@ export default function Recommend({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useEffect(() => {
+
+	useLayoutEffect(() => {
 		getRecommendList();
 	}, []);
 	const mapRef = useRef<MapView>(null);
-	if (!recommendList) {
-		return (
-			<Box>
-				<Text>추천 받는 주제에 좀 기다려 보삼 ㅋ </Text>
-			</Box>
-		);
+	if (!recommendList || isLoading) {
+		return <RecommendContainer></RecommendContainer>;
 	}
 	return (
 		<RecommendContainer>
@@ -177,12 +191,11 @@ export default function Recommend({navigation, route}: any) {
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
-						<ListHStack color={idx == select ? colors.selectButton : 'white'}>
+						<ListHStack color={idx == select ? colors.selectButton : 'white'} key={idx}>
 							<RecommendTouchableOpacity
 								onPress={() => {
 									changeRecommend(idx);
-								}}
-								key={idx}>
+								}}>
 								<RecommendElementText color={idx == select ? 'white' : 'black'}>
 									{item.place_name}
 								</RecommendElementText>
@@ -190,8 +203,7 @@ export default function Recommend({navigation, route}: any) {
 							<RecommendInfoTouchableOpacity
 								onPress={() => {
 									Linking.openURL(item.place_url);
-								}}
-								key={idx}>
+								}}>
 								<RecommendElementText color={idx == select ? 'white' : 'black'}>
 									정보
 								</RecommendElementText>

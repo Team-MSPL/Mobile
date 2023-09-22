@@ -291,19 +291,21 @@ export default function LoginScreen({navigation}: any) {
 								onPress={() => {
 									platform.onPress();
 								}}>
-								<HStack>
-									{platform.image}
+								<LogoHStack>
+									<LogoContainer>{platform.image}</LogoContainer>
 									<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
-										{platform.title} 아이디로 로그인
+										{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
 									</LogoText>
-								</HStack>
+								</LogoHStack>
 							</LongCircleButton>
 						))}
 						<LongCircleButton bgColor={colors.selectButton} onPress={goNext}>
-							<HStack>
-								<SvgGuest />
-								<LogoText color={'white'}>게스트로 로그인</LogoText>
-							</HStack>
+							<LogoHStack>
+								<LogoContainer>
+									<SvgGuest />
+								</LogoContainer>
+								<LogoText color={'white'}>로그인없이 앱 둘러보기</LogoText>
+							</LogoHStack>
 						</LongCircleButton>
 					</CircleContainer>
 					<HStack>
@@ -378,11 +380,20 @@ const LongCircleButton = styled(CircleButton)`
 	elevation: 3;
 	shadow-color: black;
 	shadow-opacity: 0.5;
+	align-items: center;
 `;
 const LogoText = styled.Text<{color: string}>`
 	font-size: 15px;
 	color: ${props => props.color};
 `;
-const LogoLeft = styled.View`
-	justify-content: start;
+const LogoContainer = styled.View`
+	position: absolute;
+	left: 10px;
+`;
+const LogoTextContainer = styled.View`
+	width: 80%;
+`;
+const LogoHStack = styled(HStack)`
+	width: 100%;
+	justify-content: center;
 `;

@@ -1,4 +1,4 @@
-import {Box, Text} from 'native-base';
+import moment from 'moment';
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
 import {BackHandler, Alert} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
@@ -11,6 +11,7 @@ import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
+import {DayButton, DayContainer, DayElementContainer, DaySubTitle, DayTitle} from './map-info';
 
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
@@ -104,6 +105,7 @@ export default function Preset({navigation}: any) {
 	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {
@@ -145,18 +147,27 @@ export default function Preset({navigation}: any) {
 				{polylines}
 			</MapView>
 			<PresetContainer>
-				{presetDatas.map((item, idx) => (
-					<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
-						<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
-					</PresetButton>
+				{presetDatas.map(
+					(item, idx) =>
+						item != null && (
+							<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
+								<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
+							</PresetButton>
+						),
 					// <SelectButton
 					// 	key={idx}
 					// 	label={idx + 1 + '번 후보'}
 					// 	bgColor={idx === select}
 					// 	onPress={() => change(idx)}></SelectButton>
-				))}
+				)}
 			</PresetContainer>
-			{/* {presetDatas[select].map((vava, inin) => vava.map((qwe, asd) => <Text key={asd}>{qwe.name}</Text>))} */}
+			{presetDatas[select].map((vava, inin) =>
+				vava.map((qwe, asd) => (
+					<InfoContainer key={asd}>
+						<ElementText>{qwe.name}</ElementText>
+					</InfoContainer>
+				)),
+			)}
 
 			<CustomButton label='코스 선택' width={40} onPress={goNext}></CustomButton>
 		</MainContainer>
@@ -169,7 +180,7 @@ const PresetContainer = styled.View`
 	flex-wrap: wrap;
 	width: 100%;
 `;
-const PresetButton = styled.TouchableOpacity<{select: boolean}>`
+export const PresetButton = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
 	border-radius: 20px;
 	padding: 10px;
@@ -186,4 +197,14 @@ const PresetMainText = styled(MainText)`
 const PresetSubText = styled(MainText)`
 	font-size: 15px;
 	margin: 0px 0px 10px 0px;
+`;
+const ElementText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+`;
+const InfoContainer = styled(DayElementContainer)`
+	padding: 10px;
+	margin: 10px 0px 10px 0px;
+	align-items: center;
 `;

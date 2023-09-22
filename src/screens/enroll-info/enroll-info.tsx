@@ -32,7 +32,7 @@ export default function EnrollInfo({navigation}: any) {
 			),
 		},
 		{
-			title: '여행 Ai',
+			title: '거리민감도',
 			component: (
 				<SelectDistance
 					navigation={navigation}

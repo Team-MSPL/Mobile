@@ -1,7 +1,4 @@
 import {useState} from 'react';
-import SelectAccommodation from '../../utill/component/templet/select-accommodation';
-import SelectEssential from '../../utill/component/templet/select-essential';
-import {Text, ScrollView, Spacer} from 'native-base';
 import CustomButton from '../../utill/component/custom-button';
 import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -85,7 +82,11 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 														) : (
 															<SvgHome color='white' />
 														)}
-														<ElementText>{value.title}</ElementText>
+														<ElementText>
+															{accommodations[idx + 1]?.name && index == 1
+																? '숙소 변경하기'
+																: value.title}
+														</ElementText>
 													</HStack>
 												</ElementContainer>
 											),

@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {Text, Box, ScrollView} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {TouchableOpacity, Image, Alert, Pressable, View} from 'react-native';
 import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
@@ -8,14 +7,15 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import ImageView from 'react-native-image-viewing';
 import styled from 'styled-components/native';
-import {HStack, MainText, VStack} from '../../utill/layout/layout';
+import {Center, HStack, MainText, VStack} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SvgApple, SvgCall, SvgLocation, SvgStart} from '../../utill/svg/svg';
+import {SvgApple, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<CourseDetailType>();
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
 	const [imageIndex, setImageIndex] = useState(0);
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const getDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -42,8 +42,8 @@ export default function CourseDetail({navigation, route}: any) {
 		{title: '리뷰', function: () => setTabView(1)},
 	];
 	const detailList = [
-		{title: courseDetail?.formatted_address, logo: <SvgLocation color={colors.regionNormal} />},
-		{title: courseDetail?.formatted_phone_number, logo: <SvgCall color={colors.regionNormal} />},
+		{title: courseDetail?.formatted_address ?? null, logo: <SvgLocation color={colors.regionNormal} />},
+		{title: courseDetail?.formatted_phone_number ?? null, logo: <SvgCall color={colors.regionNormal} />},
 	];
 	if (courseDetail?.name)
 		return (
@@ -76,7 +76,7 @@ export default function CourseDetail({navigation, route}: any) {
 							<RatingContainer>
 								<RatingHStack>
 									<SvgStart color={colors.selectButton} width={20} height={20} />
-									<RatingText>{courseDetail.rating ?? 'x'}</RatingText>
+									<RatingText>{courseDetail.rating ?? '0'}</RatingText>
 								</RatingHStack>
 							</RatingContainer>
 							<RatinInfoText>* 구글 검색 기준</RatinInfoText>
@@ -86,40 +86,65 @@ export default function CourseDetail({navigation, route}: any) {
 				<HStack>
 					{tabList.map((list, listIndex) => (
 						<TabTouchableOpacity
+							key={listIndex}
 							color={listIndex == tabView ? colors.selectButton : colors.regionNormal}
 							onPress={list.function}>
 							<TabText color={listIndex == tabView ? colors.selectButton : 'black'}>{list.title}</TabText>
 						</TabTouchableOpacity>
 					))}
 				</HStack>
-
-				{tabView == 0 ? (
-					<>
-						{detailList.map((detail, detailIndex) => {
-							detail.title != null && (
-								<DetailElementContainer>
-									<LogoContainer>{detail.logo}</LogoContainer>
-									<DetailText>{detail.title}</DetailText>
-								</DetailElementContainer>
-							);
-						})}
-						<DetailElementContainer>
-							<LogoContainer>
-								<SvgCall color={colors.regionNormal} />
-							</LogoContainer>
-							{courseDetail?.opening_hours.weekday_text.map(item => (
-								<DetailText>{item}</DetailText>
-							))}
-						</DetailElementContainer>
-					</>
-				) : (
-					<Text>ad</Text>
-				)}
-				{detailList.map((item, po) => (
-					<Text>{item.title}</Text>
-				))}
-				{courseDetail.reviews && courseDetail.reviews.map((item, idx) => <Text key={idx}>{item.text}</Text>)}
-
+				<TabScrollView>
+					{tabView == 0 ? (
+						<>
+							{detailList.map(
+								(detail, detailIndex) =>
+									detail.title != null && (
+										<DetailElementContainer key={detailIndex}>
+											<HStack>
+												<LogoContainer>{detail.logo}</LogoContainer>
+												<DetailText>{detail.title}</DetailText>
+											</HStack>
+										</DetailElementContainer>
+									),
+							)}
+							{courseDetail?.opening_hours?.weekday_text && (
+								<OpenContainer>
+									<HStack>
+										<LogoContainer>
+											<SvgInfos color={colors.regionNormal} />
+										</LogoContainer>
+										<OpenVStack>
+											{courseDetail?.opening_hours.weekday_text.map((item, itemIndex) => (
+												<DetailText key={itemIndex}>{item}</DetailText>
+											))}
+										</OpenVStack>
+									</HStack>
+								</OpenContainer>
+							)}
+						</>
+					) : (
+						<ReviewContainer>
+							{courseDetail.reviews ? (
+								courseDetail.reviews.map((item, idx) => (
+									<OpenContainer key={idx}>
+										<OpenVStack>
+											<ReviewTitleText>{item.author_name}</ReviewTitleText>
+											<ReviewElementText>{item.text}</ReviewElementText>
+										</OpenVStack>
+										<ReviewRating>
+											<SvgStart color={colors.selectButton} width={18} height={18} />
+											<ReviewText>{item.rating}</ReviewText>
+										</ReviewRating>
+									</OpenContainer>
+								))
+							) : (
+								<ReviewCenter>
+									<ReviewElementText>리뷰가 없습니다!</ReviewElementText>
+								</ReviewCenter>
+							)}
+						</ReviewContainer>
+					)}
+				</TabScrollView>
 				<ImageView
 					images={courseDetail.photos.map((value, index) => ({
 						uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
@@ -131,23 +156,24 @@ export default function CourseDetail({navigation, route}: any) {
 					FooterComponent={index => {
 						return (
 							<ImageViewFooterComponent>
-								<Text color='white'>
+								<ImageText>
 									{index.imageIndex + 1}/{courseDetail.photos.length}
-								</Text>
+								</ImageText>
 							</ImageViewFooterComponent>
 						);
 					}}
 				/>
 			</DetailContainer>
 		);
-	return (
-		<Box>
-			<Text>qwe</Text>
-		</Box>
-	);
+	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
 
-const TabScrollView = styled.ScrollView``;
+const NullContainer = styled(Center)`
+	flex: 1;
+`;
+const TabScrollView = styled.ScrollView`
+	height: 50%;
+`;
 const TitleInfoContainer = styled.View`
 	background-color: white;
 	padding: 2%;
@@ -155,6 +181,7 @@ const TitleInfoContainer = styled.View`
 
 const DetailContainer = styled.View`
 	background-color: white;
+	flex: 1;
 `;
 const DetailInfoContainer = styled(HStack)`
 	justify-content: space-between;
@@ -216,4 +243,44 @@ const DetailText = styled.Text`
 `;
 const LogoContainer = styled.View`
 	width: 20%;
+`;
+
+const OpenContainer = styled(HStack)`
+	align-items: center;
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.regionNormal};
+	padding: 5%;
+`;
+const OpenVStack = styled.View`
+	width: 80%;
+`;
+const ReviewRating = styled.View`
+	width: 20%;
+	align-items: center;
+	justify-content: center;
+	flex-direction: row;
+`;
+const ReviewText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+
+const ReviewContainer = styled.View``;
+const ReviewTitleText = styled.Text`
+	font-size: 20px;
+	font-weight: 900;
+	color: black;
+	margin: 0% 0% 1% 0%;
+`;
+const ReviewElementText = styled.Text`
+	font-size: 16px;
+	font-weight: 600;
+	color: black;
+`;
+const ImageText = styled(ReviewElementText)`
+	color: white;
+`;
+const ReviewCenter = styled(Center)`
+	height: 100px;
 `;

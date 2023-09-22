@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Image, Text, Box} from 'native-base';
 import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -69,6 +68,9 @@ export default function MoreInfo({navigation}: any) {
 	const handleInquire = () => {
 		dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}));
 	};
+	const goLogin = () => {
+		navigation.replace('LoginScreen');
+	};
 	const useInfo = [
 		{title: '공지사항', function: () => console.log('qwe')},
 		{title: '도움말', function: () => console.log('qwe')},
@@ -86,24 +88,31 @@ export default function MoreInfo({navigation}: any) {
 				<ProfileNameText>
 					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
 				</ProfileNameText>
-				<ProfileChangeContainer onPress={changeInfo}>
-					<ProfileChangeText>프로필 편집</ProfileChangeText>
-				</ProfileChangeContainer>
+				{socialloginProvider != 'anonymous' && (
+					<ProfileChangeContainer onPress={changeInfo}>
+						<ProfileChangeText>프로필 편집</ProfileChangeText>
+					</ProfileChangeContainer>
+				)}
 			</ProfileContainer>
-			<ProfileDivider />
-			<SettingContainer>
-				<TitleText>계정</TitleText>
-				<SettingElement
-					onPress={() => {
-						console.log('노노');
-					}}>
-					<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
-				</SettingElement>
-				<SettingElement onPress={goPayment}>
-					<SettingElementText>토큰 구매하기</SettingElementText>
-				</SettingElement>
-			</SettingContainer>
 
+			{/* {socialloginProvider != 'anonymous' && (
+				<>
+					<ProfileDivider />
+					<SettingContainer>
+						<TitleText>계정</TitleText>
+						<SettingElement
+							onPress={() => {
+								console.log('노노');
+							}}>
+							<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
+						</SettingElement>
+
+						<SettingElement onPress={goPayment}>
+							<SettingElementText>토큰 구매하기</SettingElementText>
+						</SettingElement>
+					</SettingContainer>
+				</>
+			)} */}
 			<ProfileDivider />
 			<SettingContainer>
 				<TitleText>이용안내</TitleText>
@@ -115,31 +124,47 @@ export default function MoreInfo({navigation}: any) {
 			</SettingContainer>
 			<ProfileDivider />
 			<SettingContainer>
-				<Text>앱버전 0.0</Text>
-				<SettingElement
-					onPress={() => {
-						dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '로그 아웃 하시겠습니까?',
-								modalFunction: goLogout,
-								modalLeft: true,
-							}),
-						);
-					}}>
-					<LogoutText>로그아웃</LogoutText>
-				</SettingElement>
-				{socialloginProvider != 'anonymous' && (
+				<TitleText>앱버전 0.0</TitleText>
+				{socialloginProvider != 'anonymous' ? (
+					<>
+						<SettingElement
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '로그 아웃 하시겠습니까?',
+										modalFunction: goLogout,
+										modalLeft: true,
+									}),
+								);
+							}}>
+							<LogoutText>로그아웃</LogoutText>
+						</SettingElement>
+
+						<SettingElement
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '회원 탈퇴 하시겠습니까?',
+										modalFunction: goWithdraw,
+										modalLeft: true,
+									}),
+								);
+							}}>
+							<LogoutText>회원탈퇴</LogoutText>
+						</SettingElement>
+					</>
+				) : (
 					<SettingElement
 						onPress={() => {
 							dispatch(
 								modalSliceActions.setOpenModal({
-									modalTitle: '회원 탈퇴 하시겠습니까?',
-									modalFunction: goWithdraw,
+									modalTitle: '로그인 페이지로 이동하시겠습니까?',
+									modalFunction: goLogin,
 									modalLeft: true,
 								}),
 							);
 						}}>
-						<LogoutText>회원탈퇴</LogoutText>
+						<LogoutText>로그인</LogoutText>
 					</SettingElement>
 				)}
 			</SettingContainer>

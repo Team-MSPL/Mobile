@@ -1,12 +1,24 @@
 import {useState, useRef} from 'react';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {TouchableOpacity, Image} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Alert} from 'react-native';
+import {Alert, View} from 'react-native';
+import styled from 'styled-components/native';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {colors} from '../../utill/colors';
+import {
+	ASD,
+	DayPressable,
+	TimeContainer,
+	TimeItemContainer,
+	TimeItemText,
+	TimeStepText,
+} from '../enroll-info/select-day';
+import {Center, HStack, MainContainer} from '../../utill/layout/layout';
+import CustomButton from '../../utill/component/custom-button';
+import {DayButton, DayContainer, DaySubTitle, DayTitle} from './map-info';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -22,6 +34,8 @@ export default function Modify({navigation, route}: any) {
 	const onCancel = () => {
 		setVisible(false);
 	};
+
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const startTime = useRef({
 		hours: Math.floor((route.params.item.value.y * 30 + 360) / 60),
 		minute: (((route.params.item.value.y * 30 + 360) / 60) % 1) * 60,
@@ -30,6 +44,28 @@ export default function Modify({navigation, route}: any) {
 		hours: Math.floor(((route.params.item.value.y + route.params.item.value.takenTime / 30) * 30 + 360) / 60),
 		minute: ((((route.params.item.value.y + route.params.item.value.takenTime / 30) * 30 + 360) / 60) % 1) * 60,
 	});
+	const DaySelectInfoList = [
+		{
+			step: 'Start',
+			title: '시작 시간',
+			hours: startTime.current.hours,
+			minute: startTime.current.minute,
+			function: () => {
+				flag.current = true;
+				setVisible(true);
+			},
+		},
+		{
+			step: 'End',
+			title: '종료 시간',
+			hours: endTime.current.hours,
+			minute: endTime.current.minute,
+			function: () => {
+				flag.current = false;
+				setVisible(true);
+			},
+		},
+	];
 	const flag = useRef(false);
 	const goModify = () => {
 		const newY = (startTime.current.hours * 60 - 360) / 30 + startTime.current.minute / 30;
@@ -76,44 +112,44 @@ export default function Modify({navigation, route}: any) {
 	};
 
 	return (
-		<ScrollView>
-			<Text>{route.params.item.value.name}</Text>
-			{[...Array(nDay + 1)].map((item, idx) => (
-				<TouchableOpacity
-					key={idx}
-					style={{height: 100, alignItems: 'center'}}
-					onPress={() => {
-						setChangeDay(idx);
-					}}>
-					<Text>{visible ? 'dd' : 'ww'}</Text>
-					<Text>날짜도 바꿔볼랭?</Text>
-					<Text>{moment(day[idx]).format('YY-MM-DD')}눌러서 수정 ㄱ</Text>
-				</TouchableOpacity>
-			))}
-
-			<TouchableOpacity
-				style={{height: 100, alignItems: 'center'}}
-				onPress={() => {
-					flag.current = true;
-					setVisible(true);
-				}}>
-				<Text>{visible ? 'dd' : 'ww'}</Text>
-				<Text>
-					앞에 시간 {startTime.current.hours}시 {startTime.current.minute}
-				</Text>
-				<Text>눌러서 수정 ㄱ</Text>
-			</TouchableOpacity>
-			<TouchableOpacity
-				style={{height: 100, alignItems: 'center'}}
-				onPress={() => {
-					flag.current = false;
-					setVisible(true);
-				}}>
-				<Text>
-					뒤에 시간 {endTime.current.hours}시 {endTime.current.minute}
-				</Text>
-				<Text>눌러서 수정 ㄱ</Text>
-			</TouchableOpacity>
+		<MainContainer>
+			<Center>
+				<TimeItemText>{route.params.item.value.name}</TimeItemText>
+			</Center>
+			<DayContainer>
+				{[...Array(nDay + 1)].map((item, idx) => (
+					<DayButton
+						key={idx}
+						select={idx === changeDay}
+						onPress={() => {
+							setChangeDay(idx);
+						}}>
+						<DayTitle select={idx === changeDay}>{idx + 1 + '일차'}</DayTitle>
+						<DaySubTitle select={idx === changeDay}>
+							{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+						</DaySubTitle>
+					</DayButton>
+				))}
+			</DayContainer>
+			<TimeContainer>
+				<ASD>
+					{DaySelectInfoList.map((item, idx) => (
+						<>
+							<TimeItemContainer key={idx}>
+								<TimeStepText>{item.step}</TimeStepText>
+								<TimeItemText>{item.title}</TimeItemText>
+								<HStack>
+									<DayElementContainer onPress={item.function}>
+										<TimeItemText>
+											{String(item.hours).padStart(2, '0')}:{String(item.minute).padStart(2, '0')}
+										</TimeItemText>
+									</DayElementContainer>
+								</HStack>
+							</TimeItemContainer>
+						</>
+					))}
+				</ASD>
+			</TimeContainer>
 			<DatePicker
 				modal
 				open={visible}
@@ -130,10 +166,10 @@ export default function Modify({navigation, route}: any) {
 				cancelText='취소'
 				confirmText='확인'
 			/>
-
-			<TouchableOpacity onPress={goModify}>
-				<Text>수정이요</Text>
-			</TouchableOpacity>
-		</ScrollView>
+			<CustomButton label='수정하기' onPress={goModify}></CustomButton>
+		</MainContainer>
 	);
 }
+const DayElementContainer = styled(DayPressable)`
+	width: 80%;
+`;

@@ -5,7 +5,6 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
-import {Text} from 'native-base';
 import {HStack, VStack, Divider, MainContainer} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -121,7 +120,7 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 				<>
 					{onSearch ? (
 						<SearchAndChoice onPress={changeShow}>
-							<Text>{`ex)제주도`}</Text>
+							<SelectRegionInfo>{`ex)제주도`}</SelectRegionInfo>
 						</SearchAndChoice>
 					) : (
 						<VStack>
@@ -132,9 +131,15 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 									onChangeText={(text: string) => changeSearch(text)}
 									placeholder='ex)제주도'></SearchInput>
 								<TouchableOpacity onPress={changeShow}>
-									<Text>취소</Text>
+									<SelectRegionInfo>취소</SelectRegionInfo>
 								</TouchableOpacity>
 							</HStack>
+							{searchData && (
+								<TouchableOpacity onPress={addCity}>
+									<SelectRegion>{searchData?.title}</SelectRegion>
+								</TouchableOpacity>
+							)}
+
 							<RegionViewContainer>
 								<RegionItemContainer>
 									<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
@@ -207,9 +212,7 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 						value={search}
 						onChangeText={(text: string) => changeSearch(text)}
 						placeholder='ex)제주도'></SearchInput> */}
-					<TouchableOpacity onPress={addCity}>
-						<Text>{searchData && searchData?.title}</Text>
-					</TouchableOpacity>
+
 					<VStack>
 						{/* <HStack>
 							<RegionViewContainer>
@@ -255,15 +258,15 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 							<HStack>
 								<SelectRegion>선택 지역</SelectRegion>
 								<SelectRegionInfo>최대 15개 까지 선택할 수 있어요</SelectRegionInfo>
-								<Text color='black' bold ml='3'>
-									{region?.length}개
-								</Text>
+								<SelectRegion>{region?.length}개</SelectRegion>
 							</HStack>
 							<SelectListContainer>
 								{region?.map((item, regionIndex) => {
 									return (
 										<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
-											<RegionElementContainerText>{item}</RegionElementContainerText>
+											<RegionElementContainerText>
+												{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
+											</RegionElementContainerText>
 											<SvgCancel color='white' />
 										</RegionElementContainer>
 									);
@@ -287,7 +290,7 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 							onPress={() => {
 								handlePopularity(value);
 							}}>
-							<Text>{item.title}</Text>
+							<SelectRegion>{item.title}</SelectRegion>
 						</TouchableOpacity>
 					))}
 				</>
@@ -359,6 +362,7 @@ const SelectRegionInfo = styled.Text`
 	font-size: 14px;
 	color: grey;
 	font-weight: bold;
+	margin: 0% 1% 0% 0%;
 `;
 const SelectListAllContainer = styled.View`
 	width: 100%;

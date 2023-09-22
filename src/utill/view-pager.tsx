@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Box, Center, Image, Text} from 'native-base';
-import React from 'react';
+import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {WithLocalSvg} from 'react-native-svg';
+import styled from 'styled-components/native';
 import {useAppDispatch} from '../redux';
 import {userSliceActions} from '../redux/user/user.slice';
 export default function ViewPager() {
@@ -11,15 +12,20 @@ export default function ViewPager() {
 		dispatch(userSliceActions.setIsFirstLaunch('false'));
 		await AsyncStorage.setItem('isFirstLaunch', 'true');
 	};
+	const [page, setPage] = useState(0);
 	return (
-		<Center position='absolute' display='flex' bgColor='rgba(0, 0, 0, 0.4)' w='100%' h='100%'>
-			<Text>ㅋㅋㅋㅋ 우리앱 첨이네 ㅋㅋ</Text>
-			<Text bold fontSize='lg'>
-				앱 쓰고싶으면 국민 950002-00-241241 로 100,000원 보내세요
-			</Text>
+		<ViewPagerContainer>
 			<TouchableOpacity style={{backgroundColor: 'orange'}} onPress={handleFirstLaunch}>
 				<Text>보냈습니당~!!!! </Text>
 			</TouchableOpacity>
-		</Center>
+		</ViewPagerContainer>
 	);
 }
+const ViewPagerContainer = styled.View`
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.4);
+`;

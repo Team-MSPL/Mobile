@@ -12,6 +12,11 @@ export default function LoadingTimetable({navigation}: any) {
 		{title: '맞춤 성향 분석 중 ✍', image: 'http://danim.me/shin.jpeg'},
 	];
 	useEffect(() => {
+		navigation.setOptions({
+			headerBackVisible: false,
+		});
+	});
+	useEffect(() => {
 		var a = 0;
 		const interval = setInterval(() => {
 			console.log('네네네네');
