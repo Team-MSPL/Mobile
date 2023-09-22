@@ -17,7 +17,6 @@ import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {HStack} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
-HEAD;
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -231,7 +230,7 @@ export default function LoginScreen({navigation}: any) {
 	const platforms = [
 		{title: 'Google', color: 'white', image: <SvgGoogle />, onPress: googleLogin},
 		{title: 'Kakao', color: colors.reviewBackground, image: <SvgKakao />, onPress: kakaoLogin},
-		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: kakaoLogin},
+		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
 	const [view, setView] = useState(0);

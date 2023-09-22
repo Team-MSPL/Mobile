@@ -10,8 +10,8 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		let season = Array(4).fill(0);
-		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		const season = Array(4).fill(0);
+		const index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
@@ -72,58 +72,90 @@ export default function Main({navigation}: any) {
 						</VStack>
 						<Icon name={'pluscircle'} size={20} color={'white'} />
 					</NewTravelButton>
-					<NewTravelButton>
+				</ButtonContainer>
+				<AloneRecommendButtonContainer>
+					<NewTravelAloneButton>
 						<VStack>
-							<ButtonText>{userName}님, 자유롭게 짜고 싶나요?</ButtonText>
+							<ButtonText>자유롭게 짜고 싶나요?</ButtonText>
 							<ButtonBoldText>혼자 만들어보기</ButtonBoldText>
 						</VStack>
-						<Icon name={'pluscircle'} size={20} color={'white'} />
-					</NewTravelButton>
-					<NewTravelButton onPress={regionRecommend}>
+					</NewTravelAloneButton>
+					<TravelRecommendButton onPress={regionRecommend}>
 						<VStack>
-							<ButtonText>어디로 가실지 고민 중이신가요?</ButtonText>
+							<ButtonText>여행지를 추천해드려요</ButtonText>
 							<ButtonBoldText>지역 추천 받기</ButtonBoldText>
 						</VStack>
-						<Icon name={'pluscircle'} size={20} color={'white'} />
-					</NewTravelButton>
-				</ButtonContainer>
+					</TravelRecommendButton>
+				</AloneRecommendButtonContainer>
+
 				<CollectionContainer>
-					<VStack>
-						<CollectionTitle>I들이 조용히 머물 수 있는 곳</CollectionTitle>
-						<CollectionSubtitle>숲과 바다를 감상할 수 있는 사색명소</CollectionSubtitle>
-						<CollectionContentContainer>
-							{viewList.map(item => (
-								<CollectionContentItem key={item.id}>
-									<CollectionContentItemImage source={{uri: item.url}} />
-									<CollectionContentItemText>{item.title}</CollectionContentItemText>
-								</CollectionContentItem>
-							))}
-						</CollectionContentContainer>
-					</VStack>
-				</CollectionContainer>
-				<CollectionContainer>
-					<VStack>
-						<CollectionTitle>E들이 조용히 머물 수 있는 곳</CollectionTitle>
-						<CollectionSubtitle>숲과 바다를 감상할 수 있는 사색명소</CollectionSubtitle>
-						<CollectionContentContainer>
-							{viewList.map(item => (
-								<CollectionContentItem key={item.id}>
-									<CollectionContentItemImage source={{uri: item.url}} />
-									<CollectionContentItemText>{item.title}</CollectionContentItemText>
-								</CollectionContentItem>
-							))}
-						</CollectionContentContainer>
-					</VStack>
+					<CollectionTitle>다님이 추천하는 이색 여행지</CollectionTitle>
+					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
+					<CollectionContentContainer>
+						{uniqueTravelList.map(item => (
+							<CollectionContentItem key={item.id}>
+								<CollectionContentItemImage source={item.imagePath} />
+								<CollectionContentItemText>{item.title}</CollectionContentItemText>
+								<CollectionContentItemHashtag>
+									<CollectionContentItemHashtagText>{item.hashtag}</CollectionContentItemHashtagText>
+								</CollectionContentItemHashtag>
+							</CollectionContentItem>
+						))}
+					</CollectionContentContainer>
 				</CollectionContainer>
 			</MainContainer>
 		</SafeAreaView>
 	);
 }
-const viewList = [
-	{id: 0, url: 'https://www.w3schools.com/css/img_lights.jpg', title: '제주,빛의벙커'},
-	{id: 1, url: 'https://wallpaperaccess.com/full/317501.jpg', title: '만장굴'},
-	{id: 2, url: 'https://www.w3schools.com/css/img_lights.jpg', title: '넥슨박물관'},
-	{id: 3, url: 'https://www.w3schools.com/css/img_lights.jpg', title: '아몰라'},
+const uniqueTravelList = [
+	{
+		id: 0,
+		imagePath: require('../../../public/images/uniqueTravelImage/danyang.jpeg'),
+		title: '단양 패러글라이딩',
+		hashtag: '#레저스포츠',
+	},
+	{
+		id: 1,
+		imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
+		title: '대전 성심당',
+		hashtag: '#맛있는',
+	},
+	{
+		id: 2,
+		imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
+		title: '동해 목포항',
+		hashtag: '#바다',
+	},
+	{
+		id: 3,
+		imagePath: require('../../../public/images/uniqueTravelImage/sejong.jpeg'),
+		title: '세종 고복자연공원',
+		hashtag: '#공원',
+	},
+	{
+		id: 4,
+		imagePath: require('../../../public/images/uniqueTravelImage/asan.jpeg'),
+		title: '아산 지중해마을',
+		hashtag: '#시티투어',
+	},
+	{
+		id: 5,
+		imagePath: require('../../../public/images/uniqueTravelImage/osan.jpeg'),
+		title: '오산 반려동물테마파크',
+		hashtag: '#반려견',
+	},
+	{
+		id: 6,
+		imagePath: require('../../../public/images/uniqueTravelImage/jangsu.jpeg'),
+		title: '장수 의암주논개생가지',
+		hashtag: '#유적지',
+	},
+	{
+		id: 7,
+		imagePath: require('../../../public/images/uniqueTravelImage/chungdo.jpeg'),
+		title: '청도 프로방스',
+		hashtag: '#이색체험',
+	},
 ];
 
 const SafeAreaView = styled.SafeAreaView`
@@ -134,7 +166,7 @@ const ButtonContainer = styled.View`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 400px;
+	height: 120px;
 `;
 
 const NewTravelButton = styled.TouchableOpacity`
@@ -144,6 +176,34 @@ const NewTravelButton = styled.TouchableOpacity`
 	margin-bottom: 10px;
 	border-radius: 24px;
 	background-color: ${colors.selectButton};
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+`;
+
+const AloneRecommendButtonContainer = styled.View`
+	flex-direction: row;
+	justify-content: space-between;
+	height: 150px;
+`;
+const NewTravelAloneButton = styled.TouchableOpacity`
+	width: 48%;
+	height: 100px;
+	padding: 6%;
+	margin-bottom: 10px;
+	border-radius: 24px;
+	background-color: #ff6b6b;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+`;
+const TravelRecommendButton = styled.TouchableOpacity`
+	width: 48%;
+	height: 100px;
+	padding: 6%;
+	margin-bottom: 10px;
+	border-radius: 24px;
+	background-color: #77dd77;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
@@ -159,39 +219,51 @@ const ButtonBoldText = styled.Text`
 `;
 
 const CollectionContainer = styled.View`
-	padding-horizontal: 24px;
-	padding-vertical: 27px;
 	margin-bottom: 12px;
-	border-radius: 20px;
-	border: ${colors.border};
-	height: 500px;
 `;
 const CollectionTitle = styled.Text`
 	font-size: 18px;
 	font-weight: bold;
+	margin-bottom: 4px;
 `;
 const CollectionSubtitle = styled.Text`
 	font-size: 14px;
 	margin-bottom: 12px;
 `;
 const CollectionContentContainer = styled.View`
+	align-items: center;
+	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: space-between;
 `;
 const CollectionContentItem = styled.View`
-	width: 48%;
-	aspect-ratio: 1;
-	margin-bottom: 24px;
+	width: 120px;
+	height: 160px;
+	margin: 12px;
 	border-radius: 12px;
 	align-items: center;
+	justify-content: center;
 `;
 const CollectionContentItemImage = styled.Image`
-	width: 100%;
-	height: 100%;
+	width: 120px;
+	height: 120;
 	border-radius: 12px;
 	margin-bottom: 4px;
 `;
 const CollectionContentItemText = styled.Text`
 	font-size: 12px;
+`;
+
+const CollectionContentItemHashtag = styled.View`
+	width: 80px;
+	height: 32px;
+	border-radius: 12px;
+	padding: 8px;
+	align-items: center;
+	justify-content: center;
+	background-color: #2698fa9f;
+`;
+const CollectionContentItemHashtagText = styled.Text`
+	font-size: 12px;
+	color: ${colors.main};
 `;
