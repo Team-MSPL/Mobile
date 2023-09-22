@@ -3,7 +3,6 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {BackHandler, Dimensions} from 'react-native';
-import {Text, Box, Center} from 'native-base';
 import Slider from '@react-native-community/slider';
 import {MainContainer, VStack, Divider} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -64,7 +63,11 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 							setRange(item);
 						}}
 					/>
-					<DistanceExplain>민감도가 높으면, 성향과는 조금 멀어질 수 있어요</DistanceExplain>
+					<DistanceExplain>
+						{range >= 5
+							? '민감도가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
+							: '민감도가 낮으면, 성향과는 조금 멀어질 수 있어요'}
+					</DistanceExplain>
 				</DistanceExplainContainer>
 				<CustomButton label='결과 확인' onPress={goNext}></CustomButton>
 			</VStack>
@@ -78,7 +81,7 @@ const DistanceExplainContainer = styled.View`
 	align-items: center;
 `;
 
-const DistanceExplain = styled.Text`
+export const DistanceExplain = styled.Text`
 	font-size: 14px;
 	font-weight: bold;
 	color: black;

@@ -2,13 +2,14 @@ import {MutableRefObject, useRef, useState} from 'react';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {googleDetailApi, PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Box} from 'native-base';
+
 import shortId from 'shortid';
 import {GOOGLE_API_KEY} from '@env';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {HStack, VStack} from '../../utill/layout/layout';
 import {TouchableOpacity} from 'react-native';
+import {SvgLoginLogo} from '../../utill/svg/svg';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
@@ -61,19 +62,26 @@ export default function SearchPlace({navigation, route}: any) {
 			<SearchPlaceSecondText>{SearchList[route.params.id].subTitle}</SearchPlaceSecondText>
 			{placeState && (
 				<SearchPlaceElement>
-					<SearchPlaceImage
-						source={{
-							uri: placeState.photo,
-						}}
-						alt='Place Image'
-					/>
-					<VStack>
+					{placeState.photo != null ? (
+						<SearchPlaceImage
+							source={{
+								uri: placeState.photo,
+							}}
+							alt='Place Image'
+						/>
+					) : (
+						<DefalutLogoContainer>
+							<SvgLoginLogo width={80} height={80} color='white' />
+						</DefalutLogoContainer>
+					)}
+
+					<SearchTextContainer>
 						<SearchPlaceElementText>{placeState.name}</SearchPlaceElementText>
 						<SearchPlaceElementText>{placeState.formatted_address}</SearchPlaceElementText>
-					</VStack>
+					</SearchTextContainer>
 					<SearchClearContainer>
 						<TouchableOpacity onPress={addPlace}>
-							<SearchClearButton>추가</SearchClearButton>
+							<SearchClearButton>선택</SearchClearButton>
 						</TouchableOpacity>
 					</SearchClearContainer>
 				</SearchPlaceElement>
@@ -100,8 +108,7 @@ export default function SearchPlace({navigation, route}: any) {
 						const photoReference = response.payload.result?.photos[0]?.photo_reference;
 						imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_API_KEY}`;
 					} else {
-						imageUrl =
-							'https://ssl.pstatic.net/melona/libs/1458/1458328/a3d169ecc295102274f4_20230718175149113.jpg';
+						imageUrl = null;
 					}
 					console.log('하이유', details);
 					const datas = {
@@ -133,12 +140,21 @@ export default function SearchPlace({navigation, route}: any) {
 const SearchPlaceElement = styled(HStack)`
 	align-items: center;
 	margin: 10px 0px 10px 0px;
+	width: 100%;
 `;
 
 const SearchPlaceImage = styled.Image`
 	width: 100px;
 	height: 100px;
 	border-radius: 10px;
+`;
+export const DefalutLogoContainer = styled.View`
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	background-color: ${colors.regionNormal};
+	align-items: center;
+	justify-content: center;
 `;
 const SearchPlaceContainer = styled.View`
 	width: 100%;
@@ -175,4 +191,8 @@ const SearchClearContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	margin: 0px 10px 0px 0px;
+	width: 20%;
+`;
+const SearchTextContainer = styled(VStack)`
+	width: 50%;
 `;

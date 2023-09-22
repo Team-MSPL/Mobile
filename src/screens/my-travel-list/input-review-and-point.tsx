@@ -11,7 +11,6 @@ import {
 } from '../../redux/travel-info/travel.slice';
 import shortId from 'shortid';
 import {Alert, TouchableOpacity, Image, TextInput, View} from 'react-native';
-import {Text} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';

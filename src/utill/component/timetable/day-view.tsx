@@ -6,6 +6,7 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {HStack} from '../../layout/layout';
 import {colors} from '../../colors';
+import {SvgRight} from '../../svg/svg';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
@@ -29,11 +30,11 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 		<DayViewContainer>
 			<TimetableDayContainer>
 				<TouchableOpacity disabled={viewDayIndex == 0} onPress={goLeft}>
-					<DayText>왼쪽 </DayText>
+					<SvgRight color={'white'} transform={180} />
 				</TouchableOpacity>
 				<DayText>{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}</DayText>
 				<TouchableOpacity disabled={viewDayIndex + 5 > nDay} onPress={goRight}>
-					<DayText>오른쪽 </DayText>
+					<SvgRight color={'white'} />
 				</TouchableOpacity>
 			</TimetableDayContainer>
 			<DayHStack>
@@ -81,7 +82,7 @@ const DayHStack = styled(HStack)`
 `;
 const DayTouchableOpacity = styled.TouchableOpacity`
 	flex: 0.18;
-	height: 70;
+	height: 70px;
 	align-items: center;
 	justify-content: center;
 `;

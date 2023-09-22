@@ -33,7 +33,6 @@ const initialState: LiteState = {
 	moveTimeList: [], // 이동시간
 	courseDetail: {name: '', rating: 0, editorial_summary: {overview: '', language: ''}, photos: [], reviews: []}, //관광지 정보볼때쓰는거
 	editMode: '', // 삭제모드=delete, 추가모드=add
-	recommendList: [], //추천할때 쓰이는 리스트
 	makeMode: 'solo', //true=추천모드, fasle==혼자짤래요    추천,혼자,수정,친구 recommend, solo, modify,share
 	//----------------------------------------------------
 	myTravelList: [],
@@ -153,6 +152,7 @@ export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: r
 export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType) => {
 	try {
 		const response = await axiosAuth.post(`/ai/run`, data);
+		console.log(response, '애ㅔ애ㅔ에ㅔㅔㅔㅔ');
 		return response.data;
 	} catch (error) {
 		console.log(error);
@@ -206,8 +206,9 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
-			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
+		console.log(a);
 		//제로리절트 처리하기
 		return a.data.result;
 	} catch (error) {
@@ -427,9 +428,6 @@ export const travelSlice = createSlice({
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
 		});
-		builder.addCase(recommendApi.fulfilled, (state, {payload}) => {
-			state.recommendList = payload;
-		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
 			state.presetDatas = payload.data.resultData;
 		});
@@ -483,7 +481,6 @@ interface LiteState {
 	moveTimeList: number[][] | [];
 	courseDetail: CourseDetailType;
 	editMode: string;
-	recommendList: RecommendList[];
 	makeMode: MakeModeType;
 	//----------------------------------------
 	myTravelList: myTravelListType[];
@@ -537,8 +534,14 @@ export interface CourseDetailType {
 	reviews: Reviews[];
 	photos: Photos[];
 	editorial_summary: EditorialSummary;
+	formatted_phone_number: string;
+	opening_hours: OpeninHoursType;
+	formatted_address: string;
 }
-
+export interface OpeninHoursType {
+	open_now: boolean;
+	weekday_text: string[];
+}
 export interface SaveTravelType {
 	userId: string;
 	region: string[];
@@ -574,7 +577,7 @@ interface EditorialSummary {
 	overview: string;
 }
 
-interface RecommendList {
+export interface RecommendList {
 	address_name: string;
 	category_group_code: string;
 	category_group_name: string;

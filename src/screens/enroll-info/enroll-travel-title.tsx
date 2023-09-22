@@ -1,18 +1,20 @@
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {useState} from 'react';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [textValue, setTextValue] = useState('');
+	const {makeMode} = useAppSelector(state => state.travelSlice);
 	const changeTextValue = (e: string) => {
 		setTextValue(e);
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		navigation.navigate('EnrollInfo');
+		console.log(makeMode);
+		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('EnrollInfo');
 	};
 	return (
 		<EnrollTravelTitleContainer>
@@ -33,6 +35,9 @@ const TravelTitleTextInput = styled.TextInput`
 	border-width: 1px;
 	border-color: ${colors.selectButton};
 	margin: 15px 0px 15px 0px;
+	padding: 10px;
+	font-weight: bold;
+	font-size: 22px;
 `;
 const EnrollTravelTitleContainer = styled.View`
 	width: 100%;

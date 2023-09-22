@@ -29,7 +29,7 @@ export default function AccessDialog({type, open, onClose, onRequestAgain, onOpe
 						</Btn>
 					) : (
 						<Btn onPress={onRequestAgain}>
-							<SubText>권한재요청</SubText>
+							<SubText>권한 재요청</SubText>
 						</Btn>
 					)}
 				</BtnSection>
@@ -55,9 +55,12 @@ const Btn = styled.TouchableOpacity`
 `;
 const MainText = styled.Text`
 	font-weight: 700;
+	color: black;
 `;
 const SubText = styled.Text`
 	font-weight: 500;
+	line-height: 30;
+	color: black;
 `;
 interface AccessDialogProps {
 	type: 'denied' | 'blocked';

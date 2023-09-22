@@ -2,8 +2,13 @@ import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import SelectButton from '../../../utill/component/select-button';
-import {Text, Box, ScrollView, VStack, HStack, Divider, Button} from 'native-base';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import {FlexWrap, MainContainer, HStack, VStack} from '../../../utill/layout/layout';
+import StepText from '../../../utill/component/enroll-info/step-text';
+import {TendencyStepText, TendencyText, TendencyContainer} from '../select-tendency';
+import TendencyButton from '../../../utill/component/tendency-button';
+import {SvgCheck} from '../../../utill/svg/svg';
+import {colors} from '../../../utill/colors';
 
 export default function SelectTendency({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -32,40 +37,73 @@ export default function SelectTendency({navigation}: any) {
 	};
 
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
-			{/* 스테퍼 넣기 */}
-			<VStack space='5'>
-				<Text fontSize='2xl' bold color='black'>
-					추천 성향 설정
-				</Text>
-				<Text fontSize='md' color='grey'>
-					어떤 스타일의 여행을 원하는가요?
-				</Text>
-				<Divider my='1' />
+		<MainContainer showsVerticalScrollIndicator={false}>
+			<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
+			<VStack>
 				{tendencyList.map((item, index) => {
 					return (
-						<Box key={index}>
-							<Text fontSize='lg' bold>
-								{item.title}
-							</Text>
-							<Box flexDir='row' flexWrap='wrap'>
+						<TendencyContainer key={index}>
+							<TendencyStepText>Step {index + 1}</TendencyStepText>
+							<TendencyText>{item.title}</TendencyText>
+							<FlexWrap>
 								{item.list.map((data, idx) => {
 									return (
-										<SelectButton
-											key={idx}
-											label={data}
-											onPress={() => selectData({index, idx})}
-											bgColor={select[index][idx]}></SelectButton>
+										<HStack key={idx}>
+											<SvgCheck
+												color={
+													select[index][idx] == 1 ? colors.selectButton : colors.regionNormal
+												}
+											/>
+											<TendencyButton
+												key={idx}
+												label={data}
+												onPress={() => selectData({index, idx})}
+												bgColor={select[index][idx] == 1}></TendencyButton>
+										</HStack>
 									);
 								})}
-							</Box>
-						</Box>
+							</FlexWrap>
+						</TendencyContainer>
 					);
 				})}
 
-				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+				<CustomButton label={'다음 '} onPress={goNext}></CustomButton>
 			</VStack>
-		</ScrollView>
+		</MainContainer>
+		// <ScrollView bgColor='#EFFBFB' p='2'>
+		// 	{/* 스테퍼 넣기 */}
+		// 	<VStack space='5'>
+		// 		<Text fontSize='2xl' bold color='black'>
+		// 			추천 성향 설정
+		// 		</Text>
+		// 		<Text fontSize='md' color='grey'>
+		// 			어떤 스타일의 여행을 원하는가요?
+		// 		</Text>
+		// 		<Divider my='1' />
+		// 		{tendencyList.map((item, index) => {
+		// 			return (
+		// 				<Box key={index}>
+		// 					<Text fontSize='lg' bold>
+		// 						{item.title}
+		// 					</Text>
+		// 					<Box flexDir='row' flexWrap='wrap'>
+		// 						{item.list.map((data, idx) => {
+		// 							return (
+		// 								<SelectButton
+		// 									key={idx}
+		// 									label={data}
+		// 									onPress={() => selectData({index, idx})}
+		// 									bgColor={select[index][idx]}></SelectButton>
+		// 							);
+		// 						})}
+		// 					</Box>
+		// 				</Box>
+		// 			);
+		// 		})}
+
+		// 		<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+		// 	</VStack>
+		// </ScrollView>
 	);
 }
 
@@ -87,7 +125,7 @@ const tendencyList = [
 		list: ['바다', '산', '드라이브코스', '산책', '쇼핑', '자연경관', '시티투어', '지역축제', '전통한옥'],
 	},
 	{
-		title: '언젠데요?',
+		title: '무엇을 즐기고 싶나요?',
 		multi: true,
 		list: ['봄꽃', '여름피서', '가을단풍', '겨울스포츠,설경', '온천'],
 	},

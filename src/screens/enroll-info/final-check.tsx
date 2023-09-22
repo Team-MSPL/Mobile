@@ -2,7 +2,6 @@ import {Alert, BackHandler, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, HStack} from 'native-base';
 import {tendencyList} from './select-tendency';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from './select-city';
@@ -10,11 +9,12 @@ import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {MainContainer} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgHome, SvgPlace} from '../../utill/svg/svg';
+import {SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
+import {DefalutLogoContainer} from './search-place';
 
 export default function FinalCheck({navigation}: any) {
 	const {
@@ -44,51 +44,51 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
-	const checkToken = () => {
-		if (socialloginProvider == 'anonymous') {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '익명 로그인으로는 이용 불가합니다',
-					modalSubTitle: '로그인 하러 가시겠습니까?',
-					modalFunction: goNewLogin,
-					modalLeft: true,
-				}),
-			);
-		} else {
-			functionToken >= 1
-				? dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
-							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
-							modalFunction: goNext,
-							modalLeft: true,
-						}),
-				  )
-				: dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
-							modalFunction: goPayment,
-							modalLeft: true,
-						}),
-				  );
-		}
-	};
+	// const checkToken = () => {
+	// 	if (socialloginProvider == 'anonymous') {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '익명 로그인으로는 이용 불가합니다',
+	// 				modalSubTitle: '로그인 하러 가시겠습니까?',
+	// 				modalFunction: goNewLogin,
+	// 				modalLeft: true,
+	// 			}),
+	// 		);
+	// 	} else {
+	// 		functionToken >= 1
+	// 			? dispatch(
+	// 					modalSliceActions.setOpenModal({
+	// 						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
+	// 						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+	// 						modalFunction: goNext,
+	// 						modalLeft: true,
+	// 					}),
+	// 			  )
+	// 			: dispatch(
+	// 					modalSliceActions.setOpenModal({
+	// 						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
+	// 						modalFunction: goPayment,
+	// 						modalLeft: true,
+	// 					}),
+	// 			  );
+	// 	}
+	// };
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useFocusEffect(
-		useCallback(() => {
-			if (signUpReward) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-						modalFunction: checkSignUpReward,
-					}),
-				);
-			}
-		}, [signUpReward]),
-	);
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		if (signUpReward) {
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '회원가입 축하드립니다',
+	// 					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+	// 					modalFunction: checkSignUpReward,
+	// 				}),
+	// 			);
+	// 		}
+	// 	}, [signUpReward]),
+	// );
 	useEffect(() => {
 		console.log('하위용', accommodations);
 		const backAction = () => {
@@ -131,8 +131,8 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 				}),
 			).unwrap();
-			console.log('하하하', result);
 			dispatch(travelSliceActions.selectRegion(a));
+			console.log(result.data);
 			if (result) {
 				navigation.popToTop();
 				navigation.navigate('Preset');
@@ -168,7 +168,7 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(travelSliceActions.reset());
 	};
 	const schedule = ['출발일', '종료일'];
-	if (loading) return <LoadingTimetable />;
+	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<MainContainer>
 			{/* 스테퍼 넣기 */}
@@ -238,12 +238,19 @@ export default function FinalCheck({navigation}: any) {
 								</HStack>
 								{accommodations[idx + 1].name ? (
 									<PlaceContainer>
-										<PlaceImage
-											source={{
-												uri: accommodations[idx + 1].photo,
-											}}
-											alt='Place Image'
-										/>
+										{accommodations[idx + 1].photo != null ? (
+											<PlaceImage
+												source={{
+													uri: accommodations[idx + 1].photo,
+												}}
+												alt='Place Image'
+											/>
+										) : (
+											<FinalDefalutLogoContainer>
+												<SvgLoginLogo width={30} height={30} color='white' />
+											</FinalDefalutLogoContainer>
+										)}
+
 										<VStack>
 											<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
 											<MultiElementText>
@@ -263,12 +270,19 @@ export default function FinalCheck({navigation}: any) {
 								{filteredPlaces.length != 0 ? (
 									filteredPlaces.map((data, imageIndex) => (
 										<PlaceContainer key={imageIndex}>
-											<PlaceImage
-												source={{
-													uri: data.photo,
-												}}
-												alt='Place Image'
-											/>
+											{data.photo != null ? (
+												<PlaceImage
+													source={{
+														uri: data.photo,
+													}}
+													alt='Place Image'
+												/>
+											) : (
+												<FinalDefalutLogoContainer>
+													<SvgLoginLogo width={30} height={30} color='white' />
+												</FinalDefalutLogoContainer>
+											)}
+
 											<VStack>
 												<MultiElementText>{data.name}</MultiElementText>
 												{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
@@ -285,7 +299,7 @@ export default function FinalCheck({navigation}: any) {
 				);
 			})}
 
-			<CustomButton label='맞춤 코스 조회' onPress={checkToken}></CustomButton>
+			<CustomButton label='맞춤 코스 조회' onPress={goNext}></CustomButton>
 		</MainContainer>
 	);
 }
@@ -338,7 +352,7 @@ const DayContainer = styled.View`
 	border-radius: 10px;
 	border-color: white;
 	border-width: 1px;
-	padding: 10px;
+	padding: 7px;
 	margin: 0px 5px 0px 0px;
 `;
 const DayText = styled.Text`
@@ -405,4 +419,9 @@ const PlaceDashed = styled.View`
 const MultiAllContainer = styled.View`
 	width: 100%;
 	margin: 10px 0px 10px 0px;
+`;
+const FinalDefalutLogoContainer = styled(DefalutLogoContainer)`
+	width: 50px;
+	height: 50px;
+	margin: 0px 20px 0px 0px;
 `;

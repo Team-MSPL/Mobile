@@ -38,9 +38,6 @@ export default function BaseModal() {
 						<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
 							<ModalText>확인</ModalText>
 						</ModalButton>
-						{/* <TouchableOpacity onPress={handleModalFunction}>
-							<Text>확인</Text>
-						</TouchableOpacity> */}
 					</Footer>
 				</ViewContaniner>
 			</ModalContainer>

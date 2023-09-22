@@ -1,17 +1,22 @@
 import {GOOGLE_API_KEY} from '@env';
-import {Box, Text} from 'native-base';
 import {memo, useRef, useState} from 'react';
 import {Image, Modal, Pressable, TouchableOpacity, View, Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {colors} from '../../colors';
 import {HStack, VStack} from '../../layout/layout';
+import {SvgInfos} from '../../svg/svg';
+import Icon from 'react-native-vector-icons/AntDesign';
 const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	const dispatch = useAppDispatch();
+	const DeleteContainer = styled(Icon)`
+		border-radius: 5px;
+	`;
 	const viewDetail = (e: any) => {
 		navigation.navigate('CourseDetail', {value: e.value});
 	};
@@ -37,7 +42,6 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 		const startNumber = e.value.y; // 시작 숫자
 		const count = e.value.takenTime / 30; // 원하는 갯수
 		const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-
 		navigation.navigate('Recommend', {
 			name: '숙소 추천',
 			x: e.value.x,
@@ -48,6 +52,8 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			lng: lng,
 			apiCategory: 'AD5',
 			radius: 2000,
+			backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+			backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
 		});
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
@@ -98,6 +104,8 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				lng: lng,
 				apiCategory: 'FD6',
 				radius: radius,
+				backupLat: timetable[e.idx][e.index - 1].lat,
+				backupLng: timetable[e.idx][e.index - 1].lng,
 			});
 		}
 	};
@@ -119,7 +127,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 												? 'red'
 												: categortColors[value.category]
 										}
-										height={35 * Math.ceil(value.takenTime / 30)}
+										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
 										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
 										key={index}
 										onPress={() => {
@@ -186,81 +194,70 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				onRequestClose={() => setVisible(false)}>
 				<ModalContainer onPress={() => setVisible(false)}>
 					<InfoModalContainer>
-						<VStack>
-							{indexRef.current.flag ? (
-								<>
-									<TouchableOpacity
-										style={{height: 60}}
-										onPress={() => {
-											indexRef.current.category == 1
-												? restaurantRecommend({
-														value: indexRef.current.value,
-														index: indexRef.current.index,
-														idx: indexRef.current.idx,
-												  })
-												: accommodationRecommend({
-														value: indexRef.current.value,
-														index: indexRef.current.index,
-														idx: indexRef.current.idx,
-												  });
-											setVisible(false);
-										}}>
-										<Text>추천받기</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										style={{height: 60}}
-										onPress={() => {
-											const a = timetable.map((item, idx) =>
-												item.filter(value => value.id != indexRef.current.value?.id),
-											);
-											dispatch(travelSliceActions.changeTimetable(a));
-											setVisible(false);
-										}}>
-										<Text>삭제하기</Text>
-									</TouchableOpacity>
-								</>
-							) : (
-								<>
-									<TouchableOpacity
-										style={{height: 60}}
-										onPress={() => {
-											viewDetail(indexRef.current);
-											setVisible(false);
-										}}>
-										<Text>정보 보기</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										style={{height: 60}}
-										onPress={() => {
-											navigation.navigate('Modify', {item: indexRef.current});
-											setVisible(false);
-										}}>
-										<Text>수정하기</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										style={{height: 60}}
-										onPress={() => {
-											dispatch(
-												modalSliceActions.setOpenModal({
-													modalTitle: '삭제하시겠습니까?',
-													modalLeft: true,
-													modalFunction: goRemove,
-												}),
-											);
-										}}>
-										<Text>삭제하기</Text>
-									</TouchableOpacity>
-								</>
-							)}
+						{indexRef.current.flag ? (
+							<>
+								<ModalElementContainer
+									onPress={() => {
+										indexRef.current.category == 1
+											? restaurantRecommend({
+													value: indexRef.current.value,
+													index: indexRef.current.index,
+													idx: indexRef.current.idx,
+											  })
+											: accommodationRecommend({
+													value: indexRef.current.value,
+													index: indexRef.current.index,
+													idx: indexRef.current.idx,
+											  });
+										setVisible(false);
+									}}>
+									<ModalIconContainer>
+										<DeleteContainer name={'like2'} size={20} color={'black'} />
+									</ModalIconContainer>
+									<ModalText>추천 받기</ModalText>
+								</ModalElementContainer>
+							</>
+						) : (
+							<>
+								<ModalElementContainer
+									onPress={() => {
+										viewDetail(indexRef.current);
+										setVisible(false);
+									}}>
+									<ModalIconContainer>
+										<SvgInfos width={20} height={20} color='black' />
+									</ModalIconContainer>
 
-							<TouchableOpacity
-								style={{height: 60}}
-								onPress={() => {
-									setVisible(false);
-								}}>
-								<Text>나가기 TODO 나가는방식,띄우는위치</Text>
-							</TouchableOpacity>
-						</VStack>
+									<ModalText>정보 보기</ModalText>
+								</ModalElementContainer>
+
+								<ModalElementContainer
+									onPress={() => {
+										navigation.navigate('Modify', {item: indexRef.current});
+										setVisible(false);
+									}}>
+									<ModalIconContainer>
+										<DeleteContainer name={'edit'} size={20} color={'black'} />
+									</ModalIconContainer>
+									<ModalText>수정 하기</ModalText>
+								</ModalElementContainer>
+							</>
+						)}
+						<ModalElementContainer
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '삭제하시겠습니까?',
+										modalLeft: true,
+										modalFunction: goRemove,
+									}),
+								);
+							}}>
+							<ModalIconContainer>
+								<DeleteContainer name={'delete'} size={20} color={'black'} />
+							</ModalIconContainer>
+							<ModalText>삭제 하기</ModalText>
+						</ModalElementContainer>
 					</InfoModalContainer>
 				</ModalContainer>
 			</Modal>
@@ -271,15 +268,33 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 const InfoVStack = styled(VStack)`
 	flex: 0.18;
 `;
+const ModalElementContainer = styled.TouchableOpacity`
+	width: 100%;
+	align-items: center;
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.regionNormal};
+	flex-direction: row;
+	padding: 3%;
+`;
+const ModalIconContainer = styled.View`
+	width: 20%;
+	align-items: center;
+	justify-content: center;
+`;
 const ModalContainer = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.4);
+`;
+const ModalText = styled.Text`
+	font-size: 18px;
+	font-weight: 500;
+	color: black;
 `;
 const InfoModalContainer = styled.View`
 	flex: 0.5;
 	position: absolute;
 	bottom: 0px;
-	background-color: gray;
+	background-color: white;
 	width: 100%;
 `;
 const InfoViewContainter = styled.View`
@@ -295,9 +310,9 @@ const SpacerView = styled.View`
 
 const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number}>`
 	width: 100%;
-	height: ${props => props.height};
-	top: ${props => props.top};
-	backgroundcolor: ${props => props.backgroundColor};
+	height: ${props => props.height}px;
+	top: ${props => props.top}px;
+	background-color: ${props => props.backgroundColor};
 	position: absolute;
 	z-index: 3;
 	border-radius: 10px;

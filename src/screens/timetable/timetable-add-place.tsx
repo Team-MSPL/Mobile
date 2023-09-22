@@ -2,7 +2,6 @@ import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {Alert, TouchableOpacity, View} from 'react-native';
-import {Text, Box, HStack, Spacer} from 'native-base';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
 import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -10,7 +9,7 @@ import moment from 'moment';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Center, VStack} from '../../utill/layout/layout';
+import {Center, VStack, HStack} from '../../utill/layout/layout';
 import {
 	CourseAndReview,
 	CourseContainer,
@@ -27,6 +26,11 @@ import {
 	TimeItemText,
 	DayPressable,
 } from '../enroll-info/select-day';
+
+import Icon from 'react-native-vector-icons/AntDesign';
+
+import Icons from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../../utill/component/custom-button';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -113,6 +117,17 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.goBack();
 	};
+	const DeleteIconContainer = styled(Icon)`
+		background-color: ${colors.selectButton};
+		border-radius: 5px;
+		padding: 0.6%;
+		margin: 0px 0px 0px 10px;
+	`;
+	const DeleteIconContainers = styled(Icons)`
+		border-radius: 5px;
+		padding: 0.6%;
+		margin: 0px 0px 0px 10px;
+	`;
 	useEffect(() => {
 		newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
 		if (newY.current == -1) {
@@ -135,32 +150,62 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					{moment(day[route.params.x]).format('YYYY-MM-DD')},{weekdays[moment(day[route.params.x]).day()]}요일
 				</DayText>
 			</DayContainer>
+
 			<TimeContainer>
 				<ASD>
 					{[...Array(2)].map((item, idx) => (
-						<>
-							<TimeItemContainer key={idx}>
-								<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-								<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-								<HStack>
-									<DayElementContainer>
-										<TimeItemText>
-											{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
-											{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
-											{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
-										</TimeItemText>
-									</DayElementContainer>
-								</HStack>
-							</TimeItemContainer>
-						</>
+						<TimeItemContainer key={idx}>
+							<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
+							<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
+							<HStack>
+								<DayElementContainer>
+									<TimeItemText>
+										{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
+										{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
+										{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
+									</TimeItemText>
+								</DayElementContainer>
+							</HStack>
+						</TimeItemContainer>
 					))}
 				</ASD>
 			</TimeContainer>
-			<TouchableOpacity disabled={!getInfo.name} style={{opacity: getInfo.name ? 1 : 0.5}} onPress={addTimetable}>
-				<Text bold fontSize='xl'>
-					추가
-				</Text>
-			</TouchableOpacity>
+
+			<SearchContainer>
+				{getInfo.name ? (
+					<AddHStack>
+						<AddText>{getInfo.name}</AddText>
+						<TouchableOpacity
+							onPress={() => {
+								setGetInfo({lat: 0, lng: 0, name: ''});
+							}}>
+							<DeleteIconContainer name={'delete'} size={20} color={'white'} />
+						</TouchableOpacity>
+					</AddHStack>
+				) : (
+					<GooglePlacesAutocomplete
+						placeholder='장소를 검색해보세요!'
+						query={{
+							key: GOOGLE_API_KEY,
+							language: 'ko',
+							components: 'country:kr',
+						}}
+						styles={{
+							container: {position: 'absolute', zIndex: 3, width: '100%'},
+							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
+						}}
+						fetchDetails={true}
+						onPress={async (data, details) => {
+							setGetInfo({
+								lat: details?.geometry.location.lat ?? 0,
+								lng: details?.geometry.location.lng ?? 0,
+								name: details?.name ?? '검색불가',
+							});
+						}}
+						onFail={error => console.log(error)}
+						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+				)}
+			</SearchContainer>
 			{/* <HStack>
 				<TouchableOpacity
 					style={{opacity: getInfo.name ? 1 : 0.5}}
@@ -193,7 +238,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					</Text>
 				</TouchableOpacity>
 			</HStack> */}
-
 			<CourseAndReview>
 				<CoffeeContainer onPress={() => goRecommend('CE7')}>
 					<VStack>
@@ -216,7 +260,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						<SvgHome width={36} height={36} color='white' />
 					</IconContainer>
 				</AccommodationsContainer>
-				<AccommodationsContainer
+				<RestoaurantContainer
 					onPress={() => {
 						goRecommend('FD6');
 					}}>
@@ -225,42 +269,11 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						{/* <CourseSubTitleText>맛있는 식당을 추천해드려요</CourseSubTitleText> */}
 					</VStack>
 					<IconContainer>
-						<SvgHome width={36} height={36} color='white' />
+						<DeleteIconContainers name={'restaurant'} size={36} color={'white'} />
 					</IconContainer>
-				</AccommodationsContainer>
+				</RestoaurantContainer>
 			</CourseAndReview>
-			{getInfo.name ? (
-				<HStack>
-					<Text bold fontSize='lg'>
-						{getInfo.name}
-					</Text>
-					<TouchableOpacity
-						onPress={() => {
-							setGetInfo({lat: 0, lng: 0, name: ''});
-						}}>
-						<Text>삭제</Text>
-					</TouchableOpacity>
-				</HStack>
-			) : (
-				<GooglePlacesAutocomplete
-					placeholder='장소를 검색해보세요!'
-					query={{
-						key: GOOGLE_API_KEY,
-						language: 'ko',
-						components: 'country:kr',
-					}}
-					styles={{textInputContainer: {zIndex: 1}, textInput: {zIndex: 1}}}
-					fetchDetails={true}
-					onPress={async (data, details) => {
-						setGetInfo({
-							lat: details?.geometry.location.lat ?? 0,
-							lng: details?.geometry.location.lng ?? 0,
-							name: details?.name ?? '검색불가',
-						});
-					}}
-					onFail={error => console.log(error)}
-					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
-			)}
+			<CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} />
 		</MainContainer>
 	);
 }
@@ -281,16 +294,37 @@ const DayText = styled.Text`
 `;
 const CoffeeContainer = styled(CourseContainer)`
 	width: 30%;
-	background-color: ${colors.coffeeColor};
+	background-color: #ffccb6;
 `;
 
 const AccommodationsContainer = styled(CourseContainer)`
 	width: 30%;
-	background-color: ${colors.accommodationColor};
+	background-color: #cbaacb;
 `;
-const MainContainer = styled(Center)`
+const RestoaurantContainer = styled(CourseContainer)`
+	width: 30%;
+	background-color: #abdee6;
+`;
+const MainContainer = styled.View`
+	flex: 1;
+	background-color: white;
 	padding: 10px;
 `;
 const DayElementContainer = styled(DayPressable).attrs({as: View})`
 	width: 80%;
+`;
+const SearchContainer = styled.View`
+	width: 100%;
+	height: 10%;
+	margin: 5% 0% 5% 0%;
+`;
+
+const AddText = styled.Text`
+	font-size: 20px;
+	gont-weight: bold;
+	color: ${colors.selectButton};
+`;
+const AddHStack = styled(HStack)`
+	align-items: center;
+	justify-content: center;
 `;

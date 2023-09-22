@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text, Box, ScrollView, VStack, Divider, Slider, Center} from 'native-base';
+import {Text} from 'native-base';
 import {
 	regionRecommendSliceActions,
 	reverseGeocoding,
@@ -9,6 +9,14 @@ import {
 } from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, TouchableOpacity, PermissionsAndroid} from 'react-native';
+import {MainContainer, Center, Divider, MainText, HStack} from '../../../utill/layout/layout';
+
+import Slider from '@react-native-community/slider';
+import StepText from '../../../utill/component/enroll-info/step-text';
+import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
+import {DistanceExplain} from '../select-distance';
+import styled from 'styled-components/native';
+import {colors} from '../../../utill/colors';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
@@ -36,6 +44,7 @@ export default function SelectDistance({navigation}: any) {
 		// const a = await dispatch(geocoding({region: '김해시'})).unwrap();
 		// console.log(a.results);
 		try {
+			dispatch(LoadingSliceActions.onLoading());
 			requestPermission().then(result => {
 				if (result === 'granted') {
 					Geolocation.getCurrentPosition(
@@ -49,9 +58,11 @@ export default function SelectDistance({navigation}: any) {
 								name: result.results[0].formatted_address,
 							};
 							setGeoInfo(latlngData);
+							dispatch(LoadingSliceActions.offLoading());
 						},
 						error => {
 							// See error code charts below.
+							dispatch(LoadingSliceActions.offLoading());
 							console.log(error.code, error.message);
 						},
 						{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
@@ -60,44 +71,65 @@ export default function SelectDistance({navigation}: any) {
 			});
 		} catch (err) {
 			console.log('에러요', err);
+		} finally {
+			// dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
-			<VStack space='5'>
-				<Text>가고자하는 범위</Text>
-				<Divider my='1' />
-
-				<Text>ㅇㄷ서 출발함?</Text>
-				<TouchableOpacity onPress={goReverseGeocoding}>
-					<Text>내 위치</Text>
-				</TouchableOpacity>
+		<MainContainer>
+			<StepText mainText='거리민감도 성정' subText='다님Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
+			<DistanceCenter>
+				<DistanceText>{range}</DistanceText>
+				<Slider
+					style={{width: '100%', height: 40}}
+					minimumValue={1}
+					maximumValue={10}
+					minimumTrackTintColor='#123123'
+					maximumTrackTintColor='#000000'
+					value={range}
+					step={1}
+					onValueChange={item => {
+						setRange(item);
+					}}
+				/>
+				<DistanceExplain>
+					{range >= 5
+						? '민감도가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
+						: '민감도가 낮으면, 성향과는 조금 멀어질 수 있어요'}
+				</DistanceExplain>
+			</DistanceCenter>
+			<DistanceDivider />
+			<StepText mainText='내 위치 정보' subText='내 위치를 기준으로 추천을 진행해요' />
+			<Center>
+				<GetContainer onPress={goReverseGeocoding}>
+					<GetContainerText>위치정보 받아오기</GetContainerText>
+				</GetContainer>
 				<Text>{geoInfo.name}</Text>
-				<Divider my='1' />
-				<Text fontSize='md' color='grey'>
-					거리 민감도가 높아질수록 멀리가도 ㄱㅊ
-				</Text>
-				<Text>{range}</Text>
-				<Center>
-					<Slider
-						w='4/5'
-						defaultValue={5}
-						minValue={1}
-						maxValue={10}
-						step={1}
-						onChange={item => {
-							setRange(item);
-						}}>
-						<Slider.Track>
-							<Slider.FilledTrack />
-						</Slider.Track>
-						<Slider.Thumb />
-					</Slider>
-				</Center>
+			</Center>
+			<DistanceDivider />
 
-				<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
-				{/* isDisabled={geoInfo.lat == 0} */}
-			</VStack>
-		</ScrollView>
+			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+		</MainContainer>
 	);
 }
+const DistanceDivider = styled(Divider)`
+	background-color: ${colors.regionNormal};
+`;
+const DistanceCenter = styled(Center)`
+	margin: 20px 0px 20px 0px;
+`;
+const DistanceText = styled(MainText)`
+	font-size: 14px;
+	margin: 10px 0px 10px 0px;
+`;
+const GetContainer = styled.TouchableOpacity`
+	padding: 10px;
+	border-radius: 10px;
+	align-items: center;
+	background-color: ${colors.selectButton};
+`;
+const GetContainerText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: white;
+`;

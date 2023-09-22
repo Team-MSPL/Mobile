@@ -6,12 +6,13 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {
 	const goEnroll = () => {
-		const season = Array(4).fill(0);
-		const index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		let season = Array(4).fill(0);
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
@@ -21,15 +22,9 @@ export default function Main({navigation}: any) {
 	);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const zxc = () => {
-		// dispatch(
-		// 	modalSliceActions.setOpenModal({
-		// 		modalTitle: '안내창',
-		// 		modalSubTitle: '지역 선택을 안하셨습니다.',
-		// 	}),
-		// );
+	const soloMaking = () => {
 		dispatch(travelSliceActions.setSingleMode());
-		navigation.navigate('Timetable');
+		navigation.navigate('EnrollTravelTitle');
 	};
 	const regionRecommend = () => {
 		navigation.navigate('RegionSelectTendency');
@@ -40,26 +35,26 @@ export default function Main({navigation}: any) {
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useEffect(() => {
-		if (signUpReward) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '회원가입 축하드립니다',
-					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-					modalFunction: checkSignUpReward,
-				}),
-			);
-		} else {
-			dailyReward &&
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '데일리 보상!',
-						modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
-						modalFunction: checkDailyReward,
-					}),
-				);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (signUpReward) {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '회원가입 축하드립니다',
+	// 				modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+	// 				modalFunction: checkSignUpReward,
+	// 			}),
+	// 		);
+	// 	} else {
+	// 		dailyReward &&
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '데일리 보상!',
+	// 					modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
+	// 					modalFunction: checkDailyReward,
+	// 				}),
+	// 			);
+	// 	}
+	// }, []);
 	useBackHandler();
 	return (
 		<SafeAreaView>
@@ -72,22 +67,21 @@ export default function Main({navigation}: any) {
 						</VStack>
 						<Icon name={'pluscircle'} size={20} color={'white'} />
 					</NewTravelButton>
-				</ButtonContainer>
-				<AloneRecommendButtonContainer>
-					<NewTravelAloneButton>
+					<NewTravelButton onPress={soloMaking}>
 						<VStack>
-							<ButtonText>자유롭게 짜고 싶나요?</ButtonText>
+							<ButtonText>{userName}님, 자유롭게 짜고 싶나요?</ButtonText>
 							<ButtonBoldText>혼자 만들어보기</ButtonBoldText>
 						</VStack>
-					</NewTravelAloneButton>
-					<TravelRecommendButton onPress={regionRecommend}>
+						<Icon name={'pluscircle'} size={20} color={'white'} />
+					</NewTravelButton>
+					<NewTravelButton onPress={regionRecommend}>
 						<VStack>
-							<ButtonText>여행지를 추천해드려요</ButtonText>
+							<ButtonText>어디로 가실지 고민 중이신가요?</ButtonText>
 							<ButtonBoldText>지역 추천 받기</ButtonBoldText>
 						</VStack>
-					</TravelRecommendButton>
-				</AloneRecommendButtonContainer>
-
+						<Icon name={'pluscircle'} size={20} color={'white'} />
+					</NewTravelButton>
+				</ButtonContainer>
 				<CollectionContainer>
 					<CollectionTitle>다님이 추천하는 이색 여행지</CollectionTitle>
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
@@ -166,7 +160,7 @@ const ButtonContainer = styled.View`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 120px;
+	height: 400px;
 `;
 
 const NewTravelButton = styled.TouchableOpacity`
@@ -176,34 +170,6 @@ const NewTravelButton = styled.TouchableOpacity`
 	margin-bottom: 10px;
 	border-radius: 24px;
 	background-color: ${colors.selectButton};
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-`;
-
-const AloneRecommendButtonContainer = styled.View`
-	flex-direction: row;
-	justify-content: space-between;
-	height: 150px;
-`;
-const NewTravelAloneButton = styled.TouchableOpacity`
-	width: 48%;
-	height: 100px;
-	padding: 6%;
-	margin-bottom: 10px;
-	border-radius: 24px;
-	background-color: #ff6b6b;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-`;
-const TravelRecommendButton = styled.TouchableOpacity`
-	width: 48%;
-	height: 100px;
-	padding: 6%;
-	margin-bottom: 10px;
-	border-radius: 24px;
-	background-color: #77dd77;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
