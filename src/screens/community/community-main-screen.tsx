@@ -10,7 +10,6 @@ import {getOnePost, getPostList, postListType} from '../../redux/community/commu
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {MainContainer} from '../../utill/layout/layout';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -73,14 +72,13 @@ export default function CommunityMainScreen({navigation}: any) {
 		navigation.setOptions({
 			headerRight: () =>
 				socialloginProvider != 'anonymous' && (
-					<View>
-						<TouchableOpacity
-							onPress={() => {
-								showCommentOptionActionSheet();
-							}}>
-							<ThreeDotsIcon></ThreeDotsIcon>
-						</TouchableOpacity>
-					</View>
+					<TouchableOpacity
+						style={{marginRight: 20}}
+						onPress={() => {
+							showCommentOptionActionSheet();
+						}}>
+						<ThreeDotsIcon></ThreeDotsIcon>
+					</TouchableOpacity>
 				),
 		});
 	}, []);
@@ -163,7 +161,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	};
 	useBackHandler();
 	return (
-		<MainContainer>
+		<CommunityMainContainer>
 			{isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (
@@ -186,9 +184,13 @@ export default function CommunityMainScreen({navigation}: any) {
 					menuOptionList.onPress[index]();
 				}}
 			/>
-		</MainContainer>
+		</CommunityMainContainer>
 	);
 }
+
+const CommunityMainContainer = styled.SafeAreaView`
+	padding: 8px;
+`;
 
 const PostItemContainer = styled.View`
 	alignitems: 'flex-start';
