@@ -1,9 +1,10 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {FlatList, ThreeDotsIcon} from 'native-base';
+import {FlatList} from 'native-base';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ActivityIndicator, RefreshControl, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Icon from 'react-native-vector-icons/AntDesign';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getOnePost, getPostList, postListType} from '../../redux/community/community.slice';
@@ -77,7 +78,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						onPress={() => {
 							showCommentOptionActionSheet();
 						}}>
-						<ThreeDotsIcon></ThreeDotsIcon>
+						<MenuIcon name='more-horizontal'></MenuIcon>
 					</TouchableOpacity>
 				),
 		});
@@ -191,7 +192,6 @@ export default function CommunityMainScreen({navigation}: any) {
 const CommunityMainContainer = styled.SafeAreaView`
 	padding: 8px;
 `;
-
 const PostItemContainer = styled.View`
 	alignitems: 'flex-start';
 	padding: 12px;
@@ -234,4 +234,7 @@ const CommentIcon = styled(Icon)`
 	size: 12px;
 	color: green;
 	margin-right: 4px;
+`;
+export const MenuIcon = styled(FeatherIcon)`
+	font-size: 20px;
 `;
