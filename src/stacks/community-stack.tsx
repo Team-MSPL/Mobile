@@ -7,17 +7,7 @@ const Stack = createNativeStackNavigator();
 export default function CommunityStack() {
 	return (
 		<Fragment>
-			<Stack.Screen
-				name='CommunityMainScreen'
-				component={CommunityMainScreen}
-				options={{
-					headerBackVisible: true,
-					headerBackTitleVisible: true,
-					headerShown: true,
-					headerTitle: '커뮤니티',
-					headerTitleAlign: 'center',
-				}}
-			/>
+			<Stack.Screen name='CommunityMainScreen' component={CommunityMainScreen} />
 			<Stack.Screen
 				name='CommunityReadingScreen'
 				component={CommunityReadingScreen}

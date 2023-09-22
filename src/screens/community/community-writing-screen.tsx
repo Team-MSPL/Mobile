@@ -1,20 +1,14 @@
 import moment from 'moment';
-import React, {useState} from 'react';
-import {
-	Alert,
-	Image,
-	SafeAreaView,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Alert} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {default as ImageView} from 'react-native-image-viewing';
+import ImageView from 'react-native-image-viewing';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import {colors} from '../../utill/colors';
+import {PostImageIndicatorText, PostImageView} from './community-reading-screen';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const goBack = () => {
@@ -25,7 +19,8 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	const [postImage, setPostImage] = useState<string[]>(route.params.images);
 	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
-	const {userId, userName} = useAppSelector(state => state.userSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
+
 	const dispatch = useAppDispatch();
 
 	// 사진 가져오기
@@ -46,9 +41,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 
 	// * 게시글 등록
 	const handlePostSubmit = () => {
+		console.log('야야양야야', postTitle);
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
-			console.log('제목을 입력해주세요.');
+			console.log(postTitle);
 			return;
 		}
 
@@ -116,33 +112,76 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		setIsImageModalVisible(index === 0 || !!index);
 	};
 
+	// 앱 바 우측 더보기
+	// useEffect(() => {
+	// 	navigation.setOptions({
+	// 		headerRight: () =>
+	// 			socialloginProvider != 'anonymous' && (
+	// 				<TouchableOpacity
+	// 					onPress={() => {
+	// 						handlePostSubmit();
+	// 					}}>
+	// 					<SubmitText>작성</SubmitText>
+	// 				</TouchableOpacity>
+	// 			),
+	// 	});
+	// }, []);
+
+	useEffect(() => {
+		setPostTitle(postTitle);
+		console.log('제머고', postTitle);
+		console.log('내용', postContent);
+		//console.log('사진', postImage);
+	}, [postTitle]);
+	useEffect(() => {
+		setPostContent(postContent);
+		console.log('제머고', postTitle);
+		console.log('내용', postContent);
+		//console.log('사진', postImage);
+	}, [postContent]);
+
+	useEffect(() => {
+		setPostImage(postImage);
+		console.log('제머고', postTitle);
+		console.log('내용', postContent);
+		console.log('사진', postImage);
+	}, [postImage]);
+
 	return (
-		<SafeAreaView style={{flex: 1}}>
-			<ScrollView style={styles.container}>
-				<TextInput style={styles.titleInput} placeholder='제목' value={postTitle} onChangeText={setPostTitle} />
-				<TextInput
-					style={styles.contentInput}
-					placeholder='내용'
-					value={postContent}
-					onChangeText={setPostContent}
-					multiline
+		<CommunityWritingContainer>
+			<CommunityWritingSafeAreaContainer>
+				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
+				<TitleInput
+					placeholder='제목을 입력해주세요'
+					value={postTitle}
+					onChangeText={text => setPostTitle(text)}
+					multiline={true}
 				/>
-				<Text>사진 목록</Text>
-				<View style={styles.container}>
+
+				<CommunityWritingTitleText>내용</CommunityWritingTitleText>
+				<ContentInput
+					placeholder='내용을 입력해주세요'
+					value={postContent}
+					onChangeText={text => setPostContent(text)}
+					multiline={true}
+				/>
+				<CommunityWritingTitleText>사진(최대 5장까지 가능합니다)</CommunityWritingTitleText>
+				<ImageContainer horizontal={true}>
+					<ImageInputButton onPress={handleImagePickerLaunch}>
+						<ImageInputButtonText>사진 추가하기</ImageInputButtonText>
+						<ImageInputButtonIcon name='pluscircleo' />
+					</ImageInputButton>
 					{postImage.map((uri, index) => {
 						return (
-							<View key={index} style={{alignItems: 'center'}}>
-								<TouchableOpacity
-									onPress={() => {
-										onSelect(index);
-										console.log('파이팅', currentImageIndex);
-									}}>
-									<Image source={{uri: uri}} style={{width: 100, height: 100}} />
-								</TouchableOpacity>
-							</View>
+							<ImageWrapper
+								onPress={() => {
+									onSelect(index);
+								}}
+								key={index}>
+								<PostImage source={{uri: uri}} />
+							</ImageWrapper>
 						);
 					})}
-
 					<ImageView
 						images={postImage.map(uri => ({uri}))}
 						imageIndex={initialImageIndex || 0}
@@ -152,99 +191,98 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 							setIsImageModalVisible(false);
 						}}
 						HeaderComponent={() => (
-							<SafeAreaView style={{alignItems: 'center'}}>
-								<Text style={{color: 'white'}}>{`${currentImageIndex + 1}/${postImage.length}`}</Text>
-							</SafeAreaView>
+							<PostImageView>
+								<PostImageIndicatorText>{`${currentImageIndex + 1}/${
+									postImage.length
+								}`}</PostImageIndicatorText>
+							</PostImageView>
 						)}
 					/>
-				</View>
-
-				<TouchableOpacity style={styles.attachButton} onPress={handleImagePickerLaunch}>
-					<Text style={styles.attachButtonText}>사진 선택하기</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.submitButton} onPress={handlePostSubmit}>
-					<Text style={styles.submitButtonText}>글 등록하기</Text>
-				</TouchableOpacity>
-			</ScrollView>
-		</SafeAreaView>
+				</ImageContainer>
+				<SubmitButton onPress={handlePostSubmit}>
+					<SubmitText>게시</SubmitText>
+				</SubmitButton>
+			</CommunityWritingSafeAreaContainer>
+		</CommunityWritingContainer>
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: '4%',
-	},
-	titleInput: {
-		fontSize: 18,
-		borderBottomWidth: 1,
-		borderColor: '#ccc',
-		marginBottom: 16,
-	},
-	contentInput: {
-		fontSize: 16,
-		borderWidth: 1,
-		borderColor: '#ccc',
-		height: 200,
-		padding: 8,
-		marginBottom: 16,
-	},
-	imageContainer: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'flex-start',
-		marginBottom: 16,
-	},
-	uploadedImage: {
-		width: 100,
-		height: 100,
-		margin: 8,
-	},
-	moreButton: {
-		width: 100,
-		height: 100,
-		margin: 8,
-		backgroundColor: '#ccc',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	moreButtonText: {
-		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 18,
-	},
-	attachButton: {
-		backgroundColor: 'blue',
-		padding: 12,
-		borderRadius: 8,
-		alignItems: 'center',
-		marginBottom: 16,
-	},
-	attachButtonText: {
-		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 16,
-	},
-	submitButton: {
-		backgroundColor: 'green',
-		padding: 12,
-		borderRadius: 8,
-		alignItems: 'center',
-	},
-	submitButtonText: {
-		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 18,
-	},
-	modalContainer: {
-		flexWrap: 'wrap',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		padding: 16,
-	},
-	modalImage: {
-		width: 100,
-		height: 100,
-		margin: 8,
-	},
-});
+const CommunityWritingContainer = styled.ScrollView`
+	flex: 1;
+	background-color: white;
+	padding: 12px;
+`;
+
+// safearea 영역
+const CommunityWritingSafeAreaContainer = styled.SafeAreaView`
+	flex: 1;
+`;
+
+const CommunityWritingTitleText = styled.Text`
+	font-weight: bold;
+	font-size: 20px;
+	margin-bottom: 16px;
+`;
+const TitleInput = styled.TextInput`
+	border: ${colors.border};
+	border-radius: 12px;
+	width: 100%;
+	padding: 12px;
+	margin-bottom: 24px;
+`;
+const ContentInput = styled.TextInput`
+	border: ${colors.border};
+	border-radius: 12px;
+	width: 100%;
+	aspect-ratio: 1.5;
+	padding: 12px;
+	margin-bottom: 24px;
+`;
+const ImageContainer = styled.ScrollView`
+	background-color: #f0f0f0;
+	width: 100%;
+	padding: 12px;
+	margin-bottom: 24px;
+	border-radius: 12px;
+`;
+const ImageInputButton = styled.TouchableOpacity`
+	height: 160px;
+	aspect-ratio: 0.8;
+	border: ${colors.border};
+	border-radius: 12px;
+	align-items: center;
+	justify-content: space-evenly;
+	background-color: #2698fa13;
+	margin-right: 12px;
+`;
+const ImageInputButtonText = styled.Text`
+	font-size: 16px;
+	color: ${colors.selectButton};
+`;
+const ImageInputButtonIcon = styled(AntDesignIcon)`
+	font-size: 24px;
+	color: ${colors.border};
+`;
+
+// 사진을 누를 수 있게 하기 위한 componenet
+const ImageWrapper = styled.TouchableOpacity``;
+const PostImage = styled.Image`
+	height: 160px;
+	aspect-ratio: 0.8;
+	border-radius: 12px;
+	margin-right: 12px;
+`;
+
+const SubmitText = styled.Text`
+	font-size: 16px;
+	font-weight: bold;
+	color: ${colors.main};
+`;
+const SubmitButton = styled.TouchableOpacity`
+	border-radius: 12px;
+	height: 48px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.selectButton};
+	width: 100%;
+`;

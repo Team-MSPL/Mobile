@@ -3,10 +3,10 @@ import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {logout, updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {Divider, MainContainer} from '../../utill/layout/layout';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,

@@ -16,7 +16,7 @@ export default function ViewPager() {
 	return (
 		<ViewPagerContainer>
 			<TouchableOpacity style={{backgroundColor: 'orange'}} onPress={handleFirstLaunch}>
-				<Text>보냈습니당~!!!! </Text>
+				<Text>앱을 다운받아주셔서 감사합니다! </Text>
 			</TouchableOpacity>
 		</ViewPagerContainer>
 	);
