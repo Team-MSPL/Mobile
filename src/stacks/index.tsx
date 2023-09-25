@@ -1,6 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAppSelector} from '../redux';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import Main from '../screens/home/main';
@@ -19,8 +20,19 @@ const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
 	const {isLogin} = useAppSelector(state => state.userSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
+
 	return (
-		<Stack.Navigator>
+		<Stack.Navigator
+			screenOptions={({navigation}) => ({
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'SpoqaHanSansNeo-Bold',
+					fontSize: 16,
+					fontWeight: '900',
+				},
+				headerStyle: {backgroundColor: 'white'},
+				headerShadowVisible: false,
+			})}>
 			{/* {isLogin ? (
 				<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			) : (
@@ -44,10 +56,22 @@ export default function StackNavigator() {
 		</Stack.Navigator>
 	);
 }
-
 function TabBar() {
+	const insets = useSafeAreaInsets();
 	return (
-		<Tab.Navigator>
+		<Tab.Navigator
+			backBehavior='none'
+			initialRouteName='Home'
+			screenOptions={{
+				tabBarStyle: {
+					minHeight: 60 + insets.bottom,
+				},
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'SpoqaHanSansNeo-Bold',
+					fontSize: 16,
+				},
+			}}>
 			<Tab.Screen
 				name='Home'
 				component={Main}
@@ -79,8 +103,8 @@ function TabBar() {
 				name='More'
 				component={MoreInfo}
 				options={{
-					title: '내정보',
-					headerShown: false,
+					title: '다님',
+					headerShown: true,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}
 			/>

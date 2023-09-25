@@ -1,13 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Image, Text, Box} from 'native-base';
 import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {logout, updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {Divider, MainContainer} from '../../utill/layout/layout';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -69,10 +68,16 @@ export default function MoreInfo({navigation}: any) {
 	const handleInquire = () => {
 		dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}));
 	};
+	const goLogin = () => {
+		navigation.replace('LoginScreen');
+	};
 	const useInfo = [
-		{title: '공지사항', function: () => console.log('qwe')},
-		{title: '도움말', function: () => console.log('qwe')},
-		{title: '문의하기', function: () => console.log('qwe')},
+		{
+			title: '공지사항',
+			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
+		},
+		// {title: '도움말', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}))},
+		// {title: '문의하기', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: ''}))},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 	];
@@ -86,24 +91,31 @@ export default function MoreInfo({navigation}: any) {
 				<ProfileNameText>
 					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
 				</ProfileNameText>
-				<ProfileChangeContainer onPress={changeInfo}>
-					<ProfileChangeText>프로필 편집</ProfileChangeText>
-				</ProfileChangeContainer>
+				{socialloginProvider != 'anonymous' && (
+					<ProfileChangeContainer onPress={changeInfo}>
+						<ProfileChangeText>프로필 편집</ProfileChangeText>
+					</ProfileChangeContainer>
+				)}
 			</ProfileContainer>
-			<ProfileDivider />
-			<SettingContainer>
-				<TitleText>계정</TitleText>
-				<SettingElement
-					onPress={() => {
-						console.log('노노');
-					}}>
-					<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
-				</SettingElement>
-				<SettingElement onPress={goPayment}>
-					<SettingElementText>토큰 구매하기</SettingElementText>
-				</SettingElement>
-			</SettingContainer>
 
+			{/* {socialloginProvider != 'anonymous' && (
+				<>
+					<ProfileDivider />
+					<SettingContainer>
+						<TitleText>계정</TitleText>
+						<SettingElement
+							onPress={() => {
+								console.log('노노');
+							}}>
+							<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
+						</SettingElement>
+
+						<SettingElement onPress={goPayment}>
+							<SettingElementText>토큰 구매하기</SettingElementText>
+						</SettingElement>
+					</SettingContainer>
+				</>
+			)} */}
 			<ProfileDivider />
 			<SettingContainer>
 				<TitleText>이용안내</TitleText>
@@ -115,31 +127,47 @@ export default function MoreInfo({navigation}: any) {
 			</SettingContainer>
 			<ProfileDivider />
 			<SettingContainer>
-				<Text>앱버전 0.0</Text>
-				<SettingElement
-					onPress={() => {
-						dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '로그 아웃 하시겠습니까?',
-								modalFunction: goLogout,
-								modalLeft: true,
-							}),
-						);
-					}}>
-					<LogoutText>로그아웃</LogoutText>
-				</SettingElement>
-				{socialloginProvider != 'anonymous' && (
+				<TitleText>앱버전 0.0</TitleText>
+				{socialloginProvider != 'anonymous' ? (
+					<>
+						<SettingElement
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '로그 아웃 하시겠습니까?',
+										modalFunction: goLogout,
+										modalLeft: true,
+									}),
+								);
+							}}>
+							<LogoutText>로그아웃</LogoutText>
+						</SettingElement>
+
+						<SettingElement
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '회원 탈퇴 하시겠습니까?',
+										modalFunction: goWithdraw,
+										modalLeft: true,
+									}),
+								);
+							}}>
+							<LogoutText>회원탈퇴</LogoutText>
+						</SettingElement>
+					</>
+				) : (
 					<SettingElement
 						onPress={() => {
 							dispatch(
 								modalSliceActions.setOpenModal({
-									modalTitle: '회원 탈퇴 하시겠습니까?',
-									modalFunction: goWithdraw,
+									modalTitle: '로그인 페이지로 이동하시겠습니까?',
+									modalFunction: goLogin,
 									modalLeft: true,
 								}),
 							);
 						}}>
-						<LogoutText>회원탈퇴</LogoutText>
+						<LogoutText>로그인</LogoutText>
 					</SettingElement>
 				)}
 			</SettingContainer>

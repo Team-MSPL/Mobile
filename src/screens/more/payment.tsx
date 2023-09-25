@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Image, Text, Center, Box, ScrollView, Button, VStack, HStack} from 'native-base';
 import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {MainContainer, MainText} from '../../utill/layout/layout';
 export default function Payment({navigation}: any) {
 	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -18,8 +17,8 @@ export default function Payment({navigation}: any) {
 		Alert.alert(`국민 950002-00-251241 ${e}원 보내세요.`);
 	};
 	return (
-		<ScrollView bgColor='#EFFBFB' p='2'>
-			<Text>출석시 하루마다 무료로 1개씩 추가됩니다! </Text>
+		<MainContainer>
+			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! </MainText>
 			{paymentViewList.map((item, idx) => (
 				<TouchableOpacity
 					key={idx}
@@ -27,11 +26,11 @@ export default function Payment({navigation}: any) {
 					onPress={() => {
 						handlePayment(item.pay);
 					}}>
-					<Text>{item.title}</Text>
-					<Text>{item.pay}원 입니다</Text>
+					<MainText>{item.title}</MainText>
+					<MainText>{item.pay}원 입니다</MainText>
 				</TouchableOpacity>
 			))}
-		</ScrollView>
+		</MainContainer>
 	);
 }
 const paymentViewList = [

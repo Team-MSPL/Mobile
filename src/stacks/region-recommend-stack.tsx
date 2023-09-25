@@ -13,8 +13,6 @@ export default function RegionRecommendStack() {
 				component={SelectTendency}
 				options={{
 					title: '지역 추천 1',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -22,8 +20,6 @@ export default function RegionRecommendStack() {
 				component={SelectDistance}
 				options={{
 					title: '지역 추천 2',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -31,8 +27,6 @@ export default function RegionRecommendStack() {
 				component={SelectPopularity}
 				options={{
 					title: '지역 추천 3',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -40,9 +34,6 @@ export default function RegionRecommendStack() {
 				component={ViewResult}
 				options={{
 					title: '추천 결과',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
-					headerBackVisible: false,
 				}}
 			/>
 		</Fragment>

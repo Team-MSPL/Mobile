@@ -3,10 +3,10 @@ import {VStack} from '../../layout/layout';
 
 export default function StepText({mainText, subText}: StepTextProps) {
 	return (
-		<VStack>
+		<StepTextVStack>
 			<MainText>{mainText}</MainText>
 			<SubText>{subText}</SubText>
-		</VStack>
+		</StepTextVStack>
 	);
 }
 
@@ -24,4 +24,8 @@ const SubText = styled.Text`
 	color: grey;
 	font-size: 14px;
 	font-weight: bold;
+`;
+
+const StepTextVStack = styled(VStack)`
+	margin: 0px 0px 30px 0px;
 `;

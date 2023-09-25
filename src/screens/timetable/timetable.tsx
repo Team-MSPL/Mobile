@@ -1,6 +1,5 @@
-import {Box, HStack, ScrollView, Text} from 'native-base';
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -15,7 +14,11 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
+import {HStack} from '../../utill/layout/layout';
 import {SvgMapIcon} from '../../utill/svg/svg';
+import {HeaderHStack} from '../my-travel-list/detail-info';
+import Icon from 'react-native-vector-icons/AntDesign';
+import background from '../../utill/component/timetable/background';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
@@ -26,6 +29,9 @@ export default function Timetable({navigation, route}: any) {
 	const [x, setX] = useState(-1);
 	const [viewDayIndex, setViewDayIndex] = useState(0);
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
+	const SaveContainer = styled(Icon)`
+		border-radius: 5px;
+	`;
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -112,67 +118,49 @@ export default function Timetable({navigation, route}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
+		console.log(
+			makeMode,
+			'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+		);
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<Box>
+				<View>
 					{makeMode == 'share' ? (
 						<TouchableOpacity onPress={goMapInfo}>
-							<Text>지도 함 볼래?</Text>
+							<SvgMapIcon color={colors.selectButton} />
 						</TouchableOpacity>
 					) : (
 						<>
-							{editMode == 'delete' ? (
-								<Box w='100%' h='60' alignItems='center'>
-									<TouchableOpacity
-										onPress={() => {
-											const a = timetable.map((item, idx) =>
-												item.filter(value => !deleteList.includes(value?.id ?? 'no')),
-											);
-											setDeleteList([]);
-											dispatch(travelSliceActions.changeTimetable(a));
-											console.log(a);
-										}}>
-										<Text>삭제요</Text>
-									</TouchableOpacity>
-								</Box>
-							) : editMode == 'add' ? (
-								<Box w='100%' h='60' alignItems='center'>
-									<TouchableOpacity
-										onPress={() => {
-											//console.log(addList);
-											navigation.navigate('TimetableAddPlace', {x: x, y: addList});
-											setAddList([]);
-											console.log('다음페이지');
-										}}>
-										<Text>추가요</Text>
-									</TouchableOpacity>
-								</Box>
+							{editMode == 'add' ? (
+								<IconContainer
+									onPress={() => {
+										navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+										setAddList([]);
+										dispatch(travelSliceActions.editModeChange(''));
+									}}>
+									<SaveContainer name={'plus'} size={25} color={'white'} />
+								</IconContainer>
 							) : (
-								<HStack w='100%' h='60'>
-									<TouchableOpacity onPress={goMapInfo}>
-										<SvgMapIcon color={colors.selectButton} />
-									</TouchableOpacity>
-									<TouchableOpacity onPress={goSave}>
-										<Text>저장</Text>
-									</TouchableOpacity>
-								</HStack>
+								<HeaderHStack>
+									<IconContainer onPress={goMapInfo}>
+										<SvgMapIcon width={25} height={25} color={'white'} />
+									</IconContainer>
+									<IconContainer onPress={goSave}>
+										<SaveContainer name={'save'} size={25} color={'white'} />
+									</IconContainer>
+								</HeaderHStack>
 							)}
 						</>
 					)}
-				</Box>
+				</View>
 			),
 		});
 	}, [editMode, timetable, addList, deleteList, x, makeMode]);
 
-	if (!tableShowFlag)
-		return (
-			<Box>
-				<Text>보여줄수없음</Text>
-			</Box>
-		);
+	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
 	return (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
@@ -199,8 +187,14 @@ const TimeTableContainer = styled.View`
 `;
 const ScrollVIewContainer = styled.View`
 	width: 100%;
-	flex: 0.8;
+	flex: 0.9;
 `;
 const TimetableScrollView = styled.ScrollView`
 	position: relative;
+`;
+const IconContainer = styled.TouchableOpacity`
+	padding: 1%;
+	border-radius: 5px;
+	background-color: ${colors.selectButton};
+	margin: 0px 0px 0px 10px;
 `;

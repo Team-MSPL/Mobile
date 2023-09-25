@@ -1,8 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getMyTravelList, getOneTravelCourse} from '../../redux/travel-info/travel.slice';
+import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {TouchableOpacity} from 'react-native';
-import {Text, Box, ScrollView} from 'native-base';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -11,11 +10,11 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import styled from 'styled-components/native';
-import {HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
 export default function MyTravelList({navigation}: any) {
-	const {myTravelList} = useAppSelector(state => state.travelSlice);
+	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
 
 	const dispatch = useAppDispatch();
@@ -34,6 +33,9 @@ export default function MyTravelList({navigation}: any) {
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
+	};
+	const goLogin = () => {
+		navigation.replace('LoginScreen');
 	};
 	const goMakeTravel = () => {
 		navigation.navigate('Home');
@@ -56,16 +58,16 @@ export default function MyTravelList({navigation}: any) {
 	useBackHandler();
 	useEffect(() => {
 		navigation.setOptions({
-			headerTitle: () => <Text>내 여행</Text>,
-			headerRight: () =>
-				socialloginProvider != 'anonymous' && (
-					<TouchableOpacity
-						onPress={() => {
-							setView(view + 1);
-						}}>
-						<Text>새로고침</Text>
-					</TouchableOpacity>
-				),
+			headerTitle: () => <MainText>내 여행</MainText>,
+			// headerRight: () =>
+			// 	socialloginProvider != 'anonymous' && (
+			// 		<TouchableOpacity
+			// 			onPress={() => {
+			// 				setView(view + 1);
+			// 			}}>
+			// 			<MainText>새로고침</MainText>
+			// 		</TouchableOpacity>
+			// 	),
 		});
 	}, []);
 	useFocusEffect(
@@ -73,6 +75,13 @@ export default function MyTravelList({navigation}: any) {
 			socialloginProvider != 'anonymous' && getTravelList();
 		}, []),
 	);
+	const goEnroll = () => {
+		let season = Array(4).fill(0);
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		index < 0 ? (season[3] = 1) : (season[index] = 1);
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		navigation.navigate('EnrollTravelTitle');
+	};
 
 	return (
 		<MainContainer>
@@ -86,7 +95,7 @@ export default function MyTravelList({navigation}: any) {
 						새로운
 						{'\n'}여행 일정 만들기
 					</MainText>
-					<NewTravelButton>
+					<NewTravelButton onPress={goEnroll}>
 						<ButtonText>출발</ButtonText>
 						<ButtonRight>
 							<SvgRight color={colors.selectButton} />
@@ -99,14 +108,26 @@ export default function MyTravelList({navigation}: any) {
 				<MainText>내 여행 기록</MainText>
 			</NewTravelContainer>
 			{socialloginProvider == 'anonymous' ? (
-				<Box>익명이라 보여줄게 없엉 </Box>
+				<NewTravelContainer>
+					<Center>
+						<AnonymousText>로그인을 하면 추억을 남길수 있어요 </AnonymousText>
+						<TouchableOpacity onPress={goLogin}>
+							<SubTitleColorText>로그인하러가기</SubTitleColorText>
+						</TouchableOpacity>
+					</Center>
+				</NewTravelContainer>
 			) : myTravelList.length == 0 ? (
-				<TouchableOpacity onPress={goMakeTravel}>
-					<Text>내 여행이 없네유 만들러 고고?</Text>
-				</TouchableOpacity>
+				<NewTravelContainer>
+					<Center>
+						<TouchableOpacity onPress={goMakeTravel}>
+							<MainText>아직 만들어진 여행이 없어요!</MainText>
+						</TouchableOpacity>
+					</Center>
+				</NewTravelContainer>
 			) : (
 				myTravelList.map((item, idx) => (
 					<MyTravelContainer
+						key={idx}
 						onPress={() => {
 							goMyTravelDetail(item._id);
 						}}>
@@ -116,7 +137,7 @@ export default function MyTravelList({navigation}: any) {
 									'~' +
 									moment(item.day[item.nDay - 1]).format('MM월-DD일')}
 							</DayText>
-							<Text>{item.travelName}</Text>
+							<TravelTitleText>{item.travelName}</TravelTitleText>
 						</VStack>
 						<SvgRightAdd color={colors.selectButton} />
 					</MyTravelContainer>
@@ -178,4 +199,11 @@ const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+`;
+const TravelTitleText = styled(SubTitleColorText)`
+	font-size: 22px;
+	font-weight: 900;
+`;
+const AnonymousText = styled(MainText)`
+	color: ${colors.regionNormal};
 `;
