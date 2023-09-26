@@ -1,4 +1,4 @@
-import {useRef, useState, useEffect, useCallback} from 'react';
+import {useRef, useState, useEffect, useCallback, useLayoutEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import DatePicker from 'react-native-date-picker';
@@ -12,7 +12,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Modal, View} from 'react-native';
 
-export default function SelectDay({setViewComponent, viewComponent}: any) {
+export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
 	const {day, Place, timeLimitArray, minuteLimitArray, nDay, accommodations, selectStartDate, selectEndDate} =
@@ -51,7 +51,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 		dateFlag.current = e;
 		setVisible(true);
 	};
-	useEffect(() => {
+	useLayoutEffect(() => {
 		goNext();
 	}, [selectStartDate, selectEndDate]);
 	const goNext = () => {
@@ -210,11 +210,7 @@ export default function SelectDay({setViewComponent, viewComponent}: any) {
 						에 돌아와요 👈
 					</PreviewText>
 				</PreviewContainer>
-				<CustomButton
-					label={'다음 (' + (viewComponent + 1) + '/5)'}
-					onPress={() => {
-						setViewComponent(viewComponent + 1);
-					}}></CustomButton>
+				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
 			</VStack>
 			<DatePicker
 				modal

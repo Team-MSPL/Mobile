@@ -9,7 +9,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgCheck} from '../../utill/svg/svg';
 import moment from 'moment';
-export default function SelectTendency({setViewComponent, viewComponent}: any) {
+export default function SelectTendency({setViewComponent, viewComponent, goNextStep}: any) {
 	const {transit, Place, tendency, selectStartDate, selectEndDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
@@ -24,29 +24,29 @@ export default function SelectTendency({setViewComponent, viewComponent}: any) {
 		console.log(copy);
 		dispatch(travelSliceActions.enrollTendency(copy));
 	};
-	useEffect(() => {
-		let data: PlaceType[] = [];
-		const checkDays = 0;
+	// useEffect(() => {
+	// 	let data: PlaceType[] = [];
+	// 	const checkDays = 0;
 
-		data = [...Array(checkDays + 2)].map(item => {
-			return Place;
-		});
+	// 	data = [...Array(checkDays + 2)].map(item => {
+	// 		return Place;
+	// 	});
 
-		let dateArray = [];
-		let count = 0;
-		let copySelectedStartDate = moment({...selectStartDate});
-		while (checkDays > 4 ? copySelectedStartDate.isSameOrBefore(selectEndDate) : count < 5) {
-			dateArray.push(copySelectedStartDate.clone());
-			copySelectedStartDate.add(1, 'day');
-			count += 1;
-		}
-		dispatch(
-			travelSliceActions.enrollFirstSetting({
-				day: dateArray,
-				accommodations: data,
-			}),
-		);
-	}, []);
+	// 	let dateArray = [];
+	// 	let count = 0;
+	// 	let copySelectedStartDate = moment({...selectStartDate});
+	// 	while (checkDays > 4 ? copySelectedStartDate.isSameOrBefore(selectEndDate) : count < 5) {
+	// 		dateArray.push(copySelectedStartDate.clone());
+	// 		copySelectedStartDate.add(1, 'day');
+	// 		count += 1;
+	// 	}
+	// 	dispatch(
+	// 		travelSliceActions.enrollFirstSetting({
+	// 			day: dateArray,
+	// 			accommodations: data,
+	// 		}),
+	// 	);
+	// }, []);
 	return (
 		<MainContainer showsVerticalScrollIndicator={false}>
 			<StepText mainText='여행 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
@@ -73,7 +73,7 @@ export default function SelectTendency({setViewComponent, viewComponent}: any) {
 							<FlexWrap>
 								{item.list.map((data, idx) => {
 									return (
-										<HStack key={idx}>
+										<TendencyElementContainer key={idx}>
 											<SvgCheck
 												color={
 													tendency[index][idx] == 1
@@ -86,7 +86,7 @@ export default function SelectTendency({setViewComponent, viewComponent}: any) {
 												label={data}
 												onPress={() => selectData({index, idx})}
 												bgColor={tendency[index][idx] == 1}></TendencyButton>
-										</HStack>
+										</TendencyElementContainer>
 									);
 								})}
 							</FlexWrap>
@@ -94,7 +94,7 @@ export default function SelectTendency({setViewComponent, viewComponent}: any) {
 					);
 				})}
 
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNext}></CustomButton>
+				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
 			</VStack>
 		</MainContainer>
 	);
@@ -134,4 +134,7 @@ export const TendencyStepText = styled.Text`
 	margin: 10px 0px 0px 0px;
 	font-size: 15px;
 	color: #2698fa;
+`;
+export const TendencyElementContainer = styled(HStack)`
+	width: 50%;
 `;

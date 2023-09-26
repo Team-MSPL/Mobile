@@ -1,15 +1,11 @@
 import React, {useState, useRef} from 'react';
 import {Permission, requestMultiple, openSettings} from 'react-native-permissions';
 import styled from 'styled-components/native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Alert, TouchableOpacity} from 'react-native';
 import {useAppDispatch} from '../redux';
 import usePermission from './hooks/usePermisson';
 import {setPermission} from '../redux/setting/settingSlice';
-import {Box, Text} from 'native-base';
 import AccessDialog from './access-dialog';
 import {modalSliceActions} from '../redux/modal/modalSlice';
-import {Center, MainContainer, MainText} from './layout/layout';
 import {SvgApple} from './svg/svg';
 
 import Icon from 'react-native-vector-icons/AntDesign';

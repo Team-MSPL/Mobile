@@ -5,7 +5,7 @@ import SelectButton from '../../../utill/component/select-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {FlexWrap, MainContainer, HStack, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
-import {TendencyStepText, TendencyText, TendencyContainer} from '../select-tendency';
+import {TendencyStepText, TendencyText, TendencyContainer, TendencyElementContainer} from '../select-tendency';
 import TendencyButton from '../../../utill/component/tendency-button';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
@@ -48,7 +48,7 @@ export default function SelectTendency({navigation}: any) {
 							<FlexWrap>
 								{item.list.map((data, idx) => {
 									return (
-										<HStack key={idx}>
+										<TendencyElementContainer key={idx}>
 											<SvgCheck
 												color={
 													select[index][idx] == 1 ? colors.selectButton : colors.regionNormal
@@ -59,7 +59,7 @@ export default function SelectTendency({navigation}: any) {
 												label={data}
 												onPress={() => selectData({index, idx})}
 												bgColor={select[index][idx] == 1}></TendencyButton>
-										</HStack>
+										</TendencyElementContainer>
 									);
 								})}
 							</FlexWrap>

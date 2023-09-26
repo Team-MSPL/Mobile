@@ -9,13 +9,19 @@ import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
+import {MainContainer} from '../../utill/layout/layout';
 
+import Icon from 'react-native-vector-icons/AntDesign';
+import {SvgRight} from '../../utill/svg/svg';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
 	const dispatch = useAppDispatch();
 	const [nickname, setNickname] = useState('');
 	const {anonymousKeep} = useAppSelector(state => state.userSlice);
+	const CheckLogoContainer = styled(Icon)`
+		border-radius: 5px;
+	`;
 	const goSignUp = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -70,9 +76,26 @@ export default function Join1({navigation, route}: any) {
 	useEffect(() => {
 		setNickname(route.params.nickname);
 	}, []);
+	const checkList = [
+		{title: '전체 동의', checkFunction: clickAllCheck, detaileFunction: () => null},
+		{
+			title: '이용 약관 동의',
+			checkFunction: () => {
+				checkClick(0);
+			},
+			detaileFunction: goPolicy,
+		},
+		{
+			title: '개인정보처리방침',
+			checkFunction: () => {
+				checkClick(1);
+			},
+			detaileFunction: goTerms,
+		},
+	];
 	return (
-		<SafeAreaView style={{backgroundColor: colors.main}}>
-			<Text>닉네임이요</Text>
+		<MainContainer>
+			<Text>닉네임을 입력해주세요</Text>
 			<InputProfileContainer>
 				<InputWrap>
 					<CustomTextInput
@@ -94,48 +117,38 @@ export default function Join1({navigation, route}: any) {
 					)}
 				</InputWrap>
 				<TermsContainer>
-					<CheckContainer>
-						<TouchableOpacity style={{backgroundColor: allCheck ? 'red' : 'black'}} onPress={clickAllCheck}>
-							<Text>dd</Text>
-						</TouchableOpacity>
-						<TouchableOpacity onPress={() => {}}>
-							<Text>약관 전체동의요</Text>
-						</TouchableOpacity>
-					</CheckContainer>
-					<CheckContainer>
-						<TouchableOpacity
-							style={{backgroundColor: check[0] ? 'red' : 'black'}}
-							onPress={() => {
-								checkClick(0);
-							}}>
-							<Text>ㅇㅇ</Text>
-						</TouchableOpacity>
-						<TouchableOpacity onPress={goPolicy}>
-							<Text>이용 약관 동의 더보기</Text>
-						</TouchableOpacity>
-					</CheckContainer>
-					<CheckContainer>
-						<TouchableOpacity
-							style={{backgroundColor: check[1] ? 'red' : 'black'}}
-							onPress={() => {
-								checkClick(1);
-							}}>
-							<Text>ㅇㅇ</Text>
-						</TouchableOpacity>
-						<TouchableOpacity onPress={goTerms}>
-							<Text>개인정보처리방침 더보기</Text>
-						</TouchableOpacity>
-					</CheckContainer>
+					{checkList.map((item, idx) => (
+						<CheckContainer>
+							<TouchableOpacity onPress={item.checkFunction}>
+								<CheckLogoContainer
+									name={'checkcircleo'}
+									size={25}
+									color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}
+								/>
+							</TouchableOpacity>
+							<CheckTouchableOpacity onPress={item.detaileFunction}>
+								<Text>{item.title}</Text>
+								<SvgRight color={'grey'} />
+							</CheckTouchableOpacity>
+						</CheckContainer>
+					))}
 				</TermsContainer>
 				<CustomButton label={'회원가입'} onPress={goSignUp} isDisabled={!(allCheck && nickname.length != 0)} />
 			</InputProfileContainer>
-		</SafeAreaView>
+		</MainContainer>
 	);
 }
 
+const CheckTouchableOpacity = styled.TouchableOpacity`
+	width: 80%;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 0px 0px 0px 5px;
+	align-items: center;
+`;
 const InputProfileContainer = styled.View`
 	display: flex;
-	margin-top: 24px;
+	margin-top: 10px;
 	background-color: ${colors.main};
 	padding: 10px;
 `;
@@ -162,14 +175,15 @@ const CustomTextInput = styled.TextInput<{text: string}>`
 `;
 
 const TermsContainer = styled.View`
-	width: 80%;
+	width: 100%;
 	padding: 10px;
 	border-radius: 1px;
 	border-color: black;
-	border-width: 1px;
-	margin: 10px;
+	margin: 20px 0px 20px 0px;
 `;
 const CheckContainer = styled.View`
 	flex-direction: row;
 	width: 100%;
+	align-items: center;
+	margin: 0px 0px 20px 0px;
 `;

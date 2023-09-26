@@ -1,6 +1,6 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Alert, Platform, TextInput, TouchableOpacity, Image} from 'react-native';
+import {Alert, Platform, TextInput, TouchableOpacity, Image, BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -16,12 +16,37 @@ export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
+	const [saveCheck, setSaveCheck] = useState(false);
 	const [diaryValue, setDiaryValue] = useState(diary);
 
 	const [pictureValue, setpictureValue] = useState<string[]>(picture);
 	const changeDiary = (e: string) => {
+		!saveCheck && setSaveCheck(true);
 		setDiaryValue(e);
 	};
+
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused() && saveCheck) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '저장이 필요합니다. ',
+						modalSubTitle: '변경사항이 저장되지않았습니다. 나가시겠습니까?',
+						modalLeft: true,
+						modalFunction: () => {
+							navigation.goBack();
+						},
+					}),
+				);
+
+				return true;
+			}
+		};
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, [saveCheck]);
 	const goSaveDiary = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -45,18 +70,24 @@ export default function InputDiary({navigation}: any) {
 			height: 400,
 			size: 1000,
 			multiple: true,
+			maxFiles: 5,
 			mediaType: 'photo',
 			croppingQuality: 0.6,
 			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
-			let temporaryList = [];
-			for (let i = 0; i < response.length; i++) {
-				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+			if (response.length <= 5) {
+				let temporaryList = [];
+				for (let i = 0; i < response.length; i++) {
+					temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+				}
+				//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+				setpictureValue(temporaryList);
+				!saveCheck && setSaveCheck(true);
+			} else {
+				dispatch(modalSliceActions.setOpenModal({modalTitle: '최대 5장까지 선택가능합니다.'}));
 			}
-			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setpictureValue(temporaryList);
 		});
 	};
 	return (
@@ -70,8 +101,8 @@ export default function InputDiary({navigation}: any) {
 						</PictuerVstack>
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
-						<PictureElementContainer>
-							<PictureElement key={idx} source={{uri: item}}></PictureElement>
+						<PictureElementContainer key={idx}>
+							<PictureElement source={{uri: item}}></PictureElement>
 						</PictureElementContainer>
 					))}
 				</PictureScroll>

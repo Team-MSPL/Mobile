@@ -48,9 +48,9 @@ export default function CourseDetail({navigation, route}: any) {
 	if (courseDetail?.name)
 		return (
 			<DetailContainer>
-				<ImageScroll horizontal={true}>
-					{courseDetail.photos &&
-						courseDetail.photos.map((value, index) => (
+				{courseDetail.photos && (
+					<ImageScroll horizontal={true}>
+						{courseDetail.photos.map((value, index) => (
 							<Pressable
 								onPress={() => {
 									setImageIndex(index);
@@ -66,7 +66,8 @@ export default function CourseDetail({navigation, route}: any) {
 								/>
 							</Pressable>
 						))}
-				</ImageScroll>
+					</ImageScroll>
+				)}
 				<TitleInfoContainer>
 					<DetailInfoContainer>
 						<VStack>
@@ -124,7 +125,7 @@ export default function CourseDetail({navigation, route}: any) {
 						</>
 					) : (
 						<ReviewContainer>
-							{courseDetail.reviews ? (
+							{courseDetail?.reviews ? (
 								courseDetail.reviews.map((item, idx) => (
 									<OpenContainer key={idx}>
 										<OpenVStack>
@@ -145,24 +146,26 @@ export default function CourseDetail({navigation, route}: any) {
 						</ReviewContainer>
 					)}
 				</TabScrollView>
-				<ImageView
-					images={courseDetail.photos.map((value, index) => ({
-						uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
-					}))}
-					onImageIndexChange={item => console.log(item)}
-					imageIndex={imageIndex}
-					visible={visible}
-					onRequestClose={() => setVisible(false)}
-					FooterComponent={index => {
-						return (
-							<ImageViewFooterComponent>
-								<ImageText>
-									{index.imageIndex + 1}/{courseDetail.photos.length}
-								</ImageText>
-							</ImageViewFooterComponent>
-						);
-					}}
-				/>
+				{courseDetail?.photos && (
+					<ImageView
+						images={courseDetail?.photos.map((value, index) => ({
+							uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
+						}))}
+						onImageIndexChange={item => console.log(item)}
+						imageIndex={imageIndex}
+						visible={visible}
+						onRequestClose={() => setVisible(false)}
+						FooterComponent={index => {
+							return (
+								<ImageViewFooterComponent>
+									<ImageText>
+										{index.imageIndex + 1}/{courseDetail.photos.length}
+									</ImageText>
+								</ImageViewFooterComponent>
+							);
+						}}
+					/>
+				)}
 			</DetailContainer>
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;

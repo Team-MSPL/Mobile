@@ -10,8 +10,9 @@ import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
 import {SvgCancel} from '../../utill/svg/svg';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
-export default function SelectCity({setViewComponent, viewComponent}: any) {
+export default function SelectCity({viewComponent, goNextStep}: any) {
 	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
@@ -48,18 +49,9 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 	};
 
 	const goNext = () => {
-		if (regionMode) {
-			//dispatch(travelSliceActions.enrollCityIndex(select));
-		} else {
-			const index = popularityList[popularitySelect];
-			dispatch(
-				travelSliceActions.enrollPoplurarityRegion({
-					region: [cityViewList[index.id].sub[index.subId].subTitle],
-					cityIndex: index.id,
-				}),
-			);
-		}
-		setViewComponent(viewComponent + 1);
+		region.length != 0
+			? goNextStep()
+			: dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
 	};
 
 	//검색 관련
