@@ -110,7 +110,7 @@ export default function FinalCheck({navigation}: any) {
 		try {
 			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(
 					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
 				);

@@ -61,7 +61,6 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log('띠영', userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
@@ -80,7 +79,7 @@ export default function LoginScreen({navigation}: any) {
 			} else {
 				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
-		} catch {
+		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',

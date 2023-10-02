@@ -280,7 +280,7 @@ export const TimeItemContainer = styled.View`
 	width: 50%;
 `;
 export const TimeItemText = styled.Text`
-	font-size: 16px;
+	font-size: 15px;
 	color: black;
 	font-weight: bold;
 `;

@@ -57,6 +57,7 @@ export default function ViewResult({navigation}: any) {
 			setRecommendList(result);
 		} catch (err) {
 			console.log(err);
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '추천을 받는 중 에러가 발생했습니다.'}));
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
