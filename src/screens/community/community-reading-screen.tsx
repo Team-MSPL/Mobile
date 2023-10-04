@@ -1,13 +1,13 @@
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
-import {FlatList, ThreeDotsIcon} from 'native-base';
+import {FlatList} from 'native-base';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Alert, Dimensions, NativeModules, Platform, RefreshControl, Text, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import ImageView from 'react-native-image-viewing';
 import Swiper from 'react-native-swiper';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import FeathernIcon from 'react-native-vector-icons/Feather';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -25,6 +25,7 @@ import {
 } from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
 import {MainContainer} from '../../utill/layout/layout';
+import {MenuIcon} from './community-main-screen';
 
 const {StatusBarManager} = NativeModules;
 
@@ -188,7 +189,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 								actionSheetType.current = '게시글';
 								showCommunityReadingOptionActionSheet();
 							}}>
-							<ThreeDotsIcon></ThreeDotsIcon>
+							<MenuIcon name='more-horizontal'></MenuIcon>
 						</TouchableOpacity>
 					</View>
 				),
@@ -684,7 +685,7 @@ const LikeCommentText = styled.Text`
 	font-size: 14px;
 	margin-right: 12px;
 `;
-const CommentIcon = styled(FeathernIcon)`
+const CommentIcon = styled(FeatherIcon)`
 	color: black;
 	font-size: 24px;
 	margin-right: 4px;
@@ -724,7 +725,7 @@ const CommentMenu = styled.TouchableOpacity`
 	justify-content: center;
 	flex: 1;
 `;
-const CommentMenuIcon = styled(FeathernIcon)`
+const CommentMenuIcon = styled(FeatherIcon)`
 	font-size: 20px;
 `;
 const CommentContent = styled.Text`
@@ -765,7 +766,7 @@ const CommentSubmitButton = styled.TouchableOpacity`
 	flex: 1;
 	align-items: center;
 `;
-const CommentSubmitButtonIcon = styled(FeathernIcon)<{isDisabled: boolean}>`
+const CommentSubmitButtonIcon = styled(FeatherIcon)<{isDisabled: boolean}>`
 	color: ${props => (props.isDisabled ? '#ccc' : colors.border)};
 	font-size: 24px;
 `;

@@ -1,5 +1,9 @@
 {
 	"name": "DanimMobile",
 	"displayName": "다님",
-	"plugins": ["@react-native-google-signin/google-signin"]
+	"plugins": ["@react-native-google-signin/google-signin"],
+	"react-native-google-mobile-ads": {
+		"android_app_id": "ca-app-pub-1677695109210729~4661048789",
+		"ios_app_id": "ca-app-pub-xxxxxxxx~xxxxxxxx"
+	}
 }

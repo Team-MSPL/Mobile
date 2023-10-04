@@ -1,5 +1,6 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
+import DetailResult from '../screens/enroll-info/region-recommend/detail-result';
 import SelectDistance from '../screens/enroll-info/region-recommend/select-distance';
 import SelectPopularity from '../screens/enroll-info/region-recommend/select-popularity';
 import SelectTendency from '../screens/enroll-info/region-recommend/select-tendency';
@@ -33,7 +34,16 @@ export default function RegionRecommendStack() {
 				name='RegionViewResult'
 				component={ViewResult}
 				options={{
+					headerBackVisible: false,
 					title: '추천 결과',
+				}}
+			/>
+			<Stack.Screen
+				name='DetailResult'
+				component={DetailResult}
+				options={{
+					headerBackVisible: false,
+					title: '여행 지역 추천',
 				}}
 			/>
 		</Fragment>

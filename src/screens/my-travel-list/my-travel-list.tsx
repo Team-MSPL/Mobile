@@ -10,7 +10,7 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import styled from 'styled-components/native';
-import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {Center, HStack, MainContainer, Margin, VStack} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
 export default function MyTravelList({navigation}: any) {

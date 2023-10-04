@@ -154,6 +154,7 @@ export default function Recommend({navigation, route}: any) {
 						radius: 20000,
 					}),
 				).unwrap();
+				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
 			}
 			setRcommendList(result);
 		} catch (err) {

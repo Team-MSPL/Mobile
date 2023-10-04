@@ -61,7 +61,6 @@ export default function LoginScreen({navigation}: any) {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log('띠영', userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
@@ -80,7 +79,7 @@ export default function LoginScreen({navigation}: any) {
 			} else {
 				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
-		} catch {
+		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',
@@ -146,7 +145,7 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userProfileImage: '../public/images/danim_logo3.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -156,7 +155,7 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
+						profileImage: '../public/images/danim_logo3.png',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
@@ -181,7 +180,7 @@ export default function LoginScreen({navigation}: any) {
 				console.log('같아라!', decodeToken.sub);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userProfileImage: '../public/images/danim_logo3.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -191,7 +190,7 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
+						profileImage: '../public/images/danim_logo3.png',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
@@ -236,9 +235,9 @@ export default function LoginScreen({navigation}: any) {
 	const [view, setView] = useState(0);
 	const viewList = [
 		require('../../../public/images/login1.png'),
-		require('../../../public/images/danim_logo.png'),
-		require('../../../public/images/apple_logo.png'),
-		require('../../../public/images/kakao_logo.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
 	];
 	const [backgroundImageIndex, setBackgroundImageIndex] = useState(0);
 	const [fadeAnim] = useState(new Animated.Value(1));
@@ -248,7 +247,7 @@ export default function LoginScreen({navigation}: any) {
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
-			require('../../../public/images/kakao_logo.png'),
+			require('../../../public/images/login1.png'),
 		];
 		Animated.timing(fadeAnim, {
 			toValue: 0,
@@ -268,6 +267,7 @@ export default function LoginScreen({navigation}: any) {
 	useEffect(() => {
 		const interval = setInterval(startBackgroundAnimation, 5000);
 		return () => {
+			console.log('에ㅔ에에에에에');
 			clearInterval(interval);
 		};
 	}, []);

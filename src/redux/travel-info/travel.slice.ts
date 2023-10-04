@@ -1,4 +1,4 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {API_ROUTE, GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -48,7 +48,7 @@ const initialState: LiteState = {
 };
 
 export const axiosAuth = axios.create({
-	baseURL: 'http://15.164.164.164',
+	baseURL: API_ROUTE,
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,
@@ -247,6 +247,10 @@ export const travelSlice = createSlice({
 
 		setNDay: (state, {payload}) => {
 			state.nDay = payload;
+		},
+		selectPopularity: (state, {payload}) => {
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
 		},
 		enrollPlace: (state, {payload}) => {
 			state.Place = payload;

@@ -1,26 +1,74 @@
 import {HStack, VStack, Divider, FlexWrap} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import SelectDay from './select-day';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import SelectTendency from './select-tendency';
-import {ScrollView} from 'react-native';
+import {BackHandler, ScrollView} from 'react-native';
 import SelectCity from './select-city';
 import SelectMulti from './select-multi';
 import {colors} from '../../utill/colors';
 import SelectDistance from './select-distance';
+import {useAppDispatch} from '../../redux';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 export default function EnrollInfo({navigation}: any) {
 	const [viewComponent, setViewComponent] = useState(0);
 	const changeComponent = (e: number) => {
 		setViewComponent(e);
 	};
+	const pfpfp = () => {
+		console.log('한ㄴ영ㅇ');
+	};
+	const [checKStep, setCheckStep] = useState(0);
+	const goNextStep = () => {
+		setViewComponent(viewComponent + 1);
+		checKStep == viewComponent && setCheckStep(viewComponent + 1);
+	};
+	const dispatch = useAppDispatch();
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused()) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '뒤로 이동시 데이터는 날라갑니다.',
+						modalSubTitle: '그래도 나가시겠습니까?',
+						modalLeft: true,
+						modalFunction: () => {
+							navigation.popToTop();
+						},
+					}),
+				);
+				return true;
+			}
+		};
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, []);
 	const enrollComponentList = [
 		{
 			title: '성향',
-			component: <SelectTendency setViewComponent={setViewComponent} viewComponent={viewComponent} />,
+			component: (
+				<SelectTendency
+					setViewComponent={setViewComponent}
+					viewComponent={viewComponent}
+					goNextStep={goNextStep}
+				/>
+			),
 		},
-		{title: '날짜', component: <SelectDay setViewComponent={setViewComponent} viewComponent={viewComponent} />},
-		{title: '지역', component: <SelectCity setViewComponent={setViewComponent} viewComponent={viewComponent} />},
+		{
+			title: '날짜',
+			component: (
+				<SelectDay setViewComponent={setViewComponent} viewComponent={viewComponent} goNextStep={goNextStep} />
+			),
+		},
+		{
+			title: '지역',
+			component: (
+				<SelectCity setViewComponent={setViewComponent} viewComponent={viewComponent} goNextStep={goNextStep} />
+			),
+		},
 		{
 			title: '여행요소',
 			component: (
@@ -28,6 +76,7 @@ export default function EnrollInfo({navigation}: any) {
 					navigation={navigation}
 					setViewComponent={setViewComponent}
 					viewComponent={viewComponent}
+					goNextStep={goNextStep}
 				/>
 			),
 		},
@@ -50,10 +99,14 @@ export default function EnrollInfo({navigation}: any) {
 						<TitleContainer
 							key={idx}
 							select={viewComponent == idx}
+							disabled={checKStep < idx}
+							isDisabledOpacity={checKStep < idx}
 							onPress={() => {
 								changeComponent(idx);
 							}}>
-							<TitleViewText select={viewComponent == idx}>{item.title}</TitleViewText>
+							<TitleViewText isDisabledOpacity={checKStep < idx} select={viewComponent == idx}>
+								{item.title}
+							</TitleViewText>
 						</TitleContainer>
 					))}
 				</ScrollView>
@@ -71,16 +124,18 @@ const TitleViewContainer = styled.View`
 	width: 100%;
 	margin: 0px 0px 20px 0px;
 `;
-const TitleContainer = styled.TouchableOpacity<{select: boolean}>`
+const TitleContainer = styled.TouchableOpacity<{select: boolean; isDisabledOpacity: boolean}>`
 	padding: 10px 20px 10px 20px;
 	justify-content: center;
 	align-items: center;
-	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
+	background-color: ${props =>
+		props.select ? colors.selectButton : props.isDisabledOpacity ? colors.regionNormal : colors.normalButton};
 	border-radius: 99px;
 	margin: 0px 10px 0px 10px;
+	opacity: ${props => (props.isDisabledOpacity ? 0.5 : 1)};
 `;
-const TitleViewText = styled.Text<{select: boolean}>`
+const TitleViewText = styled.Text<{select: boolean; isDisabledOpacity: boolean}>`
 	font-size: 17px;
-	color: ${props => (props.select ? 'white' : colors.TextPrimary)};
+	color: ${props => (props.select ? 'white' : props.isDisabledOpacity ? 'black' : colors.TextPrimary)};
 	font-weight: bold;
 `;

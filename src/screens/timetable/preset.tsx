@@ -34,6 +34,11 @@ export default function Preset({navigation}: any) {
 	let positions: {latitude: number; longitude: number}[] = [];
 
 	const change = (idx: number) => {
+		console.log('1', presetDatas[0]);
+		console.log('2', presetDatas[1]);
+		console.log('3', presetDatas[2]);
+		console.log('6', presetDatas[3]);
+		console.log('5', presetDatas[4]);
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(
 				{

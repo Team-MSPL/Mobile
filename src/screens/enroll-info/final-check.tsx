@@ -110,7 +110,7 @@ export default function FinalCheck({navigation}: any) {
 		try {
 			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(
 					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
 				);
@@ -143,7 +143,7 @@ export default function FinalCheck({navigation}: any) {
 						}),
 					);
 
-				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -304,7 +304,7 @@ export default function FinalCheck({navigation}: any) {
 	);
 }
 
-const SelectListContainer = styled.View`
+export const SelectListContainer = styled.View`
 	width: 100%;
 	border-radius: 15px;
 	background-color: ${colors.selectButton};
@@ -321,25 +321,25 @@ const SelectListAllContainer = styled.View`
 	align-items: center;
 `;
 
-const SelectListText = styled.Text`
+export const SelectListText = styled.Text`
 	font-size: 14px;
 	color: white;
 	font-weight: bold;
 `;
-const SelectTendencyContainer = styled.View`
+export const SelectTendencyContainer = styled.View`
 	padding: 10px;
 	border-radius: 10px;
 	background-color: white;
 	margin: 0px 10px 10px 0px;
 `;
-const SelectTendencyListContainer = styled.View`
+export const SelectTendencyListContainer = styled.View`
 	display: inline-block;
 	flex-direction: row;
 	flex-wrap: wrap;
 	margin: 10px;
 `;
 
-const SelectTendencyText = styled.Text`
+export const SelectTendencyText = styled.Text`
 	font-size: 18px;
 	font-weight: bold;
 	color: ${colors.selectButton};

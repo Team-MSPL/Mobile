@@ -9,7 +9,7 @@ import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/tr
 import {Pressable} from 'react-native';
 import {SvgCancel, SvgPlace, SvgHome} from '../../utill/svg/svg';
 
-export default function SelectMulti({setViewComponent, viewComponent, navigation}: any) {
+export default function SelectMulti({viewComponent, navigation, goNextStep}: any) {
 	const [accommodation, setAccommodation] = useState(false);
 	const [essential, setEssential] = useState(false);
 	const {nDay, day, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
@@ -152,11 +152,7 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 				<MarginContainder></MarginContainder>
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton
-					label={'다음 (' + (viewComponent + 1) + '/5)'}
-					onPress={() => {
-						setViewComponent(viewComponent + 1);
-					}}></CustomButton>
+				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

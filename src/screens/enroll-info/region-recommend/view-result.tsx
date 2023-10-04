@@ -12,13 +12,20 @@ import {MainContainer, HStack, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
+import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
 	const [recommendList, setRecommendList] = useState<
-		{name: string; photo: string; takenDay: number; tendency: string[]}[]
+		{
+			name: string;
+			photo: string;
+			takenDay: number;
+			tendency: string[];
+			topPopularPlaceList: {name: string; photo: string};
+		}[]
 	>([]);
 	const goEnrollInfo = (e: string) => {
 		let region: string[] = [];
@@ -50,6 +57,7 @@ export default function ViewResult({navigation}: any) {
 			setRecommendList(result);
 		} catch (err) {
 			console.log(err);
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '추천을 받는 중 에러가 발생했습니다.'}));
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -78,12 +86,7 @@ export default function ViewResult({navigation}: any) {
 	useLayoutEffect(() => {
 		getRegionRecommend();
 	}, []);
-	if (isLoading)
-		return (
-			<ScrollView>
-				<Text>스ㅔ</Text>
-			</ScrollView>
-		);
+	if (isLoading) return <ScrollView></ScrollView>;
 	return (
 		<MainContainer>
 			<StepText mainText='지역 추천' subText='당신의 성향을 기반으로, 여행 지역을 찾아왔어요' />
@@ -92,22 +95,64 @@ export default function ViewResult({navigation}: any) {
 					<RecommendContainer
 						key={idx}
 						onPress={() => {
-							goEnrollInfo(item.name);
+							navigation.navigate('DetailResult', {item: item});
+							console.log(item.topPopularPlaceList);
+							//goEnrollInfo(item.name);
 						}}>
-						<RecommendImage source={{uri: item.photo}}></RecommendImage>
+						{item.photo != '' ? (
+							<RecommendImage source={{uri: item.photo}}></RecommendImage>
+						) : (
+							<LogoCOntainer>
+								<SvgLoginLogo color={'white'} width={40} />
+							</LogoCOntainer>
+						)}
 						<RecommendElement>
 							<TitleText>{item.name}</TitleText>
-							{item.tendency.map((value, index) => (
-								<TendencyText>#{value}</TendencyText>
-							))}
+							<TendencyTextContainer>
+								<TendencyText>
+									{item.tendency.map((value, index) => (
+										<>#{value}</>
+									))}
+								</TendencyText>
+							</TendencyTextContainer>
+							<RightLogoContainer>
+								<LogoCircle>
+									<SvgRight color={'black'} width={15} />
+								</LogoCircle>
+							</RightLogoContainer>
 						</RecommendElement>
+						<TakenDayContainer>
+							<TakenText>Day {item.takenDay}</TakenText>
+						</TakenDayContainer>
 					</RecommendContainer>
 				))}
 			</RecommendAllContainer>
 		</MainContainer>
 	);
 }
-
+const TakenText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: white;
+`;
+const TakenDayContainer = styled.View`
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: ${colors.selectButton};
+	width: 20%;
+	padding: 5px;
+	border-top-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+`;
+const LogoCOntainer = styled.View`
+	width: 100%;
+	height: 200px;
+	align-items: center;
+	border-radius: 10px;
+	justify-content: center;
+	background-color: ${colors.regionNormal};
+`;
 const RecommendAllContainer = styled.View`
 	width: 100%;
 	border-radius: 10px;
@@ -115,7 +160,7 @@ const RecommendAllContainer = styled.View`
 	justify-content: center;
 	margin: 0px 0px 30px 0px;
 `;
-const RecommendContainer = styled.TouchableOpacity`
+export const RecommendContainer = styled.TouchableOpacity`
 	width: 90%;
 	border-radius: 10px;
 	align-items: center;
@@ -127,7 +172,7 @@ const RecommendImage = styled.Image`
 	height: 200px;
 	border-radius: 10px;
 `;
-const RecommendElement = styled.View`
+export const RecommendElement = styled.View`
 	width: 100%;
 	background-color: ${colors.selectButton};
 	flex-direction: row;
@@ -138,12 +183,30 @@ const RecommendElement = styled.View`
 	align-items: center;
 	padding: 10px;
 `;
+const TendencyTextContainer = styled.View`
+	width: 50%;
+	flex-direction: row;
+`;
+const RightLogoContainer = styled.View`
+	width: 20%;
+	align-items: center;
+	justify-content: center;
+`;
 const TitleText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	color: white;
+	width: 30%;
 `;
-const TendencyText = styled(TitleText)`
-	margin: 0px 0px 0px 5px;
+const TendencyText = styled.Text`
+	font-weight: bold;
+	color: white;
 	font-size: 9px;
+`;
+const LogoCircle = styled.View`
+	border-radius: 99px;
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+	background-color: white;
 `;
