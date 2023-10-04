@@ -1,4 +1,4 @@
-import {Google_Signin_Key} from '@env';
+import {API_ROUTE, Google_Signin_Key} from '@env';
 import {appleAuth, appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
@@ -102,6 +102,7 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'google',
 				signUpFlag: false,
 			};
+			console.log('디비 주소에용', API_ROUTE);
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
 				navigation.navigate('Join1', {
@@ -150,6 +151,7 @@ export default function LoginScreen({navigation}: any) {
 					loginProvider: 'apple',
 					signUpFlag: false,
 				};
+				console.log('디비 주소에용', API_ROUTE);
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {

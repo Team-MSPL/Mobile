@@ -1,12 +1,10 @@
-import {useEffect} from 'react';
+import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
-import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {
@@ -87,13 +85,13 @@ export default function Main({navigation}: any) {
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
 					<CollectionContentContainer>
 						{uniqueTravelList.map(item => (
-							<CollectionContentItem key={item.id}>
-								<CollectionContentItemImage source={item.imagePath} />
-								<CollectionContentItemText>{item.title}</CollectionContentItemText>
-								<CollectionContentItemHashtag>
+							<CollectionRecommendContentItem source={item.imagePath} key={item.id}>
+								<CollectionRecommendItemGradient colors={['transparent', 'black']} />
+								<CollectionRecommendContentItemExplainContainer>
+									<CollectionContentItemText>{item.title}</CollectionContentItemText>
 									<CollectionContentItemHashtagText>{item.hashtag}</CollectionContentItemHashtagText>
-								</CollectionContentItemHashtag>
-							</CollectionContentItem>
+								</CollectionRecommendContentItemExplainContainer>
+							</CollectionRecommendContentItem>
 						))}
 					</CollectionContentContainer>
 				</CollectionContainer>
@@ -105,49 +103,49 @@ const uniqueTravelList = [
 	{
 		id: 0,
 		imagePath: require('../../../public/images/uniqueTravelImage/danyang.jpeg'),
-		title: '단양 패러글라이딩',
+		title: '단양\n패러글라이딩',
 		hashtag: '#레저스포츠',
 	},
 	{
 		id: 1,
 		imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
-		title: '대전 성심당',
+		title: '대전\n성심당',
 		hashtag: '#맛있는',
 	},
 	{
 		id: 2,
 		imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
-		title: '동해 목포항',
+		title: '동해\n목포항',
 		hashtag: '#바다',
 	},
 	{
 		id: 3,
 		imagePath: require('../../../public/images/uniqueTravelImage/sejong.jpeg'),
-		title: '세종 고복자연공원',
+		title: '세종\n고복자연공원',
 		hashtag: '#공원',
 	},
 	{
 		id: 4,
 		imagePath: require('../../../public/images/uniqueTravelImage/asan.jpeg'),
-		title: '아산 지중해마을',
+		title: '아산\n지중해마을',
 		hashtag: '#시티투어',
 	},
 	{
 		id: 5,
 		imagePath: require('../../../public/images/uniqueTravelImage/osan.jpeg'),
-		title: '오산 반려동물테마파크',
+		title: '오산\n반려동물테마파크',
 		hashtag: '#반려견',
 	},
 	{
 		id: 6,
 		imagePath: require('../../../public/images/uniqueTravelImage/jangsu.jpeg'),
-		title: '장수 의암주논개생가지',
+		title: '장수\n의암주논개생가지',
 		hashtag: '#유적지',
 	},
 	{
 		id: 7,
 		imagePath: require('../../../public/images/uniqueTravelImage/chungdo.jpeg'),
-		title: '청도 프로방스',
+		title: '청도\n프로방스',
 		hashtag: '#이색체험',
 	},
 ];
@@ -191,6 +189,7 @@ const CollectionTitle = styled.Text`
 	font-size: 18px;
 	font-weight: bold;
 	margin-bottom: 4px;
+	color: black;
 `;
 const CollectionSubtitle = styled.Text`
 	font-size: 14px;
@@ -202,33 +201,32 @@ const CollectionContentContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 `;
-const CollectionContentItem = styled.View`
-	width: 120px;
-	height: 160px;
-	margin: 12px;
+const CollectionRecommendContentItem = styled.ImageBackground`
+	aspect-ratio: 1;
+	width: 168px;
+	overflow: hidden;
 	border-radius: 12px;
-	align-items: center;
-	justify-content: center;
+	margin-vertical: 8px;
+	margin-horizontal: 8px;
+	justify-content: flex-end;
 `;
-const CollectionContentItemImage = styled.Image`
-	width: 120px;
-	height: 120;
-	border-radius: 12px;
-	margin-bottom: 4px;
+const CollectionRecommendItemGradient = styled(LinearGradient)`
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 50%;
+`;
+const CollectionRecommendContentItemExplainContainer = styled.View`
+	flex-direction: column;
+	padding: 8px;
 `;
 const CollectionContentItemText = styled.Text`
-	font-size: 12px;
+	font-size: 16px;
+	font-weight: bold;
+	color: ${colors.main};
 `;
 
-const CollectionContentItemHashtag = styled.View`
-	width: 80px;
-	height: 32px;
-	border-radius: 12px;
-	padding: 8px;
-	align-items: center;
-	justify-content: center;
-	background-color: #2698fa9f;
-`;
 const CollectionContentItemHashtagText = styled.Text`
 	font-size: 12px;
 	color: ${colors.main};
