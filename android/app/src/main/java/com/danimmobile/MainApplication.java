@@ -10,7 +10,19 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
 import org.devio.rn.splashscreen.SplashScreenReactPackage; // SplashScreenReactPackage import 추가
-
+import com.microsoft.codepush.react.CodePush;
+public class MainApplication extends Application implements ReactApplication {
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        ...
+        // 2. Override the getJSBundleFile method to let
+        // the CodePush runtime determine where to get the JS
+        // bundle location from on each app start
+        @Override
+        protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile();
+        }
+    };
+}
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =

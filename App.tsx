@@ -27,6 +27,7 @@ import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
+import CodePush from 'react-native-code-push';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -189,5 +190,14 @@ function App(): JSX.Element {
 		</SafeAreaProvider>
 	);
 }
-
-export default App;
+const codePushOptions = {
+	checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
+	updateDialog: {
+		title: '내부 업데이트가 존재합니다.',
+		optionalUpdateMessage: '보다 안정적인 서비스 사용을 위해 내부 업데이트 후 재실행 합니다.',
+		optionalInstallButtonLabel: '업데이트',
+		optionalIgnoreButtonLabel: '나중에',
+	},
+	installMode: CodePush.InstallMode.IMMEDIATE,
+};
+export default CodePush(codePushOptions)(App);
