@@ -11,6 +11,7 @@ import {colors} from '../../utill/colors';
 import {SvgCancel} from '../../utill/svg/svg';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 
+import {ButtonContainer, MarginContainder} from './select-multi';
 export default function SelectCity({viewComponent, goNextStep}: any) {
 	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -77,72 +78,80 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 		dispatch(travelSliceActions.selectRegion([data]));
 	};
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			{/* 스테퍼 넣기 */}
-			<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
-			<HStack>
-				<SearchInput
-					// autoFocus={true}
-					value={search}
-					onChangeText={(text: string) => changeSearch(text)}
-					placeholder='ex)제주도'></SearchInput>
-			</HStack>
-			{searchData && (
-				<SearchTouchableOpacity onPress={addCity}>
-					<SelectRegion>
-						{searchData?.title + ' ' + (searchCity && searchCity) + '(눌러서 추가)'}
-					</SelectRegion>
-				</SearchTouchableOpacity>
-			)}
-			<SelectAllContainer>
-				<SelectRegion>선택 지역</SelectRegion>
-				<SelectListContainer horizontal={true}>
-					{region?.map((item, regionIndex) => {
-						return (
-							<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
-								<RegionElementContainerText>
-									{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
-								</RegionElementContainerText>
-								<SvgCancel color='white' />
-							</RegionElementContainer>
-						);
-					})}
-				</SelectListContainer>
-			</SelectAllContainer>
-			<HStack>
-				<RegionViewContainer>
-					<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
-						{cityViewList.map((item, idx) => {
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				{/* 스테퍼 넣기 */}
+				<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
+				<HStack>
+					<SearchInput
+						// autoFocus={true}
+						value={search}
+						onChangeText={(text: string) => changeSearch(text)}
+						placeholder='ex)제주도'></SearchInput>
+				</HStack>
+				{searchData && (
+					<SearchTouchableOpacity onPress={addCity}>
+						<SelectRegion>
+							{searchData?.title + ' ' + (searchCity && searchCity) + '(눌러서 추가)'}
+						</SelectRegion>
+					</SearchTouchableOpacity>
+				)}
+				<SelectAllContainer>
+					<SelectRegion>선택 지역</SelectRegion>
+					<SelectListContainer horizontal={true}>
+						{region?.map((item, regionIndex) => {
 							return (
-								<RegionItems
-									select={cityIndex == item.id}
-									onPress={() => {
-										selectCity(item.id);
-									}}>
-									<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
-								</RegionItems>
+								<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
+									<RegionElementContainerText>
+										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
+									</RegionElementContainerText>
+									<SvgCancel color='white' />
+								</RegionElementContainer>
 							);
 						})}
-					</ScrollView>
-				</RegionViewContainer>
-				<CityViewContainer>
-					<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
-						{cityViewList[cityIndex]?.sub.map((item, idx) => {
-							return (
-								<CityItems
-									select={region.includes(item.subTitle)}
-									onPress={() => {
-										cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
-									}}>
-									<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
-								</CityItems>
-							);
-						})}
-					</ScrollView>
-				</CityViewContainer>
-			</HStack>
-			<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNext}></CustomButton>
-		</MainContainer>
+					</SelectListContainer>
+				</SelectAllContainer>
+				<HStack>
+					<RegionViewContainer>
+						<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+							{cityViewList.map((item, idx) => {
+								return (
+									<RegionItems
+										key={idx}
+										select={cityIndex == item.id}
+										onPress={() => {
+											selectCity(item.id);
+										}}>
+										<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
+									</RegionItems>
+								);
+							})}
+						</ScrollView>
+					</RegionViewContainer>
+					<CityViewContainer>
+						<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+							{cityViewList[cityIndex]?.sub.map((item, idx) => {
+								return (
+									<CityItems
+										key={idx}
+										select={region.includes(item.subTitle)}
+										onPress={() => {
+											cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
+										}}>
+										<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
+									</CityItems>
+								);
+							})}
+						</ScrollView>
+					</CityViewContainer>
+				</HStack>
+
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNext}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
 

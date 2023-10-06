@@ -9,6 +9,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgCheck} from '../../utill/svg/svg';
 import moment from 'moment';
+import {ButtonContainer, MarginContainder} from './select-multi';
 export default function SelectTendency({setViewComponent, viewComponent, goNextStep}: any) {
 	const {transit, Place, tendency, selectStartDate, selectEndDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -48,55 +49,59 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 	// 	);
 	// }, []);
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			<StepText mainText='여행 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
-			<VStack>
-				<TendencyStepText>Step 1</TendencyStepText>
-				<TendencyText>어떻게 이동하시나요?</TendencyText>
-				<HStack>
-					<SvgCheck color={transit == 0 ? colors.selectButton : colors.regionNormal} />
-					<TendencyButton
-						label='자차(렌트카)'
-						onPress={() => dispatch(travelSliceActions.enrollTransit(0))}
-						bgColor={transit == 0}></TendencyButton>
-					<SvgCheck color={transit == 1 ? colors.selectButton : colors.regionNormal} />
-					<TendencyButton
-						label='대중교통'
-						onPress={() => dispatch(travelSliceActions.enrollTransit(1))}
-						bgColor={transit == 1}></TendencyButton>
-				</HStack>
-				{tendencyList.map((item, index) => {
-					return (
-						<TendencyContainer key={index}>
-							<TendencyStepText>Step {index + 2}</TendencyStepText>
-							<TendencyText>{item.title}</TendencyText>
-							<FlexWrap>
-								{item.list.map((data, idx) => {
-									return (
-										<TendencyElementContainer key={idx}>
-											<SvgCheck
-												color={
-													tendency[index][idx] == 1
-														? colors.selectButton
-														: colors.regionNormal
-												}
-											/>
-											<TendencyButton
-												key={idx}
-												label={data}
-												onPress={() => selectData({index, idx})}
-												bgColor={tendency[index][idx] == 1}></TendencyButton>
-										</TendencyElementContainer>
-									);
-								})}
-							</FlexWrap>
-						</TendencyContainer>
-					);
-				})}
-
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				<StepText mainText='여행 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
+				<VStack>
+					<TendencyStepText>Step 1</TendencyStepText>
+					<TendencyText>어떻게 이동하시나요?</TendencyText>
+					<HStack>
+						<SvgCheck color={transit == 0 ? colors.selectButton : colors.regionNormal} />
+						<TendencyButton
+							label='자차(렌트카)'
+							onPress={() => dispatch(travelSliceActions.enrollTransit(0))}
+							bgColor={transit == 0}></TendencyButton>
+						<SvgCheck color={transit == 1 ? colors.selectButton : colors.regionNormal} />
+						<TendencyButton
+							label='대중교통'
+							onPress={() => dispatch(travelSliceActions.enrollTransit(1))}
+							bgColor={transit == 1}></TendencyButton>
+					</HStack>
+					{tendencyList.map((item, index) => {
+						return (
+							<TendencyContainer key={index}>
+								<TendencyStepText>Step {index + 2}</TendencyStepText>
+								<TendencyText>{item.title}</TendencyText>
+								<FlexWrap>
+									{item.list.map((data, idx) => {
+										return (
+											<TendencyElementContainer key={idx}>
+												<SvgCheck
+													color={
+														tendency[index][idx] == 1
+															? colors.selectButton
+															: colors.regionNormal
+													}
+												/>
+												<TendencyButton
+													key={idx}
+													label={data}
+													onPress={() => selectData({index, idx})}
+													bgColor={tendency[index][idx] == 1}></TendencyButton>
+											</TendencyElementContainer>
+										);
+									})}
+								</FlexWrap>
+							</TendencyContainer>
+						);
+					})}
+				</VStack>
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
 				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
-			</VStack>
-		</MainContainer>
+			</ButtonContainer>
+		</>
 	);
 }
 

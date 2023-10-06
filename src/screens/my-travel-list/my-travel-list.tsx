@@ -56,20 +56,6 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	useBackHandler();
-	useEffect(() => {
-		navigation.setOptions({
-			headerTitle: () => <MainText>내 여행</MainText>,
-			// headerRight: () =>
-			// 	socialloginProvider != 'anonymous' && (
-			// 		<TouchableOpacity
-			// 			onPress={() => {
-			// 				setView(view + 1);
-			// 			}}>
-			// 			<MainText>새로고침</MainText>
-			// 		</TouchableOpacity>
-			// 	),
-		});
-	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			socialloginProvider != 'anonymous' && getTravelList();
