@@ -62,7 +62,7 @@ export default function Payment({navigation}: any) {
 	return (
 		<MainContainer>
 			<SettingElement onPress={openAd}>
-				<MainText>광테</MainText>
+				<MainText>광고보고 토큰 받기</MainText>
 			</SettingElement>
 			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! 결제는 빠른시일내에 적용할 예정입니다.</MainText>
 			{/* {paymentViewList.map((item, idx) => (

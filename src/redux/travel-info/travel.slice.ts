@@ -48,7 +48,7 @@ const initialState: LiteState = {
 };
 
 export const axiosAuth = axios.create({
-	baseURL: API_ROUTE,
+	baseURL: 'http://3.38.132.15:3000',
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,

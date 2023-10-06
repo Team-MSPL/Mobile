@@ -77,7 +77,7 @@ export default function SelectDistance({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='거리민감도 성정' subText='다님Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
+			<StepText mainText='거리민감도 성정' subText='Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
 			<DistanceCenter>
 				<DistanceText>{range}</DistanceText>
 				<Slider

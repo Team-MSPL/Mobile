@@ -107,59 +107,70 @@ export default function FinalCheck({navigation}: any) {
 	}, [loading]);
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
-		try {
-			setLoading(true);
-			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
-				a = cityViewList[cityIndex].sub.map(
-					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
-				);
-				a.shift();
-			}
-			let copy = [...tendency];
-			copy.push(season);
-			console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
-			const result = await dispatch(
-				getTravelAi({
-					regionList: a,
-					accomodationList: accommodations,
-					selectList: copy,
-					essentialPlaceList: essentialPlaces,
-					timeLimitArray: timeLimitArray,
-					nDay: nDay + 1,
-					transit: transit,
-					distanceSensitivity: distance,
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
 				}),
-			).unwrap();
-			dispatch(travelSliceActions.selectRegion(a));
-			console.log(result.data);
-			if (result) {
-				navigation.popToTop();
-				navigation.navigate('Preset');
-				!result.data.enoughPlace &&
+			);
+		} else {
+			try {
+				setLoading(true);
+				let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+				if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
+					a = cityViewList[cityIndex].sub.map(
+						(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+					);
+					a.shift();
+				}
+				let copy = [...tendency];
+				copy.push(season);
+				console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
+				const result = await dispatch(
+					getTravelAi({
+						regionList: a,
+						accomodationList: accommodations,
+						selectList: copy,
+						essentialPlaceList: essentialPlaces,
+						timeLimitArray: timeLimitArray,
+						nDay: nDay + 1,
+						transit: transit,
+						distanceSensitivity: distance,
+					}),
+				).unwrap();
+				dispatch(travelSliceActions.selectRegion(a));
+				console.log(result.data);
+				if (result) {
+					navigation.popToTop();
+					navigation.navigate('Preset');
+					!result.data.enoughPlace &&
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+							}),
+						);
+
+					// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				} else {
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+							modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 						}),
 					);
-
-				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-			} else {
+				}
+			} catch (error) {
+				console.log(error, 'qwe');
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 					}),
 				);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			console.log(error, 'qwe');
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
-				}),
-			);
-		} finally {
-			setLoading(false);
 		}
 	};
 

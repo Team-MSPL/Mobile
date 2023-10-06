@@ -122,7 +122,11 @@ export default function ViewResult({navigation}: any) {
 							</RightLogoContainer>
 						</RecommendElement>
 						<TakenDayContainer>
-							<TakenText>Day {item.takenDay}</TakenText>
+							<TakenText>
+								{item.takenDay == 0
+									? '당일치기추천'
+									: item.takenDay + '박 ' + (item.takenDay + 1) + '일 추천'}{' '}
+							</TakenText>
 						</TakenDayContainer>
 					</RecommendContainer>
 				))}
@@ -140,7 +144,7 @@ const TakenDayContainer = styled.View`
 	top: 0px;
 	left: 0px;
 	background-color: ${colors.selectButton};
-	width: 20%;
+	width: 40%;
 	padding: 5px;
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;

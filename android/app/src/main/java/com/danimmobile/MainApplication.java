@@ -11,18 +11,7 @@ import com.facebook.soloader.SoLoader;
 import java.util.List;
 import org.devio.rn.splashscreen.SplashScreenReactPackage; // SplashScreenReactPackage import 추가
 import com.microsoft.codepush.react.CodePush;
-public class MainApplication extends Application implements ReactApplication {
-    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-        ...
-        // 2. Override the getJSBundleFile method to let
-        // the CodePush runtime determine where to get the JS
-        // bundle location from on each app start
-        @Override
-        protected String getJSBundleFile() {
-            return CodePush.getJSBundleFile();
-        }
-    };
-}
+import com.appsflyer.reactnative.RNAppsFlyerPackage;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -36,10 +25,15 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
+          //  packages.add(new RNAppsFlyerPackage()); // RNAppsFlyerPackage 추가
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
              //packages.add(new SplashScreenReactPackage()); // SplashScreenReactPackage 추가
           return packages;
+        }
+          @Override
+        protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile();
         }
 
         @Override

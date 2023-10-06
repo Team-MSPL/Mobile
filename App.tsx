@@ -5,12 +5,12 @@
  * @format
  */
 
-import React, {useEffect, useLayoutEffect} from 'react';
-import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
+import {BackHandler, Linking, StatusBar, useColorScheme, NativeModules} from 'react-native';
 
-import {KAKAO_NATIVE_KEY} from '@env';
+import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, NavigationContainerRef} from '@react-navigation/native';
 import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -28,6 +28,8 @@ import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
 import CodePush from 'react-native-code-push';
+
+import appsFlyer from 'react-native-appsflyer';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -150,6 +152,22 @@ function App(): JSX.Element {
 	};
 	const {checkInitialPermission} = usePermission();
 
+	appsFlyer.initSdk(
+		{
+			devKey: Appsflyer_key,
+			isDebug: false,
+			appId: 'com.danimmobile',
+			onInstallConversionDataListener: true, //Optional
+			onDeepLinkListener: true, //Optional
+			timeToWaitForATTUserAuthorization: 10, //for iOS 14.5
+		},
+		result => {
+			console.log(result);
+		},
+		error => {
+			console.error(error);
+		},
+	);
 	const {hasPermission} = useAppSelector((state: RootState) => state.settingSlice);
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
