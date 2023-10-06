@@ -1,6 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
+import {Image, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAppSelector} from '../redux';
 import CommunityMainScreen from '../screens/community/community-main-screen';
@@ -76,7 +77,15 @@ function TabBar() {
 				name='Home'
 				component={Main}
 				options={{
-					title: '다님',
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', padding: 24}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 36, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
