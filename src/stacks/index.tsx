@@ -85,7 +85,7 @@ function TabBar() {
 							/>
 						</View>
 					),
-					title: '',
+					title: '홈',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
