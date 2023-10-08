@@ -11,7 +11,6 @@ import {BackHandler, Linking, StatusBar, useColorScheme, NativeModules} from 're
 import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer, NavigationContainerRef} from '@react-navigation/native';
-import {NativeBaseProvider} from 'native-base';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -198,13 +197,11 @@ function App(): JSX.Element {
 				barStyle={isDarkMode ? 'light-content' : 'dark-content'}
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
-			<NativeBaseProvider>
-				<NavigationContainer linking={linking}>
-					{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
-					{<BaseModal />}
-					{Boolean(isLoading) && <Loading />}
-				</NavigationContainer>
-			</NativeBaseProvider>
+			<NavigationContainer linking={linking}>
+				{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
+				{<BaseModal />}
+				{Boolean(isLoading) && <Loading />}
+			</NavigationContainer>
 		</SafeAreaProvider>
 	);
 }

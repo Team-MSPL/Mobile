@@ -1,7 +1,6 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text, Box, ScrollView, Divider} from 'native-base';
 import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {Alert} from 'react-native';

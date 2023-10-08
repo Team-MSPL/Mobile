@@ -1,8 +1,6 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import CustomButton from '../../../utill/component/custom-button';
-import {Text, ScrollView} from 'native-base';
 import {Platform, TouchableOpacity, PermissionsAndroid, Alert, BackHandler} from 'react-native';
 import {cityViewList} from '../select-city';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
@@ -86,7 +84,7 @@ export default function ViewResult({navigation}: any) {
 	useLayoutEffect(() => {
 		getRegionRecommend();
 	}, []);
-	if (isLoading) return <ScrollView></ScrollView>;
+	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<MainContainer>
 			<StepText mainText='지역 추천' subText='당신의 성향을 기반으로, 여행 지역을 찾아왔어요' />

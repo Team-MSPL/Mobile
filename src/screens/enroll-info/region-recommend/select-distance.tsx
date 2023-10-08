@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text} from 'native-base';
 import {
 	regionRecommendSliceActions,
 	reverseGeocoding,
@@ -104,7 +103,7 @@ export default function SelectDistance({navigation}: any) {
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<Text>{geoInfo.name}</Text>
+				<GetContainerText>{geoInfo.name}</GetContainerText>
 			</Center>
 			<DistanceDivider />
 
