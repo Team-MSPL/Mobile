@@ -184,7 +184,7 @@ export default function Main({navigation}: any) {
 						loop={false}
 					/>
 				</ButtonContainer>
-				<BoldDivider></BoldDivider>
+				{/* <BoldDivider></BoldDivider> */}
 				<CollectionContainer>
 					<CollectionTitle>다님이 추천하는 이색 여행지</CollectionTitle>
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
