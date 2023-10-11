@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, Dimensions, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -15,7 +15,7 @@ import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
 import {HStack} from '../../utill/layout/layout';
-import {SvgMapIcon} from '../../utill/svg/svg';
+import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
 import {HeaderHStack} from '../my-travel-list/detail-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 import background from '../../utill/component/timetable/background';
@@ -28,6 +28,9 @@ export default function Timetable({navigation, route}: any) {
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
 	const [viewDayIndex, setViewDayIndex] = useState(0);
+	const [mapViewState, setMapViewState] = useState(true);
+	const WINDOW_WIDTH = Dimensions.get('window').width;
+	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
 	const SaveContainer = styled(Icon)`
 		border-radius: 5px;
@@ -73,6 +76,15 @@ export default function Timetable({navigation, route}: any) {
 	const goMyTravelList = () => {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
+	};
+	const openModalHelp = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '스케줄 사용가이드',
+				modalSubTitle:
+					'1. 스케줄 추가 \n 스케줄 추가는 꾹눌러서가능합니다.\n\n2. 스케줄 삭제 \n 스케줄 삭제는 스케줄을 선택해 상세페이지에서 가능합니다.\n\n3.카페/식당 추천 \n관광지 사이 위치를 추천합니다. ',
+			}),
+		);
 	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
@@ -129,8 +141,8 @@ export default function Timetable({navigation, route}: any) {
 			headerRight: () => (
 				<View>
 					{makeMode == 'share' ? (
-						<TouchableOpacity onPress={goMapInfo}>
-							<SvgMapIcon color={colors.selectButton} />
+						<TouchableOpacity onPress={openModalHelp}>
+							<SVGHelp width={25} height={25} color={'white'} />
 						</TouchableOpacity>
 					) : (
 						<>
@@ -145,12 +157,12 @@ export default function Timetable({navigation, route}: any) {
 								</IconContainer>
 							) : (
 								<HeaderHStack>
-									<IconContainer onPress={goMapInfo}>
-										<SvgMapIcon width={25} height={25} color={'white'} />
-									</IconContainer>
 									<IconContainer onPress={goSave}>
 										<SaveContainer name={'save'} size={25} color={'white'} />
 									</IconContainer>
+									<HelpContainer onPress={openModalHelp}>
+										<SVGHelp width={20} height={20} color={'grey'} />
+									</HelpContainer>
 								</HeaderHStack>
 							)}
 						</>
@@ -159,13 +171,39 @@ export default function Timetable({navigation, route}: any) {
 			),
 		});
 	}, [editMode, timetable, addList, deleteList, x, makeMode]);
+	const dragPositionCheck = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const scrollY = e.nativeEvent.contentOffset.y;
 
+		// 스크롤뷰의 컨텐츠 높이를 가져옵니다.
+		const contentHeight = e.nativeEvent.contentSize.height;
+
+		// 스크롤뷰의 높이를 가져옵니다.
+		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
+
+		// 스크롤이 거의 끝에 다다랐는지 확인합니다.
+		if (scrollY + scrollViewHeight >= contentHeight - 20) {
+			// 스크롤이 거의 끝에 다다랐을 때 원하는 작업을 수행합니다.
+			setMapViewState(false);
+		} else if (!mapViewState) {
+			setMapViewState(true);
+		}
+	};
 	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
 	return (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
+			{mapViewState && (
+				<MapContainer onPress={goMapInfo} right={WINDOW_WIDTH * 0.1} bottom={WINDOW_HEIGHT * 0.05}>
+					<SvgMapIcon width={30} height={30} color={'white'} />
+					<MapText>지도</MapText>
+				</MapContainer>
+			)}
+
 			<ScrollVIewContainer>
-				<TimetableScrollView>
+				<TimetableScrollView
+					showsVerticalScrollIndicator={false}
+					onScroll={dragPositionCheck}
+					scrollEventThrottle={16}>
 					<InfoView
 						navigation={navigation}
 						setDeleteList={setDeleteList}
@@ -179,6 +217,22 @@ export default function Timetable({navigation, route}: any) {
 	);
 }
 
+const MapContainer = styled.TouchableOpacity<{right: number; bottom: number}>`
+	position: absolute;
+	background-color: ${colors.selectButton};
+	border-radius: 15px;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	height: 60px;
+	bottom: ${props => props.bottom}px;
+	right: ${props => props.right}px;
+	z-index: 99;
+`;
+const MapText = styled.Text`
+	font-size: 15px;
+	color: white;
+`;
 const TimeTableContainer = styled.View`
 	width: 100%;
 	background-color: white;
@@ -197,4 +251,7 @@ const IconContainer = styled.TouchableOpacity`
 	border-radius: 5px;
 	background-color: ${colors.selectButton};
 	margin: 0px 0px 0px 10px;
+`;
+const HelpContainer = styled(IconContainer)`
+	background-color: white;
 `;

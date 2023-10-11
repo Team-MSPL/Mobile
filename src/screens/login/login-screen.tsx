@@ -80,6 +80,7 @@ export default function LoginScreen({navigation}: any) {
 				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',

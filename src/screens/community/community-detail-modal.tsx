@@ -1,8 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
-import {Heading, Text, Center, IconButton, ThreeDotsIcon} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useState} from 'react';
 import {Dimensions, FlatList, Modal, View, Button, TouchableOpacity} from 'react-native';
+import styled from 'styled-components/native';
 
 export default function CommunityDetailModal() {
 	const [modalVisible, setModalVisibile] = useState(false);
@@ -45,3 +45,10 @@ export default function CommunityDetailModal() {
 		</SafeAreaView>
 	);
 }
+
+const Text = styled.Text`
+	font-size: 20px;
+	color: #182e44;
+	font-weight: 500;
+	margin: 15px;
+`;

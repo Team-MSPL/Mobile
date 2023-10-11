@@ -1,8 +1,6 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
+import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import CustomButton from '../../../utill/component/custom-button';
-import {Text, ScrollView} from 'native-base';
 import {Platform, TouchableOpacity, PermissionsAndroid, Alert, BackHandler} from 'react-native';
 import {cityViewList} from '../select-city';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
@@ -86,7 +84,7 @@ export default function ViewResult({navigation}: any) {
 	useLayoutEffect(() => {
 		getRegionRecommend();
 	}, []);
-	if (isLoading) return <ScrollView></ScrollView>;
+	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<MainContainer>
 			<StepText mainText='지역 추천' subText='당신의 성향을 기반으로, 여행 지역을 찾아왔어요' />
@@ -111,7 +109,7 @@ export default function ViewResult({navigation}: any) {
 							<TendencyTextContainer>
 								<TendencyText>
 									{item.tendency.map((value, index) => (
-										<>#{value}</>
+										<Fragment key={index}>#{value}</Fragment>
 									))}
 								</TendencyText>
 							</TendencyTextContainer>
@@ -122,7 +120,11 @@ export default function ViewResult({navigation}: any) {
 							</RightLogoContainer>
 						</RecommendElement>
 						<TakenDayContainer>
-							<TakenText>Day {item.takenDay}</TakenText>
+							<TakenText>
+								{item.takenDay == 0
+									? '당일치기추천'
+									: item.takenDay + '박 ' + (item.takenDay + 1) + '일 추천'}{' '}
+							</TakenText>
 						</TakenDayContainer>
 					</RecommendContainer>
 				))}
@@ -140,7 +142,7 @@ const TakenDayContainer = styled.View`
 	top: 0px;
 	left: 0px;
 	background-color: ${colors.selectButton};
-	width: 20%;
+	width: 40%;
 	padding: 5px;
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;

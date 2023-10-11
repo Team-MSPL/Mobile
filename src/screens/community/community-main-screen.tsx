@@ -1,7 +1,6 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {FlatList} from 'native-base';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, RefreshControl, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, RefreshControl, TouchableOpacity, View, FlatList} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';

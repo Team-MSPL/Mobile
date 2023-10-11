@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Box, Center, Image, Text} from 'native-base';
 import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {WithLocalSvg} from 'react-native-svg';
@@ -16,7 +15,7 @@ export default function ViewPager() {
 	return (
 		<ViewPagerContainer>
 			<TouchableOpacity style={{backgroundColor: 'orange'}} onPress={handleFirstLaunch}>
-				<Text>앱을 다운받아주셔서 감사합니다! </Text>
+				<ViewPagerText>앱을 다운받아주셔서 감사합니다! </ViewPagerText>
 			</TouchableOpacity>
 		</ViewPagerContainer>
 	);
@@ -28,4 +27,8 @@ const ViewPagerContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	background-color: rgba(0, 0, 0, 0.4);
+`;
+const ViewPagerText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
 `;

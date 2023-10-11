@@ -5,13 +5,12 @@
  * @format
  */
 
-import React, {useEffect, useLayoutEffect} from 'react';
-import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
+import {BackHandler, Linking, StatusBar, useColorScheme, NativeModules} from 'react-native';
 
-import {KAKAO_NATIVE_KEY} from '@env';
+import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NavigationContainer} from '@react-navigation/native';
-import {NativeBaseProvider} from 'native-base';
+import {NavigationContainer, NavigationContainerRef} from '@react-navigation/native';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -27,6 +26,9 @@ import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
+import CodePush from 'react-native-code-push';
+
+import appsFlyer from 'react-native-appsflyer';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -149,6 +151,22 @@ function App(): JSX.Element {
 	};
 	const {checkInitialPermission} = usePermission();
 
+	appsFlyer.initSdk(
+		{
+			devKey: Appsflyer_key,
+			isDebug: false,
+			appId: 'com.danimmobile',
+			onInstallConversionDataListener: true, //Optional
+			onDeepLinkListener: true, //Optional
+			timeToWaitForATTUserAuthorization: 10, //for iOS 14.5
+		},
+		result => {
+			console.log(result);
+		},
+		error => {
+			console.error(error);
+		},
+	);
 	const {hasPermission} = useAppSelector((state: RootState) => state.settingSlice);
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
@@ -179,15 +197,22 @@ function App(): JSX.Element {
 				barStyle={isDarkMode ? 'light-content' : 'dark-content'}
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
-			<NativeBaseProvider>
-				<NavigationContainer linking={linking}>
-					{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
-					{<BaseModal />}
-					{Boolean(isLoading) && <Loading />}
-				</NavigationContainer>
-			</NativeBaseProvider>
+			<NavigationContainer linking={linking}>
+				{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
+				{<BaseModal />}
+				{Boolean(isLoading) && <Loading />}
+			</NavigationContainer>
 		</SafeAreaProvider>
 	);
 }
-
-export default App;
+const codePushOptions = {
+	checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
+	updateDialog: {
+		title: '내부 업데이트가 존재합니다.',
+		optionalUpdateMessage: '보다 안정적인 서비스 사용을 위해 내부 업데이트 후 재실행 합니다.',
+		optionalInstallButtonLabel: '업데이트',
+		optionalIgnoreButtonLabel: '나중에',
+	},
+	installMode: CodePush.InstallMode.IMMEDIATE,
+};
+export default CodePush(codePushOptions)(App);

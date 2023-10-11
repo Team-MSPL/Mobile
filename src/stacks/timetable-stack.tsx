@@ -16,6 +16,7 @@ import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
 import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
+import {View, Image} from 'react-native';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -93,6 +94,14 @@ export default function TimetableStack() {
 				name='Preset'
 				component={Preset}
 				options={{
+					headerLeft: () => (
+						<View style={{justifyContent: 'center'}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 30, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
 					headerBackVisible: false,
 					title: '다님의 제안이에요',
 				}}

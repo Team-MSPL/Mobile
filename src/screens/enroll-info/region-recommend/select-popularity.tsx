@@ -1,7 +1,6 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text, Box, ScrollView, Divider} from 'native-base';
 import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {Alert} from 'react-native';
@@ -26,30 +25,29 @@ export default function SelectPopularity({navigation}: any) {
 		setSelectedId(e);
 	};
 	const goNext = async () => {
-		let data = radioButtons[selectedId].id * 20;
-		//dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
-		navigation.popToTop();
-		navigation.navigate('RegionViewResult');
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			let data = radioButtons[selectedId].id * 20;
+			//dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+			dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
+			navigation.popToTop();
+			navigation.navigate('RegionViewResult');
+		}
 	};
 	const radioButtons = [
 		{
-			id: 1,
-			label: '많이 이색적인',
-			value: 'option1',
-			explain: '발길이 많이 닿지 않은 이색 여행 지역들이에요. \n( 강원 양구군, 경남 함안군 등 37개 지역 )',
-		},
-		{
-			id: 2,
-			label: '상당히 이색적인',
+			id: 5,
+			label: '많이 유명한',
 			value: 'option2',
-			explain: '특색있는 관광지를 가지고 있는 이색 여행 지역들이에요.\n( 경북 청송군, 전남 광양시 등 53개 지역 )',
-		},
-		{
-			id: 3,
-			label: '균형잡힌',
-			value: 'option2',
-			explain: '유명과 이색, 그 중간 지점에 있는 지역들이에요.\n( 강원 화천시, 경남 진주시 등 32개 지역 )',
+			explain: '일반적으로 가장 많이 여행가는 지역들이에요.\n( 서울, 제주 등 10개 지역 )',
 		},
 		{
 			id: 4,
@@ -58,10 +56,23 @@ export default function SelectPopularity({navigation}: any) {
 			explain: `여행을 좋아한다면 자주 들어보았을 지역들이에요.\n( 강원 강릉시, 충북 단양군 등 30개 지역 )`,
 		},
 		{
-			id: 5,
-			label: '많이 유명한',
+			id: 3,
+			label: '균형잡힌',
 			value: 'option2',
-			explain: '일반적으로 가장 많이 여행가는 지역들이에요.\n( 서울, 제주 등 10개 지역 )',
+			explain: '유명과 이색, 그 중간 지점에 있는 지역들이에요.\n( 강원 화천시, 경남 진주시 등 32개 지역 )',
+		},
+		{
+			id: 2,
+			label: '상당히 이색적인',
+			value: 'option2',
+			explain: '특색있는 관광지를 가지고 있는 이색 여행 지역들이에요.\n( 경북 청송군, 전남 광양시 등 53개 지역 )',
+		},
+
+		{
+			id: 1,
+			label: '많이 이색적인',
+			value: 'option1',
+			explain: '발길이 많이 닿지 않은 이색 여행 지역들이에요. \n( 강원 양구군, 경남 함안군 등 37개 지역 )',
 		},
 	];
 	const goNewLogin = () => {

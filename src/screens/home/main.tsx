@@ -212,12 +212,12 @@ const SafeAreaView = styled.SafeAreaView`
 const TopBannerContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-between;
 	margin-vertical: 24px;
+	width:100%;
 `;
 const BannerTextContainer = styled.View`
 	flex-direction: column;
-	margin-right: 36px;
 `;
 const BannerColoredText = styled.Text`
 	font-size: 24px;
@@ -273,7 +273,7 @@ const NewTravelButtonIcon = styled(Icon)`
 `;
 
 const BoldDivider = styled.View`
-	height: 12px;
+	height: 2px;
 	align-items: center;
 	justify-content: center;
 	background-color: #ccc;

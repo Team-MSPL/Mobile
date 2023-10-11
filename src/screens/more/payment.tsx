@@ -7,10 +7,13 @@ import {useEffect, useRef} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
+import {DayViewContainer} from '../enroll-info/select-multi';
+import {useShopping} from '../../utill/hooks/useShopping';
 export default function Payment({navigation}: any) {
 	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
+	useShopping();
 
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
@@ -44,7 +47,6 @@ export default function Payment({navigation}: any) {
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
 		});
 
-		console.log(TestIds.REWARDED, 'qwe');
 		rewarded.load();
 
 		return () => {
@@ -62,28 +64,35 @@ export default function Payment({navigation}: any) {
 	return (
 		<MainContainer>
 			<SettingElement onPress={openAd}>
-				<MainText>광테</MainText>
+				<MainText>광고보고 토큰 받기</MainText>
 			</SettingElement>
-			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! 결제는 빠른시일내에 적용할 예정입니다.</MainText>
-			{/* {paymentViewList.map((item, idx) => (
-				<TouchableOpacity
-					key={idx}
-					style={{marginVertical: 10}}
-					onPress={() => {
-						handlePayment(item.pay);
-					}}>
-					<MainText>{item.title}</MainText>
-					<MainText>{item.pay}원 입니다</MainText>
+			<DayViewContainer>
+				<TouchableOpacity style={{marginVertical: 10}} onPress={openAd}>
+					<MainText>광고보기</MainText>
+					<MainText>1개 </MainText>
 				</TouchableOpacity>
-			))} */}
+			</DayViewContainer>
+			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! 결제는 빠른시일내에 적용할 예정입니다.</MainText>
+			{paymentViewList.map((item, idx) => (
+				<DayViewContainer>
+					<TouchableOpacity
+						key={idx}
+						style={{marginVertical: 10}}
+						onPress={() => {
+							handlePayment(item.pay);
+						}}>
+						<MainText>{item.title}</MainText>
+						<MainText>{item.pay}원 입니다</MainText>
+					</TouchableOpacity>
+				</DayViewContainer>
+			))}
 		</MainContainer>
 	);
 }
 const paymentViewList = [
-	{title: '토큰 1개', pay: 100},
-	{title: '토큰 10개', pay: 1000},
-	{title: '토큰 50개', pay: 5000},
-	{title: '토큰 100개', pay: 10000},
+	{title: 5, pay: 1000},
+	{title: 10, pay: 2000},
+	{title: 20, pay: 3000},
 ];
 const SettingElement = styled.TouchableOpacity`
 	margin: 12px 0px 12px 0px;

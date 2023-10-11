@@ -53,6 +53,7 @@ export const axiosAuth = axios.create({
 		'content-type': 'application/json',
 		withCredentials: true,
 	},
+	timeout: 5000,
 });
 
 export const axiosGoogle = axios.create({
