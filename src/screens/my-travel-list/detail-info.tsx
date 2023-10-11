@@ -43,6 +43,11 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const removeCheck = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({modalTitle: '삭제하시겠습니까?', modalFunction: goRemove, modalLeft: true}),
+		);
+	};
 	const goRemove = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -115,7 +120,7 @@ export default function DetailInfo({navigation}: any) {
 					<TouchableOpacity onPress={goKakaoShare}>
 						<SvgShare color={colors.selectButton} />
 					</TouchableOpacity>
-					<TouchableOpacity onPress={goRemove}>
+					<TouchableOpacity onPress={removeCheck}>
 						<HeaderIconContainer name={'delete'} size={20} color={'white'} />
 					</TouchableOpacity>
 				</HeaderHStack>

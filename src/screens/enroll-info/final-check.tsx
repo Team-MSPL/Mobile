@@ -150,7 +150,7 @@ export default function FinalCheck({navigation}: any) {
 					!result.data.enoughPlace &&
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+								modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
 							}),
 						);
 

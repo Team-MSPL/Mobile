@@ -103,7 +103,7 @@ export default function SelectDistance({navigation}: any) {
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<GetContainerText>{geoInfo.name}</GetContainerText>
+				<GetText>{geoInfo.name}</GetText>
 			</Center>
 			<DistanceDivider />
 
@@ -131,4 +131,10 @@ const GetContainerText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: white;
+`;
+const GetText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	margin: 10px 0px 0px 0px;
 `;

@@ -200,7 +200,10 @@ export default function Timetable({navigation, route}: any) {
 			)}
 
 			<ScrollVIewContainer>
-				<TimetableScrollView onScroll={dragPositionCheck} scrollEventThrottle={16}>
+				<TimetableScrollView
+					showsVerticalScrollIndicator={false}
+					onScroll={dragPositionCheck}
+					scrollEventThrottle={16}>
 					<InfoView
 						navigation={navigation}
 						setDeleteList={setDeleteList}

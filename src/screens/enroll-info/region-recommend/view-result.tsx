@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
+import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {Platform, TouchableOpacity, PermissionsAndroid, Alert, BackHandler} from 'react-native';
@@ -109,7 +109,7 @@ export default function ViewResult({navigation}: any) {
 							<TendencyTextContainer>
 								<TendencyText>
 									{item.tendency.map((value, index) => (
-										<>#{value}</>
+										<Fragment key={index}>#{value}</Fragment>
 									))}
 								</TendencyText>
 							</TendencyTextContainer>
