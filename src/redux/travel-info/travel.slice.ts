@@ -49,10 +49,12 @@ const initialState: LiteState = {
 
 export const axiosAuth = axios.create({
 	baseURL: API_ROUTE,
+
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,
 	},
+	timeout: 5000,
 });
 
 export const axiosGoogle = axios.create({

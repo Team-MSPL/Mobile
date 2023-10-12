@@ -1,8 +1,17 @@
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
-import {FlatList} from 'native-base';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert, Dimensions, NativeModules, Platform, RefreshControl, Text, TouchableOpacity, View} from 'react-native';
+import {
+	Alert,
+	Dimensions,
+	NativeModules,
+	Platform,
+	RefreshControl,
+	Text,
+	TouchableOpacity,
+	View,
+	FlatList,
+} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import ImageView from 'react-native-image-viewing';
 import Swiper from 'react-native-swiper';

@@ -127,26 +127,6 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 							</DayViewContainer>
 						);
 					})}
-					{/* <HStack>
-					<Text>로고</Text>
-					<Text fontSize='lg' bold>
-						숙소
-					</Text>
-					<Spacer />
-					<Text onPress={openAccommodation}>열어보자</Text>
-				</HStack>
-				<Divider />
-				{accommodation && <SelectAccommodation navigation={navigation} />}
-				<HStack>
-					<Text>로고</Text>
-					<Text fontSize='lg' bold>
-						필수 여행지
-					</Text>
-					<Spacer />
-					<Text onPress={openEssential}>열어보자</Text>
-				</HStack>
-				<Divider />
-				{essential && <SelectEssential navigation={navigation} />} */}
 				</VStack>
 
 				<MarginContainder></MarginContainder>

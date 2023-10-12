@@ -10,7 +10,8 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
 import org.devio.rn.splashscreen.SplashScreenReactPackage; // SplashScreenReactPackage import 추가
-
+import com.microsoft.codepush.react.CodePush;
+import com.appsflyer.reactnative.RNAppsFlyerPackage;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -24,10 +25,15 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
+          //  packages.add(new RNAppsFlyerPackage()); // RNAppsFlyerPackage 추가
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
              //packages.add(new SplashScreenReactPackage()); // SplashScreenReactPackage 추가
           return packages;
+        }
+          @Override
+        protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile();
         }
 
         @Override

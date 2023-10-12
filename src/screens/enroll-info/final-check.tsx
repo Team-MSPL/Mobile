@@ -16,6 +16,7 @@ import {SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {DefalutLogoContainer} from './search-place';
 
+import {ButtonContainer, MarginContainder} from './select-multi';
 export default function FinalCheck({navigation}: any) {
 	const {
 		day,
@@ -107,59 +108,70 @@ export default function FinalCheck({navigation}: any) {
 	}, [loading]);
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
-		try {
-			setLoading(true);
-			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
-				a = cityViewList[cityIndex].sub.map(
-					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
-				);
-				a.shift();
-			}
-			let copy = [...tendency];
-			copy.push(season);
-			console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
-			const result = await dispatch(
-				getTravelAi({
-					regionList: a,
-					accomodationList: accommodations,
-					selectList: copy,
-					essentialPlaceList: essentialPlaces,
-					timeLimitArray: timeLimitArray,
-					nDay: nDay + 1,
-					transit: transit,
-					distanceSensitivity: distance,
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
 				}),
-			).unwrap();
-			dispatch(travelSliceActions.selectRegion(a));
-			console.log(result.data);
-			if (result) {
-				navigation.popToTop();
-				navigation.navigate('Preset');
-				!result.data.enoughPlace &&
+			);
+		} else {
+			try {
+				setLoading(true);
+				let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+				if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
+					a = cityViewList[cityIndex].sub.map(
+						(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+					);
+					a.shift();
+				}
+				let copy = [...tendency];
+				copy.push(season);
+				console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
+				const result = await dispatch(
+					getTravelAi({
+						regionList: a,
+						accomodationList: accommodations,
+						selectList: copy,
+						essentialPlaceList: essentialPlaces,
+						timeLimitArray: timeLimitArray,
+						nDay: nDay + 1,
+						transit: transit,
+						distanceSensitivity: distance,
+					}),
+				).unwrap();
+				dispatch(travelSliceActions.selectRegion(a));
+				console.log(result.data);
+				if (result) {
+					navigation.popToTop();
+					navigation.navigate('Preset');
+					!result.data.enoughPlace &&
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
+							}),
+						);
+
+					// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				} else {
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+							modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 						}),
 					);
-
-				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-			} else {
+				}
+			} catch (error) {
+				console.log(error, 'qwe');
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 					}),
 				);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			console.log(error, 'qwe');
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
-				}),
-			);
-		} finally {
-			setLoading(false);
 		}
 	};
 
@@ -170,110 +182,79 @@ export default function FinalCheck({navigation}: any) {
 	const schedule = ['출발일', '종료일'];
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
-		<MainContainer>
-			{/* 스테퍼 넣기 */}
-			<SelectListAllContainer>
-				<SelectListContainer>
-					<SelectListText>선택 여행 성향</SelectListText>
-					<SelectTendencyListContainer>
-						{tendency.map((item, inx) => {
-							return (
-								inx !== tendency.length - 1 &&
-								item.map((q, a) => {
-									return q ? (
-										<SelectTendencyContainer key={a}>
-											<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
-										</SelectTendencyContainer>
-									) : null;
-								})
-							);
-						})}
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-				<Dashed />
-				<SelectListContainer>
-					<SelectListText>여행 지역</SelectListText>
-					<SelectTendencyListContainer>
-						<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-				<Dashed />
-				<SelectListContainer>
-					<SelectListText>여행 일정</SelectListText>
+		<>
+			<MainContainer>
+				{/* 스테퍼 넣기 */}
+				<SelectListAllContainer>
+					<SelectListContainer>
+						<SelectListText>선택 여행 성향</SelectListText>
+						<SelectTendencyListContainer>
+							{tendency.map((item, inx) => {
+								return (
+									inx !== tendency.length - 1 &&
+									item.map((q, a) => {
+										return q ? (
+											<SelectTendencyContainer key={a}>
+												<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
+											</SelectTendencyContainer>
+										) : null;
+									})
+								);
+							})}
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+					<Dashed />
+					<SelectListContainer>
+						<SelectListText>여행 지역</SelectListText>
+						<SelectTendencyListContainer>
+							<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+					<Dashed />
+					<SelectListContainer>
+						<SelectListText>여행 일정</SelectListText>
 
-					<SelectTendencyListContainer>
-						{schedule.map((element, index) => (
-							<DayContainer key={index}>
-								<DayText>{element}</DayText>
-								<DayElementText>
-									{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
-										', ' +
-										String(timeLimitArray[index]).padStart(2, '0') +
-										':' +
-										String(minuteLimitArray[index]).padStart(2, '0')}
-								</DayElementText>
-							</DayContainer>
-						))}
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-			</SelectListAllContainer>
-			<Spacer />
+						<SelectTendencyListContainer>
+							{schedule.map((element, index) => (
+								<DayContainer key={index}>
+									<DayText>{element}</DayText>
+									<DayElementText>
+										{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
+											', ' +
+											String(timeLimitArray[index]).padStart(2, '0') +
+											':' +
+											String(minuteLimitArray[index]).padStart(2, '0')}
+									</DayElementText>
+								</DayContainer>
+							))}
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+				</SelectListAllContainer>
+				<Spacer />
 
-			{[...Array(nDay + 1)].map((item, idx) => {
-				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+				{[...Array(nDay + 1)].map((item, idx) => {
+					const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
-				return (
-					<SelectListAllContainer key={idx}>
-						<MultiContainer first={idx == 0} last={idx == nDay}>
-							<MultiDayContainer>
-								<MultiDayText>Day {idx + 1}</MultiDayText>
-								<MultiDaySecondText>
-									{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
-								</MultiDaySecondText>
-							</MultiDayContainer>
-							<MultiAllContainer>
-								<HStack>
-									<SvgHome color={colors.selectButton} marginRight={5} />
-									<MultiDayText>숙소</MultiDayText>
-								</HStack>
-								{accommodations[idx + 1].name ? (
-									<PlaceContainer>
-										{accommodations[idx + 1].photo != null ? (
-											<PlaceImage
-												source={{
-													uri: accommodations[idx + 1].photo,
-												}}
-												alt='Place Image'
-											/>
-										) : (
-											<FinalDefalutLogoContainer>
-												<SvgLoginLogo width={30} height={30} color='white' />
-											</FinalDefalutLogoContainer>
-										)}
-
-										<VStack>
-											<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
-											<MultiElementText>
-												{accommodations[idx + 1].formatted_address}
-											</MultiElementText>
-										</VStack>
-									</PlaceContainer>
-								) : (
-									<MultiElementText>선택사항 없음</MultiElementText>
-								)}
-							</MultiAllContainer>
-							<MultiAllContainer>
-								<HStack>
-									<SvgPlace color={colors.selectButton} marginRight={5} />
-									<MultiDayText>여행지</MultiDayText>
-								</HStack>
-								{filteredPlaces.length != 0 ? (
-									filteredPlaces.map((data, imageIndex) => (
-										<PlaceContainer key={imageIndex}>
-											{data.photo != null ? (
+					return (
+						<SelectListAllContainer key={idx}>
+							<MultiContainer first={idx == 0} last={idx == nDay}>
+								<MultiDayContainer>
+									<MultiDayText>Day {idx + 1}</MultiDayText>
+									<MultiDaySecondText>
+										{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
+									</MultiDaySecondText>
+								</MultiDayContainer>
+								<MultiAllContainer>
+									<HStack>
+										<SvgHome color={colors.selectButton} marginRight={5} />
+										<MultiDayText>숙소</MultiDayText>
+									</HStack>
+									{accommodations[idx + 1].name ? (
+										<PlaceContainer>
+											{accommodations[idx + 1].photo != null ? (
 												<PlaceImage
 													source={{
-														uri: data.photo,
+														uri: accommodations[idx + 1].photo,
 													}}
 													alt='Place Image'
 												/>
@@ -284,23 +265,58 @@ export default function FinalCheck({navigation}: any) {
 											)}
 
 											<VStack>
-												<MultiElementText>{data.name}</MultiElementText>
-												{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
+												<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
+												<MultiElementText>
+													{accommodations[idx + 1].formatted_address}
+												</MultiElementText>
 											</VStack>
 										</PlaceContainer>
-									))
-								) : (
-									<MultiElementText>선택사항 없음</MultiElementText>
-								)}
-							</MultiAllContainer>
-						</MultiContainer>
-						<PlaceDashed />
-					</SelectListAllContainer>
-				);
-			})}
+									) : (
+										<MultiElementText>선택사항 없음</MultiElementText>
+									)}
+								</MultiAllContainer>
+								<MultiAllContainer>
+									<HStack>
+										<SvgPlace color={colors.selectButton} marginRight={5} />
+										<MultiDayText>여행지</MultiDayText>
+									</HStack>
+									{filteredPlaces.length != 0 ? (
+										filteredPlaces.map((data, imageIndex) => (
+											<PlaceContainer key={imageIndex}>
+												{data.photo != null ? (
+													<PlaceImage
+														source={{
+															uri: data.photo,
+														}}
+														alt='Place Image'
+													/>
+												) : (
+													<FinalDefalutLogoContainer>
+														<SvgLoginLogo width={30} height={30} color='white' />
+													</FinalDefalutLogoContainer>
+												)}
 
-			<CustomButton label='맞춤 코스 조회' onPress={goNext}></CustomButton>
-		</MainContainer>
+												<VStack>
+													<MultiElementText>{data.name}</MultiElementText>
+													{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
+												</VStack>
+											</PlaceContainer>
+										))
+									) : (
+										<MultiElementText>선택사항 없음</MultiElementText>
+									)}
+								</MultiAllContainer>
+							</MultiContainer>
+							<PlaceDashed />
+						</SelectListAllContainer>
+					);
+				})}
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton label='맞춤 코스 조회' onPress={goNext}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
 

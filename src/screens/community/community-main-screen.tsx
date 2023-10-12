@@ -1,7 +1,6 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {FlatList} from 'native-base';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, RefreshControl, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -19,25 +18,6 @@ export default function CommunityMainScreen({navigation}: any) {
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
-
-	useFocusEffect(
-		useCallback(() => {
-			dispatch(getPostList());
-		}, []),
-	);
-
-	// 아이템 구분선
-	const flatListItemSeperator = () => {
-		return (
-			<View
-				style={{
-					height: 1,
-					width: '100%',
-					backgroundColor: 'gray',
-				}}
-			/>
-		);
-	};
 
 	// 게시글 읽는 화면으로 이동
 	const goCommunityReadingScreen = async (item: string) => {
@@ -87,6 +67,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	// CommunityMainScreen으로 올 경우 새로 고침
 	useFocusEffect(
 		useCallback(() => {
+			setIsLoading(true);
 			fetchCommunityData();
 		}, []),
 	);
@@ -121,11 +102,12 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 가져온 게시글 목록 UI
 	const renderPostItem = (data: {item: postListType}) => {
 		return (
-			<PostItemContainer>
-				<TouchableOpacity
-					onPress={() => {
-						goCommunityReadingScreen(data.item.postId);
-					}}>
+			<TouchableOpacity
+				style={{flex: 1}}
+				onPress={() => {
+					goCommunityReadingScreen(data.item.postId);
+				}}>
+				<PostItemContainer>
 					<PostWriterInfoContainer>
 						<PostWriterProfileImage
 							source={require('../../../public/images/danim_logo2.png')}
@@ -137,14 +119,14 @@ export default function CommunityMainScreen({navigation}: any) {
 						{data.item.postTitle}
 					</PostTitleText>
 					<PostDetailInfoContainer>
-						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
 						<HeartIcon name={'hearto'} />
-						<PostDetailInfoText>{data.item.likerLength}</PostDetailInfoText>
+						<LikeNumText>{data.item.likerLength}</LikeNumText>
 						<CommentIcon name={'message1'} />
-						<PostDetailInfoText>{data.item.commentLength}</PostDetailInfoText>
+						<CommentNumText>{data.item.commentLength}</CommentNumText>
+						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
 					</PostDetailInfoContainer>
-				</TouchableOpacity>
-			</PostItemContainer>
+				</PostItemContainer>
+			</TouchableOpacity>
 		);
 	};
 
@@ -170,7 +152,7 @@ export default function CommunityMainScreen({navigation}: any) {
 					data={postList}
 					renderItem={renderPostItem}
 					initialNumToRender={10}
-					ItemSeparatorComponent={flatListItemSeperator}
+					ItemSeparatorComponent={() => <FlatListItemSeperator></FlatListItemSeperator>}
 					onEndReached={onEndReached}
 					onEndReachedThreshold={0.8}
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
@@ -190,10 +172,17 @@ export default function CommunityMainScreen({navigation}: any) {
 }
 
 const CommunityMainContainer = styled.SafeAreaView`
-	padding: 8px;
+	padding: 0px;
+	height: 100%;
+	background-color: ${colors.main};
+`;
+const FlatListItemSeperator = styled.View`
+	height: 1px;
+	margin-horizontal: 12px;
+	background-color: #ccc;
 `;
 const PostItemContainer = styled.View`
-	alignitems: 'flex-start';
+	align-items: 'flex-start';
 	padding: 12px;
 `;
 const PostWriterInfoContainer = styled.View`
@@ -201,15 +190,15 @@ const PostWriterInfoContainer = styled.View`
 	align-items: center;
 `;
 const PostWriterProfileImage = styled.Image`
-	width: 20px;
-	height: 20px;
-	border-radius: 10px;
+	width: 16px;
+	height: 16px;
+	border-radius: 8px;
 	border: ${colors.border};
-	margin-right: 12px;
+	margin-right: 8px;
 `;
 const PostWriterText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
+	font-size: 12px;
+	font-weight: 400;
 `;
 const PostTitleText = styled.Text`
 	font-size: 16px;
@@ -230,10 +219,20 @@ const HeartIcon = styled(Icon)`
 	color: red;
 	margin-right: 4px;
 `;
+const LikeNumText = styled.Text`
+	font-size: 12px;
+	color: red;
+	margin-right: 8px;
+`;
 const CommentIcon = styled(Icon)`
 	size: 12px;
 	color: green;
 	margin-right: 4px;
+`;
+const CommentNumText = styled.Text`
+	font-size: 12px;
+	color: green;
+	margin-right: 8px;
 `;
 export const MenuIcon = styled(FeatherIcon)`
 	font-size: 20px;

@@ -27,6 +27,7 @@ import Call from '../../../public/call.svg';
 import Location from '../../../public/location.svg';
 import Infos from '../../../public/infos.svg';
 import Share from '../../../public/share.svg';
+import Help from '../../../public/ic_help.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -110,5 +111,8 @@ export const SvgInfos = styled(Infos)<{color?: string}>`
 	color: color;
 `;
 export const SvgShare = styled(Share)<{color?: string}>`
+	color: color;
+`;
+export const SVGHelp = styled(Help)<{color?: string}>`
 	color: color;
 `;

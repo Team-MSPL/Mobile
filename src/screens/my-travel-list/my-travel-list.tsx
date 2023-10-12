@@ -10,7 +10,7 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import styled from 'styled-components/native';
-import {Center, HStack, MainContainer, Margin, VStack} from '../../utill/layout/layout';
+import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
 export default function MyTravelList({navigation}: any) {
@@ -56,20 +56,6 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	useBackHandler();
-	useEffect(() => {
-		navigation.setOptions({
-			headerTitle: () => <MainText>내 여행</MainText>,
-			// headerRight: () =>
-			// 	socialloginProvider != 'anonymous' && (
-			// 		<TouchableOpacity
-			// 			onPress={() => {
-			// 				setView(view + 1);
-			// 			}}>
-			// 			<MainText>새로고침</MainText>
-			// 		</TouchableOpacity>
-			// 	),
-		});
-	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			socialloginProvider != 'anonymous' && getTravelList();

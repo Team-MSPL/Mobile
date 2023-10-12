@@ -41,7 +41,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 
 	// * 게시글 등록
 	const handlePostSubmit = () => {
-		console.log('야야양야야', postTitle);
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
 			console.log(postTitle);
@@ -64,7 +63,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 			};
 
 			const updatePostData: updatePostType = {
@@ -85,8 +84,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
 					});
 			} else {
-				console.log('여기 왔나');
-				console.log(route.params.postId);
 				dispatch(updatePost(updatePostData))
 					.then(() => {
 						Alert.alert('게시글이 수정되었습니다.');
@@ -111,21 +108,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		setCurrentImageIndex(index);
 		setIsImageModalVisible(index === 0 || !!index);
 	};
-
-	// 앱 바 우측 더보기
-	// useEffect(() => {
-	// 	navigation.setOptions({
-	// 		headerRight: () =>
-	// 			socialloginProvider != 'anonymous' && (
-	// 				<TouchableOpacity
-	// 					onPress={() => {
-	// 						handlePostSubmit();
-	// 					}}>
-	// 					<SubmitText>작성</SubmitText>
-	// 				</TouchableOpacity>
-	// 			),
-	// 	});
-	// }, []);
 
 	useEffect(() => {
 		setPostTitle(postTitle);

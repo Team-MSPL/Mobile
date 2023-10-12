@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text} from 'native-base';
 import {
 	regionRecommendSliceActions,
 	reverseGeocoding,
@@ -77,7 +76,7 @@ export default function SelectDistance({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='거리민감도 성정' subText='다님Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
+			<StepText mainText='거리민감도 성정' subText='Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
 			<DistanceCenter>
 				<DistanceText>{range}</DistanceText>
 				<Slider
@@ -104,7 +103,7 @@ export default function SelectDistance({navigation}: any) {
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<Text>{geoInfo.name}</Text>
+				<GetText>{geoInfo.name}</GetText>
 			</Center>
 			<DistanceDivider />
 
@@ -132,4 +131,10 @@ const GetContainerText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: white;
+`;
+const GetText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	margin: 10px 0px 0px 0px;
 `;

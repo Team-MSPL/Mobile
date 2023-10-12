@@ -1,4 +1,4 @@
-import {useRef, useState, useEffect, useCallback, useLayoutEffect} from 'react';
+import {useRef, useState, useEffect, useCallback, useLayoutEffect, Fragment} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import DatePicker from 'react-native-date-picker';
@@ -12,6 +12,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Modal, View} from 'react-native';
 
+import {ButtonContainer, MarginContainder} from './select-multi';
 export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -137,128 +138,151 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	];
 	const [calendarView, setCalendarView] = useState({visible: false, x: 0, y: 0, when: 0});
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			<StepText mainText='언제 여행을 계획하고 계신가요?' subText='여행 지역을 알려주세요.' />
-			<VStack>
-				<TimeContainer>
-					<ASD>
-						{[...Array(2)].map((item, idx) => (
-							<>
-								<TimeItemContainer key={idx}>
-									<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-									<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-									<HStack>
-										<DayPressable
-											ref={calendarContainerRef}
-											onPress={() => {
-												calendarContainerRef.current?.measure(
-													(x, y, width, height, pageX, pageY) => {
-														console.log(pageX, pageY);
-														setCalendarView({visible: true, x: pageX, y: pageY, when: idx});
-													},
-												);
-											}}>
-											<TimeItemText>
-												{DaySelectInfoList[idx].day.format('YYYY-MM-DD')}
-											</TimeItemText>
-										</DayPressable>
-										<TimePressable
-											onPress={() => {
-												onPressTime(idx);
-											}}>
-											<TimeItemText>
-												{String(timeLimitArray[idx]).padStart(2, '0') +
-													':' +
-													String(minuteLimitArray[idx]).padStart(2, '0')}
-											</TimeItemText>
-										</TimePressable>
-									</HStack>
-								</TimeItemContainer>
-							</>
-						))}
-					</ASD>
-				</TimeContainer>
-				<PreviewContainer>
-					<PreviewText>이번여행은,</PreviewText>
-					<PreviewText>
-						<PreviewBoldText>
-							{nDays == 0 ? '당일치기' : nDays + '박' + Number(nDays + 1) + '일'}
-						</PreviewBoldText>
-						{nDays == 0 ? ' ' : '동안'}여행할거에요 ✈
-					</PreviewText>
-					<PreviewText>
-						<PreviewBoldText>
-							{weekdays[selectStartDate.day()] +
-								'요일 ' +
-								String(timeLimitArray[0]).padStart(2, '0') +
-								'시'}
-						</PreviewBoldText>
-						에 출발하고 👉
-					</PreviewText>
-					<PreviewText>
-						<PreviewBoldText>
-							{selectEndDate == null
-								? weekdays[selectStartDate.day()] +
-								  '요일 ' +
-								  String(timeLimitArray[1]).padStart(2, '0') +
-								  '시'
-								: weekdays[selectEndDate.day()] +
-								  '요일 ' +
-								  String(timeLimitArray[1]).padStart(2, '0') +
-								  '시'}
-						</PreviewBoldText>
-						에 돌아와요 👈
-					</PreviewText>
-				</PreviewContainer>
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
-			</VStack>
-			<DatePicker
-				modal
-				open={visible}
-				mode='time'
-				date={moment()
-					.hours(timeLimitArray[dateFlag.current])
-					.minutes(minuteLimitArray[dateFlag.current])
-					.toDate()}
-				onConfirm={onConfirm}
-				onCancel={onCancel}
-				minuteInterval={30}
-				title={dateFlag.current ? '종료 시간' : '시작 시간'}
-				cancelText='취소'
-				confirmText='확인'
-			/>
-			<Modal
-				animationType='fade'
-				transparent={true}
-				visible={calendarView.visible}
-				onRequestClose={() => {
-					setCalendarView({...calendarView, visible: false});
-				}}>
-				<ModalContainer
-					onPress={() => {
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				<StepText mainText='언제 여행을 계획하고 계신가요?' subText='여행 지역을 알려주세요.' />
+				<VStack>
+					<TimeContainer>
+						<ASD>
+							{[...Array(2)].map((item, idx) => (
+								<Fragment key={idx}>
+									<TimeItemContainer>
+										<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
+										<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
+										<HStack>
+											<DayPressable
+												ref={calendarContainerRef}
+												onPress={() => {
+													calendarContainerRef.current?.measure(
+														(x, y, width, height, pageX, pageY) => {
+															console.log(pageX, pageY);
+															setCalendarView({
+																visible: true,
+																x: pageX,
+																y: pageY,
+																when: idx,
+															});
+														},
+													);
+												}}>
+												<TimeItemText>
+													{DaySelectInfoList[idx].day.format('YYYY-MM-DD')}
+												</TimeItemText>
+											</DayPressable>
+											<TimePressable
+												onPress={() => {
+													onPressTime(idx);
+												}}>
+												<TimeItemText>
+													{String(timeLimitArray[idx]).padStart(2, '0') +
+														':' +
+														String(minuteLimitArray[idx]).padStart(2, '0')}
+												</TimeItemText>
+											</TimePressable>
+										</HStack>
+									</TimeItemContainer>
+								</Fragment>
+							))}
+						</ASD>
+					</TimeContainer>
+					<PreviewContainer>
+						<PreviewText>이번여행은,</PreviewText>
+						<PreviewText>
+							<PreviewBoldText>
+								{nDays == 0 ? '당일치기' : nDays + '박' + Number(nDays + 1) + '일'}
+							</PreviewBoldText>
+							{nDays == 0 ? ' ' : '동안'}여행할거에요 ✈
+						</PreviewText>
+						<PreviewText>
+							<PreviewBoldText>
+								{weekdays[selectStartDate.day()] +
+									'요일 ' +
+									String(timeLimitArray[0]).padStart(2, '0') +
+									'시'}
+							</PreviewBoldText>
+							에 출발하고 👉
+						</PreviewText>
+						<PreviewText>
+							<PreviewBoldText>
+								{selectEndDate == null
+									? weekdays[selectStartDate.day()] +
+									  '요일 ' +
+									  String(timeLimitArray[1]).padStart(2, '0') +
+									  '시'
+									: weekdays[selectEndDate.day()] +
+									  '요일 ' +
+									  String(timeLimitArray[1]).padStart(2, '0') +
+									  '시'}
+							</PreviewBoldText>
+							에 돌아와요 👈
+						</PreviewText>
+					</PreviewContainer>
+				</VStack>
+				<DatePicker
+					modal
+					open={visible}
+					mode='time'
+					date={moment()
+						.hours(timeLimitArray[dateFlag.current])
+						.minutes(minuteLimitArray[dateFlag.current])
+						.toDate()}
+					onConfirm={onConfirm}
+					onCancel={onCancel}
+					minuteInterval={30}
+					title={dateFlag.current ? '종료 시간' : '시작 시간'}
+					cancelText='취소'
+					confirmText='확인'
+				/>
+				<Modal
+					animationType='fade'
+					transparent={true}
+					visible={calendarView.visible}
+					onRequestClose={() => {
 						setCalendarView({...calendarView, visible: false});
 					}}>
-					<CalendarContainer x={calendarView.x} y={calendarView.y} when={calendarView.when}>
-						<CalendarPicker
-							width={300}
-							weekdays={weekdays}
-							months={months}
-							minDate={calendarView.when == 1 ? selectStartDate.toDate() : new Date()}
-							startFromMonday={false}
-							onDateChange={onDateChange}
-							showDayStragglers={false}
-							previousTitle='이전 달'
-							nextTitle='다음 달'
-							allowBackwardRangeSelect={true}
-							selectYearTitle='년도 선택'
-						/>
-					</CalendarContainer>
-				</ModalContainer>
-			</Modal>
-		</MainContainer>
+					<ModalContainer
+						onPress={() => {
+							setCalendarView({...calendarView, visible: false});
+						}}>
+						<CalendarContainer x={calendarView.x} y={calendarView.y} when={calendarView.when}>
+							<CalendarPicker
+								width={300}
+								weekdays={weekdays}
+								months={months}
+								minDate={calendarView.when == 1 ? selectStartDate.toDate() : new Date()}
+								startFromMonday={false}
+								onDateChange={onDateChange}
+								showDayStragglers={false}
+								previousTitle='이전 달'
+								nextTitle='다음 달'
+								allowBackwardRangeSelect={true}
+								selectYearTitle='년도 선택'
+							/>
+						</CalendarContainer>
+					</ModalContainer>
+				</Modal>
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
-
+const SCSC = styled.ScrollView`
+	height: 300px;
+	width: 100%;
+`;
+const QWE = styled.View`
+	width: 100%;
+	height: 20px;
+	margin: 10px;
+`;
+const QWEText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: black;
+`;
 const ModalContainer = styled.Pressable`
 	flex-directrion: row;
 	flex: 1;
@@ -269,8 +293,8 @@ const CalendarContainer = styled.View<{x: number; y: number; when: number}>`
 	border-radius: 10px;
 	padding: 10px 0px 10px 0px;
 	width: 300px;
-	top: ${props => props.y + 40};
-	left: ${props => (props.when == 0 ? props.x : props.x - 130)};
+	top: ${props => props.y + 40}px;
+	left: ${props => (props.when == 0 ? props.x : props.x - 130)}px;
 `;
 export const TimeContainer = styled.View`
 	width: 100%;

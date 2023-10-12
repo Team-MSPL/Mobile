@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -7,6 +7,7 @@ import {updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/u
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Divider, MainContainer} from '../../utill/layout/layout';
+import {SvgLoginLogo} from '../../utill/svg/svg';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -83,10 +84,19 @@ export default function MoreInfo({navigation}: any) {
 	return (
 		<MainContainer>
 			<ProfileContainer>
-				<ProfileImage
-					source={{
-						uri: userProfileImage == '' ? 'https://danim.me/lee.jpeg' : userProfileImage,
-					}}></ProfileImage>
+				{userProfileImage == '' ? (
+					<NoProfileContainer>
+						<SvgLoginLogo color={'white'} width={75} height={75} />
+					</NoProfileContainer>
+				) : (
+					<ProfileImage source={{uri: userProfileImage}}></ProfileImage>
+				)}
+				{/* <ProfileImage
+					source={
+						userProfileImage == ''
+							? require('../../../public/images/danim_logo2.png')
+							: {uri: userProfileImage}
+					}></ProfileImage> */}
 				<ProfileNameText>
 					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
 				</ProfileNameText>
@@ -183,6 +193,14 @@ const ProfileImage = styled.Image`
 	width: 100px;
 	height: 100px;
 	border-radius: 10px;
+`;
+const NoProfileContainer = styled.View`
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.selectButton};
 `;
 const ProfileNameText = styled.Text`
 	font-size: 18px;
