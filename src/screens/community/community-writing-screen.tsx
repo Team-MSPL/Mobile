@@ -7,6 +7,7 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import {PostImageIndicatorText, PostImageView} from './community-reading-screen';
 
@@ -58,6 +59,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
 			return;
 		}
+
 		try {
 			const newPostData: savePostType = {
 				postTitle: postTitle,
@@ -75,27 +77,54 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 			if (isNewPost) {
+				dispatch(LoadingSliceActions.onLoading());
 				dispatch(savePost(newPostData))
-					.then(() => {
-						Alert.alert('게시글이 등록되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
+					.then(response => {
+						if (response.payload && response.payload[0]) {
+							// 서버로부터 받은 에러 처리
+							console.log('서버로부터 받은 에러:', response.payload[0]);
+							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+						} else {
+							dispatch(LoadingSliceActions.offLoading());
+							console.log('글이 성공적으로 저장되었습니다.');
+							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
+								{text: '확인', onPress: () => goBack()},
+							]);
+						}
 					})
 					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+						// 네트워크 요청 자체에서의 오류 처리
+						dispatch(LoadingSliceActions.offLoading());
+						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
+						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 					});
 			} else {
 				dispatch(updatePost(updatePostData))
-					.then(() => {
-						Alert.alert('게시글이 수정되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
+					.then(response => {
+						if (response.payload && response.payload[0]) {
+							console.log(response);
+							// 서버로부터 받은 에러 처리
+							console.log('서버로부터 받은 에러:', response.payload[0]);
+							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+						} else {
+							dispatch(LoadingSliceActions.offLoading());
+							console.log('글이 성공적으로 저장되었습니다.');
+							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
+								{text: '확인', onPress: () => goBack()},
+							]);
+						}
 					})
 					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+						// 네트워크 요청 자체에서의 오류 처리
+						dispatch(LoadingSliceActions.offLoading());
+						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
+						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 					});
 			}
-			goBack();
 		} catch (error) {
-			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
+			dispatch(LoadingSliceActions.offLoading());
+			console.log('게시물 등록 중에 오류가 발생했습니다:', error);
+			Alert.alert('오류 발생', '글을 수정하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 		}
 	};
 

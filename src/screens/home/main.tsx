@@ -119,18 +119,18 @@ export default function Main({navigation}: any) {
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
-			onPress: goEnroll,
-			image: require('../../../public/images/bukchon_hanok.png'),
-			text: `${userName}님, \n다님과 떠나볼까요?`,
-			boldText: '여행 일정 만들기',
-			icon: 'pluscircle',
-		},
-		{
-			id: 2,
 			onPress: soloMaking,
 			image: require('../../../public/images/han_river.png'),
 			text: `${userName}님, \n직접 만들고 싶나요?`,
 			boldText: '직접 일정 만들기',
+			icon: 'pluscircle',
+		},
+		{
+			id: 2,
+			onPress: goEnroll,
+			image: require('../../../public/images/bukchon_hanok.png'),
+			text: `${userName}님, \n다님과 떠나볼까요?`,
+			boldText: '여행 일정 만들기',
 			icon: 'pluscircle',
 		},
 		{
@@ -182,6 +182,7 @@ export default function Main({navigation}: any) {
 						sliderWidth={480}
 						itemWidth={192}
 						loop={false}
+						firstItem={1}
 					/>
 				</ButtonContainer>
 				{/* <BoldDivider></BoldDivider> */}

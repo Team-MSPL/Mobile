@@ -21,7 +21,6 @@ export const communitySlice = createSlice({
 	reducers: {},
 	extraReducers: builder => {
 		builder.addCase(getPostList.fulfilled, (state, {payload}) => {
-			console.log('게시글 목록 가져오기', payload);
 			state.postList = payload;
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
@@ -35,8 +34,6 @@ export const communitySlice = createSlice({
 export const getPostList = createAsyncThunk('/getPostList', async () => {
 	try {
 		const response = await axiosAuth.get('/post/postList');
-		console.log(response.data);
-
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
@@ -63,7 +60,6 @@ export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: 
 export const savePost = createAsyncThunk('/savePost', async (data: savePostType, thunkAPI) => {
 	try {
 		const response = await axiosAuth.post('/post/savePost', data);
-		console.log(response.data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
@@ -77,7 +73,6 @@ export const savePost = createAsyncThunk('/savePost', async (data: savePostType,
 export const updatePost = createAsyncThunk('/updatePost', async (data: updatePostType, thunkAPI) => {
 	try {
 		const response = await axiosAuth.patch('/post/updatePost', data);
-		console.log(response.data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
