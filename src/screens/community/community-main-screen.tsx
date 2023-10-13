@@ -58,7 +58,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						onPress={() => {
 							showCommentOptionActionSheet();
 						}}>
-						<MenuIcon name='more-horizontal'></MenuIcon>
+						<MenuIcon name='edit'></MenuIcon>
 					</TouchableOpacity>
 				),
 		});
@@ -172,7 +172,6 @@ export default function CommunityMainScreen({navigation}: any) {
 }
 
 const CommunityMainContainer = styled.SafeAreaView`
-	padding: 0px;
 	height: 100%;
 	background-color: ${colors.main};
 `;
@@ -183,7 +182,8 @@ const FlatListItemSeperator = styled.View`
 `;
 const PostItemContainer = styled.View`
 	align-items: 'flex-start';
-	padding: 12px;
+	padding-vertical: 12px;
+	padding-horizontal: 24px;
 `;
 const PostWriterInfoContainer = styled.View`
 	flex-direction: row;
@@ -235,5 +235,6 @@ const CommentNumText = styled.Text`
 	margin-right: 8px;
 `;
 export const MenuIcon = styled(FeatherIcon)`
-	font-size: 20px;
+	font-size: 24px;
+	color: ${colors.selectButton};
 `;

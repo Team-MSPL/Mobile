@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
+import {Alert, SafeAreaView} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -159,8 +159,8 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	}, [postImage]);
 
 	return (
-		<CommunityWritingContainer>
-			<CommunityWritingSafeAreaContainer>
+		<SafeAreaView>
+			<CommunityWritingContainer>
 				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
 				<TitleInput
 					placeholder='제목을 입력해주세요'
@@ -213,20 +213,15 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				<SubmitButton onPress={handlePostSubmit}>
 					<SubmitText>게시</SubmitText>
 				</SubmitButton>
-			</CommunityWritingSafeAreaContainer>
-		</CommunityWritingContainer>
+			</CommunityWritingContainer>
+		</SafeAreaView>
 	);
 }
 
 const CommunityWritingContainer = styled.ScrollView`
-	flex: 1;
-	background-color: white;
-	padding: 12px;
-`;
-
-// safearea 영역
-const CommunityWritingSafeAreaContainer = styled.SafeAreaView`
-	flex: 1;
+	background-color: ${colors.main};
+	padding-horizontal: 24px;
+	padding-vertical: 12px;
 `;
 
 const CommunityWritingTitleText = styled.Text`
@@ -296,4 +291,5 @@ const SubmitButton = styled.TouchableOpacity`
 	justify-content: center;
 	background-color: ${colors.selectButton};
 	width: 100%;
+	margin-bottom: 24px;
 `;
