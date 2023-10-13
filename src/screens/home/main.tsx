@@ -1,5 +1,4 @@
 import {useEffect} from 'react';
-import appsFlyer from 'react-native-appsflyer';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -113,18 +112,18 @@ export default function Main({navigation}: any) {
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
-			onPress: goEnroll,
-			image: require('../../../public/images/bukchon_hanok.png'),
-			text: `${userName}님, \n다님과 떠나볼까요?`,
-			boldText: '여행 일정 만들기',
-			icon: 'pluscircle',
-		},
-		{
-			id: 2,
 			onPress: soloMaking,
 			image: require('../../../public/images/han_river.png'),
 			text: `${userName}님, \n직접 만들고 싶나요?`,
 			boldText: '직접 일정 만들기',
+			icon: 'pluscircle',
+		},
+		{
+			id: 2,
+			onPress: goEnroll,
+			image: require('../../../public/images/bukchon_hanok.png'),
+			text: `${userName}님, \n다님과 떠나볼까요?`,
+			boldText: '여행 일정 만들기',
 			icon: 'pluscircle',
 		},
 		{
@@ -176,6 +175,7 @@ export default function Main({navigation}: any) {
 						sliderWidth={480}
 						itemWidth={192}
 						loop={false}
+						firstItem={1}
 					/>
 				</ButtonContainer>
 				{/* <BoldDivider></BoldDivider> */}
@@ -229,7 +229,7 @@ const BannerEmoji = styled.Text`
 
 const ButtonContainer = styled.View`
 	align-items: center;
-	margin-bottom: 24px;
+	margin-bottom: 48px;
 `;
 const ButtonGradient = styled(LinearGradient)`
 	position: absolute;
@@ -245,7 +245,7 @@ const NewTravelButton = styled.TouchableOpacity`
 	overflow: hidden;
 `;
 const NewTravelButtonImage = styled.ImageBackground`
-	width: 192x;
+	width: 192px;
 	aspect-ratio: 1;
 	border-radius: 12px;
 	overflow: hidden;
@@ -289,7 +289,6 @@ const CollectionSubtitle = styled.Text`
 `;
 const CollectionContentContainer = styled.View`
 	align-items: center;
-	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
 `;
@@ -299,7 +298,7 @@ const CollectionRecommendContentItem = styled.ImageBackground`
 	overflow: hidden;
 	border-radius: 12px;
 	margin-vertical: 8px;
-	margin-horizontal: 8px;
+	margin-right: 12px;
 	justify-content: flex-end;
 `;
 const CollectionRecommendItemGradient = styled(LinearGradient)`

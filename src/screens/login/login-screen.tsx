@@ -104,7 +104,7 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'google',
 				signUpFlag: false,
 			};
-			console.log('디비 주소에용', API_ROUTE);
+			console.log('디비 주소요', API_ROUTE);
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
 				navigation.navigate('Join1', {

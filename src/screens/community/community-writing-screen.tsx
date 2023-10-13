@@ -1,12 +1,13 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
+import {Alert, SafeAreaView} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import {PostImageIndicatorText, PostImageView} from './community-reading-screen';
 
@@ -41,7 +42,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 
 	// * 게시글 등록
 	const handlePostSubmit = () => {
-		console.log('야야양야야', postTitle);
 		if (postTitle.trim() === '') {
 			Alert.alert('제목을 입력해주세요');
 			console.log(postTitle);
@@ -59,12 +59,13 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
 			return;
 		}
+
 		try {
 			const newPostData: savePostType = {
 				postTitle: postTitle,
 				postContent: postContent,
 				postImage: postImage,
-				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
+				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 			};
 
 			const updatePostData: updatePostType = {
@@ -76,29 +77,54 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
 			};
 			if (isNewPost) {
+				dispatch(LoadingSliceActions.onLoading());
 				dispatch(savePost(newPostData))
-					.then(() => {
-						Alert.alert('게시글이 등록되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
+					.then(response => {
+						if (response.payload && response.payload[0]) {
+							// 서버로부터 받은 에러 처리
+							console.log('서버로부터 받은 에러:', response.payload[0]);
+							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+						} else {
+							dispatch(LoadingSliceActions.offLoading());
+							console.log('글이 성공적으로 저장되었습니다.');
+							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
+								{text: '확인', onPress: () => goBack()},
+							]);
+						}
 					})
 					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+						// 네트워크 요청 자체에서의 오류 처리
+						dispatch(LoadingSliceActions.offLoading());
+						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
+						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 					});
 			} else {
-				console.log('여기 왔나');
-				console.log(route.params.postId);
 				dispatch(updatePost(updatePostData))
-					.then(() => {
-						Alert.alert('게시글이 수정되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
+					.then(response => {
+						if (response.payload && response.payload[0]) {
+							console.log(response);
+							// 서버로부터 받은 에러 처리
+							console.log('서버로부터 받은 에러:', response.payload[0]);
+							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+						} else {
+							dispatch(LoadingSliceActions.offLoading());
+							console.log('글이 성공적으로 저장되었습니다.');
+							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
+								{text: '확인', onPress: () => goBack()},
+							]);
+						}
 					})
 					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
+						// 네트워크 요청 자체에서의 오류 처리
+						dispatch(LoadingSliceActions.offLoading());
+						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
+						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 					});
 			}
-			goBack();
 		} catch (error) {
-			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
+			dispatch(LoadingSliceActions.offLoading());
+			console.log('게시물 등록 중에 오류가 발생했습니다:', error);
+			Alert.alert('오류 발생', '글을 수정하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 		}
 	};
 
@@ -111,21 +137,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		setCurrentImageIndex(index);
 		setIsImageModalVisible(index === 0 || !!index);
 	};
-
-	// 앱 바 우측 더보기
-	// useEffect(() => {
-	// 	navigation.setOptions({
-	// 		headerRight: () =>
-	// 			socialloginProvider != 'anonymous' && (
-	// 				<TouchableOpacity
-	// 					onPress={() => {
-	// 						handlePostSubmit();
-	// 					}}>
-	// 					<SubmitText>작성</SubmitText>
-	// 				</TouchableOpacity>
-	// 			),
-	// 	});
-	// }, []);
 
 	useEffect(() => {
 		setPostTitle(postTitle);
@@ -148,8 +159,8 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	}, [postImage]);
 
 	return (
-		<CommunityWritingContainer>
-			<CommunityWritingSafeAreaContainer>
+		<SafeAreaView>
+			<CommunityWritingContainer>
 				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
 				<TitleInput
 					placeholder='제목을 입력해주세요'
@@ -202,20 +213,15 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				<SubmitButton onPress={handlePostSubmit}>
 					<SubmitText>게시</SubmitText>
 				</SubmitButton>
-			</CommunityWritingSafeAreaContainer>
-		</CommunityWritingContainer>
+			</CommunityWritingContainer>
+		</SafeAreaView>
 	);
 }
 
 const CommunityWritingContainer = styled.ScrollView`
-	flex: 1;
-	background-color: white;
-	padding: 12px;
-`;
-
-// safearea 영역
-const CommunityWritingSafeAreaContainer = styled.SafeAreaView`
-	flex: 1;
+	background-color: ${colors.main};
+	padding-horizontal: 24px;
+	padding-vertical: 12px;
 `;
 
 const CommunityWritingTitleText = styled.Text`
@@ -285,4 +291,5 @@ const SubmitButton = styled.TouchableOpacity`
 	justify-content: center;
 	background-color: ${colors.selectButton};
 	width: 100%;
+	margin-bottom: 24px;
 `;

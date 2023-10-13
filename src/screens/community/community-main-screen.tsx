@@ -1,7 +1,8 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, RefreshControl, TouchableOpacity, View, FlatList} from 'react-native';
+import {ActivityIndicator, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
+import DropdownButton from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
@@ -14,29 +15,19 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function CommunityMainScreen({navigation}: any) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [currentPage, setCurrentPage] = useState(1);
 	const menuActionSheet = useRef<ActionSheet>(null);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
-
-	useFocusEffect(
-		useCallback(() => {
-			dispatch(getPostList());
-		}, []),
-	);
-
-	// 아이템 구분선
-	const flatListItemSeperator = () => {
-		return (
-			<View
-				style={{
-					height: 1,
-					width: '100%',
-					backgroundColor: 'gray',
-				}}
-			/>
-		);
-	};
+	const [totalPages, setTotalPages] = useState(0);
+	const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+	const [sortOption, setSortOption] = useState(1);
+	const [sortOptions, setSortOptions] = useState([
+		{label: '최신 순', value: 1},
+		{label: '좋아요 순 ', value: 2},
+		{label: '댓글 순', value: 3},
+	]);
 
 	// 게시글 읽는 화면으로 이동
 	const goCommunityReadingScreen = async (item: string) => {
@@ -77,7 +68,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						onPress={() => {
 							showCommentOptionActionSheet();
 						}}>
-						<MenuIcon name='more-horizontal'></MenuIcon>
+						<MenuIcon name='edit'></MenuIcon>
 					</TouchableOpacity>
 				),
 		});
@@ -86,14 +77,17 @@ export default function CommunityMainScreen({navigation}: any) {
 	// CommunityMainScreen으로 올 경우 새로 고침
 	useFocusEffect(
 		useCallback(() => {
+			setCurrentPage(1);
+			setIsLoading(true);
+			setSortOption(sortOption);
 			fetchCommunityData();
-		}, []),
+		}, [sortOption]),
 	);
 
 	// 커뮤니티 정보 가져오기
 	const fetchCommunityData = async () => {
 		try {
-			dispatch(getPostList());
+			dispatch(getPostList({page: currentPage, sort: sortOption, search: ''}));
 			console.log('DB로부터 게시글들을 가져오는데 성공했습니다.');
 			setIsLoading(false);
 		} catch (error) {
@@ -101,6 +95,30 @@ export default function CommunityMainScreen({navigation}: any) {
 			console.log('DB로부터 게시글들을 읽어오는 중에 오류가 발생했습니다:', error);
 		}
 	};
+
+	// 다음 페이지 버튼 클릭
+	const handleNextPageClick = () => {
+		if (currentPage < totalPages) {
+			// 마지막 페이지가 아니라면,
+			setCurrentPage(currentPage + 1); // 현재 페이지 번호 증가
+			fetchCommunityData(); // 변경된 currentPage 값을 바탕으로 데이터 재요청
+		}
+	};
+
+	// 이전 버튼 클릭 시 처리 함수
+	const handlePrevPageClick = () => {
+		if (currentPage > 1) {
+			// 첫 번째 페이지가 아니라면,
+			setCurrentPage(currentPage - 1); // 현재 페이지 번호 감소
+			fetchCommunityData(); // 변경된 currentPage 값을 바탕으로 데이터 재요청
+		}
+	};
+
+	// dropdown 버튼 눌렀을 때, 조건 변하게 하기
+	useEffect(() => {
+		console.log('정렬 조건', sortOption);
+		fetchCommunityData();
+	}, [sortOption]);
 
 	// 밀어서 새로고침
 	const handleRefresh = () => {
@@ -110,9 +128,10 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	// 화면 아래쪽 끝에서 정보 더 가져오기
 	const onEndReached = () => {
-		if (isLoading) {
+		if (isLoading || currentPage >= totalPages) {
 			return;
 		} else {
+			setCurrentPage(currentPage + 1);
 			fetchCommunityData();
 		}
 	};
@@ -120,11 +139,12 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 가져온 게시글 목록 UI
 	const renderPostItem = (data: {item: postListType}) => {
 		return (
-			<PostItemContainer>
-				<TouchableOpacity
-					onPress={() => {
-						goCommunityReadingScreen(data.item.postId);
-					}}>
+			<TouchableOpacity
+				style={{flex: 1}}
+				onPress={() => {
+					goCommunityReadingScreen(data.item.postId);
+				}}>
+				<PostItemContainer>
 					<PostWriterInfoContainer>
 						<PostWriterProfileImage
 							source={require('../../../public/images/danim_logo2.png')}
@@ -136,14 +156,14 @@ export default function CommunityMainScreen({navigation}: any) {
 						{data.item.postTitle}
 					</PostTitleText>
 					<PostDetailInfoContainer>
-						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
 						<HeartIcon name={'hearto'} />
-						<PostDetailInfoText>{data.item.likerLength}</PostDetailInfoText>
+						<LikeNumText>{data.item.likerLength}</LikeNumText>
 						<CommentIcon name={'message1'} />
-						<PostDetailInfoText>{data.item.commentLength}</PostDetailInfoText>
+						<CommentNumText>{data.item.commentLength}</CommentNumText>
+						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
 					</PostDetailInfoContainer>
-				</TouchableOpacity>
-			</PostItemContainer>
+				</PostItemContainer>
+			</TouchableOpacity>
 		);
 	};
 
@@ -160,19 +180,43 @@ export default function CommunityMainScreen({navigation}: any) {
 		onPress: [goCommunityWritingScreen, doNothing],
 	};
 	useBackHandler();
+
 	return (
 		<CommunityMainContainer>
+			<DropDownButton
+				open={isDropdownOpened}
+				value={sortOption}
+				items={sortOptions}
+				setOpen={setIsDropdownOpened}
+				setValue={value => {
+					setSortOption(value);
+				}}
+				setItems={setSortOptions}
+				placeholder={sortOptions.find(option => option.value === sortOption)?.label || ''}
+			/>
+
 			{isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (
 				<FlatList
 					data={postList}
 					renderItem={renderPostItem}
-					initialNumToRender={10}
-					ItemSeparatorComponent={flatListItemSeperator}
+					initialNumToRender={3}
+					ItemSeparatorComponent={() => <FlatListItemSeperator></FlatListItemSeperator>}
 					onEndReached={onEndReached}
 					onEndReachedThreshold={0.8}
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+					// ListFooterComponent={
+					// 	<PageButtonContainer>
+					// 		<PrevPageButton onPress={handlePrevPageClick}>
+					// 			<Icon name='left' size={18} color={colors.selectButton} />
+					// 		</PrevPageButton>
+					// 		<Text>{currentPage}</Text>
+					// 		<NextPageButton onPress={handleNextPageClick}>
+					// 			<Icon name='right' size={18} color={colors.selectButton} />
+					// 		</NextPageButton>
+					// 	</PageButtonContainer>
+					// }
 				/>
 			)}
 			<ActionSheet
@@ -189,26 +233,45 @@ export default function CommunityMainScreen({navigation}: any) {
 }
 
 const CommunityMainContainer = styled.SafeAreaView`
-	padding: 8px;
+	height: 100%;
+	background-color: ${colors.main};
+`;
+
+const DropDownButton = styled(DropdownButton)`
+	width: 30%;
+	margin-horizontal: 24px;
+	margin-vertical: 12px;
+	shadow-color: #000;
+	shadow-offset: 1px 2px;
+	shadow-opacity: 0.25;
+	shadow-radius: 3.84px;
+	border: #ccc;
+	elevation: 5;
+`;
+const FlatListItemSeperator = styled.View`
+	height: 1px;
+	margin-horizontal: 24px;
+	background-color: #e0e0e0;
 `;
 const PostItemContainer = styled.View`
-	alignitems: 'flex-start';
-	padding: 12px;
+	align-items: 'flex-start';
+	padding-vertical: 12px;
+	padding-horizontal: 24px;
 `;
 const PostWriterInfoContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 `;
 const PostWriterProfileImage = styled.Image`
-	width: 20px;
-	height: 20px;
-	border-radius: 10px;
+	width: 16px;
+	height: 16px;
+	border-radius: 8px;
 	border: ${colors.border};
-	margin-right: 12px;
+	margin-right: 8px;
 `;
 const PostWriterText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
+	font-size: 12px;
+	font-weight: 400;
 `;
 const PostTitleText = styled.Text`
 	font-size: 16px;
@@ -229,11 +292,36 @@ const HeartIcon = styled(Icon)`
 	color: red;
 	margin-right: 4px;
 `;
+const LikeNumText = styled.Text`
+	font-size: 12px;
+	color: red;
+	margin-right: 8px;
+`;
 const CommentIcon = styled(Icon)`
 	size: 12px;
 	color: green;
 	margin-right: 4px;
 `;
+const CommentNumText = styled.Text`
+	font-size: 12px;
+	color: green;
+	margin-right: 8px;
+`;
 export const MenuIcon = styled(FeatherIcon)`
-	font-size: 20px;
+	font-size: 24px;
+	color: ${colors.selectButton};
+`;
+
+const PageButtonContainer = styled.View`
+	flex-direction: row;
+	align-self: center;
+	margin: 24px;
+`;
+
+const PrevPageButton = styled.TouchableOpacity`
+	margin-horizontal: 24px;
+`;
+
+const NextPageButton = styled.TouchableOpacity`
+	margin-horizontal: 24px;
 `;

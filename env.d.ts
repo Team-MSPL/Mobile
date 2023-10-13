@@ -7,5 +7,4 @@ declare module '@env' {
 	export const KAKAO_REST_API_KEY: string;
 	export const KAKAO_NATIVE_KEY: string;
 	export const Google_Ads_Key: string;
-	export const Appsflyer_key: string;
 }

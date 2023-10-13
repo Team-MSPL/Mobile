@@ -21,7 +21,6 @@ export const communitySlice = createSlice({
 	reducers: {},
 	extraReducers: builder => {
 		builder.addCase(getPostList.fulfilled, (state, {payload}) => {
-			console.log('게시글 목록 가져오기', payload);
 			state.postList = payload;
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
@@ -32,11 +31,11 @@ export const communitySlice = createSlice({
 });
 
 //게시글 목록 가져오기
-export const getPostList = createAsyncThunk('/getPostList', async () => {
+export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, thunkAPI) => {
 	try {
-		const response = await axiosAuth.get('/post/postList');
-		console.log(response.data);
-
+		const response = await axiosAuth.get(
+			`/post/postList?page=${data.page}&sort=${data.sort}&search=${data.search}`,
+		);
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
@@ -63,7 +62,6 @@ export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: 
 export const savePost = createAsyncThunk('/savePost', async (data: savePostType, thunkAPI) => {
 	try {
 		const response = await axiosAuth.post('/post/savePost', data);
-		console.log(response.data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
@@ -77,7 +75,6 @@ export const savePost = createAsyncThunk('/savePost', async (data: savePostType,
 export const updatePost = createAsyncThunk('/updatePost', async (data: updatePostType, thunkAPI) => {
 	try {
 		const response = await axiosAuth.patch('/post/updatePost', data);
-		console.log(response.data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
@@ -204,6 +201,12 @@ interface postDataType {
 	postedAt: string;
 	liker: string[];
 	comment: commentType[];
+}
+
+export interface postListParameterType {
+	page: number;
+	sort: number;
+	search: string;
 }
 
 export interface postListType {
