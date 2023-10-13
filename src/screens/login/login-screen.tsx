@@ -68,6 +68,7 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'kakao',
 				signUpFlag: false,
 			};
+			dispatch(modalSliceActions.setOpenModal({modalTitle: userInfo.nickname}));
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
 				navigation.navigate('Join1', {

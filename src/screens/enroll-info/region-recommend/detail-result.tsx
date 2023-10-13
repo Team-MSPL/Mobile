@@ -64,7 +64,7 @@ export default function DetailResult({navigation, route}: any) {
 				<StepText mainText='인기 관광지 Top 5' subText='해당 지역의 인기 관광지를 확인하세요' />
 				<RecommendAllContainer>
 					{route.params.item.topPopularPlaceList.map((item, idx) => (
-						<PopularityContainer>
+						<PopularityContainer key={idx}>
 							<IndexText>{idx + 1}</IndexText>
 							{item.photo != '' ? (
 								<RecommendImage source={{uri: item.photo}}></RecommendImage>

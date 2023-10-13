@@ -5,6 +5,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Divider, MainContainer} from '../../utill/layout/layout';
 import {SvgLoginLogo} from '../../utill/svg/svg';
@@ -52,11 +53,13 @@ export default function MoreInfo({navigation}: any) {
 			);
 		}
 	};
+	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler();
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};
 	const goPayment = () => {
+		appsflyerLogEvent({name: 'more_payment_click', value: {id: 'danim'}});
 		navigation.navigate('Payment');
 	};
 	const goTerms = () => {
@@ -204,7 +207,7 @@ const NoProfileContainer = styled.View`
 `;
 const ProfileNameText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 
@@ -217,7 +220,7 @@ const ProfileChangeContainer = styled.TouchableOpacity`
 
 const ProfileChangeText = styled.Text`
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 500;
 	color: white;
 `;
 const SettingContainer = styled.View`
@@ -235,7 +238,7 @@ const TitleText = styled.Text`
 `;
 const SettingElementText = styled.Text`
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const SettingElement = styled.TouchableOpacity`

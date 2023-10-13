@@ -17,6 +17,7 @@ import LoadingTimetable from '../../utill/component/timetable/loading-timetable'
 import {DefalutLogoContainer} from './search-place';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 export default function FinalCheck({navigation}: any) {
 	const {
 		day,
@@ -45,51 +46,51 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
-	// const checkToken = () => {
-	// 	if (socialloginProvider == 'anonymous') {
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: '익명 로그인으로는 이용 불가합니다',
-	// 				modalSubTitle: '로그인 하러 가시겠습니까?',
-	// 				modalFunction: goNewLogin,
-	// 				modalLeft: true,
-	// 			}),
-	// 		);
-	// 	} else {
-	// 		functionToken >= 1
-	// 			? dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
-	// 						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
-	// 						modalFunction: goNext,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  )
-	// 			: dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
-	// 						modalFunction: goPayment,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  );
-	// 	}
-	// };
+	const checkToken = () => {
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			functionToken >= 1
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
+							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+							modalFunction: goNext,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
+							modalFunction: goPayment,
+							modalLeft: true,
+						}),
+				  );
+		}
+	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
+	useFocusEffect(
+		useCallback(() => {
+			if (signUpReward) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원가입 축하드립니다',
+						modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+						modalFunction: checkSignUpReward,
+					}),
+				);
+			}
+		}, [signUpReward]),
+	);
 	useEffect(() => {
 		console.log('하위용', accommodations);
 		const backAction = () => {
@@ -106,72 +107,63 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
-		if (socialloginProvider == 'anonymous') {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '익명 로그인으로는 이용 불가합니다',
-					modalSubTitle: '로그인 하러 가시겠습니까?',
-					modalFunction: goNewLogin,
-					modalLeft: true,
+		try {
+			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
+			setLoading(true);
+			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
+				a = cityViewList[cityIndex].sub.map(
+					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+				);
+				a.shift();
+			}
+			let copy = [...tendency];
+			copy.push(season);
+			console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
+			const result = await dispatch(
+				getTravelAi({
+					regionList: a,
+					accomodationList: accommodations,
+					selectList: copy,
+					essentialPlaceList: essentialPlaces,
+					timeLimitArray: timeLimitArray,
+					nDay: nDay + 1,
+					transit: transit,
+					distanceSensitivity: distance,
 				}),
-			);
-		} else {
-			try {
-				setLoading(true);
-				let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-				if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
-					a = cityViewList[cityIndex].sub.map(
-						(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
-					);
-					a.shift();
-				}
-				let copy = [...tendency];
-				copy.push(season);
-				console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
-				const result = await dispatch(
-					getTravelAi({
-						regionList: a,
-						accomodationList: accommodations,
-						selectList: copy,
-						essentialPlaceList: essentialPlaces,
-						timeLimitArray: timeLimitArray,
-						nDay: nDay + 1,
-						transit: transit,
-						distanceSensitivity: distance,
-					}),
-				).unwrap();
-				dispatch(travelSliceActions.selectRegion(a));
-				console.log(result.data);
-				if (result) {
-					navigation.popToTop();
-					navigation.navigate('Preset');
-					!result.data.enoughPlace &&
-						dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
-							}),
-						);
-
-					// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-				} else {
+			).unwrap();
+			dispatch(travelSliceActions.selectRegion(a));
+			console.log(result.data);
+			if (result) {
+				navigation.popToTop();
+				navigation.navigate('Preset');
+				!result.data.enoughPlace &&
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+							modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
 						}),
 					);
-				}
-			} catch (error) {
-				console.log(error, 'qwe');
+
+				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '추천을 받는 중 에러가 발생했습니다.',
 					}),
 				);
-			} finally {
-				setLoading(false);
 			}
+		} catch (error) {
+			console.log(error, 'qwe');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+				}),
+			);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -314,7 +306,7 @@ export default function FinalCheck({navigation}: any) {
 				<MarginContainder />
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton label='맞춤 코스 조회' onPress={goNext}></CustomButton>
+				<CustomButton label='맞춤 코스 조회' onPress={checkToken}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
@@ -340,7 +332,7 @@ const SelectListAllContainer = styled.View`
 export const SelectListText = styled.Text`
 	font-size: 14px;
 	color: white;
-	font-weight: bold;
+	font-weight: 500;
 `;
 export const SelectTendencyContainer = styled.View`
 	padding: 10px;
@@ -352,7 +344,8 @@ export const SelectTendencyListContainer = styled.View`
 	display: inline-block;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin: 10px;
+	margin: 10px 0px 10px 0px;
+	justify-content: center;
 `;
 
 export const SelectTendencyText = styled.Text`
@@ -378,7 +371,7 @@ const DayText = styled.Text`
 const DayElementText = styled.Text`
 	font-size: 16px;
 	color: white;
-	font-weight: bold;
+	font-weight: 600;
 `;
 const MultiContainer = styled.View<{first: boolean; last: boolean}>`
 	width: 100%;
@@ -408,7 +401,7 @@ const MultiDaySecondText = styled.Text`
 `;
 const MultiElementText = styled.Text`
 	font-size: 16px;
-	font-weight: 900;
+	font-weight: 700;
 	color: black;
 `;
 const PlaceImage = styled.Image`

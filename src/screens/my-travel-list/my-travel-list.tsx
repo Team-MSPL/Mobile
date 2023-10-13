@@ -139,6 +139,7 @@ const NewTravelContainer = styled.View`
 `;
 const NewTravelHStack = styled(HStack)`
 	justify-content: space-between;
+	margin: 10px 0px 0px 0px;
 `;
 const MainText = styled.Text`
 	font-size: 22px;
@@ -174,6 +175,7 @@ const SubTitleColorText = styled(MainText)`
 const SubTitleBlackText = styled(MainText)`
 	font-size: 17px;
 	color: black;
+	font-weight: 500;
 `;
 export const DayText = styled.Text`
 	font-size: 17px;

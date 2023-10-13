@@ -45,6 +45,7 @@ const initialState: LiteState = {
 	selectStartDate: moment().startOf('day').add(12, 'hours'),
 	selectEndDate: null,
 	travelName: '',
+	regionRecommendFlag: false,
 };
 
 export const axiosAuth = axios.create({
@@ -410,6 +411,7 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.makeMode = 'recommend';
+			state.regionRecommendFlag = true;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -498,6 +500,7 @@ interface LiteState {
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
 	travelName: string;
+	regionRecommendFlag: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

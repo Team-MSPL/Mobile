@@ -10,6 +10,7 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {Center, MainContainer} from '../../utill/layout/layout';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {SvgCancel} from '../../utill/svg/svg';
 export default function ChangeProfile({navigation}: any) {
 	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
@@ -91,13 +92,12 @@ export default function ChangeProfile({navigation}: any) {
 						clearButtonMode='while-editing'
 					/>
 					{nickname && (
-						<TouchableOpacity
-							style={{position: 'absolute', right: 8, top: 8}}
+						<ClearTouchableOpacity
 							onPress={() => {
 								setNickname('');
 							}}>
-							<Text>clear</Text>
-						</TouchableOpacity>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
 					)}
 				</InputWrap>
 				<CustomButton label={'변경'} isDisabled={nickname == ''} onPress={goChangeProfile} />
@@ -114,19 +114,22 @@ const ProfileContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 	padding: 20px;
 `;
+const ClearTouchableOpacity = styled.TouchableOpacity`
+	position: absolute;
+	right: 8px;
+	align-items: center;
+	justify-content: center;
+`;
 const InputWrap = styled.View`
 	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 	display: flex;
 	width: 100%;
 `;
-const Text = styled.Text`
-	font-size: 20px;
-	line-height: 30px;
-	color: black;
-`;
 const NicknameText = styled.Text`
 	font-size: 15px;
-	font-weight: 900;
+	font-weight: bold;
 	color: black;
 	margin: 0px 0px 10px 0px;
 `;
