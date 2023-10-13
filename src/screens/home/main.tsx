@@ -168,7 +168,7 @@ export default function Main({navigation}: any) {
 						<BannerText>
 							<BannerColoredText>{userName}</BannerColoredText>님,{'\n'}현재 인기 여행지{'\n'}
 							<BannerColoredText>
-								{regionList[Math.floor(Math.random() * emojiList.length)]}
+								{regionList[Math.floor(Math.random() * regionList.length)]}
 							</BannerColoredText>
 							여행은 어떠세요?
 						</BannerText>
@@ -214,7 +214,7 @@ const TopBannerContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	margin-vertical: 24px;
+	margin-bottom: 24px;
 	width: 100%;
 `;
 const BannerTextContainer = styled.View`
@@ -236,7 +236,7 @@ const BannerEmoji = styled.Text`
 
 const ButtonContainer = styled.View`
 	align-items: center;
-	margin-bottom: 24px;
+	margin-bottom: 48px;
 `;
 const ButtonGradient = styled(LinearGradient)`
 	position: absolute;
@@ -296,7 +296,6 @@ const CollectionSubtitle = styled.Text`
 `;
 const CollectionContentContainer = styled.View`
 	align-items: center;
-	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
 `;
@@ -306,7 +305,7 @@ const CollectionRecommendContentItem = styled.ImageBackground`
 	overflow: hidden;
 	border-radius: 12px;
 	margin-vertical: 8px;
-	margin-horizontal: 8px;
+	margin-right: 12px;
 	justify-content: flex-end;
 `;
 const CollectionRecommendItemGradient = styled(LinearGradient)`

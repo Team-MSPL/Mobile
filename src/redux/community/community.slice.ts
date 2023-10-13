@@ -31,9 +31,11 @@ export const communitySlice = createSlice({
 });
 
 //게시글 목록 가져오기
-export const getPostList = createAsyncThunk('/getPostList', async () => {
+export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, thunkAPI) => {
 	try {
-		const response = await axiosAuth.get('/post/postList');
+		const response = await axiosAuth.get(
+			`/post/postList?page=${data.page}&sort=${data.sort}&search=${data.search}`,
+		);
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
@@ -199,6 +201,12 @@ interface postDataType {
 	postedAt: string;
 	liker: string[];
 	comment: commentType[];
+}
+
+export interface postListParameterType {
+	page: number;
+	sort: number;
+	search: string;
 }
 
 export interface postListType {
