@@ -69,45 +69,55 @@ export default function Modify({navigation, route}: any) {
 	const flag = useRef(false);
 	const goModify = () => {
 		const newY = (startTime.current.hours * 60 - 360) / 30 + startTime.current.minute / 30;
-		const newEnd = (endTime.current.hours * 60 - 360) / 30 + endTime.current.minute / 30;
-		let copy = [...timetable[changeDay]];
-		let changeCopy = [...timetable];
-		let changeFlag = null;
-		//부터 가능
-		for (let i = 0; i < copy.length; i++) {
-			if (
-				((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
-					(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
-						newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
-				copy[i].id != route.params.item.value.id
-			) {
-				changeFlag = copy[i];
-				break;
-			}
-		}
-		let changeInputIndex = copy.findIndex(item => item.y >= newY);
-		changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
-		if (changeFlag) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
-				}),
-			);
+		const newEnd =
+			((startTime.current.hours > endTime.current.hours ? endTime.current.hours + 24 : endTime.current.hours) *
+				60 -
+				360) /
+				30 +
+			endTime.current.minute / 30;
+		console.log(newEnd);
+		if (newEnd >= 49) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
 		} else {
-			let copyValue = {
-				...changeCopy[route.params.item.value.x][route.params.item.index],
-				y: newY,
-				x: changeDay,
-				takenTime: (newEnd - newY) * 30,
-			};
-			let deleteCopy = [...timetable[route.params.item.value.x]];
-			deleteCopy.splice(route.params.item.index, 1);
-			changeCopy[route.params.item.value.x] = deleteCopy;
-			let addCopy = [...changeCopy[changeDay]];
-			addCopy.splice(changeInputIndex, 0, copyValue);
-			changeCopy[changeDay] = addCopy;
-			dispatch(travelSliceActions.changeTimetable(changeCopy));
-			navigation.goBack();
+			let copy = [...timetable[changeDay]];
+			let changeCopy = [...timetable];
+			let changeFlag = null;
+			//부터 가능
+			for (let i = 0; i < copy.length; i++) {
+				if (
+					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+							newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+					copy[i].id != route.params.item.value.id
+				) {
+					changeFlag = copy[i];
+					break;
+				}
+			}
+			let changeInputIndex = copy.findIndex(item => item.y >= newY);
+			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+			if (changeFlag) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+					}),
+				);
+			} else {
+				let copyValue = {
+					...changeCopy[route.params.item.value.x][route.params.item.index],
+					y: newY,
+					x: changeDay,
+					takenTime: (newEnd - newY) * 30,
+				};
+				let deleteCopy = [...timetable[route.params.item.value.x]];
+				deleteCopy.splice(route.params.item.index, 1);
+				changeCopy[route.params.item.value.x] = deleteCopy;
+				let addCopy = [...changeCopy[changeDay]];
+				addCopy.splice(changeInputIndex, 0, copyValue);
+				changeCopy[changeDay] = addCopy;
+				dispatch(travelSliceActions.changeTimetable(changeCopy));
+				navigation.goBack();
+			}
 		}
 	};
 
@@ -141,7 +151,8 @@ export default function Modify({navigation, route}: any) {
 								<HStack>
 									<DayElementContainer onPress={item.function}>
 										<TimeItemText>
-											{String(item.hours).padStart(2, '0')}:{String(item.minute).padStart(2, '0')}
+											{String(item.hours >= 24 ? item.hours - 24 : item.hours).padStart(2, '0')}:
+											{String(item.minute).padStart(2, '0')}
 										</TimeItemText>
 									</DayElementContainer>
 								</HStack>

@@ -17,9 +17,11 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack, MainText} from '../../utill/layout/layout';
+import {HStack, MainText, VStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
+import {SVGHelp} from '../../utill/svg/svg';
+import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 export default function Recommend({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -28,6 +30,8 @@ export default function Recommend({navigation, route}: any) {
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 	const [recommendList, setRcommendList] = useState<RecommendList[]>();
+	const departure = useRef<DistanceType>({lat: 0, lng: 0});
+	const whereIndex = useRef(0);
 	const polylineCoordinates = recommendItem
 		.map((item, value) => {
 			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
@@ -97,13 +101,14 @@ export default function Recommend({navigation, route}: any) {
 		);
 	};
 	const checkMessage = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '바로 추가됩니다!',
-				modalFunction: addRecommend,
-				modalLeft: true,
-			}),
-		);
+		console.log(departure);
+		// dispatch(
+		// 	modalSliceActions.setOpenModal({
+		// 		modalTitle: '바로 추가됩니다!',
+		// 		modalFunction: addRecommend,
+		// 		modalLeft: true,
+		// 	}),
+		// );
 	};
 	const addRecommend = () => {
 		let copy = [...timetable];
@@ -145,6 +150,8 @@ export default function Recommend({navigation, route}: any) {
 					radius: route.params.radius,
 				}),
 			).unwrap();
+			departure.current.lat = route.params.lat;
+			departure.current.lng = route.params.lng;
 			if (result.length == 0) {
 				result = await dispatch(
 					recommendApi({
@@ -154,6 +161,8 @@ export default function Recommend({navigation, route}: any) {
 						radius: 20000,
 					}),
 				).unwrap();
+				departure.current.lat = route.params.lat;
+				departure.current.lng = route.params.lng;
 				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
 			}
 			setRcommendList(result);
@@ -171,6 +180,16 @@ export default function Recommend({navigation, route}: any) {
 	useLayoutEffect(() => {
 		getRecommendList();
 	}, []);
+	// const whereInfo=()=>{
+	// 	if(route.params.index==0){
+	// 		whereIndex.current=route.params.index+1;
+	// 	}else{
+	// 		recommendItem.length>1
+	// 		recommendItem[route.params.index - 1].name.includes(['식당 추천','카페 추천','숙소 추천'])?
+	// 		whereIndex.current=route.params.index-1;
+	// 	}
+	// 	recommendItem[route.params.index - 1].name
+	// }
 	const mapRef = useRef<MapView>(null);
 	if (!recommendList || isLoading) {
 		return <RecommendContainer></RecommendContainer>;
@@ -189,24 +208,41 @@ export default function Recommend({navigation, route}: any) {
 				{markers}
 				{polylines}
 			</MapView>
+			<KakaoMapInfoView>
+				<SVGHelp color={colors.selectButton} width={15} height={15} />
+				<KakaoMapInfoText>앞, 뒤 관광지를 바탕으로한 카카오맵 추천 순서입니다.</KakaoMapInfoText>
+			</KakaoMapInfoView>
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
 						<ListHStack color={idx == select ? colors.selectButton : 'white'} key={idx}>
-							<RecommendTouchableOpacity
+							<ListVStack
 								onPress={() => {
 									changeRecommend(idx);
 								}}>
-								<RecommendElementText color={idx == select ? 'white' : 'black'}>
-									{item.place_name}
-								</RecommendElementText>
-							</RecommendTouchableOpacity>
+								<RecommendView>
+									<RecommendElementText color={idx == select ? 'white' : 'black'}>
+										{item.place_name}
+									</RecommendElementText>
+								</RecommendView>
+								<CategoryText color={idx == select ? 'white' : 'black'}>
+									{item.category_name.slice(6, item.category_name.length)}
+									{'>'}
+									{Math.floor(
+										useDistance({
+											departure: departure.current,
+											arrival: {lat: item.y, lng: item.x},
+										}) * 1000,
+									)}
+									m{recommendItem[route.params.index - 1].name}기준
+								</CategoryText>
+							</ListVStack>
 							<RecommendInfoTouchableOpacity
 								onPress={() => {
 									Linking.openURL(item.place_url);
 								}}>
 								<RecommendElementText color={idx == select ? 'white' : 'black'}>
-									정보
+									정보보기
 								</RecommendElementText>
 							</RecommendInfoTouchableOpacity>
 						</ListHStack>
@@ -217,21 +253,6 @@ export default function Recommend({navigation, route}: any) {
 
 				<MarginContainder />
 			</RecommendScrollView>
-			{/* <TouchableOpacity
-				onPress={checkMessage}
-				disabled={select == -1}
-				style={{
-					width: '100%',
-					height: 50,
-					margin: 5,
-					backgroundColor: 'orange',
-					alignItems: 'center',
-					opacity: select == -1 ? 0.5 : 1,
-				}}>
-				<Text bold fontSize='lg'>
-					선택이요
-				</Text>
-			</TouchableOpacity> */}
 			<ButtonContainer>
 				<CustomButton label='선택완료' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
 			</ButtonContainer>
@@ -243,10 +264,9 @@ const RecommendContainer = styled.View`
 	flex: 1;
 	background-color: white;
 `;
-const RecommendTouchableOpacity = styled.TouchableOpacity`
+const RecommendView = styled.View`
 	margin: 5px 0px 0px 0px;
 	padding: 1%;
-	width: 80%;
 `;
 const RecommendInfoTouchableOpacity = styled.TouchableOpacity`
 	margin: 5px 0px 0px 0px;
@@ -265,4 +285,26 @@ const ListHStack = styled(HStack)<{color: string}>`
 	justify-content: space-between;
 	flex-wrap: wrap;
 	background-color: ${props => props.color};
+	border-bottom-width: 1px;
+	border-color: black;
+`;
+const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
+	width: 80%;
+	padding: 3px;
+`;
+const CategoryText = styled(RecommendElementText)`
+	font-size: 14px;
+`;
+const KakaoMapInfoView = styled.View`
+	flex-direction: row;
+	width: 100%;
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+`;
+const KakaoMapInfoText = styled.Text`
+	font-size: 13px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+	margin: 0px 0px 0px 5px;
 `;

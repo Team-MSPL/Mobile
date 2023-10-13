@@ -7,6 +7,7 @@ const initialState: LiteState = {
 	popularity: [],
 	lat: 0,
 	lng: 0,
+	recommendList: [{name: '', photo: '', takenDay: 0, tendency: [''], topPopularPlaceList: {name: '', photo: ''}}],
 };
 
 export const regionRecommendSlice = createSlice({
@@ -24,6 +25,13 @@ export const regionRecommendSlice = createSlice({
 		enrollPopularity: (state, {payload}) => {
 			state.popularity = payload;
 		},
+	},
+	extraReducers: builder => {
+		builder.addCase(regionSearch.fulfilled, (state, {payload}) => {
+			console.log(payload);
+			state.recommendList = payload;
+			//state.myTravelList = payload;
+		});
 	},
 });
 //여행 지역 추천 알고리즘
@@ -77,4 +85,13 @@ interface LiteState {
 	popularity: number[];
 	lat: number;
 	lng: number;
+	recommendList: RegionRecommend[];
+}
+
+interface RegionRecommend {
+	name: string;
+	photo: string;
+	takenDay: number;
+	tendency: string[];
+	topPopularPlaceList: {name: string; photo: string};
 }

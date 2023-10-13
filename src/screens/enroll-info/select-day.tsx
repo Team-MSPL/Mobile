@@ -336,12 +336,12 @@ export const TimeStepText = styled.Text`
 
 const PreviewText = styled.Text`
 	font-size: 25px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const PreviewBoldText = styled.Text`
 	font-size: 25px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 `;
 

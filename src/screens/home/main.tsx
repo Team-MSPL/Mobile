@@ -1,59 +1,52 @@
+import {useEffect} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
+		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const {userProfileImage, userName, dailyReward, functionToken, signUpReward} = useAppSelector(
-		state => state.userSlice,
-	);
+	const {userName, functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const soloMaking = () => {
+		appsflyerLogEvent({name: 'solo_make', value: {id: 'danim'}});
 		dispatch(travelSliceActions.setSingleMode());
 		navigation.navigate('EnrollTravelTitle');
 	};
 	const regionRecommend = () => {
+		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		navigation.navigate('RegionSelectTendency');
-	};
-	const checkDailyReward = () => {
-		dispatch(userSliceActions.setCheckDailyReward());
 	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	// useEffect(() => {
-	// 	if (signUpReward) {
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: '회원가입 축하드립니다',
-	// 				modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-	// 				modalFunction: checkSignUpReward,
-	// 			}),
-	// 		);
-	// 	} else {
-	// 		dailyReward &&
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '데일리 보상!',
-	// 					modalSubTitle: `토큰이 하나 추가됐습니다. ${functionToken}개 입니다.`,
-	// 					modalFunction: checkDailyReward,
-	// 				}),
-	// 			);
-	// 	}
-	// }, []);
+	useEffect(() => {
+		if (signUpReward) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '회원가입 축하드립니다',
+					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+					modalFunction: checkSignUpReward,
+				}),
+			);
+		}
+	}, []);
 	useBackHandler();
 
 	interface ButtonListType {
@@ -214,7 +207,7 @@ const TopBannerContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 24px;
+	margin-vertical: 24px;
 	width: 100%;
 `;
 const BannerTextContainer = styled.View`

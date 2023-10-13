@@ -1,4 +1,5 @@
-import {useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {
@@ -8,14 +9,26 @@ import {
 	purchaseUpdatedListener,
 	SubscriptionPurchase,
 	purchaseErrorListener,
+	Product,
+	RequestPurchase,
 } from 'react-native-iap';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {updateFunctionToken} from '../../redux/user/user.slice';
 export const useShopping = () => {
+	const itemSkus: any = Platform.select({
+		android: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+	});
+	const {functionToken} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	let purchaseUpdateSubscription: any;
 	let purchaseErrorSubscription: any;
+	const [purchaseItems, setPurchaseItems] = useState<Product[]>();
+	const navigation = useNavigation();
+	const goBack = () => {
+		navigation.goBack();
+	};
 	useEffect(() => {
 		const connection = async () => {
 			try {
@@ -33,17 +46,30 @@ export const useShopping = () => {
 						const receipt = purchase.transactionReceipt
 							? purchase.transactionReceipt
 							: purchase.purchaseToken;
-
 						if (receipt) {
 							try {
-								dispatch(LoadingSliceActions.offLoading());
+								dispatch(LoadingSliceActions.onLoading());
 								const ackResult = await finishTransaction({purchase, isConsumable: true});
-
 								// 구매이력 저장 및 상태 갱신
 								if (purchase) {
+									dispatch(
+										updateFunctionToken({
+											functionToken:
+												functionToken +
+												parseInt(purchase.productId.slice(21, purchase.productId.length)),
+										}),
+									);
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '구매 완료',
+											modalFunction: goBack,
+										}),
+									);
 								}
 							} catch (error) {
 								console.log('ackError: ', error);
+							} finally {
+								dispatch(LoadingSliceActions.offLoading());
 							}
 						}
 					},
@@ -67,9 +93,16 @@ export const useShopping = () => {
 						);
 					}
 				});
+				getItems();
 			} catch (error) {
 				console.log(error);
-				dispatch(modalSliceActions.setOpenModal({modalTitle: '에러가 발생했습니다.'}));
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '문제가 발생했습니다',
+						modalSubTitle: '잠시 후 시도해주세요',
+						modalFunction: goBack,
+					}),
+				);
 			}
 		};
 		connection();
@@ -85,4 +118,48 @@ export const useShopping = () => {
 			RNIap.endConnection();
 		};
 	}, []);
+	const getItems = async () => {
+		try {
+			const items = await RNIap.getProducts({skus: itemSkus});
+			setPurchaseItems(items);
+		} catch (error) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '에러가 발생했습니다.',
+					modalSubTitle: '잠시 후 시도해주세요',
+					modalFunction: goBack,
+				}),
+			);
+		}
+	};
+	const requestItemPurchase = async (sku: string) => {
+		try {
+			await RNIap.requestPurchase({skus: [sku]});
+		} catch (error) {
+			console.log('request purchase error: ', error);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '에러가 발생했습니다.',
+					modalSubTitle: '잠시 후 시도해주세요',
+					modalFunction: goBack,
+				}),
+			);
+		}
+	};
+	return {purchaseItems, requestItemPurchase};
 };
+
+interface PurchaseType {
+	currency: string;
+	description: string;
+	localizedPrice: string;
+	oneTimePurchaseOfferDetails: {
+		formattedPrice: string;
+		priceAmountMicros: string;
+		priceCurrencyCode: string;
+	};
+	price: string;
+	productId: string;
+	productType: string;
+	title: string;
+}

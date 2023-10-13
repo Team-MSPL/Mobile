@@ -112,38 +112,44 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 					</SelectListContainer>
 				</SelectAllContainer>
 				<HStack>
-					<RegionViewContainer>
-						<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
-							{cityViewList.map((item, idx) => {
-								return (
-									<RegionItems
-										key={idx}
-										select={cityIndex == item.id}
-										onPress={() => {
-											selectCity(item.id);
-										}}>
-										<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
-									</RegionItems>
-								);
-							})}
-						</ScrollView>
-					</RegionViewContainer>
-					<CityViewContainer>
-						<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
-							{cityViewList[cityIndex]?.sub.map((item, idx) => {
-								return (
-									<CityItems
-										key={idx}
-										select={region.includes(item.subTitle)}
-										onPress={() => {
-											cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
-										}}>
-										<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
-									</CityItems>
-								);
-							})}
-						</ScrollView>
-					</CityViewContainer>
+					<RegionAllContainer>
+						<StepInfo>Step 1</StepInfo>
+						<RegionViewContainer>
+							<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+								{cityViewList.map((item, idx) => {
+									return (
+										<RegionItems
+											key={idx}
+											select={cityIndex == item.id}
+											onPress={() => {
+												selectCity(item.id);
+											}}>
+											<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
+										</RegionItems>
+									);
+								})}
+							</ScrollView>
+						</RegionViewContainer>
+					</RegionAllContainer>
+					<CityAllContainer>
+						<StepInfo>Step 2</StepInfo>
+						<CityViewContainer>
+							<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+								{cityViewList[cityIndex]?.sub.map((item, idx) => {
+									return (
+										<CityItems
+											key={idx}
+											select={region.includes(item.subTitle)}
+											onPress={() => {
+												cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
+											}}>
+											<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
+										</CityItems>
+									);
+								})}
+							</ScrollView>
+						</CityViewContainer>
+					</CityAllContainer>
 				</HStack>
 
 				<MarginContainder />
@@ -154,15 +160,21 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 		</>
 	);
 }
-
-const RegionViewContainer = styled.View`
+const RegionAllContainer = styled(VStack)`
 	width: 30%;
+`;
+
+const CityAllContainer = styled(VStack)`
+	width: 70%;
+`;
+const RegionViewContainer = styled.View`
 	height: 300px;
 	border-width: 1px;
 	border-color: ${colors.regionNormal};
+	margin: 10px 0px 0px 0px;
 `;
 const CityViewContainer = styled(RegionViewContainer)`
-	width: 70%;
+	margin: 10px 0px 0px 0px;
 `;
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
@@ -179,7 +191,7 @@ const CityItems = styled(RegionItems)`
 const RegionText = styled.Text<{select: boolean}>`
 	color: ${props => (props.select ? 'white' : 'black')};
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 500;
 `;
 const CityText = styled(RegionText)`
 	color: ${props => (props.select ? colors.selectButton : 'black')};
@@ -207,13 +219,13 @@ const RegionElementContainerText = styled.Text`
 const SelectRegion = styled.Text`
 	font-size: 17px;
 	color: black;
-	font-weight: bold;
+	font-weight: 500;
 	margin: 0px 10px 0px 0px;
 `;
-const SelectRegionInfo = styled.Text`
+const StepInfo = styled.Text`
 	font-size: 14px;
-	color: grey;
-	font-weight: bold;
+	color: ${colors.selectButton};
+	font-weight: 500;
 	margin: 0% 1% 0% 0%;
 `;
 const SelectListContainer = styled.ScrollView`
@@ -233,13 +245,6 @@ const SelectAllContainer = styled.View`
 	width: 100%;
 	margin: 10px 0px 0px 0px;
 `;
-const popularityList = [
-	{id: 0, title: '서울', subId: 0},
-	{id: 1, title: '부산', subId: 0},
-	{id: 2, title: '대구', subId: 0},
-	{id: 9, title: '강원 강릉 ', subId: 1},
-	{id: 10, title: '충북 단양', subId: 2},
-];
 export const cityViewList = [
 	{
 		id: 0,

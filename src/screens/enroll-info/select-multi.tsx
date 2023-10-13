@@ -152,13 +152,13 @@ export const DayViewContainer = styled.View`
 
 const DayText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 	margin: 0px 10px 0px 0px;
 `;
 const DayInfoText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const ElementContainer = styled.TouchableOpacity`
@@ -180,7 +180,7 @@ const MultiAllContainer = styled.View`
 `;
 const MultiText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const MultiContainer = styled.View`
@@ -197,7 +197,7 @@ const MultiContainer = styled.View`
 `;
 const MultiElementText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 `;
 export const ButtonContainer = styled.View`

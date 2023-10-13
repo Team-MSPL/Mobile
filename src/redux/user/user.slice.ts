@@ -13,7 +13,6 @@ const initialUserState: UserState = {
 	socialloginProvider: undefined,
 	isLogin: false,
 	isFirstLaunch: 'false',
-	dailyReward: false,
 	signUpReward: false,
 	anonymousKeep: false,
 };
@@ -85,14 +84,12 @@ const userSlice = createSlice({
 	initialState: initialUserState,
 	reducers: {
 		setUserInfo(state, {payload}) {
-			console.log('에에에에에에에에에에', payload);
 			state.userId = payload.userId;
 			state.userName = payload.userName;
 			state.userProfileImage = payload.userProfileImage;
 			state.userJwtToken = payload.userjwtToken;
 			state.functionToken = payload.functionToken;
 			state.socialloginProvider = payload.loginProvider;
-			state.dailyReward = payload.dailyReward;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -114,9 +111,6 @@ const userSlice = createSlice({
 		setAnonymousKeep(state, {payload}) {
 			state.anonymousKeep = payload;
 		},
-		setCheckDailyReward(state) {
-			state.dailyReward = false;
-		},
 		setAnonymous(state) {
 			state.isLogin = true;
 			state.userId = 'x';
@@ -125,7 +119,6 @@ const userSlice = createSlice({
 			state.userJwtToken = '';
 			state.functionToken = 0;
 			state.socialloginProvider = 'anonymous';
-			state.dailyReward = false;
 			axiosAuth.defaults.headers.Authorization = `Bearer x`;
 		},
 	},
@@ -173,7 +166,6 @@ export interface UserState {
 	functionToken: number;
 	userProfileImage: string;
 	isFirstLaunch: string;
-	dailyReward: boolean;
 	signUpReward: boolean;
 	anonymousKeep: boolean;
 }

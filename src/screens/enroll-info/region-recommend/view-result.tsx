@@ -1,12 +1,10 @@
-import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
+import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import {Platform, TouchableOpacity, PermissionsAndroid, Alert, BackHandler} from 'react-native';
+import {BackHandler} from 'react-native';
 import {cityViewList} from '../select-city';
-import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {MainContainer, HStack, VStack} from '../../../utill/layout/layout';
+import {MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
@@ -15,16 +13,7 @@ export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
-	const [recommendList, setRecommendList] = useState<
-		{
-			name: string;
-			photo: string;
-			takenDay: number;
-			tendency: string[];
-			topPopularPlaceList: {name: string; photo: string};
-		}[]
-	>([]);
+	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = (e: string) => {
 		let region: string[] = [];
 		if (e.includes(' ')) {
@@ -41,24 +30,6 @@ export default function ViewResult({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
-	};
-	const getRegionRecommend = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			let datas = {
-				selectList: tendency,
-				selectPopular: popularity,
-				recentPosition: {lat: lat, lng: lng},
-				distanceSensitivity: distance,
-			};
-			const result = await dispatch(regionSearch(datas)).unwrap();
-			setRecommendList(result);
-		} catch (err) {
-			console.log(err);
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '추천을 받는 중 에러가 발생했습니다.'}));
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
 	};
 	useEffect(() => {
 		const backAction = () => {
@@ -81,9 +52,6 @@ export default function ViewResult({navigation}: any) {
 
 		return () => backHandler.remove();
 	}, []);
-	useLayoutEffect(() => {
-		getRegionRecommend();
-	}, []);
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<MainContainer>
@@ -94,7 +62,6 @@ export default function ViewResult({navigation}: any) {
 						key={idx}
 						onPress={() => {
 							navigation.navigate('DetailResult', {item: item});
-							console.log(item.topPopularPlaceList);
 							//goEnrollInfo(item.name);
 						}}>
 						{item.photo != '' ? (

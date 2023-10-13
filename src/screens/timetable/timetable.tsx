@@ -19,12 +19,12 @@ import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
 import {HeaderHStack} from '../my-travel-list/detail-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 import background from '../../utill/component/timetable/background';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const [deleteList, setDeleteList] = useState<string[]>([]);
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
 	const [viewDayIndex, setViewDayIndex] = useState(0);
@@ -86,14 +86,13 @@ export default function Timetable({navigation, route}: any) {
 			}),
 		);
 	};
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
+			makeMode == 'solo' && appsflyerLogEvent({name: 'solo_save', value: {id: 'danim'}});
 			dispatch(LoadingSliceActions.onLoading());
-
-			console.log('아디아디123벅', travelId);
 			if (travelId == '') {
-				console.log('아디아디벅', travelId);
 				const data = {
 					userId: userId,
 					region: makeMode == 'recommend' ? region : ['자유여행'],
@@ -170,7 +169,7 @@ export default function Timetable({navigation, route}: any) {
 				</View>
 			),
 		});
-	}, [editMode, timetable, addList, deleteList, x, makeMode]);
+	}, [editMode, timetable, addList, x, makeMode]);
 	const dragPositionCheck = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		const scrollY = e.nativeEvent.contentOffset.y;
 
@@ -204,12 +203,7 @@ export default function Timetable({navigation, route}: any) {
 					showsVerticalScrollIndicator={false}
 					onScroll={dragPositionCheck}
 					scrollEventThrottle={16}>
-					<InfoView
-						navigation={navigation}
-						setDeleteList={setDeleteList}
-						deleteList={deleteList}
-						viewDayIndex={viewDayIndex}
-					/>
+					<InfoView navigation={navigation} viewDayIndex={viewDayIndex} />
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 				</TimetableScrollView>
 			</ScrollVIewContainer>

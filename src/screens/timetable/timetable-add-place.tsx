@@ -31,6 +31,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../../utill/component/custom-button';
+import {useDistance} from '../../utill/hooks/useDistance';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -59,21 +60,16 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				);
 				return 0;
 			default:
-				const dLat =
-					(timetable[route.params.x][newY.current - 1].lat - timetable[route.params.x][newY.current].lat) *
-					(Math.PI / 180);
-				const dLon =
-					(timetable[route.params.x][newY.current - 1].lng - timetable[route.params.x][newY.current].lng) *
-					(Math.PI / 180);
+				const departure = {
+					lat: timetable[route.params.x][newY.current - 1].lat,
+					lng: timetable[route.params.x][newY.current - 1].lng,
+				};
+				const arrival = {
+					lat: timetable[route.params.x][newY.current].lat,
+					lng: timetable[route.params.x][newY.current].lng,
+				};
 
-				const a =
-					Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-					Math.cos(timetable[route.params.x][newY.current - 1].lat * (Math.PI / 180)) *
-						Math.cos(timetable[route.params.x][newY.current].lat * (Math.PI / 180)) *
-						Math.sin(dLon / 2) *
-						Math.sin(dLon / 2);
-				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival})); // 두 지점 간의 거리 (단위: km)
 				lat =
 					(timetable[route.params.x][newY.current - 1].lat + timetable[route.params.x][newY.current].lat) / 2;
 				lng =
