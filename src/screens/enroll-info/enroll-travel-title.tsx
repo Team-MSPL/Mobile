@@ -34,7 +34,11 @@ export default function EnrollTravelTitle({navigation}: any) {
 						value={textValue}
 						onBlur={() => setOnFocus(false)}
 						onChangeText={(value: string) => changeTextValue(value)}></TravelTitleTextInput>
-					<CustomButton isDisabled={textValue == ''} label='다음' onPress={goNext} />
+					<CustomButton
+						isDisabled={textValue == '' || textValue.startsWith(' ')}
+						label='다음'
+						onPress={goNext}
+					/>
 				</InputContainer>
 			</TouchableWithoutFeedback>
 		</EnrollTravelTitleContainer>

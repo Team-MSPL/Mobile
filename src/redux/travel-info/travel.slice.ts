@@ -4,6 +4,7 @@ import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import {tendencyList} from '../../screens/enroll-info/select-tendency';
+import axiosAuth from '../api/api';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -48,16 +49,6 @@ const initialState: LiteState = {
 	regionRecommendFlag: false,
 };
 
-export const axiosAuth = axios.create({
-	baseURL: API_ROUTE,
-
-	headers: {
-		'content-type': 'application/json',
-		withCredentials: true,
-	},
-	timeout: 5000,
-});
-
 export const axiosGoogle = axios.create({
 	baseURL: 'https://maps.googleapis.com/maps/api',
 	headers: {'content-type': 'application/json'},
@@ -83,99 +74,97 @@ export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data,
 	try {
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
 		return response.data.travelCourseList;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw thunkAPI.rejectWithValue(error.code);
 	}
 });
 //여행 코스 하나 가져오기
 export const getOneTravelCourse = createAsyncThunk(
 	'/getOneTravelCourse',
-	async (data: {travelId: string}, thunkAPI) => {
+	async (data: {travelId: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.get(`/travelCourse/getOneTravelCourse?travelId=${data.travelId}`);
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return 0;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 //코스 수정하기
 export const updateTravelCourse = createAsyncThunk(
 	'/updateTravelCourse',
-	async (data: updateTravelCourseType, thunkAPI) => {
+	async (data: updateTravelCourseType, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourse`, data);
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //코스 삭제하기
-export const deleteTravelCourse = createAsyncThunk('/deleteTravelCourse', async (data: {travelId: string}) => {
-	try {
-		const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
-	}
-});
+export const deleteTravelCourse = createAsyncThunk(
+	'/deleteTravelCourse',
+	async (data: {travelId: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //여행일기 저장,수정
 export const updateDiary = createAsyncThunk(
 	'/updateDiary',
-	async (data: {travelId: string; diary: string; picture: string[]}) => {
+	async (data: {travelId: string; diary: string; picture: string[]}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/travelCourse/updateDiary`, data);
 			return response;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //여행 리뷰, 별점 저장
-export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: reviewAndPointType) => {
-	try {
-		const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
-	}
-});
+export const reviewAndPoint = createAsyncThunk(
+	'/reviewAndPoint',
+	async (data: reviewAndPointType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
-export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType) => {
+export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, {rejectWithValue}) => {
 	try {
-		const response = await axiosAuth.post(`/ai/run`, data);
+		const response = await axiosAuth.post(`/ai/run`, data, {timeout: 60000});
 		console.log(response, '애ㅔ애ㅔ에ㅔㅔㅔㅔ');
 		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 //여행 코스 저장
-export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, thunkAPI) => {
+export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/travelCourse/saveTravelCourse`, data);
 		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',
-	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+	async (data: {start: string; goal: string; wayPoint: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosNaver.get(
 				`/map-direction/v1/driving?start=${data.start}&goal=${data.goal}${
@@ -183,27 +172,27 @@ export const getDrivingDuration = createAsyncThunk(
 				}&option=trafast`,
 			);
 			return response.data.route.trafast[0].summary;
-		} catch (error) {
-			return console.log(error);
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //장소 정보 얻어오는거
-export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, thunkAPI) => {
+export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
 			`/place/details/json?place_id=${data.placeId}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
 		//제로리절트 처리하기
 		return response.data;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 
 // 탐테에서 눌렀을때 검색이 아니라 이름으로 장소 찾는 거
-export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, thunkAPI) => {
+export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
 			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
@@ -214,13 +203,13 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 		console.log(a);
 		//제로리절트 처리하기
 		return a.data.result;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 
 //카카오 식당,카페 등 추천 장소 얻는 거
-export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, thunkAPI) => {
+export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosKakao.get(
 			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
@@ -229,8 +218,8 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 
 		//제로리절트 처리하기
 		return response.data.documents;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 

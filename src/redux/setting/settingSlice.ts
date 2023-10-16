@@ -5,6 +5,7 @@ const initialState: SettingState = {
 	isAppLoaded: false,
 	isFirstLaunched: null,
 	hasPermission: false,
+	noPermission: false,
 };
 
 const settingSlice = createSlice({
@@ -20,6 +21,9 @@ const settingSlice = createSlice({
 		setPermission: (state, action) => {
 			state.hasPermission = action.payload;
 		},
+		setNopermission: (state, action) => {
+			state.noPermission = action.payload;
+		},
 	},
 });
 
@@ -27,7 +31,8 @@ interface SettingState {
 	isAppLoaded: boolean;
 	isFirstLaunched: boolean | null;
 	hasPermission: boolean; // 앱 접근 권한
+	noPermission: boolean;
 }
 
-export const {setAppLoaded, setFirstLaunched, setPermission} = settingSlice.actions;
+export const {setAppLoaded, setFirstLaunched, setPermission, setNopermission} = settingSlice.actions;
 export default settingSlice.reducer;

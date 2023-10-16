@@ -73,14 +73,12 @@ export default function ChangeProfile({navigation}: any) {
 			<Center>
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
-
 					<ImageBottom>
 						<IconContainer name={'camera'} size={20} color={'grey'} />
 					</ImageBottom>
 				</TouchableOpacity>
 			</Center>
 			<NicknameText>닉네임</NicknameText>
-
 			<InputProfileContainer>
 				<InputWrap>
 					<CustomTextInput
@@ -100,7 +98,11 @@ export default function ChangeProfile({navigation}: any) {
 						</ClearTouchableOpacity>
 					)}
 				</InputWrap>
-				<CustomButton label={'변경'} isDisabled={nickname == ''} onPress={goChangeProfile} />
+				<CustomButton
+					label={'변경'}
+					isDisabled={nickname == '' || nickname.startsWith(' ')}
+					onPress={goChangeProfile}
+				/>
 			</InputProfileContainer>
 		</ProfileContainer>
 	);
@@ -112,7 +114,7 @@ const InputProfileContainer = styled.View`
 `;
 const ProfileContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
-	padding: 20px;
+	justify-content: center;
 `;
 const ClearTouchableOpacity = styled.TouchableOpacity`
 	position: absolute;
@@ -126,12 +128,13 @@ const InputWrap = styled.View`
 	justify-content: center;
 	display: flex;
 	width: 100%;
+	margin: 0px 0px 20px 0px;
 `;
 const NicknameText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: black;
-	margin: 0px 0px 10px 0px;
+	margin: 30px 0px 10px 0px;
 `;
 const CustomTextInput = styled.TextInput<{text: string}>`
 	width: 100%;

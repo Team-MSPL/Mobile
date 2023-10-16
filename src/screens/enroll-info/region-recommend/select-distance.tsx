@@ -84,7 +84,7 @@ export default function SelectDistance({navigation}: any) {
 		} catch (err) {
 			console.log('에러요', err);
 		} finally {
-			// dispatch(LoadingSliceActions.offLoading());
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	return (

@@ -34,6 +34,7 @@ import {
 } from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
 import {MenuIcon} from './community-main-screen';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 const {StatusBarManager} = NativeModules;
 
@@ -130,7 +131,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				reportWriter: userName,
 			};
 			await dispatch(reportPost(reportData));
-			Alert.alert('신고가 접수되었습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '신고완료',
+					modalSubTitle:
+						'신고가 접수되었습니다.\n검토까지는 최대24시간 소요됩니다.\n\n⦁신고사유에 맞지 않는 신고일 경우,\n해당 신고는 처리되지않습니다.\n\n⦁누적 신고횟수가 3회 이상인 유저는 글 작성을 할 수 없게됩니다.',
+				}),
+			);
 			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);

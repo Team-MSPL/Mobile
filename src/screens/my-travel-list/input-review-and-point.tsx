@@ -28,7 +28,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [reviewValue, setReviewValue] = useState('');
-	const [pointValue, setPointValue] = useState(-1);
+	const [pointValue, setPointValue] = useState(5);
 	const [tedencyPointList, setTedencyPointList] = useState<number[][]>(
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
@@ -111,7 +111,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 												changeTendencyPoint({index: index, iindex: iindex, inex: inex});
 											}}>
 											<SvgStart
-												color={idx <= pointValue ? colors.selectButton : colors.emptyStart}
+												color={inex <= pointValue ? colors.selectButton : colors.emptyStart}
 											/>
 										</RatingElement>
 									))}

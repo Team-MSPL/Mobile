@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useEffect} from 'react';
+import {Fragment, useEffect} from 'react';
 import {useAppDispatch} from '../redux';
 import {modalSliceActions} from '../redux/modal/modalSlice';
 import {userSliceActions} from '../redux/user/user.slice';
@@ -18,4 +18,5 @@ export default function ViewPager() {
 			}),
 		);
 	}, []);
+	return (<Fragment></Fragment>)
 }

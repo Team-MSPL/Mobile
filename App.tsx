@@ -27,12 +27,15 @@ import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
 import CodePush from 'react-native-code-push';
-
 import appsFlyer from 'react-native-appsflyer';
+import NetInfo from '@react-native-community/netinfo';
+import {networkSliceActions} from './src/redux/network/networkSlice';
+import Connection from './src/screens/network/connection';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
+	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -150,7 +153,12 @@ function App(): JSX.Element {
 		}
 	};
 	const {checkInitialPermission} = usePermission();
-
+	const setNetInfoEvent = () => {
+		NetInfo.addEventListener(state => {
+			const networkConnection = !!state.isConnected;
+			dispatch(networkSliceActions.setNetworkConn(networkConnection));
+		});
+	};
 	appsFlyer.initSdk(
 		{
 			devKey: Appsflyer_key,
@@ -167,13 +175,13 @@ function App(): JSX.Element {
 			console.error(error);
 		},
 	);
-	const {hasPermission} = useAppSelector((state: RootState) => state.settingSlice);
+	const {hasPermission, noPermission} = useAppSelector((state: RootState) => state.settingSlice);
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
 	};
 	useEffect(() => {
 		checkInitialPermission();
-	}, [hasPermission]);
+	}, [hasPermission, noPermission]);
 	useLayoutEffect(() => {
 		getDeepLink();
 	}, []);
@@ -181,6 +189,11 @@ function App(): JSX.Element {
 		getAllKeys();
 		checkFirstLaunch();
 		lottieHide();
+
+		setNetInfoEvent();
+		// return () => {
+		// 	setNetInfoEvent();
+		// };
 	}, []);
 	const linking = {
 		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],
@@ -198,7 +211,14 @@ function App(): JSX.Element {
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
 			<NavigationContainer linking={linking}>
-				{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
+				{isFirstLaunch == 'true' ? (
+					<ViewPager />
+				) : hasPermission || noPermission ? (
+					<StackNavigator />
+				) : (
+					<NeedPermissions />
+				)}
+				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
 				{Boolean(isLoading) && <Loading />}
 			</NavigationContainer>
