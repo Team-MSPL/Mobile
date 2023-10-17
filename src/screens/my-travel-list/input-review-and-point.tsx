@@ -111,7 +111,11 @@ export default function InputReviewAndPoint({navigation}: any) {
 												changeTendencyPoint({index: index, iindex: iindex, inex: inex});
 											}}>
 											<SvgStart
-												color={inex <= pointValue ? colors.selectButton : colors.emptyStart}
+												color={
+													inex <= tedencyPointList[index][iindex]
+														? colors.selectButton
+														: colors.emptyStart
+												}
 											/>
 										</RatingElement>
 									))}

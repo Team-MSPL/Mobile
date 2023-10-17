@@ -20,6 +20,7 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
+	blockUser,
 	clickLike,
 	commentType,
 	deleteComment,
@@ -35,6 +36,7 @@ import {
 import {colors} from '../../utill/colors';
 import {MenuIcon} from './community-main-screen';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {userSliceActions} from '../../redux/user/user.slice';
 
 const {StatusBarManager} = NativeModules;
 
@@ -371,10 +373,29 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	function doNothing(): any {
 		// 아무것도 하지 않음
 	}
+	const checkBlock = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '차단',
+				modalSubTitle: '차단한 사용자의 모든 글을 못보게됩니다.\n차단하시겠습니까?',
+				modalLeft: true,
+				modalFunction: handleBlock,
+			}),
+		);
+	};
+	const handleBlock = async () => {
+		dispatch(userSliceActions.setBlockList(postData.postWriterUserId));
+		try {
+			await dispatch(blockUser({blockUserId: postData.postWriterUserId}));
+			navigation.goBack();
+		} catch (err) {
+			console.log(err);
+		}
+	};
 
 	const communityReadingMenuOptionList: {options: string[]; onPress: (() => void)[]} = {
-		options: ['수정', '삭제', '신고', '취소'],
-		onPress: [goCommunityWritingScreen, postDeleteCheckAlert, showReportActionSheet, doNothing],
+		options: ['수정', '삭제', '신고', '차단', '취소'],
+		onPress: [goCommunityWritingScreen, postDeleteCheckAlert, showReportActionSheet, checkBlock, doNothing],
 	};
 
 	const reportOptionList: {
@@ -435,13 +456,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				options={
 					userId === postData.postWriterUserId
 						? communityReadingMenuOptionList.options
-						: communityReadingMenuOptionList.options.filter(item => item === '신고' || item === '취소')
+						: communityReadingMenuOptionList.options.filter(
+								item => item === '신고' || item === '차단' || item === '취소',
+						  )
 				}
-				cancelButtonIndex={userId == postData.postWriterUserId ? 3 : 1}
+				cancelButtonIndex={userId == postData.postWriterUserId ? 4 : 2}
 				onPress={(index: number) => {
 					userId === postData.postWriterUserId
 						? communityReadingMenuOptionList.onPress[index]()
-						: communityReadingMenuOptionList.onPress.slice(2, 4)[index]();
+						: communityReadingMenuOptionList.onPress.slice(2, 5)[index]();
 				}}
 			/>
 			<ActionSheet

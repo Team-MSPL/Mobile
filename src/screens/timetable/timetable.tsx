@@ -20,6 +20,7 @@ import {HeaderHStack} from '../my-travel-list/detail-info';
 import Icon from 'react-native-vector-icons/AntDesign';
 import background from '../../utill/component/timetable/background';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+import {usePosition} from '../../utill/hooks/usePosition';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
@@ -170,22 +171,9 @@ export default function Timetable({navigation, route}: any) {
 			),
 		});
 	}, [editMode, timetable, addList, x, makeMode]);
-	const dragPositionCheck = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-		const scrollY = e.nativeEvent.contentOffset.y;
 
-		// 스크롤뷰의 컨텐츠 높이를 가져옵니다.
-		const contentHeight = e.nativeEvent.contentSize.height;
-
-		// 스크롤뷰의 높이를 가져옵니다.
-		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
-
-		// 스크롤이 거의 끝에 다다랐는지 확인합니다.
-		if (scrollY + scrollViewHeight >= contentHeight - 20) {
-			// 스크롤이 거의 끝에 다다랐을 때 원하는 작업을 수행합니다.
-			setMapViewState(false);
-		} else if (!mapViewState) {
-			setMapViewState(true);
-		}
+	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		setMapViewState(usePosition(e));
 	};
 	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
 	return (
@@ -201,7 +189,7 @@ export default function Timetable({navigation, route}: any) {
 			<ScrollVIewContainer>
 				<TimetableScrollView
 					showsVerticalScrollIndicator={false}
-					onScroll={dragPositionCheck}
+					onScroll={changeViewState}
 					scrollEventThrottle={16}>
 					<InfoView navigation={navigation} viewDayIndex={viewDayIndex} />
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />

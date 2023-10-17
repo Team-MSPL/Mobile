@@ -15,6 +15,7 @@ const initialUserState: UserState = {
 	isFirstLaunch: 'false',
 	signUpReward: false,
 	anonymousKeep: false,
+	blockUserList: [],
 };
 
 // 로그아웃
@@ -87,6 +88,7 @@ const userSlice = createSlice({
 			state.userJwtToken = payload.userjwtToken;
 			state.functionToken = payload.functionToken;
 			state.socialloginProvider = payload.loginProvider;
+			state.blockUserList = payload.blockUserList;
 		},
 		reset: state => {
 			console.log('오긴함');
@@ -94,6 +96,9 @@ const userSlice = createSlice({
 		},
 		login(state) {
 			state.isLogin = true;
+		},
+		setBlockList(state, {payload}) {
+			state.blockUserList = [...state.blockUserList, payload];
 		},
 		setNicknameAndImage(state, {payload}) {
 			state.userProfileImage = payload.userProfileImage;
@@ -165,4 +170,5 @@ export interface UserState {
 	isFirstLaunch: string;
 	signUpReward: boolean;
 	anonymousKeep: boolean;
+	blockUserList: string[];
 }
