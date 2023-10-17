@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {axiosAuth} from '../travel-info/travel.slice';
 import {userSliceActions} from './user.slice';
+import axiosAuth from '../api/api';
 const initialState: LiteState = {
 	anonymous: false,
 };
@@ -36,7 +36,7 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 		}
 		return response.status;
 	} catch (error) {
-		return thunkAPI.rejectWithValue(error);
+		throw thunkAPI.rejectWithValue(error);
 	}
 });
 

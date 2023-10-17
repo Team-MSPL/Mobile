@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {axiosAuth} from '../travel-info/travel.slice';
+import axiosAuth from '../api/api';
 
 const name = 'user';
 
@@ -33,15 +33,14 @@ export const logout = createAsyncThunk('user/logout', async (_, {rejectWithValue
 //회원탈퇴
 export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
-	async (data: {userId: string; signUpFirebase: boolean}, thunkAPI) => {
+	async (data: {userId: string; signUpFirebase: boolean}, {rejectWithValue}) => {
 		try {
 			console.log('ㅇ헝허', data.signUpFirebase);
 			const response = await axiosAuth.delete('/user/withdraw', {data});
 			console.log(response);
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (err: any) {
+			throw rejectWithValue(err.response.data);
 		}
 	},
 );
@@ -49,15 +48,14 @@ export const userWithdraw = createAsyncThunk(
 //기능토큰관리
 export const updateFunctionToken = createAsyncThunk(
 	'/user/updateFunctionToken',
-	async (data: {functionToken: number}, thunkAPI) => {
+	async (data: {functionToken: number}, {rejectWithValue}) => {
 		try {
 			console.log('왔엉', data);
 			const response = await axiosAuth.patch('/user/updateFunctionToken', data);
 			console.log('안뇽', response);
 			return data;
-		} catch (error) {
-			console.log('에러에유', error);
-			return error;
+		} catch (err: any) {
+			throw rejectWithValue(err.response.data);
 		}
 	},
 );
@@ -65,16 +63,15 @@ export const updateFunctionToken = createAsyncThunk(
 //사용자 프로필 변경하기
 export const updateProfile = createAsyncThunk(
 	'/updateProfile',
-	async (data: {userName: string; userProfileImage: string}, thunkAPI) => {
+	async (data: {userName: string; userProfileImage: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/user/updateProfile`, data);
 			console.log(response.data);
 
 			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (err: any) {
+			throw rejectWithValue(err.response.data);
 		}
 	},
 );

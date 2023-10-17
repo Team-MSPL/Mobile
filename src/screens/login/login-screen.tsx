@@ -17,6 +17,7 @@ import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {HStack} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {networkCheck} from '../../redux/network/networkSlice';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -40,7 +41,7 @@ export default function LoginScreen({navigation}: any) {
 	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
-	}, []);
+	}, [isLogin]);
 
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
@@ -68,7 +69,6 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'kakao',
 				signUpFlag: false,
 			};
-			dispatch(modalSliceActions.setOpenModal({modalTitle: userInfo.nickname}));
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
 				navigation.navigate('Join1', {
@@ -104,7 +104,6 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'google',
 				signUpFlag: false,
 			};
-			console.log('디비 주소요', API_ROUTE);
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
 				navigation.navigate('Join1', {
@@ -118,15 +117,39 @@ export default function LoginScreen({navigation}: any) {
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 취소됨', error);
 				// user cancelled the login flow
 			} else if (error === statusCodes.IN_PROGRESS) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 이미 실행 중', error);
 				// operation (e.g. sign in) is in progress already
 			} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 서비스 이용 불가 및 만료');
 				// play services not available or outdated
 			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 다른 에러 발생', error);
 				// some other error happened
 			}

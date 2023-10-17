@@ -12,7 +12,11 @@ const usePermission = () => {
 		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
 		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
 	];
-	const iosPermissions = [PERMISSIONS.IOS.PHOTO_LIBRARY, PERMISSIONS.IOS.LOCATION_WHEN_IN_USE];
+	const iosPermissions = [
+		PERMISSIONS.IOS.PHOTO_LIBRARY,
+		PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+		PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY,
+	];
 	const androidSDKVersion = Platform.Version;
 	const needPermission =
 		Platform.OS === 'android'
@@ -23,7 +27,6 @@ const usePermission = () => {
 
 	// 앱 실행했을 때 혹은 로그아웃 이후 권한 체크
 	const checkInitialPermission = async () => {
-		console.log('ddddddddddddddddddddddddddddddddddddddd', androidSDKVersion);
 		const {hasBlocked, deniedList} = await checkPermissions();
 		if (hasBlocked || deniedList.length) dispatch(setPermission(false));
 		else dispatch(setPermission(true));

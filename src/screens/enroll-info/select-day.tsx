@@ -13,6 +13,7 @@ import {colors} from '../../utill/colors';
 import {Modal, View} from 'react-native';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
+import UseDatePicker from '../../utill/hooks/useDatePicker';
 export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -58,8 +59,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	const goNext = () => {
 		let data: PlaceType[] = [];
 		const checkDays = calculateDateDifference();
-
-		console.log('하위요ㅕ', checkDays);
 		if (Object.keys(accommodations).length) {
 			let copy = [...accommodations];
 			if (checkDays + 2 < Object.keys(accommodations).length) {
@@ -95,7 +94,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 			copySelectedStartDate.add(1, 'day');
 			count += 1;
 		}
-		console.log('ㅂㅈㄷ', dateArray, checkDays);
 		dispatch(
 			travelSliceActions.enrollDayInfo({
 				day: dateArray,
@@ -107,8 +105,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	};
 
 	const onDateChange = (date: any, type: string) => {
-		console.log(selectStartDate.format('YY-DD-MM-HH-mm-ss'));
-		console.log(date.format('YY-DD-MM-HH-mm-ss'));
 		if (calendarView.when == 0) {
 			selectEndDate && selectEndDate.diff(date) <= 0 && dispatch(travelSliceActions.enrollSelectEndDate(date));
 			dispatch(travelSliceActions.enrollSelectStartDate(date));
@@ -124,7 +120,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 			const diffInMilliseconds = selectEndDate.diff(selectStartDate);
 			const duration = moment.duration(diffInMilliseconds);
 			const days = duration.asDays();
-			console.log('우ㅜㅜㅜㅜㅜㅜㅜ', days, selectEndDate.diff(selectStartDate, 'days'));
 			return Math.ceil(Math.abs(days)); // 절대값으로 반환 (음수 값 제거)
 		}
 		return 0;
@@ -263,26 +258,14 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 				</Modal>
 				<MarginContainder />
 			</MainContainer>
+			{/* <UseDatePicker visible={visible} setVisible={setVisible} when={dateFlag.current}></UseDatePicker>
+			 */}
 			<ButtonContainer>
 				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
 }
-const SCSC = styled.ScrollView`
-	height: 300px;
-	width: 100%;
-`;
-const QWE = styled.View`
-	width: 100%;
-	height: 20px;
-	margin: 10px;
-`;
-const QWEText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-`;
 const ModalContainer = styled.Pressable`
 	flex-directrion: row;
 	flex: 1;
@@ -348,12 +331,6 @@ const PreviewBoldText = styled.Text`
 const PreviewContainer = styled.View`
 	width: 100%;
 	margin: 50px 0px 50px 0px;
-`;
-const SelectDivide = styled.View`
-	width: 2px;
-	height: 50px;
-	background-color: black;
-	margin: 0px 0px 0px 0px;
 `;
 
 export const ASD = styled.View`

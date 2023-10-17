@@ -3,7 +3,7 @@ import {Permission, requestMultiple, openSettings} from 'react-native-permission
 import styled from 'styled-components/native';
 import {useAppDispatch} from '../redux';
 import usePermission from './hooks/usePermisson';
-import {setPermission} from '../redux/setting/settingSlice';
+import {setPermission, setNopermission} from '../redux/setting/settingSlice';
 import AccessDialog from './access-dialog';
 import {modalSliceActions} from '../redux/modal/modalSlice';
 import {SvgApple} from './svg/svg';
@@ -44,6 +44,12 @@ export default function NeedPermissions() {
 			title: '사진 / 카메라',
 			desc: '내여행,프로필사진에서 사진 업로드',
 			logo: <IconContainer name={'camera'} size={25} color={colors.selectButton} />,
+		},
+		{
+			id: '4',
+			title: '추적 -ios한정',
+			desc: '광고 최적화와 사용자 경험 개선을 위해 데이터 추적',
+			logo: <IconContainer name={'filetext1'} size={25} color={colors.selectButton} />,
 		},
 	];
 
@@ -103,6 +109,10 @@ export default function NeedPermissions() {
 		await openSettings();
 		setShowModal(false);
 	};
+	const noPermissions = () => {
+		dispatch(setNopermission(true));
+		setShowModal(false);
+	};
 
 	return (
 		<PermissionMainContainer>
@@ -128,6 +138,7 @@ export default function NeedPermissions() {
 				onClose={closeModal}
 				onRequestAgain={requestAgain}
 				onOpenSetting={openSetting}
+				noPermissions={noPermissions}
 			/>
 		</PermissionMainContainer>
 	);

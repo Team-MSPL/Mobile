@@ -69,7 +69,12 @@ export default function MoreInfo({navigation}: any) {
 		navigation.navigate('PolicyMain');
 	};
 	const handleInquire = () => {
-		dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}));
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '아래 이메일로 문의주세요',
+				modalSubTitle: 'wayfarers0814@gmail.com',
+			}),
+		);
 	};
 	const goLogin = () => {
 		navigation.replace('LoginScreen');
@@ -80,7 +85,7 @@ export default function MoreInfo({navigation}: any) {
 			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
 		},
 		// {title: '도움말', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}))},
-		// {title: '문의하기', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: ''}))},
+		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 	];

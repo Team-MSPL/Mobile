@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {axiosAuth} from '../travel-info/travel.slice';
+import axiosAuth from '../api/api';
 const initialState: LiteState = {
 	postData: {
 		_id: '',
@@ -31,7 +31,7 @@ export const communitySlice = createSlice({
 });
 
 //게시글 목록 가져오기
-export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, thunkAPI) => {
+export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(
 			`/post/postList?page=${data.page}&sort=${data.sort}&search=${data.search}`,
@@ -39,13 +39,12 @@ export const getPostList = createAsyncThunk('/getPostList', async (data: postLis
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //게시글 하나 가져오기
-export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: string}, thunkAPI) => {
+export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: string}, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(`/post/getOnePost?postId=${data.postId}`);
 		//console.log('게시글 하나 가져오기가 실행됐을 때의 결과', response.data);
@@ -53,39 +52,36 @@ export const getOnePost = createAsyncThunk('/getOnePost', async (data: {postId: 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //게시글 저장하기
-export const savePost = createAsyncThunk('/savePost', async (data: savePostType, thunkAPI) => {
+export const savePost = createAsyncThunk('/savePost', async (data: savePostType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post('/post/savePost', data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //게시글 수정하기
-export const updatePost = createAsyncThunk('/updatePost', async (data: updatePostType, thunkAPI) => {
+export const updatePost = createAsyncThunk('/updatePost', async (data: updatePostType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.patch('/post/updatePost', data);
 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //게시글 삭제하기
-export const deletePost = createAsyncThunk('/deletePost', async (data: {postId: string}, thunkAPI) => {
+export const deletePost = createAsyncThunk('/deletePost', async (data: {postId: string}, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.delete('/post/deletePost', {data});
 		console.log(response.data);
@@ -93,13 +89,12 @@ export const deletePost = createAsyncThunk('/deletePost', async (data: {postId: 
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //좋아요 추가하기
-export const clickLike = createAsyncThunk('/clickLike', async (data: {postId: string}, thunkAPI) => {
+export const clickLike = createAsyncThunk('/clickLike', async (data: {postId: string}, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.patch('/post/clickLike', data);
 		console.log(response.data);
@@ -107,13 +102,12 @@ export const clickLike = createAsyncThunk('/clickLike', async (data: {postId: st
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //좋아요 삭제하기  click 에서 대문자일수도
-export const unclickLike = createAsyncThunk('/unclickLike', async (data: {postId: string}, thunkAPI) => {
+export const unclickLike = createAsyncThunk('/unclickLike', async (data: {postId: string}, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.patch('/post/unclickLike', data);
 		console.log(response.data);
@@ -121,13 +115,12 @@ export const unclickLike = createAsyncThunk('/unclickLike', async (data: {postId
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //댓글 추가하기
-export const saveComment = createAsyncThunk('/saveComment', async (data: saveCommentType, thunkAPI) => {
+export const saveComment = createAsyncThunk('/saveComment', async (data: saveCommentType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.patch('/post/saveComment', data);
 		console.log(response.data);
@@ -135,15 +128,14 @@ export const saveComment = createAsyncThunk('/saveComment', async (data: saveCom
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //댓글 삭제하기
 export const deleteComment = createAsyncThunk(
 	'/deleteComment',
-	async (data: {postId: string; commentId: string}, thunkAPI) => {
+	async (data: {postId: string; commentId: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch('/post/deleteComment', data);
 			console.log(response.data);
@@ -151,13 +143,12 @@ export const deleteComment = createAsyncThunk(
 			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
 		} catch (error) {
-			console.log(error);
-			return error;
+			throw rejectWithValue(error);
 		}
 	},
 );
 //게시글 신고하기
-export const reportPost = createAsyncThunk('/reportPost', async (data: reportPostType, thunkAPI) => {
+export const reportPost = createAsyncThunk('/reportPost', async (data: reportPostType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post('/managePost/reportPost', data);
 		console.log(response.data);
@@ -165,13 +156,12 @@ export const reportPost = createAsyncThunk('/reportPost', async (data: reportPos
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 
 //댓글 신고하기
-export const reportComment = createAsyncThunk('/reportComment', async (data: reportCommentType, thunkAPI) => {
+export const reportComment = createAsyncThunk('/reportComment', async (data: reportCommentType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post('/managePost/reportComment', data);
 		console.log(response.data);
@@ -179,8 +169,7 @@ export const reportComment = createAsyncThunk('/reportComment', async (data: rep
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log(error);
-		return error;
+		throw rejectWithValue(error);
 	}
 });
 export const communitySliceActions = communitySlice.actions;
