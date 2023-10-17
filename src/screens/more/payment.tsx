@@ -132,7 +132,7 @@ const InfoText = styled.Text`
 	color: black;
 `;
 const MoneyText = styled(InfoText)`
-	font-size: 13;
+	font-size: 13px;
 	color: grey;
 	text-decoration: line-through;
 `;

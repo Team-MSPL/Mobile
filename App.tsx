@@ -162,7 +162,7 @@ function App(): JSX.Element {
 	appsFlyer.initSdk(
 		{
 			devKey: Appsflyer_key,
-			isDebug: false,
+			isDebug: true,
 			appId: 'com.danimmobile',
 			onInstallConversionDataListener: true, //Optional
 			onDeepLinkListener: true, //Optional

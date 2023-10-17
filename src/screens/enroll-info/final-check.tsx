@@ -38,7 +38,7 @@ export default function FinalCheck({navigation}: any) {
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
-		Alert.alert('결제창');
+		navigation.navigate('Payment');
 	};
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];

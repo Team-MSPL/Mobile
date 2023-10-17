@@ -11,6 +11,7 @@ import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {MainContainer} from '../../utill/layout/layout';
+import {Dimensions} from 'react-native';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -35,6 +36,10 @@ export default function Main({navigation}: any) {
 	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
+	};
+	const goCourseDetaile = (e: any) => {
+		const data = {name: e.title, lat: e.lat, lng: e.lng};
+		navigation.navigate('CourseDetail', {value: data});
 	};
 	useEffect(() => {
 		if (signUpReward) {
@@ -63,50 +68,74 @@ export default function Main({navigation}: any) {
 		{
 			id: 0,
 			imagePath: require('../../../public/images/uniqueTravelImage/danyang.jpeg'),
-			title: '단양\n패러글라이딩',
+			city: '단양',
+			title: '패러글라이딩',
 			hashtag: '#레저스포츠',
+			lat: 36.9966,
+			lng: 128.3965,
 		},
 		{
 			id: 1,
 			imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
-			title: '대전\n성심당',
+			city: '대전',
+			title: 'n성심당',
 			hashtag: '#맛있는',
+			lat: 36.3277,
+			lng: 127.4273,
 		},
 		{
 			id: 2,
 			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
-			title: '동해\n목포항',
+			city: '동해',
+			title: '목포항',
 			hashtag: '#바다',
+			lat: 34.7807,
+			lng: 126.383,
 		},
 		{
 			id: 3,
 			imagePath: require('../../../public/images/uniqueTravelImage/sejong.jpeg'),
-			title: '세종\n고복자연공원',
+			city: '세종',
+			title: '고복자연공원',
 			hashtag: '#공원',
+			lat: 36.6113,
+			lng: 127.2385,
 		},
 		{
 			id: 4,
 			imagePath: require('../../../public/images/uniqueTravelImage/asan.jpeg'),
-			title: '아산\n지중해마을',
+			city: '아산',
+			title: '지중해마을',
 			hashtag: '#시티투어',
+			lat: 36.7975,
+			lng: 127.0605,
 		},
 		{
 			id: 5,
 			imagePath: require('../../../public/images/uniqueTravelImage/osan.jpeg'),
-			title: '오산\n반려동물테마파크',
+			city: '오산',
+			title: '반려동물테마파크',
 			hashtag: '#반려견',
+			lat: 37.1396,
+			lng: 127.064,
 		},
 		{
 			id: 6,
 			imagePath: require('../../../public/images/uniqueTravelImage/jangsu.jpeg'),
-			title: '장수\n의암주논개생가지',
+			city: '장수',
+			title: '의암주논개생가지',
 			hashtag: '#유적지',
+			lat: 35.6802,
+			lng: 127.6208,
 		},
 		{
 			id: 7,
 			imagePath: require('../../../public/images/uniqueTravelImage/chungdo.jpeg'),
-			title: '청도\n프로방스',
+			city: '청도',
+			title: '프로방스',
 			hashtag: '#이색체험',
+			lat: 35.6843,
+			lng: 128.7182,
 		},
 	];
 	const buttonList: ButtonListType[] = [
@@ -135,7 +164,7 @@ export default function Main({navigation}: any) {
 			icon: 'arrowright',
 		},
 	];
-
+	const DeviceWidth = Dimensions.get('window').width;
 	const buttonRenderItem = ({item}: {item: ButtonListType}) => {
 		return (
 			<NewTravelButton onPress={item.onPress} key={item.id}>
@@ -184,13 +213,26 @@ export default function Main({navigation}: any) {
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
 					<CollectionContentContainer>
 						{uniqueTravelList.map(item => (
-							<CollectionRecommendContentItem source={item.imagePath} key={item.id}>
-								<CollectionRecommendItemGradient colors={['transparent', 'black']} />
-								<CollectionRecommendContentItemExplainContainer>
-									<CollectionContentItemText>{item.title}</CollectionContentItemText>
-									<CollectionContentItemHashtagText>{item.hashtag}</CollectionContentItemHashtagText>
-								</CollectionRecommendContentItemExplainContainer>
-							</CollectionRecommendContentItem>
+							<CollectionTouchableOpacity
+								onPress={() => {
+									goCourseDetaile(item);
+								}}>
+								<CollectionRecommendContentItem
+									width={DeviceWidth * 0.4}
+									source={item.imagePath}
+									key={item.id}>
+									<CollectionRecommendItemGradient colors={['transparent', 'black']} />
+									<CollectionRecommendContentItemExplainContainer>
+										<CollectionContentItemText>
+											{item.city + '\n'}
+											{item.title}
+										</CollectionContentItemText>
+										<CollectionContentItemHashtagText>
+											{item.hashtag}
+										</CollectionContentItemHashtagText>
+									</CollectionRecommendContentItemExplainContainer>
+								</CollectionRecommendContentItem>
+							</CollectionTouchableOpacity>
 						))}
 					</CollectionContentContainer>
 				</CollectionContainer>
@@ -291,14 +333,16 @@ const CollectionContentContainer = styled.View`
 	align-items: center;
 	flex-direction: row;
 	flex-wrap: wrap;
+	justify-content: space-between;
+	width: 100%;
 `;
-const CollectionRecommendContentItem = styled.ImageBackground`
+const CollectionTouchableOpacity = styled.TouchableOpacity``;
+const CollectionRecommendContentItem = styled.ImageBackground<{width: number}>`
 	aspect-ratio: 1;
-	width: 144px;
+	width: ${props => props.width}px;
 	overflow: hidden;
 	border-radius: 12px;
 	margin-vertical: 8px;
-	margin-right: 12px;
 	justify-content: flex-end;
 `;
 const CollectionRecommendItemGradient = styled(LinearGradient)`

@@ -101,14 +101,14 @@ export default function Recommend({navigation, route}: any) {
 		);
 	};
 	const checkMessage = () => {
-		console.log(departure);
-		// dispatch(
-		// 	modalSliceActions.setOpenModal({
-		// 		modalTitle: '바로 추가됩니다!',
-		// 		modalFunction: addRecommend,
-		// 		modalLeft: true,
-		// 	}),
-		// );
+		//	console.log(departure);
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '바로 추가됩니다!',
+				modalFunction: addRecommend,
+				modalLeft: true,
+			}),
+		);
 	};
 	const addRecommend = () => {
 		let copy = [...timetable];
@@ -225,7 +225,7 @@ export default function Recommend({navigation, route}: any) {
 										{item.place_name}
 									</RecommendElementText>
 								</RecommendView>
-								<CategoryText color={idx == select ? 'white' : 'black'}>
+								{/* <CategoryText color={idx == select ? 'white' : 'black'}>
 									{item.category_name.slice(6, item.category_name.length)}
 									{'>'}
 									{Math.floor(
@@ -235,7 +235,7 @@ export default function Recommend({navigation, route}: any) {
 										}) * 1000,
 									)}
 									m{recommendItem[route.params.index - 1].name}기준
-								</CategoryText>
+								</CategoryText> */}
 							</ListVStack>
 							<RecommendInfoTouchableOpacity
 								onPress={() => {
