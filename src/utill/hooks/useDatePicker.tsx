@@ -1,14 +1,15 @@
-import {Dispatch, SetStateAction, useState} from 'react';
-import {Modal, Dimensions} from 'react-native';
+import {Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState} from 'react';
+import {Modal, Dimensions, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {HStack, MainContainer, VStack} from '../layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {colors} from '../colors';
 
 export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 	const ampmList = ['', '오전', '오후', ''];
-	const hourList = ['', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''];
+	const hourList = ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ''];
 	const minuteList = ['', '0', '30', ''];
 	const [ampm, setAmpm] = useState(0);
 	const [hour, setHour] = useState(0);
@@ -16,13 +17,26 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 	const dispatch = useAppDispatch();
 	const deviceHeight = Dimensions.get('window').height;
 	const deviceWidth = Dimensions.get('window').width;
-
+	const ampmRef = useRef<ScrollView>();
+	const hourRef = useRef<ScrollView>();
+	const minuteRef = useRef<ScrollView>();
 	const {timeLimitArray, minuteLimitArray} = useAppSelector(state => state.travelSlice);
+	useEffect(() => {
+		let hourData = (timeLimitArray[when] < 12 ? timeLimitArray[when] : timeLimitArray[when] - 12) + 1;
+		let ampmData = timeLimitArray[when] < 12 ? 1 : 2;
+		let minuteData = minuteLimitArray[when] / 30 + 1;
+		console.log(hourData, minuteData);
+		setMinute(minuteData);
+		setAmpm(ampmData);
+		setHour(hourData);
+		hourRef.current?.scrollTo({y: (hourData - 1) * 50});
+		minuteRef.current?.scrollTo({y: (minuteData - 1) * 50});
+		ampmRef.current?.scrollTo({y: (ampmData - 1) * 50});
+	}, [visible]);
 	const hoursCalculate = (e: any) => {
 		setHour(Math.round(e.nativeEvent.contentOffset.y / 50 + 1));
 	};
 	const minuteCalculate = (e: any) => {
-		console.log(e.nativeEvent.contentOffset.y / 50);
 		setMinute(Math.round(e.nativeEvent.contentOffset.y / 50 + 1));
 	};
 	const ampmCalculate = (e: any) => {
@@ -42,9 +56,9 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 		}
 	};
 	const viewList = [
-		{value: ampm, list: ampmList, function: ampmCalculate},
-		{value: hour, list: hourList, function: hoursCalculate},
-		{value: minute, list: minuteList, function: minuteCalculate},
+		{value: ampm, list: ampmList, ref: ampmRef, function: ampmCalculate},
+		{value: hour, list: hourList, ref: hourRef, function: hoursCalculate},
+		{value: minute, list: minuteList, ref: minuteRef, function: minuteCalculate},
 	];
 	const onCancel = () => {
 		setVisible(false);
@@ -61,6 +75,7 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 								nestedScrollEnabled={true}
 								pagingEnabled
 								snapToInterval={50}
+								ref={value.ref}
 								decelerationRate={'fast'}
 								onScroll={e => value.function(e)}
 								showsVerticalScrollIndicator={false}>
@@ -100,7 +115,7 @@ const StatusText = styled.Text`
 `;
 const StateText = styled(StatusText)`
 	align-self: flex-start;
-	margin: 0px 0px 0px 10px;
+	margin: 0px 0px 20px 10px;
 `;
 const StatusTouchableOpacity = styled.TouchableOpacity`
 	width: 40%;
@@ -109,6 +124,7 @@ const StatusTouchableOpacity = styled.TouchableOpacity`
 const StatusHstack = styled(HStack)`
 	width: 100%;
 	justify-content: center;
+	margin: 10px 0px 0px 0px;
 `;
 
 const Container = styled.View<{height: number; width: number}>`
@@ -118,7 +134,7 @@ const Container = styled.View<{height: number; width: number}>`
 	align-items: center;
 	justify-content: center;
 	height: ${props => props.height}px;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.9);
 `;
 const ModalContainer = styled.View`
 	width: 90%;
@@ -149,5 +165,5 @@ const ModalHstack = styled(HStack)`
 const Text = styled.Text<{color: boolean}>`
 	font-size: 20px;
 	font-weight: ${props => (props.color ? 900 : 500)};
-	color: ${props => (props.color ? 'black' : 'grey')};
+	color: ${props => (props.color ? 'black' : colors.regionNormal)};
 `;

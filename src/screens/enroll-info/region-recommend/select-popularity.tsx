@@ -21,7 +21,7 @@ export default function SelectPopularity({navigation}: any) {
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const [selectedId, setSelectedId] = useState(0);
 	const goPayment = async () => {
-		Alert.alert('결제창');
+		navigation.navigate('Payment');
 	};
 	const changeSelectId = (e: number) => {
 		setSelectedId(e);

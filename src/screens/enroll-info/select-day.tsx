@@ -24,31 +24,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
-	const onConfirm = (selectedDate: Date) => {
-		setVisible(false); // 모달 close
-		if (dateFlag.current == 1 && selectedDate.getHours() < 13) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '13시 이전은 불가능합니다.',
-					modalFunction: () => {},
-				}),
-			);
-		} else {
-			console.log(selectedDate.getHours());
-			// 날짜 또는 시간 선택 시
-			let timeCopy = [...timeLimitArray];
-			timeCopy[dateFlag.current] = selectedDate.getHours();
-			let minuteCopy = [...minuteLimitArray];
-			minuteCopy[dateFlag.current] = selectedDate.getMinutes();
-			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-		}
-	};
-
-	const onCancel = () => {
-		// 취소 시
-		setVisible(false); // 모달 close
-	};
-
 	const onPressTime = (e: number) => {
 		dateFlag.current = e;
 		setVisible(true);
@@ -213,21 +188,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 						</PreviewText>
 					</PreviewContainer>
 				</VStack>
-				<DatePicker
-					modal
-					open={visible}
-					mode='time'
-					date={moment()
-						.hours(timeLimitArray[dateFlag.current])
-						.minutes(minuteLimitArray[dateFlag.current])
-						.toDate()}
-					onConfirm={onConfirm}
-					onCancel={onCancel}
-					minuteInterval={30}
-					title={dateFlag.current ? '종료 시간' : '시작 시간'}
-					cancelText='취소'
-					confirmText='확인'
-				/>
 				<Modal
 					animationType='fade'
 					transparent={true}
@@ -258,8 +218,8 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 				</Modal>
 				<MarginContainder />
 			</MainContainer>
-			{/* <UseDatePicker visible={visible} setVisible={setVisible} when={dateFlag.current}></UseDatePicker>
-			 */}
+			<UseDatePicker visible={visible} setVisible={setVisible} when={dateFlag.current}></UseDatePicker>
+
 			<ButtonContainer>
 				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
 			</ButtonContainer>

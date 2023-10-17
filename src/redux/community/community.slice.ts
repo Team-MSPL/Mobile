@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axiosAuth from '../api/api';
+import {userSliceActions} from '../user/user.slice';
 const initialState: LiteState = {
 	postData: {
 		_id: '',
@@ -33,12 +34,21 @@ export const communitySlice = createSlice({
 //게시글 목록 가져오기
 export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, {rejectWithValue}) => {
 	try {
+		// const response = await axiosAuth.get(
+		// 	`/post/postList?page=${data.page}&sort=${data.sort}${data.search != '' && `&search=${data.search}`}`,
+		// );
+		const block = data.blockList.map(item => `&blockedUserIDs=${item}`);
+		console.log('gpgp', block);
 		const response = await axiosAuth.get(
-			`/post/postList?page=${data.page}&sort=${data.sort}&search=${data.search}`,
+			`/post/postList?page=${data.page}&sort=${data.sort}${
+				data.search != undefined && `&search=${data.search}`
+			}${block.join('')}`,
 		);
+		// console.log(response.request);
 		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
+		console.log('dpdp', error);
 		throw rejectWithValue(error);
 	}
 });
@@ -67,7 +77,18 @@ export const savePost = createAsyncThunk('/savePost', async (data: savePostType,
 		throw rejectWithValue(error);
 	}
 });
-
+//사용자 차단하기
+export const blockUser = createAsyncThunk('/blockUser', async (data: {blockUserId: string}, thunkAPI) => {
+	try {
+		//thunkAPI.dispatch(userSliceActions.setBlockList(data.blockUserId));
+		const response = await axiosAuth.patch('/user/blockUser', data);
+		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
+		console.log(response.data);
+		return response.data;
+	} catch (error) {
+		throw thunkAPI.rejectWithValue(error);
+	}
+});
 //게시글 수정하기
 export const updatePost = createAsyncThunk('/updatePost', async (data: updatePostType, {rejectWithValue}) => {
 	try {
@@ -195,7 +216,8 @@ interface postDataType {
 export interface postListParameterType {
 	page: number;
 	sort: number;
-	search: string;
+	search?: string;
+	blockList: string[];
 }
 
 export interface postListType {

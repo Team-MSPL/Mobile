@@ -11,6 +11,7 @@ import {
 	purchaseErrorListener,
 	Product,
 	RequestPurchase,
+	flushFailedPurchasesCachedAsPendingAndroid,
 } from 'react-native-iap';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -32,11 +33,16 @@ export const useShopping = () => {
 	useEffect(() => {
 		const connection = async () => {
 			try {
+				dispatch(LoadingSliceActions.onLoading());
 				const init = await RNIap.initConnection();
 				const initCompleted = init === true;
 				if (initCompleted) {
 					if (Platform.OS === 'android') {
-						await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
+						try {
+							await flushFailedPurchasesCachedAsPendingAndroid();
+						} catch (err) {
+							console.log(err, init);
+						}
 					} else {
 						await RNIap.clearTransactionIOS();
 					}
@@ -95,7 +101,6 @@ export const useShopping = () => {
 				});
 				getItems();
 			} catch (error) {
-				console.log(error);
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '문제가 발생했습니다',
@@ -103,6 +108,8 @@ export const useShopping = () => {
 						modalFunction: goBack,
 					}),
 				);
+			} finally {
+				dispatch(LoadingSliceActions.offLoading());
 			}
 		};
 		connection();
