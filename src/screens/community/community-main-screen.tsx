@@ -1,6 +1,5 @@
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator} from 'react-native';
 import DropdownButton from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -8,10 +7,9 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getPostList, postListType} from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {HStack} from '../../utill/layout/layout';
-import ScrollButton from '../../utill/component/scroll-button';
 import CommunityMain from '../../utill/component/community/community-main';
+import ScrollButton from '../../utill/component/scroll-button';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);

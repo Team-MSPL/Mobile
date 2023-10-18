@@ -5,32 +5,32 @@
  * @format
  */
 
-import React, {useEffect, useLayoutEffect, useRef} from 'react';
-import {BackHandler, Linking, StatusBar, useColorScheme, NativeModules} from 'react-native';
+import React, {useEffect, useLayoutEffect} from 'react';
+import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
 import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NavigationContainer, NavigationContainerRef} from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
+import {NavigationContainer} from '@react-navigation/native';
+import appsFlyer from 'react-native-appsflyer';
+import CodePush from 'react-native-code-push';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {modalSliceActions} from './src/redux/modal/modalSlice';
+import {networkSliceActions} from './src/redux/network/networkSlice';
 import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
 import {socialConnect} from './src/redux/user/login.slice';
 import {userSliceActions} from './src/redux/user/user.slice';
+import Connection from './src/screens/network/connection';
 import StackNavigator from './src/stacks';
 import BaseModal from './src/utill/base-modal';
 import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
-import CodePush from 'react-native-code-push';
-import appsFlyer from 'react-native-appsflyer';
-import NetInfo from '@react-native-community/netinfo';
-import {networkSliceActions} from './src/redux/network/networkSlice';
-import Connection from './src/screens/network/connection';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -162,7 +162,7 @@ function App(): JSX.Element {
 	appsFlyer.initSdk(
 		{
 			devKey: Appsflyer_key,
-			isDebug: true,
+			isDebug: false,
 			appId: 'com.danimmobile',
 			onInstallConversionDataListener: true, //Optional
 			onDeepLinkListener: true, //Optional

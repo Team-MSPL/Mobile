@@ -64,7 +64,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>캘린더에 이벤트를 추가하려고 합니다.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>'다님'의 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
+	<string>'다님'에서 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>주소록에 접근하여 연락처를 볼 수 있도록 합니다.</string>
 	<key>NSFaceIDUsageDescription</key>
@@ -82,9 +82,9 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>사진 앨범에 사진을 추가하려고 합니다.</string>
 	<key>NSPhotoLibraryAppUsageDescription</key>
-	<string>사용자가 선택한 사진 내여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
+	<string>사용자가 선택한 사진 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>'다님'의 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
+	<string>'다님'에서 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>미리 알림과 할 일 목록에 접근하려고 합니다.</string>
 	<key>NSSiriUsageDescription</key>
