@@ -25,7 +25,7 @@ export default function CourseDetail({navigation, route}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+					modalTitle: '여행 정보가 없습니다',
 				}),
 			);
 		} finally {

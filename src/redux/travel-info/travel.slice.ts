@@ -195,7 +195,7 @@ export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data:
 export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
-			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
+			`/place/textsearch/json?query=${data.name}&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
 			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
@@ -204,6 +204,7 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 		//제로리절트 처리하기
 		return a.data.result;
 	} catch (error: any) {
+		console.log(error);
 		throw rejectWithValue(error.code);
 	}
 });
@@ -402,6 +403,10 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.makeMode = 'recommend';
 			state.regionRecommendFlag = true;
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+			state.selectEndDate = payload.selectEndDate;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);

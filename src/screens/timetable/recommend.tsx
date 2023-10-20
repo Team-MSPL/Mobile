@@ -48,6 +48,7 @@ export default function Recommend({navigation, route}: any) {
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
+						pinColor={route.params.index == index ? 'black' : 'red'}
 					/>
 				);
 			}

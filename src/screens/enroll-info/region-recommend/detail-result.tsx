@@ -19,6 +19,7 @@ export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const goEnrollInfo = () => {
+		let selectEndDate = selectStartDate.clone().add(route.params.item.takenDay, 'days');
 		let region: string[] = [];
 		if (route.params.item.name.includes(' ')) {
 			region = route.params.item.name.split(' ');
@@ -26,14 +27,17 @@ export default function DetailResult({navigation, route}: any) {
 			region = [route.params.item.name, '전체'];
 		}
 		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		const data = {cityIndex: cityIndex, region: [region[1]]};
-
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		const data = {cityIndex: cityIndex, region: [region[1]], season: season, selectEndDate: selectEndDate};
+		// dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
+	};
+	const goDetail = (e: string) => {
+		const data = {name: e, lat: 0, lng: 0};
+		navigation.navigate('CourseDetail', {value: data});
 	};
 	return (
 		<>
@@ -64,7 +68,11 @@ export default function DetailResult({navigation, route}: any) {
 				<StepText mainText='인기 관광지 Top 5' subText='해당 지역의 인기 관광지를 확인하세요' />
 				<RecommendAllContainer>
 					{route.params.item.topPopularPlaceList.map((item, idx) => (
-						<PopularityContainer key={idx}>
+						<PopularityContainer
+							key={idx}
+							onPress={() => {
+								goDetail(item.name);
+							}}>
 							<IndexText>{idx + 1}</IndexText>
 							{item.photo != '' ? (
 								<RecommendImage source={{uri: item.photo}}></RecommendImage>
@@ -131,8 +139,11 @@ const IndexText = styled(TitleText)`
 	width: 15%;
 	text-align: center;
 `;
-const PopularityContainer = styled(HStack)`
+const PopularityContainer = styled.TouchableOpacity`
 	margin: 0px 0px 10px 0px;
+	display: inline-block;
+	flex-direction: row;
+	align-items: center;
 `;
 const PopularityInfoTitleText = styled(TitleText)`
 	color: black;

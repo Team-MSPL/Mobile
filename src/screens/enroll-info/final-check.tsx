@@ -316,7 +316,6 @@ export const SelectListContainer = styled.View`
 	width: 100%;
 	border-radius: 15px;
 	background-color: ${colors.selectButton};
-	border-style: dashed;
 	padding: 10px;
 `;
 const Dashed = styled.View`

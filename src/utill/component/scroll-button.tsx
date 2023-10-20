@@ -4,17 +4,18 @@ import {HStack, devicesHeight, devicesWidth} from '../layout/layout';
 import {useEffect} from 'react';
 import {colors} from '../colors';
 
-export default function ScrollButton({
-	viewState,
-	goCommunityWritingScreen,
-}: {
-	viewState: boolean;
-	goCommunityWritingScreen: () => void;
-}) {
+export default function ScrollButton({viewState, navigation}: {viewState: boolean; navigation: any}) {
 	const IconContainer = styled(Icon)``;
 
 	useEffect(() => {}, [viewState]);
-
+	const goCommunityWritingScreen = () => {
+		navigation.navigate('CommunityWritingScreen', {
+			title: '',
+			content: '',
+			images: [],
+			isNewPost: true,
+		});
+	};
 	return (
 		<CommunityButton onPress={goCommunityWritingScreen}>
 			<HStack>

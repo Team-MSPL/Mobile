@@ -7,7 +7,7 @@ import shortId from 'shortid';
 import {GOOGLE_API_KEY} from '@env';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack, VStack} from '../../utill/layout/layout';
+import {HStack, VStack, devicesWidth} from '../../utill/layout/layout';
 import {TouchableOpacity} from 'react-native';
 import {SvgLoginLogo} from '../../utill/svg/svg';
 export default function SearchPlace({navigation, route}: any) {
@@ -97,7 +97,13 @@ export default function SearchPlace({navigation, route}: any) {
 				}}
 				renderRightButton={clearButton}
 				styles={{
-					textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
+					textInputContainer: {
+						borderWidth: 1,
+						borderColor: colors.selectButton,
+						borderRadius: 10,
+					},
+					textInput: {margin: 1},
+					listView: {position: 'relative'},
 				}}
 				fetchDetails={true}
 				onPress={async (data, details) => {
@@ -182,12 +188,12 @@ const SearchPlaceElementText = styled.Text`
 	flex-wrap: wrap;
 `;
 
-const SearchClearButton = styled.Text`
+export const SearchClearButton = styled.Text`
 	font-size: 17px;
 	font-weight: bold;
 	color: ${colors.selectButton};
 `;
-const SearchClearContainer = styled.View`
+export const SearchClearContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	margin: 0px 10px 0px 0px;

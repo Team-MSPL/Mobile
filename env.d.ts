@@ -8,4 +8,5 @@ declare module '@env' {
 	export const KAKAO_NATIVE_KEY: string;
 	export const Google_Ads_Key: string;
 	export const Appsflyer_key: string;
+	export const Appsflyer_ios_id: string;
 }

@@ -30,8 +30,11 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 	});
 	const [visible, setVisible] = useState(false);
 	const goRemove = () => {
+		console.log('1');
 		const a = timetable.map(item => item.filter(value => value.id != indexRef.current.value?.id));
+		console.log('2');
 		dispatch(travelSliceActions.changeTimetable(a));
+		console.log('3');
 		setVisible(false);
 	};
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
@@ -212,13 +215,14 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 						)}
 						<ModalElementContainer
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '삭제하시겠습니까?',
-										modalLeft: true,
-										modalFunction: goRemove,
-									}),
-								);
+								setVisible(false),
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '삭제하시겠습니까?',
+											modalLeft: true,
+											modalFunction: goRemove,
+										}),
+									);
 							}}>
 							<ModalIconContainer>
 								<DeleteContainer name={'delete'} size={20} color={'black'} />

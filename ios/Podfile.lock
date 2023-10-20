@@ -1391,7 +1391,7 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
-  - RNPermissions (3.8.4):
+  - RNPermissions (3.10.0):
     - React-Core
   - RNReanimated (3.4.2):
     - DoubleConversion
@@ -1815,7 +1815,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: ccaa4a81582cf713eea562c5dd9dc1961a715fd0
   RNIap: 99a559a3642155b47aa0622f9693632010a0b4f7
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
-  RNPermissions: f1b49dd05fa9b83993cd05a9ee115247944d8f1a
+  RNPermissions: e6624f61e0020b4322723ea7ef05ffa52cfdb445
   RNReanimated: 726395a2fa2f04cea340274ba57a4e659bc0d9c1
   RNScreens: b21dc57dfa2b710c30ec600786a3fc223b1b92e7
   RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
@@ -1825,6 +1825,6 @@ SPEC CHECKSUMS:
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
 
-PODFILE CHECKSUM: 4e1ec157fe99d4aa2435b863aa7131007926b190
+PODFILE CHECKSUM: 847296e8d95a3dddcfb09fa633759e7a850b4b33
 
 COCOAPODS: 1.13.0

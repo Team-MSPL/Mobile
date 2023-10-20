@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Alert, TouchableOpacity, Image} from 'react-native';
+import {TouchableOpacity, Platform} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -9,25 +9,15 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {HStack, HeaderContianer, HeaderText, MainContainer, VStack} from '../../utill/layout/layout';
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgMilestone, SvgPicture, SvgReview, SvgShare} from '../../utill/svg/svg';
+import {SvgMilestone, SvgReview, SvgShare} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
-import Icon from 'react-native-vector-icons/AntDesign';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, region, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
+	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const HeaderIconContainer = styled(Icon)`
-		background-color: ${colors.selectButton};
-		border-radius: 5px;
-		padding: 0.6%;
-		margin: 0px 0px 0px 10px;
-	`;
-	const goInputDiary = () => {
-		navigation.navigate('InputDiary');
-	};
 	const goMyTravelDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -116,14 +106,16 @@ export default function DetailInfo({navigation}: any) {
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<HeaderHStack>
-					<TouchableOpacity onPress={goKakaoShare}>
-						<SvgShare color={colors.selectButton} />
-					</TouchableOpacity>
+				<HeaderContianer>
+					{Platform.OS != 'ios' && (
+						<TouchableOpacity onPress={goKakaoShare}>
+							<HeaderText>공유</HeaderText>
+						</TouchableOpacity>
+					)}
 					<TouchableOpacity onPress={removeCheck}>
-						<HeaderIconContainer name={'delete'} size={20} color={'white'} />
+						<HeaderText>삭제</HeaderText>
 					</TouchableOpacity>
-				</HeaderHStack>
+				</HeaderContianer>
 			),
 		});
 	}, []);
@@ -135,14 +127,6 @@ export default function DetailInfo({navigation}: any) {
 	return (
 		<MainContainer>
 			<DayText>{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay]).format('MM월-DD일')}</DayText>
-			{/* <PictureCotainer>
-				<PictureElementContainer>
-					<PictuerVstack>
-						<SvgPicture color={colors.selectButton} />
-						<PictureText>사진 추가</PictureText>
-					</PictuerVstack>
-				</PictureElementContainer>
-			</PictureCotainer> */}
 			<InputDiary navigation={navigation} />
 			<CourseAndReview>
 				<CourseContainer onPress={goTimetable}>
@@ -168,31 +152,6 @@ export default function DetailInfo({navigation}: any) {
 	);
 }
 
-const PictureCotainer = styled.View`
-	height: 180px;
-	width: 100%;
-	align-items: center;
-	margin: 15px 0px 15px 0px;
-`;
-const PictureElementContainer = styled.TouchableOpacity`
-	width: 135px;
-	height: 180px;
-	border-radius: 10px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
-	align-items: center;
-	justify-content: center;
-`;
-const PictureText = styled.Text`
-	margin: 10px 0px 0px 0px;
-	font-size: 15px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-const PictuerVstack = styled(VStack)`
-	align-items: center;
-	justify-content: center;
-`;
 export const IconContainer = styled.View`
 	width: 100%;
 	align-items: flex-end;
@@ -204,14 +163,16 @@ export const CourseAndReview = styled(HStack)`
 export const CourseContainer = styled.TouchableOpacity`
 	width: 45%;
 	padding: 15px;
+	height: 150px;
 	border-radius: 10px;
 	background: ${colors.selectButton};
 	justify-content: space-between;
 `;
 export const CourseTitleText = styled.Text`
-	font-size: 22px;
+	font-size: 20px;
 	font-weight: bold;
 	color: white;
+	margin: 0px 0px 5px 0px;
 `;
 export const CourseSubTitleText = styled.Text`
 	font-size: 15px;

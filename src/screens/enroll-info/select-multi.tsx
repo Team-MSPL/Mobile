@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack, Divider, devicesWidth} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -201,7 +201,7 @@ const MultiElementText = styled.Text`
 	color: ${colors.selectButton};
 `;
 export const ButtonContainer = styled.View`
-	width: 100%;
+	width: ${devicesWidth}px;
 	background-color: rgba(255, 255, 255, 0.8);
 	position: absolute;
 	bottom: 0;

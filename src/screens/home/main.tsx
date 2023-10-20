@@ -78,7 +78,7 @@ export default function Main({navigation}: any) {
 			id: 1,
 			imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
 			city: '대전',
-			title: 'n성심당',
+			title: '성심당',
 			hashtag: '#맛있는',
 			lat: 36.3277,
 			lng: 127.4273,

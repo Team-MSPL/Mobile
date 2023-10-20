@@ -150,8 +150,6 @@ const ImageElement = styled.Image`
 	height: 100px;
 	border-radius: 99px;
 	overflow: hidden;
-	border-width: 10px;
-	border-color: red;
 `;
 const ImageBottom = styled.View`
 	position: absolute;

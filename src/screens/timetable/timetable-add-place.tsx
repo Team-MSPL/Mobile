@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
@@ -32,6 +32,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../../utill/component/custom-button';
 import {useDistance} from '../../utill/hooks/useDistance';
+import {SearchClearButton, SearchClearContainer} from '../enroll-info/search-place';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -139,6 +140,18 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		{step: 'Start', title: '시작 시간', time: route.params.y[0]},
 		{step: 'End', title: '종료 시간', time: route.params.y[route.params.y.length - 1] + 1},
 	];
+
+	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+	const clearInput = () => {
+		autocompleteRef.current?.setAddressText('');
+	};
+	const clearButton = () => (
+		<SearchClearContainer>
+			<TouchableOpacity onPress={clearInput}>
+				<SearchClearButton>취소</SearchClearButton>
+			</TouchableOpacity>
+		</SearchClearContainer>
+	);
 	return (
 		<MainContainer>
 			<DayContainer>
@@ -186,10 +199,13 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							language: 'ko',
 							components: 'country:kr',
 						}}
+						ref={autocompleteRef}
 						styles={{
-							container: {position: 'absolute', zIndex: 3, width: '100%'},
 							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
+							textInput: {margin: 1},
+							listView: {height: 300},
 						}}
+						renderRightButton={clearButton}
 						fetchDetails={true}
 						onPress={async (data, details) => {
 							setGetInfo({
@@ -202,72 +218,34 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 				)}
 			</SearchContainer>
-			{/* <HStack>
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('CE7');
-					}}>
-					<Text bold fontSize='xl'>
-						카페 추천
-					</Text>
-				</TouchableOpacity>
-				<Spacer />
-
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('AD5');
-					}}>
-					<Text bold fontSize='xl'>
-						숙소 추천
-					</Text>
-				</TouchableOpacity>
-				<Spacer />
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('FD6');
-					}}>
-					<Text bold fontSize='xl'>
-						식당 추천
-					</Text>
-				</TouchableOpacity>
-			</HStack> */}
 			<CourseAndReview>
-				<CoffeeContainer onPress={() => goRecommend('CE7')}>
-					<VStack>
-						<CourseTitleText>카페 추천</CourseTitleText>
-						{/* <CourseSubTitleText>지금 인기 있는 카페를 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+				<RecommendContainer color='#ffccb6' onPress={() => goRecommend('CE7')}>
+					<CourseTitleText>카페 추천</CourseTitleText>
 					<IconContainer>
 						<SvgCoffee color='white' />
 					</IconContainer>
-				</CoffeeContainer>
-				<AccommodationsContainer
+				</RecommendContainer>
+				<RecommendContainer
+					color='#cbaacb'
 					onPress={() => {
 						goRecommend('AD5');
 					}}>
-					<VStack>
-						<CourseTitleText>숙소 추천</CourseTitleText>
-						{/* <CourseSubTitleText>성향에 맞는 숙소를 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+					<CourseTitleText>숙소 추천</CourseTitleText>
+
 					<IconContainer>
 						<SvgHome width={36} height={36} color='white' />
 					</IconContainer>
-				</AccommodationsContainer>
-				<RestoaurantContainer
+				</RecommendContainer>
+				<RecommendContainer
+					color='#abdee6'
 					onPress={() => {
 						goRecommend('FD6');
 					}}>
-					<VStack>
-						<CourseTitleText>식당 추천</CourseTitleText>
-						{/* <CourseSubTitleText>맛있는 식당을 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+					<CourseTitleText>식당 추천</CourseTitleText>
 					<IconContainer>
 						<DeleteIconContainers name={'restaurant'} size={36} color={'white'} />
 					</IconContainer>
-				</RestoaurantContainer>
+				</RecommendContainer>
 			</CourseAndReview>
 			<CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} />
 		</MainContainer>
@@ -282,25 +260,19 @@ const DayContainer = styled.View`
 	padding: 10px;
 	align-items: center;
 	justify-content: center;
+	margin: 0px 0px 10px 0px;
 `;
 const DayText = styled.Text`
 	font-size: 22px;
 	font-weight: bold;
 	color: white;
 `;
-const CoffeeContainer = styled(CourseContainer)`
+const RecommendContainer = styled(CourseContainer)<{color: string}>`
 	width: 30%;
-	background-color: #ffccb6;
+	background-color: ${props => props.color};
+	height: 100px;
 `;
 
-const AccommodationsContainer = styled(CourseContainer)`
-	width: 30%;
-	background-color: #cbaacb;
-`;
-const RestoaurantContainer = styled(CourseContainer)`
-	width: 30%;
-	background-color: #abdee6;
-`;
 const MainContainer = styled.View`
 	flex: 1;
 	background-color: white;
@@ -311,8 +283,8 @@ const DayElementContainer = styled(DayPressable).attrs({as: View})`
 `;
 const SearchContainer = styled.View`
 	width: 100%;
-	height: 10%;
 	margin: 5% 0% 5% 0%;
+	height: 100px;
 `;
 
 const AddText = styled.Text`

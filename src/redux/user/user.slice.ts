@@ -18,27 +18,12 @@ const initialUserState: UserState = {
 	blockUserList: [],
 };
 
-// 로그아웃
-export const logout = createAsyncThunk('user/logout', async (_, {rejectWithValue}) => {
-	try {
-		// 로그아웃 시 플래그같은거.
-		console.log('ㅁㅁ');
-		//return (await api.post('/user/logout')).data;
-
-		return 0;
-	} catch (err: any) {
-		throw rejectWithValue(err.response.data);
-	}
-});
-
 //회원탈퇴
 export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
 	async (data: {userId: string; signUpFirebase: boolean}, {rejectWithValue}) => {
 		try {
-			console.log('ㅇ헝허', data.signUpFirebase);
 			const response = await axiosAuth.delete('/user/withdraw', {data});
-			console.log(response);
 			return response.data;
 		} catch (err: any) {
 			throw rejectWithValue(err.response.data);
@@ -51,9 +36,7 @@ export const updateFunctionToken = createAsyncThunk(
 	'/user/updateFunctionToken',
 	async (data: {functionToken: number}, {rejectWithValue}) => {
 		try {
-			console.log('왔엉', data);
 			const response = await axiosAuth.patch('/user/updateFunctionToken', data);
-			console.log('안뇽', response);
 			return data;
 		} catch (err: any) {
 			throw rejectWithValue(err.response.data);
@@ -67,9 +50,6 @@ export const updateProfile = createAsyncThunk(
 	async (data: {userName: string; userProfileImage: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/user/updateProfile`, data);
-			console.log(response.data);
-
-			// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 			return response.data;
 		} catch (err: any) {
 			throw rejectWithValue(err.response.data);
@@ -125,19 +105,6 @@ const userSlice = createSlice({
 		},
 	},
 	extraReducers: builder => {
-		// 로그아웃 지금은 다 지워버리지만 추후 처음런치때나 그런거 체크도해야할듯
-		builder.addCase(logout.fulfilled, state => {
-			AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
-			// console.log('왔는딩?');
-			// state.functionToken = 0;
-			// console.log('허허허?');
-			// state.isLogin = false;
-			// state.socialloginProvider = null;
-			// state.userId = '';
-			// state.userName = '';
-			//userSlice.actions.reset();
-			return {...initialUserState};
-		});
 		builder.addCase(userWithdraw.fulfilled, state => {
 			// /AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
 			// console.log('왔는딩?');

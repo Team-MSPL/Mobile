@@ -16,9 +16,8 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
-
+	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
-		const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종'];
 		dispatch(
 			travelSliceActions.selectPopularity({
 				region: checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle],
@@ -63,8 +62,10 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 		cityViewList.find(item =>
 			item.sub.some(
 				subItem =>
-					(subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
-					subItem.subTitle.startsWith(search),
+					((subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
+						item.id != 0 &&
+						subItem.subTitle.startsWith(search)) ||
+					item.title.startsWith(search),
 			),
 		);
 
@@ -75,7 +76,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 	const addCity = () => {
 		searchData && selectCity(searchData.id);
 		const data = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
-		dispatch(travelSliceActions.selectRegion([data]));
+		dispatch(travelSliceActions.selectRegion([data ?? '전체']));
 	};
 	return (
 		<>
@@ -85,15 +86,15 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 				<HStack>
 					<SearchInput
 						// autoFocus={true}
+						style={{fontSize: 15}}
+						placeholderTextColor={'grey'}
 						value={search}
 						onChangeText={(text: string) => changeSearch(text)}
-						placeholder='ex)제주도'></SearchInput>
+						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>
 				</HStack>
 				{searchData && (
 					<SearchTouchableOpacity onPress={addCity}>
-						<SelectRegion>
-							{searchData?.title + ' ' + (searchCity && searchCity) + '(눌러서 추가)'}
-						</SelectRegion>
+						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
 					</SearchTouchableOpacity>
 				)}
 				<SelectAllContainer>
@@ -208,7 +209,8 @@ const RegionElementContainer = styled.TouchableOpacity`
 const SearchTouchableOpacity = styled.TouchableOpacity`
 	width: 100%;
 	padding: 10px;
-	align-items: center;
+	background-color: #f0f0f0;
+	border-radius: 10px;
 `;
 const RegionElementContainerText = styled.Text`
 	font-size: 15px;
@@ -240,6 +242,8 @@ const SearchInput = styled.TextInput`
 	border-width: 1px;
 	border-radius: 15px;
 	flex: 1;
+	height: 40px;
+	padding: 0px 5px 0px 5px;
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;
@@ -252,9 +256,17 @@ export const cityViewList = [
 		sub: [
 			{id: 1, subTitle: '서울'},
 			{id: 2, subTitle: '부산'},
+			{id: 17, subTitle: '제주'},
+			{id: 4, subTitle: '인천'},
 			{id: 3, subTitle: '대구'},
+			{id: 5, subTitle: '광주'},
+			{id: 6, subTitle: '대전'},
+			{id: 7, subTitle: '울산'},
 			{id: 10, subTitle: '강릉시'},
-			{id: 11, subTitle: '단양군'},
+			{id: 10, subTitle: '속초시'},
+			{id: 15, subTitle: '경주시'},
+			{id: 15, subTitle: '포항시'},
+			{id: 14, subTitle: '여수시'},
 		],
 	},
 	{id: 1, title: '서울', sub: [{id: 0, subTitle: '전체'}]},

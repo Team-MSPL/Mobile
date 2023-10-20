@@ -171,7 +171,7 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo3.png',
+					userProfileImage: '',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -182,7 +182,7 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo3.png',
+						profileImage: '',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {

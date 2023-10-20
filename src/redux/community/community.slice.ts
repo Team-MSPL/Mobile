@@ -14,15 +14,28 @@ const initialState: LiteState = {
 		comment: [],
 	},
 	postList: [],
+	searchList: [],
 };
 
 export const communitySlice = createSlice({
 	name: 'community',
 	initialState,
-	reducers: {},
+	reducers: {
+		resetSearchList: state => {
+			state.searchList = [];
+		},
+		resetPostList: state => {
+			state.postList = [];
+		},
+	},
 	extraReducers: builder => {
 		builder.addCase(getPostList.fulfilled, (state, {payload}) => {
-			state.postList = payload;
+			let copy = [...state.postList, ...payload];
+			state.postList = copy;
+		});
+		builder.addCase(getSearchPostList.fulfilled, (state, {payload}) => {
+			let copy = [...state.searchList, ...payload];
+			state.searchList = copy;
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
 			//console.log('게시글 하나 가져오기', payload);
@@ -30,25 +43,36 @@ export const communitySlice = createSlice({
 		});
 	},
 });
-
+//검색 게시글 가져오기
+export const getSearchPostList = createAsyncThunk(
+	'/getSearchPostList',
+	async (data: postListParameterType, {rejectWithValue}) => {
+		try {
+			const block = data.blockList.map(item => `&blockedUserIDs=${item}`);
+			const response = await axiosAuth.get(
+				`/post/postList?page=${data.page}&sort=${data.sort}${
+					data.search != undefined && `&search=${data.search}`
+				}${block.join('')}`,
+			);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			throw rejectWithValue(error);
+		}
+	},
+);
 //게시글 목록 가져오기
 export const getPostList = createAsyncThunk('/getPostList', async (data: postListParameterType, {rejectWithValue}) => {
 	try {
-		// const response = await axiosAuth.get(
-		// 	`/post/postList?page=${data.page}&sort=${data.sort}${data.search != '' && `&search=${data.search}`}`,
-		// );
 		const block = data.blockList.map(item => `&blockedUserIDs=${item}`);
-		console.log('gpgp', block);
 		const response = await axiosAuth.get(
 			`/post/postList?page=${data.page}&sort=${data.sort}${
 				data.search != undefined && `&search=${data.search}`
 			}${block.join('')}`,
 		);
-		// console.log(response.request);
-		// thunkAPI.dispatch(travelSliceActions.enrollPreset(response.request._response.resultData));
 		return response.data;
 	} catch (error) {
-		console.log('dpdp', error);
+		console.log(error);
 		throw rejectWithValue(error);
 	}
 });
@@ -199,6 +223,7 @@ export default communitySlice.reducer;
 interface LiteState {
 	postData: postDataType;
 	postList: postListType[];
+	searchList: postListType[];
 }
 
 interface postDataType {

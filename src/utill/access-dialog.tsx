@@ -65,7 +65,7 @@ const MainText = styled.Text`
 `;
 const SubText = styled.Text`
 	font-weight: 500;
-	line-height: 30;
+	line-height: 30px;
 	color: black;
 `;
 interface AccessDialogProps {

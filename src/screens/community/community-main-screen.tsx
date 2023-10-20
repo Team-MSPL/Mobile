@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, TouchableOpacity} from 'react-native';
 import DropdownButton from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getPostList, postListType} from '../../redux/community/community.slice';
+import {communitySliceActions, getPostList, postListType} from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
 import CommunityMain from '../../utill/component/community/community-main';
 import ScrollButton from '../../utill/component/scroll-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -41,19 +42,20 @@ export default function CommunityMainScreen({navigation}: any) {
 	const goSearch = () => {
 		navigation.navigate('CommunitySearch');
 	};
-	// 앱 바 우측 더보기
-	// useEffect(() => {
-	// 	navigation.setOptions({
-	// 		headerRight: () =>
-	// 			socialloginProvider != 'anonymous' && (
-	// 				<HeaderHstack>
-	// 					<TouchableOpacity onPress={goSearch}>
-	// 						<IconContainer color={'black'} name='search1' size={24}></IconContainer>
-	// 					</TouchableOpacity>
-	// 				</HeaderHstack>
-	// 			),
-	// 	});
-	// }, []);
+	//앱 바 우측 더보기
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
+					<HeaderContianer>
+						<TouchableOpacity onPress={goSearch}>
+							<HeaderText>검색</HeaderText>
+							{/* <IconContainer color={'black'} name='search1' size={24}></IconContainer> */}
+						</TouchableOpacity>
+					</HeaderContianer>
+				),
+		});
+	}, []);
 
 	// CommunityMainScreen으로 올 경우 새로 고침
 	// useFocusEffect(
@@ -68,6 +70,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 커뮤니티 정보 가져오기
 	const fetchCommunityData = async () => {
 		try {
+			dispatch(communitySliceActions.resetPostList());
 			const response = await dispatch(
 				getPostList({page: currentPage, sort: sortOption, blockList: blockUserList}),
 			);
@@ -104,18 +107,12 @@ export default function CommunityMainScreen({navigation}: any) {
 			{isLoading ? (
 				<ActivityIndicator size='large' color='#0000ff' />
 			) : (
-				<CommunityMain setViewState={setViewState} navigation={navigation}></CommunityMain>
+				<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
 			)}
-			{socialloginProvider != 'anonymous' && (
-				<ScrollButton viewState={viewState} goCommunityWritingScreen={goCommunityWritingScreen} />
-			)}
+			{socialloginProvider != 'anonymous' && <ScrollButton viewState={viewState} navigation={navigation} />}
 		</CommunityMainContainer>
 	);
 }
-const HeaderHstack = styled.View`
-	width: 100%;
-	align-items: center;
-`;
 const CommunityMainContainer = styled.SafeAreaView`
 	height: 100%;
 	background-color: ${colors.main};

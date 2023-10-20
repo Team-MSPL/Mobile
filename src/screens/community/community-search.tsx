@@ -6,7 +6,8 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {useEffect, useRef, useState} from 'react';
 import {TextInput} from 'react-native';
 import CommunityMain from '../../utill/component/community/community-main';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {communitySliceActions, getSearchPostList} from '../../redux/community/community.slice';
 export default function CommunitySearch({navigation}: any) {
 	const IconElement = styled(Icon)`
 		background-color: ${colors.regionNormal};
@@ -14,6 +15,8 @@ export default function CommunitySearch({navigation}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
+	const {blockUserList} = useAppSelector(state => state.userSlice);
+	const {searchList} = useAppSelector(state => state.communitySlice);
 	const [searchValue, setSearchValue] = useState('');
 	useEffect(() => {
 		searchRef.current?.focus();
@@ -22,7 +25,9 @@ export default function CommunitySearch({navigation}: any) {
 		setSearchValue(e);
 	};
 	const dispatch = useAppDispatch();
-	const handleSearch = () => {
+	const handleSearch = async () => {
+		dispatch(communitySliceActions.resetSearchList());
+		await dispatch(getSearchPostList({page: 1, sort: 1, blockList: blockUserList, search: searchValue}));
 		setShow(true);
 	};
 	const cleanValue = () => {
@@ -48,14 +53,30 @@ export default function CommunitySearch({navigation}: any) {
 					</IconContainer>
 				)}
 			</SearchHstack>
-			{show && <CommunityMain navigation={navigation} searchValue={searchValue} show={show}></CommunityMain>}
+			{show && searchList.length == 0 && (
+				<TextContainer>
+					<SearchText>검색 결과가 없습니다</SearchText>
+				</TextContainer>
+			)}
+			{show ? (
+				<CommunityMain navigation={navigation} searchState={true}></CommunityMain>
+			) : (
+				<TextContainer>
+					<SearchText>제목, 내용을 검색해보세요</SearchText>
+				</TextContainer>
+			)}
 		</MainContainer>
 	);
 }
+const TextContainer = styled.View`
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+`;
 const SearchText = styled.Text`
-	font-size: 30px;
+	font-size: 25px;
 	font-weight: bold;
-	color: ${colors.regionNormal};
+	color: grey;
 `;
 const MainContainer = styled.SafeAreaView`
 	flex: 1;
@@ -66,7 +87,9 @@ const IconContainer = styled.TouchableOpacity`
 const SearchHstack = styled(HStack)`
 	justify-content: center;
 	align-items: center;
+	height: 50px;
 	margin: 10px 24px 0px 24px;
+	border-radius: 10px;
 	background-color: ${colors.regionNormal};
 `;
 const SearchContainer = styled.TextInput`

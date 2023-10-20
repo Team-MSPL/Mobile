@@ -1,7 +1,8 @@
 import {Platform} from 'react-native';
 import {PERMISSIONS, checkMultiple, Permission} from 'react-native-permissions';
 import {useAppDispatch} from '../../redux';
-import {setPermission} from '../../redux/setting/settingSlice';
+import {setNopermission, setPermission} from '../../redux/setting/settingSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const usePermission = () => {
 	const dispatch = useAppDispatch();
@@ -37,17 +38,21 @@ const usePermission = () => {
 		let checkResult: {[key: string]: string} = {};
 		let hasBlocked = false; // blocked가 있으면 설정창 이동 모달 오픈
 		let deniedList: Permission[] = [];
-
-		checkResult = props || (await checkMultiple(needPermission));
-		console.log(checkResult);
-		for (let permission in checkResult) {
-			if (checkResult[permission] === 'denied') {
-				deniedList.push(permission as PermissionStatus);
-			} else if (checkResult[permission] === 'blocked') {
-				hasBlocked = true;
+		const noPermissionCheck = await AsyncStorage.getItem('noPermission');
+		if (noPermissionCheck == 'true') {
+			dispatch(setNopermission(true));
+		} else {
+			checkResult = props || (await checkMultiple(needPermission));
+			console.log(checkResult);
+			for (let permission in checkResult) {
+				if (checkResult[permission] === 'denied') {
+					deniedList.push(permission as PermissionStatus);
+				} else if (checkResult[permission] === 'blocked') {
+					hasBlocked = true;
+				}
 			}
+			console.log('번', hasBlocked, '게', deniedList);
 		}
-		console.log('번', hasBlocked, '게', deniedList);
 		return {hasBlocked, deniedList};
 	};
 

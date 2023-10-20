@@ -1,4 +1,4 @@
-import {TouchableOpacity} from 'react-native';
+import {Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {updateFunctionToken} from '../../redux/user/user.slice';
 import {HStack, MainContainer, MainText, VStack} from '../../utill/layout/layout';
@@ -18,7 +18,11 @@ export default function Payment({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const adUnitId = __DEV__ ? TestIds.REWARDED : Google_Ads_Key;
 	const rewardedRef = useRef<RewardedAd | null>(null);
-
+	const viewList = [
+		{title: '5', before: 5000, after: 1000},
+		{title: '10', before: 10000, after: 2000},
+		{title: '20', before: 20000, after: 3000},
+	];
 	useEffect(() => {
 		// 광고 생성
 		const rewarded = RewardedAd.createForAdRequest(adUnitId, {
@@ -80,23 +84,27 @@ export default function Payment({navigation}: any) {
 					</HStack>
 				</TouchableOpacity>
 			</DayViewContainer>
-			{purchaseItems?.map((item, idx) => (
+			{viewList?.map((item, idx) => (
 				<DayViewContainer key={idx}>
 					<TouchableOpacity
 						style={{marginVertical: 2}}
 						onPress={() => {
 							//console.log(item);
-							requestItemPurchase(item.productId);
+							requestItemPurchase(purchaseItems[idx].productId);
 						}}>
 						<HStack>
 							<TotalContainer>
-								<TotalText>{item.name.slice(3, item.name.length - 1)}</TotalText>
+								<TotalText>{item.title}</TotalText>
 							</TotalContainer>
 							<InfoContainer>
 								<HStack>
-									<MoneyText>{item.description}원</MoneyText>
+									<MoneyText>
+										{Platform.OS == 'ios' ? Math.floor(item.before * 1.1) : item.before}원
+									</MoneyText>
 									<SvgRight color='black' />
-									<InfoText>{item.price.slice(1, item.price.length)}원</InfoText>
+									<InfoText>
+										{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
+									</InfoText>
 								</HStack>
 								<HStack>
 									<BonusText>출시 오픈 기념 세일 진행 중</BonusText>

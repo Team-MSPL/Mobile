@@ -209,6 +209,7 @@ export default function MapInfo({navigation, route}: any) {
 														goNavigation(index);
 													}}>
 													<PlaceText>이동</PlaceText>
+													<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
 												</MoveContainer>
 											)}
 									</DayElementContainer>
@@ -234,7 +235,7 @@ const PlaceText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-export const DayButton = styled(PresetButton)<{select: boolean}>`
+export const DayButton = styled(PresetButton)`
 	border-radius: 15px;
 	padding: 3%;
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
@@ -246,7 +247,7 @@ export const DayTitle = styled(PlaceText)<{select: boolean}>`
 `;
 export const DaySubTitle = styled(DayTitle)`
 	font-weight: 500;
-	font-size: 14px;
+	font-size: 12px;
 `;
 export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
@@ -268,6 +269,8 @@ const MoveContainer = styled.TouchableOpacity`
 	width: 100%;
 	padding: 5%;
 	align-items: center;
+	justify-content: space-around;
+	flex-direction: row;
 `;
 const PlaceContainer = styled(MoveContainer)`
 	flex-direction: row;

@@ -11,6 +11,7 @@ import {SvgApple} from './svg/svg';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * 필수 권한 허용 요청 페이지
  */
@@ -109,16 +110,17 @@ export default function NeedPermissions() {
 		await openSettings();
 		setShowModal(false);
 	};
-	const noPermissions = () => {
+	const noPermissions = async () => {
 		dispatch(setNopermission(true));
+		await AsyncStorage.setItem('noPermission', 'true');
 		setShowModal(false);
 	};
 
 	return (
 		<PermissionMainContainer>
 			<PermissionText>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PermissionText>
-			{items.map(item => (
-				<PermissionElementContainer>
+			{items.map((item, idx) => (
+				<PermissionElementContainer key={idx}>
 					<SvgApple color={'black'} />
 					<ItemBox key={item.id}>
 						{item.logo}

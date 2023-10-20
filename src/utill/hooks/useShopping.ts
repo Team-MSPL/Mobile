@@ -20,6 +20,7 @@ import {updateFunctionToken} from '../../redux/user/user.slice';
 export const useShopping = () => {
 	const itemSkus: any = Platform.select({
 		android: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+		ios: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
 	});
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -141,7 +142,8 @@ export const useShopping = () => {
 	};
 	const requestItemPurchase = async (sku: string) => {
 		try {
-			await RNIap.requestPurchase({skus: [sku]});
+			console.log('sa', sku);
+			await RNIap.requestPurchase({sku});
 		} catch (error) {
 			console.log('request purchase error: ', error);
 			dispatch(

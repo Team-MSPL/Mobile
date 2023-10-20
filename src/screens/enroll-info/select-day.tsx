@@ -12,9 +12,12 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Modal, View} from 'react-native';
 
+import Icon from 'react-native-vector-icons/AntDesign';
+
 import {ButtonContainer, MarginContainder} from './select-multi';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
+	const IconElement = styled(Icon)``;
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
 	const {day, Place, timeLimitArray, minuteLimitArray, nDay, accommodations, selectStartDate, selectEndDate} =
@@ -99,7 +102,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 		}
 		return 0;
 	};
-
 	const calendarContainerRef = useRef<View>(null);
 	const nDays = calculateDateDifference();
 	const DaySelectInfoList = [
@@ -107,68 +109,79 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 		{step: 'End', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
 	const [calendarView, setCalendarView] = useState({visible: false, x: 0, y: 0, when: 0});
+
+	const customDate = [
+		{
+			date: calendarView.when == 1 ? DaySelectInfoList[1].day.clone() : selectStartDate.clone(),
+			style: {backgroundColor: colors.regionNormal},
+			allowDisabled: true,
+		},
+	];
 	return (
 		<>
 			<MainContainer showsVerticalScrollIndicator={false}>
-				<StepText mainText='언제 여행을 계획하고 계신가요?' subText='여행 지역을 알려주세요.' />
+				<StepText mainText='언제 여행을 계획하고 계신가요?' subText='여행 일정을 알려주세요.' />
 				<VStack>
 					<TimeContainer>
-						<ASD>
-							{[...Array(2)].map((item, idx) => (
-								<Fragment key={idx}>
-									<TimeItemContainer>
-										<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-										<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-										<HStack>
-											<DayPressable
-												ref={calendarContainerRef}
-												onPress={() => {
-													calendarContainerRef.current?.measure(
-														(x, y, width, height, pageX, pageY) => {
-															console.log(pageX, pageY);
-															setCalendarView({
-																visible: true,
-																x: pageX,
-																y: pageY,
-																when: idx,
-															});
-														},
-													);
-												}}>
-												<TimeItemText>
-													{DaySelectInfoList[idx].day.format('YYYY-MM-DD')}
-												</TimeItemText>
-											</DayPressable>
-											<TimePressable
-												onPress={() => {
-													onPressTime(idx);
-												}}>
-												<TimeItemText>
-													{String(timeLimitArray[idx]).padStart(2, '0') +
-														':' +
-														String(minuteLimitArray[idx]).padStart(2, '0')}
-												</TimeItemText>
-											</TimePressable>
-										</HStack>
-									</TimeItemContainer>
-								</Fragment>
-							))}
-						</ASD>
+						{[...Array(2)].map((item, idx) => (
+							<Fragment key={idx}>
+								<TimeItemContainer>
+									<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
+									<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
+									<TiemSelectContainer>
+										<DayPressable
+											ref={calendarContainerRef}
+											onPress={() => {
+												calendarContainerRef.current?.measure(
+													(x, y, width, height, pageX, pageY) => {
+														console.log(pageX, pageY);
+														setCalendarView({
+															visible: true,
+															x: pageX,
+															y: pageY,
+															when: idx,
+														});
+													},
+												);
+											}}>
+											<TimeItemText>
+												{DaySelectInfoList[idx].day.format('YYYY-MM-DD')}
+											</TimeItemText>
+											<IconElement name={'down'} size={16} color='black' />
+										</DayPressable>
+										<TimePressable
+											onPress={() => {
+												onPressTime(idx);
+											}}>
+											<TimeItemText>
+												{String(timeLimitArray[idx]).padStart(2, '0') +
+													':' +
+													String(minuteLimitArray[idx]).padStart(2, '0')}
+											</TimeItemText>
+
+											<IconElement name={'down'} size={16} color='black' />
+										</TimePressable>
+									</TiemSelectContainer>
+								</TimeItemContainer>
+							</Fragment>
+						))}
 					</TimeContainer>
 					<PreviewContainer>
-						<PreviewText>이번여행은,</PreviewText>
+						<PreviewText>이번 여행은,</PreviewText>
 						<PreviewText>
 							<PreviewBoldText>
 								{nDays == 0 ? '당일치기' : nDays + '박' + Number(nDays + 1) + '일'}
 							</PreviewBoldText>
-							{nDays == 0 ? ' ' : '동안'}여행할거에요 ✈
+							{nDays == 0 ? ' ' : '동안 '}여행할 거에요 ✈
 						</PreviewText>
 						<PreviewText>
 							<PreviewBoldText>
 								{weekdays[selectStartDate.day()] +
 									'요일 ' +
 									String(timeLimitArray[0]).padStart(2, '0') +
-									'시'}
+									'시 ' +
+									String(minuteLimitArray[0]).padStart(2, '0') +
+									'분'}
 							</PreviewBoldText>
 							에 출발하고 👉
 						</PreviewText>
@@ -178,11 +191,15 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 									? weekdays[selectStartDate.day()] +
 									  '요일 ' +
 									  String(timeLimitArray[1]).padStart(2, '0') +
-									  '시'
+									  '시 ' +
+									  String(minuteLimitArray[1]).padStart(2, '0') +
+									  '분'
 									: weekdays[selectEndDate.day()] +
 									  '요일 ' +
 									  String(timeLimitArray[1]).padStart(2, '0') +
-									  '시'}
+									  '시 ' +
+									  String(minuteLimitArray[1]).padStart(2, '0') +
+									  '분'}
 							</PreviewBoldText>
 							에 돌아와요 👈
 						</PreviewText>
@@ -201,7 +218,8 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 						}}>
 						<CalendarContainer x={calendarView.x} y={calendarView.y} when={calendarView.when}>
 							<CalendarPicker
-								width={300}
+								todayBackgroundColor='white'
+								customDatesStyles={customDate}
 								weekdays={weekdays}
 								months={months}
 								minDate={calendarView.when == 1 ? selectStartDate.toDate() : new Date()}
@@ -226,6 +244,10 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 		</>
 	);
 }
+const TiemSelectContainer = styled(HStack)`
+	width: 100%;
+	justify-content: space-around;
+`;
 const ModalContainer = styled.Pressable`
 	flex-directrion: row;
 	flex: 1;
@@ -235,41 +257,39 @@ const CalendarContainer = styled.View<{x: number; y: number; when: number}>`
 	border-width: 1px;
 	border-radius: 10px;
 	padding: 10px 0px 10px 0px;
-	width: 300px;
 	top: ${props => props.y + 40}px;
-	left: ${props => (props.when == 0 ? props.x : props.x - 130)}px;
 `;
 export const TimeContainer = styled.View`
 	width: 100%;
-	margin: 50px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 `;
 export const TimeItemContainer = styled.View`
-	width: 50%;
+	width: 100%;
+	margin: 0px 0px 10px 0px;
 `;
 export const TimeItemText = styled.Text`
 	font-size: 15px;
 	color: black;
 	font-weight: bold;
+	margin: 0px 12px 0px 0px;
 `;
 const TimePressable = styled.Pressable`
-	border-width: 1px;
 	align-items: center;
 	justify-content: center;
-	width: 30%;
-	border-color: ${colors.border};
-	border-radius: 10px;
 	height: 40px;
 	margin: 5px 0px 0px 0px;
+	flex-direction: row;
+	border-bottom-color: ${colors.regionNormal};
+	border-bottom-width: 1px;
 `;
 export const DayPressable = styled.Pressable`
-	border-width: 1px;
 	align-items: center;
 	justify-content: center;
-	width: 60%;
-	border-color: ${colors.border};
-	border-radius: 10px;
 	height: 40px;
 	margin: 5px 2px 0px 0px;
+	flex-direction: row;
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.regionNormal};
 `;
 export const TimeStepText = styled.Text`
 	color: ${colors.selectButton};
@@ -278,13 +298,13 @@ export const TimeStepText = styled.Text`
 `;
 
 const PreviewText = styled.Text`
-	font-size: 25px;
-	font-weight: 500;
+	font-size: 23px;
+	font-weight: 400;
 	color: black;
 `;
 const PreviewBoldText = styled.Text`
-	font-size: 25px;
-	font-weight: 500;
+	font-size: 23px;
+	font-weight: bold;
 	color: ${colors.selectButton};
 `;
 
@@ -293,9 +313,4 @@ const PreviewContainer = styled.View`
 	margin: 50px 0px 50px 0px;
 `;
 
-export const ASD = styled.View`
-	display: inline-block;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-`;
+export const ASD = styled.View``;

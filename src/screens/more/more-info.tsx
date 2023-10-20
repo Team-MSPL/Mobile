@@ -15,7 +15,7 @@ export default function MoreInfo({navigation}: any) {
 	);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
-	const exceptionKeys = ['isFirstLaunch'];
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
 	const goLogout = async () => {
 		await AsyncStorage.getAllKeys().then(allKeys => {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
@@ -144,14 +144,14 @@ export default function MoreInfo({navigation}: any) {
 			</SettingContainer>
 			<ProfileDivider />
 			<SettingContainer>
-				<TitleText>앱버전 0.0</TitleText>
+				<TitleText>앱버전 2.0.4</TitleText>
 				{socialloginProvider != 'anonymous' ? (
 					<>
 						<SettingElement
 							onPress={() => {
 								dispatch(
 									modalSliceActions.setOpenModal({
-										modalTitle: '로그 아웃 하시겠습니까?',
+										modalTitle: '로그아웃 하시겠습니까?',
 										modalFunction: goLogout,
 										modalLeft: true,
 									}),

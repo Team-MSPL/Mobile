@@ -8,7 +8,7 @@
 import React, {useEffect, useLayoutEffect} from 'react';
 import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
-import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
+import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
@@ -163,8 +163,8 @@ function App(): JSX.Element {
 		{
 			devKey: Appsflyer_key,
 			isDebug: false,
-			appId: 'com.danimmobile',
-			onInstallConversionDataListener: true, //Optional
+			appId: Appsflyer_ios_id,
+			onInstallConversionDataListener: false, //Optional
 			onDeepLinkListener: true, //Optional
 			timeToWaitForATTUserAuthorization: 10, //for iOS 14.5
 		},

@@ -14,11 +14,8 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, HeaderContianer, HeaderText} from '../../utill/layout/layout';
 import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
-import {HeaderHStack} from '../my-travel-list/detail-info';
-import Icon from 'react-native-vector-icons/AntDesign';
-import background from '../../utill/component/timetable/background';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
 export default function Timetable({navigation, route}: any) {
@@ -33,9 +30,6 @@ export default function Timetable({navigation, route}: any) {
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
-	const SaveContainer = styled(Icon)`
-		border-radius: 5px;
-	`;
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -130,44 +124,32 @@ export default function Timetable({navigation, route}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		console.log(
-			makeMode,
-			'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
-		);
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<View>
-					{makeMode == 'share' ? (
-						<TouchableOpacity onPress={openModalHelp}>
-							<SVGHelp width={25} height={25} color={'white'} />
+				<HeaderContianer>
+					{editMode == 'add' ? (
+						<TouchableOpacity
+							onPress={() => {
+								navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+								setAddList([]);
+								dispatch(travelSliceActions.editModeChange(''));
+							}}>
+							<HeaderText>추가</HeaderText>
 						</TouchableOpacity>
 					) : (
 						<>
-							{editMode == 'add' ? (
-								<IconContainer
-									onPress={() => {
-										navigation.navigate('TimetableAddPlace', {x: x, y: addList});
-										setAddList([]);
-										dispatch(travelSliceActions.editModeChange(''));
-									}}>
-									<SaveContainer name={'plus'} size={25} color={'white'} />
-								</IconContainer>
-							) : (
-								<HeaderHStack>
-									<IconContainer onPress={goSave}>
-										<SaveContainer name={'save'} size={25} color={'white'} />
-									</IconContainer>
-									<HelpContainer onPress={openModalHelp}>
-										<SVGHelp width={20} height={20} color={'grey'} />
-									</HelpContainer>
-								</HeaderHStack>
-							)}
+							<TouchableOpacity onPress={goSave}>
+								<HeaderText>저장</HeaderText>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={openModalHelp}>
+								<HeaderText>설명</HeaderText>
+							</TouchableOpacity>
 						</>
 					)}
-				</View>
+				</HeaderContianer>
 			),
 		});
 	}, [editMode, timetable, addList, x, makeMode]);
@@ -227,13 +209,4 @@ const ScrollVIewContainer = styled.View`
 `;
 const TimetableScrollView = styled.ScrollView`
 	position: relative;
-`;
-const IconContainer = styled.TouchableOpacity`
-	padding: 1%;
-	border-radius: 5px;
-	background-color: ${colors.selectButton};
-	margin: 0px 0px 0px 10px;
-`;
-const HelpContainer = styled(IconContainer)`
-	background-color: white;
 `;
