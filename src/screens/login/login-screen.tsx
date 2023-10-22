@@ -113,7 +113,7 @@ export default function LoginScreen({navigation}: any) {
 					nickname: userInfo.user.name,
 				});
 			} else {
-				navigation.replace('Tab');
+				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
@@ -186,7 +186,7 @@ export default function LoginScreen({navigation}: any) {
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					navigation.replace('Tab');
+					anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 				}
 			} else {
 				console.log('안드로이드다!!');
@@ -221,7 +221,7 @@ export default function LoginScreen({navigation}: any) {
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					navigation.replace('Tab');
+					anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 				}
 
 				// if (response.state === state) {

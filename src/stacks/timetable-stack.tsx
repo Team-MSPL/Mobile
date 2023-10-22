@@ -95,6 +95,7 @@ export default function TimetableStack() {
 				component={Preset}
 				options={{
 					headerBackVisible: false,
+					gestureEnabled: false,
 					title: '다님의 제안이에요',
 				}}
 			/>

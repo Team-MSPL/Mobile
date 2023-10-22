@@ -42,6 +42,7 @@ export default function CommunitySearch({navigation}: any) {
 					<IconElement name={'arrowleft'} size={25} color={'black'}></IconElement>
 				</IconContainer>
 				<SearchContainer
+					placeholderTextColor={'grey'}
 					placeholder='글 제목,내용'
 					value={searchValue}
 					onSubmitEditing={handleSearch}

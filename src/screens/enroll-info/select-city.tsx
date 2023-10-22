@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
-import {HStack, VStack, Divider, MainContainer} from '../../utill/layout/layout';
+import {HStack, VStack, Divider, MainContainer, InputWrap, ClearTouchableOpacity} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
@@ -83,15 +83,22 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 			<MainContainer showsVerticalScrollIndicator={false}>
 				{/* 스테퍼 넣기 */}
 				<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
-				<HStack>
+
+				<InputAllContainter>
 					<SearchInput
-						// autoFocus={true}
-						style={{fontSize: 15}}
 						placeholderTextColor={'grey'}
 						value={search}
 						onChangeText={(text: string) => changeSearch(text)}
 						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>
-				</HStack>
+					{search && (
+						<ClearTouchableOpacity
+							onPress={() => {
+								changeSearch('');
+							}}>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
+					)}
+				</InputAllContainter>
 				{searchData && (
 					<SearchTouchableOpacity onPress={addCity}>
 						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
@@ -161,6 +168,10 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 		</>
 	);
 }
+const InputAllContainter = styled(InputWrap)`
+	border-color: ${colors.border};
+	height: 50px;
+`;
 const RegionAllContainer = styled(VStack)`
 	width: 30%;
 `;
@@ -237,13 +248,8 @@ const SelectListContainer = styled.ScrollView`
 	padding: 5px;
 `;
 const SearchInput = styled.TextInput`
-	background-color: white;
-	border-color: ${colors.border};
-	border-width: 1px;
-	border-radius: 15px;
 	flex: 1;
-	height: 40px;
-	padding: 0px 5px 0px 5px;
+	padding: 0px 0px 0px 8px;
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;

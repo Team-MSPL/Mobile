@@ -37,6 +37,7 @@ end
 
 target 'DanimMobile' do
   config = use_native_modules!
+  pod 'react-native-version-check', :path => '../node_modules/react-native-version-check'
   # pod 'GoogleUtilities', :modular_headers => true
   pod 'Firebase/Core', '~> 10.0'
   use_frameworks! :linkage => :static

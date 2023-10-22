@@ -38,7 +38,7 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
 	const goCourseDetaile = (e: any) => {
-		const data = {name: e.title, lat: e.lat, lng: e.lng};
+		const data = {name: e.city + e.title, lat: e.lat, lng: e.lng};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	useEffect(() => {
@@ -46,7 +46,7 @@ export default function Main({navigation}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '회원가입 축하드립니다',
-					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
 					modalFunction: checkSignUpReward,
 				}),
 			);
@@ -78,7 +78,7 @@ export default function Main({navigation}: any) {
 			id: 1,
 			imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
 			city: '대전',
-			title: '성심당',
+			title: '성심당 본점',
 			hashtag: '#맛있는',
 			lat: 36.3277,
 			lng: 127.4273,
@@ -86,7 +86,7 @@ export default function Main({navigation}: any) {
 		{
 			id: 2,
 			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
-			city: '동해',
+			city: '목포',
 			title: '목포항',
 			hashtag: '#바다',
 			lat: 34.7807,

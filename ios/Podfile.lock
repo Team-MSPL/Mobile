@@ -1237,6 +1237,8 @@ PODS:
     - React-Core
   - react-native-slider (4.4.3):
     - React-Core
+  - react-native-version-check (3.4.7):
+    - React-Core
   - React-NativeModulesApple (0.72.4):
     - hermes-engine
     - React-callinvoker
@@ -1475,6 +1477,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
+  - react-native-version-check (from `../node_modules/react-native-version-check`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -1633,6 +1636,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-slider:
     :path: "../node_modules/@react-native-community/slider"
+  react-native-version-check:
+    :path: "../node_modules/react-native-version-check"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-perflogger:
@@ -1785,6 +1790,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: fefd4e98d75cbdd6e85fc530f7111a8afdf2b0c5
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
   react-native-slider: 1cdd6ba29675df21f30544253bf7351d3c2d68c4
+  react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   React-NativeModulesApple: a5ffa05042d07813e4ba80e25487c91f487728f7
   React-perflogger: 496a1a3dc6737f964107cb3ddae7f9e265ddda58
   React-RCTActionSheet: 02904b932b50e680f4e26e7a686b33ebf7ef3c00
@@ -1825,6 +1831,6 @@ SPEC CHECKSUMS:
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
 
-PODFILE CHECKSUM: 847296e8d95a3dddcfb09fa633759e7a850b4b33
+PODFILE CHECKSUM: 351ab2fc3771471c02eb75f7d310c9ea305b6e37
 
 COCOAPODS: 1.13.0

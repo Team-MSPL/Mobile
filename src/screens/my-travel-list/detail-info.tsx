@@ -158,6 +158,7 @@ export const IconContainer = styled.View`
 `;
 export const CourseAndReview = styled(HStack)`
 	width: 100%;
+	margin: 0px 0px 10px 0px;
 	justify-content: space-between;
 `;
 export const CourseContainer = styled.TouchableOpacity`

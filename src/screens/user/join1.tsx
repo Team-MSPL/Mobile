@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Alert, TouchableOpacity} from 'react-native';
+import {Alert, Keyboard, Pressable, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -94,17 +94,20 @@ export default function Join1({navigation, route}: any) {
 		},
 	];
 	return (
-		<MainContainer>
+		<JoinContainer
+			onPress={() => {
+				Keyboard.dismiss();
+			}}>
 			<Text>닉네임을 입력해주세요</Text>
 			<InputProfileContainer>
 				<InputWrap>
 					<CustomTextInput
 						text={nickname}
+						placeholderTextColor={'grey'}
 						placeholder='ex)홍길동 최대 8자이내 '
 						value={nickname}
 						onChangeText={(value: string) => chageNickname(value)}
 						maxLength={8}
-						clearButtonMode='while-editing'
 					/>
 					{nickname && (
 						<TouchableOpacity
@@ -135,9 +138,11 @@ export default function Join1({navigation, route}: any) {
 				</TermsContainer>
 				<CustomButton label={'회원가입'} onPress={goSignUp} isDisabled={!(allCheck && nickname.length != 0)} />
 			</InputProfileContainer>
-		</MainContainer>
+		</JoinContainer>
 	);
 }
+
+const JoinContainer = styled(MainContainer).attrs({as: Pressable})``;
 
 const CheckTouchableOpacity = styled.TouchableOpacity`
 	width: 80%;

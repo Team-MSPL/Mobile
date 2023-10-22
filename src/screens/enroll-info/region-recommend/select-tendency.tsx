@@ -8,6 +8,7 @@ import {TendencyStepText, TendencyText, TendencyContainer, TendencyElementContai
 import TendencyButton from '../../../utill/component/tendency-button';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
+import {ButtonContainer, MarginContainder} from '../select-multi';
 
 export default function SelectTendency({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -36,38 +37,46 @@ export default function SelectTendency({navigation}: any) {
 	};
 
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
-			<VStack>
-				{tendencyList.map((item, index) => {
-					return (
-						<TendencyContainer key={index}>
-							<TendencyStepText>Step {index + 1}</TendencyStepText>
-							<TendencyText>{item.title}</TendencyText>
-							<FlexWrap>
-								{item.list.map((data, idx) => {
-									return (
-										<TendencyElementContainer key={idx} onPress={() => selectData({index, idx})}>
-											<SvgCheck
-												color={
-													select[index][idx] == 1 ? colors.selectButton : colors.regionNormal
-												}
-											/>
-											<TendencyButton
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
+				<VStack>
+					{tendencyList.map((item, index) => {
+						return (
+							<TendencyContainer key={index}>
+								<TendencyStepText>Step {index + 1}</TendencyStepText>
+								<TendencyText>{item.title}</TendencyText>
+								<FlexWrap>
+									{item.list.map((data, idx) => {
+										return (
+											<TendencyElementContainer
 												key={idx}
-												label={data}
-												bgColor={select[index][idx] == 1}></TendencyButton>
-										</TendencyElementContainer>
-									);
-								})}
-							</FlexWrap>
-						</TendencyContainer>
-					);
-				})}
-
+												onPress={() => selectData({index, idx})}>
+												<SvgCheck
+													color={
+														select[index][idx] == 1
+															? colors.selectButton
+															: colors.regionNormal
+													}
+												/>
+												<TendencyButton
+													key={idx}
+													label={data}
+													bgColor={select[index][idx] == 1}></TendencyButton>
+											</TendencyElementContainer>
+										);
+									})}
+								</FlexWrap>
+							</TendencyContainer>
+						);
+					})}
+				</VStack>
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
 				<CustomButton label={'다음 '} onPress={goNext}></CustomButton>
-			</VStack>
-		</MainContainer>
+			</ButtonContainer>
+		</>
 	);
 }
 

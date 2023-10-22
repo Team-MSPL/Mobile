@@ -1,14 +1,14 @@
 import styled from 'styled-components/native';
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {TouchableOpacity, Image, View} from 'react-native';
+import {TouchableOpacity, Image, View, Pressable, Keyboard} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {updateProfile, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {Center, MainContainer} from '../../utill/layout/layout';
+import {Center, ClearTouchableOpacity, InputWrap, MainContainer} from '../../utill/layout/layout';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel} from '../../utill/svg/svg';
 export default function ChangeProfile({navigation}: any) {
@@ -69,7 +69,10 @@ export default function ChangeProfile({navigation}: any) {
 		setNickname(e);
 	};
 	return (
-		<ProfileContainer>
+		<ProfileContainer
+			onPress={() => {
+				Keyboard.dismiss();
+			}}>
 			<Center>
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
@@ -78,16 +81,16 @@ export default function ChangeProfile({navigation}: any) {
 					</ImageBottom>
 				</TouchableOpacity>
 			</Center>
-			<NicknameText>닉네임</NicknameText>
 			<InputProfileContainer>
+				<NicknameText>닉네임</NicknameText>
 				<InputWrap>
 					<CustomTextInput
 						text={nickname}
+						placeholderTextColor={'grey'}
 						placeholder='ex)홍길동 최대 8자이내 '
 						value={nickname}
 						onChangeText={(value: string) => changeNickname(value)}
 						maxLength={8}
-						clearButtonMode='while-editing'
 					/>
 					{nickname && (
 						<ClearTouchableOpacity
@@ -112,38 +115,22 @@ const InputProfileContainer = styled.View`
 	display: flex;
 	background-color: ${colors.main};
 `;
-const ProfileContainer = styled(MainContainer).attrs({as: View})`
+const ProfileContainer = styled(MainContainer).attrs({as: Pressable})`
 	flex: 1;
 	justify-content: center;
 `;
-const ClearTouchableOpacity = styled.TouchableOpacity`
-	position: absolute;
-	right: 8px;
-	align-items: center;
-	justify-content: center;
-`;
-const InputWrap = styled.View`
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-	display: flex;
-	width: 100%;
-	margin: 0px 0px 20px 0px;
-`;
+
 const NicknameText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: black;
-	margin: 30px 0px 10px 0px;
+	margin: 30px 0px 20px 0px;
 `;
 const CustomTextInput = styled.TextInput<{text: string}>`
-	width: 100%;
+	flex: 1;
 	padding: 8px;
 	font-size: 16px;
 	font-weight: 400;
-	border-width: 1px;
-	border-radius: 8px;
-	border-color: ${({text}: {text: string}) => (text == '' ? 'grey' : 'black')};
 `;
 const ImageElement = styled.Image`
 	width: 100px;

@@ -3,12 +3,16 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {HStack, devicesHeight, devicesWidth} from '../layout/layout';
 import {useEffect} from 'react';
 import {colors} from '../colors';
+import {useAppDispatch} from '../../redux';
+import {communitySliceActions} from '../../redux/community/community.slice';
 
 export default function ScrollButton({viewState, navigation}: {viewState: boolean; navigation: any}) {
 	const IconContainer = styled(Icon)``;
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {}, [viewState]);
 	const goCommunityWritingScreen = () => {
+		dispatch(communitySliceActions.resetPostData());
 		navigation.navigate('CommunityWritingScreen', {
 			title: '',
 			content: '',

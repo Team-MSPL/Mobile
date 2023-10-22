@@ -31,6 +31,7 @@ import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
+import useVersion from './src/utill/hooks/useVersion';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -139,6 +140,7 @@ function App(): JSX.Element {
 			}
 		});
 	};
+
 	const checkFirstLaunch = async () => {
 		try {
 			const firstLaunch = await AsyncStorage.getItem('isFirstLaunch');
@@ -179,6 +181,7 @@ function App(): JSX.Element {
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
 	};
+	const {checkVersion} = useVersion();
 	useEffect(() => {
 		checkInitialPermission();
 	}, [hasPermission, noPermission]);
@@ -189,7 +192,7 @@ function App(): JSX.Element {
 		getAllKeys();
 		checkFirstLaunch();
 		lottieHide();
-
+		checkVersion();
 		setNetInfoEvent();
 		// return () => {
 		// 	setNetInfoEvent();

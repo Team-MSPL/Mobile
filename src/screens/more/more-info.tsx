@@ -13,6 +13,7 @@ export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
+	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
@@ -124,11 +125,11 @@ export default function MoreInfo({navigation}: any) {
 							onPress={() => {
 								console.log('노노');
 							}}>
-							<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
+							<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
 						</SettingElement>
 
 						<SettingElement onPress={goPayment}>
-							<SettingElementText>토큰 구매하기</SettingElementText>
+							<SettingElementText>이용권 구매하기</SettingElementText>
 						</SettingElement>
 					</SettingContainer>
 				</>
@@ -144,7 +145,9 @@ export default function MoreInfo({navigation}: any) {
 			</SettingContainer>
 			<ProfileDivider />
 			<SettingContainer>
-				<TitleText>앱버전 2.0.4</TitleText>
+				<TitleText>
+					앱 버전 {nowVersion} (최신{latestVersion})
+				</TitleText>
 				{socialloginProvider != 'anonymous' ? (
 					<>
 						<SettingElement

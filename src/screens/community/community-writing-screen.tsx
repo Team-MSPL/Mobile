@@ -1,29 +1,33 @@
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Alert, SafeAreaView} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import {communitySliceActions, getPostList, savePost, updatePost} from '../../redux/community/community.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
-import {PostImageIndicatorText, PostImageView} from './community-reading-screen';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
-	const goBack = () => {
-		navigation.goBack();
-	};
-	const [postTitle, setPostTitle] = useState<string>(route.params.title);
-	const [postContent, setPostContent] = useState<string>(route.params.content);
-	const [postImage, setPostImage] = useState<string[]>(route.params.images);
-	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
-	const {socialloginProvider} = useAppSelector(state => state.userSlice);
+	const {blockUserList} = useAppSelector(state => state.userSlice);
+	const {postData} = useAppSelector(state => state.communitySlice);
 
 	const dispatch = useAppDispatch();
 
+	const changeTitle = (e: string) => {
+		dispatch(communitySliceActions.setPostTitle(e));
+	};
+	const changeContent = (e: string) => {
+		dispatch(communitySliceActions.setPostContent(e));
+	};
+	const changeImage = (e: string[]) => {
+		dispatch(communitySliceActions.setPostImage(e));
+	};
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
@@ -36,127 +40,76 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			for (let i = 0; i < response.length; i++) {
 				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
-			setPostImage(temporaryList);
+			changeImage(temporaryList);
 		});
 	};
-
+	const handleRefresh = async () => {
+		try {
+			dispatch(communitySliceActions.resetPostList());
+			await dispatch(getPostList({page: 1, sort: 1, blockList: blockUserList}));
+			navigation.popToTop();
+		} catch {
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
+		}
+	};
 	// * 게시글 등록
-	const handlePostSubmit = () => {
-		if (postTitle.trim() === '') {
-			Alert.alert('제목을 입력해주세요');
-			console.log(postTitle);
+	const handlePostSubmit = async () => {
+		if (postData.postTitle.trim() === '') {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '제목을 입력해주세요'}));
 			return;
 		}
 
-		if (postContent.trim() === '') {
-			Alert.alert('내용을 입력해주세요');
-			console.log('내용을 입력해주세요.');
+		if (postData.postContent.trim() === '') {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '내용을 입력해주세요'}));
 			return;
 		}
 
-		if (postImage.length > 10) {
-			Alert.alert('최대 10장까지만 사진을 업로드할 수 있습니다.');
-			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
+		if (postData.postImage.length > 5) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '업로드 제한',
+					modalSubTitle: '사진은 최대 5장까지 가능합니다.',
+				}),
+			);
 			return;
 		}
 
 		try {
-			const newPostData: savePostType = {
-				postTitle: postTitle,
-				postContent: postContent,
-				postImage: postImage,
-				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
-			};
-
-			const updatePostData: updatePostType = {
-				postId: route.params.postId,
-				postTitle: postTitle,
-				postContent: postContent,
-				postImage: postImage,
-				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
-				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-			};
-			if (isNewPost) {
-				dispatch(LoadingSliceActions.onLoading());
-				dispatch(savePost(newPostData))
-					.then(response => {
-						if (response.payload && response.payload[0]) {
-							// 서버로부터 받은 에러 처리
-							console.log('서버로부터 받은 에러:', response.payload[0]);
-							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
-						} else {
-							dispatch(LoadingSliceActions.offLoading());
-							console.log('글이 성공적으로 저장되었습니다.');
-							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
-								{text: '확인', onPress: () => goBack()},
-							]);
-						}
-					})
-					.catch(error => {
-						// 네트워크 요청 자체에서의 오류 처리
-						dispatch(LoadingSliceActions.offLoading());
-						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
-						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
-					});
+			dispatch(LoadingSliceActions.onLoading());
+			if (route.params.isNewPost) {
+				const data = {
+					postTitle: postData.postTitle,
+					postContent: postData.postContent,
+					postImage: postData.postImage,
+					postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
+				};
+				await dispatch(savePost(data));
 			} else {
-				dispatch(updatePost(updatePostData))
-					.then(response => {
-						if (response.payload && response.payload[0]) {
-							console.log(response);
-							// 서버로부터 받은 에러 처리
-							console.log('서버로부터 받은 에러:', response.payload[0]);
-							Alert.alert('오류 발생', '글을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
-						} else {
-							dispatch(LoadingSliceActions.offLoading());
-							console.log('글이 성공적으로 저장되었습니다.');
-							Alert.alert('게시글 등록', '게시글이 성공적으로 등록되었습니다.', [
-								{text: '확인', onPress: () => goBack()},
-							]);
-						}
-					})
-					.catch(error => {
-						// 네트워크 요청 자체에서의 오류 처리
-						dispatch(LoadingSliceActions.offLoading());
-						console.log('네트워크 요청 중에 오류가 발생했습니다:', error);
-						Alert.alert('오류 발생', '네트워크 요청 중에 오류가 발생했습니다. 다시 시도해 주세요.');
-					});
+				const data = {
+					postTitle: postData.postTitle,
+					postContent: postData.postContent,
+					postImage: postData.postImage,
+					postId: postData._id,
+				};
+				await dispatch(updatePost(data));
 			}
+
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '등록',
+					modalSubTitle: '게시글이 등록되었습니다.',
+					modalFunction: handleRefresh,
+				}),
+			);
 		} catch (error) {
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
+		} finally {
 			dispatch(LoadingSliceActions.offLoading());
-			console.log('게시물 등록 중에 오류가 발생했습니다:', error);
-			Alert.alert('오류 발생', '글을 수정하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
 		}
 	};
 
 	// 변화되는 인덱스
 	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-	// 초기 인덱스
-	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
-	const onSelect = (index: number) => {
-		setInitialImageIndex(index);
-		setCurrentImageIndex(index);
-		setIsImageModalVisible(index === 0 || !!index);
-	};
-
-	useEffect(() => {
-		setPostTitle(postTitle);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		//console.log('사진', postImage);
-	}, [postTitle]);
-	useEffect(() => {
-		setPostContent(postContent);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		//console.log('사진', postImage);
-	}, [postContent]);
-
-	useEffect(() => {
-		setPostImage(postImage);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		console.log('사진', postImage);
-	}, [postImage]);
 
 	return (
 		<SafeAreaView>
@@ -164,16 +117,17 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
 				<TitleInput
 					placeholder='제목을 입력해주세요'
-					value={postTitle}
-					onChangeText={text => setPostTitle(text)}
+					placeholderTextColor={'grey'}
+					value={postData.postTitle}
+					onChangeText={changeTitle}
 					multiline={true}
 				/>
 
 				<CommunityWritingTitleText>내용</CommunityWritingTitleText>
 				<ContentInput
 					placeholder='부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.'
-					value={postContent}
-					onChangeText={text => setPostContent(text)}
+					value={postData.postContent}
+					onChangeText={changeContent}
 					multiline={true}
 				/>
 				<CommunityWritingTitleText>사진(최대 5장까지 가능합니다)</CommunityWritingTitleText>
@@ -182,11 +136,12 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						<ImageInputButtonText>사진 추가하기</ImageInputButtonText>
 						<ImageInputButtonIcon name='pluscircleo' />
 					</ImageInputButton>
-					{postImage.map((uri, index) => {
+					{postData.postImage.map((uri, index) => {
 						return (
 							<ImageWrapper
 								onPress={() => {
-									onSelect(index);
+									setCurrentImageIndex(index);
+									setIsImageModalVisible(true);
 								}}
 								key={index}>
 								<PostImage source={{uri: uri}} />
@@ -194,20 +149,21 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						);
 					})}
 					<ImageView
-						images={postImage.map(uri => ({uri}))}
-						imageIndex={initialImageIndex || 0}
+						images={postData.postImage.map(uri => ({uri}))}
+						imageIndex={currentImageIndex}
 						visible={isImageModalVisible}
-						onImageIndexChange={setCurrentImageIndex}
 						onRequestClose={() => {
 							setIsImageModalVisible(false);
 						}}
-						HeaderComponent={() => (
-							<PostImageView>
-								<PostImageIndicatorText>{`${currentImageIndex + 1}/${
-									postImage.length
-								}`}</PostImageIndicatorText>
-							</PostImageView>
-						)}
+						FooterComponent={index => {
+							return (
+								<ImageViewFooterComponent>
+									<ImageText>
+										{index.imageIndex + 1}/{postData.postImage.length}
+									</ImageText>
+								</ImageViewFooterComponent>
+							);
+						}}
 					/>
 				</ImageContainer>
 				<SubmitButton onPress={handlePostSubmit}>

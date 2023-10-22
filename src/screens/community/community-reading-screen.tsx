@@ -23,9 +23,11 @@ import {
 	blockUser,
 	clickLike,
 	commentType,
+	communitySliceActions,
 	deleteComment,
 	deletePost,
 	getOnePost,
+	getPostList,
 	reportCommentType,
 	reportPost,
 	reportPostType,
@@ -37,6 +39,8 @@ import {colors} from '../../utill/colors';
 import {MenuIcon} from './community-main-screen';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {userSliceActions} from '../../redux/user/user.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 
 const {StatusBarManager} = NativeModules;
 
@@ -65,7 +69,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-	const {userId, userName, userProfileImage, socialloginProvider} = useAppSelector(state => state.userSlice);
+	const {userId, userName, userProfileImage, socialloginProvider, blockUserList} = useAppSelector(
+		state => state.userSlice,
+	);
 	const [commentData, setCommentData] = useState<commentType>({
 		commentContent: '',
 		commentedAt: '',
@@ -100,25 +106,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 게시글 지우기 확인창
 	const postDeleteCheckAlert = () => {
-		Alert.alert(
-			'게시글을 삭제하시겠습니까?',
-			'',
-			[
-				{
-					text: '취소',
-					onPress: () => console.log('취소 버튼 누름'),
-				},
-				{
-					text: '삭제',
-					onPress: () => {
-						handleDeletePost();
-					},
-					style: 'destructive',
-				},
-			],
-			{
-				cancelable: false,
-			},
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '삭제',
+				modalSubTitle: '게시글을 삭제하시겠습니까?',
+				modalLeft: true,
+				modalFunction: handleDeletePost,
+			}),
 		);
 	};
 
@@ -158,8 +152,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				reportWriter: userName,
 			};
 			await dispatch(reportPost(reportData));
-			Alert.alert('신고가 접수되었습니다.');
-			console.log(`"${reason}"`, '사유로 댓글 신고가 성공적으로 접수되었습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({modalTitle: '접수 완료', modalSubTitle: '신고가 접수되었습니다.'}),
+			);
 		} catch (error) {
 			console.log('댓글 신고 접수 중에 오류가 발생했습니다:', error);
 		}
@@ -264,10 +259,11 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				},
 			};
 			await dispatch(saveComment(newCommentData));
-			console.log(commentContent, '댓글이 성공적으로 등록되었습니다.');
 			// 댓글 등록 후 입력창 초기화
 			setCommentContent('');
-			Alert.alert('댓글이 등록되었습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({modalTitle: '등록 완료', modalSubTitle: '댓글이 등록되었습니다.'}),
+			);
 			await fetchPostData();
 		} catch (error) {
 			console.log('댓글 등록 중에 오류가 발생했습니다:', error);
@@ -276,25 +272,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 댓글 삭제 확인창
 	const commentDeleteCheckAlert = (commentId: string) => {
-		Alert.alert(
-			'댓글을 삭제하시겠습니까?',
-			'',
-			[
-				{
-					text: '취소',
-					onPress: () => console.log('취소 버튼 누름'),
-				},
-				{
-					text: '삭제',
-					onPress: () => {
-						handleDeleteComment(commentId);
-					},
-					style: 'destructive',
-				},
-			],
-			{
-				cancelable: false,
-			},
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '삭제',
+				modalSubTitle: '댓글을 삭제하시겠습니까?.',
+				modalLeft: true,
+				modalFunction: () => handleDeleteComment(commentId),
+			}),
 		);
 	};
 
@@ -302,8 +286,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const handleDeleteComment = async (commentId: string) => {
 		try {
 			await dispatch(deleteComment({postId: postData._id, commentId: commentId}));
-			Alert.alert('댓글이 삭제되었습니다.');
-			console.log('댓글을 성공적으로 삭제했습니다.');
+			dispatch(
+				modalSliceActions.setOpenModal({modalTitle: '성공', modalSubTitle: '댓글을 성공적으로 삭제했습니다.'}),
+			);
 			await fetchPostData();
 		} catch (error) {
 			console.log('댓글을 삭제하는 도중 에러가 발생했습니다.', error);
@@ -330,11 +315,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// * 게시글 삭제
 	const handleDeletePost = async () => {
 		try {
-			await dispatch(deletePost({postId: route.params.postId}));
-			console.log(postData.postTitle, '게시글 삭제를 완료했습니다');
+			dispatch(LoadingSliceActions.onLoading());
+			await dispatch(deletePost({postId: postData._id}));
+			dispatch(communitySliceActions.resetPostList());
+			await dispatch(getPostList({page: 1, sort: 1, blockList: blockUserList}));
 			goBack();
 		} catch (e) {
-			console.log('삭제에 실패했습니다', e);
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '실패', modalSubTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 
@@ -577,7 +566,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			</PostContentCommentContainer>
 			<CommentInputContainer
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				keyboardVerticalOffset={statusBarHeight + 52}>
+				keyboardVerticalOffset={statusBarHeight + 44}>
 				{socialloginProvider == 'anonymous' ? (
 					<View>
 						<Text>로그인 후 이용 가능합니다.</Text>
@@ -590,9 +579,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							onChangeText={text => setCommentContent(text)}
 							placeholder='댓글을 입력하세요...'
 						/>
-						<CommentSubmitButton disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
+						<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
 							<CommentSubmitButtonIcon name='send' isDisabled={isCommentButtonDisabled} />
-						</CommentSubmitButton>
+						</ClearContainer>
 					</CommentTextInputContainer>
 				)}
 			</CommentInputContainer>
@@ -600,6 +589,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	);
 }
 
+const ClearContainer = styled(ClearTouchableOpacity)`
+	width: 10%;
+`;
 // 전체화면(safearea바깥 영역 포함)
 const CommunityReadingContainer = styled.SafeAreaView`
 	flex: 1;
@@ -658,7 +650,7 @@ const PostImageContainer = styled.View`
 	margin-vertical: 12px;
 `;
 const PostImageSwiper = styled(Swiper)`
-	height: ${Dimensions.get('window').width};
+	height: ${Dimensions.get('window').width}px;
 `;
 const Dot = styled.View`
 	background-color: #ccc;
@@ -779,29 +771,22 @@ const CommentInputContainer = styled.KeyboardAvoidingView`
 	align-items: center;
 	justify-content: center;
 	background-color: white;
-	padding-horizontal: 8px;
-	padding-vertical: 4px;
 `;
 // 밝은 회색(#f0f0f0)인 영역
-const CommentTextInputContainer = styled.View`
+const CommentTextInputContainer = styled(InputWrap)`
 	background-color: #f0f0f0;
 	border-radius: 16px;
-	flex-direction: row;
-	align-items: center;
-	flex: 0.9;
 	width: 100%;
+	height: 50px;
 	padding-horizontal: 16px;
+	align-items: center;
+	border-width: 0px;
 `;
 // 실제 글이 입력될 영역
 const CommentTextInput = styled.TextInput`
-	flex: 9;
-	margin-right: 12px;
+	width: 90%;
 `;
 // 댓글 등록 버튼
-const CommentSubmitButton = styled.TouchableOpacity`
-	flex: 1;
-	align-items: center;
-`;
 const CommentSubmitButtonIcon = styled(FeatherIcon)<{isDisabled: boolean}>`
 	color: ${props => (props.isDisabled ? '#ccc' : colors.border)};
 	font-size: 24px;

@@ -31,7 +31,7 @@ export const userWithdraw = createAsyncThunk(
 	},
 );
 
-//기능토큰관리
+//이용권관리
 export const updateFunctionToken = createAsyncThunk(
 	'/user/updateFunctionToken',
 	async (data: {functionToken: number}, {rejectWithValue}) => {

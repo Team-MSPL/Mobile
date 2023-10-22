@@ -56,3 +56,19 @@ export const HeaderText = styled.Text`
 	color: ${colors.selectButton};
 	margin: 0px 5px;
 `;
+export const InputWrap = styled.View`
+	flex-direction: row;
+	align-self: center;
+	justify-content: center;
+	display: flex;
+	width: 100%;
+	margin: 0px 0px 20px 0px;
+	border-width: 1px;
+	border-radius: 8px;
+	height: 50px;
+`;
+export const ClearTouchableOpacity = styled.TouchableOpacity`
+	width: 20%;
+	align-items: center;
+	justify-content: center;
+`;

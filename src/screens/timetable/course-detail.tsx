@@ -21,7 +21,6 @@ export default function CourseDetail({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
-			console.log(a);
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -190,7 +189,7 @@ const DetailInfoContainer = styled(HStack)`
 	justify-content: space-between;
 	padding: 1%;
 `;
-const ImageViewFooterComponent = styled.View`
+export const ImageViewFooterComponent = styled.View`
 	width: 100%;
 	height: 50;
 	align-items: center;
@@ -281,7 +280,7 @@ const ReviewElementText = styled.Text`
 	font-weight: 600;
 	color: black;
 `;
-const ImageText = styled(ReviewElementText)`
+export const ImageText = styled(ReviewElementText)`
 	color: white;
 `;
 const ReviewCenter = styled(Center)`

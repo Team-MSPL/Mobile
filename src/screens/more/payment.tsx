@@ -40,7 +40,7 @@ export default function Payment({navigation}: any) {
 		// 라워드를 받았을 때 이벤트 리스너
 		const unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, reward => {
 			rewarded.removeAllListeners();
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '토큰 1개가 지급되었습니다.'}));
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
 			navigation.goBack();
 		});

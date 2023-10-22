@@ -27,6 +27,18 @@ export const communitySlice = createSlice({
 		resetPostList: state => {
 			state.postList = [];
 		},
+		resetPostData: state => {
+			Object.assign(state.postData, initialState.postData);
+		},
+		setPostTitle: (state, {payload}) => {
+			state.postData.postTitle = payload;
+		},
+		setPostContent: (state, {payload}) => {
+			state.postData.postContent = payload;
+		},
+		setPostImage: (state, {payload}) => {
+			state.postData.postImage = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getPostList.fulfilled, (state, {payload}) => {

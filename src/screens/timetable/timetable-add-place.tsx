@@ -194,12 +194,14 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				) : (
 					<GooglePlacesAutocomplete
 						placeholder='장소를 검색해보세요!'
+						placeholderTextColor={'grey'}
 						query={{
 							key: GOOGLE_API_KEY,
 							language: 'ko',
 							components: 'country:kr',
 						}}
 						ref={autocompleteRef}
+						textInputProps={{placeholderTextColor: 'grey'}}
 						styles={{
 							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
 							textInput: {margin: 1},

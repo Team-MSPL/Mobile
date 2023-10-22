@@ -12,6 +12,7 @@ import java.util.List;
 import org.devio.rn.splashscreen.SplashScreenReactPackage; // SplashScreenReactPackage import 추가
 import com.microsoft.codepush.react.CodePush;
 import com.appsflyer.reactnative.RNAppsFlyerPackage;
+import io.xogus.reactnative.versioncheck.RNVersionCheckPackage;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =

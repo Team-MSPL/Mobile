@@ -14,6 +14,7 @@ import {colors} from '../../colors';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 function CommunityMain({
 	navigation,
 	setViewState,
@@ -61,12 +62,10 @@ function CommunityMain({
 						last.current = true;
 					}
 					currentPage.current += 1;
-					setIsLoading(false);
 				}
 			}
 		} catch (error) {
-			setIsLoading(false);
-			console.log('DB로부터 게시글들을 읽어오는 중에 오류가 발생했습니다:', error);
+			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
 		}
 	};
 	const goCommunityReadingScreen = async (item: string) => {

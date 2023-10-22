@@ -45,15 +45,14 @@ export default function CommunityMainScreen({navigation}: any) {
 	//앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () =>
-				socialloginProvider != 'anonymous' && (
-					<HeaderContianer>
-						<TouchableOpacity onPress={goSearch}>
-							<HeaderText>검색</HeaderText>
-							{/* <IconContainer color={'black'} name='search1' size={24}></IconContainer> */}
-						</TouchableOpacity>
-					</HeaderContianer>
-				),
+			headerRight: () => (
+				<HeaderContianer>
+					<TouchableOpacity onPress={goSearch}>
+						<HeaderText>검색</HeaderText>
+						{/* <IconContainer color={'black'} name='search1' size={24}></IconContainer> */}
+					</TouchableOpacity>
+				</HeaderContianer>
+			),
 		});
 	}, []);
 

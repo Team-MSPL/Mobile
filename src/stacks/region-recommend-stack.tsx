@@ -34,6 +34,7 @@ export default function RegionRecommendStack() {
 				name='RegionViewResult'
 				component={ViewResult}
 				options={{
+					gestureEnabled: false,
 					headerBackVisible: false,
 					title: '추천 결과',
 				}}

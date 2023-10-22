@@ -102,7 +102,7 @@ export default function SelectPopularity({navigation}: any) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
+						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
 						modalFunction: checkSignUpReward,
 					}),
 				);
@@ -123,7 +123,7 @@ export default function SelectPopularity({navigation}: any) {
 			functionToken >= 1
 				? dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
+							modalTitle: '이용권이 하나 소모됩니다. 실행하시겠습니까?',
 							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
 							modalFunction: goNext,
 							modalLeft: true,
@@ -131,7 +131,7 @@ export default function SelectPopularity({navigation}: any) {
 				  )
 				: dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
+							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
 							modalFunction: goPayment,
 							modalLeft: true,
 						}),
