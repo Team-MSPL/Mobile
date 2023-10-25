@@ -330,8 +330,9 @@ export const travelSlice = createSlice({
 					if (index == 0) {
 						if (idx == 0) {
 							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-						} else if (copy[idx - 1].at(-1).name == '숙소 추천') {
+						} else if (copy[idx - 1].at(-1)?.category == 4) {
 							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
+							console.log(index, value);
 						}
 					}
 					// if (idx == 0 && index == 0) {
@@ -358,14 +359,33 @@ export const travelSlice = createSlice({
 						eatTimeList.shift();
 						time += 3;
 					}
-					copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
-					time += value.takenTime / 30;
-					index != item.length - 1 && (time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+					if (value.category != 4) {
+						console.log('dpdpdpdp', value, time);
+						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
+						time += value.takenTime / 30;
+						index != item.length - 1 &&
+							(time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+					}
 					if (index == item.length - 1 && idx != state.timetable.length - 1 && value.category != 4) {
 						copy[idx].push({
 							...updateItem,
 							name: '숙소 추천',
-							y: time < 36 ? 36 : time,
+							y: 36,
+							//y: time < 36 ? 36 : time,
+							takenTime: time < 36 ? 360 : (48 - time) * 30,
+							id: shortId.generate(),
+							category: 4,
+							lat: value.lat,
+							lng: value.lng,
+							photo: '',
+						});
+					} else if (value.category == 4 && index != 0) {
+						console.log(time < 36 ? 36 : time, 'qwe');
+						//copy[idx].pop();
+						copy[idx].push({
+							...value,
+							y: 36,
+							//y: time < 36 ? 36 : time,
 							takenTime: time < 36 ? 360 : (48 - time) * 30,
 							id: shortId.generate(),
 							category: 4,

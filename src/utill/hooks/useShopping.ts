@@ -128,6 +128,7 @@ export const useShopping = () => {
 	}, []);
 	const getItems = async () => {
 		try {
+			dispatch(LoadingSliceActions.onLoading());
 			const items = await RNIap.getProducts({skus: itemSkus});
 			setPurchaseItems(items);
 		} catch (error) {
@@ -138,12 +139,15 @@ export const useShopping = () => {
 					modalFunction: goBack,
 				}),
 			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	const requestItemPurchase = async (sku: string) => {
 		try {
-			console.log('sa', sku);
-			await RNIap.requestPurchase({sku});
+			dispatch(LoadingSliceActions.onLoading());
+			await RNIap.requestPurchase({sku: sku});
+			//Platform.OS == 'android' ? await RNIap.requestPurchase({skus: [sku]}) : await RNIap.requestPurchase({sku});
 		} catch (error) {
 			console.log('request purchase error: ', error);
 			dispatch(
@@ -153,6 +157,8 @@ export const useShopping = () => {
 					modalFunction: goBack,
 				}),
 			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	return {purchaseItems, requestItemPurchase};

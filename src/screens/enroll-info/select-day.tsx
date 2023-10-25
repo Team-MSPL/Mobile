@@ -1,11 +1,9 @@
 import {useRef, useState, useEffect, useCallback, useLayoutEffect, Fragment} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import DatePicker from 'react-native-date-picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import moment, {Moment} from 'moment';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {Divider, VStack, HStack, MainContainer} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
@@ -16,6 +14,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
 	const IconElement = styled(Icon)``;
 	const dateFlag = useRef(0);
@@ -81,7 +80,20 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 			}),
 		);
 	};
-
+	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
+		console.log(timeData);
+		if (dateFlag.current == 1 && timeData.ampm == '오전') {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '13시 이전은 불가능합니다.'}));
+		} else {
+			let timeCopy = [...timeLimitArray];
+			let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
+			timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
+			let minuteCopy = [...minuteLimitArray];
+			minuteCopy[dateFlag.current] = parseInt(timeData.minute);
+			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+			setVisible(false);
+		}
+	};
 	const onDateChange = (date: any, type: string) => {
 		if (calendarView.when == 0) {
 			selectEndDate && selectEndDate.diff(date) <= 0 && dispatch(travelSliceActions.enrollSelectEndDate(date));
@@ -236,7 +248,18 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 				</Modal>
 				<MarginContainder />
 			</MainContainer>
-			<UseDatePicker visible={visible} setVisible={setVisible} when={dateFlag.current}></UseDatePicker>
+			<UseDatePicker
+				title={dateFlag.current == 0 ? '시작 시간' : '종료 시간'}
+				goConfirm={goConfirm}
+				minuteData={minuteLimitArray[dateFlag.current] / 30 + 1}
+				ampmData={timeLimitArray[dateFlag.current] < 12 ? 1 : 2}
+				hourData={
+					(timeLimitArray[dateFlag.current] < 12
+						? timeLimitArray[dateFlag.current]
+						: timeLimitArray[dateFlag.current] - 12) + 1
+				}
+				visible={visible}
+				setVisible={setVisible}></UseDatePicker>
 
 			<ButtonContainer>
 				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
@@ -312,5 +335,3 @@ const PreviewContainer = styled.View`
 	width: 100%;
 	margin: 50px 0px 50px 0px;
 `;
-
-export const ASD = styled.View``;

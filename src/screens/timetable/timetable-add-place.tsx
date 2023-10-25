@@ -204,7 +204,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						textInputProps={{placeholderTextColor: 'grey'}}
 						styles={{
 							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
-							textInput: {margin: 1},
+							textInput: {margin: 1, color: 'black'},
 							listView: {height: 300},
 						}}
 						renderRightButton={clearButton}

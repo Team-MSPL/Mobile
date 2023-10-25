@@ -1,31 +1,31 @@
-import {Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState} from 'react';
-import {Modal, Dimensions, ScrollView} from 'react-native';
+import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import {Dimensions, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
-import {HStack, MainContainer, VStack} from '../layout/layout';
-import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {HStack, MainContainer} from '../layout/layout';
 import {colors} from '../colors';
 
-export default function UseDatePicker({visible, setVisible, when}: PickerType) {
+export default function UseDatePicker({
+	hourData,
+	ampmData,
+	minuteData,
+	visible,
+	setVisible,
+	title,
+	goConfirm,
+}: PickerType) {
 	const ampmList = ['', '오전', '오후', ''];
 	const hourList = ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ''];
 	const minuteList = ['', '0', '30', ''];
 	const [ampm, setAmpm] = useState(0);
 	const [hour, setHour] = useState(0);
 	const [minute, setMinute] = useState(0);
-	const dispatch = useAppDispatch();
 	const deviceHeight = Dimensions.get('window').height;
 	const deviceWidth = Dimensions.get('window').width;
 	const ampmRef = useRef<ScrollView>();
 	const hourRef = useRef<ScrollView>();
 	const minuteRef = useRef<ScrollView>();
-	const {timeLimitArray, minuteLimitArray} = useAppSelector(state => state.travelSlice);
 	useEffect(() => {
-		let hourData = (timeLimitArray[when] < 12 ? timeLimitArray[when] : timeLimitArray[when] - 12) + 1;
-		let ampmData = timeLimitArray[when] < 12 ? 1 : 2;
-		let minuteData = minuteLimitArray[when] / 30 + 1;
-		console.log(hourData, minuteData);
+		console.log(minuteData, 'qwp');
 		setMinute(minuteData);
 		setAmpm(ampmData);
 		setHour(hourData);
@@ -42,18 +42,13 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 	const ampmCalculate = (e: any) => {
 		setAmpm(Math.ceil(e.nativeEvent.contentOffset.y / 50 + 1));
 	};
-	const goConfirm = () => {
-		if (when == 1 && ampmList[ampm] == '오전') {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '13시 이전은 불가능합니다.'}));
-		} else {
-			let timeCopy = [...timeLimitArray];
-			let ampmCheck = ampmList[ampm] == '오후' ? 12 : 0;
-			timeCopy[when] = parseInt(hourList[hour]) + ampmCheck;
-			let minuteCopy = [...minuteLimitArray];
-			minuteCopy[when] = parseInt(minuteList[minute]);
-			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-			setVisible(false);
-		}
+	const goConfirms = () => {
+		const timeData: {
+			ampm: string;
+			hour: string;
+			minute: string;
+		} = {ampm: ampmList[ampm], hour: hourList[hour], minute: minuteList[minute]};
+		goConfirm(timeData);
 	};
 	const viewList = [
 		{value: ampm, list: ampmList, ref: ampmRef, function: ampmCalculate},
@@ -67,7 +62,7 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 	return (
 		<Container height={deviceHeight} width={deviceWidth}>
 			<ModalContainer>
-				<StateText>{when == 0 ? '시작 시간' : '종료시간'}</StateText>
+				<StateText>{title}</StateText>
 				<ModalHstack>
 					{viewList.map((value, index) => (
 						<ModalElementWidthContainer key={index}>
@@ -95,7 +90,7 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 					<StatusTouchableOpacity onPress={onCancel}>
 						<StatusText>취소</StatusText>
 					</StatusTouchableOpacity>
-					<StatusTouchableOpacity onPress={goConfirm}>
+					<StatusTouchableOpacity onPress={goConfirms}>
 						<StatusText>확인</StatusText>
 					</StatusTouchableOpacity>
 				</StatusHstack>
@@ -104,9 +99,13 @@ export default function UseDatePicker({visible, setVisible, when}: PickerType) {
 	);
 }
 interface PickerType {
+	hourData: number;
+	ampmData: number;
+	minuteData: number;
 	visible: boolean;
 	setVisible: Dispatch<SetStateAction<boolean>>;
-	when: number;
+	title: string;
+	goConfirm: (timeData: {hour: string; ampm: string; minute: string}) => void;
 }
 const StatusText = styled.Text`
 	font-size: 20px;

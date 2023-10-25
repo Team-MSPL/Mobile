@@ -1,9 +1,7 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
-import {regionRecommendSliceActions, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
-import {Alert} from 'react-native';
+import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useFocusEffect} from '@react-navigation/native';

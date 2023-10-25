@@ -32,6 +32,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 					{(onFocus || textValue) && <FocusTitleText>신나는 여행</FocusTitleText>}
 					<InputAllContainter>
 						<TravelTitleTextInput
+							style={{color: 'black'}}
 							placeholder={!onFocus ? '신나는 여행' : ''}
 							placeholderTextColor={'grey'}
 							onFocus={() => setOnFocus(true)}

@@ -106,7 +106,7 @@ export default function SearchPlace({navigation, route}: any) {
 						borderColor: colors.selectButton,
 						borderRadius: 10,
 					},
-					textInput: {margin: 1},
+					textInput: {margin: 1, color: 'black'},
 					listView: {position: 'relative'},
 				}}
 				fetchDetails={true}

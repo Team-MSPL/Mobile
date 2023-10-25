@@ -286,7 +286,6 @@ const InfoPressable = styled.Pressable<{backgroundColor: string; height: number;
 	background-color: ${props => props.backgroundColor};
 	position: absolute;
 	z-index: 3;
-	border-radius: 10px;
 	padding: 4px;
 `;
 const InfoText = styled.Text`

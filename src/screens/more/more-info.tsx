@@ -69,6 +69,9 @@ export default function MoreInfo({navigation}: any) {
 	const goPolicy = () => {
 		navigation.navigate('PolicyMain');
 	};
+	const goCoupon = () => {
+		navigation.navigate('Coupon');
+	};
 	const handleInquire = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -100,12 +103,6 @@ export default function MoreInfo({navigation}: any) {
 				) : (
 					<ProfileImage source={{uri: userProfileImage}}></ProfileImage>
 				)}
-				{/* <ProfileImage
-					source={
-						userProfileImage == ''
-							? require('../../../public/images/danim_logo2.png')
-							: {uri: userProfileImage}
-					}></ProfileImage> */}
 				<ProfileNameText>
 					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
 				</ProfileNameText>
@@ -121,15 +118,15 @@ export default function MoreInfo({navigation}: any) {
 					<ProfileDivider />
 					<SettingContainer>
 						<TitleText>계정</TitleText>
-						<SettingElement
-							onPress={() => {
-								console.log('노노');
-							}}>
+						<SettingElement onPress={() => {}}>
 							<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
 						</SettingElement>
 
 						<SettingElement onPress={goPayment}>
 							<SettingElementText>이용권 구매하기</SettingElementText>
+						</SettingElement>
+						<SettingElement onPress={goCoupon}>
+							<SettingElementText>쿠폰 입력하기</SettingElementText>
 						</SettingElement>
 					</SettingContainer>
 				</>

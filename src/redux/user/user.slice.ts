@@ -30,7 +30,20 @@ export const userWithdraw = createAsyncThunk(
 		}
 	},
 );
-
+//쿠폰입력
+export const couponCheck = createAsyncThunk(
+	'/marketing/useCoupon',
+	async (data: {couponCode: string; functionToken: number}, {rejectWithValue}) => {
+		try {
+			console.log(data.couponCode);
+			const response = await axiosAuth.patch('/marketing/useCoupon', data);
+			console.log(response);
+			return response;
+		} catch (err: any) {
+			return rejectWithValue(err.response.data);
+		}
+	},
+);
 //이용권관리
 export const updateFunctionToken = createAsyncThunk(
 	'/user/updateFunctionToken',

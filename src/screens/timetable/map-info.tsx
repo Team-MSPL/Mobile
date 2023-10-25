@@ -159,7 +159,7 @@ export default function MapInfo({navigation, route}: any) {
 						),
 				)}
 
-				<DayContainer>
+				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 					{timetable.map(
 						(item, idx) =>
 							item.length != 0 && (
@@ -226,9 +226,8 @@ export default function MapInfo({navigation, route}: any) {
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-export const DayContainer = styled.View`
-	flex-direction: row;
-	flex-wrap: wrap;
+export const DayContainer = styled.ScrollView`
+	height: 80px;
 `;
 const PlaceText = styled.Text`
 	font-size: 16px;
@@ -236,10 +235,13 @@ const PlaceText = styled.Text`
 	color: black;
 `;
 export const DayButton = styled(PresetButton)`
+	width: 130px;
+	height: 60px;
 	border-radius: 15px;
-	padding: 3%;
+	padding: 10px;
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
 	align-items: center;
+	justify-content: center;
 `;
 
 export const DayTitle = styled(PlaceText)<{select: boolean}>`

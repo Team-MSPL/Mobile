@@ -97,6 +97,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 			<RatingReview
 				placeholder='좋았던 점을 남겨주세요'
 				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
 				value={reviewValue}
 				onChangeText={(value: string) => changeReview(value)}></RatingReview>
 

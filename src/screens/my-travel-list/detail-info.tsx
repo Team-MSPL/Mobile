@@ -112,6 +112,9 @@ export default function DetailInfo({navigation}: any) {
 							<HeaderText>공유</HeaderText>
 						</TouchableOpacity>
 					)}
+					<TouchableOpacity onPress={goKakaoShare}>
+						<HeaderText>공유</HeaderText>
+					</TouchableOpacity>
 					<TouchableOpacity onPress={removeCheck}>
 						<HeaderText>삭제</HeaderText>
 					</TouchableOpacity>

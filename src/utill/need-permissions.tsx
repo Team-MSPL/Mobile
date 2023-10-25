@@ -118,7 +118,7 @@ export default function NeedPermissions() {
 	};
 
 	return (
-		<SafeAreaView>
+		<SafeAreaView style={{flex: 1}}>
 			<PermissionMainContainer>
 				<PermissionText>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PermissionText>
 				{items.map((item, idx) => (

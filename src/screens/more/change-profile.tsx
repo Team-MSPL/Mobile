@@ -86,6 +86,7 @@ export default function ChangeProfile({navigation}: any) {
 				<InputWrap>
 					<CustomTextInput
 						text={nickname}
+						style={{color: 'black'}}
 						placeholderTextColor={'grey'}
 						placeholder='ex)홍길동 최대 8자이내 '
 						value={nickname}

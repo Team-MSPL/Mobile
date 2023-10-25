@@ -118,6 +118,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				<TitleInput
 					placeholder='제목을 입력해주세요'
 					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
 					value={postData.postTitle}
 					onChangeText={changeTitle}
 					multiline={true}
@@ -126,6 +127,8 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				<CommunityWritingTitleText>내용</CommunityWritingTitleText>
 				<ContentInput
 					placeholder='부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.'
+					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
 					value={postData.postContent}
 					onChangeText={changeContent}
 					multiline={true}

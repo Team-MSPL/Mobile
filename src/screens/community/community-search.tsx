@@ -43,6 +43,7 @@ export default function CommunitySearch({navigation}: any) {
 				</IconContainer>
 				<SearchContainer
 					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
 					placeholder='글 제목,내용'
 					value={searchValue}
 					onSubmitEditing={handleSearch}

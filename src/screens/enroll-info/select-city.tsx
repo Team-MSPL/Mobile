@@ -87,6 +87,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 				<InputAllContainter>
 					<SearchInput
 						placeholderTextColor={'grey'}
+						style={{color: 'black'}}
 						value={search}
 						onChangeText={(text: string) => changeSearch(text)}
 						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>

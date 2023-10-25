@@ -1,37 +1,28 @@
 import {useState, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {TouchableOpacity, Image} from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Alert, View} from 'react-native';
 import styled from 'styled-components/native';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {colors} from '../../utill/colors';
-import {
-	ASD,
-	DayPressable,
-	TimeContainer,
-	TimeItemContainer,
-	TimeItemText,
-	TimeStepText,
-} from '../enroll-info/select-day';
+import {DayPressable, TimeContainer, TimeItemContainer, TimeItemText, TimeStepText} from '../enroll-info/select-day';
 import {Center, HStack, MainContainer} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {DayButton, DayContainer, DaySubTitle, DayTitle} from './map-info';
+import UseDatePicker from '../../utill/hooks/useDatePicker';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
 
 	const [changeDay, setChangeDay] = useState(route.params.item.value.x);
-	const onConfirm = (data: any) => {
-		flag.current
-			? ((startTime.current.hours = data.getHours()), (startTime.current.minute = data.getMinutes()))
-			: ((endTime.current.hours = data.getHours()), (endTime.current.minute = data.getMinutes()));
-		setVisible(false);
-	};
-	const onCancel = () => {
+	const onConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
+		console.log(timeData.ampm, 'ndoasndkl');
+		const ampm = timeData.ampm == '오전' ? 0 : 12;
+		flag.current == 0
+			? ((startTime.current.hours = parseInt(timeData.hour) + ampm),
+			  (startTime.current.minute = parseInt(timeData.minute)))
+			: ((endTime.current.hours = parseInt(timeData.hour) + ampm),
+			  (endTime.current.minute = parseInt(timeData.minute)));
 		setVisible(false);
 	};
 
@@ -51,7 +42,7 @@ export default function Modify({navigation, route}: any) {
 			hours: startTime.current.hours,
 			minute: startTime.current.minute,
 			function: () => {
-				flag.current = true;
+				flag.current = 0;
 				setVisible(true);
 			},
 		},
@@ -61,12 +52,12 @@ export default function Modify({navigation, route}: any) {
 			hours: endTime.current.hours,
 			minute: endTime.current.minute,
 			function: () => {
-				flag.current = false;
+				flag.current = 1;
 				setVisible(true);
 			},
 		},
 	];
-	const flag = useRef(false);
+	const flag = useRef(0);
 	const goModify = () => {
 		const newY = (startTime.current.hours * 60 - 360) / 30 + startTime.current.minute / 30;
 		const newEnd =
@@ -122,65 +113,61 @@ export default function Modify({navigation, route}: any) {
 	};
 
 	return (
-		<MainContainer>
-			<Center>
-				<TimeItemText>{route.params.item.value.name}</TimeItemText>
-			</Center>
-			<DayContainer>
-				{[...Array(nDay + 1)].map((item, idx) => (
-					<DayButton
-						key={idx}
-						select={idx === changeDay}
-						onPress={() => {
-							setChangeDay(idx);
-						}}>
-						<DayTitle select={idx === changeDay}>{idx + 1 + '일차'}</DayTitle>
-						<DaySubTitle select={idx === changeDay}>
-							{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-						</DaySubTitle>
-					</DayButton>
-				))}
-			</DayContainer>
-			<TimeContainer>
-				<ASD>
-					{DaySelectInfoList.map((item, idx) => (
-						<>
-							<TimeItemContainer key={idx}>
-								<TimeStepText>{item.step}</TimeStepText>
-								<TimeItemText>{item.title}</TimeItemText>
-								<HStack>
-									<DayElementContainer onPress={item.function}>
-										<TimeItemText>
-											{String(item.hours >= 24 ? item.hours - 24 : item.hours).padStart(2, '0')}:
-											{String(item.minute).padStart(2, '0')}
-										</TimeItemText>
-									</DayElementContainer>
-								</HStack>
-							</TimeItemContainer>
-						</>
+		<>
+			<MainContainer>
+				<Center>
+					<TimeItemText>{route.params.item.value.name}</TimeItemText>
+				</Center>
+				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+					{[...Array(nDay + 1)].map((item, idx) => (
+						<DayButton
+							key={idx}
+							select={idx === changeDay}
+							onPress={() => {
+								setChangeDay(idx);
+							}}>
+							<DayTitle select={idx === changeDay}>{idx + 1 + '일차'}</DayTitle>
+							<DaySubTitle select={idx === changeDay}>
+								{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+							</DaySubTitle>
+						</DayButton>
 					))}
-				</ASD>
-			</TimeContainer>
-			<DatePicker
-				modal
-				open={visible}
-				mode='time'
-				date={
-					flag.current
-						? moment().hours(startTime.current.hours).minutes(startTime.current.minute).toDate()
-						: moment().hours(endTime.current.hours).minutes(endTime.current.minute).toDate()
+				</DayContainer>
+				<TimeContainer>
+					{DaySelectInfoList.map((item, idx) => (
+						<TimeItemContainer key={idx}>
+							<TimeStepText>{item.step}</TimeStepText>
+							<TimeItemText>{item.title}</TimeItemText>
+							<HStack>
+								<DayElementContainer onPress={item.function}>
+									<TimeItemText>
+										{String(item.hours >= 24 ? item.hours - 24 : item.hours).padStart(2, '0')}:
+										{String(item.minute).padStart(2, '0')}
+									</TimeItemText>
+								</DayElementContainer>
+							</HStack>
+						</TimeItemContainer>
+					))}
+				</TimeContainer>
+				<CustomButton label='수정하기' onPress={goModify}></CustomButton>
+			</MainContainer>
+			<UseDatePicker
+				title={flag.current == 0 ? '시작 시간' : '종료 시간'}
+				goConfirm={onConfirm}
+				minuteData={flag.current == 0 ? startTime.current.minute / 30 + 1 : endTime.current.minute / 30 + 1}
+				ampmData={
+					flag.current == 0 ? (startTime.current.hours < 12 ? 1 : 2) : endTime.current.hours < 12 ? 1 : 2
 				}
-				onConfirm={onConfirm}
-				onCancel={onCancel}
-				minuteInterval={30}
-				title={flag.current ? '시작 시간' : '종료 시간'}
-				cancelText='취소'
-				confirmText='확인'
-			/>
-			<CustomButton label='수정하기' onPress={goModify}></CustomButton>
-		</MainContainer>
+				hourData={
+					flag.current == 0
+						? (startTime.current.hours < 12 ? startTime.current.hours : startTime.current.hours - 12) + 1
+						: (endTime.current.hours < 12 ? endTime.current.hours : endTime.current.hours - 12) + 1
+				}
+				visible={visible}
+				setVisible={setVisible}></UseDatePicker>
+		</>
 	);
 }
 const DayElementContainer = styled(DayPressable)`
-	width: 80%;
+	width: 100%;
 `;

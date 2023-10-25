@@ -104,6 +104,7 @@ export default function Join1({navigation, route}: any) {
 					<CustomTextInput
 						text={nickname}
 						placeholderTextColor={'grey'}
+						style={{color: 'black'}}
 						placeholder='ex)홍길동 최대 8자이내 '
 						value={nickname}
 						onChangeText={(value: string) => chageNickname(value)}

@@ -574,6 +574,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				) : (
 					<CommentTextInputContainer>
 						<CommentTextInput
+							placeholderTextColor={'grey'}
+							style={{color: 'black'}}
 							value={commentContent}
 							multiline={true}
 							onChangeText={text => setCommentContent(text)}
