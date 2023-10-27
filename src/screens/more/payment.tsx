@@ -64,6 +64,10 @@ export default function Payment({navigation}: any) {
 				  );
 		}
 	};
+	const itemSkus: any = Platform.select({
+		android: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+		ios: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+	});
 	return (
 		<MainContainer>
 			<TitleText>
@@ -90,7 +94,7 @@ export default function Payment({navigation}: any) {
 						style={{marginVertical: 2}}
 						onPress={() => {
 							//console.log(item);
-							requestItemPurchase(purchaseItems[idx].productId);
+							requestItemPurchase(itemSkus[idx]);
 						}}>
 						<HStack>
 							<TotalContainer>

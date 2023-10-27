@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -18,7 +18,6 @@ export default function MyTravelList({navigation}: any) {
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
 
 	const dispatch = useAppDispatch();
-	const [view, setView] = useState(0);
 	const goMyTravelDetail = async (e: string) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());

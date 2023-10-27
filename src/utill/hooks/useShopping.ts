@@ -11,6 +11,7 @@ import {
 	purchaseErrorListener,
 	Product,
 	RequestPurchase,
+	getProducts,
 	flushFailedPurchasesCachedAsPendingAndroid,
 } from 'react-native-iap';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -100,7 +101,7 @@ export const useShopping = () => {
 						);
 					}
 				});
-				getItems();
+				//getItems();
 			} catch (error) {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -126,34 +127,34 @@ export const useShopping = () => {
 			RNIap.endConnection();
 		};
 	}, []);
-	const getItems = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			const items = await RNIap.getProducts({skus: itemSkus});
-			setPurchaseItems(items);
-		} catch (error) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '에러가 발생했습니다.',
-					modalSubTitle: '잠시 후 시도해주세요',
-					modalFunction: goBack,
-				}),
-			);
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
+	// const getItems = async () => {
+	// 	try {
+	// 		dispatch(LoadingSliceActions.onLoading());
+	// 		const items = await getProducts({skus: itemSkus});
+	// 		setPurchaseItems(items);
+	// 	} catch (error) {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '문제가 발생했습니다.',
+	// 				modalSubTitle: '잠시 후 시도해주세요',
+	// 				modalFunction: goBack,
+	// 			}),
+	// 		);
+	// 	} finally {
+	// 		dispatch(LoadingSliceActions.offLoading());
+	// 	}
+	// };
 	const requestItemPurchase = async (sku: string) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			await RNIap.requestPurchase({sku: sku});
-			//Platform.OS == 'android' ? await RNIap.requestPurchase({skus: [sku]}) : await RNIap.requestPurchase({sku});
+			await getProducts({skus: itemSkus});
+			Platform.OS == 'android' ? await RNIap.requestPurchase({skus: [sku]}) : await RNIap.requestPurchase({sku});
 		} catch (error) {
 			console.log('request purchase error: ', error);
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '에러가 발생했습니다.',
-					modalSubTitle: '잠시 후 시도해주세요',
+					modalTitle: '취소',
+					modalSubTitle: '구매가 취소되었습니다.',
 					modalFunction: goBack,
 				}),
 			);

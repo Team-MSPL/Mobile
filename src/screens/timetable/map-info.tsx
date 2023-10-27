@@ -16,11 +16,13 @@ export default function MapInfo({navigation, route}: any) {
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
 	const viewRef = useRef(0);
+	const [selectPinIndex, setSecletPinIndex] = useState(-1);
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
+		setSecletPinIndex(e);
 		mapRef.current?.animateCamera(
 			{
 				center: {
@@ -67,6 +69,8 @@ export default function MapInfo({navigation, route}: any) {
 						key={`marker_${idx}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
+						pinColor={idx == selectPinIndex ? 'yellow' : 'red'}
+						//icon={{uri: '../../../public/images/busan.jpg',width:'10',height:'10'}}
 					/>
 				);
 			}

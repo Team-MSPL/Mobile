@@ -49,7 +49,7 @@ export default function NeedPermissions() {
 		},
 		Platform.OS == 'ios' && {
 			id: '4',
-			title: '추적 -ios한정',
+			title: '추적',
 			desc: '광고 최적화와 사용자 경험 개선을 위해 데이터 추적',
 			logo: <IconContainer name={'filetext1'} size={25} color={colors.selectButton} />,
 		},

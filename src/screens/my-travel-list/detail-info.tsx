@@ -72,7 +72,7 @@ export default function DetailInfo({navigation}: any) {
 			const response = await KakaoShareLink.sendFeed({
 				content: {
 					title: travelName,
-					imageUrl: '',
+					imageUrl: 'https://danim.me/square_logo.png',
 					link: {
 						webUrl: 'http://danim.me',
 						mobileWebUrl: 'http://danim.me',
@@ -98,7 +98,7 @@ export default function DetailInfo({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '카카오 공유 중 에러가 발생했습니다.',
+					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
 				}),
 			);
 		}
@@ -107,11 +107,6 @@ export default function DetailInfo({navigation}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderContianer>
-					{Platform.OS != 'ios' && (
-						<TouchableOpacity onPress={goKakaoShare}>
-							<HeaderText>공유</HeaderText>
-						</TouchableOpacity>
-					)}
 					<TouchableOpacity onPress={goKakaoShare}>
 						<HeaderText>공유</HeaderText>
 					</TouchableOpacity>

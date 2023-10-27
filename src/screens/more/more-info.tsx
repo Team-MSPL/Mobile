@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TouchableOpacity, View} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -9,6 +9,8 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Divider, MainContainer} from '../../utill/layout/layout';
 import {SvgLoginLogo} from '../../utill/svg/svg';
+import {useState} from 'react';
+import ViewPager from '../../utill/view-pager';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -83,6 +85,13 @@ export default function MoreInfo({navigation}: any) {
 	const goLogin = () => {
 		navigation.replace('LoginScreen');
 	};
+	const goBack = () => {
+		setViewPagerView(false);
+	};
+	const goViewPager = () => {
+		setViewPagerView(true);
+	};
+	const [viewPagerView, setViewPagerView] = useState(false);
 	const useInfo = [
 		{
 			title: '공지사항',
@@ -92,9 +101,17 @@ export default function MoreInfo({navigation}: any) {
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
+		{title: '사용 가이드', function: goViewPager},
 	];
 	return (
 		<MainContainer>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerView}
+				onRequestClose={() => setViewPagerView(false)}>
+				<ViewPager handleFunction={goBack} />
+			</Modal>
 			<ProfileContainer>
 				{userProfileImage == '' ? (
 					<NoProfileContainer>

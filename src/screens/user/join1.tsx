@@ -9,10 +9,10 @@ import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer} from '../../utill/layout/layout';
+import {ClearTouchableOpacity, MainContainer} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import {SvgRight} from '../../utill/svg/svg';
+import {SvgCancel, SvgRight} from '../../utill/svg/svg';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
@@ -111,13 +111,13 @@ export default function Join1({navigation, route}: any) {
 						maxLength={8}
 					/>
 					{nickname && (
-						<TouchableOpacity
+						<ClearTouchableOpacity
 							style={{position: 'absolute', right: 8, top: 8}}
 							onPress={() => {
 								setNickname('');
 							}}>
-							<Text>clear</Text>
-						</TouchableOpacity>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
 					)}
 				</InputWrap>
 				<TermsContainer>
@@ -143,7 +143,9 @@ export default function Join1({navigation, route}: any) {
 	);
 }
 
-const JoinContainer = styled(MainContainer).attrs({as: Pressable})``;
+const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
+	flex: 1;
+`;
 
 const CheckTouchableOpacity = styled.TouchableOpacity`
 	width: 80%;

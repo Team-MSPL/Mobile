@@ -1,4 +1,4 @@
-import {API_ROUTE, Google_Signin_Key} from '@env';
+import {Google_Signin_Key} from '@env';
 import {appleAuth, appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
@@ -38,10 +38,7 @@ export default function LoginScreen({navigation}: any) {
 		dispatch(userSliceActions.setAnonymous());
 		navigation.replace('Tab');
 	};
-	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
-	useEffect(() => {
-		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
-	}, [isLogin]);
+	const {anonymousKeep} = useAppSelector(state => state.userSlice);
 
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
@@ -53,9 +50,6 @@ export default function LoginScreen({navigation}: any) {
 		return result;
 	};
 
-	const goAI = () => {
-		navigation.navigate('LocalSearchAITest');
-	};
 	const dispatch = useAppDispatch();
 
 	const kakaoLogin = async () => {
@@ -176,7 +170,6 @@ export default function LoginScreen({navigation}: any) {
 					loginProvider: 'apple',
 					signUpFlag: false,
 				};
-				console.log('디비 주소에용', API_ROUTE);
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {
@@ -207,7 +200,7 @@ export default function LoginScreen({navigation}: any) {
 				console.log('같아라!', decodeToken.sub);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo3.png',
+					userProfileImage: '',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -217,36 +210,12 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo3.png',
+						profileImage: '',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
 					anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 				}
-
-				// if (response.state === state) {
-				// 	const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
-				// 	const userInfo = await auth().signInWithCredential(credential);
-				// 	console.log('안드로이드로 애플 로그인 성공', userInfo.user);
-				// 	const data = {
-				// 		userName: `김다님${shortid.generate()}`,
-				// 		userProfileImage: '../public/images/danim_logo.png',
-				// 		userToken: userInfo.user.uid,
-				// 		loginProvider: 'apple',
-				// 		signUpFlag: false,
-				// 	};
-				// 	const result = await dispatch(socialConnect(data)).unwrap();
-				// 	if (result == 202) {
-				// 		navigation.navigate('Join1', {
-				// 			userToken: userInfo.user.uid,
-				// 			loginProvider: 'apple',
-				// 			profileImage: '../public/images/danim_logo.png',
-				// 			nickname: `김다님${shortid.generate()}`,
-				// 		});
-				// 	} else {
-				// 		navigation.replace('Tab');
-				// 	}
-				// }
 			}
 		} catch (error) {
 			console.error('애플 로그인 실패', error);
@@ -259,7 +228,6 @@ export default function LoginScreen({navigation}: any) {
 		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
-	const [view, setView] = useState(0);
 	const viewList = [
 		require('../../../public/images/login1.png'),
 		require('../../../public/images/login1.png'),
@@ -335,27 +303,7 @@ export default function LoginScreen({navigation}: any) {
 							</LogoHStack>
 						</LongCircleButton>
 					</CircleContainer>
-					<HStack>
-						{/* {platforms.map((platform, index) => (
-						<CircleButton
-							key={index}
-							bgColor={platform.color}
-							onPress={() => {
-								platform.onPress();
-							}}>
-							{platform.image}
-						</CircleButton>
-					))} */}
-						{/* <AppleButton
-						buttonStyle={AppleButton.Style.WHITE}
-						buttonType={AppleButton.Type.SIGN_IN}
-						style={{
-							width: 160, // You must specify a width
-							height: 45, // You must specify a height
-						}}
-						onPress={() => appleLogin()}
-					/> */}
-					</HStack>
+					<HStack></HStack>
 				</LoginSCreenContainer>
 			</BackgroundImage>
 		</SafeAreaView>
@@ -416,9 +364,6 @@ const LogoText = styled.Text<{color: string}>`
 const LogoContainer = styled.View`
 	position: absolute;
 	left: 10px;
-`;
-const LogoTextContainer = styled.View`
-	width: 80%;
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

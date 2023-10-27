@@ -1,8 +1,6 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {BackHandler} from 'react-native';
-import {cityViewList} from '../select-city';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -11,26 +9,8 @@ import {colors} from '../../../utill/colors';
 import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
-	const goEnrollInfo = (e: string) => {
-		let region: string[] = [];
-		if (e.includes(' ')) {
-			region = e.split(' ');
-		} else {
-			region = [e, '전체'];
-		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		const data = {cityIndex: cityIndex, region: [region[1]]};
-
-		let season = Array(4).fill(0);
-		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
-		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
-		dispatch(travelSliceActions.setRecommendRegion(data));
-		navigation.navigate('EnrollTravelTitle');
-	};
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {

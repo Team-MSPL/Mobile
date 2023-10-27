@@ -1,11 +1,11 @@
-import {API_ROUTE} from '@env';
+import {API_ROUTE, API_ROUTE_RELEASE} from '@env';
 import axios from 'axios';
 import {store, useAppDispatch} from '..';
 import {networkSliceActions} from '../network/networkSlice';
 import {modalSliceActions} from '../modal/modalSlice';
 
 const axiosAuth = axios.create({
-	baseURL: API_ROUTE,
+	baseURL: __DEV__ ? API_ROUTE : API_ROUTE_RELEASE,
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,

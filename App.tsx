@@ -206,6 +206,10 @@ function App(): JSX.Element {
 			},
 		},
 	};
+	const handleFirstLaunch = async () => {
+		dispatch(userSliceActions.setIsFirstLaunch('false'));
+		await AsyncStorage.setItem('isFirstLaunch', 'true');
+	};
 	return (
 		<SafeAreaProvider>
 			<StatusBar
@@ -215,7 +219,7 @@ function App(): JSX.Element {
 			/>
 			<NavigationContainer linking={linking}>
 				{isFirstLaunch == 'true' ? (
-					<ViewPager />
+					<ViewPager handleFunction={handleFirstLaunch} />
 				) : hasPermission || noPermission ? (
 					<StackNavigator />
 				) : (

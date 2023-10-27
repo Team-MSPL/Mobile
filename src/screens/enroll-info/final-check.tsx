@@ -236,37 +236,39 @@ export default function FinalCheck({navigation}: any) {
 										{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
 									</MultiDaySecondText>
 								</MultiDayContainer>
-								<MultiAllContainer>
-									<HStack>
-										<SvgHome color={colors.selectButton} marginRight={5} />
-										<MultiDayText>숙소</MultiDayText>
-									</HStack>
-									{accommodations[idx + 1].name ? (
-										<PlaceContainer>
-											{accommodations[idx + 1].photo != null ? (
-												<PlaceImage
-													source={{
-														uri: accommodations[idx + 1].photo,
-													}}
-													alt='Place Image'
-												/>
-											) : (
-												<FinalDefalutLogoContainer>
-													<SvgLoginLogo width={30} height={30} color='white' />
-												</FinalDefalutLogoContainer>
-											)}
+								{idx != nDay && (
+									<MultiAllContainer>
+										<HStack>
+											<SvgHome color={colors.selectButton} marginRight={5} />
+											<MultiDayText>숙소</MultiDayText>
+										</HStack>
+										{accommodations[idx + 1].name ? (
+											<PlaceContainer>
+												{accommodations[idx + 1].photo != null ? (
+													<PlaceImage
+														source={{
+															uri: accommodations[idx + 1].photo,
+														}}
+														alt='Place Image'
+													/>
+												) : (
+													<FinalDefalutLogoContainer>
+														<SvgLoginLogo width={30} height={30} color='white' />
+													</FinalDefalutLogoContainer>
+												)}
 
-											<VStack>
-												<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
-												<MultiElementText>
-													{accommodations[idx + 1].formatted_address}
-												</MultiElementText>
-											</VStack>
-										</PlaceContainer>
-									) : (
-										<MultiElementText>선택사항 없음</MultiElementText>
-									)}
-								</MultiAllContainer>
+												<VStack>
+													<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
+													<MultiElementText>
+														{accommodations[idx + 1].formatted_address}
+													</MultiElementText>
+												</VStack>
+											</PlaceContainer>
+										) : (
+											<MultiElementText>선택사항 없음</MultiElementText>
+										)}
+									</MultiAllContainer>
+								)}
 								<MultiAllContainer>
 									<HStack>
 										<SvgPlace color={colors.selectButton} marginRight={5} />

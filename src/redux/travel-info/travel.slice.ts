@@ -1,4 +1,4 @@
-import {API_ROUTE, GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -146,7 +146,6 @@ export const reviewAndPoint = createAsyncThunk(
 export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/ai/run`, data, {timeout: 60000});
-		console.log(response, '애ㅔ애ㅔ에ㅔㅔㅔㅔ');
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -197,7 +196,6 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 		const response = await axiosGoogle.get(
 			`/place/textsearch/json?location=${data.lng}%2C${data.lat}&query=${data.name}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
-		console.log(response.config.url);
 		const a = await axiosGoogle.get(
 			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
@@ -332,7 +330,6 @@ export const travelSlice = createSlice({
 							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
 						} else if (copy[idx - 1].at(-1)?.category == 4) {
 							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
-							console.log(index, value);
 						}
 					}
 					// if (idx == 0 && index == 0) {
@@ -360,7 +357,6 @@ export const travelSlice = createSlice({
 						time += 3;
 					}
 					if (value.category != 4) {
-						console.log('dpdpdpdp', value, time);
 						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
 						time += value.takenTime / 30;
 						index != item.length - 1 &&
@@ -380,7 +376,6 @@ export const travelSlice = createSlice({
 							photo: '',
 						});
 					} else if (value.category == 4 && index != 0) {
-						console.log(time < 36 ? 36 : time, 'qwe');
 						//copy[idx].pop();
 						copy[idx].push({
 							...value,
@@ -435,7 +430,6 @@ export const travelSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
-			console.log('1', payload);
 			let list: number[] = [];
 			if (payload == undefined) {
 				list.push(30);
@@ -446,7 +440,6 @@ export const travelSlice = createSlice({
 				list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			}
 			state.moveTimeList.push(list);
-			console.log('2');
 		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;

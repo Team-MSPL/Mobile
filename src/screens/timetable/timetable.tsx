@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity, View, Dimensions, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
+import {TouchableOpacity, View, Dimensions, NativeSyntheticEvent, NativeScrollEvent, Modal} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -18,6 +18,7 @@ import {HStack, HeaderContianer, HeaderText} from '../../utill/layout/layout';
 import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
+import ViewPager from '../../utill/view-pager';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
@@ -72,15 +73,7 @@ export default function Timetable({navigation, route}: any) {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
 	};
-	const openModalHelp = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '스케줄 사용가이드',
-				modalSubTitle:
-					'1. 스케줄 추가 \n 스케줄 추가는 꾹눌러서가능합니다.\n\n2. 스케줄 삭제 \n 스케줄 삭제는 스케줄을 선택해 상세페이지에서 가능합니다.\n\n3.카페/식당 추천 \n관광지 사이 위치를 추천합니다. ',
-			}),
-		);
-	};
+
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
@@ -144,7 +137,7 @@ export default function Timetable({navigation, route}: any) {
 							<TouchableOpacity onPress={goSave}>
 								<HeaderText>저장</HeaderText>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={openModalHelp}>
+							<TouchableOpacity onPress={goViewPager}>
 								<HeaderText>설명</HeaderText>
 							</TouchableOpacity>
 						</>
@@ -157,6 +150,13 @@ export default function Timetable({navigation, route}: any) {
 	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		setMapViewState(usePosition(e));
 	};
+	const goBack = () => {
+		setViewPagerView(false);
+	};
+	const goViewPager = () => {
+		setViewPagerView(true);
+	};
+	const [viewPagerView, setViewPagerView] = useState(false);
 	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
 	return (
 		<TimeTableContainer>
@@ -177,6 +177,14 @@ export default function Timetable({navigation, route}: any) {
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 				</TimetableScrollView>
 			</ScrollVIewContainer>
+
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerView}
+				onRequestClose={() => setViewPagerView(false)}>
+				<ViewPager handleFunction={goBack} timetable={true} />
+			</Modal>
 		</TimeTableContainer>
 	);
 }

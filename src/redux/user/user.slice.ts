@@ -35,10 +35,8 @@ export const couponCheck = createAsyncThunk(
 	'/marketing/useCoupon',
 	async (data: {couponCode: string; functionToken: number}, {rejectWithValue}) => {
 		try {
-			console.log(data.couponCode);
 			const response = await axiosAuth.patch('/marketing/useCoupon', data);
-			console.log(response);
-			return response;
+			return response.data;
 		} catch (err: any) {
 			return rejectWithValue(err.response.data);
 		}
@@ -131,6 +129,9 @@ const userSlice = createSlice({
 			return {...initialUserState};
 		});
 		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {
+			state.functionToken = payload.functionToken;
+		});
+		builder.addCase(couponCheck.fulfilled, (state, {payload}) => {
 			state.functionToken = payload.functionToken;
 		});
 	},
