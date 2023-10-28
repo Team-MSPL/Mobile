@@ -51,6 +51,7 @@ function App(): JSX.Element {
 				'userToken',
 				'loginProvider',
 			]);
+			console.log(userName, userProfileImage, userToken, loginProvider);
 			if (userToken && userName && loginProvider) {
 				dispatch(
 					socialConnect({

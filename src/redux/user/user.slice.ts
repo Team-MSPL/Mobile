@@ -107,7 +107,7 @@ const userSlice = createSlice({
 		setAnonymous(state) {
 			state.isLogin = true;
 			state.userId = 'x';
-			state.userName = '익명';
+			state.userName = '나그네';
 			state.userProfileImage = '';
 			state.userJwtToken = '';
 			state.functionToken = 0;

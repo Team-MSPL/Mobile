@@ -38,8 +38,10 @@ export default function LoginScreen({navigation}: any) {
 		dispatch(userSliceActions.setAnonymous());
 		navigation.replace('Tab');
 	};
-	const {anonymousKeep} = useAppSelector(state => state.userSlice);
-
+	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
+	useEffect(() => {
+		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
+	}, [isLogin]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
 		const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -72,7 +74,7 @@ export default function LoginScreen({navigation}: any) {
 					nickname: userInfo.nickname,
 				});
 			} else {
-				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
+				anonymousKeep && navigation.goBack();
 			}
 		} catch (err) {
 			console.log(err);
@@ -107,7 +109,7 @@ export default function LoginScreen({navigation}: any) {
 					nickname: userInfo.user.name,
 				});
 			} else {
-				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
+				anonymousKeep && navigation.goBack();
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
@@ -179,7 +181,7 @@ export default function LoginScreen({navigation}: any) {
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
+					anonymousKeep && navigation.goBack();
 				}
 			} else {
 				console.log('안드로이드다!!');
@@ -214,7 +216,7 @@ export default function LoginScreen({navigation}: any) {
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
+					anonymousKeep && navigation.goBack();
 				}
 			}
 		} catch (error) {

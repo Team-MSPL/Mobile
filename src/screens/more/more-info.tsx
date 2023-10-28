@@ -83,6 +83,7 @@ export default function MoreInfo({navigation}: any) {
 		);
 	};
 	const goLogin = () => {
+		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
 	};
 	const goBack = () => {
@@ -121,7 +122,7 @@ export default function MoreInfo({navigation}: any) {
 					<ProfileImage source={{uri: userProfileImage}}></ProfileImage>
 				)}
 				<ProfileNameText>
-					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
+					{userName} {socialloginProvider != 'anonymous' && socialloginProvider}
 				</ProfileNameText>
 				{socialloginProvider != 'anonymous' && (
 					<ProfileChangeContainer onPress={changeInfo}>

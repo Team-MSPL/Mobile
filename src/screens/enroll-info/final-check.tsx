@@ -50,7 +50,7 @@ export default function FinalCheck({navigation}: any) {
 		if (socialloginProvider == 'anonymous') {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalTitle: '로그인 없이는 이용 불가합니다',
 					modalSubTitle: '로그인 하러 가시겠습니까?',
 					modalFunction: goNewLogin,
 					modalLeft: true,
