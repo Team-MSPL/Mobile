@@ -18,14 +18,7 @@ import {
 	IconContainer,
 } from '../my-travel-list/detail-info';
 import {SvgCoffee, SvgHome} from '../../utill/svg/svg';
-import {
-	TimeContainer,
-	ASD,
-	TimeItemContainer,
-	TimeStepText,
-	TimeItemText,
-	DayPressable,
-} from '../enroll-info/select-day';
+import {TimeContainer, TimeItemContainer, TimeStepText, TimeItemText, DayPressable} from '../enroll-info/select-day';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 
@@ -161,23 +154,21 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			</DayContainer>
 
 			<TimeContainer>
-				<ASD>
-					{[...Array(2)].map((item, idx) => (
-						<TimeItemContainer key={idx}>
-							<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-							<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-							<HStack>
-								<DayElementContainer>
-									<TimeItemText>
-										{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
-										{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
-										{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
-									</TimeItemText>
-								</DayElementContainer>
-							</HStack>
-						</TimeItemContainer>
-					))}
-				</ASD>
+				{[...Array(2)].map((item, idx) => (
+					<TimeItemContainer key={idx}>
+						<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
+						<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
+						<HStack>
+							<DayElementContainer>
+								<TimeItemText>
+									{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
+									{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
+									{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
+								</TimeItemText>
+							</DayElementContainer>
+						</HStack>
+					</TimeItemContainer>
+				))}
 			</TimeContainer>
 
 			<SearchContainer>
@@ -281,7 +272,7 @@ const MainContainer = styled.View`
 	padding: 10px;
 `;
 const DayElementContainer = styled(DayPressable).attrs({as: View})`
-	width: 80%;
+	width: 100%;
 `;
 const SearchContainer = styled.View`
 	width: 100%;

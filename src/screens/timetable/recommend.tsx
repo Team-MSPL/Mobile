@@ -226,17 +226,17 @@ export default function Recommend({navigation, route}: any) {
 										{item.place_name}
 									</RecommendElementText>
 								</RecommendView>
-								{/* <CategoryText color={idx == select ? 'white' : 'black'}>
+								<CategoryText color={idx == select ? 'white' : 'black'}>
 									{item.category_name.slice(6, item.category_name.length)}
-									{'>'}
+									{/* {'>'}
 									{Math.floor(
 										useDistance({
 											departure: departure.current,
 											arrival: {lat: item.y, lng: item.x},
 										}) * 1000,
 									)}
-									m{recommendItem[route.params.index - 1].name}기준
-								</CategoryText> */}
+									m{recommendItem[route.params.index - 1].name}기준 */}
+								</CategoryText>
 							</ListVStack>
 							<RecommendInfoTouchableOpacity
 								onPress={() => {
@@ -295,6 +295,7 @@ const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
 `;
 const CategoryText = styled(RecommendElementText)`
 	font-size: 14px;
+	font-weight: 500;
 `;
 const KakaoMapInfoView = styled.View`
 	flex-direction: row;

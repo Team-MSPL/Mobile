@@ -5,6 +5,7 @@ import {networkSliceActions} from '../network/networkSlice';
 import {modalSliceActions} from '../modal/modalSlice';
 
 const axiosAuth = axios.create({
+	//baseURL:'http://3.37.54.226',
 	baseURL: __DEV__ ? API_ROUTE : API_ROUTE_RELEASE,
 	headers: {
 		'content-type': 'application/json',

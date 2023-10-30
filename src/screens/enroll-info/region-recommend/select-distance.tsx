@@ -89,7 +89,7 @@ export default function SelectDistance({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='거리민감도 성정' subText='Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
+			<StepText mainText='거리민감도 설정' subText='Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
 			<DistanceCenter>
 				<DistanceText>{range}</DistanceText>
 				<Slider
@@ -106,7 +106,7 @@ export default function SelectDistance({navigation}: any) {
 				/>
 				<DistanceSpace>
 					<DistanceExplain>내 근처</DistanceExplain>
-					<DistanceExplain>남한 전체</DistanceExplain>
+					<DistanceExplain>한국 전체</DistanceExplain>
 				</DistanceSpace>
 			</DistanceCenter>
 			<DistanceDivider />

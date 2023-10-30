@@ -34,6 +34,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			multiple: true,
 			mediaType: 'photo',
 			cropping: true,
+			compressImageQuality: 0.1,
 			includeBase64: true,
 		}).then(response => {
 			const temporaryList = [];

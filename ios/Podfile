@@ -40,6 +40,8 @@ target 'DanimMobile' do
   pod 'react-native-version-check', :path => '../node_modules/react-native-version-check'
   # pod 'GoogleUtilities', :modular_headers => true
   pod 'Firebase/Core', '~> 10.0'
+  pod 'FirebaseAuth' 
+  pod 'FirebaseFirestore'
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
   flags = get_default_flags()

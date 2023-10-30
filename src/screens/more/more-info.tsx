@@ -75,12 +75,7 @@ export default function MoreInfo({navigation}: any) {
 		navigation.navigate('Coupon');
 	};
 	const handleInquire = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '아래 이메일로 문의주세요',
-				modalSubTitle: 'wayfarers0814@gmail.com',
-			}),
-		);
+		navigation.navigate('Inquire');
 	};
 	const goLogin = () => {
 		dispatch(userSliceActions.reset());
@@ -98,7 +93,6 @@ export default function MoreInfo({navigation}: any) {
 			title: '공지사항',
 			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
 		},
-		// {title: '도움말', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}))},
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},

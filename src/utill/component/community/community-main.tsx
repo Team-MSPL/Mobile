@@ -187,11 +187,13 @@ const PostWriterProfileImage = styled.Image`
 const PostWriterText = styled.Text`
 	font-size: 12px;
 	font-weight: 400;
+	color: black;
 `;
 const PostTitleText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	margin-vertical: 8px;
+	color: black;
 `;
 const PostDetailInfoContainer = styled.View`
 	flex-direction: row;

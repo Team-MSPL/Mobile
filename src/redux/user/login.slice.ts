@@ -9,6 +9,7 @@ const initialState: LiteState = {
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
 		console.log('왔긴한데', data.userName, data.userProfileImage);
+		console.log('dpdpdp', axiosAuth.getUri());
 		console.log(axiosAuth.getUri());
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,

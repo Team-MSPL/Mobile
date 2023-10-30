@@ -54,6 +54,18 @@ export const updateFunctionToken = createAsyncThunk(
 		}
 	},
 );
+//이용권관리
+export const inquiryEnroll = createAsyncThunk(
+	'/inquiry/inquiry',
+	async (data: {userName: string; inquire: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post('/inquiry/inquiry', data);
+			return data;
+		} catch (err: any) {
+			throw rejectWithValue(err.response.data);
+		}
+	},
+);
 
 //사용자 프로필 변경하기
 export const updateProfile = createAsyncThunk(
