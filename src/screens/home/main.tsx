@@ -1,6 +1,5 @@
 import {useEffect} from 'react';
 import {Dimensions, Platform} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
@@ -142,7 +141,7 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: soloMaking,
-			image: require('../../../public/images/han_river.png'),
+			image: require('../../../public/images/note.png'),
 			text: `${userName}님, \n직접 만들고 싶나요?`,
 			boldText: '직접 일정 만들기',
 			icon: 'pluscircle',
@@ -150,7 +149,7 @@ export default function Main({navigation}: any) {
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: require('../../../public/images/bukchon_hanok.png'),
+			image: require('../../../public/images/route.png'),
 			text: `${userName}님, \n다님과 떠나볼까요?`,
 			boldText: '여행 일정 만들기',
 			icon: 'pluscircle',
@@ -158,7 +157,7 @@ export default function Main({navigation}: any) {
 		{
 			id: 3,
 			onPress: regionRecommend,
-			image: require('../../../public/images/busan.jpg'),
+			image: require('../../../public/images/map.png'),
 			text: '어디로 떠날지\n고민중이신가요?',
 			boldText: '지역 추천 받기',
 			icon: 'arrowright',
@@ -168,15 +167,12 @@ export default function Main({navigation}: any) {
 	const buttonRenderItem = ({item}: {item: ButtonListType}) => {
 		return (
 			<NewTravelButton onPress={item.onPress} key={item.id}>
-				<NewTravelButtonImage source={item.image}>
-					<ButtonGradient
-						start={{x: 0.5, y: 1}}
-						end={{x: 0.5, y: 0.5}}
-						colors={[`${colors.selectButton}`, 'transparent']}>
-						<NewTravelButtonText>{item.text}</NewTravelButtonText>
-						<NewTravelButtonBoldText>{item.boldText}</NewTravelButtonBoldText>
-					</ButtonGradient>
-				</NewTravelButtonImage>
+				<NewTravelButtonImage source={item.image} />
+				<NewTravelButtonTextContainer>
+					<NewTravelButtonDescriptionText>{item.text}</NewTravelButtonDescriptionText>
+					<NewTravelButtonTitleText>{item.boldText}</NewTravelButtonTitleText>
+				</NewTravelButtonTextContainer>
+				<RightArrowIcon name='right' size={24} color={'#ccc'} />
 			</NewTravelButton>
 		);
 	};
@@ -201,9 +197,10 @@ export default function Main({navigation}: any) {
 						data={buttonList}
 						renderItem={buttonRenderItem}
 						sliderWidth={devicesWidth * 0.9}
-						itemWidth={devicesHeight * 0.3}
+						itemWidth={devicesWidth * 0.75}
 						loop={false}
 						firstItem={1}
+						contentContainerCustomStyle={{alignItems: 'center', justifyContent: 'center'}}
 					/>
 				</ButtonContainer>
 				{/* <BoldDivider></BoldDivider> */}
@@ -269,41 +266,45 @@ const BannerEmoji = styled.Text`
 
 const ButtonContainer = styled.View`
 	align-items: center;
+	justify-content: center;
+	align-self: center;
+	width: ${devicesWidth * 0.9}px;
+	aspect-ratio: 2;
 	margin-bottom: 48px;
 `;
-const ButtonGradient = styled(LinearGradient)`
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	height: 100%;
-	padding: 12px;
-	justify-content: flex-end;
-`;
+
 const NewTravelButton = styled.TouchableOpacity`
-	border-radius: 12px;
-	overflow: hidden;
+	aspect-ratio: 2;
+	flex-direction: row;
+	padding-vertical: ${devicesWidth * 0.02}px;
+	padding-horizontal: ${devicesWidth * 0.05}px;
+	align-items: center;
+	border-radius: 16px;
+	background-color: ${colors.main};
+	${Platform.OS === 'android' ? 'elevation: 4;' : 'box-shadow: 0px 2px 4px #ccc;'}
 `;
 const NewTravelButtonImage = styled.ImageBackground`
-	width: ${devicesHeight * 0.4}px;
+	width: ${devicesHeight * 0.07}px;
 	aspect-ratio: 1;
 	border-radius: 12px;
 	overflow: hidden;
+	margin-right: ${devicesWidth * 0.05}px;
 `;
-const NewTravelButtonText = styled.Text`
-	color: white;
+const NewTravelButtonTextContainer = styled.View`
+	justify-content: center;
+	flex-direction: column;
+	width: ${devicesWidth * 0.4}px;
+`;
+const NewTravelButtonDescriptionText = styled.Text`
+	color: black;
 	font-size: ${devicesWidth * 0.04}px;
 	font-weight: thin;
+	margin-bottom: ${devicesWidth * 0.02}px;
 `;
-const NewTravelButtonBoldText = styled.Text`
-	color: white;
+const NewTravelButtonTitleText = styled.Text`
+	color: black;
 	font-size: ${devicesWidth * 0.05}px;
 	font-weight: bold;
-`;
-const NewTravelButtonIcon = styled(Icon)`
-	margin-left: auto;
-	margin-right: 12px;
 `;
 
 const RightArrowIcon = styled(Icon)``;
