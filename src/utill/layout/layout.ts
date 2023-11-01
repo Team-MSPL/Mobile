@@ -1,6 +1,6 @@
+import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {colors} from '../colors';
-import {Dimensions} from 'react-native';
 
 export const devicesWidth = Dimensions.get('window').width;
 export const devicesHeight = Dimensions.get('window').height;
