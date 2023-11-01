@@ -635,6 +635,10 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
+  - AppsFlyerFramework (6.12.2):
+    - AppsFlyerFramework/Main (= 6.12.2)
+  - AppsFlyerFramework/Main (6.12.2)
+  - Base64 (1.1.2)
   - boost (1.76.0)
   - BoringSSL-GRPC (0.0.24):
     - BoringSSL-GRPC/Implementation (= 0.0.24)
@@ -644,6 +648,11 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.24)
   - BVLinearGradient (2.8.3):
     - React-Core
+  - CodePush (8.1.0):
+    - Base64 (~> 1.1)
+    - JWT (~> 3.0.0-beta.12)
+    - React-Core
+    - SSZipArchive (~> 2.2.2)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.72.4)
   - FBReactNativeSpec (0.72.4):
@@ -867,6 +876,8 @@ PODS:
   - hermes-engine (0.72.4):
     - hermes-engine/Pre-built (= 0.72.4)
   - hermes-engine/Pre-built (0.72.4)
+  - JWT (3.0.0-beta.14):
+    - Base64 (~> 1.1.2)
   - kakao-login (5.3.0):
     - KakaoSDKAuth (= 2.11.1)
     - KakaoSDKCommon (= 2.11.1)
@@ -1200,6 +1211,9 @@ PODS:
   - React-jsinspector (0.72.4)
   - React-logger (0.72.4):
     - glog
+  - react-native-appsflyer (6.12.2):
+    - AppsFlyerFramework (= 6.12.2)
+    - React
   - react-native-date-picker (4.2.14):
     - React-Core
   - react-native-geolocation-service (5.3.1):
@@ -1414,12 +1428,14 @@ PODS:
   - RNVectorIcons (10.0.0):
     - React-Core
   - SocketRocket (0.6.1)
+  - SSZipArchive (2.2.3)
   - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
+  - CodePush (from `../node_modules/react-native-code-push`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
@@ -1447,6 +1463,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-appsflyer (from `../node_modules/react-native-appsflyer`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
@@ -1496,6 +1513,8 @@ SPEC REPOS:
     - abseil
     - Alamofire
     - AppAuth
+    - AppsFlyerFramework
+    - Base64
     - BoringSSL-GRPC
     - Firebase
     - FirebaseAnalytics
@@ -1519,6 +1538,7 @@ SPEC REPOS:
     - gRPC-Core
     - GTMAppAuth
     - GTMSessionFetcher
+    - JWT
     - KakaoSDKAuth
     - KakaoSDKCommon
     - KakaoSDKShare
@@ -1530,6 +1550,7 @@ SPEC REPOS:
     - PromisesObjC
     - RecaptchaInterop
     - SocketRocket
+    - SSZipArchive
     - TOCropViewController
 
 EXTERNAL SOURCES:
@@ -1537,6 +1558,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   BVLinearGradient:
     :path: "../node_modules/react-native-linear-gradient"
+  CodePush:
+    :path: "../node_modules/react-native-code-push"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   FBLazyVector:
@@ -1587,6 +1610,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-appsflyer:
+    :path: "../node_modules/react-native-appsflyer"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
   react-native-geolocation-service:
@@ -1683,9 +1708,12 @@ SPEC CHECKSUMS:
   abseil: 926fb7a82dc6d2b8e1f2ed7f3a718bce691d1e46
   Alamofire: 0123a34370cb170936ae79a8df46cc62b2edeb88
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
+  AppsFlyerFramework: 6eb4d89d2eb9a6632317f1055b359d9fd85fd5ff
+  Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
+  CodePush: 255d7607f428dcbec39085f81a206b170e01d012
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: 5d4a3b7f411219a45a6d952f77d2c0a6c9989da5
   FBReactNativeSpec: 3fc2d478e1c4b08276f9dd9128f80ec6d5d85c1f
@@ -1714,6 +1742,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   hermes-engine: 81191603c4eaa01f5e4ae5737a9efcf64756c7b2
+  JWT: ef71dfb03e1f842081e64dc42eef0e164f35d251
   kakao-login: 3d7afeb8d49d4fa9a3ee579edb1b68c65bf20dac
   KakaoSDKAuth: bb2dfa7be30daa8403c9cfc8001aa6fde7a5b779
   KakaoSDKCommon: 555e1bb46595b842ded01cf7888cc17bbae4e113
@@ -1741,6 +1770,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: c7f826e40fa9cab5d37cab6130b1af237332b594
   React-jsinspector: aaed4cf551c4a1c98092436518c2d267b13a673f
   React-logger: da1ebe05ae06eb6db4b162202faeafac4b435e77
+  react-native-appsflyer: 202a3a36d7fabe9f36198b45f952b1a91f9b27a0
   react-native-date-picker: 8847cb359cf259ddae5ed165217e15573a654519
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-google-maps: dd12cdd86b8e3fedbbb671676aedaa2f656e2ccd
@@ -1779,15 +1809,16 @@ SPEC CHECKSUMS:
   RNGoogleSignin: ccaa4a81582cf713eea562c5dd9dc1961a715fd0
   RNIap: 99a559a3642155b47aa0622f9693632010a0b4f7
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
-  RNPermissions: 09010ab77268f92c9d34d8ab696532d6cdb8c2a3
+  RNPermissions: f1b49dd05fa9b83993cd05a9ee115247944d8f1a
   RNReanimated: 726395a2fa2f04cea340274ba57a4e659bc0d9c1
   RNScreens: b21dc57dfa2b710c30ec600786a3fc223b1b92e7
   RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
   RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
 
 PODFILE CHECKSUM: 4e1ec157fe99d4aa2435b863aa7131007926b190
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.13.0
