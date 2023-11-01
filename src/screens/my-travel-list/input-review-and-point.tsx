@@ -10,7 +10,7 @@ import {
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
 import shortId from 'shortid';
-import {Alert, TouchableOpacity, Image, TextInput, View} from 'react-native';
+import {Alert, TouchableOpacity, Image, TextInput, View, Pressable, Keyboard} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -28,7 +28,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [reviewValue, setReviewValue] = useState('');
-	const [pointValue, setPointValue] = useState(-1);
+	const [pointValue, setPointValue] = useState(5);
 	const [tedencyPointList, setTedencyPointList] = useState<number[][]>(
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
@@ -77,7 +77,10 @@ export default function InputReviewAndPoint({navigation}: any) {
 		}, []),
 	);
 	return (
-		<ReviewAndPointContainer>
+		<ReviewAndPointContainer
+			onPress={() => {
+				Keyboard.dismiss();
+			}}>
 			<MainText>이 여행 코스는 어떠셨나요?</MainText>
 			<HStack>
 				{[...Array(5)].map((item, idx) => (
@@ -93,6 +96,8 @@ export default function InputReviewAndPoint({navigation}: any) {
 			<MainText>어떤 점이 좋았나요?</MainText>
 			<RatingReview
 				placeholder='좋았던 점을 남겨주세요'
+				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
 				value={reviewValue}
 				onChangeText={(value: string) => changeReview(value)}></RatingReview>
 
@@ -111,7 +116,11 @@ export default function InputReviewAndPoint({navigation}: any) {
 												changeTendencyPoint({index: index, iindex: iindex, inex: inex});
 											}}>
 											<SvgStart
-												color={idx <= pointValue ? colors.selectButton : colors.emptyStart}
+												color={
+													inex <= tedencyPointList[index][iindex]
+														? colors.selectButton
+														: colors.emptyStart
+												}
 											/>
 										</RatingElement>
 									))}
@@ -130,7 +139,8 @@ const reviewTendencyList = [
 	{title: '계절이 언제인가?', multi: true, list: ['봄', '여름', '가을', '겨울']},
 ];
 
-const ReviewAndPointContainer = styled(MainContainer).attrs({as: View})`
+const ReviewAndPointContainer = styled(MainContainer).attrs({as: Pressable})`
+	flex: 1;
 	align-items: center;
 `;
 const RatingReview = styled(DiaryTextInput)`

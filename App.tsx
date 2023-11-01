@@ -5,34 +5,38 @@
  * @format
  */
 
-import React, {useEffect, useLayoutEffect, useRef} from 'react';
-import {BackHandler, Linking, StatusBar, useColorScheme, NativeModules} from 'react-native';
+import React, {useEffect, useLayoutEffect} from 'react';
+import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
-import {Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
+import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NavigationContainer, NavigationContainerRef} from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
+import {NavigationContainer} from '@react-navigation/native';
+import appsFlyer from 'react-native-appsflyer';
+import CodePush from 'react-native-code-push';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
 import {modalSliceActions} from './src/redux/modal/modalSlice';
+import {networkSliceActions} from './src/redux/network/networkSlice';
 import {getOneTravelCourse, travelSliceActions} from './src/redux/travel-info/travel.slice';
 import {socialConnect} from './src/redux/user/login.slice';
 import {userSliceActions} from './src/redux/user/user.slice';
+import Connection from './src/screens/network/connection';
 import StackNavigator from './src/stacks';
 import BaseModal from './src/utill/base-modal';
 import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
-import CodePush from 'react-native-code-push';
-
-import appsFlyer from 'react-native-appsflyer';
+import useVersion from './src/utill/hooks/useVersion';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
+	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -136,6 +140,7 @@ function App(): JSX.Element {
 			}
 		});
 	};
+
 	const checkFirstLaunch = async () => {
 		try {
 			const firstLaunch = await AsyncStorage.getItem('isFirstLaunch');
@@ -150,13 +155,18 @@ function App(): JSX.Element {
 		}
 	};
 	const {checkInitialPermission} = usePermission();
-
+	const setNetInfoEvent = () => {
+		NetInfo.addEventListener(state => {
+			const networkConnection = !!state.isConnected;
+			dispatch(networkSliceActions.setNetworkConn(networkConnection));
+		});
+	};
 	appsFlyer.initSdk(
 		{
 			devKey: Appsflyer_key,
 			isDebug: false,
-			appId: 'com.danimmobile',
-			onInstallConversionDataListener: true, //Optional
+			appId: Appsflyer_ios_id,
+			onInstallConversionDataListener: false, //Optional
 			onDeepLinkListener: true, //Optional
 			timeToWaitForATTUserAuthorization: 10, //for iOS 14.5
 		},
@@ -167,13 +177,14 @@ function App(): JSX.Element {
 			console.error(error);
 		},
 	);
-	const {hasPermission} = useAppSelector((state: RootState) => state.settingSlice);
+	const {hasPermission, noPermission} = useAppSelector((state: RootState) => state.settingSlice);
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
 	};
+	const {checkVersion} = useVersion();
 	useEffect(() => {
 		checkInitialPermission();
-	}, [hasPermission]);
+	}, [hasPermission, noPermission]);
 	useLayoutEffect(() => {
 		getDeepLink();
 	}, []);
@@ -181,6 +192,11 @@ function App(): JSX.Element {
 		getAllKeys();
 		checkFirstLaunch();
 		lottieHide();
+		checkVersion();
+		setNetInfoEvent();
+		// return () => {
+		// 	setNetInfoEvent();
+		// };
 	}, []);
 	const linking = {
 		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],
@@ -190,6 +206,10 @@ function App(): JSX.Element {
 			},
 		},
 	};
+	const handleFirstLaunch = async () => {
+		dispatch(userSliceActions.setIsFirstLaunch('false'));
+		await AsyncStorage.setItem('isFirstLaunch', 'true');
+	};
 	return (
 		<SafeAreaProvider>
 			<StatusBar
@@ -198,7 +218,14 @@ function App(): JSX.Element {
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
 			<NavigationContainer linking={linking}>
-				{isFirstLaunch == 'true' ? <ViewPager /> : hasPermission ? <StackNavigator /> : <NeedPermissions />}
+				{isFirstLaunch == 'true' ? (
+					<ViewPager handleFunction={handleFirstLaunch} />
+				) : hasPermission || noPermission ? (
+					<StackNavigator />
+				) : (
+					<NeedPermissions />
+				)}
+				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
 				{Boolean(isLoading) && <Loading />}
 			</NavigationContainer>

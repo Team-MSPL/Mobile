@@ -1,28 +1,33 @@
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
+import React, {useState} from 'react';
+import {Alert, SafeAreaView} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {savePost, savePostType, updatePost, updatePostType} from '../../redux/community/community.slice';
+import {communitySliceActions, getPostList, savePost, updatePost} from '../../redux/community/community.slice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
-import {PostImageIndicatorText, PostImageView} from './community-reading-screen';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
-	const goBack = () => {
-		navigation.goBack();
-	};
-	const [postTitle, setPostTitle] = useState<string>(route.params.title);
-	const [postContent, setPostContent] = useState<string>(route.params.content);
-	const [postImage, setPostImage] = useState<string[]>(route.params.images);
-	const [isNewPost, setIsNewPost] = useState<boolean>(route.params.isNewPost);
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
-	const {socialloginProvider} = useAppSelector(state => state.userSlice);
+	const {blockUserList} = useAppSelector(state => state.userSlice);
+	const {postData} = useAppSelector(state => state.communitySlice);
 
 	const dispatch = useAppDispatch();
 
+	const changeTitle = (e: string) => {
+		dispatch(communitySliceActions.setPostTitle(e));
+	};
+	const changeContent = (e: string) => {
+		dispatch(communitySliceActions.setPostContent(e));
+	};
+	const changeImage = (e: string[]) => {
+		dispatch(communitySliceActions.setPostImage(e));
+	};
 	// 사진 가져오기
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
@@ -35,134 +40,97 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			for (let i = 0; i < response.length; i++) {
 				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
 			}
-			setPostImage(temporaryList);
+			changeImage(temporaryList);
 		});
 	};
-
-	// * 게시글 등록
-	const handlePostSubmit = () => {
-		console.log('야야양야야', postTitle);
-		if (postTitle.trim() === '') {
-			Alert.alert('제목을 입력해주세요');
-			console.log(postTitle);
-			return;
-		}
-
-		if (postContent.trim() === '') {
-			Alert.alert('내용을 입력해주세요');
-			console.log('내용을 입력해주세요.');
-			return;
-		}
-
-		if (postImage.length > 10) {
-			Alert.alert('최대 10장까지만 사진을 업로드할 수 있습니다.');
-			console.log('사진 업로드 제한', '최대 10장까지만 사진을 업로드할 수 있습니다.');
-			return;
-		}
+	const handleRefresh = async () => {
 		try {
-			const newPostData: savePostType = {
-				postTitle: postTitle,
-				postContent: postContent,
-				postImage: postImage,
-				postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-			};
+			dispatch(communitySliceActions.resetPostList());
+			await dispatch(getPostList({page: 1, sort: 1, blockList: blockUserList}));
+			navigation.popToTop();
+		} catch {
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
+		}
+	};
+	// * 게시글 등록
+	const handlePostSubmit = async () => {
+		if (postData.postTitle.trim() === '') {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '제목을 입력해주세요'}));
+			return;
+		}
 
-			const updatePostData: updatePostType = {
-				postId: route.params.postId,
-				postTitle: postTitle,
-				postContent: postContent,
-				postImage: postImage,
-				// TODO 게시글을 수정하면 수정한 시간 뜨게 하기
-				//postedAt: moment(Date()).format('yy/MM/DD HH:mm:ss'),
-			};
-			if (isNewPost) {
-				dispatch(savePost(newPostData))
-					.then(() => {
-						Alert.alert('게시글이 등록되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
-					})
-					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
-					});
+		if (postData.postContent.trim() === '') {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '내용을 입력해주세요'}));
+			return;
+		}
+
+		if (postData.postImage.length > 5) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '업로드 제한',
+					modalSubTitle: '사진은 최대 5장까지 가능합니다.',
+				}),
+			);
+			return;
+		}
+
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			if (route.params.isNewPost) {
+				const data = {
+					postTitle: postData.postTitle,
+					postContent: postData.postContent,
+					postImage: postData.postImage,
+					postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
+				};
+				await dispatch(savePost(data));
 			} else {
-				console.log('여기 왔나');
-				console.log(route.params.postId);
-				dispatch(updatePost(updatePostData))
-					.then(() => {
-						Alert.alert('게시글이 수정되었습니다.');
-						console.log('글이 성공적으로 저장되었습니다.');
-					})
-					.catch(error => {
-						console.log('글을 저장하는 중에 오류가 발생했습니다:', error);
-					});
+				const data = {
+					postTitle: postData.postTitle,
+					postContent: postData.postContent,
+					postImage: postData.postImage,
+					postId: postData._id,
+				};
+				await dispatch(updatePost(data));
 			}
-			goBack();
+
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '등록',
+					modalSubTitle: '게시글이 등록되었습니다.',
+					modalFunction: handleRefresh,
+				}),
+			);
 		} catch (error) {
-			console.log('게시글 등록 중에 오류가 발생했습니다:', error);
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 
 	// 변화되는 인덱스
 	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-	// 초기 인덱스
-	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
-	const onSelect = (index: number) => {
-		setInitialImageIndex(index);
-		setCurrentImageIndex(index);
-		setIsImageModalVisible(index === 0 || !!index);
-	};
-
-	// 앱 바 우측 더보기
-	// useEffect(() => {
-	// 	navigation.setOptions({
-	// 		headerRight: () =>
-	// 			socialloginProvider != 'anonymous' && (
-	// 				<TouchableOpacity
-	// 					onPress={() => {
-	// 						handlePostSubmit();
-	// 					}}>
-	// 					<SubmitText>작성</SubmitText>
-	// 				</TouchableOpacity>
-	// 			),
-	// 	});
-	// }, []);
-
-	useEffect(() => {
-		setPostTitle(postTitle);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		//console.log('사진', postImage);
-	}, [postTitle]);
-	useEffect(() => {
-		setPostContent(postContent);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		//console.log('사진', postImage);
-	}, [postContent]);
-
-	useEffect(() => {
-		setPostImage(postImage);
-		console.log('제머고', postTitle);
-		console.log('내용', postContent);
-		console.log('사진', postImage);
-	}, [postImage]);
 
 	return (
-		<CommunityWritingContainer>
-			<CommunityWritingSafeAreaContainer>
+		<SafeAreaView>
+			<CommunityWritingContainer>
 				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
 				<TitleInput
 					placeholder='제목을 입력해주세요'
-					value={postTitle}
-					onChangeText={text => setPostTitle(text)}
+					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
+					value={postData.postTitle}
+					onChangeText={changeTitle}
 					multiline={true}
 				/>
 
 				<CommunityWritingTitleText>내용</CommunityWritingTitleText>
 				<ContentInput
-					placeholder='내용을 입력해주세요'
-					value={postContent}
-					onChangeText={text => setPostContent(text)}
+					placeholder='부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.'
+					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
+					value={postData.postContent}
+					onChangeText={changeContent}
 					multiline={true}
 				/>
 				<CommunityWritingTitleText>사진(최대 5장까지 가능합니다)</CommunityWritingTitleText>
@@ -171,11 +139,12 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						<ImageInputButtonText>사진 추가하기</ImageInputButtonText>
 						<ImageInputButtonIcon name='pluscircleo' />
 					</ImageInputButton>
-					{postImage.map((uri, index) => {
+					{postData.postImage.map((uri, index) => {
 						return (
 							<ImageWrapper
 								onPress={() => {
-									onSelect(index);
+									setCurrentImageIndex(index);
+									setIsImageModalVisible(true);
 								}}
 								key={index}>
 								<PostImage source={{uri: uri}} />
@@ -183,39 +152,35 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						);
 					})}
 					<ImageView
-						images={postImage.map(uri => ({uri}))}
-						imageIndex={initialImageIndex || 0}
+						images={postData.postImage.map(uri => ({uri}))}
+						imageIndex={currentImageIndex}
 						visible={isImageModalVisible}
-						onImageIndexChange={setCurrentImageIndex}
 						onRequestClose={() => {
 							setIsImageModalVisible(false);
 						}}
-						HeaderComponent={() => (
-							<PostImageView>
-								<PostImageIndicatorText>{`${currentImageIndex + 1}/${
-									postImage.length
-								}`}</PostImageIndicatorText>
-							</PostImageView>
-						)}
+						FooterComponent={index => {
+							return (
+								<ImageViewFooterComponent>
+									<ImageText>
+										{index.imageIndex + 1}/{postData.postImage.length}
+									</ImageText>
+								</ImageViewFooterComponent>
+							);
+						}}
 					/>
 				</ImageContainer>
 				<SubmitButton onPress={handlePostSubmit}>
 					<SubmitText>게시</SubmitText>
 				</SubmitButton>
-			</CommunityWritingSafeAreaContainer>
-		</CommunityWritingContainer>
+			</CommunityWritingContainer>
+		</SafeAreaView>
 	);
 }
 
 const CommunityWritingContainer = styled.ScrollView`
-	flex: 1;
-	background-color: white;
-	padding: 12px;
-`;
-
-// safearea 영역
-const CommunityWritingSafeAreaContainer = styled.SafeAreaView`
-	flex: 1;
+	background-color: ${colors.main};
+	padding-horizontal: 24px;
+	padding-vertical: 12px;
 `;
 
 const CommunityWritingTitleText = styled.Text`
@@ -285,4 +250,5 @@ const SubmitButton = styled.TouchableOpacity`
 	justify-content: center;
 	background-color: ${colors.selectButton};
 	width: 100%;
+	margin-bottom: 24px;
 `;

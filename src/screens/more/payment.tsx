@@ -1,7 +1,7 @@
-import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
+import {Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
-import {MainContainer, MainText} from '../../utill/layout/layout';
+import {updateFunctionToken} from '../../redux/user/user.slice';
+import {HStack, MainContainer, MainText, VStack} from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
 import {useEffect, useRef} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -9,24 +9,20 @@ import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import {useShopping} from '../../utill/hooks/useShopping';
+import {colors} from '../../utill/colors';
+import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
 export default function Payment({navigation}: any) {
-	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
-		state => state.userSlice,
-	);
+	const {functionToken} = useAppSelector(state => state.userSlice);
+	const {purchaseItems, requestItemPurchase} = useShopping();
 	useShopping();
-
-	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
-
-	const changeInfo = () => {
-		navigation.navigate('ChangeProfile');
-	};
-	const handlePayment = (e: number) => {
-		Alert.alert(`국민 950002-00-251241 ${e}원 보내세요.`);
-	};
 	const adUnitId = __DEV__ ? TestIds.REWARDED : Google_Ads_Key;
 	const rewardedRef = useRef<RewardedAd | null>(null);
-
+	const viewList = [
+		{title: '5', before: 5000, after: 1000},
+		{title: '10', before: 10000, after: 2000},
+		{title: '20', before: 20000, after: 3000},
+	];
 	useEffect(() => {
 		// 광고 생성
 		const rewarded = RewardedAd.createForAdRequest(adUnitId, {
@@ -44,7 +40,9 @@ export default function Payment({navigation}: any) {
 		// 라워드를 받았을 때 이벤트 리스너
 		const unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, reward => {
 			rewarded.removeAllListeners();
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
+			navigation.goBack();
 		});
 
 		rewarded.load();
@@ -58,42 +56,109 @@ export default function Payment({navigation}: any) {
 		if (rewardedRef.current !== null) {
 			rewardedRef?.current?.loaded
 				? rewardedRef.current.show()
-				: dispatch(modalSliceActions.setOpenModal({modalTitle: '광고가 없습니다.'}));
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '광고가 없습니다.',
+							modalSubTitle: '잠시 후 다시 시도해주세요',
+						}),
+				  );
 		}
 	};
+	const itemSkus: any = Platform.select({
+		android: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+		ios: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+	});
 	return (
 		<MainContainer>
-			<SettingElement onPress={openAd}>
-				<MainText>광고보고 토큰 받기</MainText>
-			</SettingElement>
+			<TitleText>
+				코인을 구매하고, 다님의 다양한 기능을 즐겨보세요!{'\n'}여행 지역 추천 또는 여행 코스 추천 AI를 사용하실
+				수 있습니다.
+			</TitleText>
 			<DayViewContainer>
-				<TouchableOpacity style={{marginVertical: 10}} onPress={openAd}>
-					<MainText>광고보기</MainText>
-					<MainText>1개 </MainText>
+				<TouchableOpacity style={{marginVertical: 2}} onPress={openAd}>
+					<HStack>
+						<TotalContainer>
+							<TotalText>1</TotalText>
+						</TotalContainer>
+						<InfoContainer>
+							<InfoText>1개 - 광고보상</InfoText>
+							<BonusText>수령 가능</BonusText>
+						</InfoContainer>
+						<SvgRightAdd width={30} height={30} color={'black'} />
+					</HStack>
 				</TouchableOpacity>
 			</DayViewContainer>
-			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! 결제는 빠른시일내에 적용할 예정입니다.</MainText>
-			{paymentViewList.map((item, idx) => (
-				<DayViewContainer>
+			{viewList?.map((item, idx) => (
+				<DayViewContainer key={idx}>
 					<TouchableOpacity
-						key={idx}
-						style={{marginVertical: 10}}
+						style={{marginVertical: 2}}
 						onPress={() => {
-							handlePayment(item.pay);
+							//console.log(item);
+							requestItemPurchase(itemSkus[idx]);
 						}}>
-						<MainText>{item.title}</MainText>
-						<MainText>{item.pay}원 입니다</MainText>
+						<HStack>
+							<TotalContainer>
+								<TotalText>{item.title}</TotalText>
+							</TotalContainer>
+							<InfoContainer>
+								<HStack>
+									<MoneyText>
+										{Platform.OS == 'ios' ? Math.floor(item.before * 1.1) : item.before}원
+									</MoneyText>
+									<SvgRight color='black' />
+									<InfoText>
+										{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
+									</InfoText>
+								</HStack>
+								<HStack>
+									<BonusText>출시 오픈 기념 세일 진행 중</BonusText>
+								</HStack>
+							</InfoContainer>
+							<SvgRightAdd width={30} height={30} color={'black'} />
+						</HStack>
 					</TouchableOpacity>
 				</DayViewContainer>
 			))}
 		</MainContainer>
 	);
 }
-const paymentViewList = [
-	{title: 5, pay: 1000},
-	{title: 10, pay: 2000},
-	{title: 20, pay: 3000},
-];
-const SettingElement = styled.TouchableOpacity`
-	margin: 12px 0px 12px 0px;
+const TotalContainer = styled.View`
+	width: 20%;
+	border-radius: 99px;
+	padding: 5px;
+	background-color: ${colors.selectButton};
+	align-items: center;
+	justify-content: center;
+	border-width: 1px;
+	border-color: ${colors.regionNormal};
+	margin: 0px 10px 0px 0px;
+`;
+const TotalText = styled.Text`
+	font-size: 25px;
+	font-weight: bold;
+	color: white;
+`;
+const InfoText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: black;
+`;
+const MoneyText = styled(InfoText)`
+	font-size: 13px;
+	color: grey;
+	text-decoration: line-through;
+`;
+const BonusText = styled.Text`
+	font-size: 13px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const InfoContainer = styled(VStack)`
+	width: 60%;
+`;
+const TitleText = styled(InfoText)`
+	font-size: 13px;
+	font-weight: 900;
+	line-height: 20px;
+	margin: 0px 0px 30px 0px;
 `;

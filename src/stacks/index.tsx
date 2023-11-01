@@ -103,7 +103,7 @@ function TabBar() {
 							/>
 						</View>
 					),
-					title: '내여행',
+					title: '내 여행',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
@@ -137,7 +137,7 @@ function TabBar() {
 							/>
 						</View>
 					),
-					title: '다님',
+					title: '내 정보',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}

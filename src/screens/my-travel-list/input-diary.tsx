@@ -135,6 +135,8 @@ export default function InputDiary({navigation}: any) {
 			<DiaryTextInput
 				value={diaryValue}
 				multiline={true}
+				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
 				placeholder='여행 일기로 추억을 기록해보세요'
 				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
 

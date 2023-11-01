@@ -16,11 +16,13 @@ export default function MapInfo({navigation, route}: any) {
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
 	const viewRef = useRef(0);
+	const [selectPinIndex, setSecletPinIndex] = useState(-1);
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
+		setSecletPinIndex(e);
 		mapRef.current?.animateCamera(
 			{
 				center: {
@@ -67,6 +69,8 @@ export default function MapInfo({navigation, route}: any) {
 						key={`marker_${idx}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
+						pinColor={idx == selectPinIndex ? 'yellow' : 'red'}
+						//icon={{uri: '../../../public/images/busan.jpg',width:'10',height:'10'}}
 					/>
 				);
 			}
@@ -159,7 +163,7 @@ export default function MapInfo({navigation, route}: any) {
 						),
 				)}
 
-				<DayContainer>
+				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 					{timetable.map(
 						(item, idx) =>
 							item.length != 0 && (
@@ -209,6 +213,7 @@ export default function MapInfo({navigation, route}: any) {
 														goNavigation(index);
 													}}>
 													<PlaceText>이동</PlaceText>
+													<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
 												</MoveContainer>
 											)}
 									</DayElementContainer>
@@ -225,20 +230,22 @@ export default function MapInfo({navigation, route}: any) {
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-export const DayContainer = styled.View`
-	flex-direction: row;
-	flex-wrap: wrap;
+export const DayContainer = styled.ScrollView`
+	height: 80px;
 `;
 const PlaceText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	color: black;
 `;
-export const DayButton = styled(PresetButton)<{select: boolean}>`
+export const DayButton = styled(PresetButton)`
+	width: 130px;
+	height: 60px;
 	border-radius: 15px;
-	padding: 3%;
+	padding: 10px;
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
 	align-items: center;
+	justify-content: center;
 `;
 
 export const DayTitle = styled(PlaceText)<{select: boolean}>`
@@ -246,7 +253,7 @@ export const DayTitle = styled(PlaceText)<{select: boolean}>`
 `;
 export const DaySubTitle = styled(DayTitle)`
 	font-weight: 500;
-	font-size: 14px;
+	font-size: 12px;
 `;
 export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
@@ -268,6 +275,8 @@ const MoveContainer = styled.TouchableOpacity`
 	width: 100%;
 	padding: 5%;
 	align-items: center;
+	justify-content: space-around;
+	flex-direction: row;
 `;
 const PlaceContainer = styled(MoveContainer)`
 	flex-direction: row;

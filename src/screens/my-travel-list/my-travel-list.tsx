@@ -1,24 +1,23 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback} from 'react';
+import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {TouchableOpacity} from 'react-native';
 
-import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {DayViewContainer} from '../enroll-info/select-multi';
+import moment from 'moment';
 import styled from 'styled-components/native';
-import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import {DayViewContainer} from '../enroll-info/select-multi';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
 
 	const dispatch = useAppDispatch();
-	const [view, setView] = useState(0);
 	const goMyTravelDetail = async (e: string) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -139,6 +138,7 @@ const NewTravelContainer = styled.View`
 `;
 const NewTravelHStack = styled(HStack)`
 	justify-content: space-between;
+	margin: 10px 0px 0px 0px;
 `;
 const MainText = styled.Text`
 	font-size: 22px;
@@ -174,6 +174,7 @@ const SubTitleColorText = styled(MainText)`
 const SubTitleBlackText = styled(MainText)`
 	font-size: 17px;
 	color: black;
+	font-weight: 500;
 `;
 export const DayText = styled.Text`
 	font-size: 17px;

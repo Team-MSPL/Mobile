@@ -1,6 +1,9 @@
 import styled from 'styled-components/native';
 import {colors} from '../colors';
+import {Dimensions} from 'react-native';
 
+export const devicesWidth = Dimensions.get('window').width;
+export const devicesHeight = Dimensions.get('window').height;
 export const HStack = styled.View`
 	display: inline-block;
 	flex-direction: row;
@@ -27,7 +30,7 @@ export const Divider = styled.View`
 
 export const MainContainer = styled.ScrollView`
 	background-color: ${colors.main};
-	padding: 0px 20px 20px 20px;
+	padding: 0px 24px 24px 24px;
 `;
 export const MainText = styled.Text`
 	font-size: 22px;
@@ -41,6 +44,31 @@ export const SubText = styled.Text`
 `;
 export const Center = styled.View`
 	width: 100%;
+	align-items: center;
+	justify-content: center;
+`;
+export const HeaderContianer = styled(HStack)`
+	justify-content: space-between;
+`;
+export const HeaderText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+	margin: 0px 5px;
+`;
+export const InputWrap = styled.View`
+	flex-direction: row;
+	align-self: center;
+	justify-content: center;
+	display: flex;
+	width: 100%;
+	margin: 0px 0px 20px 0px;
+	border-width: 1px;
+	border-radius: 8px;
+	height: 50px;
+`;
+export const ClearTouchableOpacity = styled.TouchableOpacity`
+	width: 20%;
 	align-items: center;
 	justify-content: center;
 `;

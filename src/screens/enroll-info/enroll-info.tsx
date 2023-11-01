@@ -8,7 +8,7 @@ import SelectCity from './select-city';
 import SelectMulti from './select-multi';
 import {colors} from '../../utill/colors';
 import SelectDistance from './select-distance';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 export default function EnrollInfo({navigation}: any) {
@@ -16,10 +16,8 @@ export default function EnrollInfo({navigation}: any) {
 	const changeComponent = (e: number) => {
 		setViewComponent(e);
 	};
-	const pfpfp = () => {
-		console.log('한ㄴ영ㅇ');
-	};
 	const [checKStep, setCheckStep] = useState(0);
+	const {regionRecommendFlag} = useAppSelector(state => state.travelSlice);
 	const goNextStep = () => {
 		setViewComponent(viewComponent + 1);
 		checKStep == viewComponent && setCheckStep(viewComponent + 1);
@@ -91,11 +89,14 @@ export default function EnrollInfo({navigation}: any) {
 			),
 		},
 	];
+	const viewComponentList = regionRecommendFlag
+		? enrollComponentList.filter(item => item.title != '지역')
+		: enrollComponentList;
 	return (
 		<MainContainer>
 			<TitleViewContainer>
 				<ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
-					{enrollComponentList.map((item, idx) => (
+					{viewComponentList.map((item, idx) => (
 						<TitleContainer
 							key={idx}
 							select={viewComponent == idx}
@@ -111,7 +112,7 @@ export default function EnrollInfo({navigation}: any) {
 					))}
 				</ScrollView>
 			</TitleViewContainer>
-			{enrollComponentList[viewComponent].component}
+			{viewComponentList[viewComponent].component}
 		</MainContainer>
 	);
 }
@@ -136,6 +137,6 @@ const TitleContainer = styled.TouchableOpacity<{select: boolean; isDisabledOpaci
 `;
 const TitleViewText = styled.Text<{select: boolean; isDisabledOpacity: boolean}>`
 	font-size: 17px;
-	color: ${props => (props.select ? 'white' : props.isDisabledOpacity ? 'black' : colors.TextPrimary)};
+	color: ${props => (props.select ? 'white' : props.isDisabledOpacity ? '#CBCBCB' : colors.TextPrimary)};
 	font-weight: bold;
 `;

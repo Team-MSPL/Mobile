@@ -1,45 +1,58 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {RadioButtonProps, RadioGroup} from 'react-native-radio-buttons-group';
-import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
-import {Alert} from 'react-native';
+import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useFocusEffect} from '@react-navigation/native';
 import {HStack, MainContainer, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {SvgCheck} from '../../../utill/svg/svg';
-import TendencyButton from '../../../utill/component/tendency-button';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
+import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
+import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
-
+	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const {tendency, distance, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const [selectedId, setSelectedId] = useState(0);
 	const goPayment = async () => {
-		Alert.alert('결제창');
+		navigation.navigate('Payment');
 	};
 	const changeSelectId = (e: number) => {
 		setSelectedId(e);
 	};
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
-		if (socialloginProvider == 'anonymous') {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
+			let data = radioButtons[selectedId].id * 20;
+			let datas = {
+				selectList: tendency,
+				selectPopular: [data, data],
+				recentPosition: {lat: lat, lng: lng},
+				distanceSensitivity: distance,
+			};
+			const result = await dispatch(regionSearch(datas)).unwrap();
+			if (result.length != 0) {
+				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				navigation.popToTop();
+				navigation.navigate('RegionViewResult');
+			} else {
+				dispatch(modalSliceActions.setOpenModal({modalSubTitle: '적절한 여행지를 찾지못하였습니다.'}));
+			}
+		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '익명 로그인으로는 이용 불가합니다',
-					modalSubTitle: '로그인 하러 가시겠습니까?',
-					modalFunction: goNewLogin,
-					modalLeft: true,
+					modalTitle: '에러',
+					modalSubTitle: '추천을 받는 중 에러가 발생했습니다.',
 				}),
 			);
-		} else {
-			let data = radioButtons[selectedId].id * 20;
-			//dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-			dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
-			navigation.popToTop();
-			navigation.navigate('RegionViewResult');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	const radioButtons = [
@@ -81,49 +94,49 @@ export default function SelectPopularity({navigation}: any) {
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
-	// const checkToken = () => {
-	// 	if (socialloginProvider == 'anonymous') {
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: '익명 로그인으로는 이용 불가합니다',
-	// 				modalSubTitle: '로그인 하러 가시겠습니까?',
-	// 				modalFunction: goNewLogin,
-	// 				modalLeft: true,
-	// 			}),
-	// 		);
-	// 	} else {
-	// 		functionToken >= 1
-	// 			? dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
-	// 						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
-	// 						modalFunction: goNext,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  )
-	// 			: dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
-	// 						modalFunction: goPayment,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  );
-	// 	}
-	// };
-
+	useFocusEffect(
+		useCallback(() => {
+			if (signUpReward) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원가입 축하드립니다',
+						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
+						modalFunction: checkSignUpReward,
+					}),
+				);
+			}
+		}, [signUpReward]),
+	);
+	const checkToken = () => {
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '익명 로그인으로는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			functionToken >= 1
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '이용권이 하나 소모됩니다. 실행하시겠습니까?',
+							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+							modalFunction: goNext,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+							modalFunction: goPayment,
+							modalLeft: true,
+						}),
+				  );
+		}
+	};
+	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<MainContainer>
 			<StepText mainText='인기도 선택' subText='가고자 하는 여행지의 느낌을 선택해주세요.' />
@@ -139,7 +152,7 @@ export default function SelectPopularity({navigation}: any) {
 				</PopularButton>
 			))}
 			<ExplainText>{radioButtons[selectedId].explain}</ExplainText>
-			<CustomButton label='추천받기' onPress={goNext}></CustomButton>
+			<CustomButton label='추천받기' onPress={checkToken}></CustomButton>
 		</MainContainer>
 	);
 }

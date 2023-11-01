@@ -94,15 +94,8 @@ export default function TimetableStack() {
 				name='Preset'
 				component={Preset}
 				options={{
-					headerLeft: () => (
-						<View style={{justifyContent: 'center'}}>
-							<Image
-								source={require('../../public/images/danim_logo_row.png')}
-								style={{height: 30, aspectRatio: 2.054}}
-							/>
-						</View>
-					),
 					headerBackVisible: false,
+					gestureEnabled: false,
 					title: '다님의 제안이에요',
 				}}
 			/>
@@ -152,7 +145,7 @@ export default function TimetableStack() {
 				name='EnrollTravelTitle'
 				component={EnrollTravelTitle}
 				options={{
-					title: '새여행',
+					title: '새 여행',
 				}}
 			/>
 		</Fragment>

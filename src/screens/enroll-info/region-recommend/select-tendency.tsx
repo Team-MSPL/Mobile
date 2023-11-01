@@ -1,7 +1,6 @@
 import {useState} from 'react';
-import {useAppDispatch, useAppSelector} from '../../../redux';
+import {useAppDispatch} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import SelectButton from '../../../utill/component/select-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {FlexWrap, MainContainer, HStack, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -9,6 +8,7 @@ import {TendencyStepText, TendencyText, TendencyContainer, TendencyElementContai
 import TendencyButton from '../../../utill/component/tendency-button';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
+import {ButtonContainer, MarginContainder} from '../select-multi';
 
 export default function SelectTendency({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -37,73 +37,46 @@ export default function SelectTendency({navigation}: any) {
 	};
 
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
-			<VStack>
-				{tendencyList.map((item, index) => {
-					return (
-						<TendencyContainer key={index}>
-							<TendencyStepText>Step {index + 1}</TendencyStepText>
-							<TendencyText>{item.title}</TendencyText>
-							<FlexWrap>
-								{item.list.map((data, idx) => {
-									return (
-										<TendencyElementContainer key={idx}>
-											<SvgCheck
-												color={
-													select[index][idx] == 1 ? colors.selectButton : colors.regionNormal
-												}
-											/>
-											<TendencyButton
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
+				<VStack>
+					{tendencyList.map((item, index) => {
+						return (
+							<TendencyContainer key={index}>
+								<TendencyStepText>Step {index + 1}</TendencyStepText>
+								<TendencyText>{item.title}</TendencyText>
+								<FlexWrap>
+									{item.list.map((data, idx) => {
+										return (
+											<TendencyElementContainer
 												key={idx}
-												label={data}
-												onPress={() => selectData({index, idx})}
-												bgColor={select[index][idx] == 1}></TendencyButton>
-										</TendencyElementContainer>
-									);
-								})}
-							</FlexWrap>
-						</TendencyContainer>
-					);
-				})}
-
+												onPress={() => selectData({index, idx})}>
+												<SvgCheck
+													color={
+														select[index][idx] == 1
+															? colors.selectButton
+															: colors.regionNormal
+													}
+												/>
+												<TendencyButton
+													key={idx}
+													label={data}
+													bgColor={select[index][idx] == 1}></TendencyButton>
+											</TendencyElementContainer>
+										);
+									})}
+								</FlexWrap>
+							</TendencyContainer>
+						);
+					})}
+				</VStack>
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
 				<CustomButton label={'다음 '} onPress={goNext}></CustomButton>
-			</VStack>
-		</MainContainer>
-		// <ScrollView bgColor='#EFFBFB' p='2'>
-		// 	{/* 스테퍼 넣기 */}
-		// 	<VStack space='5'>
-		// 		<Text fontSize='2xl' bold color='black'>
-		// 			추천 성향 설정
-		// 		</Text>
-		// 		<Text fontSize='md' color='grey'>
-		// 			어떤 스타일의 여행을 원하는가요?
-		// 		</Text>
-		// 		<Divider my='1' />
-		// 		{tendencyList.map((item, index) => {
-		// 			return (
-		// 				<Box key={index}>
-		// 					<Text fontSize='lg' bold>
-		// 						{item.title}
-		// 					</Text>
-		// 					<Box flexDir='row' flexWrap='wrap'>
-		// 						{item.list.map((data, idx) => {
-		// 							return (
-		// 								<SelectButton
-		// 									key={idx}
-		// 									label={data}
-		// 									onPress={() => selectData({index, idx})}
-		// 									bgColor={select[index][idx]}></SelectButton>
-		// 							);
-		// 						})}
-		// 					</Box>
-		// 				</Box>
-		// 			);
-		// 		})}
-
-		// 		<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
-		// 	</VStack>
-		// </ScrollView>
+			</ButtonContainer>
+		</>
 	);
 }
 

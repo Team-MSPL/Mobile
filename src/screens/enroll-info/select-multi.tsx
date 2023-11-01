@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack, Divider, devicesWidth} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -152,13 +152,13 @@ export const DayViewContainer = styled.View`
 
 const DayText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 	margin: 0px 10px 0px 0px;
 `;
 const DayInfoText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const ElementContainer = styled.TouchableOpacity`
@@ -180,7 +180,7 @@ const MultiAllContainer = styled.View`
 `;
 const MultiText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const MultiContainer = styled.View`
@@ -197,11 +197,11 @@ const MultiContainer = styled.View`
 `;
 const MultiElementText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 `;
 export const ButtonContainer = styled.View`
-	width: 100%;
+	width: ${devicesWidth}px;
 	background-color: rgba(255, 255, 255, 0.8);
 	position: absolute;
 	bottom: 0;

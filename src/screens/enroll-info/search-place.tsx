@@ -7,8 +7,8 @@ import shortId from 'shortid';
 import {GOOGLE_API_KEY} from '@env';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack, VStack} from '../../utill/layout/layout';
-import {TouchableOpacity} from 'react-native';
+import {HStack, VStack, devicesWidth} from '../../utill/layout/layout';
+import {Keyboard, TouchableOpacity} from 'react-native';
 import {SvgLoginLogo} from '../../utill/svg/svg';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
@@ -57,7 +57,10 @@ export default function SearchPlace({navigation, route}: any) {
 		</SearchClearContainer>
 	);
 	return (
-		<SearchPlaceContainer>
+		<SearchPlaceContainer
+			onPress={() => {
+				Keyboard.dismiss();
+			}}>
 			<SearchPlaceText>{SearchList[route.params.id].title}</SearchPlaceText>
 			<SearchPlaceSecondText>{SearchList[route.params.id].subTitle}</SearchPlaceSecondText>
 			{placeState && (
@@ -96,8 +99,15 @@ export default function SearchPlace({navigation, route}: any) {
 					components: 'country:kr',
 				}}
 				renderRightButton={clearButton}
+				textInputProps={{placeholderTextColor: 'grey'}}
 				styles={{
-					textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
+					textInputContainer: {
+						borderWidth: 1,
+						borderColor: colors.selectButton,
+						borderRadius: 10,
+					},
+					textInput: {margin: 1, color: 'black'},
+					listView: {position: 'relative'},
 				}}
 				fetchDetails={true}
 				onPress={async (data, details) => {
@@ -156,7 +166,7 @@ export const DefalutLogoContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-const SearchPlaceContainer = styled.View`
+const SearchPlaceContainer = styled.Pressable`
 	width: 100%;
 	padding: 10px;
 	flex: 1;
@@ -182,12 +192,12 @@ const SearchPlaceElementText = styled.Text`
 	flex-wrap: wrap;
 `;
 
-const SearchClearButton = styled.Text`
+export const SearchClearButton = styled.Text`
 	font-size: 17px;
 	font-weight: bold;
 	color: ${colors.selectButton};
 `;
-const SearchClearContainer = styled.View`
+export const SearchClearContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	margin: 0px 10px 0px 0px;

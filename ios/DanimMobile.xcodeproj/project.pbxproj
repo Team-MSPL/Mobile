@@ -12,12 +12,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		24898BBA054EC4C84F0CABBE /* Pods_DanimMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E06AFEE820299F9D13EA69 /* Pods_DanimMobile.framework */; };
+		6B001E9D2ADF7FCC009535FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B001E9C2ADF7FCC009535FC /* Assets.xcassets */; };
+		6B001E9F2ADF802E009535FC /* loading.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B001E9E2ADF802E009535FC /* loading.json */; };
 		6B11C9022A7A420C00A32397 /* Swift Bridging Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */; };
 		6B14E63E2A7B4ED10021332D /* AppDelegate.h in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FAF1A68108700A75B9A /* AppDelegate.h */; };
-		6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1D4B442A839D1E00920AAA /* Assets.xcassets */; };
 		6B7561B12A9C982900AB6832 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7561B02A9C982900AB6832 /* Dynamic.swift */; };
-		6B7561B62A9C9AA700AB6832 /* loading.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B7561B52A9C9AA700AB6832 /* loading.json */; };
 		6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */; };
+		6B987E8B2ACCEF9E0075567A /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B987E8A2ACCEF9E0075567A /* StoreKit.framework */; };
 		6BA4817B2A9DDE4800F08403 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6BA4817A2A9DDE4800F08403 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -42,9 +43,11 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DanimMobile/main.m; sourceTree = "<group>"; };
 		1806795ABFA7922C91013BE4 /* Pods-DanimMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2F52BBD6DFF2005D77C42206 /* Pods_DanimMobile_DanimMobileTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DanimMobile_DanimMobileTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3370DF1A2AE11B7A002B8BD4 /* react_native_kakao_share_link.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = react_native_kakao_share_link.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AA2825828FC86D4BC587BFE /* Pods-DanimMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.release.xcconfig"; sourceTree = "<group>"; };
+		6B001E9C2ADF7FCC009535FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = AppIcons/Assets.xcassets; sourceTree = "<group>"; };
+		6B001E9E2ADF802E009535FC /* loading.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = loading.json; sourceTree = "<group>"; };
 		6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Swift Bridging Header.swift"; sourceTree = "<group>"; };
-		6B1D4B442A839D1E00920AAA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6B2830B32AA876CF00B1F841 /* DanimMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = DanimMobile.entitlements; path = DanimMobile/DanimMobile.entitlements; sourceTree = "<group>"; };
 		6B38229C2A8248D700A1F0CF /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		6B38229D2A8248D700A1F0CF /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Solid.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
@@ -67,9 +70,9 @@
 		6B3822AE2A8248D700A1F0CF /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		6B45F0542A9C9D8700583285 /* DanimMobile-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DanimMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		6B7561B02A9C982900AB6832 /* Dynamic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dynamic.swift; sourceTree = "<group>"; };
-		6B7561B52A9C9AA700AB6832 /* loading.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = loading.json; path = ../../../Downloads/loading.json; sourceTree = "<group>"; };
 		6B83D4462A7B6B2300CBCBB3 /* RCTAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RCTAppDelegate.h; path = "../node_modules/react-native/Libraries/AppDelegate/RCTAppDelegate.h"; sourceTree = "<group>"; };
 		6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "DanimMobile/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6B987E8A2ACCEF9E0075567A /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6BA4817A2A9DDE4800F08403 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89D831737463844134328E87 /* Pods-DanimMobile-DanimMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6E427EBAF0F157A7DF7C3E /* Pods-DanimMobile-DanimMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile-DanimMobileTests.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile-DanimMobileTests/Pods-DanimMobile-DanimMobileTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -91,6 +94,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24898BBA054EC4C84F0CABBE /* Pods_DanimMobile.framework in Frameworks */,
+				6B987E8B2ACCEF9E0075567A /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,10 +121,10 @@
 		13B07FAE1A68108700A75B9A /* DanimMobile */ = {
 			isa = PBXGroup;
 			children = (
+				6B45F0542A9C9D8700583285 /* DanimMobile-Bridging-Header.h */,
 				6B2830B32AA876CF00B1F841 /* DanimMobile.entitlements */,
 				6BA4817A2A9DDE4800F08403 /* LaunchScreen.storyboard */,
-				6B45F0542A9C9D8700583285 /* DanimMobile-Bridging-Header.h */,
-				6B7561B52A9C9AA700AB6832 /* loading.json */,
+				6B001E9E2ADF802E009535FC /* loading.json */,
 				6B1D4B462A839D2600920AAA /* Images.xcassets */,
 				6B955B5F2A8397F4007A6EFE /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -136,6 +140,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3370DF1A2AE11B7A002B8BD4 /* react_native_kakao_share_link.framework */,
+				6B987E8A2ACCEF9E0075567A /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				D8E06AFEE820299F9D13EA69 /* Pods_DanimMobile.framework */,
 				2F52BBD6DFF2005D77C42206 /* Pods_DanimMobile_DanimMobileTests.framework */,
@@ -146,7 +152,7 @@
 		6B1D4B462A839D2600920AAA /* Images.xcassets */ = {
 			isa = PBXGroup;
 			children = (
-				6B1D4B442A839D1E00920AAA /* Assets.xcassets */,
+				6B001E9C2ADF7FCC009535FC /* Assets.xcassets */,
 			);
 			name = Images.xcassets;
 			sourceTree = "<group>";
@@ -318,9 +324,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B7561B62A9C9AA700AB6832 /* loading.json in Resources */,
 				6BA4817B2A9DDE4800F08403 /* LaunchScreen.storyboard in Resources */,
-				6B1D4B452A839D1E00920AAA /* Assets.xcassets in Resources */,
+				6B001E9D2ADF7FCC009535FC /* Assets.xcassets in Resources */,
+				6B001E9F2ADF802E009535FC /* loading.json in Resources */,
 				6B955B602A8397F4007A6EFE /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -541,6 +547,8 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				DEVELOPMENT_TEAM = 6A68QPK22L;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -569,7 +577,9 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 6A68QPK22L;
 				INFOPLIST_FILE = DanimMobileTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -598,7 +608,7 @@
 				CODE_SIGN_ENTITLEMENTS = DanimMobile/DanimMobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 6A68QPK22L;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DanimMobile/Info.plist;
@@ -607,7 +617,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
+					"$(inherited)",
+				);
+				MARKETING_VERSION = 1.1.0;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -633,7 +648,7 @@
 				CODE_SIGN_ENTITLEMENTS = DanimMobile/DanimMobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 6A68QPK22L;
 				INFOPLIST_FILE = DanimMobile/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "다님";
@@ -641,7 +656,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
+					"$(inherited)",
+				);
+				MARKETING_VERSION = 1.1.0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -713,15 +733,12 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SDKROOT)/usr/lib/swift\"",
-					"\"$(inherited)\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
@@ -786,15 +803,12 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SDKROOT)/usr/lib/swift\"",
-					"\"$(inherited)\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
