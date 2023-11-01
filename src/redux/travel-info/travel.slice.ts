@@ -423,6 +423,7 @@ export const travelSlice = createSlice({
 			state.editMode = '';
 			state.season = payload.season;
 			state.selectEndDate = payload.selectEndDate;
+			state.tendency = payload.tendency;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);

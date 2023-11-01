@@ -81,7 +81,7 @@ export const regionRecommendSliceActions = regionRecommendSlice.actions;
 export default regionRecommendSlice.reducer;
 
 interface LiteState {
-	tendency: boolean[][];
+	tendency: number[][];
 	distance: number;
 	popularity: number[];
 	lat: number;

@@ -12,7 +12,9 @@ import {SvgCancel, SvgPlace, SvgHome} from '../../utill/svg/svg';
 export default function SelectMulti({viewComponent, navigation, goNextStep}: any) {
 	const [accommodation, setAccommodation] = useState(false);
 	const [essential, setEssential] = useState(false);
-	const {nDay, day, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const goSearchPlace = (data: {idx: number; index: number}) => {
 		console.log(navigation);
@@ -39,15 +41,6 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
-	// const StyledHome = styled(Home)<{color: string}>`
-	// 	color: color;
-	// `;
-	// const StyledPlace = styled(Place)<{color: string}>`
-	// 	color: color;
-	// `;
-	// const StyledCancel = styled(Cancel)<{color: string}>`
-	// 	color: color;
-	// `;
 	const openEssential = () => {
 		setEssential(!essential);
 	};
@@ -132,7 +125,9 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 				<MarginContainder></MarginContainder>
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
+				<CustomButton
+					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

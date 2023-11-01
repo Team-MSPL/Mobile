@@ -47,10 +47,10 @@ export default function CommunityMainScreen({navigation}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderContianer>
-					<TouchableOpacity onPress={goSearch}>
+					<SearchTouchableOpacity onPress={goSearch}>
 						<HeaderText>검색</HeaderText>
 						{/* <IconContainer color={'black'} name='search1' size={24}></IconContainer> */}
-					</TouchableOpacity>
+					</SearchTouchableOpacity>
 				</HeaderContianer>
 			),
 		});
@@ -116,16 +116,9 @@ const CommunityMainContainer = styled.SafeAreaView`
 	height: 100%;
 	background-color: ${colors.main};
 `;
-const DropDownButton = styled(DropdownButton)`
-	width: 30%;
-	margin-horizontal: 24px;
-	margin-vertical: 12px;
-	shadow-color: #000;
-	shadow-offset: 1px 2px;
-	shadow-opacity: 0.25;
-	shadow-radius: 3.84px;
-	border: #ccc;
-	elevation: 5;
+const SearchTouchableOpacity = styled.TouchableOpacity`
+	width: 50%;
+	align-items: center;
 `;
 const IconContainer = styled(Icon)``;
 export const MenuIcon = styled(FeatherIcon)`

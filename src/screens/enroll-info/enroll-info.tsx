@@ -1,7 +1,6 @@
-import {HStack, VStack, Divider, FlexWrap} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import SelectDay from './select-day';
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import SelectTendency from './select-tendency';
 import {BackHandler, ScrollView} from 'react-native';
 import SelectCity from './select-city';
@@ -89,8 +88,9 @@ export default function EnrollInfo({navigation}: any) {
 			),
 		},
 	];
+	const blackList = ['지역', '성향'];
 	const viewComponentList = regionRecommendFlag
-		? enrollComponentList.filter(item => item.title != '지역')
+		? enrollComponentList.filter(item => !blackList.includes(item.title))
 		: enrollComponentList;
 	return (
 		<MainContainer>

@@ -182,16 +182,13 @@ export default function FinalCheck({navigation}: any) {
 						<SelectListText>선택 여행 성향</SelectListText>
 						<SelectTendencyListContainer>
 							{tendency.map((item, inx) => {
-								return (
-									inx !== tendency.length - 1 &&
-									item.map((q, a) => {
-										return q ? (
-											<SelectTendencyContainer key={a}>
-												<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
-											</SelectTendencyContainer>
-										) : null;
-									})
-								);
+								return item.map((q, a) => {
+									return q ? (
+										<SelectTendencyContainer key={a}>
+											<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
+										</SelectTendencyContainer>
+									) : null;
+								});
 							})}
 						</SelectTendencyListContainer>
 					</SelectListContainer>

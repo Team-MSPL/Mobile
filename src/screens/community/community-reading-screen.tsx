@@ -631,6 +631,7 @@ const PostWriterText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	margin-bottom: 4px;
+	color: black;
 `;
 const PostDetailInfoText = styled.Text`
 	font-size: 12px;
@@ -641,6 +642,7 @@ const PostTitleText = styled.Text`
 	font-size: 24px;
 	font-weight: bold;
 	margin-vertical: 8px;
+	color: black;
 `;
 const Divider = styled.View`
 	border-bottom-color: #ccc;
@@ -669,7 +671,7 @@ const ActiveDot = styled.View`
 	margin: 4px;
 `;
 // 사진을 누를 수 있게 하기 위한 componenet
-const PostImageWrapper = styled.TouchableOpacity`
+const PostImageWrapper = styled.Pressable`
 	width: 100%;
 	aspect-ratio: 1;
 `;
@@ -695,6 +697,7 @@ const PostContentContainer = styled.View`
 `;
 const PostContentText = styled.Text`
 	font-size: 16px;
+	color: black;
 `;
 
 // 게시글 좋아요 수 및 댓글 수
@@ -714,6 +717,7 @@ const HeartIcon = styled(AntDesignIcon)<{selected: boolean}>`
 `;
 const LikeCommentText = styled.Text`
 	font-size: 14px;
+	color: black;
 	margin-right: 12px;
 `;
 const CommentIcon = styled(FeatherIcon)`
@@ -750,6 +754,7 @@ const CommentWriterImage = styled.Image`
 const CommentWriterText = styled.Text`
 	font-size: 12px;
 	font-weight: bold;
+	color: black;
 `;
 const CommentMenu = styled.TouchableOpacity`
 	align-items: center;
@@ -762,9 +767,11 @@ const CommentMenuIcon = styled(FeatherIcon)`
 const CommentContent = styled.Text`
 	font-size: 16px;
 	margin-bottom: 8px;
+	color: black;
 `;
 const CommentInfoText = styled.Text`
 	font-size: 10px;
+	color: black;
 `;
 
 // 댓글 입력을 위해 전체 화면을 9:1로 나눈 곳 중 1인 영역

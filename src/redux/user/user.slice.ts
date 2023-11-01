@@ -67,6 +67,16 @@ export const inquiryEnroll = createAsyncThunk(
 	},
 );
 
+//회원 쪽지 조회
+export const getNoteList = createAsyncThunk('/user/noteList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get('/user/noteList');
+		return response.data;
+	} catch (err: any) {
+		throw rejectWithValue(err.response.data);
+	}
+});
+
 //사용자 프로필 변경하기
 export const updateProfile = createAsyncThunk(
 	'/updateProfile',

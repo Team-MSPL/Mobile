@@ -13,7 +13,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
 export default function SelectCity({viewComponent, goNextStep}: any) {
-	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
+	const {region, regionRecommendFlag, cityIndex} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
@@ -164,7 +164,9 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 				<MarginContainder />
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNext}></CustomButton>
+				<CustomButton
+					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

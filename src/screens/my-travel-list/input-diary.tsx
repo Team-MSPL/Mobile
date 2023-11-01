@@ -1,16 +1,15 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Alert, Platform, TextInput, TouchableOpacity, Image, BackHandler} from 'react-native';
+import {BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import moment from 'moment';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgPicture} from '../../utill/svg/svg';
+import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
 import {VStack} from '../../utill/layout/layout';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
@@ -90,6 +89,11 @@ export default function InputDiary({navigation}: any) {
 			}
 		});
 	};
+	const deletePicture = (e: number) => {
+		let copy = [...pictureValue];
+		copy.splice(e, 1);
+		setpictureValue(copy);
+	};
 	return (
 		<>
 			<PictureCotainer>
@@ -102,34 +106,16 @@ export default function InputDiary({navigation}: any) {
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
 						<PictureElementContainer key={idx}>
+							<CancelContainer
+								onPress={() => {
+									deletePicture(idx);
+								}}>
+								<SvgCancel color='white' width={13} height={13}></SvgCancel>
+							</CancelContainer>
 							<PictureElement source={{uri: item}}></PictureElement>
 						</PictureElementContainer>
 					))}
 				</PictureScroll>
-				{/* {pictureValue.length != 0 ? (
-					<>
-						<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
-							<PictureElementContainer onPress={handelGetImage}>
-								<PictuerVstack>
-									<SvgPicture color={colors.selectButton} />
-									<PictureText>사진 변경</PictureText>
-								</PictuerVstack>
-							</PictureElementContainer>
-							{pictureValue.map((item, idx) => (
-								<PictureElementContainer>
-									<PictureElement key={idx} source={{uri: item}}></PictureElement>
-								</PictureElementContainer>
-							))}
-						</PictureScroll>
-					</>
-				) : (
-					<PictureElementContainer onPress={handelGetImage}>
-						<PictuerVstack>
-							<SvgPicture color={colors.selectButton} />
-							<PictureText>사진 추가</PictureText>
-						</PictuerVstack>
-					</PictureElementContainer>
-				)} */}
 			</PictureCotainer>
 			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
 			<DiaryTextInput
@@ -148,6 +134,15 @@ export default function InputDiary({navigation}: any) {
 	);
 }
 
+const CancelContainer = styled.TouchableOpacity`
+	border-radius: 99px;
+	padding: 10px;
+	position: absolute;
+	right: -10px;
+	top: -10px;
+	background-color: black;
+	z-index: 3;
+`;
 const DiaryText = styled.Text`
 	font-size: 17px;
 	font-weight: bold;
@@ -164,7 +159,7 @@ export const DiaryTextInput = styled.TextInput`
 	padding: 10px;
 `;
 const PictureCotainer = styled.View`
-	height: 180px;
+	padding: 10px 0px;
 	width: 100%;
 	align-items: center;
 	margin: 15px 0px 15px 0px;
@@ -173,15 +168,14 @@ const PictureCotainer = styled.View`
 const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
-const PictureElementContainer = styled.TouchableOpacity`
+const PictureElementContainer = styled.Pressable`
 	width: 135px;
-	height: 180px;
 	border-radius: 10px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};
 	align-items: center;
 	justify-content: center;
-	margin: 0px 5px 0px 0px;
+	margin: 10px 10px 0px 0px;
 `;
 const PictureText = styled.Text`
 	margin: 10px 0px 0px 0px;

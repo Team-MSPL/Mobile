@@ -35,6 +35,7 @@ export default function SelectPopularity({navigation}: any) {
 				selectPopular: [data, data],
 				recentPosition: {lat: lat, lng: lng},
 				distanceSensitivity: distance,
+				version: 2,
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
 			if (result.length != 0) {

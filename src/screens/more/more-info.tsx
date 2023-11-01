@@ -77,6 +77,9 @@ export default function MoreInfo({navigation}: any) {
 	const handleInquire = () => {
 		navigation.navigate('Inquire');
 	};
+	const goNoteList = () => {
+		navigation.navigate('NoteList');
+	};
 	const goLogin = () => {
 		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
@@ -139,6 +142,9 @@ export default function MoreInfo({navigation}: any) {
 						</SettingElement>
 						<SettingElement onPress={goCoupon}>
 							<SettingElementText>쿠폰 입력하기</SettingElementText>
+						</SettingElement>
+						<SettingElement onPress={goNoteList}>
+							<SettingElementText>쪽지함</SettingElementText>
 						</SettingElement>
 					</SettingContainer>
 				</>

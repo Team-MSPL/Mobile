@@ -25,7 +25,7 @@ export default function Inquire({navigation}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '문의완료',
-					modalSubTitle: '빠른 시일 내에 답변드리겠습니다.',
+					modalSubTitle: '빠른 시일 내에 답변드리겠습니다.\n답변은 쪽지함에서 확인하실 수 있습니다.',
 					modalFunction: goBack,
 				}),
 			);

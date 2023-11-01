@@ -7,6 +7,7 @@ import PolicyMain from '../screens/more/policy-main';
 import Terms from '../screens/more/terms';
 import Coupon from '../screens/more/coupon';
 import Inquire from '../screens/more/inquire';
+import NoteList from '../screens/more/note-list';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -56,6 +57,13 @@ export default function MoreStack() {
 			<Stack.Screen
 				name='Inquire'
 				component={Inquire}
+				options={{
+					title: '문의 하기',
+				}}
+			/>
+			<Stack.Screen
+				name='NoteList'
+				component={NoteList}
 				options={{
 					title: '문의 하기',
 				}}

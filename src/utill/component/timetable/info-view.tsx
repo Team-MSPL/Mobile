@@ -100,8 +100,8 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 				lng: lng,
 				apiCategory: 'FD6',
 				radius: radius,
-				backupLat: timetable[e.idx][e.index - 1].lat,
-				backupLng: timetable[e.idx][e.index - 1].lng,
+				backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
+				backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
 			});
 		}
 	};

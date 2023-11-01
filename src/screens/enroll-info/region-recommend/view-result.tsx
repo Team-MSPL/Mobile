@@ -1,6 +1,6 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {BackHandler} from 'react-native';
+import {BackHandler, Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -30,6 +30,29 @@ export default function ViewResult({navigation}: any) {
 
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
+		navigation.setOptions({
+			headerLeft: () => (
+				<TouchableOpacity
+					onPress={() => {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '홈으로 이동시 데이터는 날라갑니다.',
+								modalSubTitle: '그래도 나가시겠습니까?',
+								modalFunction: () => {
+									navigation.popToTop();
+								},
+								modalLeft: true,
+							}),
+						);
+					}}
+					style={{justifyContent: 'center'}}>
+					<Image
+						source={require('../../../../public/images/danim_logo_row.png')}
+						style={{height: 30, aspectRatio: 2.054}}
+					/>
+				</TouchableOpacity>
+			),
+		});
 		return () => backHandler.remove();
 	}, []);
 	if (isLoading) return <MainContainer></MainContainer>;

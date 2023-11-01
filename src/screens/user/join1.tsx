@@ -35,7 +35,9 @@ export default function Join1({navigation, route}: any) {
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));
 			console.log(navigation);
-			anonymousKeep ? (navigation.goBack(), navigation.goBack()) : navigation.replace('Tab');
+			anonymousKeep
+				? (navigation.goBack(), navigation.goBack())
+				: (navigation.goBack(), navigation.replace('Tab'));
 		} catch (err) {
 			console.log('왜 이래', err);
 			dispatch(

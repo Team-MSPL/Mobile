@@ -1,4 +1,4 @@
-import {useRef, useState, useEffect, useCallback, useLayoutEffect, Fragment} from 'react';
+import {useRef, useState, useLayoutEffect, Fragment} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -19,8 +19,16 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	const IconElement = styled(Icon)``;
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
-	const {day, Place, timeLimitArray, minuteLimitArray, nDay, accommodations, selectStartDate, selectEndDate} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		day,
+		Place,
+		timeLimitArray,
+		minuteLimitArray,
+		regionRecommendFlag,
+		accommodations,
+		selectStartDate,
+		selectEndDate,
+	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -200,18 +208,13 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 						<PreviewText>
 							<PreviewBoldText>
 								{selectEndDate == null
-									? weekdays[selectStartDate.day()] +
-									  '요일 ' +
-									  String(timeLimitArray[1]).padStart(2, '0') +
-									  '시 ' +
-									  String(minuteLimitArray[1]).padStart(2, '0') +
-									  '분'
-									: weekdays[selectEndDate.day()] +
-									  '요일 ' +
-									  String(timeLimitArray[1]).padStart(2, '0') +
-									  '시 ' +
-									  String(minuteLimitArray[1]).padStart(2, '0') +
-									  '분'}
+									? weekdays[selectStartDate.day()]
+									: weekdays[selectEndDate.day()]}
+								{'요일 ' +
+									String(timeLimitArray[1]).padStart(2, '0') +
+									'시 ' +
+									String(minuteLimitArray[1]).padStart(2, '0') +
+									'분'}
 							</PreviewBoldText>
 							에 돌아와요 👈
 						</PreviewText>
@@ -240,6 +243,8 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 								showDayStragglers={false}
 								previousTitle='이전 달'
 								nextTitle='다음 달'
+								previousTitleStyle={{color: 'black'}}
+								nextTitleStyle={{color: 'black'}}
 								allowBackwardRangeSelect={true}
 								selectYearTitle='년도 선택'
 							/>
@@ -262,7 +267,9 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 				setVisible={setVisible}></UseDatePicker>
 
 			<ButtonContainer>
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
+				<CustomButton
+					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

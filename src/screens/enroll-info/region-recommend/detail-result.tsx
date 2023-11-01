@@ -18,7 +18,29 @@ import {
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {tendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = () => {
+		let copy = [...tendency];
+		let copy2 = [...tendency[2]];
+		if (copy2[4] == 1) {
+			copy2.push(1);
+			copy2.push(0);
+			copy2.push(1);
+			copy2.push(1);
+		} else {
+			copy2.push(0);
+			copy2.push(0);
+			copy2.push(0);
+			copy2.push(0);
+		}
+		copy[2] = copy2;
+		let copy3 = [...tendency[3]];
+		if (copy3[5] == 1) {
+			copy3[0] = 1;
+			copy3[1] = 1;
+			copy3[5] = 0;
+		}
+		copy[3] = copy3;
 		let selectEndDate = selectStartDate.clone().add(route.params.item.takenDay, 'days');
 		let region: string[] = [];
 		if (route.params.item.name.includes(' ')) {
@@ -27,16 +49,19 @@ export default function DetailResult({navigation, route}: any) {
 			region = [route.params.item.name, '전체'];
 		}
 		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		let season = Array(4).fill(0);
-		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
-		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		const data = {cityIndex: cityIndex, region: [region[1]], season: season, selectEndDate: selectEndDate};
-		// dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		let season = copy.pop();
+		const data = {
+			cityIndex: cityIndex,
+			region: [region[1]],
+			tendency: copy,
+			season: season,
+			selectEndDate: selectEndDate,
+		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const goDetail = (e: string) => {
-		const data = {name: e, lat: 0, lng: 0};
+	const goDetail = (e: {name: string; lat: number; lng: number}) => {
+		const data = {name: e.name, lat: e.lat, lng: e.lng};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	return (
@@ -71,7 +96,7 @@ export default function DetailResult({navigation, route}: any) {
 						<PopularityContainer
 							key={idx}
 							onPress={() => {
-								goDetail(item.name);
+								goDetail(item);
 							}}>
 							<IndexText>{idx + 1}</IndexText>
 							{item.photo != '' ? (

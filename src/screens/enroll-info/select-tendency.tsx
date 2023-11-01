@@ -10,7 +10,7 @@ import {SvgCheck} from '../../utill/svg/svg';
 import {ButtonContainer, MarginContainder} from './select-multi';
 import {TouchableOpacity} from 'react-native';
 export default function SelectTendency({setViewComponent, viewComponent, goNextStep}: any) {
-	const {transit, tendency} = useAppSelector(state => state.travelSlice);
+	const {transit, tendency, regionRecommendFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
 		let copy = [...tendency];
@@ -41,7 +41,10 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 						return (
 							<TendencyContainer key={index}>
 								<TendencyStepText>Step {index + 2}</TendencyStepText>
-								<TendencyText>{item.title}</TendencyText>
+								<HStack>
+									<TendencyText>{item.title}</TendencyText>
+									<MultiText> *중복 선택 가능</MultiText>
+								</HStack>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (
@@ -70,7 +73,9 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 				<MarginContainder />
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNextStep}></CustomButton>
+				<CustomButton
+					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
@@ -95,10 +100,15 @@ export const tendencyList = [
 	{
 		title: '어디를 가고싶으신가요?',
 		multi: true,
-		list: ['바다', '산', '드라이브코스', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+		list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
 	},
 ];
 
+export const MultiText = styled.Text`
+	color: ${colors.selectButton};
+	font-size: 13px;
+	margin: 0px 0px 0px 5px;
+`;
 export const TendencyText = styled.Text`
 	font-size: 20px;
 	font-weight: bold;

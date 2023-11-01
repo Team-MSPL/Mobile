@@ -4,7 +4,13 @@ import CustomButton from '../../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {FlexWrap, MainContainer, HStack, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
-import {TendencyStepText, TendencyText, TendencyContainer, TendencyElementContainer} from '../select-tendency';
+import {
+	TendencyStepText,
+	TendencyText,
+	TendencyContainer,
+	TendencyElementContainer,
+	MultiText,
+} from '../select-tendency';
 import TendencyButton from '../../../utill/component/tendency-button';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
@@ -45,7 +51,10 @@ export default function SelectTendency({navigation}: any) {
 						return (
 							<TendencyContainer key={index}>
 								<TendencyStepText>Step {index + 1}</TendencyStepText>
-								<TendencyText>{item.title}</TendencyText>
+								<HStack>
+									<TendencyText>{item.title}</TendencyText>
+									<MultiText>* 중복 선택 가능</MultiText>
+								</HStack>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (
@@ -84,22 +93,26 @@ const tendencyList = [
 	{
 		title: '누구와 떠나시나요?',
 		multi: true,
-		list: ['혼자여행', '커플 여행', '우정 여행', '가족 여행', '효도 여행', '어린 자녀와'],
+		list: ['혼자여행', '커플 여행', '우정 여행', '가족 여행', '효도 여행', '어린 자녀와', '반려동물과'],
 	},
-	{title: '테마는 무엇인가요?', multi: true, list: ['힐링', '에너제틱', '배움이 있는', '맛있는']},
 	{
-		title: '무엇을 하고싶으신가요?',
+		title: '테마는 무엇인가요?',
+		multi: true,
+		list: ['힐링', '에너제틱', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+	},
+	{
+		title: '무엇을 하고 싶으신가요?',
 		multi: true,
 		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '역사여행'],
 	},
 	{
-		title: '뭘하고싶나요?',
+		title: '어디를 가고 싶으신가요?',
 		multi: true,
-		list: ['바다', '산', '드라이브코스', '산책', '쇼핑', '자연경관', '시티투어', '지역축제', '전통한옥'],
+		list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통한옥'],
 	},
 	{
 		title: '무엇을 즐기고 싶나요?',
 		multi: true,
-		list: ['봄꽃', '여름피서', '가을단풍', '겨울스포츠,설경', '온천'],
+		list: ['봄', '여름', '가을', '겨울'],
 	},
 ];

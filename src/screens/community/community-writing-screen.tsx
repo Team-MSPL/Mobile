@@ -188,6 +188,7 @@ const CommunityWritingTitleText = styled.Text`
 	font-weight: bold;
 	font-size: 20px;
 	margin-bottom: 16px;
+	color: black;
 `;
 const TitleInput = styled.TextInput`
 	border: ${colors.border};
