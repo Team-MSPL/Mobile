@@ -2,23 +2,47 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import TendencyButton from '../../utill/component/tendency-button';
-import {FlexWrap, MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {FlexWrap, MainContainer, VStack, HStack} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgCheck} from '../../utill/svg/svg';
 import {ButtonContainer, MarginContainder} from './select-multi';
 import {TouchableOpacity} from 'react-native';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SelectTendency({setViewComponent, viewComponent, goNextStep}: any) {
 	const {transit, tendency, regionRecommendFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
-		let copy = [...tendency];
-		let copySecond = [...copy[index]];
-		copySecond[idx] = copySecond[idx] == 0 ? 1 : 0;
-		copy[index] = copySecond;
-		console.log(copy);
-		dispatch(travelSliceActions.enrollTendency(copy));
+		if (checkDialog({flag: tendency[index][idx], name: tendencyList[index].list[idx]})) {
+			let copy = [...tendency];
+			let copySecond = [...copy[index]];
+			copySecond[idx] = copySecond[idx] == 0 ? 1 : 0;
+			copy[index] = copySecond;
+			console.log(copy);
+			dispatch(travelSliceActions.enrollTendency(copy));
+		}
+	};
+	const checkDialog = ({flag, name}: {flag: number; name: string}) => {
+		if ((name == '실내여행지' && tendency[0][6]) || (tendency[3][5] && name == '반려동물과')) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '선택 불가',
+					modalSubTitle: '반려 동물과 실내여행지는 같이 선택할 수 없어요',
+				}),
+			);
+			return false;
+		} else {
+			if (name == '반려동물과' && flag == 0) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '주의사항',
+						modalSubTitle: '반려견 출입이 제한된 곳은 추천되지않아 관광지 수가 적을 수 있습니다.',
+					}),
+				);
+			}
+			return true;
+		}
 	};
 	return (
 		<>
@@ -43,7 +67,7 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 								<TendencyStepText>Step {index + 2}</TendencyStepText>
 								<HStack>
 									<TendencyText>{item.title}</TendencyText>
-									<MultiText> *중복 선택 가능</MultiText>
+									<MultiText> * 중복 선택, 선택 안 하셔도 됩니다.</MultiText>
 								</HStack>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
@@ -106,8 +130,7 @@ export const tendencyList = [
 
 export const MultiText = styled.Text`
 	color: ${colors.selectButton};
-	font-size: 13px;
-	margin: 0px 0px 0px 5px;
+	font-size: 10px;
 `;
 export const TendencyText = styled.Text`
 	font-size: 20px;

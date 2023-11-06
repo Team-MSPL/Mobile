@@ -18,7 +18,7 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 	useEffect(() => {
 		if (timetable ?? false) {
 			let copy = [...viewList];
-			setViewList(copy.slice(1, 3));
+			setViewList(copy.slice(2, 4));
 		}
 	}, []);
 	return (

@@ -21,7 +21,7 @@ export default function BaseModal() {
 			//transparent={true}
 			visible={modalOpen}
 			onRequestClose={close}>
-			<ModalContainer onPress={close}>
+			<ModalContainer onPress={() => {}}>
 				<ViewContaniner>
 					<Body>
 						<TitleText>{modalTitle}</TitleText>

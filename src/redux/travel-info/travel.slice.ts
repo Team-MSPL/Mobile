@@ -21,7 +21,7 @@ const initialState: LiteState = {
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
-	distance: 5, //거리민감도
+	distance: 5, //여행반경
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: tendencyList.map(item => {
 		return Array(item.list.length).fill(0);

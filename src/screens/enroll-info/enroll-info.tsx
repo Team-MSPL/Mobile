@@ -67,7 +67,7 @@ export default function EnrollInfo({navigation}: any) {
 			),
 		},
 		{
-			title: '여행요소',
+			title: '여행 요소',
 			component: (
 				<SelectMulti
 					navigation={navigation}
@@ -78,7 +78,7 @@ export default function EnrollInfo({navigation}: any) {
 			),
 		},
 		{
-			title: '거리민감도',
+			title: '여행 반경',
 			component: (
 				<SelectDistance
 					navigation={navigation}

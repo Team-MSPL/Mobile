@@ -53,7 +53,7 @@ export default function SelectTendency({navigation}: any) {
 								<TendencyStepText>Step {index + 1}</TendencyStepText>
 								<HStack>
 									<TendencyText>{item.title}</TendencyText>
-									<MultiText>* 중복 선택 가능</MultiText>
+									<MultiText>* 중복 선택 가능, 선택 안 하셔도 됩니다.</MultiText>
 								</HStack>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
@@ -93,7 +93,7 @@ const tendencyList = [
 	{
 		title: '누구와 떠나시나요?',
 		multi: true,
-		list: ['혼자여행', '커플 여행', '우정 여행', '가족 여행', '효도 여행', '어린 자녀와', '반려동물과'],
+		list: ['혼자여행', '커플 여행', '우정 여행', '가족 여행', '효도 여행', '어린 자녀와'],
 	},
 	{
 		title: '테마는 무엇인가요?',
@@ -111,7 +111,7 @@ const tendencyList = [
 		list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통한옥'],
 	},
 	{
-		title: '무엇을 즐기고 싶나요?',
+		title: '어느 계절에 가고 싶으신가요?',
 		multi: true,
 		list: ['봄', '여름', '가을', '겨울'],
 	},

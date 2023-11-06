@@ -11,6 +11,10 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
+import CustomButton from '../../utill/component/custom-button';
+import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
+import {SvgCancel} from '../../utill/svg/svg';
+import {usePhoto} from '../../utill/hooks/usePhoto';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -29,20 +33,14 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		dispatch(communitySliceActions.setPostImage(e));
 	};
 	// 사진 가져오기
-	const handleImagePickerLaunch = () => {
-		ImageCropPicker.openPicker({
-			multiple: true,
-			mediaType: 'photo',
-			cropping: true,
-			compressImageQuality: 0.1,
-			includeBase64: true,
-		}).then(response => {
-			const temporaryList = [];
-			for (let i = 0; i < response.length; i++) {
-				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
-			}
-			changeImage(temporaryList);
-		});
+	const {handleImagePickerLaunch} = usePhoto();
+	const handleImage = () => {
+		handleImagePickerLaunch({photoData: postData.postImage, changeFunction: changeImage});
+	};
+	const deletePicture = (idx: number) => {
+		let copy = [...postData.postImage];
+		copy.splice(idx, 1);
+		dispatch(communitySliceActions.setPostImage(copy));
 	};
 	const handleRefresh = async () => {
 		try {
@@ -55,26 +53,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	};
 	// * 게시글 등록
 	const handlePostSubmit = async () => {
-		if (postData.postTitle.trim() === '') {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '제목을 입력해주세요'}));
-			return;
-		}
-
-		if (postData.postContent.trim() === '') {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '내용을 입력해주세요'}));
-			return;
-		}
-
-		if (postData.postImage.length > 5) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '업로드 제한',
-					modalSubTitle: '사진은 최대 5장까지 가능합니다.',
-				}),
-			);
-			return;
-		}
-
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			if (route.params.isNewPost) {
@@ -136,20 +114,26 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				/>
 				<CommunityWritingTitleText>사진(최대 5장까지 가능합니다)</CommunityWritingTitleText>
 				<ImageContainer horizontal={true}>
-					<ImageInputButton onPress={handleImagePickerLaunch}>
+					<PictureElementContainer onPress={handleImage}>
 						<ImageInputButtonText>사진 추가하기</ImageInputButtonText>
 						<ImageInputButtonIcon name='pluscircleo' />
-					</ImageInputButton>
+					</PictureElementContainer>
 					{postData.postImage.map((uri, index) => {
 						return (
-							<ImageWrapper
+							<PictureElementContainer
 								onPress={() => {
 									setCurrentImageIndex(index);
 									setIsImageModalVisible(true);
 								}}
 								key={index}>
-								<PostImage source={{uri: uri}} />
-							</ImageWrapper>
+								<CancelContainer
+									onPress={() => {
+										deletePicture(index);
+									}}>
+									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+								</CancelContainer>
+								<PictureElement source={{uri: uri}} />
+							</PictureElementContainer>
 						);
 					})}
 					<ImageView
@@ -170,9 +154,11 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						}}
 					/>
 				</ImageContainer>
-				<SubmitButton onPress={handlePostSubmit}>
-					<SubmitText>게시</SubmitText>
-				</SubmitButton>
+				<CustomButton
+					label='게시'
+					onPress={handlePostSubmit}
+					width={100}
+					isDisabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}></CustomButton>
 			</CommunityWritingContainer>
 		</SafeAreaView>
 	);

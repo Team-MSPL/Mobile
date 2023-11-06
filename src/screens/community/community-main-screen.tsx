@@ -11,9 +11,9 @@ import CommunityMain from '../../utill/component/community/community-main';
 import ScrollButton from '../../utill/component/scroll-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function CommunityMainScreen({navigation}: any) {
-	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [currentPage, setCurrentPage] = useState(1);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
@@ -29,15 +29,6 @@ export default function CommunityMainScreen({navigation}: any) {
 	const [currentPostList, setCurrentPostList] = useState<postListType[]>(postList);
 
 	const [viewState, setViewState] = useState(false);
-	// 게시글 작성하는 화면으로 이동
-	const goCommunityWritingScreen = () => {
-		navigation.navigate('CommunityWritingScreen', {
-			title: '',
-			content: '',
-			images: [],
-			isNewPost: true,
-		});
-	};
 
 	const goSearch = () => {
 		navigation.navigate('CommunitySearch');
@@ -69,6 +60,7 @@ export default function CommunityMainScreen({navigation}: any) {
 	// 커뮤니티 정보 가져오기
 	const fetchCommunityData = async () => {
 		try {
+			dispatch(LoadingSliceActions.onLoading());
 			dispatch(communitySliceActions.resetPostList());
 			const response = await dispatch(
 				getPostList({page: currentPage, sort: sortOption, blockList: blockUserList}),
@@ -80,10 +72,10 @@ export default function CommunityMainScreen({navigation}: any) {
 				setTotalPages(currentPage); // 현재 페이지가 마지막 페이지임을 설정
 				console.log('현재가 마지막 페이지임');
 			}
-			setIsLoading(false);
 		} catch (error) {
-			setIsLoading(false);
 			console.log('DB로부터 게시글들을 읽어오는 중에 오류가 발생했습니다:', error);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 
@@ -103,11 +95,7 @@ export default function CommunityMainScreen({navigation}: any) {
 				placeholder={sortOptions.find(option => option.value === sortOption)?.label || ''}
 			/> */}
 
-			{isLoading ? (
-				<ActivityIndicator size='large' color='#0000ff' />
-			) : (
-				<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
-			)}
+			<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
 			{socialloginProvider != 'anonymous' && <ScrollButton viewState={viewState} navigation={navigation} />}
 		</CommunityMainContainer>
 	);
@@ -120,7 +108,6 @@ const SearchTouchableOpacity = styled.TouchableOpacity`
 	width: 50%;
 	align-items: center;
 `;
-const IconContainer = styled(Icon)``;
 export const MenuIcon = styled(FeatherIcon)`
 	font-size: 24px;
 	color: ${colors.selectButton};

@@ -21,6 +21,7 @@ export default function Join1({navigation, route}: any) {
 	const {anonymousKeep} = useAppSelector(state => state.userSlice);
 	const CheckLogoContainer = styled(Icon)`
 		border-radius: 5px;
+		margin: 0px 5px 0px 0px;
 	`;
 	const goSignUp = async () => {
 		try {
@@ -34,7 +35,6 @@ export default function Join1({navigation, route}: any) {
 			};
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));
-			console.log(navigation);
 			anonymousKeep
 				? (navigation.goBack(), navigation.goBack())
 				: (navigation.goBack(), navigation.replace('Tab'));
@@ -125,17 +125,19 @@ export default function Join1({navigation, route}: any) {
 				<TermsContainer>
 					{checkList.map((item, idx) => (
 						<CheckContainer>
-							<TouchableOpacity onPress={item.checkFunction}>
+							<CheckTouchableOpacity onPress={item.checkFunction}>
 								<CheckLogoContainer
 									name={'checkcircleo'}
 									size={25}
 									color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}
 								/>
-							</TouchableOpacity>
-							<CheckTouchableOpacity onPress={item.detaileFunction}>
 								<Text>{item.title}</Text>
-								<SvgRight color={'grey'} />
 							</CheckTouchableOpacity>
+							{idx != 0 && (
+								<PlusTouchableOpacity onPress={item.detaileFunction}>
+									<SvgRight color={'grey'} />
+								</PlusTouchableOpacity>
+							)}
 						</CheckContainer>
 					))}
 				</TermsContainer>
@@ -144,7 +146,9 @@ export default function Join1({navigation, route}: any) {
 		</JoinContainer>
 	);
 }
-
+const PlusTouchableOpacity = styled.TouchableOpacity`
+	padding: 5px;
+`;
 const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
 	flex: 1;
 `;
@@ -152,7 +156,6 @@ const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
 const CheckTouchableOpacity = styled.TouchableOpacity`
 	width: 80%;
 	flex-direction: row;
-	justify-content: space-between;
 	margin: 0px 0px 0px 5px;
 	align-items: center;
 `;
@@ -196,4 +199,5 @@ const CheckContainer = styled.View`
 	width: 100%;
 	align-items: center;
 	margin: 0px 0px 20px 0px;
+	justify-content: space-between;
 `;

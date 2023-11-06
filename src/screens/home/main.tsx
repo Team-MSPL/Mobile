@@ -85,11 +85,11 @@ export default function Main({navigation}: any) {
 		{
 			id: 2,
 			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
-			city: '목포',
-			title: '목포항',
+			city: '동해',
+			title: '묵호항',
 			hashtag: '#바다',
-			lat: 34.7807,
-			lng: 126.383,
+			lat: 37.5519,
+			lng: 129.1149,
 		},
 		{
 			id: 3,

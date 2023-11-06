@@ -19,10 +19,12 @@ function CommunityMain({
 	navigation,
 	setViewState,
 	searchState,
+	searchValue,
 }: {
 	navigation: any;
 	setViewState?: any;
 	searchState: boolean;
+	searchValue?: string;
 }) {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const [sortOption, setSortOption] = useState(1);
@@ -32,7 +34,6 @@ function CommunityMain({
 		{label: '좋아요 순 ', value: 2},
 		{label: '댓글 순', value: 3},
 	]);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const {postList, searchList} = useAppSelector(state => state.communitySlice);
 	const {blockUserList} = useAppSelector(state => state.userSlice);
 	const currentPage = useRef(2);
@@ -81,12 +82,22 @@ function CommunityMain({
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const handleRefresh = () => {
-		console.log('qwe');
-		setIsRefreshing(true); // 새로고침 시작
-		!searchState ? dispatch(communitySliceActions.resetPostList) : dispatch(communitySliceActions.resetSearchList);
+	const handleRefresh = async () => {
+		try {
+			setIsRefreshing(true); // 새로고침 시작
+			if (searchState) {
+				dispatch(communitySliceActions.resetSearchList());
 
-		fetchCommunityData().then(() => setIsRefreshing(false));
+				await dispatch(getSearchPostList({page: 1, sort: 1, blockList: blockUserList, search: searchValue}));
+			} else {
+				dispatch(communitySliceActions.resetPostList());
+				await dispatch(getPostList({page: 1, sort: 1, blockList: blockUserList}));
+			}
+		} catch {
+			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+			setIsRefreshing(false);
+		}
 	};
 	// 가져온 게시글 목록 UI
 	const renderPostItem = (data: {item: postListType}) => {

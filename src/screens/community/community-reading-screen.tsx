@@ -2,9 +2,9 @@ import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {
-	Alert,
 	Dimensions,
 	FlatList,
+	Keyboard,
 	NativeModules,
 	Platform,
 	RefreshControl,
@@ -13,15 +13,11 @@ import {
 	View,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import ImageView from 'react-native-image-viewing';
-import Swiper from 'react-native-swiper';
-import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	blockUser,
-	clickLike,
 	commentType,
 	communitySliceActions,
 	deleteComment,
@@ -33,7 +29,6 @@ import {
 	reportPostType,
 	saveComment,
 	saveCommentType,
-	unclickLike,
 } from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
 import {MenuIcon} from './community-main-screen';
@@ -41,6 +36,8 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
+import CommunityPost from '../../utill/component/community/community-post';
+import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 
 const {StatusBarManager} = NativeModules;
 
@@ -62,12 +59,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	const [commentContent, setCommentContent] = useState<string>('');
-	const [postImage, setPostImage] = useState<string[]>([]);
 	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
-	const [isImageMoreModalVisible, setMoreModalVisible] = useState<boolean>(false);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const {userId, userName, userProfileImage, socialloginProvider, blockUserList} = useAppSelector(
 		state => state.userSlice,
@@ -83,7 +77,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
 	const {postData} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
-
 	const communityReadingOptionActionSheet = useRef<ActionSheet>(null);
 	const reportPostActionSheet = useRef<ActionSheet>(null);
 	const commentOptionActionSheet = useRef<ActionSheet>(null);
@@ -231,10 +224,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const fetchPostData = async () => {
 		try {
 			await dispatch(getOnePost({postId: route.params.postId}));
-			if (postData.liker.includes(userId)) {
-				console.log('게시글 정보 가져오기에서의 좋아요 변화');
-				setIsLiked(true);
-			}
 			setIsLoading(false);
 			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
@@ -260,10 +249,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			};
 			await dispatch(saveComment(newCommentData));
 			// 댓글 등록 후 입력창 초기화
+			Keyboard.dismiss();
 			setCommentContent('');
-			dispatch(
-				modalSliceActions.setOpenModal({modalTitle: '등록 완료', modalSubTitle: '댓글이 등록되었습니다.'}),
-			);
+
 			await fetchPostData();
 		} catch (error) {
 			console.log('댓글 등록 중에 오류가 발생했습니다:', error);
@@ -286,29 +274,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const handleDeleteComment = async (commentId: string) => {
 		try {
 			await dispatch(deleteComment({postId: postData._id, commentId: commentId}));
-			dispatch(
-				modalSliceActions.setOpenModal({modalTitle: '성공', modalSubTitle: '댓글을 성공적으로 삭제했습니다.'}),
-			);
+
 			await fetchPostData();
 		} catch (error) {
 			console.log('댓글을 삭제하는 도중 에러가 발생했습니다.', error);
-		}
-	};
-
-	// * 좋아요 버튼을 눌렀을 때
-	const handleLikePress = async () => {
-		try {
-			if (isLiked) {
-				await dispatch(unclickLike({postId: route.params.postId}));
-				console.log('좋아요 취소를 하였습니다.');
-			} else {
-				await dispatch(clickLike({postId: route.params.postId}));
-				console.log('좋아요를 했습니다.');
-			}
-			await fetchPostData();
-			setIsLiked(!isLiked);
-		} catch (error) {
-			console.log('좋아요에 오류가 발생했습니다:', error);
 		}
 	};
 
@@ -426,17 +395,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		onPress: [() => commentDeleteCheckAlert(commentData._id), () => showReportActionSheet(), doNothing],
 	};
 
-	// 변화되는 인덱스
-	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-	// 초기 인덱스
-	const [initialImageIndex, setInitialImageIndex] = useState<number | null>(null);
-	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
-	const onSelect = (index: number) => {
-		setInitialImageIndex(index);
-		setCurrentImageIndex(index);
-		setIsImageModalVisible(index === 0 || !!index);
-	};
-
 	return (
 		<CommunityReadingContainer>
 			<ActionSheet
@@ -444,15 +402,19 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				title={'글 메뉴'}
 				options={
 					userId === postData.postWriterUserId
-						? communityReadingMenuOptionList.options
+						? communityReadingMenuOptionList.options.filter(
+								item => item === '수정' || item === '삭제' || item === '취소',
+						  )
 						: communityReadingMenuOptionList.options.filter(
 								item => item === '신고' || item === '차단' || item === '취소',
 						  )
 				}
-				cancelButtonIndex={userId == postData.postWriterUserId ? 4 : 2}
+				cancelButtonIndex={userId == postData.postWriterUserId ? 2 : 2}
 				onPress={(index: number) => {
 					userId === postData.postWriterUserId
-						? communityReadingMenuOptionList.onPress[index]()
+						? index == 2
+							? () => {}
+							: communityReadingMenuOptionList.onPress[index]()
 						: communityReadingMenuOptionList.onPress.slice(2, 5)[index]();
 				}}
 			/>
@@ -474,13 +436,15 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				title={'댓글 메뉴'}
 				options={
 					userId === commentData.commentWriterUserId
-						? commentOptionList.options
+						? commentOptionList.options.filter(item => item == '삭제' || item === '취소')
 						: commentOptionList.options.filter(item => item === '신고' || item === '취소')
 				}
-				cancelButtonIndex={userId === commentData.commentWriterUserId ? 2 : 1}
+				cancelButtonIndex={1}
 				onPress={(index: number) => {
 					userId == commentData.commentWriterUserId
-						? commentOptionList.onPress[index]()
+						? index == 1
+							? () => {}
+							: commentOptionList.onPress[index]()
 						: commentOptionList.onPress.slice(1, 3)[index]();
 				}}
 			/>
@@ -489,73 +453,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
 					ListHeaderComponent={
 						<FlatListHeaderContainer>
-							<PostInfoContainer>
-								<PostWriterInfoContainer>
-									<PostWriterProfileImage
-										source={require('../../../public/images/danim_logo2.png')}
-										resizeMode='contain'
-									/>
-									<PostDetailInfoContainer>
-										<PostWriterText>{postData.postWriter}</PostWriterText>
-										<PostDetailInfoText>{postData.postedAt.slice(0, 10)}</PostDetailInfoText>
-									</PostDetailInfoContainer>
-								</PostWriterInfoContainer>
-								<PostTitleText>{postData.postTitle}</PostTitleText>
-							</PostInfoContainer>
-							{postData.postImage.length === 0 ? (
-								<></>
-							) : (
-								<PostImageContainer>
-									<PostImageSwiper
-										dot={<Dot />}
-										activeDot={<ActiveDot />}
-										paginationStyle={{
-											marginBottom: -24,
-										}}
-										loop={false}>
-										{postData.postImage.map((uri, index) => (
-											<PostImageWrapper
-												onPress={() => {
-													onSelect(index);
-												}}
-												key={index}>
-												<PostImage source={{uri: uri}} />
-											</PostImageWrapper>
-										))}
-									</PostImageSwiper>
-								</PostImageContainer>
-							)}
-							<ImageView
-								images={postData.postImage.map(uri => ({uri}))}
-								imageIndex={initialImageIndex || 0}
-								visible={isImageModalVisible}
-								onImageIndexChange={setCurrentImageIndex}
-								onRequestClose={() => {
-									setIsImageModalVisible(false);
-								}}
-								HeaderComponent={() => (
-									<PostImageView>
-										<PostImageIndicatorText>{`${currentImageIndex + 1}/${
-											postData.postImage.length
-										}`}</PostImageIndicatorText>
-									</PostImageView>
-								)}
-							/>
-							<PostContentContainer>
-								<PostContentText>{postData.postContent}</PostContentText>
-							</PostContentContainer>
+							<CommunityPost></CommunityPost>
 							<Divider></Divider>
-							{socialloginProvider != 'anonymous' && (
-								<PostLikeCommentNumContainer>
-									<LikeButton onPress={handleLikePress}>
-										<HeartIcon name={isLiked ? 'heart' : 'hearto'} selected={isLiked}></HeartIcon>
-										<LikeCommentText>{isLiked ? '좋아요 취소' : '좋아요'}</LikeCommentText>
-									</LikeButton>
-									<CommentIcon name='message-circle' />
-									<LikeCommentText>{postData.comment.length}</LikeCommentText>
-								</PostLikeCommentNumContainer>
-							)}
-							<LikeCommentText>{postData.liker.length}명이 좋아합니다</LikeCommentText>
+							<LiKeCommentBar></LiKeCommentBar>
 						</FlatListHeaderContainer>
 					}
 					data={postData.comment}
@@ -609,75 +509,9 @@ const FlatListHeaderContainer = styled.View`
 	padding-vertical: 12px;
 	padding-horizontal: 24px;
 `;
-const PostInfoContainer = styled.View`
-	margin-bottom: 12px;
-`;
-const PostWriterInfoContainer = styled.View`
-	flex-direction: row;
-	align-items: center;
-`;
-const PostWriterProfileImage = styled.Image`
-	width: 36;
-	height: 36;
-	border-radius: 18px;
-	border: ${colors.border};
-	margin-right: 12px;
-`;
-const PostDetailInfoContainer = styled.View`
-	flex-direction: column;
-	align-items: flex-start;
-`;
-const PostWriterText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	margin-bottom: 4px;
-	color: black;
-`;
-const PostDetailInfoText = styled.Text`
-	font-size: 12px;
-	margin-right: 8px;
-	color: gray;
-`;
-const PostTitleText = styled.Text`
-	font-size: 24px;
-	font-weight: bold;
-	margin-vertical: 8px;
-	color: black;
-`;
 const Divider = styled.View`
 	border-bottom-color: #ccc;
 	border-bottom-width: 1px;
-`;
-
-// 사진이랑 dots 담을 영역
-const PostImageContainer = styled.View`
-	margin-vertical: 12px;
-`;
-const PostImageSwiper = styled(Swiper)`
-	height: ${Dimensions.get('window').width}px;
-`;
-const Dot = styled.View`
-	background-color: #ccc;
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
-`;
-const ActiveDot = styled.View`
-	background-color: ${colors.border};
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
-`;
-// 사진을 누를 수 있게 하기 위한 componenet
-const PostImageWrapper = styled.Pressable`
-	width: 100%;
-	aspect-ratio: 1;
-`;
-const PostImage = styled.Image`
-	width: 100%;
-	aspect-ratio: 1;
 `;
 
 // 사진 눌렀을 때 사진 보이는 화면
@@ -687,43 +521,6 @@ export const PostImageView = styled.SafeAreaView`
 export const PostImageIndicatorText = styled.Text`
 	font-size: 16px;
 	color: white;
-`;
-
-// 게시글 글 내용담는 컨테이너
-const PostContentContainer = styled.View`
-	justify-content: center;
-	padding-vertical: 8px;
-	margin-bottom: 24px;
-`;
-const PostContentText = styled.Text`
-	font-size: 16px;
-	color: black;
-`;
-
-// 게시글 좋아요 수 및 댓글 수
-const PostLikeCommentNumContainer = styled.View`
-	align-items: center;
-	flex-direction: row;
-	padding-vertical: 8px;
-`;
-const LikeButton = styled.TouchableOpacity`
-	align-items: center;
-	flex-direction: row;
-`;
-const HeartIcon = styled(AntDesignIcon)<{selected: boolean}>`
-	color: ${props => (props.selected ? 'red' : 'black')};
-	font-size: 24px;
-	margin-right: 4px;
-`;
-const LikeCommentText = styled.Text`
-	font-size: 14px;
-	color: black;
-	margin-right: 12px;
-`;
-const CommentIcon = styled(FeatherIcon)`
-	color: black;
-	font-size: 24px;
-	margin-right: 4px;
 `;
 
 const CommentItemContainer = styled.View`

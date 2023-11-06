@@ -102,6 +102,8 @@ const userSlice = createSlice({
 			state.functionToken = payload.functionToken;
 			state.socialloginProvider = payload.loginProvider;
 			state.blockUserList = payload.blockUserList;
+			state.isLogin = true;
+			console.log('왔는데용?');
 		},
 		reset: state => {
 			console.log('오긴함');

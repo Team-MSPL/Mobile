@@ -8,9 +8,7 @@ const initialState: LiteState = {
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
-		console.log('왔긴한데', data.userName, data.userProfileImage);
-		console.log('dpdpdp', axiosAuth.getUri());
-		console.log(axiosAuth.getUri());
+		console.log(data.userName, data.userProfileImage, data.userToken, data.loginProvider, data.signUpFlag);
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,
 			userProfileImage: data.userProfileImage,
@@ -18,15 +16,11 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			loginProvider: data.loginProvider,
 			signUpFlag: data.signUpFlag,
 		});
-		console.log('ㅂㅈㄷ');
 		let userData = response.data;
 		//성공했을때
 		if (response.status != 202) {
 			axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
-
-			console.log('qwe', userData.userJwtToken);
 			thunkAPI.dispatch(userSliceActions.setUserInfo(userData));
-			thunkAPI.dispatch(userSliceActions.login());
 			const loginValues: [string, string][] = [
 				['userName', userData.userName],
 				['userProfileImage', data.userProfileImage],

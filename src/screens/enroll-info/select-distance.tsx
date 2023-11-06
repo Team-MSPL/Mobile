@@ -31,7 +31,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 	return (
 		<>
 			<MainContainer showsVerticalScrollIndicator={false}>
-				<StepText mainText='거리민감도 설정' subText='Ai는 거리 민감도를 통해 추천 여행 코스를 짜드려요' />
+				<StepText mainText='여행 반경 설정' subText='Ai는 여행 반경을 통해 추천 여행 코스를 짜드려요' />
 				<VStack>
 					<MapContainer>
 						<Qwe>
@@ -55,8 +55,8 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 						/>
 						<DistanceExplain>
 							{range >= 5
-								? '민감도가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
-								: '민감도가 낮으면, 성향과는 조금 멀어질 수 있어요'}
+								? '숫자가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
+								: '숫자가 낮으면, 성향과는 조금 멀어질 수 있어요'}
 						</DistanceExplain>
 					</DistanceExplainContainer>
 				</VStack>

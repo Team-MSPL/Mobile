@@ -61,7 +61,7 @@ export default function CommunitySearch({navigation}: any) {
 				</TextContainer>
 			)}
 			{show ? (
-				<CommunityMain navigation={navigation} searchState={true}></CommunityMain>
+				<CommunityMain navigation={navigation} searchState={true} searchValue={searchValue}></CommunityMain>
 			) : (
 				<TextContainer>
 					<SearchText>제목, 내용을 검색해보세요</SearchText>

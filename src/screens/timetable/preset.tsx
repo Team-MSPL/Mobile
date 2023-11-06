@@ -12,6 +12,7 @@ import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
 import {DayElementContainer} from './map-info';
+import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
@@ -152,49 +153,57 @@ export default function Preset({navigation}: any) {
 		return () => backHandler.remove();
 	}, []);
 	return (
-		<MainContainer>
-			<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
-			<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
+		<>
+			<MainContainer>
+				<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
+				<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
 
-			<MapView
-				ref={mapRef}
-				style={{width: '100%', height: 300}}
-				//provider={PROVIDER_GOOGLE}
-				showsMyLocationButton={true}
-				region={{
-					latitude: centerLatitude,
-					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + deltaLatitude / 2,
-					longitudeDelta: deltaLongitude + deltaLongitude / 5,
-				}}>
-				{markers}
-				{polylines}
-			</MapView>
-			<PresetContainer>
-				{presetDatas.map(
-					(item, idx) =>
-						item != null && (
-							<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
-								<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
-							</PresetButton>
-						),
-					// <SelectButton
-					// 	key={idx}
-					// 	label={idx + 1 + '번 후보'}
-					// 	bgColor={idx === select}
-					// 	onPress={() => change(idx)}></SelectButton>
-				)}
-			</PresetContainer>
-			{presetDatas[select].map((vava, inin) =>
-				vava.map((qwe, asd) => (
-					<InfoContainer key={asd}>
-						<ElementText>{qwe.name}</ElementText>
-					</InfoContainer>
-				)),
-			)}
+				<MapView
+					ref={mapRef}
+					style={{width: '100%', height: 300}}
+					//provider={PROVIDER_GOOGLE}
+					showsMyLocationButton={true}
+					region={{
+						latitude: centerLatitude,
+						longitude: centerLongitude,
+						latitudeDelta: deltaLatitude + deltaLatitude / 2,
+						longitudeDelta: deltaLongitude + deltaLongitude / 5,
+					}}>
+					{markers}
+					{polylines}
+				</MapView>
+				<PresetContainer>
+					{presetDatas.map(
+						(item, idx) =>
+							item != null && (
+								<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
+									<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
+								</PresetButton>
+							),
+						// <SelectButton
+						// 	key={idx}
+						// 	label={idx + 1 + '번 후보'}
+						// 	bgColor={idx === select}
+						// 	onPress={() => change(idx)}></SelectButton>
+					)}
+				</PresetContainer>
+				{presetDatas[select].map((vava, inin) => (
+					<>
+						<DayText>{inin + 1}일차 코스</DayText>
+						{vava.map((qwe, asd) => (
+							<InfoContainer key={asd}>
+								<ElementText>{qwe.name}</ElementText>
+							</InfoContainer>
+						))}
+					</>
+				))}
 
-			<CustomButton label='코스 선택' width={40} onPress={goNext}></CustomButton>
-		</MainContainer>
+				<MarginContainder></MarginContainder>
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton label='코스 선택' width={40} onPress={goNext}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
 
@@ -203,6 +212,9 @@ const PresetContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	width: 100%;
+	border-bottom-width: 1px;
+	padding: 10px 0px;
+	border-bottom-color: ${colors.regionNormal};
 `;
 export const PresetButton = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
@@ -231,4 +243,9 @@ const InfoContainer = styled(DayElementContainer)`
 	padding: 10px;
 	margin: 10px 0px 10px 0px;
 	align-items: center;
+`;
+const DayText = styled.Text`
+	font-size: 20px;
+	font-weight: bold;
+	color: ${colors.selectButton};
 `;

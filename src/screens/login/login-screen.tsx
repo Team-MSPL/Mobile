@@ -40,6 +40,7 @@ export default function LoginScreen({navigation}: any) {
 	};
 	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
+		console.log('dnpioqdniop', isLogin);
 		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
 	}, [isLogin]);
 	// 랜덤으로 문자열 생성
@@ -167,7 +168,7 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '',
+					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -177,7 +178,7 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '',
+						profileImage: 'https://danim.me/square_logo.png',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
@@ -202,7 +203,7 @@ export default function LoginScreen({navigation}: any) {
 				console.log('같아라!', decodeToken.sub);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '',
+					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -212,7 +213,7 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '',
+						profileImage: 'https://danim.me/square_logo.png',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {

@@ -11,6 +11,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
 import {VStack} from '../../utill/layout/layout';
+import {usePhoto} from '../../utill/hooks/usePhoto';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -63,30 +64,14 @@ export default function InputDiary({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+
+	const {handleImagePickerLaunch} = usePhoto();
 	const handelGetImage = async () => {
-		ImageCropPicker.openPicker({
-			width: 300,
-			height: 400,
-			size: 1000,
-			multiple: true,
-			maxFiles: 5,
-			mediaType: 'photo',
-			croppingQuality: 0.6,
-			compressImageQuality: 0.3,
-			cropping: true,
-			includeBase64: true,
-		}).then(response => {
-			if (response.length <= 5) {
-				let temporaryList = [];
-				for (let i = 0; i < response.length; i++) {
-					temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
-				}
-				//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-				setpictureValue(temporaryList);
-				!saveCheck && setSaveCheck(true);
-			} else {
-				dispatch(modalSliceActions.setOpenModal({modalTitle: '최대 5장까지 선택가능합니다.'}));
-			}
+		handleImagePickerLaunch({
+			photoData: pictureValue,
+			changeFunction: setpictureValue,
+			saveCheck: saveCheck,
+			setSaveCheck: setSaveCheck,
 		});
 	};
 	const deletePicture = (e: number) => {
@@ -101,7 +86,7 @@ export default function InputDiary({navigation}: any) {
 					<PictureElementContainer onPress={handelGetImage}>
 						<PictuerVstack>
 							<SvgPicture color={colors.selectButton} />
-							<PictureText>{pictureValue.length == 0 ? '사진 추가' : '사진 변경'}</PictureText>
+							<PictureText>사진 추가</PictureText>
 						</PictuerVstack>
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
@@ -134,7 +119,7 @@ export default function InputDiary({navigation}: any) {
 	);
 }
 
-const CancelContainer = styled.TouchableOpacity`
+export const CancelContainer = styled.TouchableOpacity`
 	border-radius: 99px;
 	padding: 10px;
 	position: absolute;
@@ -168,8 +153,9 @@ const PictureCotainer = styled.View`
 const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
-const PictureElementContainer = styled.Pressable`
+export const PictureElementContainer = styled.Pressable`
 	width: 135px;
+	height: 180px;
 	border-radius: 10px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};
@@ -187,7 +173,7 @@ const PictuerVstack = styled(VStack)`
 	align-items: center;
 	justify-content: center;
 `;
-const PictureElement = styled.Image`
+export const PictureElement = styled.Image`
 	width: 135px;
 	height: 180px;
 	border-radius: 10px;
