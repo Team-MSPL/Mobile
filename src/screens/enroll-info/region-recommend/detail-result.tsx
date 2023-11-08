@@ -188,7 +188,7 @@ const GoRecommendButton = styled.TouchableOpacity`
 	padding: 15px;
 	position: absolute;
 	bottom: 20px;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const ButtonText = styled(TitleText)`
 	color: ${colors.selectButton};

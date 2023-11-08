@@ -154,7 +154,7 @@ const PermissionText = styled.Text`
 	color: black;
 `;
 const PermissionMainContainer = styled.ScrollView`
-	background-color: white;
+	background-color: ${colors.main};
 	padding: 10%;
 `;
 const TitleText = styled.Text`

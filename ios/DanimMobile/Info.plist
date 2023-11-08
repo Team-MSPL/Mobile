@@ -43,6 +43,7 @@
 			<string>kakao1059586e7b1423286b1a1a37606f9786</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+        <string>fb860879588873738</string>
 				<string>kakao1059586e7b1423286b1a1a37606f9786</string>
 			</array>
 		</dict>
@@ -59,6 +60,10 @@
 	<string>1</string>
 	<key>GMSApiKey</key>
 	<string>70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com</string>
+  <key>FacebookAppID</key>
+  <string>fb860879588873738</string>
+  <key>FacebookDisplayName</key>
+  <string>다님 - 이색 여행은 다님과 함께</string>
 	<key>KAKAO_APP_KEY</key>
 	<string>1059586e7b1423286b1a1a37606f9786</string>
 	<key>LSApplicationQueriesSchemes</key>

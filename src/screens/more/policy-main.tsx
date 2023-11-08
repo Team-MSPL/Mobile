@@ -62,7 +62,7 @@ const PolicyText = styled.Text`
 const PolicyTouchableOpacity = styled.TouchableOpacity<{index: number; viewIndex: number}>`
 	justify-content: center;
 	align-items: center;
-	background-color: ${props => (props.index == props.viewIndex ? colors.selectButton : 'white')};
+	background-color: ${props => (props.index == props.viewIndex ? colors.selectButton : colors.main)};
 	border-width: 1px;
 	border-radius: 10px;
 	height: 30px;

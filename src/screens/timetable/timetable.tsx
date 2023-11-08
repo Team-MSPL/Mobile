@@ -207,7 +207,7 @@ const MapText = styled.Text`
 `;
 const TimeTableContainer = styled.View`
 	width: 100%;
-	background-color: white;
+	background-color: ${colors.main};
 	flex: 1;
 	padding: 10px;
 `;

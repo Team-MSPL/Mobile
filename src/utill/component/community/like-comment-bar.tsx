@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from 'react';
 import {clickLike, unclickLike} from '../../../redux/community/community.slice';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import {colors} from '../../colors';
 
 export default function LiKeCommentBar() {
 	const {socialloginProvider, userId} = useAppSelector(state => state.userSlice);
@@ -50,6 +51,7 @@ const PostLikeCommentNumContainer = styled.View`
 	align-items: center;
 	flex-direction: row;
 	padding-vertical: 8px;
+	background-color: ${colors.main};
 `;
 const LikeButton = styled.TouchableOpacity`
 	align-items: center;

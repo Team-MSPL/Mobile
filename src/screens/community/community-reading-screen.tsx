@@ -529,6 +529,7 @@ const CommentItemContainer = styled.View`
 	margin-vertical: 8px;
 	padding-vertical: 12px;
 	padding-horizontal: 24px;
+	background-color: ${colors.main};
 `;
 
 // 댓글 작성자 프로필 이미지, 이름, 메뉴를 담을 영역

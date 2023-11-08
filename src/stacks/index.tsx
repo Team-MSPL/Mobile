@@ -16,6 +16,7 @@ import MoreStack from './more-stack';
 import MyTravelListStack from './my-travel-list-stack';
 import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
+import {colors} from '../utill/colors';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -31,7 +32,7 @@ export default function StackNavigator() {
 					fontSize: 16,
 					fontWeight: '900',
 				},
-				headerStyle: {backgroundColor: 'white'},
+				headerStyle: {backgroundColor: colors.main},
 				headerShadowVisible: false,
 			})}>
 			{/* {isLogin ? (
@@ -66,6 +67,7 @@ function TabBar() {
 			screenOptions={{
 				tabBarStyle: {
 					minHeight: 60 + insets.bottom,
+					backgroundColor: colors.main,
 				},
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -88,6 +90,7 @@ function TabBar() {
 					),
 					title: '홈',
 					headerShown: true,
+					headerStyle: {backgroundColor: colors.main},
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
@@ -104,6 +107,7 @@ function TabBar() {
 						</View>
 					),
 					title: '내 여행',
+					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
@@ -122,6 +126,7 @@ function TabBar() {
 					),
 					title: '커뮤니티',
 					headerShown: true,
+					headerStyle: {backgroundColor: colors.main},
 					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
 				}}
 			/>
@@ -138,6 +143,7 @@ function TabBar() {
 						</View>
 					),
 					title: '내 정보',
+					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}

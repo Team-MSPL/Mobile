@@ -92,6 +92,7 @@ const PostContentText = styled.Text`
 `;
 const PostInfoContainer = styled.View`
 	margin-bottom: 12px;
+	background-color: ${colors.main};
 `;
 const PostWriterInfoContainer = styled.View`
 	flex-direction: row;
@@ -133,6 +134,7 @@ const Divider = styled.View`
 // 사진이랑 dots 담을 영역
 const PostImageContainer = styled.View`
 	margin-vertical: 12px;
+	background-color: ${colors.main};
 `;
 const PostImageSwiper = styled(Swiper)`
 	height: ${Dimensions.get('window').width}px;

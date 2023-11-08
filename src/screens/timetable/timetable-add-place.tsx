@@ -268,7 +268,7 @@ const RecommendContainer = styled(CourseContainer)<{color: string}>`
 
 const MainContainer = styled.View`
 	flex: 1;
-	background-color: white;
+	background-color: ${colors.main};
 	padding: 10px;
 `;
 const DayElementContainer = styled(DayPressable).attrs({as: View})`

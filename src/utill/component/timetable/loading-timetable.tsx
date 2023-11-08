@@ -41,7 +41,7 @@ export default function LoadingTimetable({navigation}: any) {
 
 const LoadingTimetableContainer = styled.View`
 	align-items: center;
-	background-color: white;
+	background-color: ${colors.main};
 	flex: 1;
 `;
 const LimitText = styled.Text`

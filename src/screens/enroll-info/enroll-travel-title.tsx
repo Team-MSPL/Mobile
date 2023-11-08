@@ -78,7 +78,7 @@ const EnrollTravelTitleContainer = styled.View`
 	padding: 10px;
 	align-items: center;
 	justify-content: center;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const TitleText = styled.Text`
 	font-size: 22px;

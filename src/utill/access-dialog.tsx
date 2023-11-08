@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from 'react-native-modal';
 import styled from 'styled-components/native';
+import {colors} from './colors';
 
 /**
  * 필수 접근 권한 거절 시 보여질 모달
@@ -47,7 +48,7 @@ export default function AccessDialog({
 
 const ModalView = styled.View`
 	width: 100%;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const Section = styled.View`
 	padding: 20px;

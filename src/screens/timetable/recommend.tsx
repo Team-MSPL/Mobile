@@ -263,7 +263,7 @@ export default function Recommend({navigation, route}: any) {
 
 const RecommendContainer = styled.View`
 	flex: 1;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const RecommendView = styled.View`
 	margin: 5px 0px 0px 0px;

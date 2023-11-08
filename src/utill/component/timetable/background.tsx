@@ -68,7 +68,9 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 					{[...Array(48)].map((value, index) => (
 						<BackgroundTouchable
 							key={index}
-							background={editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white'}
+							background={
+								editMode === 'add' && x === inx && addList.includes(index) ? 'black' : colors.main
+							}
 							valueIndex={index}
 							borderColor={
 								editMode === 'add' && x === inx && addList.includes(index)

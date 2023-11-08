@@ -265,7 +265,7 @@ const InfoModalContainer = styled.View`
 	flex: 0.5;
 	position: absolute;
 	bottom: 0px;
-	background-color: white;
+	background-color: ${colors.main};
 	width: 100%;
 `;
 const InfoViewContainter = styled.View`

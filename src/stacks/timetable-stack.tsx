@@ -17,6 +17,7 @@ import MapInfo from '../screens/timetable/map-info';
 import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
 import {View, Image} from 'react-native';
+import {colors} from '../utill/colors';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -33,7 +34,7 @@ export default function TimetableStack() {
 				component={SelectCity}
 				options={{
 					title: '새 여행 (1/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -42,7 +43,7 @@ export default function TimetableStack() {
 				component={SelectDay}
 				options={{
 					title: '새 여행 (2/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -51,7 +52,7 @@ export default function TimetableStack() {
 				component={SelectMulti}
 				options={{
 					title: '새 여행 (3/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -60,7 +61,7 @@ export default function TimetableStack() {
 				component={SearchPlace}
 				options={{
 					title: '숙소 추가하기',
-					headerStyle: {backgroundColor: 'white'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 					headerTitleAlign: 'center',
 				}}
@@ -70,7 +71,7 @@ export default function TimetableStack() {
 				component={SelectDistance}
 				options={{
 					title: '새 여행 (4/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -79,7 +80,7 @@ export default function TimetableStack() {
 				component={SelectTendency}
 				options={{
 					title: '새 여행 (5/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>

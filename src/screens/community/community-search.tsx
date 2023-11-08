@@ -82,6 +82,7 @@ const SearchText = styled.Text`
 `;
 const MainContainer = styled.SafeAreaView`
 	flex: 1;
+	background-color: ${colors.main};
 `;
 const IconContainer = styled.TouchableOpacity`
 	padding: 0px 10px 0px 10px;

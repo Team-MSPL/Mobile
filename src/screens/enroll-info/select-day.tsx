@@ -283,7 +283,7 @@ const ModalContainer = styled.Pressable`
 	flex: 1;
 `;
 const CalendarContainer = styled.View<{x: number; y: number; when: number}>`
-	background-color: white;
+	background-color: ${colors.main};
 	border-width: 1px;
 	border-radius: 10px;
 	padding: 10px 0px 10px 0px;

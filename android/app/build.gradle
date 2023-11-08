@@ -79,8 +79,8 @@ android {
         applicationId "com.danimmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "1.1.4"
+        versionCode 12
+        versionName "1.1.5"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         missingDimensionStrategy 'store', 'play'
@@ -135,6 +135,7 @@ dependencies {
     implementation project(':react-native-lottie-splash-screen')
     implementation project(':react-native-version-check')
     implementation project(':react-native-appsflyer')
+    implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

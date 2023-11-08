@@ -170,7 +170,7 @@ const SearchPlaceContainer = styled.Pressable`
 	width: 100%;
 	padding: 10px;
 	flex: 1;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const SearchPlaceText = styled.Text`
 	font-size: 20px;

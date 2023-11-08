@@ -182,6 +182,7 @@ const PostItemContainer = styled.View`
 	align-items: 'flex-start';
 	padding-vertical: 12px;
 	padding-horizontal: 24px;
+	background-color: ${colors.main};
 `;
 const PostWriterInfoContainer = styled.View`
 	flex-direction: row;

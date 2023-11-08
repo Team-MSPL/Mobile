@@ -195,16 +195,16 @@ const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
 	align-items: center;
 	height: 40px;
-	background-color: ${props => (props.select ? colors.selectButton : 'white')};
+	background-color: ${props => (props.select ? colors.selectButton : colors.main)};
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};
 `;
 const CityItems = styled(RegionItems)`
-	background-color: ${props => (props.select ? colors.normalButton : 'white')};
+	background-color: ${props => (props.select ? colors.normalButton : colors.main)};
 	border-bottom-width: 0px;
 `;
 const RegionText = styled.Text<{select: boolean}>`
-	color: ${props => (props.select ? 'white' : 'black')};
+	color: ${props => (props.select ? colors.main : 'black')};
 	font-size: 16px;
 	font-weight: 500;
 `;

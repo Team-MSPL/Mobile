@@ -2,7 +2,7 @@ export const colors = {
 	TextPrimary: '#3AA1FC',
 	TextSecondary: 'blue.500',
 	border: '#2698FA',
-	main: 'white',
+	main: '#fafaff',
 	selectButton: '#2698FA',
 	normalButton: '#ECF6FF',
 	regionNormal: '#E0E0E0',

@@ -69,18 +69,14 @@ export default function CourseDetail({navigation, route}: any) {
 				)}
 				<TitleInfoContainer>
 					<DetailInfoContainer>
-						<VStack>
-							<TitleText>{courseDetail.name ?? '정보가 없습니다'}</TitleText>
-						</VStack>
-						<VStack>
-							<RatingContainer>
-								<RatingHStack>
-									<SvgStart color={colors.selectButton} width={20} height={20} />
-									<RatingText>{courseDetail.rating ?? '0'}</RatingText>
-								</RatingHStack>
-							</RatingContainer>
+						<TitleText>{courseDetail.name ?? '정보가 없습니다'}</TitleText>
+						<RatingContainer>
+							<RatingHStack>
+								<SvgStart color={colors.selectButton} width={20} height={20} />
+								<RatingText>{courseDetail.rating ?? '0'}</RatingText>
+							</RatingHStack>
 							<RatinInfoText>* 구글 검색 기준</RatinInfoText>
-						</VStack>
+						</RatingContainer>
 					</DetailInfoContainer>
 				</TitleInfoContainer>
 				<HStack>
@@ -169,7 +165,6 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
-
 const NullContainer = styled(Center)`
 	flex: 1;
 `;
@@ -177,17 +172,18 @@ const TabScrollView = styled.ScrollView`
 	height: 50%;
 `;
 const TitleInfoContainer = styled.View`
-	background-color: white;
+	background-color: ${colors.main};
+	width: 100%;
 	padding: 2%;
 `;
 
 const DetailContainer = styled.View`
-	background-color: white;
+	background-color: ${colors.main};
 	flex: 1;
 `;
 const DetailInfoContainer = styled(HStack)`
 	justify-content: space-between;
-	padding: 1%;
+	width: 100%;
 `;
 export const ImageViewFooterComponent = styled.View`
 	width: 100%;
@@ -197,8 +193,9 @@ export const ImageViewFooterComponent = styled.View`
 const ImageScroll = styled.ScrollView`
 	height: 20%;
 `;
-const RatingContainer = styled.View`
-	padding: 5%;
+const RatingContainer = styled(VStack)`
+	padding: 1%;
+	width: 20%;
 	border-radius: 20px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};
@@ -213,9 +210,10 @@ const TitleText = styled.Text`
 	font-size: 25px;
 	font-weight: 900;
 	color: black;
+	width: 80%;
 `;
 const RatinInfoText = styled(RatingText)`
-	font-size: 10px;
+	font-size: 8px;
 `;
 const RatingHStack = styled(HStack)`
 	justify-content: center;
