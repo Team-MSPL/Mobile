@@ -1,11 +1,10 @@
-import {useState, memo} from 'react';
-import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
-import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {memo} from 'react';
 import styled from 'styled-components/native';
-import {HStack} from '../../layout/layout';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {colors} from '../../colors';
+import {HStack, devicesWidth} from '../../layout/layout';
 import {SvgRight} from '../../svg/svg';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	const {day, nDay, timetable, makeMode} = useAppSelector(state => state.travelSlice);
@@ -34,7 +33,9 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 						<SvgRight color={'white'} transform={180} />
 					</ArrowTouchableOpacity>
 				)}
-				<DayText>{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}</DayText>
+				<DurationText>
+					{moment(day[0]).format('YYYY.MM.DD') + '    ~    ' + moment(day[nDay]).format('YYYY.MM.DD')}
+				</DurationText>
 				{nDay > 4 && (
 					<ArrowTouchableOpacity float='right' onPress={goRight}>
 						<SvgRight color={'white'} />
@@ -94,6 +95,12 @@ const DayTouchableOpacity = styled.TouchableOpacity`
 	height: 70px;
 	align-items: center;
 	justify-content: center;
+`;
+
+const DurationText = styled.Text`
+	font-size: ${devicesWidth * 0.04}px;
+	font-weight: bold;
+	color: white;
 `;
 
 const DayText = styled.Text`
