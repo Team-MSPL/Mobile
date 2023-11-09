@@ -1,6 +1,5 @@
 import {useEffect} from 'react';
 import {Dimensions, Platform} from 'react-native';
-import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -59,7 +58,6 @@ export default function Main({navigation}: any) {
 		image: any;
 		text: string;
 		boldText: string;
-		icon: string;
 	}
 	const emojiList = ['🏖', '🏕', '🍲', '📸', '🏃', '🗼', '🚅', '🛫', '🛳', '🚗', '🦐'];
 	const regionList = ['서울', '부산', '제주', '강릉', '단양', '여수', '울산', '대전', '광주', '경주'];
@@ -69,7 +67,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/danyang.jpeg'),
 			city: '단양',
 			title: '패러글라이딩',
-			hashtag: '#레저스포츠',
+			hashtag: '#액티비티 #교통이편한 #나홀로\n#연인과 #친구와 #레저스포츠',
 			lat: 36.9966,
 			lng: 128.3965,
 		},
@@ -78,7 +76,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
 			city: '대전',
 			title: '성심당 본점',
-			hashtag: '#맛있는',
+			hashtag: '#쇼핑 #실내여행지 #맛있는\n#교통이편한 #이색체험',
 			lat: 36.3277,
 			lng: 127.4273,
 		},
@@ -87,7 +85,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
 			city: '목포',
 			title: '목포항',
-			hashtag: '#바다',
+			hashtag: '#교통이편한 #쇼핑 #연인과\n#친구와 #산책',
 			lat: 34.7807,
 			lng: 126.383,
 		},
@@ -96,7 +94,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/sejong.jpeg'),
 			city: '세종',
 			title: '고복자연공원',
-			hashtag: '#공원',
+			hashtag: '#알뜰한 #반려동물과 #공원\n#산책 #사진명소',
 			lat: 36.6113,
 			lng: 127.2385,
 		},
@@ -105,7 +103,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/asan.jpeg'),
 			city: '아산',
 			title: '지중해마을',
-			hashtag: '#시티투어',
+			hashtag: '#알뜰한 #가족과 #사진명소\n#시티투어 #산책',
 			lat: 36.7975,
 			lng: 127.0605,
 		},
@@ -114,7 +112,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/osan.jpeg'),
 			city: '오산',
 			title: '반려동물테마파크',
-			hashtag: '#반려견',
+			hashtag: '#힐링 #교통이편한 #반려동물과\n#이색체험 #산책',
 			lat: 37.1396,
 			lng: 127.064,
 		},
@@ -123,7 +121,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/jangsu.jpeg'),
 			city: '장수',
 			title: '의암주논개생가지',
-			hashtag: '#유적지',
+			hashtag: '#교통이편한 #알뜰한 #유적지\n#전통한옥',
 			lat: 35.6802,
 			lng: 127.6208,
 		},
@@ -132,7 +130,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/chungdo.jpeg'),
 			city: '청도',
 			title: '프로방스',
-			hashtag: '#이색체험',
+			hashtag: '#교통이편한 #사진명소 #산책',
 			lat: 35.6843,
 			lng: 128.7182,
 		},
@@ -140,27 +138,17 @@ export default function Main({navigation}: any) {
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
-			onPress: soloMaking,
-			image: require('../../../public/images/note.png'),
-			text: `${userName}님, \n직접 만들고 싶나요?`,
-			boldText: '직접 일정 만들기',
-			icon: 'pluscircle',
+			onPress: goEnroll,
+			image: require('../../../public/images/destination.png'),
+			text: '일정 추천받을래요',
+			boldText: '여행 일정 만들기',
 		},
 		{
 			id: 2,
-			onPress: goEnroll,
-			image: require('../../../public/images/route.png'),
-			text: `${userName}님, \n다님과 떠나볼까요?`,
-			boldText: '여행 일정 만들기',
-			icon: 'pluscircle',
-		},
-		{
-			id: 3,
 			onPress: regionRecommend,
 			image: require('../../../public/images/map.png'),
-			text: '어디로 떠날지\n고민중이신가요?',
-			boldText: '지역 추천 받기',
-			icon: 'arrowright',
+			text: '지역 추천받을래요',
+			boldText: '여행 지역 추천받기',
 		},
 	];
 	const DeviceWidth = Dimensions.get('window').width;
@@ -192,18 +180,19 @@ export default function Main({navigation}: any) {
 					</BannerTextContainer>
 					<BannerEmoji>{emojiList[Math.floor(Math.random() * emojiList.length)]}</BannerEmoji>
 				</TopBannerContainer>
+
 				<ButtonContainer>
-					<Carousel
-						data={buttonList}
-						renderItem={buttonRenderItem}
-						sliderWidth={devicesWidth * 0.9}
-						itemWidth={devicesWidth * 0.75}
-						loop={false}
-						firstItem={1}
-						contentContainerCustomStyle={{alignItems: 'center', justifyContent: 'center'}}
-					/>
+					{buttonList.map(item => (
+						<NewTravelButton onPress={item.onPress} key={item.id}>
+							<NewTravelButtonTextContainer>
+								<NewTravelButtonDescriptionText>{item.text}</NewTravelButtonDescriptionText>
+							</NewTravelButtonTextContainer>
+							<NewTravelButtonImage source={item.image} />
+							<NewTravelButtonTitleText>{item.boldText}</NewTravelButtonTitleText>
+						</NewTravelButton>
+					))}
 				</ButtonContainer>
-				{/* <BoldDivider></BoldDivider> */}
+
 				<CollectionContainer>
 					<CollectionTitle>다님이 추천하는 이색 여행지</CollectionTitle>
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
@@ -265,45 +254,48 @@ const BannerEmoji = styled.Text`
 `;
 
 const ButtonContainer = styled.View`
+	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-around;
 	align-self: center;
 	width: ${devicesWidth * 0.9}px;
-	aspect-ratio: 2;
+	aspect-ratio: 2.4;
 	margin-bottom: 48px;
 `;
 
 const NewTravelButton = styled.TouchableOpacity`
-	aspect-ratio: 2;
-	flex-direction: row;
-	padding-vertical: ${devicesWidth * 0.02}px;
-	padding-horizontal: ${devicesWidth * 0.05}px;
+	width: ${devicesWidth * 0.36}px;
+	aspect-ratio: 1;
 	align-items: center;
-	border-radius: 16px;
+	border-radius: ${devicesWidth * 0.04}px;
 	background-color: ${colors.main};
 	${Platform.OS === 'android' ? 'elevation: 4;' : 'box-shadow: 0px 2px 4px #ccc;'}
 `;
-const NewTravelButtonImage = styled.ImageBackground`
-	width: ${devicesHeight * 0.07}px;
-	aspect-ratio: 1;
-	border-radius: 12px;
-	overflow: hidden;
-	margin-right: ${devicesWidth * 0.05}px;
-`;
 const NewTravelButtonTextContainer = styled.View`
+	align-items: center;
 	justify-content: center;
-	flex-direction: column;
-	width: ${devicesWidth * 0.4}px;
+	background-color: ${colors.selectButton};
+	border-top-left-radius: ${devicesWidth * 0.04}px;
+	border-top-right-radius: ${devicesWidth * 0.04}px;
+	width: ${devicesWidth * 0.36}px;
+	aspect-ratio: 5;
+	margin-bottom: ${devicesWidth * 0.05}px;
 `;
 const NewTravelButtonDescriptionText = styled.Text`
-	color: black;
-	font-size: ${devicesWidth * 0.04}px;
-	font-weight: thin;
-	margin-bottom: ${devicesWidth * 0.02}px;
+	color: ${colors.main};
+	font-size: ${devicesWidth * 0.032}px;
+	font-weight: 600;
+	font-family: '';
+`;
+const NewTravelButtonImage = styled.ImageBackground`
+	width: ${devicesHeight * 0.05}px;
+	aspect-ratio: 1;
+	overflow: hidden;
+	margin-bottom: ${devicesWidth * 0.05}px;
 `;
 const NewTravelButtonTitleText = styled.Text`
 	color: black;
-	font-size: ${devicesWidth * 0.05}px;
+	font-size: ${devicesWidth * 0.04}px;
 	font-weight: bold;
 `;
 
