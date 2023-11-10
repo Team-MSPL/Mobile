@@ -1,15 +1,15 @@
 import {GOOGLE_API_KEY} from '@env';
 import {memo, useRef, useState} from 'react';
-import {Image, Modal, Pressable, TouchableOpacity, View, Dimensions} from 'react-native';
+import {Dimensions, Modal} from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
-import {HStack, VStack} from '../../layout/layout';
-import {SvgInfos} from '../../svg/svg';
-import Icon from 'react-native-vector-icons/AntDesign';
 import {useDistance} from '../../hooks/useDistance';
+import {VStack, devicesWidth} from '../../layout/layout';
+import {SvgInfos} from '../../svg/svg';
 const InfoView = ({navigation, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -105,8 +105,9 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 			});
 		}
 	};
-	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
-	const selectCategortColors = ['#89C7FD', '#FFE812', 'green', 'pink', '#9DFE9A', 'gray'];
+
+	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
+	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
 	return (
 		<InfoViewContainter>
 			<SpacerView />
@@ -158,7 +159,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 			)}
 			<Modal
 				visible={visible}
-				animationType={'slide'}
+				animationType={'fade'}
 				transparent={true}
 				statusBarTranslucent={true}
 				onRequestClose={() => setVisible(false)}>
@@ -184,7 +185,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 									<ModalIconContainer>
 										<DeleteContainer name={'like2'} size={20} color={'black'} />
 									</ModalIconContainer>
-									<ModalText>추천 받기</ModalText>
+									<ModalText>추천받기</ModalText>
 								</ModalElementContainer>
 							</>
 						) : (
@@ -227,7 +228,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 							<ModalIconContainer>
 								<DeleteContainer name={'delete'} size={20} color={'black'} />
 							</ModalIconContainer>
-							<ModalText>삭제 하기</ModalText>
+							<ModalText>삭제하기</ModalText>
 						</ModalElementContainer>
 					</InfoModalContainer>
 				</ModalContainer>
@@ -287,10 +288,12 @@ const InfoPressable = styled.Pressable<{backgroundColor: string; height: number;
 	position: absolute;
 	z-index: 3;
 	padding: 4px;
+	border-radius: ${devicesWidth * 0.01}px;
 `;
 const InfoText = styled.Text`
-	font-size: 13px;
-	color: black;
+	font-size: ${devicesWidth * 0.036}px;
+	color: white;
+	font-weight: 500;
 `;
 const InfoImage = styled.Image`
 	margin: 5px 0px 0px 0px;
