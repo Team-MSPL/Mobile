@@ -34,7 +34,7 @@ export default function Timetable({navigation, route}: any) {
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log(timetable.length);
+			dispatch(travelSliceActions.resetMoveTimeList());
 			for (let i = 0; i < timetable.length; i++) {
 				if (timetable[i].length > 1) {
 					for (let j = 0; j < timetable[i].length; j++) {
@@ -53,7 +53,6 @@ export default function Timetable({navigation, route}: any) {
 					dispatch(travelSliceActions.pushMoveTimeList());
 				}
 			}
-			console.log('여기는 왓군요?');
 
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {

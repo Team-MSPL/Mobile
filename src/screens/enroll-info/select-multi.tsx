@@ -197,7 +197,7 @@ const MultiElementText = styled.Text`
 `;
 export const ButtonContainer = styled.View`
 	width: ${devicesWidth}px;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(250, 250, 255, 0.8);
 	position: absolute;
 	bottom: 0;
 `;

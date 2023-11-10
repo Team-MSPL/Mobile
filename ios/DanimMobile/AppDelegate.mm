@@ -7,32 +7,26 @@
 #import <GoogleMaps/GoogleMaps.h>
 #import "RNSplashScreen.h"
 #import "DanimMobile-Swift.h"
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
+
 
 @implementation AppDelegate
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-  [FBSDKAppEvents activateApp];
-}
 
 - (BOOL)application:(UIApplication *)application
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
-        return [RNKakaoLogins handleOpenUrl:url];
-    } else if ([RCTLinkingManager application:application openURL:url sourceApplication:nil annotation:nil]) {
-        return YES;
-    } else if ([[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:nil annotation:nil]) {
-        return YES;
-    }
-    return NO;
+     openURL:(NSURL *)url
+     options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+ if([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
+    return [RNKakaoLogins handleOpenUrl: url];
+ }
+  if ([RCTLinkingManager application:application openURL:url sourceApplication:nil annotation:nil]) {
+     return YES;
+   }
+ return NO;
 }
-
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [GMSServices provideAPIKey:@"70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com"]; // add this line using the api key obtained from Google Console
   [FIRApp configure];
-  [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
   self.moduleName = @"DanimMobile";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.

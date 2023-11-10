@@ -36,7 +36,7 @@ const Container = styled.View`
 	justify-content: center;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(255, 255, 255, 0.9);
+	background-color: rgba(250, 250, 255, 0.9);
 `;
 const Guide = styled.Text`
 	font-size: 16px;

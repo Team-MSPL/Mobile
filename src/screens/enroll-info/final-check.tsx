@@ -32,6 +32,7 @@ export default function FinalCheck({navigation}: any) {
 		distance,
 		minuteLimitArray,
 		season,
+		bandwidth,
 	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -133,6 +134,7 @@ export default function FinalCheck({navigation}: any) {
 					nDay: nDay + 1,
 					transit: transit,
 					distanceSensitivity: distance,
+					bandwidth: bandwidth,
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));
@@ -181,6 +183,9 @@ export default function FinalCheck({navigation}: any) {
 					<SelectListContainer>
 						<SelectListText>선택 여행 성향</SelectListText>
 						<SelectTendencyListContainer>
+							<SelectTendencyContainer>
+								<SelectTendencyText># {bandwidth ? '여유있는 일정' : '바쁜 일정'}</SelectTendencyText>
+							</SelectTendencyContainer>
 							{tendency.map((item, inx) => {
 								return item.map((q, a) => {
 									return q ? (

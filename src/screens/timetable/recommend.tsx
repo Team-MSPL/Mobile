@@ -1,6 +1,5 @@
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {Alert, Linking, TouchableOpacity, ScrollView} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 

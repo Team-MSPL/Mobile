@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">다님</string>
     <string name="kakao_app_key">1059586e7b1423286b1a1a37606f9786</string>
-    <string name="facebook_app_id">860879588873738</string>
-<string name="facebook_client_token">4083e76d801626de77b41c71e0241cbc</string>
 </resources>

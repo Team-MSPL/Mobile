@@ -89,7 +89,7 @@ export default function SelectDistance({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='여행 반경 설정' subText='Ai는 여행 반경을 통해 지역 코스를 추천해드려요' />
+			<StepText mainText='지역 추천 반경 설정' subText='Ai는 입력된 값을 통해 지역 코스를 추천해드려요' />
 			<DistanceCenter>
 				<DistanceText>{range}</DistanceText>
 				<Slider

@@ -194,8 +194,13 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						ref={autocompleteRef}
 						textInputProps={{placeholderTextColor: 'grey'}}
 						styles={{
-							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
-							textInput: {margin: 1, color: 'black'},
+							textInputContainer: {
+								borderWidth: 1,
+								borderColor: colors.selectButton,
+								borderRadius: 10,
+								backgroundColor: colors.main,
+							},
+							textInput: {margin: 1, color: 'black', backgroundColor: colors.main},
 							listView: {height: 300},
 						}}
 						renderRightButton={clearButton}

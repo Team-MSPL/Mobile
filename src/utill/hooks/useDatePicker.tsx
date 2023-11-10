@@ -133,7 +133,7 @@ const Container = styled.View<{height: number; width: number}>`
 	align-items: center;
 	justify-content: center;
 	height: ${props => props.height}px;
-	background-color: rgba(255, 255, 255, 0.9);
+	background-color: rgba(250, 250, 255, 0.9);
 `;
 const ModalContainer = styled.View`
 	width: 90%;

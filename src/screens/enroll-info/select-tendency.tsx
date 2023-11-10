@@ -2,7 +2,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import TendencyButton from '../../utill/component/tendency-button';
-import {FlexWrap, MainContainer, VStack, HStack} from '../../utill/layout/layout';
+import {FlexWrap, MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -11,7 +11,7 @@ import {ButtonContainer, MarginContainder} from './select-multi';
 import {TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SelectTendency({setViewComponent, viewComponent, goNextStep}: any) {
-	const {transit, tendency, regionRecommendFlag} = useAppSelector(state => state.travelSlice);
+	const {transit, tendency, regionRecommendFlag, bandwidth} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
 		if (checkDialog({flag: tendency[index][idx], name: tendencyList[index].list[idx]})) {
@@ -61,14 +61,24 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 							<TendencyButton label='대중교통' bgColor={transit == 1}></TendencyButton>
 						</TendencyElementContainer>
 					</FlexWrap>
+					<TendencyStepText>Step 2</TendencyStepText>
+					<TendencyText>어떤 스타일을 원하시나요?</TendencyText>
+					<FlexWrap>
+						<TendencyElementContainer onPress={() => dispatch(travelSliceActions.enrollBandwidth(false))}>
+							<SvgCheck color={!bandwidth ? colors.selectButton : colors.regionNormal} />
+							<TendencyButton label='바쁜 일정' bgColor={!bandwidth}></TendencyButton>
+						</TendencyElementContainer>
+						<TendencyElementContainer onPress={() => dispatch(travelSliceActions.enrollBandwidth(true))}>
+							<SvgCheck color={bandwidth ? colors.selectButton : colors.regionNormal} />
+							<TendencyButton label='여유있는 일정' bgColor={bandwidth}></TendencyButton>
+						</TendencyElementContainer>
+					</FlexWrap>
 					{tendencyList.map((item, index) => {
 						return (
 							<TendencyContainer key={index}>
-								<TendencyStepText>Step {index + 2}</TendencyStepText>
-								<HStack>
-									<TendencyText>{item.title}</TendencyText>
-									<MultiText> * 중복 선택, 선택 안 하셔도 됩니다.</MultiText>
-								</HStack>
+								<TendencyStepText>Step {index + 3}</TendencyStepText>
+								<TendencyText>{item.title}</TendencyText>
+								<MultiText> * 중복 선택, 선택 안 하셔도 됩니다.</MultiText>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (
@@ -130,7 +140,8 @@ export const tendencyList = [
 
 export const MultiText = styled.Text`
 	color: ${colors.selectButton};
-	font-size: 10px;
+	font-size: ${devicesWidth * 0.03}px;
+	margin: 5px 0px 0px 0px;
 `;
 export const TendencyText = styled.Text`
 	font-size: 20px;

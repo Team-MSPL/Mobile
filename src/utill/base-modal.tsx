@@ -49,7 +49,7 @@ const ModalContainer = styled.Pressable`
 	justify-content: center;
 	flex-directrion: row;
 	flex: 1;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(250, 250, 255, 0.8);
 `;
 
 const ViewContaniner = styled.Pressable`

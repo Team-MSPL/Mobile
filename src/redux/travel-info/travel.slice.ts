@@ -47,6 +47,7 @@ const initialState: LiteState = {
 	selectEndDate: null,
 	travelName: '',
 	regionRecommendFlag: false,
+	bandwidth: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -313,7 +314,10 @@ export const travelSlice = createSlice({
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			state.timetable.forEach((item, idx) => {
 				let time = 6;
-				let eatTimeList = [8, 15, 22, 29];
+				let dinnerTime = [22, 29];
+				let lunchTime = [8, 15];
+				let lunch = false;
+				let dinner = false;
 				const updateItem = {
 					name: '', //넣을거
 					lat: 0,
@@ -332,18 +336,10 @@ export const travelSlice = createSlice({
 							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
 						}
 					}
-					// if (idx == 0 && index == 0) {
-					// 	time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-					// 	console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
-					// }
-					// if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
-					// 	copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
-					// 	time += 2;
-					// }
-					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
+					if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
 						copy[idx].push({
 							...updateItem,
-							name: eatTimeList[0] == 8 ? '점심 추천' : '저녁 추천',
+							name: '점심 추천',
 							y: time,
 							takenTime: 60,
 							id: shortId.generate(),
@@ -352,15 +348,30 @@ export const travelSlice = createSlice({
 							lng: value.lng,
 							photo: '',
 						});
-						eatTimeList.shift();
-						eatTimeList.shift();
+						lunch = true;
+						time += 3;
+					}
+					if (time >= dinnerTime[0] && time <= dinnerTime[1] && dinner == false) {
+						copy[idx].push({
+							...updateItem,
+							name: '저녁 추천',
+							y: time,
+							takenTime: 60,
+							id: shortId.generate(),
+							category: 1,
+							lat: value.lat,
+							lng: value.lng,
+							photo: '',
+						});
+						dinner = true;
 						time += 3;
 					}
 					if (value.category != 4) {
 						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
 						time += value.takenTime / 30;
+						let bandwidthTime = state.bandwidth ? 1 : 0;
 						index != item.length - 1 &&
-							(time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+							(time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30) + bandwidthTime);
 					}
 					if (index == item.length - 1 && idx != state.timetable.length - 1 && value.category != 4) {
 						copy[idx].push({
@@ -428,6 +439,12 @@ export const travelSlice = createSlice({
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
 		},
+		resetMoveTimeList: state => {
+			state.moveTimeList = [];
+		},
+		enrollBandwidth: (state, {payload}) => {
+			state.bandwidth = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
@@ -435,9 +452,9 @@ export const travelSlice = createSlice({
 			if (payload == undefined) {
 				list.push(30);
 			} else {
-				payload.waypoints &&
+				payload?.waypoints &&
 					((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
-					list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
+					list.push(state.transit == 0 ? payload?.goal?.duration : payload?.goal?.duration * 1.5));
 				list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			}
 			state.moveTimeList.push(list);
@@ -511,6 +528,7 @@ interface LiteState {
 	selectEndDate: Moment | null;
 	travelName: string;
 	regionRecommendFlag: boolean;
+	bandwidth: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
@@ -619,6 +637,7 @@ interface travelAiType {
 	nDay: number;
 	transit: number;
 	distanceSensitivity: number;
+	bandwidth: boolean;
 }
 
 interface myTravelListType {
