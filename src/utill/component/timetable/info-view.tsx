@@ -107,7 +107,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 	};
 
 	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
-	const selectCategortColors = ['#89C7FD', '#FFE812', 'green', 'pink', '#86D0C2', 'gray'];
+	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
 	return (
 		<InfoViewContainter>
 			<SpacerView />
