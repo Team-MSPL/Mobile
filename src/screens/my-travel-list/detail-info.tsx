@@ -9,7 +9,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {HStack, HeaderContianer, HeaderText, MainContainer, VStack} from '../../utill/layout/layout';
+import {HStack, HeaderContianer, HeaderText, MainContainer, VStack, devicesWidth} from '../../utill/layout/layout';
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -168,7 +168,7 @@ export const CourseContainer = styled.TouchableOpacity`
 	justify-content: space-between;
 `;
 export const CourseTitleText = styled.Text`
-	font-size: 20px;
+	font-size: ${devicesWidth * 0.05}px;
 	font-weight: bold;
 	color: white;
 	margin: 0px 0px 5px 0px;

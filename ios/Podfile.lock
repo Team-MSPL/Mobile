@@ -662,20 +662,6 @@ PODS:
     - React-Core (= 0.72.4)
     - React-jsi (= 0.72.4)
     - ReactCommon/turbomodule/core (= 0.72.4)
-  - FBSDKCoreKit (8.2.0):
-    - FBSDKCoreKit/Basics (= 8.2.0)
-    - FBSDKCoreKit/Core (= 8.2.0)
-  - FBSDKCoreKit/Basics (8.2.0)
-  - FBSDKCoreKit/Core (8.2.0):
-    - FBSDKCoreKit/Basics
-  - FBSDKLoginKit (8.2.0):
-    - FBSDKLoginKit/Login (= 8.2.0)
-  - FBSDKLoginKit/Login (8.2.0):
-    - FBSDKCoreKit (~> 8.2.0)
-  - FBSDKShareKit (8.2.0):
-    - FBSDKShareKit/Share (= 8.2.0)
-  - FBSDKShareKit/Share (8.2.0):
-    - FBSDKCoreKit (~> 8.2.0)
   - Firebase/Auth (10.14.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.14.0)
@@ -687,6 +673,9 @@ PODS:
   - Firebase/Firestore (10.14.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.14.0)
+  - Firebase/Messaging (10.14.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 10.14.0)
   - Firebase/Storage (10.14.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.14.0)
@@ -716,14 +705,14 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
     - RecaptchaInterop (~> 100.0)
-  - FirebaseAuthInterop (10.14.0)
+  - FirebaseAuthInterop (10.16.0)
   - FirebaseCore (10.14.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/Logger (~> 7.8)
-  - FirebaseCoreExtension (10.14.0):
+  - FirebaseCoreExtension (10.16.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseCoreInternal (10.14.0):
+  - FirebaseCoreInternal (10.16.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseFirestore (10.14.0):
     - abseil/algorithm (~> 1.20220623.0)
@@ -738,11 +727,20 @@ PODS:
     - "gRPC-C++ (~> 1.50.1)"
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - FirebaseInstallations (10.14.0):
+  - FirebaseInstallations (10.16.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
+  - FirebaseMessaging (10.14.0):
+    - FirebaseCore (~> 10.0)
+    - FirebaseInstallations (~> 10.0)
+    - GoogleDataTransport (~> 9.2)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
+    - GoogleUtilities/Environment (~> 7.8)
+    - GoogleUtilities/Reachability (~> 7.8)
+    - GoogleUtilities/UserDefaults (~> 7.8)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
   - FirebaseStorage (10.14.0):
     - FirebaseAppCheckInterop (~> 10.0)
     - FirebaseAuthInterop (~> 10.0)
@@ -793,6 +791,10 @@ PODS:
     - GoogleUtilities/Network (~> 7.11)
     - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - GoogleDataTransport (9.2.5):
+    - GoogleUtilities/Environment (~> 7.7)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
+    - PromisesObjC (< 3.0, >= 1.2)
   - GoogleMaps (7.4.0):
     - GoogleMaps/Maps (= 7.4.0)
   - GoogleMaps/Base (7.4.0)
@@ -1228,20 +1230,6 @@ PODS:
   - react-native-appsflyer (6.12.2):
     - AppsFlyerFramework (= 6.12.2)
     - React
-  - react-native-fbsdk (3.0.0):
-    - React
-    - react-native-fbsdk/Core (= 3.0.0)
-    - react-native-fbsdk/Login (= 3.0.0)
-    - react-native-fbsdk/Share (= 3.0.0)
-  - react-native-fbsdk/Core (3.0.0):
-    - FBSDKCoreKit (~> 8.1)
-    - React
-  - react-native-fbsdk/Login (3.0.0):
-    - FBSDKLoginKit (~> 8.1)
-    - React
-  - react-native-fbsdk/Share (3.0.0):
-    - FBSDKShareKit (~> 8.1)
-    - React
   - react-native-geolocation-service (5.3.1):
     - React
   - react-native-google-maps (1.7.1):
@@ -1470,6 +1458,7 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - Firebase/Core (~> 10.0)
+  - Firebase/Messaging
   - FirebaseAuth
   - FirebaseFirestore
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
@@ -1496,7 +1485,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-appsflyer (from `../node_modules/react-native-appsflyer`)
-  - react-native-fbsdk (from `../node_modules/react-native-fbsdk`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-kakao-share-link (from `../node_modules/react-native-kakao-share-link`)
@@ -1550,9 +1538,6 @@ SPEC REPOS:
     - AppsFlyerFramework
     - Base64
     - BoringSSL-GRPC
-    - FBSDKCoreKit
-    - FBSDKLoginKit
-    - FBSDKShareKit
     - Firebase
     - FirebaseAnalytics
     - FirebaseAppCheckInterop
@@ -1563,10 +1548,12 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseFirestore
     - FirebaseInstallations
+    - FirebaseMessaging
     - FirebaseStorage
     - fmt
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
+    - GoogleDataTransport
     - GoogleMaps
     - GoogleSignIn
     - GoogleUserMessagingPlatform
@@ -1649,8 +1636,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-appsflyer:
     :path: "../node_modules/react-native-appsflyer"
-  react-native-fbsdk:
-    :path: "../node_modules/react-native-fbsdk"
   react-native-geolocation-service:
     :path: "../node_modules/react-native-geolocation-service"
   react-native-google-maps:
@@ -1758,25 +1743,24 @@ SPEC CHECKSUMS:
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: 5d4a3b7f411219a45a6d952f77d2c0a6c9989da5
   FBReactNativeSpec: 3fc2d478e1c4b08276f9dd9128f80ec6d5d85c1f
-  FBSDKCoreKit: 4afd6ff53d8133a433dbcda44451c9498f8c6ce4
-  FBSDKLoginKit: 7181765f2524d7ebf82d9629066c8e6caafc99d0
-  FBSDKShareKit: 0c0d51b3af47075a85ed9bea0e28b2fc70e3594b
   Firebase: 6c1bf3f534bc422d52af2e41fe0d50bf08b6b773
   FirebaseAnalytics: 5c6d58814afa4db82cf7fdbc02b0b0e2fa3d43ff
   FirebaseAppCheckInterop: c87f1d5421c852413dd936b2b2340b21e62501a0
   FirebaseAuth: bd1ae3d28beb83bfe9247e50eb82688b683dd770
-  FirebaseAuthInterop: 23be77be1ca68e4bd15214f403f807a6ca70d7e0
+  FirebaseAuthInterop: b79fab8ce80e685145eee5f973d9ad5210e19d44
   FirebaseCore: 6fc17ac9f03509d51c131298aacb3ee5698b4f02
-  FirebaseCoreExtension: 976638051b1a46b503afce7ec80277f9161f2040
-  FirebaseCoreInternal: d558159ee6cc4b823c2296ecc193de9f6d9a5bb3
+  FirebaseCoreExtension: 2dbc745b337eb99d2026a7a309ae037bd873f45e
+  FirebaseCoreInternal: 26233f705cc4531236818a07ac84d20c333e505a
   FirebaseFirestore: 808dd08cbc1c7be9052055f62ab312fdae611e37
-  FirebaseInstallations: f672b1eda64e6381c21d424a2f680a943fd83f3b
+  FirebaseInstallations: b822f91a61f7d1ba763e5ccc9d4f2e6f2ed3b3ee
+  FirebaseMessaging: 1077a4499f0c0a140b9a2e34fe08a1acc806b36d
   FirebaseStorage: e97b4bdd84b21ec060d5737a9c4f8f8fc6a0d041
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   Google-Maps-iOS-Utils: d3fdfd57db799771418f06189e33981597553aa8
   Google-Mobile-Ads-SDK: 509e53bd31c6accb2d9c33b0eb66df1d54dda622
   GoogleAppMeasurement: 7fee012a868315d418f365fbc8d394d8e020e749
+  GoogleDataTransport: 54dee9d48d14580407f8f5fbf2f496e92437a2f2
   GoogleMaps: 032f676450ba0779bd8ce16840690915f84e57ac
   GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
   GoogleUserMessagingPlatform: dce302b8f1b84d6e945812ee7a15c3f65a102cbf
@@ -1815,7 +1799,6 @@ SPEC CHECKSUMS:
   React-jsinspector: aaed4cf551c4a1c98092436518c2d267b13a673f
   React-logger: da1ebe05ae06eb6db4b162202faeafac4b435e77
   react-native-appsflyer: 202a3a36d7fabe9f36198b45f952b1a91f9b27a0
-  react-native-fbsdk: 8e92c7a334fd8d9c2b5d8b8fcd7ae2c314161099
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-google-maps: dd12cdd86b8e3fedbbb671676aedaa2f656e2ccd
   react-native-kakao-share-link: f9be590aec95928451f6ce1a622ef9c91a48d79b
@@ -1865,6 +1848,6 @@ SPEC CHECKSUMS:
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
 
-PODFILE CHECKSUM: 35ce9dd93753f3ae535e6c30af23910e847ccf23
+PODFILE CHECKSUM: e760b9fc85eb97cd102e0fba991d4a57e275af58
 
 COCOAPODS: 1.13.0

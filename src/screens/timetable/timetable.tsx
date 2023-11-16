@@ -1,5 +1,13 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity, View, Dimensions, NativeSyntheticEvent, NativeScrollEvent, Modal} from 'react-native';
+import {
+	TouchableOpacity,
+	View,
+	Dimensions,
+	NativeSyntheticEvent,
+	NativeScrollEvent,
+	Modal,
+	BackHandler,
+} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -19,9 +27,23 @@ import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
 import ViewPager from '../../utill/view-pager';
+import Skeleton from '../../utill/component/skeleton/skeleton';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function Timetable({navigation, route}: any) {
-	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		timetable,
+		day,
+		makeMode,
+		editMode,
+		region,
+		nDay,
+		transit,
+		tendency,
+		travelId,
+		tableShowFlag,
+		travelName,
+		saveFlag,
+	} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [addList, setAddList] = useState<number[]>([]);
@@ -53,7 +75,6 @@ export default function Timetable({navigation, route}: any) {
 					dispatch(travelSliceActions.pushMoveTimeList());
 				}
 			}
-
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
 			dispatch(
@@ -72,33 +93,61 @@ export default function Timetable({navigation, route}: any) {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
 	};
+	const goHome = () => {
+		navigation.popToTop();
+	};
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused()) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '홈으로',
+						modalSubTitle: '홈으로 이동하시겠습니까?',
+						modalFunction: goHome,
+						modalLeft: true,
+					}),
+				);
 
+				return true;
+			}
+		};
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, []);
 	const {appsflyerLogEvent} = useAppsflyer();
+	const firstSave = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				userId: userId,
+				region: makeMode == 'recommend' ? region : ['자유여행'],
+				day: day,
+				nDay: nDay + 1,
+				transit: transit,
+				timetable: timetable,
+				tendency: tendency,
+				travelName: travelName,
+			};
+			await dispatch(saveTravel(data));
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
 			makeMode == 'solo' && appsflyerLogEvent({name: 'solo_save', value: {id: 'danim'}});
 			dispatch(LoadingSliceActions.onLoading());
-			if (travelId == '') {
-				const data = {
-					userId: userId,
-					region: makeMode == 'recommend' ? region : ['자유여행'],
-					day: day,
-					nDay: nDay + 1,
-					transit: transit,
-					timetable: timetable,
-					tendency: tendency,
-					travelName: travelName,
-				};
-				await dispatch(saveTravel(data));
-			} else {
-				console.log('여기구여', travelId);
-				const data = {travelId: travelId, timetable: timetable};
-				await dispatch(updateTravelCourse(data));
-			}
+			const data = {travelId: travelId, timetable: timetable};
+			await dispatch(updateTravelCourse(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: travelId == '' ? '저장 완료' : '수정 완료',
+					modalTitle: '수정 완료',
 					modalSubTitle: '내 여행 리스트로 이동합니다.',
 					modalFunction: goMyTravelList,
 				}),
@@ -115,11 +164,16 @@ export default function Timetable({navigation, route}: any) {
 
 		//혼자짤래요면 지역 '자유여행'으로
 	};
+	useEffect(() => {
+		saveFlag && firstSave();
+	}, [saveFlag]);
 	useLayoutEffect(() => {
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
+			headerBackVisible: makeMode == 'recommend' ? false : true,
+			gestureEnabled: makeMode == 'recommend' ? false : true,
 			headerRight: () => (
 				<HeaderContianer>
 					{editMode == 'add' ? (
@@ -133,12 +187,17 @@ export default function Timetable({navigation, route}: any) {
 						</TouchableOpacity>
 					) : (
 						<>
-							<TouchableOpacity onPress={goSave}>
-								<HeaderText>저장</HeaderText>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={goViewPager}>
-								<HeaderText>설명</HeaderText>
-							</TouchableOpacity>
+							{makeMode != 'share' && (
+								<>
+									<TouchableOpacity onPress={goSave}>
+										<HeaderText>저장</HeaderText>
+									</TouchableOpacity>
+
+									<TouchableOpacity onPress={goViewPager}>
+										<HeaderText>설명</HeaderText>
+									</TouchableOpacity>
+								</>
+							)}
 						</>
 					)}
 				</HeaderContianer>
@@ -156,7 +215,7 @@ export default function Timetable({navigation, route}: any) {
 		setViewPagerView(true);
 	};
 	const [viewPagerView, setViewPagerView] = useState(false);
-	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
+	if (!tableShowFlag) return <Skeleton></Skeleton>;
 	return (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />

@@ -1,14 +1,14 @@
 import moment from 'moment';
 import {useEffect, useRef, useState} from 'react';
-import {Linking, Platform, TouchableOpacity, View} from 'react-native';
+import {Image, Linking, Platform, TouchableOpacity, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
-import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 import {PresetButton} from './preset';
+import {SvgApple, SvgPlace} from '../../utill/svg/svg';
 
 export default function MapInfo({navigation, route}: any) {
 	const {timetable, day} = useAppSelector(state => state.travelSlice);
@@ -61,17 +61,23 @@ export default function MapInfo({navigation, route}: any) {
 			return null;
 		})
 		.filter(items => items !== null);
+	let count = 0;
 	const markers = timetable[select]
 		.map((value, idx) => {
 			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				count += 1;
 				return (
 					<Marker
 						key={`marker_${idx}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
+						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+						anchor={{x: 0.5, y: 0.9}}
 						pinColor={idx == selectPinIndex ? 'yellow' : 'red'}
-						//icon={{uri: '../../../public/images/busan.jpg',width:'10',height:'10'}}
-					/>
+						style={{width: 50, height: 50}}>
+						<MarkerText>{count}</MarkerText>
+						<SvgPlace color={'#F08676'} width={50} height={50} />
+					</Marker>
 				);
 			}
 			return null;
@@ -117,13 +123,10 @@ export default function MapInfo({navigation, route}: any) {
 				}
 			}
 		}
-		console.log(route.params.mapIndex);
-		console.log(select);
-		console.log('하이이이', markers);
 		if (polylineCoordinates.length == 0) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '보여줄게 없습니다.',
+					modalTitle: '보여질 정보가 없습니다.',
 					modalFunction: goBack,
 				}),
 			);
@@ -285,4 +288,13 @@ const PlaceContainer = styled(MoveContainer)`
 const DayTimeText = styled.Text`
 	font-size: 14px;
 	color: ${colors.selectButton};
+`;
+export const MarkerText = styled.Text`
+	position: absolute;
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	z-index: 1;
+	left: 20px;
+	bottom: 10px;
 `;

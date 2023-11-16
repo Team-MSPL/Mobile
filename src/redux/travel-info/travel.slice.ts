@@ -48,6 +48,7 @@ const initialState: LiteState = {
 	travelName: '',
 	regionRecommendFlag: false,
 	bandwidth: false,
+	saveFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -280,7 +281,7 @@ export const travelSlice = createSlice({
 		setTravelStart: (state, {payload}) => {
 			Object.assign(state, initialState);
 			state.makeMode = payload.makeMode;
-			state.tableShowFlag = true;
+			//state.tableShowFlag = true;
 			state.editMode = '';
 			state.season = payload.season;
 		},
@@ -308,7 +309,7 @@ export const travelSlice = createSlice({
 		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = payload;
-			state.tableShowFlag = true;
+			//state.tableShowFlag = true;
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
@@ -402,7 +403,10 @@ export const travelSlice = createSlice({
 					}
 				});
 			});
+
+			state.saveFlag = true;
 			state.timetable = copy;
+			state.tableShowFlag = true;
 		},
 		editModeChange: (state, {payload}) => {
 			state.editMode = payload;
@@ -466,11 +470,9 @@ export const travelSlice = createSlice({
 			state.presetDatas = payload.data.resultData;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
-			console.log('페페', payload);
 			state.myTravelList = payload;
 		});
 		builder.addCase(getOneTravelCourse.fulfilled, (state, {payload}) => {
-			console.log('목아파', payload.timetable);
 			state.day = payload.day;
 			state.nDay = payload.nDay - 1;
 			state.region = payload.region;
@@ -485,9 +487,13 @@ export const travelSlice = createSlice({
 			//state.myTravelList = payload;
 		});
 		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
-			console.log(payload, 'qwe');
 			state.diary = payload.diary;
 			state.picture = payload.picture;
+			//state.myTravelList = payload;
+		});
+		builder.addCase(saveTravel.fulfilled, (state, {payload}) => {
+			console.log('벤이요', payload);
+			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
 		});
 	},
@@ -529,6 +535,7 @@ interface LiteState {
 	travelName: string;
 	regionRecommendFlag: boolean;
 	bandwidth: boolean;
+	saveFlag: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

@@ -9,7 +9,7 @@ import moment from 'moment';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Center, VStack, HStack} from '../../utill/layout/layout';
+import {Center, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import {
 	CourseAndReview,
 	CourseContainer,
@@ -220,7 +220,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				<RecommendContainer color='#ffccb6' onPress={() => goRecommend('CE7')}>
 					<CourseTitleText>카페 추천</CourseTitleText>
 					<IconContainer>
-						<SvgCoffee color='white' />
+						<SvgCoffee width={devicesWidth * 0.09} height={devicesWidth * 0.09} color='white' />
 					</IconContainer>
 				</RecommendContainer>
 				<RecommendContainer
@@ -231,7 +231,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					<CourseTitleText>숙소 추천</CourseTitleText>
 
 					<IconContainer>
-						<SvgHome width={36} height={36} color='white' />
+						<SvgHome width={devicesWidth * 0.09} height={devicesWidth * 0.09} color='white' />
 					</IconContainer>
 				</RecommendContainer>
 				<RecommendContainer
@@ -241,7 +241,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					}}>
 					<CourseTitleText>식당 추천</CourseTitleText>
 					<IconContainer>
-						<DeleteIconContainers name={'restaurant'} size={36} color={'white'} />
+						<DeleteIconContainers name={'restaurant'} size={devicesWidth * 0.09} color={'white'} />
 					</IconContainer>
 				</RecommendContainer>
 			</CourseAndReview>

@@ -60,7 +60,7 @@ export default function TimetableStack() {
 				name='SearchPlace'
 				component={SearchPlace}
 				options={{
-					title: '숙소 추가하기',
+					title: '요소 추가하기',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 					headerTitleAlign: 'center',

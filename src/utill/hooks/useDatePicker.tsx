@@ -58,7 +58,7 @@ export default function UseDatePicker({
 	const onCancel = () => {
 		setVisible(false);
 	};
-	if (!visible) return <MainContainer></MainContainer>;
+	if (!visible) return <></>;
 	return (
 		<Container height={deviceHeight} width={deviceWidth}>
 			<ModalContainer>

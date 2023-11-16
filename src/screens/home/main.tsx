@@ -85,7 +85,7 @@ export default function Main({navigation}: any) {
 			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
 			city: '동해',
 			title: '묵호항',
-			hashtag: '#바다',
+			hashtag: '#교통이편한#쇼핑#연인과#친구와#산책',
 			lat: 37.5519,
 			lng: 129.1149,
 		},

@@ -141,7 +141,11 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 														: false,
 											};
 											if (makeMode == 'share') {
-												viewDetail(indexRef.current);
+												value.name == '점심 추천' ||
+												value.name == '저녁 추천' ||
+												value.name == '숙소 추천'
+													? () => {}
+													: viewDetail(indexRef.current);
 											} else {
 												setVisible(true);
 											}

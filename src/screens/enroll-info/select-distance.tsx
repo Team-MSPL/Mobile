@@ -4,7 +4,7 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {BackHandler, Dimensions} from 'react-native';
 import Slider from '@react-native-community/slider';
-import {MainContainer, VStack, Divider} from '../../utill/layout/layout';
+import {MainContainer, VStack} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';

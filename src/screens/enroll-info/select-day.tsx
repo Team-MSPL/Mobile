@@ -5,7 +5,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import moment, {Moment} from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {Divider, VStack, HStack, MainContainer} from '../../utill/layout/layout';
+import {VStack, HStack, MainContainer} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Modal, View} from 'react-native';

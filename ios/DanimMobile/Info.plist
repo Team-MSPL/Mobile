@@ -75,7 +75,7 @@
 			<true/>
 			<key>NSIncludesSubDomains</key>
 			<true/>
-			<key>http://13.125.229.9</key>
+			<key>http://3.37.54.226</key>
 			<dict/>
 		</dict>
 	</dict>
@@ -137,7 +137,9 @@
 		<string>Fontisto.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
-	<array/>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>

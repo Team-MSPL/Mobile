@@ -90,12 +90,14 @@ function App(): JSX.Element {
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
+					console.log('하하하하하');
 					console.log(match);
 					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-					if (q.payload == 0) {
+					console.log('아니아나이');
+					if (q.payload == 'ERR_BAD_REQUEST') {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+								modalTitle: '사라진 여행입니다.',
 								modalFunction: goOffApp,
 							}),
 						);

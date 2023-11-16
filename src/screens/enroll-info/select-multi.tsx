@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, Divider, devicesWidth} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';

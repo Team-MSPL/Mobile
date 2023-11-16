@@ -1,6 +1,5 @@
-import moment from 'moment';
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
-import {BackHandler, Alert, View, Image, TouchableOpacity} from 'react-native';
+import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {BackHandler, Alert, View, Image, TouchableOpacity, Platform} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -11,14 +10,25 @@ import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
-import {DayElementContainer} from './map-info';
+import {DayElementContainer, MarkerText} from './map-info';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
+import {SvgPlace} from '../../utill/svg/svg';
 
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
+	const checkNext = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '경고',
+				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
+				modalLeft: true,
+				modalFunction: goNext,
+			}),
+		);
+	};
 	const goNext = () => {
 		let copy = [...presetDatas[select]];
 		if (presetDatas[select].length != nDay + 1) {
@@ -89,6 +99,7 @@ export default function Preset({navigation}: any) {
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
 		}));
+		let count = 0;
 		value.map(vvalue =>
 			positions.push({
 				latitude: vvalue.lat,
@@ -96,13 +107,20 @@ export default function Preset({navigation}: any) {
 			}),
 		),
 			markers.push(
-				value.map((vvalue, iindex) => (
-					<Marker
-						key={`marker_${index}_${iindex}`}
-						coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-						title={vvalue.name}
-					/>
-				)),
+				value.map((vvalue, iindex) => {
+					count += 1;
+					return (
+						<Marker
+							key={`marker_${index}_${iindex}`}
+							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							anchor={{x: 0.5, y: 0.9}}
+							title={vvalue.name}>
+							<MarkerText>{count}</MarkerText>
+							<SvgPlace color={mapColor[index]} width={50} height={50} />
+						</Marker>
+					);
+				}),
 			);
 
 		polylines.push(
@@ -161,7 +179,6 @@ export default function Preset({navigation}: any) {
 				<MapView
 					ref={mapRef}
 					style={{width: '100%', height: 300}}
-					//provider={PROVIDER_GOOGLE}
 					showsMyLocationButton={true}
 					region={{
 						latitude: centerLatitude,
@@ -180,34 +197,29 @@ export default function Preset({navigation}: any) {
 									<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
 								</PresetButton>
 							),
-						// <SelectButton
-						// 	key={idx}
-						// 	label={idx + 1 + '번 후보'}
-						// 	bgColor={idx === select}
-						// 	onPress={() => change(idx)}></SelectButton>
 					)}
 				</PresetContainer>
 				{presetDatas[select].map((vava, inin) => (
-					<>
+					<Fragment key={inin}>
 						<DayText>{inin + 1}일차 코스</DayText>
 						{vava.map((qwe, asd) => (
 							<InfoContainer key={asd}>
 								<ElementText>{qwe.name}</ElementText>
 							</InfoContainer>
 						))}
-					</>
+					</Fragment>
 				))}
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>
 			<ButtonContainer>
-				<CustomButton label='코스 선택' width={40} onPress={goNext}></CustomButton>
+				<CustomButton label='코스 선택' width={40} onPress={checkNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
 }
 
-const mapColor = ['red', 'orange', 'yellow', 'green', 'blue'];
+const mapColor = ['#F08676', '#E7A88D', '#ECC369', '#86D0C2', '#7AA1DC', '#D58DE7'];
 const PresetContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;

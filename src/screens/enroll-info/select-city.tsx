@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
-import {HStack, VStack, Divider, MainContainer, InputWrap, ClearTouchableOpacity} from '../../utill/layout/layout';
+import {HStack, VStack, MainContainer, InputWrap, ClearTouchableOpacity} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
@@ -278,7 +278,18 @@ export const cityViewList = [
 			{id: 14, subTitle: '여수시'},
 		],
 	},
-	{id: 1, title: '서울', sub: [{id: 0, subTitle: '전체'}]},
+	{
+		id: 1,
+		title: '서울',
+		sub: [
+			{id: 0, subTitle: '전체'},
+			{id: 1, subTitle: '도심권'},
+			{id: 2, subTitle: '동남권'},
+			{id: 3, subTitle: '동북권'},
+			{id: 4, subTitle: '서남권'},
+			{id: 5, subTitle: '서북권'},
+		],
+	},
 	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 3, title: '대구', sub: [{id: 0, subTitle: '전체'}]},
 	{id: 4, title: '인천', sub: [{id: 0, subTitle: '전체'}]},

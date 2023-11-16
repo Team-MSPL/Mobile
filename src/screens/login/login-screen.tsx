@@ -15,7 +15,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {networkCheck} from '../../redux/network/networkSlice';
 interface tokenType {
@@ -270,17 +270,17 @@ export default function LoginScreen({navigation}: any) {
 		};
 	}, []);
 	return (
-		<SafeAreaView>
-			<BackgroundImage source={viewList[backgroundImageIndex]}>
+		<BackgroundImage source={viewList[backgroundImageIndex]}>
+			<SafeAreaView>
 				<LoginSCreenContainer>
 					<TitleTextContainer>
 						<LoginText>여행 일정을 이렇게</LoginText>
 						<TextContainer>
 							<LoginText>쉽게 짤 수 있</LoginText>
-							<SvgDanimText color='white' />
+							<SvgDanimText color='white' height={devicesHeight * 0.09} />
 						</TextContainer>
 					</TitleTextContainer>
-					<SvgLoginLogo color='white' />
+					<SvgLoginLogo color='white' width={devicesWidth} height={devicesHeight * 0.2} />
 					<CircleContainer>
 						{platforms.map((platform, index) => (
 							<LongCircleButton
@@ -306,10 +306,9 @@ export default function LoginScreen({navigation}: any) {
 							</LogoHStack>
 						</LongCircleButton>
 					</CircleContainer>
-					<HStack></HStack>
 				</LoginSCreenContainer>
-			</BackgroundImage>
-		</SafeAreaView>
+			</SafeAreaView>
+		</BackgroundImage>
 	);
 }
 
@@ -318,7 +317,6 @@ const LoginSCreenContainer = styled.View`
 	padding: 20px;
 	align-items: center;
 	justify-content: center;
-	margin: 10% 0% 0% 0%;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;
@@ -329,10 +327,11 @@ const TextContainer = styled(HStack)`
 `;
 const TitleTextContainer = styled.View`
 	align-items: flex-start;
-	margin: 0% 0% 15% 0%;
+	justify-content: center;
+	height: ${devicesHeight * 0.2}px;
 `;
 const LoginText = styled.Text`
-	font-size: 23px;
+	font-size: ${devicesHeight * 0.03}px;
 	font-weight: bold;
 	color: white;
 	margin: 0px 10px 0px 0px;
@@ -350,7 +349,8 @@ const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
 `;
 const CircleContainer = styled.View`
 	width: 100%;
-	margin: 10% 0% 0% 0%;
+	justify-content: center;
+	height: ${devicesHeight * 0.6}px;
 `;
 const LongCircleButton = styled(CircleButton)`
 	width: 100%;

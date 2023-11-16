@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {devicesWidth} from './layout/layout';
+import {devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
@@ -85,14 +85,13 @@ const CancelContainer = styled.TouchableOpacity`
 	position: absolute;
 	right: 20px;
 `;
-const MainContainer = styled.View`
+const MainContainer = styled.SafeAreaView`
 	flex: 1;
 	align-items: center;
 	background-color: rgba(122, 122, 122, 1);
 `;
 const ImageAllContainer = styled.View`
 	width: ${devicesWidth * 0.8}px;
-	height: ${devicesWidth * (0.8 * 2.13)}px;
 	margin: 0px ${devicesWidth * 0.1}px;
 `;
 const ImageContainer = styled.Image`

@@ -3,15 +3,14 @@ import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import {SvgCancel} from '../../utill/svg/svg';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const [textValue, setTextValue] = useState('');
+	const [textValue, setTextValue] = useState('신나는 여행');
 	const {makeMode} = useAppSelector(state => state.travelSlice);
-	const inputRef = useRef();
 	const changeTextValue = (e: string) => {
 		setTextValue(e);
 	};

@@ -115,7 +115,7 @@ export default function FinalCheck({navigation}: any) {
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
+			if ((cityViewList[cityIndex].id >= 9 && region[0] == '전체') || cityViewList[cityIndex].id == 1) {
 				a = cityViewList[cityIndex].sub.map(
 					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
 				);
