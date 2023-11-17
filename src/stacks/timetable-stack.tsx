@@ -16,6 +16,7 @@ import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
 import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
+import {View, Image} from 'react-native';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -93,6 +94,8 @@ export default function TimetableStack() {
 				name='Preset'
 				component={Preset}
 				options={{
+					headerBackVisible: false,
+					gestureEnabled: false,
 					title: '다님의 제안이에요',
 				}}
 			/>
@@ -142,7 +145,7 @@ export default function TimetableStack() {
 				name='EnrollTravelTitle'
 				component={EnrollTravelTitle}
 				options={{
-					title: '새여행',
+					title: '새 여행',
 				}}
 			/>
 		</Fragment>

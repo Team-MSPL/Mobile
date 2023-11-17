@@ -5,6 +5,9 @@ import MoreInfo from '../screens/more/more-info';
 import Payment from '../screens/more/payment';
 import PolicyMain from '../screens/more/policy-main';
 import Terms from '../screens/more/terms';
+import Coupon from '../screens/more/coupon';
+import Inquire from '../screens/more/inquire';
+import NoteList from '../screens/more/note-list';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -42,6 +45,27 @@ export default function MoreStack() {
 				component={PolicyMain}
 				options={{
 					title: '이용약관',
+				}}
+			/>
+			<Stack.Screen
+				name='Coupon'
+				component={Coupon}
+				options={{
+					title: '쿠폰 입력',
+				}}
+			/>
+			<Stack.Screen
+				name='Inquire'
+				component={Inquire}
+				options={{
+					title: '문의 하기',
+				}}
+			/>
+			<Stack.Screen
+				name='NoteList'
+				component={NoteList}
+				options={{
+					title: '문의 하기',
 				}}
 			/>
 		</Fragment>

@@ -1,15 +1,16 @@
 import {GOOGLE_API_KEY} from '@env';
 import {memo, useRef, useState} from 'react';
-import {Image, Modal, Pressable, TouchableOpacity, View, Dimensions} from 'react-native';
+import {Dimensions, Modal} from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
-import {HStack, VStack} from '../../layout/layout';
+import {useDistance} from '../../hooks/useDistance';
+import {VStack, devicesWidth} from '../../layout/layout';
 import {SvgInfos} from '../../svg/svg';
-import Icon from 'react-native-vector-icons/AntDesign';
-const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
+const InfoView = ({navigation, viewDayIndex}: any) => {
 	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -29,8 +30,11 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 	});
 	const [visible, setVisible] = useState(false);
 	const goRemove = () => {
+		console.log('1');
 		const a = timetable.map(item => item.filter(value => value.id != indexRef.current.value?.id));
+		console.log('2');
 		dispatch(travelSliceActions.changeTimetable(a));
+		console.log('3');
 		setVisible(false);
 	};
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
@@ -74,17 +78,9 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				lat = timetable[e.idx][1].lat;
 				lng = timetable[e.idx][1].lng;
 			} else {
-				const dLat = (timetable[e.idx][e.index - 1].lat - timetable[e.idx][e.index + 1].lat) * (Math.PI / 180);
-				const dLon = (timetable[e.idx][e.index - 1].lng - timetable[e.idx][e.index + 1].lng) * (Math.PI / 180);
-
-				const a =
-					Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-					Math.cos(timetable[e.idx][e.index - 1].lat * (Math.PI / 180)) *
-						Math.cos(timetable[e.idx][e.index + 1].lat * (Math.PI / 180)) *
-						Math.sin(dLon / 2) *
-						Math.sin(dLon / 2);
-				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
+				const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
+				const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
 				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
 				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
 				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
@@ -104,13 +100,14 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 				lng: lng,
 				apiCategory: 'FD6',
 				radius: radius,
-				backupLat: timetable[e.idx][e.index - 1].lat,
-				backupLng: timetable[e.idx][e.index - 1].lng,
+				backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
+				backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
 			});
 		}
 	};
-	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
 
+	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
+	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
 	return (
 		<InfoViewContainter>
 			<SpacerView />
@@ -123,8 +120,8 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 								return (
 									<InfoPressable
 										backgroundColor={
-											editMode == 'delete' && deleteList.includes(value.id)
-												? 'red'
+											(value.category == 4 || value.category == 1) && !value.name.includes('추천')
+												? selectCategortColors[value.category]
 												: categortColors[value.category]
 										}
 										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
@@ -146,35 +143,9 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 											if (makeMode == 'share') {
 												viewDetail(indexRef.current);
 											} else {
-												if (editMode == 'delete') {
-													let copy = [...deleteList];
-													if (deleteList.includes(value.id)) {
-														copy = copy.filter(item => item != value.id);
-													} else {
-														copy.push(value.id);
-													}
-													setDeleteList(copy);
-												} else {
-													setVisible(true);
-												}
+												setVisible(true);
 											}
-										}}
-										// onLongPress={() => {
-
-										//    if (makeMode != 'share') {
-										//       if (editMode == 'delete') {
-										//          setDeleteList([]);
-										//          dispatch(travelSliceActions.editModeChange(''));
-										//       } else {
-										//          let copy = [...deleteList];
-										//          copy.push(value.id);
-										//          setDeleteList(copy);
-										//          dispatch(travelSliceActions.editModeChange('delete'));
-										//       }
-										//    }
-										// }}
-									>
-										{/* h= takenTime top=시간위치 */}
+										}}>
 										<InfoText>{value.name}</InfoText>
 
 										{value.photo != '' && (
@@ -188,7 +159,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			)}
 			<Modal
 				visible={visible}
-				animationType={'slide'}
+				animationType={'fade'}
 				transparent={true}
 				statusBarTranslucent={true}
 				onRequestClose={() => setVisible(false)}>
@@ -214,7 +185,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 									<ModalIconContainer>
 										<DeleteContainer name={'like2'} size={20} color={'black'} />
 									</ModalIconContainer>
-									<ModalText>추천 받기</ModalText>
+									<ModalText>추천받기</ModalText>
 								</ModalElementContainer>
 							</>
 						) : (
@@ -245,18 +216,19 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 						)}
 						<ModalElementContainer
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '삭제하시겠습니까?',
-										modalLeft: true,
-										modalFunction: goRemove,
-									}),
-								);
+								setVisible(false),
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '삭제하시겠습니까?',
+											modalLeft: true,
+											modalFunction: goRemove,
+										}),
+									);
 							}}>
 							<ModalIconContainer>
 								<DeleteContainer name={'delete'} size={20} color={'black'} />
 							</ModalIconContainer>
-							<ModalText>삭제 하기</ModalText>
+							<ModalText>삭제하기</ModalText>
 						</ModalElementContainer>
 					</InfoModalContainer>
 				</ModalContainer>
@@ -315,12 +287,13 @@ const InfoPressable = styled.Pressable<{backgroundColor: string; height: number;
 	background-color: ${props => props.backgroundColor};
 	position: absolute;
 	z-index: 3;
-	border-radius: 10px;
 	padding: 4px;
+	border-radius: ${devicesWidth * 0.01}px;
 `;
 const InfoText = styled.Text`
-	font-size: 13px;
-	color: black;
+	font-size: ${devicesWidth * 0.036}px;
+	color: white;
+	font-weight: 500;
 `;
 const InfoImage = styled.Image`
 	margin: 5px 0px 0px 0px;

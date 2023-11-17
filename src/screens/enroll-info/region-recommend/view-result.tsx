@@ -1,59 +1,16 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
+import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import CustomButton from '../../../utill/component/custom-button';
-import {Text, ScrollView} from 'native-base';
-import {Platform, TouchableOpacity, PermissionsAndroid, Alert, BackHandler} from 'react-native';
-import {cityViewList} from '../select-city';
-import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {regionSearch} from '../../../redux/travel-info/region-recommend.slice';
+import {BackHandler, Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {MainContainer, HStack, VStack} from '../../../utill/layout/layout';
+import {MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
+import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-	const {tendency, distance, popularity, lat, lng} = useAppSelector(state => state.regionRecommendSlice);
-	const [recommendList, setRecommendList] = useState<
-		{name: string; photo: string; takenDay: number; tendency: string[]}[]
-	>([]);
-	const goEnrollInfo = (e: string) => {
-		let region: string[] = [];
-		if (e.includes(' ')) {
-			region = e.split(' ');
-		} else {
-			region = [e, '전체'];
-		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		const data = {cityIndex: cityIndex, region: [region[1]]};
-
-		let season = Array(4).fill(0);
-		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
-		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
-		dispatch(travelSliceActions.setRecommendRegion(data));
-		navigation.navigate('EnrollTravelTitle');
-	};
-	const getRegionRecommend = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			let datas = {
-				selectList: tendency,
-				selectPopular: popularity,
-				recentPosition: {lat: lat, lng: lng},
-				distanceSensitivity: distance,
-			};
-			const result = await dispatch(regionSearch(datas)).unwrap();
-			setRecommendList(result);
-		} catch (err) {
-			console.log(err);
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
+	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {
@@ -73,17 +30,32 @@ export default function ViewResult({navigation}: any) {
 
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
+		navigation.setOptions({
+			headerLeft: () => (
+				<TouchableOpacity
+					onPress={() => {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '홈으로 이동시 데이터는 날라갑니다.',
+								modalSubTitle: '그래도 나가시겠습니까?',
+								modalFunction: () => {
+									navigation.popToTop();
+								},
+								modalLeft: true,
+							}),
+						);
+					}}
+					style={{justifyContent: 'center'}}>
+					<Image
+						source={require('../../../../public/images/danim_logo_row.png')}
+						style={{height: 30, aspectRatio: 2.054}}
+					/>
+				</TouchableOpacity>
+			),
+		});
 		return () => backHandler.remove();
 	}, []);
-	useLayoutEffect(() => {
-		getRegionRecommend();
-	}, []);
-	if (isLoading)
-		return (
-			<ScrollView>
-				<Text>스ㅔ</Text>
-			</ScrollView>
-		);
+	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<MainContainer>
 			<StepText mainText='지역 추천' subText='당신의 성향을 기반으로, 여행 지역을 찾아왔어요' />
@@ -92,22 +64,67 @@ export default function ViewResult({navigation}: any) {
 					<RecommendContainer
 						key={idx}
 						onPress={() => {
-							goEnrollInfo(item.name);
+							navigation.navigate('DetailResult', {item: item});
+							//goEnrollInfo(item.name);
 						}}>
-						<RecommendImage source={{uri: item.photo}}></RecommendImage>
+						{item.photo != '' ? (
+							<RecommendImage source={{uri: item.photo}}></RecommendImage>
+						) : (
+							<LogoCOntainer>
+								<SvgLoginLogo color={'white'} width={40} />
+							</LogoCOntainer>
+						)}
 						<RecommendElement>
 							<TitleText>{item.name}</TitleText>
-							{item.tendency.map((value, index) => (
-								<TendencyText>#{value}</TendencyText>
-							))}
+							<TendencyTextContainer>
+								<TendencyText>
+									{item.tendency.map((value, index) => (
+										<Fragment key={index}>#{value}</Fragment>
+									))}
+								</TendencyText>
+							</TendencyTextContainer>
+							<RightLogoContainer>
+								<LogoCircle>
+									<SvgRight color={'black'} width={15} />
+								</LogoCircle>
+							</RightLogoContainer>
 						</RecommendElement>
+						<TakenDayContainer>
+							<TakenText>
+								{item.takenDay == 0
+									? '당일치기추천'
+									: item.takenDay + '박 ' + (item.takenDay + 1) + '일 추천'}{' '}
+							</TakenText>
+						</TakenDayContainer>
 					</RecommendContainer>
 				))}
 			</RecommendAllContainer>
 		</MainContainer>
 	);
 }
-
+const TakenText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: white;
+`;
+const TakenDayContainer = styled.View`
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: ${colors.selectButton};
+	width: 40%;
+	padding: 5px;
+	border-top-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+`;
+const LogoCOntainer = styled.View`
+	width: 100%;
+	height: 200px;
+	align-items: center;
+	border-radius: 10px;
+	justify-content: center;
+	background-color: ${colors.regionNormal};
+`;
 const RecommendAllContainer = styled.View`
 	width: 100%;
 	border-radius: 10px;
@@ -115,7 +132,7 @@ const RecommendAllContainer = styled.View`
 	justify-content: center;
 	margin: 0px 0px 30px 0px;
 `;
-const RecommendContainer = styled.TouchableOpacity`
+export const RecommendContainer = styled.TouchableOpacity`
 	width: 90%;
 	border-radius: 10px;
 	align-items: center;
@@ -127,7 +144,7 @@ const RecommendImage = styled.Image`
 	height: 200px;
 	border-radius: 10px;
 `;
-const RecommendElement = styled.View`
+export const RecommendElement = styled.View`
 	width: 100%;
 	background-color: ${colors.selectButton};
 	flex-direction: row;
@@ -138,12 +155,30 @@ const RecommendElement = styled.View`
 	align-items: center;
 	padding: 10px;
 `;
+const TendencyTextContainer = styled.View`
+	width: 50%;
+	flex-direction: row;
+`;
+const RightLogoContainer = styled.View`
+	width: 20%;
+	align-items: center;
+	justify-content: center;
+`;
 const TitleText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	color: white;
+	width: 30%;
 `;
-const TendencyText = styled(TitleText)`
-	margin: 0px 0px 0px 5px;
+const TendencyText = styled.Text`
+	font-weight: bold;
+	color: white;
 	font-size: 9px;
+`;
+const LogoCircle = styled.View`
+	border-radius: 99px;
+	padding: 10px;
+	align-items: center;
+	justify-content: center;
+	background-color: white;
 `;

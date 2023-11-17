@@ -1,7 +1,15 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import LoadingLottie from './loading-lottie';
 export default function Loading() {
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			setView(true);
+		}, 200);
+		return () => clearTimeout(timeoutId);
+	}, []);
+	const [view, setView] = useState(false);
+	if (!view) return <></>;
 	return (
 		<LoadingContainer>
 			<LoadingLottie />

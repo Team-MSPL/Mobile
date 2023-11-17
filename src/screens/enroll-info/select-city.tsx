@@ -4,24 +4,27 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
-import SelectButton from '../../utill/component/select-button';
-import {HStack, VStack, Divider, MainContainer} from '../../utill/layout/layout';
+import {HStack, VStack, Divider, MainContainer, InputWrap, ClearTouchableOpacity} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
 import {SvgCancel} from '../../utill/svg/svg';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
-export default function SelectCity({setViewComponent, viewComponent}: any) {
-	const {region, cityIndex} = useAppSelector(state => state.travelSlice);
+import {ButtonContainer, MarginContainder} from './select-multi';
+export default function SelectCity({viewComponent, goNextStep}: any) {
+	const {region, regionRecommendFlag, cityIndex} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
-	const [regionMode, setRegionMode] = useState(true);
-	const [popularitySelect, setPopularitySelect] = useState(-1);
-	const [onSearch, setOnSearch] = useState(true);
-	const handlePopularity = (e: number) => {
-		setPopularitySelect(e);
+	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
+	const selectPopularity = (e: {id: number; subTitle: string}) => {
+		dispatch(
+			travelSliceActions.selectPopularity({
+				region: checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle],
+				cityIndex: e.id,
+			}),
+		);
 	};
-
 	const selectRegion = (e: string) => {
 		if (e === '전체' || region.includes('전체')) {
 			dispatch(travelSliceActions.selectRegion([e]));
@@ -48,18 +51,9 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 	};
 
 	const goNext = () => {
-		if (regionMode) {
-			//dispatch(travelSliceActions.enrollCityIndex(select));
-		} else {
-			const index = popularityList[popularitySelect];
-			dispatch(
-				travelSliceActions.enrollPoplurarityRegion({
-					region: [cityViewList[index.id].sub[index.subId].subTitle],
-					cityIndex: index.id,
-				}),
-			);
-		}
-		setViewComponent(viewComponent + 1);
+		region.length != 0
+			? goNextStep()
+			: dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
 	};
 
 	//검색 관련
@@ -68,274 +62,160 @@ export default function SelectCity({setViewComponent, viewComponent}: any) {
 		cityViewList.find(item =>
 			item.sub.some(
 				subItem =>
-					(subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
-					subItem.subTitle.startsWith(search),
+					((subItem.subTitle.endsWith('시') || subItem.subTitle.endsWith('군')) &&
+						item.id != 0 &&
+						subItem.subTitle.startsWith(search)) ||
+					item.title.startsWith(search),
 			),
 		);
 
+	const searchCity = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
 	const changeSearch = (e: any) => {
 		setSearch(e);
 	};
 	const addCity = () => {
 		searchData && selectCity(searchData.id);
 		const data = searchData && searchData.sub.find(item => item.subTitle.includes(search))?.subTitle;
-		dispatch(travelSliceActions.selectRegion([data]));
+		dispatch(travelSliceActions.selectRegion([data ?? '전체']));
 	};
-	const changeShow = () => {
-		setOnSearch(!onSearch);
-	};
-	useEffect(() => {
-		// dispatch(travelSliceActions.reset());
-		// dispatch(travelSliceActions.setMakeMode('recommend'));
-	}, []);
 	return (
-		<MainContainer showsVerticalScrollIndicator={false}>
-			{/* 스테퍼 넣기 */}
-			<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
+		<>
+			<MainContainer showsVerticalScrollIndicator={false}>
+				{/* 스테퍼 넣기 */}
+				<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
 
-			{/* <HStack>
-				<TouchableOpacity
-					style={{
-						width: 50,
-						height: 100,
-						backgroundColor: regionMode ? 'red' : 'white',
-						marginHorizontal: 10,
-					}}
-					onPress={() => setRegionMode(true)}>
-					<Text>그냥</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={{
-						width: 50,
-						height: 100,
-						backgroundColor: regionMode ? 'white' : 'red',
-						marginHorizontal: 10,
-					}}
-					onPress={() => setRegionMode(false)}>
-					<Text>인기</Text>
-				</TouchableOpacity>
-			</HStack> */}
-			{regionMode ? (
-				<>
-					{onSearch ? (
-						<SearchAndChoice onPress={changeShow}>
-							<SelectRegionInfo>{`ex)제주도`}</SelectRegionInfo>
-						</SearchAndChoice>
-					) : (
-						<VStack>
-							<HStack>
-								<SearchInput
-									autoFocus={true}
-									value={search}
-									onChangeText={(text: string) => changeSearch(text)}
-									placeholder='ex)제주도'></SearchInput>
-								<TouchableOpacity onPress={changeShow}>
-									<SelectRegionInfo>취소</SelectRegionInfo>
-								</TouchableOpacity>
-							</HStack>
-							{searchData && (
-								<SearchTouchableOpacity onPress={addCity}>
-									<SelectRegion>{searchData?.title}</SelectRegion>
-								</SearchTouchableOpacity>
-							)}
-
-							<RegionViewContainer>
-								<RegionItemContainer>
-									<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
-										{cityViewList.map((item, idx) => {
-											return (
-												<Fragment key={idx}>
-													<RegionItems
-														select={cityIndex == item.id}
-														onPress={() => {
-															selectCity(item.id);
-														}}>
-														<RegionText select={cityIndex == item.id}>
-															{item.title}
-														</RegionText>
-													</RegionItems>
-													{cityIndex == item.id && (
-														<CityItemContainer>
-															{cityViewList[cityIndex]?.sub.map((item, index) => {
-																return (
-																	<CityItems
-																		key={index}
-																		select={region.includes(item.subTitle)}
-																		onPress={() => {
-																			selectRegion(item.subTitle);
-																		}}>
-																		<CityCheckBox
-																			select={region.includes(
-																				item.subTitle,
-																			)}></CityCheckBox>
-																		<CityText
-																			select={region.includes(item.subTitle)}>
-																			{item.subTitle}
-																		</CityText>
-																	</CityItems>
-																);
-															})}
-														</CityItemContainer>
-													)}
-												</Fragment>
-											);
-										})}
-									</ScrollView>
-								</RegionItemContainer>
-							</RegionViewContainer>
-							{/* <RegionViewContainer>
-								<RegionItemContainer>
-									<ScrollView nestedScrollEnabled={true}>
-										{cityViewList[select]?.sub.map((item, idx) => {
-											return (
-												<RegionItems
-													select={region.includes(item.subTitle)}
-													onPress={() => {
-														selectRegion(item.subTitle);
-													}}>
-													<RegionText select={region.includes(item.subTitle)}>
-														{item.subTitle}
-													</RegionText>
-												</RegionItems>
-											);
-										})}
-									</ScrollView>
-								</RegionItemContainer>
-							</RegionViewContainer> */}
-						</VStack>
-					)}
-					{/* <SearchAndChoice onPress={changeShow}>
-						<Text>{`ex)제주도`}</Text>
-					</SearchAndChoice>
+				<InputAllContainter>
 					<SearchInput
+						placeholderTextColor={'grey'}
+						style={{color: 'black'}}
 						value={search}
 						onChangeText={(text: string) => changeSearch(text)}
-						placeholder='ex)제주도'></SearchInput> */}
-
-					<VStack>
-						{/* <HStack>
-							<RegionViewContainer>
-								<RegionItemContainerText>지역</RegionItemContainerText>
-								<RegionItemContainer>
-									<ScrollView nestedScrollEnabled={true}>
-										{cityViewList.map((item, idx) => {
-											return (
-												<RegionItems
-													select={select == item.id}
-													onPress={() => {
-														selectCity(item.id);
-													}}>
-													<RegionText select={select == item.id}>{item.title}</RegionText>
-												</RegionItems>
-											);
-										})}
-									</ScrollView>
-								</RegionItemContainer>
-							</RegionViewContainer>
-							<RegionViewContainer>
-								<RegionItemContainerText>상세 지역</RegionItemContainerText>
-								<RegionItemContainer>
-									<ScrollView nestedScrollEnabled={true}>
-										{cityViewList[select]?.sub.map((item, idx) => {
-											return (
-												<RegionItems
-													select={region.includes(item.subTitle)}
-													onPress={() => {
-														selectRegion(item.subTitle);
-													}}>
-													<RegionText select={region.includes(item.subTitle)}>
-														{item.subTitle}
-													</RegionText>
-												</RegionItems>
-											);
-										})}
-									</ScrollView>
-								</RegionItemContainer>
-							</RegionViewContainer>
-						</HStack> */}
-						<SelectListAllContainer>
-							<HStack>
-								<SelectRegion>선택 지역</SelectRegion>
-								<SelectRegionInfo>최대 15개 까지 선택할 수 있어요</SelectRegionInfo>
-								<SelectRegion>{region?.length}개</SelectRegion>
-							</HStack>
-							<SelectListContainer>
-								{region?.map((item, regionIndex) => {
+						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>
+					{search && (
+						<ClearTouchableOpacity
+							onPress={() => {
+								changeSearch('');
+							}}>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
+					)}
+				</InputAllContainter>
+				{searchData && (
+					<SearchTouchableOpacity onPress={addCity}>
+						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
+					</SearchTouchableOpacity>
+				)}
+				<SelectAllContainer>
+					<SelectRegion>선택 지역</SelectRegion>
+					<SelectListContainer horizontal={true}>
+						{region?.map((item, regionIndex) => {
+							return (
+								<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
+									<RegionElementContainerText>
+										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
+									</RegionElementContainerText>
+									<SvgCancel color='white' />
+								</RegionElementContainer>
+							);
+						})}
+					</SelectListContainer>
+				</SelectAllContainer>
+				<HStack>
+					<RegionAllContainer>
+						<StepInfo>Step 1</StepInfo>
+						<RegionViewContainer>
+							<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+								{cityViewList.map((item, idx) => {
 									return (
-										<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
-											<RegionElementContainerText>
-												{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
-											</RegionElementContainerText>
-											<SvgCancel color='white' />
-										</RegionElementContainer>
+										<RegionItems
+											key={idx}
+											select={cityIndex == item.id}
+											onPress={() => {
+												selectCity(item.id);
+											}}>
+											<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
+										</RegionItems>
 									);
 								})}
-							</SelectListContainer>
-						</SelectListAllContainer>
-					</VStack>
-				</>
-			) : (
-				<>
-					{popularityList.map((item, value) => (
-						<TouchableOpacity
-							key={value}
-							style={{
-								width: 100,
-								height: 50,
-								backgroundColor: popularitySelect == value ? 'red' : 'white',
-								borderRadius: 10,
-								marginVertical: 10,
-							}}
-							onPress={() => {
-								handlePopularity(value);
-							}}>
-							<SelectRegion>{item.title}</SelectRegion>
-						</TouchableOpacity>
-					))}
-				</>
-			)}
-			<CustomButton label={'다음 (' + (viewComponent + 1) + '/5)'} onPress={goNext}></CustomButton>
-		</MainContainer>
+							</ScrollView>
+						</RegionViewContainer>
+					</RegionAllContainer>
+					<CityAllContainer>
+						<StepInfo>Step 2</StepInfo>
+						<CityViewContainer>
+							<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
+								{cityViewList[cityIndex]?.sub.map((item, idx) => {
+									return (
+										<CityItems
+											key={idx}
+											select={region.includes(item.subTitle)}
+											onPress={() => {
+												cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
+											}}>
+											<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
+										</CityItems>
+									);
+								})}
+							</ScrollView>
+						</CityViewContainer>
+					</CityAllContainer>
+				</HStack>
+
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton
+					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNext}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
+const InputAllContainter = styled(InputWrap)`
+	border-color: ${colors.border};
+	height: 50px;
+`;
+const RegionAllContainer = styled(VStack)`
+	width: 30%;
+`;
 
+const CityAllContainer = styled(VStack)`
+	width: 70%;
+`;
 const RegionViewContainer = styled.View`
-	width: 100%;
 	height: 300px;
+	border-width: 1px;
+	border-color: ${colors.regionNormal};
+	margin: 10px 0px 0px 0px;
+`;
+const CityViewContainer = styled(RegionViewContainer)`
+	margin: 10px 0px 0px 0px;
 `;
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
-	height: 40px;
-	border-bottom-width: 1px;
-`;
-const CityItems = styled.TouchableOpacity<{select: boolean}>`
-	height: 35px;
-	display: inline-block;
-	flex-direction: row;
 	align-items: center;
+	height: 40px;
+	background-color: ${props => (props.select ? colors.selectButton : 'white')};
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.regionNormal};
+`;
+const CityItems = styled(RegionItems)`
+	background-color: ${props => (props.select ? colors.normalButton : 'white')};
+	border-bottom-width: 0px;
 `;
 const RegionText = styled.Text<{select: boolean}>`
-	color: black;
-	font-size: 20px;
-	font-weight: bold;
+	color: ${props => (props.select ? 'white' : 'black')};
+	font-size: 16px;
+	font-weight: 500;
 `;
-const CityText = styled.Text<{select: boolean}>`
+const CityText = styled(RegionText)`
 	color: ${props => (props.select ? colors.selectButton : 'black')};
-	font-size: 17px;
-`;
-const RegionItemContainer = styled.View`
-	width: 100%;
-`;
-const CityItemContainer = styled.View`
-	width: 100%;
-	background-color: ${colors.normalButton};
 `;
 const RegionElementContainer = styled.TouchableOpacity`
 	background-color: ${colors.selectButton};
 	border-radius: 20px;
-	margin: 10px 5px 5px 5px;
-	padding: 5px 15px 5px 15px;
+	margin: 0px 5px 0px 0px;
+	padding: 10px 20px 10px 20px;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
@@ -343,79 +223,71 @@ const RegionElementContainer = styled.TouchableOpacity`
 const SearchTouchableOpacity = styled.TouchableOpacity`
 	width: 100%;
 	padding: 10px;
-	align-items: center;
+	background-color: #f0f0f0;
+	border-radius: 10px;
 `;
 const RegionElementContainerText = styled.Text`
 	font-size: 15px;
 	color: white;
 	margin: 0px 10px 0px 0px;
 `;
-const CityCheckBox = styled.View<{select: boolean}>`
-	background-color: ${props => (props.select ? colors.selectButton : colors.regionNormal)};
-	width: 20px;
-	height: 20px;
-	margin: 0px 10px 0px 10px;
-`;
 
 const SelectRegion = styled.Text`
 	font-size: 17px;
 	color: black;
-	font-weight: bold;
+	font-weight: 500;
 	margin: 0px 10px 0px 0px;
 `;
-const SelectRegionInfo = styled.Text`
+const StepInfo = styled.Text`
 	font-size: 14px;
-	color: grey;
-	font-weight: bold;
+	color: ${colors.selectButton};
+	font-weight: 500;
 	margin: 0% 1% 0% 0%;
 `;
-const SelectListAllContainer = styled.View`
+const SelectListContainer = styled.ScrollView`
 	width: 100%;
-`;
-const SelectListContainer = styled.View`
-	width: 100%;
-	height: 300px;
-	background-color: ${colors.normalButton};
-	margin: 20px 0px 20px 0px;
-	border-radius: 10px;
+	height: 50px;
+	margin: 10px 0px 10px 0px;
 	padding: 5px;
-	display: inline-block;
-	flex-direction: row;
-	flex-wrap: wrap;
 `;
 const SearchInput = styled.TextInput`
-	background-color: white;
-	border-color: ${colors.border};
-	border-width: 1px;
-	border-radius: 15px;
 	flex: 1;
+	padding: 0px 0px 0px 8px;
 `;
-const SearchAndChoice = styled.Pressable`
-	background-color: white;
-	border-color: ${colors.border};
-	border-width: 1px;
-	border-radius: 15px;
-	padding: 15px 0px 15px 10px;
-	margin: 10px 0px 10px 0px;
+const SelectAllContainer = styled.View`
+	width: 100%;
+	margin: 10px 0px 0px 0px;
 `;
-const popularityList = [
-	{id: 0, title: '서울', subId: 0},
-	{id: 1, title: '부산', subId: 0},
-	{id: 2, title: '대구', subId: 0},
-	{id: 9, title: '강원 강릉 ', subId: 1},
-	{id: 10, title: '충북 단양', subId: 2},
-];
 export const cityViewList = [
-	{id: 0, title: '서울', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 1, title: '부산', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 2, title: '대구', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 3, title: '인천', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 4, title: '광주', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 5, title: '대전', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 6, title: '울산', sub: [{id: 0, subTitle: '전체'}]},
-	{id: 7, title: '세종', sub: [{id: 0, subTitle: '전체'}]},
 	{
-		id: 8,
+		id: 0,
+		title: '인기',
+		sub: [
+			{id: 1, subTitle: '서울'},
+			{id: 2, subTitle: '부산'},
+			{id: 17, subTitle: '제주'},
+			{id: 4, subTitle: '인천'},
+			{id: 3, subTitle: '대구'},
+			{id: 5, subTitle: '광주'},
+			{id: 6, subTitle: '대전'},
+			{id: 7, subTitle: '울산'},
+			{id: 10, subTitle: '강릉시'},
+			{id: 10, subTitle: '속초시'},
+			{id: 15, subTitle: '경주시'},
+			{id: 15, subTitle: '포항시'},
+			{id: 14, subTitle: '여수시'},
+		],
+	},
+	{id: 1, title: '서울', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 3, title: '대구', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 4, title: '인천', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 5, title: '광주', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 6, title: '대전', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 7, title: '울산', sub: [{id: 0, subTitle: '전체'}]},
+	{id: 8, title: '세종', sub: [{id: 0, subTitle: '전체'}]},
+	{
+		id: 9,
 		title: '경기',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -453,7 +325,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 9,
+		id: 10,
 		title: '강원',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -478,7 +350,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 10,
+		id: 11,
 		title: '충북',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -496,7 +368,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 11,
+		id: 12,
 		title: '충남',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -518,7 +390,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 12,
+		id: 13,
 		title: '전북',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -539,7 +411,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 13,
+		id: 14,
 		title: '전남',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -568,7 +440,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 14,
+		id: 15,
 		title: '경북',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -596,7 +468,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 15,
+		id: 16,
 		title: '경남',
 		sub: [
 			{id: 0, subTitle: '전체'},
@@ -621,7 +493,7 @@ export const cityViewList = [
 		],
 	},
 	{
-		id: 16,
+		id: 17,
 		title: '제주',
 		sub: [
 			{id: 0, subTitle: '전체'},

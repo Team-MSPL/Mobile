@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
-import {BackHandler, Alert} from 'react-native';
+import {BackHandler, Alert, View, Image, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -11,7 +11,7 @@ import CustomButton from '../../utill/component/custom-button';
 import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
-import {DayButton, DayContainer, DayElementContainer, DaySubTitle, DayTitle} from './map-info';
+import {DayElementContainer} from './map-info';
 
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
@@ -32,7 +32,31 @@ export default function Preset({navigation}: any) {
 		navigation.navigate('Timetable');
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
-
+	useEffect(() => {
+		navigation.setOptions({
+			headerLeft: () => (
+				<TouchableOpacity
+					onPress={() => {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '홈으로 이동시 데이터는 날라갑니다.',
+								modalSubTitle: '그래도 나가시겠습니까?',
+								modalFunction: () => {
+									navigation.popToTop();
+								},
+								modalLeft: true,
+							}),
+						);
+					}}
+					style={{justifyContent: 'center'}}>
+					<Image
+						source={require('../../../public/images/danim_logo_row.png')}
+						style={{height: 30, aspectRatio: 2.054}}
+					/>
+				</TouchableOpacity>
+			),
+		});
+	}, []);
 	const change = (idx: number) => {
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(

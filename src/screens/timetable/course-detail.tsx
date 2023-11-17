@@ -21,11 +21,10 @@ export default function CourseDetail({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
-			console.log(a);
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+					modalTitle: '여행 정보가 없습니다',
 				}),
 			);
 		} finally {
@@ -48,9 +47,9 @@ export default function CourseDetail({navigation, route}: any) {
 	if (courseDetail?.name)
 		return (
 			<DetailContainer>
-				<ImageScroll horizontal={true}>
-					{courseDetail.photos &&
-						courseDetail.photos.map((value, index) => (
+				{courseDetail.photos && (
+					<ImageScroll horizontal={true}>
+						{courseDetail.photos.map((value, index) => (
 							<Pressable
 								onPress={() => {
 									setImageIndex(index);
@@ -66,7 +65,8 @@ export default function CourseDetail({navigation, route}: any) {
 								/>
 							</Pressable>
 						))}
-				</ImageScroll>
+					</ImageScroll>
+				)}
 				<TitleInfoContainer>
 					<DetailInfoContainer>
 						<VStack>
@@ -124,7 +124,7 @@ export default function CourseDetail({navigation, route}: any) {
 						</>
 					) : (
 						<ReviewContainer>
-							{courseDetail.reviews ? (
+							{courseDetail?.reviews ? (
 								courseDetail.reviews.map((item, idx) => (
 									<OpenContainer key={idx}>
 										<OpenVStack>
@@ -145,24 +145,26 @@ export default function CourseDetail({navigation, route}: any) {
 						</ReviewContainer>
 					)}
 				</TabScrollView>
-				<ImageView
-					images={courseDetail.photos.map((value, index) => ({
-						uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
-					}))}
-					onImageIndexChange={item => console.log(item)}
-					imageIndex={imageIndex}
-					visible={visible}
-					onRequestClose={() => setVisible(false)}
-					FooterComponent={index => {
-						return (
-							<ImageViewFooterComponent>
-								<ImageText>
-									{index.imageIndex + 1}/{courseDetail.photos.length}
-								</ImageText>
-							</ImageViewFooterComponent>
-						);
-					}}
-				/>
+				{courseDetail?.photos && (
+					<ImageView
+						images={courseDetail?.photos.map((value, index) => ({
+							uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
+						}))}
+						onImageIndexChange={item => console.log(item)}
+						imageIndex={imageIndex}
+						visible={visible}
+						onRequestClose={() => setVisible(false)}
+						FooterComponent={index => {
+							return (
+								<ImageViewFooterComponent>
+									<ImageText>
+										{index.imageIndex + 1}/{courseDetail.photos.length}
+									</ImageText>
+								</ImageViewFooterComponent>
+							);
+						}}
+					/>
+				)}
 			</DetailContainer>
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
@@ -187,7 +189,7 @@ const DetailInfoContainer = styled(HStack)`
 	justify-content: space-between;
 	padding: 1%;
 `;
-const ImageViewFooterComponent = styled.View`
+export const ImageViewFooterComponent = styled.View`
 	width: 100%;
 	height: 50;
 	align-items: center;
@@ -278,7 +280,7 @@ const ReviewElementText = styled.Text`
 	font-weight: 600;
 	color: black;
 `;
-const ImageText = styled(ReviewElementText)`
+export const ImageText = styled(ReviewElementText)`
 	color: white;
 `;
 const ReviewCenter = styled(Center)`

@@ -1,27 +1,51 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Alert, Platform, TextInput, TouchableOpacity, Image} from 'react-native';
+import {BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import moment from 'moment';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgPicture} from '../../utill/svg/svg';
+import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
 import {VStack} from '../../utill/layout/layout';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
+	const [saveCheck, setSaveCheck] = useState(false);
 	const [diaryValue, setDiaryValue] = useState(diary);
 
 	const [pictureValue, setpictureValue] = useState<string[]>(picture);
 	const changeDiary = (e: string) => {
+		!saveCheck && setSaveCheck(true);
 		setDiaryValue(e);
 	};
+
+	useEffect(() => {
+		const backAction = () => {
+			if (navigation.isFocused() && saveCheck) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '저장이 필요합니다. ',
+						modalSubTitle: '변경사항이 저장되지않았습니다. 나가시겠습니까?',
+						modalLeft: true,
+						modalFunction: () => {
+							navigation.goBack();
+						},
+					}),
+				);
+
+				return true;
+			}
+		};
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, [saveCheck]);
 	const goSaveDiary = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -45,19 +69,30 @@ export default function InputDiary({navigation}: any) {
 			height: 400,
 			size: 1000,
 			multiple: true,
+			maxFiles: 5,
 			mediaType: 'photo',
 			croppingQuality: 0.6,
 			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
-			let temporaryList = [];
-			for (let i = 0; i < response.length; i++) {
-				temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+			if (response.length <= 5) {
+				let temporaryList = [];
+				for (let i = 0; i < response.length; i++) {
+					temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+				}
+				//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
+				setpictureValue(temporaryList);
+				!saveCheck && setSaveCheck(true);
+			} else {
+				dispatch(modalSliceActions.setOpenModal({modalTitle: '최대 5장까지 선택가능합니다.'}));
 			}
-			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setpictureValue(temporaryList);
 		});
+	};
+	const deletePicture = (e: number) => {
+		let copy = [...pictureValue];
+		copy.splice(e, 1);
+		setpictureValue(copy);
 	};
 	return (
 		<>
@@ -70,40 +105,24 @@ export default function InputDiary({navigation}: any) {
 						</PictuerVstack>
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
-						<PictureElementContainer>
-							<PictureElement key={idx} source={{uri: item}}></PictureElement>
+						<PictureElementContainer key={idx}>
+							<CancelContainer
+								onPress={() => {
+									deletePicture(idx);
+								}}>
+								<SvgCancel color='white' width={13} height={13}></SvgCancel>
+							</CancelContainer>
+							<PictureElement source={{uri: item}}></PictureElement>
 						</PictureElementContainer>
 					))}
 				</PictureScroll>
-				{/* {pictureValue.length != 0 ? (
-					<>
-						<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
-							<PictureElementContainer onPress={handelGetImage}>
-								<PictuerVstack>
-									<SvgPicture color={colors.selectButton} />
-									<PictureText>사진 변경</PictureText>
-								</PictuerVstack>
-							</PictureElementContainer>
-							{pictureValue.map((item, idx) => (
-								<PictureElementContainer>
-									<PictureElement key={idx} source={{uri: item}}></PictureElement>
-								</PictureElementContainer>
-							))}
-						</PictureScroll>
-					</>
-				) : (
-					<PictureElementContainer onPress={handelGetImage}>
-						<PictuerVstack>
-							<SvgPicture color={colors.selectButton} />
-							<PictureText>사진 추가</PictureText>
-						</PictuerVstack>
-					</PictureElementContainer>
-				)} */}
 			</PictureCotainer>
 			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
 			<DiaryTextInput
 				value={diaryValue}
 				multiline={true}
+				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
 				placeholder='여행 일기로 추억을 기록해보세요'
 				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
 
@@ -115,6 +134,15 @@ export default function InputDiary({navigation}: any) {
 	);
 }
 
+const CancelContainer = styled.TouchableOpacity`
+	border-radius: 99px;
+	padding: 10px;
+	position: absolute;
+	right: -10px;
+	top: -10px;
+	background-color: black;
+	z-index: 3;
+`;
 const DiaryText = styled.Text`
 	font-size: 17px;
 	font-weight: bold;
@@ -131,7 +159,7 @@ export const DiaryTextInput = styled.TextInput`
 	padding: 10px;
 `;
 const PictureCotainer = styled.View`
-	height: 180px;
+	padding: 10px 0px;
 	width: 100%;
 	align-items: center;
 	margin: 15px 0px 15px 0px;
@@ -140,15 +168,14 @@ const PictureCotainer = styled.View`
 const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
-const PictureElementContainer = styled.TouchableOpacity`
+const PictureElementContainer = styled.Pressable`
 	width: 135px;
-	height: 180px;
 	border-radius: 10px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};
 	align-items: center;
 	justify-content: center;
-	margin: 0px 5px 0px 0px;
+	margin: 10px 10px 0px 0px;
 `;
 const PictureText = styled.Text`
 	margin: 10px 0px 0px 0px;

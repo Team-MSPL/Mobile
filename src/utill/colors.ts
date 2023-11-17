@@ -1,4 +1,9 @@
 export const colors = {
+	Black: '#000000',
+	LightGray1: '#EFEFEF',
+	LightGray2: '#DFDFDF',
+	LightGray3: '#D3D3D3',
+	Gray: '#B3B3B3',
 	TextPrimary: '#3AA1FC',
 	TextSecondary: 'blue.500',
 	border: '#2698FA',

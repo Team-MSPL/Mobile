@@ -3,6 +3,7 @@ import React, {Fragment} from 'react';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import CommunityReadingScreen from '../screens/community/community-reading-screen';
 import CommunityWritingScreen from '../screens/community/community-writing-screen';
+import CommunitySearch from '../screens/community/community-search';
 const Stack = createNativeStackNavigator();
 export default function CommunityStack() {
 	return (
@@ -23,8 +24,13 @@ export default function CommunityStack() {
 				component={CommunityWritingScreen}
 				options={{
 					title: '커뮤니티 글 작성',
-					headerStyle: {backgroundColor: '#EFFBFB'},
-					headerShadowVisible: false,
+				}}
+			/>
+			<Stack.Screen
+				name='CommunitySearch'
+				component={CommunitySearch}
+				options={{
+					headerShown: false,
 				}}
 			/>
 		</Fragment>

@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, Dimensions, NativeSyntheticEvent, NativeScrollEvent, Modal} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -14,24 +14,23 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import {HStack} from '../../utill/layout/layout';
-import {SvgMapIcon} from '../../utill/svg/svg';
-import {HeaderHStack} from '../my-travel-list/detail-info';
-import Icon from 'react-native-vector-icons/AntDesign';
-import background from '../../utill/component/timetable/background';
+import {HStack, HeaderContianer, HeaderText} from '../../utill/layout/layout';
+import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+import {usePosition} from '../../utill/hooks/usePosition';
+import ViewPager from '../../utill/view-pager';
 export default function Timetable({navigation, route}: any) {
 	const {timetable, day, makeMode, editMode, region, nDay, transit, tendency, travelId, tableShowFlag, travelName} =
 		useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const [deleteList, setDeleteList] = useState<string[]>([]);
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
 	const [viewDayIndex, setViewDayIndex] = useState(0);
+	const [mapViewState, setMapViewState] = useState(true);
+	const WINDOW_WIDTH = Dimensions.get('window').width;
+	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
-	const SaveContainer = styled(Icon)`
-		border-radius: 5px;
-	`;
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -74,14 +73,14 @@ export default function Timetable({navigation, route}: any) {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
 	};
+
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
+			makeMode == 'solo' && appsflyerLogEvent({name: 'solo_save', value: {id: 'danim'}});
 			dispatch(LoadingSliceActions.onLoading());
-
-			console.log('아디아디123벅', travelId);
 			if (travelId == '') {
-				console.log('아디아디벅', travelId);
 				const data = {
 					userId: userId,
 					region: makeMode == 'recommend' ? region : ['자유여행'],
@@ -118,67 +117,94 @@ export default function Timetable({navigation, route}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useLayoutEffect(() => {
-		console.log(
-			makeMode,
-			'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
-		);
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<View>
-					{makeMode == 'share' ? (
-						<TouchableOpacity onPress={goMapInfo}>
-							<SvgMapIcon color={colors.selectButton} />
+				<HeaderContianer>
+					{editMode == 'add' ? (
+						<TouchableOpacity
+							onPress={() => {
+								navigation.navigate('TimetableAddPlace', {x: x, y: addList});
+								setAddList([]);
+								dispatch(travelSliceActions.editModeChange(''));
+							}}>
+							<HeaderText>추가</HeaderText>
 						</TouchableOpacity>
 					) : (
 						<>
-							{editMode == 'add' ? (
-								<IconContainer
-									onPress={() => {
-										navigation.navigate('TimetableAddPlace', {x: x, y: addList});
-										setAddList([]);
-										dispatch(travelSliceActions.editModeChange(''));
-									}}>
-									<SaveContainer name={'plus'} size={25} color={'white'} />
-								</IconContainer>
-							) : (
-								<HeaderHStack>
-									<IconContainer onPress={goMapInfo}>
-										<SvgMapIcon width={25} height={25} color={'white'} />
-									</IconContainer>
-									<IconContainer onPress={goSave}>
-										<SaveContainer name={'save'} size={25} color={'white'} />
-									</IconContainer>
-								</HeaderHStack>
-							)}
+							<TouchableOpacity onPress={goSave}>
+								<HeaderText>저장</HeaderText>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={goViewPager}>
+								<HeaderText>설명</HeaderText>
+							</TouchableOpacity>
 						</>
 					)}
-				</View>
+				</HeaderContianer>
 			),
 		});
-	}, [editMode, timetable, addList, deleteList, x, makeMode]);
+	}, [editMode, timetable, addList, x, makeMode]);
 
+	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		setMapViewState(usePosition(e));
+	};
+	const goBack = () => {
+		setViewPagerView(false);
+	};
+	const goViewPager = () => {
+		setViewPagerView(true);
+	};
+	const [viewPagerView, setViewPagerView] = useState(false);
 	if (!tableShowFlag) return <TimeTableContainer></TimeTableContainer>;
 	return (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
+			{mapViewState && (
+				<MapContainer onPress={goMapInfo} right={WINDOW_WIDTH * 0.1} bottom={WINDOW_HEIGHT * 0.05}>
+					<SvgMapIcon width={30} height={30} color={'white'} />
+					<MapText>지도</MapText>
+				</MapContainer>
+			)}
+
 			<ScrollVIewContainer>
-				<TimetableScrollView>
-					<InfoView
-						navigation={navigation}
-						setDeleteList={setDeleteList}
-						deleteList={deleteList}
-						viewDayIndex={viewDayIndex}
-					/>
+				<TimetableScrollView
+					showsVerticalScrollIndicator={false}
+					onScroll={changeViewState}
+					scrollEventThrottle={16}>
+					<InfoView navigation={navigation} viewDayIndex={viewDayIndex} />
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 				</TimetableScrollView>
 			</ScrollVIewContainer>
+
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerView}
+				onRequestClose={() => setViewPagerView(false)}>
+				<ViewPager handleFunction={goBack} timetable={true} />
+			</Modal>
 		</TimeTableContainer>
 	);
 }
 
+const MapContainer = styled.TouchableOpacity<{right: number; bottom: number}>`
+	position: absolute;
+	background-color: ${colors.selectButton};
+	border-radius: 15px;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	height: 60px;
+	bottom: ${props => props.bottom}px;
+	right: ${props => props.right}px;
+	z-index: 99;
+`;
+const MapText = styled.Text`
+	font-size: 15px;
+	color: white;
+`;
 const TimeTableContainer = styled.View`
 	width: 100%;
 	background-color: white;
@@ -191,10 +217,4 @@ const ScrollVIewContainer = styled.View`
 `;
 const TimetableScrollView = styled.ScrollView`
 	position: relative;
-`;
-const IconContainer = styled.TouchableOpacity`
-	padding: 1%;
-	border-radius: 5px;
-	background-color: ${colors.selectButton};
-	margin: 0px 0px 0px 10px;
 `;

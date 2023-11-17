@@ -18,7 +18,6 @@ export default function BaseModal() {
 	return (
 		<Modal
 			animationType={'fade'}
-			presentationStyle={'formSheet'}
 			//transparent={true}
 			visible={modalOpen}
 			onRequestClose={close}>

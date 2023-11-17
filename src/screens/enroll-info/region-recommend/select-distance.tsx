@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {Text} from 'native-base';
 import {
 	regionRecommendSliceActions,
 	reverseGeocoding,
@@ -17,11 +16,24 @@ import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import {DistanceExplain} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 0, lng: 0, name: ''});
 
+	const checkDistance = () => {
+		geoInfo.name == ''
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '위치정보',
+						modalSubTitle: '현재 위치가 설정되지 않아 위치기반 추천이 어렵습니다. 그래도 진행하시겠습니까?',
+						modalLeft: true,
+						modalFunction: goNext,
+					}),
+			  )
+			: goNext();
+	};
 	const goNext = () => {
 		const data = {distance: range, lat: geoInfo.lat, lng: geoInfo.lng};
 		dispatch(regionRecommendSliceActions.enrollDistanceAndLatLng(data));
@@ -72,12 +84,12 @@ export default function SelectDistance({navigation}: any) {
 		} catch (err) {
 			console.log('에러요', err);
 		} finally {
-			// dispatch(LoadingSliceActions.offLoading());
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='거리민감도 성정' subText='다님Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
+			<StepText mainText='거리민감도 설정' subText='Ai는 거리 민감도를 통해 지역 코스를 추천해드려요' />
 			<DistanceCenter>
 				<DistanceText>{range}</DistanceText>
 				<Slider
@@ -92,11 +104,10 @@ export default function SelectDistance({navigation}: any) {
 						setRange(item);
 					}}
 				/>
-				<DistanceExplain>
-					{range >= 5
-						? '민감도가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
-						: '민감도가 낮으면, 성향과는 조금 멀어질 수 있어요'}
-				</DistanceExplain>
+				<DistanceSpace>
+					<DistanceExplain>내 근처</DistanceExplain>
+					<DistanceExplain>한국 전체</DistanceExplain>
+				</DistanceSpace>
 			</DistanceCenter>
 			<DistanceDivider />
 			<StepText mainText='내 위치 정보' subText='내 위치를 기준으로 추천을 진행해요' />
@@ -104,11 +115,11 @@ export default function SelectDistance({navigation}: any) {
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<Text>{geoInfo.name}</Text>
+				<GetText>{geoInfo.name}</GetText>
 			</Center>
 			<DistanceDivider />
 
-			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
+			<CustomButton label='다음 단계' onPress={checkDistance}></CustomButton>
 		</MainContainer>
 	);
 }
@@ -132,4 +143,15 @@ const GetContainerText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: white;
+`;
+const GetText = styled.Text`
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	margin: 10px 0px 0px 0px;
+`;
+const DistanceSpace = styled.View`
+	width: 100%;
+	flex-direction: row;
+	justify-content: space-between;
 `;

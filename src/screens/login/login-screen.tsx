@@ -17,6 +17,7 @@ import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {HStack} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {networkCheck} from '../../redux/network/networkSlice';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -40,8 +41,7 @@ export default function LoginScreen({navigation}: any) {
 	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
-	}, []);
-
+	}, [isLogin]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
 		const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -52,16 +52,12 @@ export default function LoginScreen({navigation}: any) {
 		return result;
 	};
 
-	const goAI = () => {
-		navigation.navigate('LocalSearchAITest');
-	};
 	const dispatch = useAppDispatch();
 
 	const kakaoLogin = async () => {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log('띠영', userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
@@ -78,9 +74,10 @@ export default function LoginScreen({navigation}: any) {
 					nickname: userInfo.nickname,
 				});
 			} else {
-				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
+				anonymousKeep && navigation.goBack();
 			}
-		} catch {
+		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',
@@ -112,19 +109,43 @@ export default function LoginScreen({navigation}: any) {
 					nickname: userInfo.user.name,
 				});
 			} else {
-				navigation.replace('Tab');
+				anonymousKeep && navigation.goBack();
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 취소됨', error);
 				// user cancelled the login flow
 			} else if (error === statusCodes.IN_PROGRESS) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 이미 실행 중', error);
 				// operation (e.g. sign in) is in progress already
 			} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 서비스 이용 불가 및 만료');
 				// play services not available or outdated
 			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '구글 에러',
+						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+					}),
+				);
 				console.log('구글 로그인 다른 에러 발생', error);
 				// some other error happened
 			}
@@ -146,7 +167,7 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userProfileImage: '',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -156,11 +177,11 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
+						profileImage: '',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					navigation.replace('Tab');
+					anonymousKeep && navigation.goBack();
 				}
 			} else {
 				console.log('안드로이드다!!');
@@ -181,7 +202,7 @@ export default function LoginScreen({navigation}: any) {
 				console.log('같아라!', decodeToken.sub);
 				const data = {
 					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userProfileImage: '',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
@@ -191,36 +212,12 @@ export default function LoginScreen({navigation}: any) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
+						profileImage: '',
 						nickname: `김다님${shortid.generate()}`,
 					});
 				} else {
-					navigation.replace('Tab');
+					anonymousKeep && navigation.goBack();
 				}
-
-				// if (response.state === state) {
-				// 	const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
-				// 	const userInfo = await auth().signInWithCredential(credential);
-				// 	console.log('안드로이드로 애플 로그인 성공', userInfo.user);
-				// 	const data = {
-				// 		userName: `김다님${shortid.generate()}`,
-				// 		userProfileImage: '../public/images/danim_logo.png',
-				// 		userToken: userInfo.user.uid,
-				// 		loginProvider: 'apple',
-				// 		signUpFlag: false,
-				// 	};
-				// 	const result = await dispatch(socialConnect(data)).unwrap();
-				// 	if (result == 202) {
-				// 		navigation.navigate('Join1', {
-				// 			userToken: userInfo.user.uid,
-				// 			loginProvider: 'apple',
-				// 			profileImage: '../public/images/danim_logo.png',
-				// 			nickname: `김다님${shortid.generate()}`,
-				// 		});
-				// 	} else {
-				// 		navigation.replace('Tab');
-				// 	}
-				// }
 			}
 		} catch (error) {
 			console.error('애플 로그인 실패', error);
@@ -233,12 +230,11 @@ export default function LoginScreen({navigation}: any) {
 		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
-	const [view, setView] = useState(0);
 	const viewList = [
 		require('../../../public/images/login1.png'),
-		require('../../../public/images/danim_logo.png'),
-		require('../../../public/images/apple_logo.png'),
-		require('../../../public/images/kakao_logo.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
 	];
 	const [backgroundImageIndex, setBackgroundImageIndex] = useState(0);
 	const [fadeAnim] = useState(new Animated.Value(1));
@@ -248,7 +244,7 @@ export default function LoginScreen({navigation}: any) {
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
-			require('../../../public/images/kakao_logo.png'),
+			require('../../../public/images/login1.png'),
 		];
 		Animated.timing(fadeAnim, {
 			toValue: 0,
@@ -268,6 +264,7 @@ export default function LoginScreen({navigation}: any) {
 	useEffect(() => {
 		const interval = setInterval(startBackgroundAnimation, 5000);
 		return () => {
+			console.log('에ㅔ에에에에에');
 			clearInterval(interval);
 		};
 	}, []);
@@ -308,27 +305,7 @@ export default function LoginScreen({navigation}: any) {
 							</LogoHStack>
 						</LongCircleButton>
 					</CircleContainer>
-					<HStack>
-						{/* {platforms.map((platform, index) => (
-						<CircleButton
-							key={index}
-							bgColor={platform.color}
-							onPress={() => {
-								platform.onPress();
-							}}>
-							{platform.image}
-						</CircleButton>
-					))} */}
-						{/* <AppleButton
-						buttonStyle={AppleButton.Style.WHITE}
-						buttonType={AppleButton.Type.SIGN_IN}
-						style={{
-							width: 160, // You must specify a width
-							height: 45, // You must specify a height
-						}}
-						onPress={() => appleLogin()}
-					/> */}
-					</HStack>
+					<HStack></HStack>
 				</LoginSCreenContainer>
 			</BackgroundImage>
 		</SafeAreaView>
@@ -389,9 +366,6 @@ const LogoText = styled.Text<{color: string}>`
 const LogoContainer = styled.View`
 	position: absolute;
 	left: 10px;
-`;
-const LogoTextContainer = styled.View`
-	width: 80%;
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

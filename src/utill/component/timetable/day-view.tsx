@@ -1,14 +1,13 @@
-import {useState, memo} from 'react';
-import {useAppDispatch, useAppSelector} from '../../../redux';
-import {TouchableOpacity, Alert} from 'react-native';
 import moment from 'moment';
-import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {memo} from 'react';
 import styled from 'styled-components/native';
-import {HStack} from '../../layout/layout';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {colors} from '../../colors';
+import {HStack, devicesWidth} from '../../layout/layout';
 import {SvgRight} from '../../svg/svg';
 const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
-	const {day, nDay, timetable} = useAppSelector(state => state.travelSlice);
+	const {day, nDay, timetable, makeMode} = useAppSelector(state => state.travelSlice);
 	const dayList = ['일', '월', '화', '수', '목', '금', '토'];
 	const dispatch = useAppDispatch();
 	const goRight = () => {
@@ -28,14 +27,20 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 	};
 	return (
 		<DayViewContainer>
-			<TimetableDayContainer>
-				<TouchableOpacity disabled={viewDayIndex == 0} onPress={goLeft}>
-					<SvgRight color={'white'} transform={180} />
-				</TouchableOpacity>
-				<DayText>{moment(day[0]).format('YYYY-MM-DD') + '~' + moment(day[nDay]).format('YYYY-MM-DD')}</DayText>
-				<TouchableOpacity disabled={viewDayIndex + 5 > nDay} onPress={goRight}>
-					<SvgRight color={'white'} />
-				</TouchableOpacity>
+			<TimetableDayContainer center={nDay > 4}>
+				{nDay > 4 && (
+					<ArrowTouchableOpacity float='left' onPress={goLeft}>
+						<SvgRight color={'white'} transform={180} />
+					</ArrowTouchableOpacity>
+				)}
+				<DurationText>
+					{moment(day[0]).format('YYYY.MM.DD') + '    ~    ' + moment(day[nDay]).format('YYYY.MM.DD')}
+				</DurationText>
+				{nDay > 4 && (
+					<ArrowTouchableOpacity float='right' onPress={goRight}>
+						<SvgRight color={'white'} />
+					</ArrowTouchableOpacity>
+				)}
 			</TimetableDayContainer>
 			<DayHStack>
 				<EmptyView></EmptyView>
@@ -59,6 +64,11 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 };
 
 export default memo(DayView);
+const ArrowTouchableOpacity = styled.TouchableOpacity<{float: string}>`
+	width: 20%;
+	align-items: ${props => (props.float == 'left' ? 'flex-start' : 'flex-end')};
+	justify-content: cetner;
+`;
 const EmptyView = styled.View`
 	flex: 0.1;
 	background-color: red;
@@ -66,11 +76,11 @@ const EmptyView = styled.View`
 const DayViewContainer = styled.View`
 	flex: 0.15;
 `;
-const TimetableDayContainer = styled.View`
+const TimetableDayContainer = styled.View<{center: boolean}>`
 	display: inline-block;
 	flex-direction: row;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: ${props => (props.center ? 'space-between' : 'center')};
 	border-radius: 10px;
 	padding: 10px;
 	background-color: ${colors.selectButton};
@@ -85,6 +95,12 @@ const DayTouchableOpacity = styled.TouchableOpacity`
 	height: 70px;
 	align-items: center;
 	justify-content: center;
+`;
+
+const DurationText = styled.Text`
+	font-size: ${devicesWidth * 0.04}px;
+	font-weight: bold;
+	color: white;
 `;
 
 const DayText = styled.Text`

@@ -1,19 +1,7 @@
-import {JSX, JSXElementConstructor, ReactElement, useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	deleteTravelCourse,
-	getDrivingDuration,
-	getOneTravelCourse,
-	reviewAndPoint,
-	saveTravel,
-	travelSliceActions,
-	updateTravelCourse,
-} from '../../redux/travel-info/travel.slice';
-import shortId from 'shortid';
-import {Alert, TouchableOpacity, Image, TextInput, View} from 'react-native';
-
+import {getOneTravelCourse, reviewAndPoint} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
 import CustomButton from '../../utill/component/custom-button';
 import {tendencyList} from '../enroll-info/select-tendency';
@@ -24,15 +12,13 @@ import {colors} from '../../utill/colors';
 import styled from 'styled-components/native';
 import {DiaryTextInput} from './input-diary';
 export default function InputReviewAndPoint({navigation}: any) {
-	const {travelId, tendency, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
+	const {travelId, tendency} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [reviewValue, setReviewValue] = useState('');
-	const [pointValue, setPointValue] = useState(-1);
+	const [pointValue, setPointValue] = useState(5);
 	const [tedencyPointList, setTedencyPointList] = useState<number[][]>(
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
-	let wayPoint = {start: '', goal: '', wayPoint: ''};
 
 	const goMyTravelDetail = async () => {
 		await dispatch(getOneTravelCourse({travelId: travelId}));
@@ -78,21 +64,27 @@ export default function InputReviewAndPoint({navigation}: any) {
 	);
 	return (
 		<ReviewAndPointContainer>
-			<MainText>이 여행 코스는 어떠셨나요?</MainText>
-			<HStack>
+			<ElementText>이 여행 코스는 어떠셨나요?</ElementText>
+			<ReviewContainer>
 				{[...Array(5)].map((item, idx) => (
 					<RatingElement
 						key={idx}
 						onPress={() => {
 							changePoint(idx);
 						}}>
-						<SvgStart color={idx <= pointValue ? colors.selectButton : colors.emptyStart} />
+						<SvgStart
+							width={30}
+							height={30}
+							color={idx <= pointValue ? colors.selectButton : colors.emptyStart}
+						/>
 					</RatingElement>
 				))}
-			</HStack>
-			<MainText>어떤 점이 좋았나요?</MainText>
+			</ReviewContainer>
+			<ElementText>어떤 점이 좋았나요?</ElementText>
 			<RatingReview
 				placeholder='좋았던 점을 남겨주세요'
+				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
 				value={reviewValue}
 				onChangeText={(value: string) => changeReview(value)}></RatingReview>
 
@@ -103,7 +95,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 						(vvalue, iindex) =>
 							vvalue == 1 && (
 								<HStack key={iindex}>
-									<MainText>{reviewTendencyList[index].list[iindex]}</MainText>
+									<ElementText>{reviewTendencyList[index].list[iindex]}</ElementText>
 									{[...Array(5)].map((_, inex) => (
 										<RatingElement
 											key={inex}
@@ -111,7 +103,13 @@ export default function InputReviewAndPoint({navigation}: any) {
 												changeTendencyPoint({index: index, iindex: iindex, inex: inex});
 											}}>
 											<SvgStart
-												color={idx <= pointValue ? colors.selectButton : colors.emptyStart}
+												width={30}
+												height={30}
+												color={
+													inex <= tedencyPointList[index][iindex]
+														? colors.selectButton
+														: colors.emptyStart
+												}
 											/>
 										</RatingElement>
 									))}
@@ -130,12 +128,21 @@ const reviewTendencyList = [
 	{title: '계절이 언제인가?', multi: true, list: ['봄', '여름', '가을', '겨울']},
 ];
 
-const ReviewAndPointContainer = styled(MainContainer).attrs({as: View})`
-	align-items: center;
+const ReviewAndPointContainer = styled(MainContainer)`
+	flex: 1;
 `;
 const RatingReview = styled(DiaryTextInput)`
 	height: 340px;
 `;
 const RatingElement = styled.TouchableOpacity`
 	margin: 0px 10px 0px 10px;
+`;
+const ElementText = styled.Text`
+	font-size: 20px;
+	font-weight: 500;
+	color: black;
+	margin: 10px 0px;
+`;
+const ReviewContainer = styled(HStack)`
+	justify-content: center;
 `;

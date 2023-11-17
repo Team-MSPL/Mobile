@@ -42,5 +42,5 @@ const ButtonContainer = styled.TouchableOpacity<{width: number; isDisabledOpacit
 const ButtonText = styled.Text`
 	color: white;
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 `;

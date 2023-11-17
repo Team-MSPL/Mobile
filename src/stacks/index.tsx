@@ -1,6 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
+import {Image, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAppSelector} from '../redux';
 import CommunityMainScreen from '../screens/community/community-main-screen';
@@ -69,14 +70,23 @@ function TabBar() {
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'SpoqaHanSansNeo-Bold',
-					fontSize: 16,
+					fontSize: 20,
+					fontWeight: '900',
 				},
 			}}>
 			<Tab.Screen
 				name='Home'
 				component={Main}
 				options={{
-					title: '다님',
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', padding: 24}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 36, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '홈',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
@@ -85,7 +95,15 @@ function TabBar() {
 				name='MyTravelListStack'
 				component={MyTravelList}
 				options={{
-					title: '내여행',
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', padding: 24}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 36, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '내 여행',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
@@ -94,6 +112,14 @@ function TabBar() {
 				name='Community'
 				component={CommunityMainScreen}
 				options={{
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', padding: 24}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 36, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
 					title: '커뮤니티',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
@@ -103,7 +129,15 @@ function TabBar() {
 				name='More'
 				component={MoreInfo}
 				options={{
-					title: '다님',
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', padding: 24}}>
+							<Image
+								source={require('../../public/images/danim_logo_row.png')}
+								style={{height: 36, aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '내 정보',
 					headerShown: true,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}

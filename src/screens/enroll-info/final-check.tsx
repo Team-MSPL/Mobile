@@ -16,6 +16,8 @@ import {SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {DefalutLogoContainer} from './search-place';
 
+import {ButtonContainer, MarginContainder} from './select-multi';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 export default function FinalCheck({navigation}: any) {
 	const {
 		day,
@@ -36,7 +38,7 @@ export default function FinalCheck({navigation}: any) {
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
-		Alert.alert('결제창');
+		navigation.navigate('Payment');
 	};
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -44,51 +46,51 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
-	// const checkToken = () => {
-	// 	if (socialloginProvider == 'anonymous') {
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: '익명 로그인으로는 이용 불가합니다',
-	// 				modalSubTitle: '로그인 하러 가시겠습니까?',
-	// 				modalFunction: goNewLogin,
-	// 				modalLeft: true,
-	// 			}),
-	// 		);
-	// 	} else {
-	// 		functionToken >= 1
-	// 			? dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 하나 소모됩니다. 실행하시겠습니까?',
-	// 						modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
-	// 						modalFunction: goNext,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  )
-	// 			: dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalTitle: '토큰이 부족합니다. 결제창으로 가시겠습니까?',
-	// 						modalFunction: goPayment,
-	// 						modalLeft: true,
-	// 					}),
-	// 			  );
-	// 	}
-	// };
+	const checkToken = () => {
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '로그인 없이는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			functionToken >= 1
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '이용권이 하나 소모됩니다. 실행하시겠습니까?',
+							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+							modalFunction: goNext,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+							modalFunction: goPayment,
+							modalLeft: true,
+						}),
+				  );
+		}
+	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 토큰을 드렸습니다. ${functionToken}개 입니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
+	useFocusEffect(
+		useCallback(() => {
+			if (signUpReward) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원가입 축하드립니다',
+						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
+						modalFunction: checkSignUpReward,
+					}),
+				);
+			}
+		}, [signUpReward]),
+	);
 	useEffect(() => {
 		console.log('하위용', accommodations);
 		const backAction = () => {
@@ -105,12 +107,14 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
+	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		try {
+			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (cityViewList[cityIndex].id >= 8 && region[0] == '전체') {
+			if (cityViewList[cityIndex].id >= 9 && region[0] == '전체') {
 				a = cityViewList[cityIndex].sub.map(
 					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
 				);
@@ -139,7 +143,7 @@ export default function FinalCheck({navigation}: any) {
 				!result.data.enoughPlace &&
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '관광지 갯수가 조금 부족해서 완벽하지는 않아유',
+							modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
 						}),
 					);
 
@@ -170,145 +174,147 @@ export default function FinalCheck({navigation}: any) {
 	const schedule = ['출발일', '종료일'];
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
-		<MainContainer>
-			{/* 스테퍼 넣기 */}
-			<SelectListAllContainer>
-				<SelectListContainer>
-					<SelectListText>선택 여행 성향</SelectListText>
-					<SelectTendencyListContainer>
-						{tendency.map((item, inx) => {
-							return (
-								inx !== tendency.length - 1 &&
-								item.map((q, a) => {
+		<>
+			<MainContainer>
+				{/* 스테퍼 넣기 */}
+				<SelectListAllContainer>
+					<SelectListContainer>
+						<SelectListText>선택 여행 성향</SelectListText>
+						<SelectTendencyListContainer>
+							{tendency.map((item, inx) => {
+								return item.map((q, a) => {
 									return q ? (
 										<SelectTendencyContainer key={a}>
 											<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
 										</SelectTendencyContainer>
 									) : null;
-								})
-							);
-						})}
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-				<Dashed />
-				<SelectListContainer>
-					<SelectListText>여행 지역</SelectListText>
-					<SelectTendencyListContainer>
-						<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-				<Dashed />
-				<SelectListContainer>
-					<SelectListText>여행 일정</SelectListText>
+								});
+							})}
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+					<Dashed />
+					<SelectListContainer>
+						<SelectListText>여행 지역</SelectListText>
+						<SelectTendencyListContainer>
+							<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+					<Dashed />
+					<SelectListContainer>
+						<SelectListText>여행 일정</SelectListText>
 
-					<SelectTendencyListContainer>
-						{schedule.map((element, index) => (
-							<DayContainer key={index}>
-								<DayText>{element}</DayText>
-								<DayElementText>
-									{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
-										', ' +
-										String(timeLimitArray[index]).padStart(2, '0') +
-										':' +
-										String(minuteLimitArray[index]).padStart(2, '0')}
-								</DayElementText>
-							</DayContainer>
-						))}
-					</SelectTendencyListContainer>
-				</SelectListContainer>
-			</SelectListAllContainer>
-			<Spacer />
+						<SelectTendencyListContainer>
+							{schedule.map((element, index) => (
+								<DayContainer key={index}>
+									<DayText>{element}</DayText>
+									<DayElementText>
+										{day[index == 0 ? 0 : nDay].format('YY-MM-DD') +
+											', ' +
+											String(timeLimitArray[index]).padStart(2, '0') +
+											':' +
+											String(minuteLimitArray[index]).padStart(2, '0')}
+									</DayElementText>
+								</DayContainer>
+							))}
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+				</SelectListAllContainer>
+				<Spacer />
 
-			{[...Array(nDay + 1)].map((item, idx) => {
-				const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+				{[...Array(nDay + 1)].map((item, idx) => {
+					const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
-				return (
-					<SelectListAllContainer key={idx}>
-						<MultiContainer first={idx == 0} last={idx == nDay}>
-							<MultiDayContainer>
-								<MultiDayText>Day {idx + 1}</MultiDayText>
-								<MultiDaySecondText>
-									{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
-								</MultiDaySecondText>
-							</MultiDayContainer>
-							<MultiAllContainer>
-								<HStack>
-									<SvgHome color={colors.selectButton} marginRight={5} />
-									<MultiDayText>숙소</MultiDayText>
-								</HStack>
-								{accommodations[idx + 1].name ? (
-									<PlaceContainer>
-										{accommodations[idx + 1].photo != null ? (
-											<PlaceImage
-												source={{
-													uri: accommodations[idx + 1].photo,
-												}}
-												alt='Place Image'
-											/>
+					return (
+						<SelectListAllContainer key={idx}>
+							<MultiContainer first={idx == 0} last={idx == nDay}>
+								<MultiDayContainer>
+									<MultiDayText>Day {idx + 1}</MultiDayText>
+									<MultiDaySecondText>
+										{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
+									</MultiDaySecondText>
+								</MultiDayContainer>
+								{idx != nDay && (
+									<MultiAllContainer>
+										<HStack>
+											<SvgHome color={colors.selectButton} marginRight={5} />
+											<MultiDayText>숙소</MultiDayText>
+										</HStack>
+										{accommodations[idx + 1].name ? (
+											<PlaceContainer>
+												{accommodations[idx + 1].photo != null ? (
+													<PlaceImage
+														source={{
+															uri: accommodations[idx + 1].photo,
+														}}
+														alt='Place Image'
+													/>
+												) : (
+													<FinalDefalutLogoContainer>
+														<SvgLoginLogo width={30} height={30} color='white' />
+													</FinalDefalutLogoContainer>
+												)}
+
+												<VStack>
+													<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
+													<MultiElementText>
+														{accommodations[idx + 1].formatted_address}
+													</MultiElementText>
+												</VStack>
+											</PlaceContainer>
 										) : (
-											<FinalDefalutLogoContainer>
-												<SvgLoginLogo width={30} height={30} color='white' />
-											</FinalDefalutLogoContainer>
+											<MultiElementText>선택사항 없음</MultiElementText>
 										)}
-
-										<VStack>
-											<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
-											<MultiElementText>
-												{accommodations[idx + 1].formatted_address}
-											</MultiElementText>
-										</VStack>
-									</PlaceContainer>
-								) : (
-									<MultiElementText>선택사항 없음</MultiElementText>
+									</MultiAllContainer>
 								)}
-							</MultiAllContainer>
-							<MultiAllContainer>
-								<HStack>
-									<SvgPlace color={colors.selectButton} marginRight={5} />
-									<MultiDayText>여행지</MultiDayText>
-								</HStack>
-								{filteredPlaces.length != 0 ? (
-									filteredPlaces.map((data, imageIndex) => (
-										<PlaceContainer key={imageIndex}>
-											{data.photo != null ? (
-												<PlaceImage
-													source={{
-														uri: data.photo,
-													}}
-													alt='Place Image'
-												/>
-											) : (
-												<FinalDefalutLogoContainer>
-													<SvgLoginLogo width={30} height={30} color='white' />
-												</FinalDefalutLogoContainer>
-											)}
+								<MultiAllContainer>
+									<HStack>
+										<SvgPlace color={colors.selectButton} marginRight={5} />
+										<MultiDayText>여행지</MultiDayText>
+									</HStack>
+									{filteredPlaces.length != 0 ? (
+										filteredPlaces.map((data, imageIndex) => (
+											<PlaceContainer key={imageIndex}>
+												{data.photo != null ? (
+													<PlaceImage
+														source={{
+															uri: data.photo,
+														}}
+														alt='Place Image'
+													/>
+												) : (
+													<FinalDefalutLogoContainer>
+														<SvgLoginLogo width={30} height={30} color='white' />
+													</FinalDefalutLogoContainer>
+												)}
 
-											<VStack>
-												<MultiElementText>{data.name}</MultiElementText>
-												{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
-											</VStack>
-										</PlaceContainer>
-									))
-								) : (
-									<MultiElementText>선택사항 없음</MultiElementText>
-								)}
-							</MultiAllContainer>
-						</MultiContainer>
-						<PlaceDashed />
-					</SelectListAllContainer>
-				);
-			})}
-
-			<CustomButton label='맞춤 코스 조회' onPress={goNext}></CustomButton>
-		</MainContainer>
+												<VStack>
+													<MultiElementText>{data.name}</MultiElementText>
+													{/* <MultiElementText>{data.formatted_address}</MultiElementText> */}
+												</VStack>
+											</PlaceContainer>
+										))
+									) : (
+										<MultiElementText>선택사항 없음</MultiElementText>
+									)}
+								</MultiAllContainer>
+							</MultiContainer>
+							<PlaceDashed />
+						</SelectListAllContainer>
+					);
+				})}
+				<MarginContainder />
+			</MainContainer>
+			<ButtonContainer>
+				<CustomButton label='맞춤 코스 조회' onPress={checkToken}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
 
-const SelectListContainer = styled.View`
+export const SelectListContainer = styled.View`
 	width: 100%;
 	border-radius: 15px;
 	background-color: ${colors.selectButton};
-	border-style: dashed;
 	padding: 10px;
 `;
 const Dashed = styled.View`
@@ -321,25 +327,26 @@ const SelectListAllContainer = styled.View`
 	align-items: center;
 `;
 
-const SelectListText = styled.Text`
+export const SelectListText = styled.Text`
 	font-size: 14px;
 	color: white;
-	font-weight: bold;
+	font-weight: 500;
 `;
-const SelectTendencyContainer = styled.View`
+export const SelectTendencyContainer = styled.View`
 	padding: 10px;
 	border-radius: 10px;
 	background-color: white;
 	margin: 0px 10px 10px 0px;
 `;
-const SelectTendencyListContainer = styled.View`
+export const SelectTendencyListContainer = styled.View`
 	display: inline-block;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin: 10px;
+	margin: 10px 0px 10px 0px;
+	justify-content: center;
 `;
 
-const SelectTendencyText = styled.Text`
+export const SelectTendencyText = styled.Text`
 	font-size: 18px;
 	font-weight: bold;
 	color: ${colors.selectButton};
@@ -362,7 +369,7 @@ const DayText = styled.Text`
 const DayElementText = styled.Text`
 	font-size: 16px;
 	color: white;
-	font-weight: bold;
+	font-weight: 600;
 `;
 const MultiContainer = styled.View<{first: boolean; last: boolean}>`
 	width: 100%;
@@ -392,7 +399,7 @@ const MultiDaySecondText = styled.Text`
 `;
 const MultiElementText = styled.Text`
 	font-size: 16px;
-	font-weight: 900;
+	font-weight: 700;
 	color: black;
 `;
 const PlaceImage = styled.Image`

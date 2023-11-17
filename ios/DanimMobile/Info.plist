@@ -2,6 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>http://13.125.229.9</key>
+			<dict/>
+			<key>NSIncludesSubDomains</key>
+			<true/>
+			<key>NSExceptionAllowsInsecureHTTPLoads</key>
+			<true/>
+		</dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -55,8 +69,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict/>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Apple Music 앱에서 음악을 재생하려고 합니다.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
@@ -66,7 +78,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>캘린더에 이벤트를 추가하려고 합니다.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
+	<string>'다님'에서 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>주소록에 접근하여 연락처를 볼 수 있도록 합니다.</string>
 	<key>NSFaceIDUsageDescription</key>
@@ -76,7 +88,7 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>항상 위치 정보를 사용하여 주변 서비스를 제공하려고 합니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>앱을 사용하는 동안에만 위치 정보를 사용하여 주변 서비스를 제공하려고 합니다.</string>
+	<string>지역 추천 기능에서 내 주변 지역을 추천받기 위해 선택적으로 위치 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>마이크를 사용하여 오디오 녹음하려고 합니다.</string>
 	<key>NSMotionUsageDescription</key>
@@ -84,9 +96,9 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>사진 앨범에 사진을 추가하려고 합니다.</string>
 	<key>NSPhotoLibraryAppUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
+	<string>사용자가 선택한 사진 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
+	<string>'다님'에서 내 여행 다이어리, 커뮤니티 사진, 프로필 사진 변경에서 사진 첨부 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다.</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>미리 알림과 할 일 목록에 접근하려고 합니다.</string>
 	<key>NSSiriUsageDescription</key>
@@ -94,7 +106,7 @@
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>음성 인식을 사용하여 명령을 이해하려고 합니다.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>사용자의 추적 정보를 수집하려고 합니다.</string>
+	<string>다님은 광고 최적화와 사용자 경험 개선을 위해 데이터 추적이 필요합니다.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -115,9 +127,7 @@
 		<string>Fontisto.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-	</array>
+	<array/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -127,8 +137,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

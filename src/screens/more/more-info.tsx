@@ -1,20 +1,24 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TouchableOpacity} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Divider, MainContainer} from '../../utill/layout/layout';
+import {SvgLoginLogo} from '../../utill/svg/svg';
+import {useState} from 'react';
+import ViewPager from '../../utill/view-pager';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
 	);
-
+	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
 	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
-	const exceptionKeys = ['isFirstLaunch'];
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
 	const goLogout = async () => {
 		await AsyncStorage.getAllKeys().then(allKeys => {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
@@ -52,11 +56,13 @@ export default function MoreInfo({navigation}: any) {
 			);
 		}
 	};
+	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler();
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};
 	const goPayment = () => {
+		appsflyerLogEvent({name: 'more_payment_click', value: {id: 'danim'}});
 		navigation.navigate('Payment');
 	};
 	const goTerms = () => {
@@ -65,31 +71,55 @@ export default function MoreInfo({navigation}: any) {
 	const goPolicy = () => {
 		navigation.navigate('PolicyMain');
 	};
+	const goCoupon = () => {
+		navigation.navigate('Coupon');
+	};
 	const handleInquire = () => {
-		dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}));
+		navigation.navigate('Inquire');
+	};
+	const goNoteList = () => {
+		navigation.navigate('NoteList');
 	};
 	const goLogin = () => {
+		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
 	};
+	const goBack = () => {
+		setViewPagerView(false);
+	};
+	const goViewPager = () => {
+		setViewPagerView(true);
+	};
+	const [viewPagerView, setViewPagerView] = useState(false);
 	const useInfo = [
 		{
 			title: '공지사항',
 			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
 		},
-		// {title: '도움말', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '운스한테 문의하삼유'}))},
-		// {title: '문의하기', function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: ''}))},
+		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
+		{title: '사용 가이드', function: goViewPager},
 	];
 	return (
 		<MainContainer>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerView}
+				onRequestClose={() => setViewPagerView(false)}>
+				<ViewPager handleFunction={goBack} />
+			</Modal>
 			<ProfileContainer>
-				<ProfileImage
-					source={{
-						uri: userProfileImage == '' ? 'https://danim.me/lee.jpeg' : userProfileImage,
-					}}></ProfileImage>
+				{userProfileImage == '' ? (
+					<NoProfileContainer>
+						<SvgLoginLogo color={'white'} width={75} height={75} />
+					</NoProfileContainer>
+				) : (
+					<ProfileImage source={{uri: userProfileImage}}></ProfileImage>
+				)}
 				<ProfileNameText>
-					{userName} {socialloginProvider == 'anonymous' ? '익명' : socialloginProvider}
+					{userName} {socialloginProvider != 'anonymous' && socialloginProvider}
 				</ProfileNameText>
 				{socialloginProvider != 'anonymous' && (
 					<ProfileChangeContainer onPress={changeInfo}>
@@ -98,24 +128,27 @@ export default function MoreInfo({navigation}: any) {
 				)}
 			</ProfileContainer>
 
-			{/* {socialloginProvider != 'anonymous' && (
+			{socialloginProvider != 'anonymous' && (
 				<>
 					<ProfileDivider />
 					<SettingContainer>
 						<TitleText>계정</TitleText>
-						<SettingElement
-							onPress={() => {
-								console.log('노노');
-							}}>
-							<SettingElementText>토큰 갯수 {functionToken} 개</SettingElementText>
+						<SettingElement onPress={() => {}}>
+							<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
 						</SettingElement>
 
 						<SettingElement onPress={goPayment}>
-							<SettingElementText>토큰 구매하기</SettingElementText>
+							<SettingElementText>이용권 구매하기</SettingElementText>
+						</SettingElement>
+						<SettingElement onPress={goCoupon}>
+							<SettingElementText>쿠폰 입력하기</SettingElementText>
+						</SettingElement>
+						<SettingElement onPress={goNoteList}>
+							<SettingElementText>쪽지함</SettingElementText>
 						</SettingElement>
 					</SettingContainer>
 				</>
-			)} */}
+			)}
 			<ProfileDivider />
 			<SettingContainer>
 				<TitleText>이용안내</TitleText>
@@ -127,14 +160,16 @@ export default function MoreInfo({navigation}: any) {
 			</SettingContainer>
 			<ProfileDivider />
 			<SettingContainer>
-				<TitleText>앱버전 0.0</TitleText>
+				<TitleText>
+					앱 버전 {nowVersion} (최신{latestVersion})
+				</TitleText>
 				{socialloginProvider != 'anonymous' ? (
 					<>
 						<SettingElement
 							onPress={() => {
 								dispatch(
 									modalSliceActions.setOpenModal({
-										modalTitle: '로그 아웃 하시겠습니까?',
+										modalTitle: '로그아웃 하시겠습니까?',
 										modalFunction: goLogout,
 										modalLeft: true,
 									}),
@@ -185,9 +220,17 @@ const ProfileImage = styled.Image`
 	height: 100px;
 	border-radius: 10px;
 `;
+const NoProfileContainer = styled.View`
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.selectButton};
+`;
 const ProfileNameText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 
@@ -200,7 +243,7 @@ const ProfileChangeContainer = styled.TouchableOpacity`
 
 const ProfileChangeText = styled.Text`
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 500;
 	color: white;
 `;
 const SettingContainer = styled.View`
@@ -218,7 +261,7 @@ const TitleText = styled.Text`
 `;
 const SettingElementText = styled.Text`
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const SettingElement = styled.TouchableOpacity`

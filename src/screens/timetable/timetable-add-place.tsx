@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
@@ -18,19 +18,14 @@ import {
 	IconContainer,
 } from '../my-travel-list/detail-info';
 import {SvgCoffee, SvgHome} from '../../utill/svg/svg';
-import {
-	TimeContainer,
-	ASD,
-	TimeItemContainer,
-	TimeStepText,
-	TimeItemText,
-	DayPressable,
-} from '../enroll-info/select-day';
+import {TimeContainer, TimeItemContainer, TimeStepText, TimeItemText, DayPressable} from '../enroll-info/select-day';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../../utill/component/custom-button';
+import {useDistance} from '../../utill/hooks/useDistance';
+import {SearchClearButton, SearchClearContainer} from '../enroll-info/search-place';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -59,21 +54,16 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				);
 				return 0;
 			default:
-				const dLat =
-					(timetable[route.params.x][newY.current - 1].lat - timetable[route.params.x][newY.current].lat) *
-					(Math.PI / 180);
-				const dLon =
-					(timetable[route.params.x][newY.current - 1].lng - timetable[route.params.x][newY.current].lng) *
-					(Math.PI / 180);
+				const departure = {
+					lat: timetable[route.params.x][newY.current - 1].lat,
+					lng: timetable[route.params.x][newY.current - 1].lng,
+				};
+				const arrival = {
+					lat: timetable[route.params.x][newY.current].lat,
+					lng: timetable[route.params.x][newY.current].lng,
+				};
 
-				const a =
-					Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-					Math.cos(timetable[route.params.x][newY.current - 1].lat * (Math.PI / 180)) *
-						Math.cos(timetable[route.params.x][newY.current].lat * (Math.PI / 180)) *
-						Math.sin(dLon / 2) *
-						Math.sin(dLon / 2);
-				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival})); // 두 지점 간의 거리 (단위: km)
 				lat =
 					(timetable[route.params.x][newY.current - 1].lat + timetable[route.params.x][newY.current].lat) / 2;
 				lng =
@@ -143,6 +133,18 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		{step: 'Start', title: '시작 시간', time: route.params.y[0]},
 		{step: 'End', title: '종료 시간', time: route.params.y[route.params.y.length - 1] + 1},
 	];
+
+	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+	const clearInput = () => {
+		autocompleteRef.current?.setAddressText('');
+	};
+	const clearButton = () => (
+		<SearchClearContainer>
+			<TouchableOpacity onPress={clearInput}>
+				<SearchClearButton>취소</SearchClearButton>
+			</TouchableOpacity>
+		</SearchClearContainer>
+	);
 	return (
 		<MainContainer>
 			<DayContainer>
@@ -152,23 +154,21 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			</DayContainer>
 
 			<TimeContainer>
-				<ASD>
-					{[...Array(2)].map((item, idx) => (
-						<TimeItemContainer key={idx}>
-							<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-							<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-							<HStack>
-								<DayElementContainer>
-									<TimeItemText>
-										{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
-										{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
-										{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
-									</TimeItemText>
-								</DayElementContainer>
-							</HStack>
-						</TimeItemContainer>
-					))}
-				</ASD>
+				{[...Array(2)].map((item, idx) => (
+					<TimeItemContainer key={idx}>
+						<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
+						<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
+						<HStack>
+							<DayElementContainer>
+								<TimeItemText>
+									{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
+									{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
+									{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
+								</TimeItemText>
+							</DayElementContainer>
+						</HStack>
+					</TimeItemContainer>
+				))}
 			</TimeContainer>
 
 			<SearchContainer>
@@ -185,15 +185,20 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				) : (
 					<GooglePlacesAutocomplete
 						placeholder='장소를 검색해보세요!'
+						placeholderTextColor={'grey'}
 						query={{
 							key: GOOGLE_API_KEY,
 							language: 'ko',
 							components: 'country:kr',
 						}}
+						ref={autocompleteRef}
+						textInputProps={{placeholderTextColor: 'grey'}}
 						styles={{
-							container: {position: 'absolute', zIndex: 3, width: '100%'},
 							textInputContainer: {borderWidth: 1, borderColor: colors.selectButton, borderRadius: 10},
+							textInput: {margin: 1, color: 'black'},
+							listView: {height: 300},
 						}}
+						renderRightButton={clearButton}
 						fetchDetails={true}
 						onPress={async (data, details) => {
 							setGetInfo({
@@ -206,72 +211,34 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 				)}
 			</SearchContainer>
-			{/* <HStack>
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('CE7');
-					}}>
-					<Text bold fontSize='xl'>
-						카페 추천
-					</Text>
-				</TouchableOpacity>
-				<Spacer />
-
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('AD5');
-					}}>
-					<Text bold fontSize='xl'>
-						숙소 추천
-					</Text>
-				</TouchableOpacity>
-				<Spacer />
-				<TouchableOpacity
-					style={{opacity: getInfo.name ? 1 : 0.5}}
-					onPress={() => {
-						goRecommend('FD6');
-					}}>
-					<Text bold fontSize='xl'>
-						식당 추천
-					</Text>
-				</TouchableOpacity>
-			</HStack> */}
 			<CourseAndReview>
-				<CoffeeContainer onPress={() => goRecommend('CE7')}>
-					<VStack>
-						<CourseTitleText>카페 추천</CourseTitleText>
-						{/* <CourseSubTitleText>지금 인기 있는 카페를 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+				<RecommendContainer color='#ffccb6' onPress={() => goRecommend('CE7')}>
+					<CourseTitleText>카페 추천</CourseTitleText>
 					<IconContainer>
 						<SvgCoffee color='white' />
 					</IconContainer>
-				</CoffeeContainer>
-				<AccommodationsContainer
+				</RecommendContainer>
+				<RecommendContainer
+					color='#cbaacb'
 					onPress={() => {
 						goRecommend('AD5');
 					}}>
-					<VStack>
-						<CourseTitleText>숙소 추천</CourseTitleText>
-						{/* <CourseSubTitleText>성향에 맞는 숙소를 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+					<CourseTitleText>숙소 추천</CourseTitleText>
+
 					<IconContainer>
 						<SvgHome width={36} height={36} color='white' />
 					</IconContainer>
-				</AccommodationsContainer>
-				<RestoaurantContainer
+				</RecommendContainer>
+				<RecommendContainer
+					color='#abdee6'
 					onPress={() => {
 						goRecommend('FD6');
 					}}>
-					<VStack>
-						<CourseTitleText>식당 추천</CourseTitleText>
-						{/* <CourseSubTitleText>맛있는 식당을 추천해드려요</CourseSubTitleText> */}
-					</VStack>
+					<CourseTitleText>식당 추천</CourseTitleText>
 					<IconContainer>
 						<DeleteIconContainers name={'restaurant'} size={36} color={'white'} />
 					</IconContainer>
-				</RestoaurantContainer>
+				</RecommendContainer>
 			</CourseAndReview>
 			<CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} />
 		</MainContainer>
@@ -286,37 +253,31 @@ const DayContainer = styled.View`
 	padding: 10px;
 	align-items: center;
 	justify-content: center;
+	margin: 0px 0px 10px 0px;
 `;
 const DayText = styled.Text`
 	font-size: 22px;
 	font-weight: bold;
 	color: white;
 `;
-const CoffeeContainer = styled(CourseContainer)`
+const RecommendContainer = styled(CourseContainer)<{color: string}>`
 	width: 30%;
-	background-color: #ffccb6;
+	background-color: ${props => props.color};
+	height: 100px;
 `;
 
-const AccommodationsContainer = styled(CourseContainer)`
-	width: 30%;
-	background-color: #cbaacb;
-`;
-const RestoaurantContainer = styled(CourseContainer)`
-	width: 30%;
-	background-color: #abdee6;
-`;
 const MainContainer = styled.View`
 	flex: 1;
 	background-color: white;
 	padding: 10px;
 `;
 const DayElementContainer = styled(DayPressable).attrs({as: View})`
-	width: 80%;
+	width: 100%;
 `;
 const SearchContainer = styled.View`
 	width: 100%;
-	height: 10%;
 	margin: 5% 0% 5% 0%;
+	height: 100px;
 `;
 
 const AddText = styled.Text`
