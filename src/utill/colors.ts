@@ -1,4 +1,6 @@
 export const colors = {
+	DanimMain: '#2698FB',
+	DanimSub: '#5DC3DB',
 	Black: '#000000',
 	LightGray1: '#EFEFEF',
 	LightGray2: '#DFDFDF',

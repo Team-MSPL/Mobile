@@ -5,7 +5,7 @@ import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../red
 
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/Entypo';
+import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -117,26 +117,30 @@ export default function MyTravelList({navigation}: any) {
 							onPress={() => {
 								goMyTravelDetail(item._id);
 							}}>
-							<MyTravelInfoContainer>
-								<MyTravelContainerThumbnail
-									source={require('../../../public/images/danim_logo2.png')}
-									resizeMode='contain'></MyTravelContainerThumbnail>
-								<MyTravelTextContainer>
-									<TravelTitleText>{item.travelName}</TravelTitleText>
-									<DayText>
+							<MyTravelContainerThumbnail
+								source={require('../../../public/images/danim_logo2.png')}
+								resizeMode='contain'></MyTravelContainerThumbnail>
+							<MyTravelTextContainer>
+								<TravelTitleText>{item.travelName}</TravelTitleText>
+								<HStack>
+									<DateIcon name='calendar' />
+									<DateText>
 										{moment(item.day[0]).format('YYYY.MM.DD') +
 											' ~ ' +
 											moment(item.day[item.nDay - 1]).format('MM.DD')}
-									</DayText>
-									<DayText>
-										({item.nDay - 1}박 {item.nDay}일)
-									</DayText>
-								</MyTravelTextContainer>
-							</MyTravelInfoContainer>
-							<LocationInfoContainer>
-								<LocationIcon name='location-pin' />
-								<LocationText>{item.region}</LocationText>
-							</LocationInfoContainer>
+									</DateText>
+								</HStack>
+								<HStack>
+									<RegionIcon name='enviromento' />
+									{item.region.length == 1 ? (
+										<RegionText>{item.region}</RegionText>
+									) : (
+										<RegionText>
+											{item.region[0]} 외 {item.region.length - 1}곳
+										</RegionText>
+									)}
+								</HStack>
+							</MyTravelTextContainer>
 						</MyTravelContainer>
 					))
 				)}
@@ -200,63 +204,57 @@ const MyTravelListContainer = styled.View`
 
 const MyTravelContainer = styled.TouchableOpacity`
 	width: ${devicesWidth * 0.9}px;
-	aspect-ratio: 2;
+	height: ${devicesWidth * 0.32}px;
+	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-evenly;
 	border-radius: ${devicesWidth * 0.03}px;
 	background-color: ${colors.main};
 	${Platform.OS === 'android' ? 'elevation: 4;' : 'box-shadow: 0px 2px 4px #ccc;'}
 	margin-bottom: ${devicesWidth * 0.05}px;
 `;
 
-const MyTravelInfoContainer = styled.View`
-	flex: 4;
-	width: ${devicesWidth * 0.9}px;
-	padding-horizontal: ${devicesWidth * 0.04}px;
-	padding-vertical: ${devicesWidth * 0.02}px;
-	flex-direction: row;
-	align-items: center;
-`;
-
 const MyTravelContainerThumbnail = styled.ImageBackground`
-	height: ${devicesWidth * 0.28}px;
-	width: ${devicesWidth * 0.16}px;
-	margin-right: ${devicesWidth * 0.1}px;
+	height: ${devicesWidth * 0.24}px;
+	aspect-ratio: 1;
 	align-items: center;
 	justify-content: center;
+	border-radius: ${devicesWidth * 0.04}px;
 `;
 
 const MyTravelTextContainer = styled.View`
-	height: ${devicesWidth * 0.28}px;
+	height: ${devicesWidth * 0.24}px;
 	width: ${devicesWidth * 0.56}px;
 `;
 
 const TravelTitleText = styled.Text`
-	color: black;
-	font-size: ${devicesWidth * 0.05}px;
+	color: ${colors.Black};
+	font-size: ${devicesWidth * 0.04}px;
 	font-weight: 600;
 	margin-bottom: ${devicesWidth * 0.02}px;
 `;
 
-const LocationInfoContainer = styled.View`
-	flex: 1;
-	width: ${devicesWidth * 0.9}px;
-	border-radius: 0px 0px ${devicesWidth * 0.03}px ${devicesWidth * 0.03}px;
-	align-items: center;
-	flex-direction: row;
-	padding-horizontal: ${devicesWidth * 0.04}px;
-	padding-vertical: ${devicesWidth * 0.0}px;
-	background-color: ${colors.LightGray1};
+const DateIcon = styled(Icon)`
+	font-size: ${devicesWidth * 0.04}px;
+	color: ${colors.DanimSub};
+	margin-right: ${devicesWidth * 0.01}px;
+	margin-bottom: ${devicesWidth * 0.03}px;
 `;
-const LocationIcon = styled(Icon)`
-	font-size: ${devicesWidth * 0.048}px;
-	margin-right: ${devicesWidth * 0.036}px;
-	color: #2698fb;
+const DateText = styled.Text`
+	font-size: ${devicesWidth * 0.04}px;
+	font-weight: 500;
+	color: ${colors.LightGray3};
+	margin-bottom: ${devicesWidth * 0.03}px;
 `;
-const LocationText = styled.Text`
-	font-size: ${devicesWidth * 0.032}px;
-	font-weight: 600;
-	color: ${colors.Black};
+const RegionIcon = styled(Icon)`
+	font-size: ${devicesWidth * 0.04}px;
+	margin-right: ${devicesWidth * 0.01}px;
+	color: ${colors.DanimSub};
+`;
+const RegionText = styled.Text`
+	font-size: ${devicesWidth * 0.04}px;
+	font-weight: 500;
+	color: ${colors.LightGray3};
 `;
 
 const AnonymousText = styled(MainText)`
