@@ -20,14 +20,14 @@ export default function RegionRecommendStack() {
 				name='RegionSelectDistance'
 				component={SelectDistance}
 				options={{
-					title: '지역 추천 2',
+					title: '지역 추천 3',
 				}}
 			/>
 			<Stack.Screen
 				name='RegionSelectPopularity'
 				component={SelectPopularity}
 				options={{
-					title: '지역 추천 3',
+					title: '지역 추천 2',
 				}}
 			/>
 			<Stack.Screen

@@ -49,6 +49,7 @@ const initialState: LiteState = {
 	regionRecommendFlag: false,
 	bandwidth: false,
 	saveFlag: false,
+	checKStep: 0,
 };
 
 export const axiosGoogle = axios.create({
@@ -225,6 +226,18 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 	}
 });
 
+//여행코스 제목 수정
+export const reCourseName = createAsyncThunk(
+	'/travelCourse/updateTravelCourseName',
+	async (data: {travelId: string; updateTravelName: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourseName`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -277,6 +290,9 @@ export const travelSlice = createSlice({
 		enrollPoplurarityRegion: (state, {payload}) => {
 			state.region = payload.region;
 			state.cityIndex = payload.cityIndex;
+		},
+		changeChecKStep: (state, {payload}) => {
+			state.checKStep = payload;
 		},
 		setTravelStart: (state, {payload}) => {
 			Object.assign(state, initialState);
@@ -536,6 +552,7 @@ interface LiteState {
 	regionRecommendFlag: boolean;
 	bandwidth: boolean;
 	saveFlag: boolean;
+	checKStep: number;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

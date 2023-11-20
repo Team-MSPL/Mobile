@@ -162,6 +162,7 @@ export default function SearchPlace({navigation, route}: any) {
 						},
 						textInput: {margin: 1, color: 'black', backgroundColor: colors.main},
 						listView: {position: 'relative'},
+						description: {color: 'black'},
 					}}
 					fetchDetails={true}
 					onPress={async (data, details) => {

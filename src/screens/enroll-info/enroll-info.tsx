@@ -9,17 +9,18 @@ import {colors} from '../../utill/colors';
 import SelectDistance from './select-distance';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 export default function EnrollInfo({navigation}: any) {
-	const [viewComponent, setViewComponent] = useState(0);
 	const changeComponent = (e: number) => {
 		setViewComponent(e);
 	};
-	const [checKStep, setCheckStep] = useState(0);
-	const {regionRecommendFlag} = useAppSelector(state => state.travelSlice);
+	const {regionRecommendFlag, checKStep} = useAppSelector(state => state.travelSlice);
+
+	const [viewComponent, setViewComponent] = useState(checKStep);
 	const goNextStep = () => {
 		setViewComponent(viewComponent + 1);
-		checKStep == viewComponent && setCheckStep(viewComponent + 1);
+		checKStep == viewComponent && dispatch(travelSliceActions.changeChecKStep(viewComponent + 1));
 	};
 	const dispatch = useAppDispatch();
 	useEffect(() => {

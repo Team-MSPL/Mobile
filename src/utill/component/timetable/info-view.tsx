@@ -243,6 +243,8 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 
 const InfoVStack = styled(VStack)`
 	flex: 0.18;
+	align-items: center;
+	padding: 0px 0px 0px 1px;
 `;
 const ModalElementContainer = styled.TouchableOpacity`
 	width: 100%;

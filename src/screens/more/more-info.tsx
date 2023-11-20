@@ -84,6 +84,9 @@ export default function MoreInfo({navigation}: any) {
 		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
 	};
+	const goTokenLog = () => {
+		navigation.navigate('TokenLog');
+	};
 	const goBack = () => {
 		setViewPagerView(false);
 	};
@@ -133,7 +136,7 @@ export default function MoreInfo({navigation}: any) {
 					<ProfileDivider />
 					<SettingContainer>
 						<TitleText>계정</TitleText>
-						<SettingElement onPress={() => {}}>
+						<SettingElement onPress={goTokenLog}>
 							<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
 						</SettingElement>
 

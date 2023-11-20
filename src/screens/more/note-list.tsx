@@ -52,7 +52,7 @@ const MainContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	padding: 10px;
-	background-color: white;
+	background-color: ${colors.main};
 `;
 const ElementContainer = styled.View`
 	width: 100%;

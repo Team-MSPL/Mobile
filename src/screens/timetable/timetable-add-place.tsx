@@ -202,6 +202,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							},
 							textInput: {margin: 1, color: 'black', backgroundColor: colors.main},
 							listView: {height: 300},
+							description: {color: 'black'},
 						}}
 						renderRightButton={clearButton}
 						fetchDetails={true}

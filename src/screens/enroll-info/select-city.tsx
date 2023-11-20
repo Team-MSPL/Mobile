@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
-import {HStack, VStack, MainContainer, InputWrap, ClearTouchableOpacity} from '../../utill/layout/layout';
+import {HStack, VStack, MainContainer, InputWrap, ClearTouchableOpacity, Divider} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
@@ -83,28 +83,6 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 			<MainContainer showsVerticalScrollIndicator={false}>
 				{/* 스테퍼 넣기 */}
 				<StepText mainText='어디로 떠나실건가요?' subText='관심있는 여행 지역을 알려주세요.' />
-
-				<InputAllContainter>
-					<SearchInput
-						placeholderTextColor={'grey'}
-						style={{color: 'black'}}
-						value={search}
-						onChangeText={(text: string) => changeSearch(text)}
-						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>
-					{search && (
-						<ClearTouchableOpacity
-							onPress={() => {
-								changeSearch('');
-							}}>
-							<SvgCancel width='20' height='20' color='black' />
-						</ClearTouchableOpacity>
-					)}
-				</InputAllContainter>
-				{searchData && (
-					<SearchTouchableOpacity onPress={addCity}>
-						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
-					</SearchTouchableOpacity>
-				)}
 				<SelectAllContainer>
 					<SelectRegion>선택 지역</SelectRegion>
 					<SelectListContainer horizontal={true}>
@@ -141,7 +119,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 						</RegionViewContainer>
 					</RegionAllContainer>
 					<CityAllContainer>
-						<StepInfo>Step 2</StepInfo>
+						<StepInfo>Step 2 *중복선택가능</StepInfo>
 						<CityViewContainer>
 							<ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
 								{cityViewList[cityIndex]?.sub.map((item, idx) => {
@@ -153,6 +131,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 												cityIndex == 0 ? selectPopularity(item) : selectRegion(item.subTitle);
 											}}>
 											<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
+											{item?.example && <ExampleText>{item.example}</ExampleText>}
 										</CityItems>
 									);
 								})}
@@ -160,7 +139,29 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 						</CityViewContainer>
 					</CityAllContainer>
 				</HStack>
-
+				<CityDivider></CityDivider>
+				<SelectRegion>검색으로 지역 찾기</SelectRegion>
+				<InputAllContainter>
+					<SearchInput
+						placeholderTextColor={'grey'}
+						style={{color: 'black'}}
+						value={search}
+						onChangeText={(text: string) => changeSearch(text)}
+						placeholder='지역을 직접 검색해보세요 ex)부여'></SearchInput>
+					{search && (
+						<ClearTouchableOpacity
+							onPress={() => {
+								changeSearch('');
+							}}>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
+					)}
+				</InputAllContainter>
+				{searchData && (
+					<SearchTouchableOpacity onPress={addCity}>
+						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
+					</SearchTouchableOpacity>
+				)}
 				<MarginContainder />
 			</MainContainer>
 			<ButtonContainer>
@@ -171,14 +172,21 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 		</>
 	);
 }
+const CityDivider = styled(Divider)`
+	background-color: ${colors.regionNormal};
+`;
 const InputAllContainter = styled(InputWrap)`
 	border-color: ${colors.border};
 	height: 50px;
+	margin: 10px 0px 0px 0px;
 `;
 const RegionAllContainer = styled(VStack)`
 	width: 30%;
 `;
-
+const ExampleText = styled.Text`
+	font-size: 13px;
+	color: grey;
+`;
 const CityAllContainer = styled(VStack)`
 	width: 70%;
 `;
@@ -202,6 +210,7 @@ const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 const CityItems = styled(RegionItems)`
 	background-color: ${props => (props.select ? colors.normalButton : colors.main)};
 	border-bottom-width: 0px;
+	flex-direction: row;
 `;
 const RegionText = styled.Text<{select: boolean}>`
 	color: ${props => (props.select ? colors.main : 'black')};
@@ -256,7 +265,6 @@ const SearchInput = styled.TextInput`
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;
-	margin: 10px 0px 0px 0px;
 `;
 export const cityViewList = [
 	{
@@ -283,11 +291,11 @@ export const cityViewList = [
 		title: '서울',
 		sub: [
 			{id: 0, subTitle: '전체'},
-			{id: 1, subTitle: '도심권'},
-			{id: 2, subTitle: '동남권'},
-			{id: 3, subTitle: '동북권'},
-			{id: 4, subTitle: '서남권'},
-			{id: 5, subTitle: '서북권'},
+			{id: 1, subTitle: '도심권', example: '예)용산구,종로구'},
+			{id: 2, subTitle: '동남권', example: '예)강남구,송파구'},
+			{id: 3, subTitle: '동북권', example: '예)강북구,동대문구'},
+			{id: 4, subTitle: '서남권', example: '예)강서구,영등포구'},
+			{id: 5, subTitle: '서북권', example: '예)마포구,서대문구'},
 		],
 	},
 	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체'}]},

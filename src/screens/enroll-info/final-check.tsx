@@ -61,7 +61,7 @@ export default function FinalCheck({navigation}: any) {
 			functionToken >= 1
 				? dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '이용권이 하나 소모됩니다. 실행하시겠습니까?',
+							modalTitle: `이용권이 하나 소모됩니다.\n현재 이용권은 ${functionToken}개입니다. 실행하시겠습니까?`,
 							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
 							modalFunction: goNext,
 							modalLeft: true,
@@ -85,7 +85,7 @@ export default function FinalCheck({navigation}: any) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
+						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
 						modalFunction: checkSignUpReward,
 					}),
 				);
@@ -115,7 +115,10 @@ export default function FinalCheck({navigation}: any) {
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if ((cityViewList[cityIndex].id >= 9 && region[0] == '전체') || cityViewList[cityIndex].id == 1) {
+			if (
+				(cityViewList[cityIndex].id >= 9 && region[0] == '전체') ||
+				(cityViewList[cityIndex].id == 1 && region[0] == '전체')
+			) {
 				a = cityViewList[cityIndex].sub.map(
 					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
 				);

@@ -19,6 +19,7 @@ export default function CourseDetail({navigation, route}: any) {
 	const getDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			console.log(route.params.value, 'qwe');
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
 		} catch (err) {

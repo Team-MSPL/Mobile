@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
 import {Dimensions, Platform} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import Icons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -9,7 +10,7 @@ import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {MainContainer, devicesHeight, devicesWidth} from '../../utill/layout/layout';
+import {HStack, HeaderContianer, MainContainer, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -23,11 +24,6 @@ export default function Main({navigation}: any) {
 	const {userName, functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const soloMaking = () => {
-		appsflyerLogEvent({name: 'solo_make', value: {id: 'danim'}});
-		dispatch(travelSliceActions.setSingleMode());
-		navigation.navigate('EnrollTravelTitle');
-	};
 	const regionRecommend = () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		navigation.navigate('RegionSelectTendency');
@@ -40,11 +36,21 @@ export default function Main({navigation}: any) {
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<HeaderHStack>
+					<Ticket name='ticket' size={26} color={colors.selectButton} />
+					<BannerColoredText>{functionToken}</BannerColoredText>
+				</HeaderHStack>
+			),
+		});
+	}, []);
+	useEffect(() => {
 		if (signUpReward) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '회원가입 축하드립니다',
-					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.`,
+					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
 					modalFunction: checkSignUpReward,
 				}),
 			);
@@ -152,19 +158,6 @@ export default function Main({navigation}: any) {
 		},
 	];
 	const DeviceWidth = Dimensions.get('window').width;
-	const buttonRenderItem = ({item}: {item: ButtonListType}) => {
-		return (
-			<NewTravelButton onPress={item.onPress} key={item.id}>
-				<NewTravelButtonImage source={item.image} />
-				<NewTravelButtonTextContainer>
-					<NewTravelButtonDescriptionText>{item.text}</NewTravelButtonDescriptionText>
-					<NewTravelButtonTitleText>{item.boldText}</NewTravelButtonTitleText>
-				</NewTravelButtonTextContainer>
-				<RightArrowIcon name='right' size={24} color={'#ccc'} />
-			</NewTravelButton>
-		);
-	};
-
 	return (
 		<SafeAreaView>
 			<MainContainer>
@@ -227,6 +220,9 @@ export default function Main({navigation}: any) {
 
 const SafeAreaView = styled.SafeAreaView`
 	height: 100%;
+`;
+const HeaderHStack = styled(HStack)`
+	padding: 0px 3px;
 `;
 
 const TopBannerContainer = styled.View`
@@ -300,6 +296,7 @@ const NewTravelButtonTitleText = styled.Text`
 `;
 
 const RightArrowIcon = styled(Icon)``;
+const Ticket = styled(Icons)``;
 
 const CollectionContainer = styled.View`
 	margin-bottom: 12px;

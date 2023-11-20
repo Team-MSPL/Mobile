@@ -7,6 +7,7 @@ import {
 	NativeScrollEvent,
 	Modal,
 	BackHandler,
+	Image,
 } from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -165,10 +166,13 @@ export default function Timetable({navigation, route}: any) {
 		//혼자짤래요면 지역 '자유여행'으로
 	};
 	useEffect(() => {
-		saveFlag && firstSave();
+		makeMode == 'recommend' && saveFlag && firstSave();
 	}, [saveFlag]);
 	useLayoutEffect(() => {
 		makeMode == 'recommend' && getDuration();
+	}, []);
+	useEffect(() => {
+		makeMode == 'recommend' && setViewPagerView(true);
 	}, []);
 	useEffect(() => {
 		navigation.setOptions({
@@ -202,6 +206,26 @@ export default function Timetable({navigation, route}: any) {
 					)}
 				</HeaderContianer>
 			),
+			headerLeft: () =>
+				makeMode == 'recommend' && (
+					<TouchableOpacity
+						style={{justifyContent: 'center'}}
+						onPress={() => {
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '홈으로',
+									modalSubTitle: '홈으로 이동하시겠습니까?',
+									modalLeft: true,
+									modalFunction: goHome,
+								}),
+							);
+						}}>
+						<Image
+							source={require('../../../public/images/danim_logo_row.png')}
+							style={{height: 36, aspectRatio: 2.054}}
+						/>
+					</TouchableOpacity>
+				),
 		});
 	}, [editMode, timetable, addList, x, makeMode]);
 

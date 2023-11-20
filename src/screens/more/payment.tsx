@@ -11,6 +11,7 @@ import {DayViewContainer} from '../enroll-info/select-multi';
 import {useShopping} from '../../utill/hooks/useShopping';
 import {colors} from '../../utill/colors';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import Toast from 'react-native-toast-message';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const {purchaseItems, requestItemPurchase} = useShopping();
@@ -56,12 +57,7 @@ export default function Payment({navigation}: any) {
 		if (rewardedRef.current !== null) {
 			rewardedRef?.current?.loaded
 				? rewardedRef.current.show()
-				: dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '광고가 없습니다.',
-							modalSubTitle: '잠시 후 다시 시도해주세요',
-						}),
-				  );
+				: Toast.show({type: 'error', text1: '광고 준비중이니 잠시만 기다려 주세요', position: 'bottom'});
 		}
 	};
 	const itemSkus: any = Platform.select({

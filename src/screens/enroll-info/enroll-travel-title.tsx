@@ -16,7 +16,6 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		console.log(makeMode);
 		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('EnrollInfo');
 	};
 	const [onFocus, setOnFocus] = useState(false);
@@ -34,6 +33,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 							style={{color: 'black'}}
 							placeholder={!onFocus ? '신나는 여행' : ''}
 							placeholderTextColor={'grey'}
+							maxLength={10}
 							onFocus={() => setOnFocus(true)}
 							value={textValue}
 							onBlur={() => setOnFocus(false)}

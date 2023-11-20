@@ -90,6 +90,16 @@ export const updateProfile = createAsyncThunk(
 	},
 );
 
+//이용권 로그 확인하기
+export const getTokenLog = createAsyncThunk('/tokenLog', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/manageUser/tokenLog`);
+		return response.data;
+	} catch (err: any) {
+		throw rejectWithValue(err.response.data);
+	}
+});
+
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,
@@ -176,4 +186,11 @@ export interface UserState {
 	signUpReward: boolean;
 	anonymousKeep: boolean;
 	blockUserList: string[];
+}
+
+export interface TokenLogType {
+	tokenLogContent: string;
+	tokenLogNumber: number;
+	tokenLogDate: string;
+	_id: string;
 }

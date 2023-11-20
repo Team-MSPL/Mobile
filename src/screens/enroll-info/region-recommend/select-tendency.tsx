@@ -34,7 +34,7 @@ export default function SelectTendency({navigation}: any) {
 			});
 		});
 		dispatch(regionRecommendSliceActions.enrollTendency(copy));
-		navigation.navigate('RegionSelectDistance');
+		navigation.navigate('RegionSelectPopularity');
 	};
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
 		let copy = [...select];

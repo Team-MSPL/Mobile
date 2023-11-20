@@ -11,6 +11,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {Center, ClearTouchableOpacity, InputWrap, MainContainer} from '../../utill/layout/layout';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel} from '../../utill/svg/svg';
+import {FilterList} from '../../utill/filter';
 export default function ChangeProfile({navigation}: any) {
 	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
@@ -41,20 +42,29 @@ export default function ChangeProfile({navigation}: any) {
 	};
 	const goChangeProfile = () => {
 		try {
-			dispatch(
-				updateProfile({
-					userName: nickname,
-					userProfileImage: image,
-				}),
-			);
-			dispatch(
-				userSliceActions.setNicknameAndImage({
-					userName: nickname,
-					userProfileImage: image,
-				}),
-			);
+			if (FilterList.includes(nickname)) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '사용불가',
+						modalSubTitle: '사용 불가한 닉네임입니다.',
+					}),
+				);
+			} else {
+				dispatch(
+					updateProfile({
+						userName: nickname,
+						userProfileImage: image,
+					}),
+				);
+				dispatch(
+					userSliceActions.setNicknameAndImage({
+						userName: nickname,
+						userProfileImage: image,
+					}),
+				);
 
-			navigation.goBack();
+				navigation.goBack();
+			}
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({

@@ -1,10 +1,11 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {
 	regionRecommendSliceActions,
 	reverseGeocoding,
 	geocoding,
+	regionSearch,
 } from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, TouchableOpacity, PermissionsAndroid} from 'react-native';
@@ -17,11 +18,17 @@ import {DistanceExplain} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {useFocusEffect} from '@react-navigation/native';
+import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
+import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 0, lng: 0, name: ''});
+	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
+	const {tendency, distance, lat, lng, popularity} = useAppSelector(state => state.regionRecommendSlice);
 
+	const {appsflyerLogEvent} = useAppsflyer();
 	const checkDistance = () => {
 		geoInfo.name == ''
 			? dispatch(
@@ -29,15 +36,95 @@ export default function SelectDistance({navigation}: any) {
 						modalTitle: '위치정보',
 						modalSubTitle: '현재 위치가 설정되지 않아 위치기반 추천이 어렵습니다. 그래도 진행하시겠습니까?',
 						modalLeft: true,
-						modalFunction: goNext,
+						modalFunction: checkToken,
 					}),
 			  )
 			: goNext();
 	};
-	const goNext = () => {
+	const goNext = async () => {
 		const data = {distance: range, lat: geoInfo.lat, lng: geoInfo.lng};
 		dispatch(regionRecommendSliceActions.enrollDistanceAndLatLng(data));
 		navigation.navigate('RegionSelectPopularity');
+
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
+			let datas = {
+				selectList: tendency,
+				selectPopular: popularity,
+				recentPosition: {lat: lat, lng: lng},
+				distanceSensitivity: distance,
+				version: 2,
+			};
+			const result = await dispatch(regionSearch(datas)).unwrap();
+			if (result.length != 0) {
+				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				navigation.popToTop();
+				navigation.navigate('RegionViewResult');
+			} else {
+				dispatch(modalSliceActions.setOpenModal({modalSubTitle: '적절한 여행지를 찾지못하였습니다.'}));
+			}
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '에러',
+					modalSubTitle: '추천을 받는 중 에러가 발생했습니다.',
+				}),
+			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const checkSignUpReward = () => {
+		dispatch(userSliceActions.setSignUpReward(false));
+	};
+	useFocusEffect(
+		useCallback(() => {
+			if (signUpReward) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원가입 축하드립니다',
+						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+						modalFunction: checkSignUpReward,
+					}),
+				);
+			}
+		}, [signUpReward]),
+	);
+	const goNewLogin = () => {
+		navigation.navigate('LoginScreen');
+	};
+	const goPayment = async () => {
+		navigation.navigate('Payment');
+	};
+	const checkToken = () => {
+		if (socialloginProvider == 'anonymous') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '로그인 없이는 이용 불가합니다',
+					modalSubTitle: '로그인 하러 가시겠습니까?',
+					modalFunction: goNewLogin,
+					modalLeft: true,
+				}),
+			);
+		} else {
+			functionToken >= 1
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: `이용권이 하나 소모됩니다.\n현재 이용권은 ${functionToken}개입니다. 실행하시겠습니까?`,
+							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
+							modalFunction: goNext,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+							modalFunction: goPayment,
+							modalLeft: true,
+						}),
+				  );
+		}
 	};
 	const requestPermission = async () => {
 		try {
@@ -89,9 +176,12 @@ export default function SelectDistance({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<StepText mainText='지역 추천 반경 설정' subText='Ai는 입력된 값을 통해 지역 코스를 추천해드려요' />
+			<StepText
+				mainText='지역 추천 반경 설정'
+				subText='본인의 위치에서 추천받고자하는 여행 반경을 설정해주세요'
+			/>
 			<DistanceCenter>
-				<DistanceText>{range}</DistanceText>
+				<DistanceText>{range * 50}</DistanceText>
 				<Slider
 					style={{width: '100%', height: 40}}
 					minimumValue={1}
@@ -110,16 +200,16 @@ export default function SelectDistance({navigation}: any) {
 				</DistanceSpace>
 			</DistanceCenter>
 			<DistanceDivider />
-			<StepText mainText='내 위치 정보' subText='내 위치를 기준으로 추천을 진행해요' />
+			<StepText mainText='내 위치 정보' subText='선택시 내 위치를 기준으로 추천을 진행해요' />
 			<Center>
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<GetText>{geoInfo.name}</GetText>
+				<GetText>{geoInfo.name ? geoInfo.name : '기본값:서울특별시'}</GetText>
 			</Center>
 			<DistanceDivider />
 
-			<CustomButton label='다음 단계' onPress={checkDistance}></CustomButton>
+			<CustomButton label='추천 받기' onPress={checkDistance}></CustomButton>
 		</MainContainer>
 	);
 }

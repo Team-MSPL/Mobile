@@ -81,6 +81,14 @@ export default function InputDiary({navigation}: any) {
 	};
 	return (
 		<>
+			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
+			<DiaryTextInput
+				value={diaryValue}
+				multiline={true}
+				placeholderTextColor={'grey'}
+				style={{color: 'black'}}
+				placeholder='여행 일기로 추억을 기록해보세요'
+				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
 			<PictureCotainer>
 				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
 					<PictureElementContainer onPress={handelGetImage}>
@@ -102,15 +110,6 @@ export default function InputDiary({navigation}: any) {
 					))}
 				</PictureScroll>
 			</PictureCotainer>
-			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
-			<DiaryTextInput
-				value={diaryValue}
-				multiline={true}
-				placeholderTextColor={'grey'}
-				style={{color: 'black'}}
-				placeholder='여행 일기로 추억을 기록해보세요'
-				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
-
 			<CustomButton
 				width={40}
 				label={diary == '' ? '일기 저장' : '일기 수정'}

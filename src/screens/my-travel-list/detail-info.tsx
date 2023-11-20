@@ -1,7 +1,12 @@
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {deleteTravelCourse, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {TouchableOpacity, Platform} from 'react-native';
+import {
+	deleteTravelCourse,
+	getOneTravelCourse,
+	reCourseName,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
+import {TouchableOpacity} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -9,20 +14,31 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {HStack, HeaderContianer, HeaderText, MainContainer, VStack, devicesWidth} from '../../utill/layout/layout';
+import {
+	Divider,
+	HStack,
+	HeaderContianer,
+	HeaderText,
+	MainContainer,
+	VStack,
+	devicesWidth,
+} from '../../utill/layout/layout';
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgMilestone, SvgReview, SvgShare} from '../../utill/svg/svg';
+import {SvgMilestone, SvgReview} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
+
+import Icon from 'react-native-vector-icons/AntDesign';
+import Toast from 'react-native-toast-message';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const Icons = styled(Icon)``;
 	const goMyTravelDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			await dispatch(getOneTravelCourse({travelId: travelId}));
-			console.log('아니아니이요', Object.keys(picture));
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -61,14 +77,26 @@ export default function DetailInfo({navigation}: any) {
 					}),
 			  )
 			: navigation.navigate('InputReviewAndPoint');
+		if (editing) {
+			setEditing(false);
+			setText(travelName);
+		}
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
 		dispatch(travelSliceActions.setMakeMode('modify'));
 		navigation.navigate('Timetable');
+		if (editing) {
+			setEditing(false);
+			setText(travelName);
+		}
 	};
 
 	const goKakaoShare = async () => {
 		try {
+			if (editing) {
+				setEditing(false);
+				setText(travelName);
+			}
 			const response = await KakaoShareLink.sendFeed({
 				content: {
 					title: travelName,
@@ -107,7 +135,18 @@ export default function DetailInfo({navigation}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderContianer>
-					<TouchableOpacity onPress={goKakaoShare}>
+					<TouchableOpacity
+						onPress={() => {
+							editing
+								? dispatch(
+										modalSliceActions.setOpenModal({
+											modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
+											modalLeft: true,
+											modalFunction: goKakaoShare,
+										}),
+								  )
+								: goKakaoShare();
+						}}>
 						<HeaderText>공유</HeaderText>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={removeCheck}>
@@ -122,12 +161,72 @@ export default function DetailInfo({navigation}: any) {
 			goMyTravelDetail();
 		}, []),
 	);
+	const [editing, setEditing] = useState(false);
+	const [text, setText] = useState(travelName);
+	const checkChange = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '제목 변경',
+				modalSubTitle: `${text}로 변경하시겠습니까?`,
+				modalLeft: true,
+				modalFunction: changeTravelName,
+			}),
+		);
+	};
+	const changeTravelName = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {updateTravelName: text, travelId: travelId};
+			await dispatch(reCourseName(data));
+			setEditing(false);
+			dispatch(travelSliceActions.enrollTravelName(text));
+		} catch {
+			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '예기치 못한 오류가 발생했습니다.'}));
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	return (
 		<MainContainer>
+			{!editing ? (
+				<TravleHStack>
+					<TravelNameText>{travelName}</TravelNameText>
+					<ReName
+						onPress={() => {
+							setEditing(true);
+						}}>
+						<Icons name={'form'} size={20} color={'grey'} />
+					</ReName>
+				</TravleHStack>
+			) : (
+				<RenameContainer>
+					<CustomTextInput
+						text={text}
+						placeholderTextColor={'grey'}
+						style={{color: 'black', fontSize: 20}}
+						autoFocus={true}
+						value={text}
+						onChangeText={(value: string) => setText(value)}
+						maxLength={10}></CustomTextInput>
+					<ReName onPress={checkChange}>
+						<Icons name={'save'} size={30} color={'black'} />
+					</ReName>
+				</RenameContainer>
+			)}
 			<DayText>{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay]).format('MM월-DD일')}</DayText>
-			<InputDiary navigation={navigation} />
 			<CourseAndReview>
-				<CourseContainer onPress={goTimetable}>
+				<CourseContainer
+					onPress={() => {
+						editing
+							? dispatch(
+									modalSliceActions.setOpenModal({
+										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
+										modalLeft: true,
+										modalFunction: goTimetable,
+									}),
+							  )
+							: goTimetable();
+					}}>
 					<VStack>
 						<CourseTitleText>여행 코스 확인</CourseTitleText>
 						<CourseSubTitleText>지난 여행 코스를 확인해보세요</CourseSubTitleText>
@@ -136,7 +235,18 @@ export default function DetailInfo({navigation}: any) {
 						<SvgMilestone color='white' />
 					</IconContainer>
 				</CourseContainer>
-				<ReviewContainer onPress={goReviewAndRating}>
+				<ReviewContainer
+					onPress={() => {
+						editing
+							? dispatch(
+									modalSliceActions.setOpenModal({
+										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
+										modalLeft: true,
+										modalFunction: goReviewAndRating,
+									}),
+							  )
+							: goReviewAndRating();
+					}}>
 					<VStack>
 						<ReviewTitleText>리뷰 작성</ReviewTitleText>
 						<ReviewSubTitleText>다른 여행자들에게 도움이 되는 리뷰를 작성해주세요</ReviewSubTitleText>
@@ -146,9 +256,34 @@ export default function DetailInfo({navigation}: any) {
 					</IconContainer>
 				</ReviewContainer>
 			</CourseAndReview>
+			<InfoDivider></InfoDivider>
+			<InputDiary navigation={navigation} />
 		</MainContainer>
 	);
 }
+
+const InfoDivider = styled(Divider)`
+	background-color: ${colors.regionNormal};
+`;
+const ReName = styled.TouchableOpacity`
+	padding: 5px;
+`;
+const RenameContainer = styled(HStack)`
+	border-bottom-width: 1px;
+	align-items: center;
+	width: 70%;
+	margin: 0px 0px 5px 0px;
+`;
+const TravleHStack = styled(HStack)`
+	width: 100%;
+	align-items: center;
+	margin: 0px 0px 5px 0px;
+`;
+const TravelNameText = styled.Text`
+	font-size: ${devicesWidth * 0.08}px;
+	color: ${colors.selectButton};
+	margin: ${devicesWidth * 0.01}px;
+`;
 
 export const IconContainer = styled.View`
 	width: 100%;
@@ -156,7 +291,7 @@ export const IconContainer = styled.View`
 `;
 export const CourseAndReview = styled(HStack)`
 	width: 100%;
-	margin: 0px 0px 10px 0px;
+	margin: 10px 0px 10px 0px;
 	justify-content: space-between;
 `;
 export const CourseContainer = styled.TouchableOpacity`
@@ -189,4 +324,11 @@ const ReviewSubTitleText = styled(CourseSubTitleText)`
 `;
 export const HeaderHStack = styled(HStack)`
 	justify-content: space-between;
+`;
+const CustomTextInput = styled.TextInput<{text: string}>`
+	width: 80%;
+	padding: 8px;
+	font-size: 16px;
+	font-weight: 400;
+	border-radius: 8px;
 `;

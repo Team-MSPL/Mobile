@@ -68,6 +68,7 @@ function TabBar() {
 				tabBarStyle: {
 					minHeight: 60 + insets.bottom,
 					backgroundColor: colors.main,
+					paddingBottom: 10,
 				},
 				headerTitleAlign: 'center',
 				headerTitleStyle: {

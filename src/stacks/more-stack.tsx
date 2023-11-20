@@ -8,6 +8,7 @@ import Terms from '../screens/more/terms';
 import Coupon from '../screens/more/coupon';
 import Inquire from '../screens/more/inquire';
 import NoteList from '../screens/more/note-list';
+import TokenLog from '../screens/more/token-log';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -66,6 +67,13 @@ export default function MoreStack() {
 				component={NoteList}
 				options={{
 					title: '문의 하기',
+				}}
+			/>
+			<Stack.Screen
+				name='TokenLog'
+				component={TokenLog}
+				options={{
+					title: '이용 기록',
 				}}
 			/>
 		</Fragment>

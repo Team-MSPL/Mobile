@@ -32,6 +32,8 @@ import Loading from './src/utill/loading';
 import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
 import useVersion from './src/utill/hooks/useVersion';
+import Toast from 'react-native-toast-message';
+//import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
@@ -41,6 +43,11 @@ function App(): JSX.Element {
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 	};
+
+	// messaging().setBackgroundMessageHandler(async remoteMessage => {
+	// 	console.log('[Background Remote Message]', remoteMessage);
+	// });
+
 	const getAllKeys = async () => {
 		try {
 			// await AsyncStorage.clear();
@@ -191,6 +198,18 @@ function App(): JSX.Element {
 	useLayoutEffect(() => {
 		getDeepLink();
 	}, []);
+	// const getFcmToken = async () => {
+	// 	const fcmToken = await messaging().getToken();
+	// 	console.log('[FCM Token] ', fcmToken);
+	// };
+
+	// useEffect(() => {
+	// 	getFcmToken();
+	// 	const unsubscribe = messaging().onMessage(async remoteMessage => {
+	// 		console.log('[Remote Message] ', JSON.stringify(remoteMessage));
+	// 	});
+	// 	return unsubscribe;
+	// }, []);
 	useEffect(() => {
 		getAllKeys();
 		checkFirstLaunch();
@@ -231,6 +250,7 @@ function App(): JSX.Element {
 				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
 				{Boolean(isLoading) && <Loading />}
+				<Toast />
 			</NavigationContainer>
 		</SafeAreaProvider>
 	);
