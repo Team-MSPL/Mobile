@@ -1,12 +1,12 @@
 import {useEffect} from 'react';
-import {Dimensions, Platform} from 'react-native';
+import {Dimensions, Platform, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
@@ -21,6 +21,23 @@ export default function Main({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
+	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
+	const selectPopularity = (e: {id: number; subTitle: string}) => {
+		let season = Array(4).fill(0);
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		index < 0 ? (season[3] = 1) : (season[index] = 1);
+		let region = checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle];
+		dispatch(
+			travelSliceActions.setPopuarityClickStart({
+				makeMode: 'recommend',
+				season: season,
+				cityIndex: e.id,
+				region: region,
+			}),
+		);
+		navigation.navigate('EnrollTravelTitle');
+	};
+
 	const {userName, functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -44,7 +61,7 @@ export default function Main({navigation}: any) {
 				</HeaderHStack>
 			),
 		});
-	}, []);
+	}, [functionToken]);
 	useEffect(() => {
 		if (signUpReward) {
 			dispatch(
@@ -66,7 +83,21 @@ export default function Main({navigation}: any) {
 		boldText: string;
 	}
 	const emojiList = ['🏖', '🏕', '🍲', '📸', '🏃', '🗼', '🚅', '🛫', '🛳', '🚗', '🦐'];
-	const regionList = ['서울', '부산', '제주', '강릉', '단양', '여수', '울산', '대전', '광주', '경주'];
+	const regionList = [
+		{id: 1, subTitle: '서울'},
+		{id: 2, subTitle: '부산'},
+		{id: 17, subTitle: '제주'},
+		{id: 4, subTitle: '인천'},
+		{id: 3, subTitle: '대구'},
+		{id: 5, subTitle: '광주'},
+		{id: 6, subTitle: '대전'},
+		{id: 7, subTitle: '울산'},
+		{id: 10, subTitle: '강릉시'},
+		{id: 10, subTitle: '속초시'},
+		{id: 15, subTitle: '경주시'},
+		{id: 15, subTitle: '포항시'},
+		{id: 14, subTitle: '여수시'},
+	];
 	const uniqueTravelList = [
 		{
 			id: 0,
@@ -158,18 +189,31 @@ export default function Main({navigation}: any) {
 		},
 	];
 	const DeviceWidth = Dimensions.get('window').width;
+	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
 	return (
 		<SafeAreaView>
 			<MainContainer>
 				<TopBannerContainer>
 					<BannerTextContainer>
-						<BannerText>
-							<BannerColoredText>{userName}</BannerColoredText>님,{'\n'}현재 인기 여행지{'\n'}
-							<BannerColoredText>
-								{regionList[Math.floor(Math.random() * regionList.length)]}
-							</BannerColoredText>
-							여행은 어떠세요?
-						</BannerText>
+						<HStack>
+							<TouchableOpacity
+								onPress={() => {
+									navigation.navigate('More');
+								}}>
+								<BannerColoredText>{userName}</BannerColoredText>
+							</TouchableOpacity>
+							<BannerText>님,</BannerText>
+						</HStack>
+						<BannerText>현재 인기 여행지</BannerText>
+						<HStack>
+							<TouchableOpacity
+								onPress={() => {
+									selectPopularity({id: randomRegion.id, subTitle: randomRegion.subTitle});
+								}}>
+								<BannerColoredText>{randomRegion.subTitle}</BannerColoredText>
+							</TouchableOpacity>
+							<BannerText>여행은 어떠세요?</BannerText>
+						</HStack>
 					</BannerTextContainer>
 					<BannerEmoji>{emojiList[Math.floor(Math.random() * emojiList.length)]}</BannerEmoji>
 				</TopBannerContainer>
@@ -222,7 +266,7 @@ const SafeAreaView = styled.SafeAreaView`
 	height: 100%;
 `;
 const HeaderHStack = styled(HStack)`
-	padding: 0px 3px;
+	padding: 0px 24px;
 `;
 
 const TopBannerContainer = styled.View`
@@ -296,7 +340,9 @@ const NewTravelButtonTitleText = styled.Text`
 `;
 
 const RightArrowIcon = styled(Icon)``;
-const Ticket = styled(Icons)``;
+const Ticket = styled(Icons)`
+	margin: 0px 5px 0px 0px;
+`;
 
 const CollectionContainer = styled.View`
 	margin-bottom: 12px;

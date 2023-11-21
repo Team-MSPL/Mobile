@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {TouchableOpacity, Image, Alert, Pressable, View} from 'react-native';
+import {Image, Pressable} from 'react-native';
 import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -9,7 +9,7 @@ import ImageView from 'react-native-image-viewing';
 import styled from 'styled-components/native';
 import {Center, HStack, MainText, VStack} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SvgApple, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
+import {SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<CourseDetailType>();
 	const dispatch = useAppDispatch();
@@ -19,7 +19,6 @@ export default function CourseDetail({navigation, route}: any) {
 	const getDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log(route.params.value, 'qwe');
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
 		} catch (err) {

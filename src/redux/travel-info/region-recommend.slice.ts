@@ -44,6 +44,7 @@ export const regionSearch = createAsyncThunk('/regionSearch', async (data: any, 
 		console.log(response.data);
 		return response.data;
 	} catch (error: any) {
+		console.log(error, 'qwe');
 		throw rejectWithValue(error.code);
 	}
 });

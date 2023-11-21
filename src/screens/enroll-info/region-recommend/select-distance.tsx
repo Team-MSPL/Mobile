@@ -1,14 +1,9 @@
 import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {
-	regionRecommendSliceActions,
-	reverseGeocoding,
-	geocoding,
-	regionSearch,
-} from '../../../redux/travel-info/region-recommend.slice';
+import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
-import {Platform, TouchableOpacity, PermissionsAndroid} from 'react-native';
+import {Platform, PermissionsAndroid} from 'react-native';
 import {MainContainer, Center, Divider, MainText, HStack} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
@@ -26,7 +21,7 @@ export default function SelectDistance({navigation}: any) {
 	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 0, lng: 0, name: ''});
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
-	const {tendency, distance, lat, lng, popularity} = useAppSelector(state => state.regionRecommendSlice);
+	const {tendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 
 	const {appsflyerLogEvent} = useAppsflyer();
 	const checkDistance = () => {
@@ -42,18 +37,14 @@ export default function SelectDistance({navigation}: any) {
 			: goNext();
 	};
 	const goNext = async () => {
-		const data = {distance: range, lat: geoInfo.lat, lng: geoInfo.lng};
-		dispatch(regionRecommendSliceActions.enrollDistanceAndLatLng(data));
-		navigation.navigate('RegionSelectPopularity');
-
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			let datas = {
 				selectList: tendency,
 				selectPopular: popularity,
-				recentPosition: {lat: lat, lng: lng},
-				distanceSensitivity: distance,
+				recentPosition: {lat: geoInfo.lat, lng: geoInfo.lng},
+				distanceSensitivity: range,
 				version: 2,
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
@@ -62,13 +53,18 @@ export default function SelectDistance({navigation}: any) {
 				navigation.popToTop();
 				navigation.navigate('RegionViewResult');
 			} else {
-				dispatch(modalSliceActions.setOpenModal({modalSubTitle: '적절한 여행지를 찾지못하였습니다.'}));
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalSubTitle:
+							'적절한 여행지를 찾지못하였습니다.\n이용권은 차감되지않습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
+					}),
+				);
 			}
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '에러',
-					modalSubTitle: '추천을 받는 중 에러가 발생했습니다.',
+					modalSubTitle:
+						'적절한 여행지를 찾지못하였습니다.\n이용권은 차감되지않습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
 				}),
 			);
 		} finally {
@@ -140,8 +136,6 @@ export default function SelectDistance({navigation}: any) {
 		}
 	};
 	const goReverseGeocoding = async () => {
-		// const a = await dispatch(geocoding({region: '김해시'})).unwrap();
-		// console.log(a.results);
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			requestPermission().then(result => {
@@ -181,7 +175,7 @@ export default function SelectDistance({navigation}: any) {
 				subText='본인의 위치에서 추천받고자하는 여행 반경을 설정해주세요'
 			/>
 			<DistanceCenter>
-				<DistanceText>{range * 50}</DistanceText>
+				<DistanceText>{range * 50}km</DistanceText>
 				<Slider
 					style={{width: '100%', height: 40}}
 					minimumValue={1}

@@ -20,7 +20,6 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
 	const {
-		day,
 		Place,
 		timeLimitArray,
 		minuteLimitArray,

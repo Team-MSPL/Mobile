@@ -51,10 +51,8 @@ export default function SelectTendency({navigation}: any) {
 						return (
 							<TendencyContainer key={index}>
 								<TendencyStepText>Step {index + 1}</TendencyStepText>
-								<HStack>
-									<TendencyText>{item.title}</TendencyText>
-									<MultiText>* 중복 선택 가능, 선택 안 하셔도 됩니다.</MultiText>
-								</HStack>
+								<TendencyText>{item.title}</TendencyText>
+								<MultiText>* 중복 선택 가능, 선택 안 하셔도 됩니다.</MultiText>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (

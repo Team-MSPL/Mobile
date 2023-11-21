@@ -99,8 +99,8 @@ const PostWriterInfoContainer = styled.View`
 	align-items: center;
 `;
 const PostWriterProfileImage = styled.Image`
-	width: 36;
-	height: 36;
+	width: 36px;
+	height: 36px;
 	border-radius: 18px;
 	border: ${colors.border};
 	margin-right: 12px;

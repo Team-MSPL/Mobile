@@ -65,7 +65,7 @@ export default function CommunityMainScreen({navigation}: any) {
 			const response = await dispatch(
 				getPostList({page: currentPage, sort: sortOption, blockList: blockUserList}),
 			);
-			console.log('DB로부터 게시글들을 가져오는데 성공했습니다.');
+			console.log('DB로부터 게시글들을 가져오는데 성공했습니다.', response.payload);
 			setCurrentPostList([...response.payload]);
 			if (response.payload.length < 20) {
 				// payload에 실제로 게시글 데이터가 담겨 있다고 가정

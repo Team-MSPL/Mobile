@@ -167,7 +167,7 @@ export default function LoginScreen({navigation}: any) {
 				}
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
-					userName: `김다님${shortid.generate()}`,
+					userName: `나그네${shortid.generate()}`,
 					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
@@ -179,7 +179,7 @@ export default function LoginScreen({navigation}: any) {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
 						profileImage: 'https://danim.me/square_logo.png',
-						nickname: `김다님${shortid.generate()}`,
+						nickname: `나그네${shortid.generate()}`,
 					});
 				} else {
 					anonymousKeep && navigation.goBack();
@@ -202,7 +202,7 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(response.id_token!);
 				console.log('같아라!', decodeToken.sub);
 				const data = {
-					userName: `김다님${shortid.generate()}`,
+					userName: `나그네${shortid.generate()}`,
 					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
@@ -214,7 +214,7 @@ export default function LoginScreen({navigation}: any) {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
 						profileImage: 'https://danim.me/square_logo.png',
-						nickname: `김다님${shortid.generate()}`,
+						nickname: `나그네${shortid.generate()}`,
 					});
 				} else {
 					anonymousKeep && navigation.goBack();

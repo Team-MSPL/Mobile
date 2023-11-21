@@ -7,7 +7,6 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
 import {cityViewList} from '../enroll-info/select-city';
 import {DayElementContainer, MarkerText} from './map-info';

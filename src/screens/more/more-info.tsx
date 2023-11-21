@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Modal, TouchableOpacity, View} from 'react-native';
+import {Modal} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {Divider, MainContainer} from '../../utill/layout/layout';
+import {Divider, MainContainer, devicesHeight} from '../../utill/layout/layout';
 import {SvgLoginLogo} from '../../utill/svg/svg';
 import {useState} from 'react';
 import ViewPager from '../../utill/view-pager';
@@ -16,7 +16,6 @@ export default function MoreInfo({navigation}: any) {
 		state => state.userSlice,
 	);
 	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
-	const {anonymous} = useAppSelector(state => state.loginSlice);
 	const dispatch = useAppDispatch();
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
 	const goLogout = async () => {
@@ -217,6 +216,7 @@ const ProfileContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	width: 100%;
+	margin: ${devicesHeight * 0.02}px 0px;
 `;
 const ProfileImage = styled.Image`
 	width: 100px;

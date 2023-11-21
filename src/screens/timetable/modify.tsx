@@ -9,11 +9,12 @@ import {Center, HStack, MainContainer} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {DayButton, DayContainer, DaySubTitle, DayTitle} from './map-info';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
+import Icon from 'react-native-vector-icons/AntDesign';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
-
+	const Icons = styled(Icon)``;
 	const [changeDay, setChangeDay] = useState(route.params.item.value.x);
 	const onConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
 		console.log(timeData.ampm, 'ndoasndkl');
@@ -144,6 +145,7 @@ export default function Modify({navigation, route}: any) {
 										{String(item.hours >= 24 ? item.hours - 24 : item.hours).padStart(2, '0')}:
 										{String(item.minute).padStart(2, '0')}
 									</TimeItemText>
+									<Icons name={'down'} size={20} color={'black'} />
 								</DayElementContainer>
 							</HStack>
 						</TimeItemContainer>

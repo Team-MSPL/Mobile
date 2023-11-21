@@ -9,7 +9,7 @@ import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {MainContainer, VStack, HStack} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg';
@@ -184,6 +184,13 @@ export default function FinalCheck({navigation}: any) {
 				{/* 스테퍼 넣기 */}
 				<SelectListAllContainer>
 					<SelectListContainer>
+						<SelectListText>여행 지역</SelectListText>
+						<SelectTendencyListContainer>
+							<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
+						</SelectTendencyListContainer>
+					</SelectListContainer>
+					<Dashed />
+					<SelectListContainer>
 						<SelectListText>선택 여행 성향</SelectListText>
 						<SelectTendencyListContainer>
 							<SelectTendencyContainer>
@@ -198,13 +205,6 @@ export default function FinalCheck({navigation}: any) {
 									) : null;
 								});
 							})}
-						</SelectTendencyListContainer>
-					</SelectListContainer>
-					<Dashed />
-					<SelectListContainer>
-						<SelectListText>여행 지역</SelectListText>
-						<SelectTendencyListContainer>
-							<RegionText>{cityViewList[cityIndex].title + region}</RegionText>
 						</SelectTendencyListContainer>
 					</SelectListContainer>
 					<Dashed />
@@ -341,7 +341,7 @@ export const SelectListText = styled.Text`
 	font-weight: 500;
 `;
 export const SelectTendencyContainer = styled.View`
-	padding: 10px;
+	padding: 7px;
 	border-radius: 10px;
 	background-color: white;
 	margin: 0px 10px 10px 0px;
@@ -355,7 +355,7 @@ export const SelectTendencyListContainer = styled.View`
 `;
 
 export const SelectTendencyText = styled.Text`
-	font-size: 18px;
+	font-size: ${devicesWidth * 0.05}px;
 	font-weight: bold;
 	color: ${colors.selectButton};
 `;

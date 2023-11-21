@@ -15,6 +15,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
 import {SvgCancel} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
+import {FilterList} from '../../utill/filter';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);

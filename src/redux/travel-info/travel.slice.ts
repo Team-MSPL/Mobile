@@ -301,6 +301,15 @@ export const travelSlice = createSlice({
 			state.editMode = '';
 			state.season = payload.season;
 		},
+		setPopuarityClickStart: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.makeMode = payload.makeMode;
+			//state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
+		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
 		},

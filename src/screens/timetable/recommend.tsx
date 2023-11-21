@@ -1,17 +1,10 @@
-import {JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {Alert, Linking, TouchableOpacity, ScrollView} from 'react-native';
+import {Alert, Linking, TouchableOpacity, ScrollView, Platform} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
-import {GOOGLE_API_KEY} from '@env';
-import {
-	googleDetailApi,
-	recommendApi,
-	RecommendList,
-	TimetableType,
-	travelSliceActions,
-} from '../../redux/travel-info/travel.slice';
+import {recommendApi, RecommendList, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
@@ -19,8 +12,9 @@ import {colors} from '../../utill/colors';
 import {HStack, MainText, VStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
-import {SVGHelp} from '../../utill/svg/svg';
+import {SVGHelp, SvgPlace} from '../../utill/svg/svg';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
+import {MarkerText} from './map-info';
 export default function Recommend({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -39,16 +33,22 @@ export default function Recommend({navigation, route}: any) {
 			return null;
 		})
 		.filter(items => items !== null);
+
+	let count = 0;
 	const markers = recommendItem
 		.map((value, index) => {
 			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				count += 1;
 				return (
 					<Marker
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-						pinColor={route.params.index == index ? 'black' : 'red'}
-					/>
+						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+						anchor={{x: 0.5, y: 0.9}}>
+						<MarkerText>{count}</MarkerText>
+						<SvgPlace color={route.params.index == index ? 'yellow' : 'red'} width={50} height={50} />
+					</Marker>
 				);
 			}
 			return null;
@@ -180,16 +180,7 @@ export default function Recommend({navigation, route}: any) {
 	useLayoutEffect(() => {
 		getRecommendList();
 	}, []);
-	// const whereInfo=()=>{
-	// 	if(route.params.index==0){
-	// 		whereIndex.current=route.params.index+1;
-	// 	}else{
-	// 		recommendItem.length>1
-	// 		recommendItem[route.params.index - 1].name.includes(['식당 추천','카페 추천','숙소 추천'])?
-	// 		whereIndex.current=route.params.index-1;
-	// 	}
-	// 	recommendItem[route.params.index - 1].name
-	// }
+
 	const mapRef = useRef<MapView>(null);
 	if (!recommendList || isLoading) {
 		return <RecommendContainer></RecommendContainer>;
@@ -227,14 +218,6 @@ export default function Recommend({navigation, route}: any) {
 								</RecommendView>
 								<CategoryText color={idx == select ? 'white' : 'black'}>
 									{item.category_name.slice(6, item.category_name.length)}
-									{/* {'>'}
-									{Math.floor(
-										useDistance({
-											departure: departure.current,
-											arrival: {lat: item.y, lng: item.x},
-										}) * 1000,
-									)}
-									m{recommendItem[route.params.index - 1].name}기준 */}
 								</CategoryText>
 							</ListVStack>
 							<RecommendInfoTouchableOpacity

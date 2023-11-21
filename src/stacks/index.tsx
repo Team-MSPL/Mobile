@@ -3,7 +3,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {Image, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useAppSelector} from '../redux';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
@@ -20,9 +19,6 @@ import {colors} from '../utill/colors';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
-	const {isLogin} = useAppSelector(state => state.userSlice);
-	const {anonymous} = useAppSelector(state => state.loginSlice);
-
 	return (
 		<Stack.Navigator
 			screenOptions={({navigation}) => ({
@@ -35,12 +31,6 @@ export default function StackNavigator() {
 				headerStyle: {backgroundColor: colors.main},
 				headerShadowVisible: false,
 			})}>
-			{/* {isLogin ? (
-				<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
-			) : (
-				<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
-			)} */}
-
 			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 
@@ -82,7 +72,7 @@ function TabBar() {
 				component={Main}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', padding: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
@@ -100,7 +90,7 @@ function TabBar() {
 				component={MyTravelList}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', padding: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
@@ -118,7 +108,7 @@ function TabBar() {
 				component={CommunityMainScreen}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', padding: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
@@ -136,7 +126,7 @@ function TabBar() {
 				component={MoreInfo}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', padding: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
