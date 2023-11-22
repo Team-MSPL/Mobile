@@ -35,7 +35,6 @@ export default function FinalCheck({navigation}: any) {
 		bandwidth,
 	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
-	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 	const goPayment = async () => {
@@ -193,6 +192,9 @@ export default function FinalCheck({navigation}: any) {
 					<SelectListContainer>
 						<SelectListText>선택 여행 성향</SelectListText>
 						<SelectTendencyListContainer>
+							<SelectTendencyContainer>
+								<SelectTendencyText># {!transit ? '자차(렌트카)' : '대중교통'}</SelectTendencyText>
+							</SelectTendencyContainer>
 							<SelectTendencyContainer>
 								<SelectTendencyText># {bandwidth ? '여유있는 일정' : '바쁜 일정'}</SelectTendencyText>
 							</SelectTendencyContainer>

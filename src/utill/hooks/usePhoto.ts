@@ -1,9 +1,13 @@
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useAppDispatch} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {openSettings} from 'react-native-permissions';
 
 export const usePhoto = () => {
 	const dispatch = useAppDispatch();
+	const goPermission = async () => {
+		await openSettings();
+	};
 	const handleImagePickerLaunch = ({
 		photoData,
 		changeFunction,
@@ -26,20 +30,32 @@ export const usePhoto = () => {
 			compressImageQuality: 0.3,
 			cropping: true,
 			includeBase64: true,
-		}).then(response => {
-			if (response.length + photoData.length <= 5) {
-				let temporaryList = [];
-				for (let i = 0; i < response.length; i++) {
-					temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+		})
+			.then(response => {
+				if (response.length + photoData.length <= 5) {
+					let temporaryList = [];
+					for (let i = 0; i < response.length; i++) {
+						temporaryList.push(`data:${response[i].mime};base64,${response[i]?.data}`);
+					}
+					changeFunction([...photoData, ...temporaryList]);
+					(!saveCheck ?? false) && setSaveCheck && setSaveCheck(true);
+					return true;
+				} else {
+					dispatch(modalSliceActions.setOpenModal({modalTitle: '최대 5장까지 선택가능합니다.'}));
+					return false;
 				}
-				changeFunction([...photoData, ...temporaryList]);
-				(!saveCheck ?? false) && setSaveCheck && setSaveCheck(true);
-				return true;
-			} else {
-				dispatch(modalSliceActions.setOpenModal({modalTitle: '최대 5장까지 선택가능합니다.'}));
-				return false;
-			}
-		});
+			})
+			.catch(re => {
+				re == 'Error: User did not grant library permission.' &&
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '권한 설정',
+							modalSubTitle: '현재 권한이 거부된 상태입니다.\n위치 정보 권한을 설정하러 가시겠습니까?',
+							modalLeft: true,
+							modalFunction: goPermission,
+						}),
+					);
+			});
 	};
 
 	return {handleImagePickerLaunch};

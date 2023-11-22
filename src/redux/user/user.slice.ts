@@ -16,6 +16,7 @@ const initialUserState: UserState = {
 	signUpReward: false,
 	anonymousKeep: false,
 	blockUserList: [],
+	pushNotify: false,
 };
 
 //회원탈퇴
@@ -122,6 +123,9 @@ const userSlice = createSlice({
 		login(state) {
 			state.isLogin = true;
 		},
+		setPushNotify(state, {payload}) {
+			state.pushNotify = payload;
+		},
 		setBlockList(state, {payload}) {
 			state.blockUserList = [...state.blockUserList, payload];
 		},
@@ -186,6 +190,7 @@ export interface UserState {
 	signUpReward: boolean;
 	anonymousKeep: boolean;
 	blockUserList: string[];
+	pushNotify: boolean;
 }
 
 export interface TokenLogType {

@@ -43,7 +43,7 @@ function CommunityMain({
 	const fetchCommunityData = async (value?: string) => {
 		try {
 			if (!last.current) {
-				if (searchState && searchList.length >= 20) {
+				if ((searchState && searchList.length >= 20) || postList.length >= 20) {
 					const response = searchState
 						? await dispatch(
 								getSearchPostList({

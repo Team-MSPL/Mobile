@@ -9,6 +9,7 @@ import Coupon from '../screens/more/coupon';
 import Inquire from '../screens/more/inquire';
 import NoteList from '../screens/more/note-list';
 import TokenLog from '../screens/more/token-log';
+import PushNotify from '../screens/more/push-notify';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -74,6 +75,13 @@ export default function MoreStack() {
 				component={TokenLog}
 				options={{
 					title: '이용 기록',
+				}}
+			/>
+			<Stack.Screen
+				name='PushNotify'
+				component={PushNotify}
+				options={{
+					title: '알림 설정',
 				}}
 			/>
 		</Fragment>

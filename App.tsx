@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useLayoutEffect} from 'react';
-import {BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
+import {Alert, BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
 
 import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,6 +33,7 @@ import NeedPermissions from './src/utill/need-permissions';
 import ViewPager from './src/utill/view-pager';
 import useVersion from './src/utill/hooks/useVersion';
 import Toast from 'react-native-toast-message';
+import messaging from '@react-native-firebase/messaging';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -232,6 +233,25 @@ function App(): JSX.Element {
 		dispatch(userSliceActions.setIsFirstLaunch('false'));
 		await AsyncStorage.setItem('isFirstLaunch', 'true');
 	};
+
+	const getFcmToken = async () => {
+		const fcmToken = await messaging().getToken();
+		console.log('[FCM Token] ', fcmToken);
+	};
+	useEffect(() => {
+		getFcmToken();
+		const unsubscribe = messaging().onMessage(async remoteMessage => {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: remoteMessage.notification?.body,
+					modalSubTitle: remoteMessage.notification?.title,
+				}),
+			);
+		});
+
+		return unsubscribe;
+	}, []);
+
 	return (
 		<SafeAreaProvider>
 			<StatusBar
@@ -240,13 +260,17 @@ function App(): JSX.Element {
 				backgroundColor={backgroundStyle.backgroundColor}
 			/>
 			<NavigationContainer linking={linking}>
-				{isFirstLaunch == 'true' ? (
-					<ViewPager handleFunction={handleFirstLaunch} />
-				) : hasPermission || noPermission ? (
-					<StackNavigator />
-				) : (
-					<NeedPermissions />
-				)}
+				{
+					// isFirstLaunch == 'true' ? (
+					// 	<ViewPager handleFunction={handleFirstLaunch} />
+					// ) :
+					isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
+					// hasPermission || noPermission ? (
+
+					// ) : (
+					// 	<NeedPermissions />
+					// )
+				}
 				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
 				{Boolean(isLoading) && <Loading />}

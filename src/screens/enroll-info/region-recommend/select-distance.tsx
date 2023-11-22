@@ -16,6 +16,7 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useFocusEffect} from '@react-navigation/native';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
+import {openSettings} from 'react-native-permissions';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
@@ -135,6 +136,9 @@ export default function SelectDistance({navigation}: any) {
 			console.log(e);
 		}
 	};
+	const goPermission = async () => {
+		await openSettings();
+	};
 	const goReverseGeocoding = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -159,6 +163,15 @@ export default function SelectDistance({navigation}: any) {
 							console.log(error.code, error.message);
 						},
 						{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+					);
+				} else {
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '권한 설정',
+							modalSubTitle: '현재 권한이 거부된 상태입니다.\n위치 정보 권한을 설정하러 가시겠습니까?',
+							modalLeft: true,
+							modalFunction: goPermission,
+						}),
 					);
 				}
 			});

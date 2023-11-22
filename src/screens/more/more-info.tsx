@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Modal} from 'react-native';
+import {Modal, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -92,6 +92,9 @@ export default function MoreInfo({navigation}: any) {
 	const goViewPager = () => {
 		setViewPagerView(true);
 	};
+	const goPushNotify = () => {
+		navigation.navigate('PushNotify');
+	};
 	const [viewPagerView, setViewPagerView] = useState(false);
 	const useInfo = [
 		{
@@ -102,6 +105,7 @@ export default function MoreInfo({navigation}: any) {
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 		{title: '사용 가이드', function: goViewPager},
+		{title: '알림', function: goPushNotify},
 	];
 	return (
 		<MainContainer>
@@ -142,9 +146,11 @@ export default function MoreInfo({navigation}: any) {
 						<SettingElement onPress={goPayment}>
 							<SettingElementText>이용권 구매하기</SettingElementText>
 						</SettingElement>
-						<SettingElement onPress={goCoupon}>
-							<SettingElementText>쿠폰 입력하기</SettingElementText>
-						</SettingElement>
+						{Platform.OS != 'ios' && (
+							<SettingElement onPress={goCoupon}>
+								<SettingElementText>쿠폰 입력하기</SettingElementText>
+							</SettingElement>
+						)}
 						<SettingElement onPress={goNoteList}>
 							<SettingElementText>쪽지함</SettingElementText>
 						</SettingElement>
