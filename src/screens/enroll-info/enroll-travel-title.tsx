@@ -33,7 +33,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 							style={{color: 'black'}}
 							placeholder={!onFocus ? '신나는 여행' : ''}
 							placeholderTextColor={'grey'}
-							maxLength={10}
+							maxLength={20}
 							onFocus={() => setOnFocus(true)}
 							value={textValue}
 							onBlur={() => setOnFocus(false)}

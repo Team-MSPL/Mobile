@@ -80,9 +80,10 @@ export default function Timetable({navigation, route}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '타임테이블 로딩 중 에러가 발생했습니다.',
+					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',
 				}),
 			);
+			navigation.goBack();
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

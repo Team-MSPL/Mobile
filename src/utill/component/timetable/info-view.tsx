@@ -63,10 +63,15 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 				radius: 2000,
 				backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
 				backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
+				status: timetable[e.idx][e.index - 1],
 			});
 		}
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
+		// let copy = timetable[e.idx];
+		// let temp = copy.filter(
+		// 	item => item.name != '숙소 추천' && item.name != '점심 추천' && item.name != '저녁 추천',
+		// );
 		if (timetable[e.idx].length == 0) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -77,6 +82,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 			let lat = 0;
 			let lng = 0;
 			let radius = 2000;
+			let status = timetable[e.idx][e.index - 1];
 			if (timetable[e.idx].length == 1) {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -87,9 +93,11 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 				if (e.index == timetable[e.idx].length - 1) {
 					lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
 					lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
+					status = timetable[e.idx][timetable[e.idx].length - 2];
 				} else if (e.index == 0) {
 					lat = timetable[e.idx][1].lat;
 					lng = timetable[e.idx][1].lng;
+					status = timetable[e.idx][1];
 				} else {
 					const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
 					const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
@@ -97,6 +105,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 					lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
 					lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
 					radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+					status = timetable[e.idx][e.index - 1];
 				}
 				const startNumber = e.value.y; // 시작 숫자
 				const count = e.value.takenTime / 30; // 원하는 갯수
@@ -115,6 +124,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 					radius: radius,
 					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
 					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
+					status: status,
 				});
 			}
 		}

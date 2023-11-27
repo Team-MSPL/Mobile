@@ -45,10 +45,6 @@ function App(): JSX.Element {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 	};
 
-	// messaging().setBackgroundMessageHandler(async remoteMessage => {
-	// 	console.log('[Background Remote Message]', remoteMessage);
-	// });
-
 	const getAllKeys = async () => {
 		try {
 			// await AsyncStorage.clear();
@@ -199,18 +195,6 @@ function App(): JSX.Element {
 	useLayoutEffect(() => {
 		getDeepLink();
 	}, []);
-	// const getFcmToken = async () => {
-	// 	const fcmToken = await messaging().getToken();
-	// 	console.log('[FCM Token] ', fcmToken);
-	// };
-
-	// useEffect(() => {
-	// 	getFcmToken();
-	// 	const unsubscribe = messaging().onMessage(async remoteMessage => {
-	// 		console.log('[Remote Message] ', JSON.stringify(remoteMessage));
-	// 	});
-	// 	return unsubscribe;
-	// }, []);
 	useEffect(() => {
 		getAllKeys();
 		checkFirstLaunch();
@@ -234,23 +218,23 @@ function App(): JSX.Element {
 		await AsyncStorage.setItem('isFirstLaunch', 'true');
 	};
 
-	const getFcmToken = async () => {
-		const fcmToken = await messaging().getToken();
-		console.log('[FCM Token] ', fcmToken);
-	};
-	useEffect(() => {
-		getFcmToken();
-		const unsubscribe = messaging().onMessage(async remoteMessage => {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: remoteMessage.notification?.body,
-					modalSubTitle: remoteMessage.notification?.title,
-				}),
-			);
-		});
+	// const getFcmToken = async () => {
+	// 	const fcmToken = await messaging().getToken();
+	// 	console.log('[FCM Token] ', fcmToken);
+	// };
+	// useEffect(() => {
+	// 	getFcmToken();
+	// 	const unsubscribe = messaging().onMessage(async remoteMessage => {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: remoteMessage.notification?.body,
+	// 				modalSubTitle: remoteMessage.notification?.title,
+	// 			}),
+	// 		);
+	// 	});
 
-		return unsubscribe;
-	}, []);
+	// 	return unsubscribe;
+	// }, []);
 
 	return (
 		<SafeAreaProvider>

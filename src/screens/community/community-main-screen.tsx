@@ -12,6 +12,8 @@ import ScrollButton from '../../utill/component/scroll-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
+import {Google_Ads_Key} from '@env';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [currentPage, setCurrentPage] = useState(1);
@@ -81,6 +83,7 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	useBackHandler();
 
+	const adUnitId = __DEV__ ? TestIds.BANNER : Google_Ads_Key;
 	return (
 		<CommunityMainContainer>
 			{/* <DropDownButton
@@ -94,7 +97,13 @@ export default function CommunityMainScreen({navigation}: any) {
 				setItems={setSortOptions}
 				placeholder={sortOptions.find(option => option.value === sortOption)?.label || ''}
 			/> */}
-
+			<BannerAd
+				unitId={adUnitId}
+				size={BannerAdSize.FULL_BANNER}
+				requestOptions={{
+					requestNonPersonalizedAdsOnly: true,
+				}}
+			/>
 			<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
 			{socialloginProvider != 'anonymous' && <ScrollButton viewState={viewState} navigation={navigation} />}
 		</CommunityMainContainer>

@@ -1,5 +1,5 @@
-import {Platform} from 'react-native';
-import {PERMISSIONS, checkMultiple, Permission} from 'react-native-permissions';
+import {AppState, Platform} from 'react-native';
+import {PERMISSIONS, checkMultiple, Permission, requestMultiple, request} from 'react-native-permissions';
 import {useAppDispatch} from '../../redux';
 import {setNopermission, setPermission} from '../../redux/setting/settingSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,8 +14,8 @@ const usePermission = () => {
 		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
 	];
 	const iosPermissions = [
-		PERMISSIONS.IOS.PHOTO_LIBRARY,
-		PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+		// PERMISSIONS.IOS.PHOTO_LIBRARY,
+		// PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
 		PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY,
 	];
 	const androidSDKVersion = Platform.Version;
@@ -42,8 +42,15 @@ const usePermission = () => {
 		if (noPermissionCheck == 'true') {
 			dispatch(setNopermission(true));
 		} else {
+			const listener = AppState.addEventListener('change', status => {
+				if (Platform.OS === 'ios' && status === 'active') {
+					request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
+						.then(result => console.log(result))
+						.catch(error => console.log(error));
+				}
+			});
+			// await requestMultiple(needPermission);
 			checkResult = props || (await checkMultiple(needPermission));
-			console.log(checkResult);
 			for (let permission in checkResult) {
 				if (checkResult[permission] === 'denied') {
 					deniedList.push(permission as PermissionStatus);

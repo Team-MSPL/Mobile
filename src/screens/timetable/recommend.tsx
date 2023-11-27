@@ -9,7 +9,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack, MainText, VStack} from '../../utill/layout/layout';
+import {HStack, MainText, VStack, devicesWidth} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {SVGHelp, SvgPlace} from '../../utill/svg/svg';
@@ -169,9 +169,10 @@ export default function Recommend({navigation, route}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '추천 관광지를 받아오는 중 에러가 발생했습니다.',
+					modalTitle: '추천 아이템이 없습니다!',
 				}),
 			);
+			navigation.goBack();
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -216,6 +217,18 @@ export default function Recommend({navigation, route}: any) {
 										{item.place_name}
 									</RecommendElementText>
 								</RecommendView>
+								<DistanceText color={idx == select ? 'black' : colors.selectButton}>
+									{'* ' +
+										route.params.status.name +
+										' 기준 ' +
+										Math.floor(
+											useDistance({
+												departure: {lat: item.y, lng: item.x},
+												arrival: {lat: route.params.lat, lng: route.params.lng},
+											}) * 1000,
+										) +
+										'm'}
+								</DistanceText>
 								<CategoryText color={idx == select ? 'white' : 'black'}>
 									{item.category_name.slice(6, item.category_name.length)}
 								</CategoryText>
@@ -242,7 +255,10 @@ export default function Recommend({navigation, route}: any) {
 		</RecommendContainer>
 	);
 }
-
+const DistanceText = styled.Text<{color: string}>`
+	font-size: ${devicesWidth * 0.03}px;
+	color: ${props => props.color};
+`;
 const RecommendContainer = styled.View`
 	flex: 1;
 	background-color: ${colors.main};

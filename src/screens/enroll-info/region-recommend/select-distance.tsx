@@ -35,7 +35,7 @@ export default function SelectDistance({navigation}: any) {
 						modalFunction: checkToken,
 					}),
 			  )
-			: goNext();
+			: checkToken();
 	};
 	const goNext = async () => {
 		try {
@@ -109,7 +109,6 @@ export default function SelectDistance({navigation}: any) {
 				? dispatch(
 						modalSliceActions.setOpenModal({
 							modalTitle: `이용권이 하나 소모됩니다.\n현재 이용권은 ${functionToken}개입니다. 실행하시겠습니까?`,
-							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
 							modalFunction: goNext,
 							modalLeft: true,
 						}),

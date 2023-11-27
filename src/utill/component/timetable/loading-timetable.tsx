@@ -33,7 +33,7 @@ export default function LoadingTimetable({navigation}: any) {
 			<BarContainer>
 				<BarContinueContainer size={view}></BarContinueContainer>
 			</BarContainer>
-			<LimitText>사용자가 많을 수록 시간이 오래 걸릴 수 있어요</LimitText>
+			<LimitText>네트워크 환경에 따라 시간이 오래 걸릴 수 있어요</LimitText>
 			<MainText>{viewList[view]}</MainText>
 		</LoadingTimetableContainer>
 	);

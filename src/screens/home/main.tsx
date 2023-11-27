@@ -53,10 +53,14 @@ export default function Main({navigation}: any) {
 		const data = {name: e.city + e.title, lat: e.lat, lng: e.lng};
 		navigation.navigate('CourseDetail', {value: data});
 	};
+	const goTokenLog = () => {
+		navigation.navigate('TokenLog');
+	};
+
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<HeaderHStack>
+				<HeaderHStack onPress={goTokenLog}>
 					<Ticket name='ticket' size={26} color={colors.selectButton} />
 					<BannerColoredText>{functionToken}</BannerColoredText>
 				</HeaderHStack>
@@ -69,7 +73,7 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
 	};
 	useEffect(() => {
-		pushPermission();
+		// pushPermission();
 		if (signUpReward) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -182,17 +186,17 @@ export default function Main({navigation}: any) {
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
-			onPress: goEnroll,
-			image: require('../../../public/images/destination.png'),
-			text: '일정 추천받을래요',
-			boldText: '여행 일정 만들기',
-		},
-		{
-			id: 2,
 			onPress: regionRecommend,
 			image: require('../../../public/images/map.png'),
 			text: '지역 추천받을래요',
 			boldText: '여행 지역 추천받기',
+		},
+		{
+			id: 2,
+			onPress: goEnroll,
+			image: require('../../../public/images/destination.png'),
+			text: '일정 추천받을래요',
+			boldText: '여행 일정 만들기',
 		},
 	];
 	const DeviceWidth = Dimensions.get('window').width;
@@ -279,7 +283,7 @@ export default function Main({navigation}: any) {
 const SafeAreaView = styled.SafeAreaView`
 	height: 100%;
 `;
-const HeaderHStack = styled(HStack)`
+const HeaderHStack = styled(HStack).attrs({as: TouchableOpacity})`
 	padding: 0px 24px;
 `;
 

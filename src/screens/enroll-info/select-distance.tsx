@@ -49,7 +49,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 							))}
 						</DistanceCotainer>
 						<Slider
-							style={{width: devicesWidth * 0.9, height: 40}}
+							style={{width: devicesWidth * 0.8, height: 40}}
 							minimumValue={1}
 							maximumValue={10}
 							minimumTrackTintColor='#123123'
@@ -77,7 +77,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 }
 
 const DistanceCotainer = styled(HStack)`
-	width: ${devicesWidth * 0.9}px;
+	width: ${devicesWidth * 0.8}px;
 	justify-content: space-between;
 `;
 const DistanceText = styled.Text<{check: boolean}>`

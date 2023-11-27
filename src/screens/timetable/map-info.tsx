@@ -11,7 +11,7 @@ import {PresetButton} from './preset';
 import {SvgApple, SvgPlace} from '../../utill/svg/svg';
 
 export default function MapInfo({navigation, route}: any) {
-	const {timetable, day} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -36,8 +36,9 @@ export default function MapInfo({navigation, route}: any) {
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
 		let navigationIndex = e + 1;
+		let transitCondition = transit == 1 ? 'public' : 'car';
 		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
-		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
+		const url = `nmap://route/${transitCondition}?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
 		const supported = await Linking.canOpenURL(url);
 		if (supported) {
 			await Linking.openURL(url);

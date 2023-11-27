@@ -105,7 +105,7 @@ export default function MoreInfo({navigation}: any) {
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 		{title: '사용 가이드', function: goViewPager},
-		{title: '알림', function: goPushNotify},
+		//{title: '알림', function: goPushNotify},
 	];
 	return (
 		<MainContainer>

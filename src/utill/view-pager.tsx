@@ -27,7 +27,9 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 				nestedScrollEnabled={true}
 				pagingEnabled
 				snapToInterval={devicesWidth}
+				scrollEventThrottle={200}
 				decelerationRate={'fast'}
+				disableIntervalMomentum={true}
 				onScroll={e => {
 					newPage(e);
 				}}

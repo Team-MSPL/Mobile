@@ -16,7 +16,7 @@ export default function ViewResult({navigation}: any) {
 			if (navigation.isFocused()) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '뒤로 이동시 데이터는 날라갑니다.',
+						modalTitle: '취소시 데이터가 삭제됩니다.',
 						modalSubTitle: '그래도 나가시겠습니까?',
 						modalLeft: true,
 						modalFunction: () => {
@@ -36,7 +36,7 @@ export default function ViewResult({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로 이동시 데이터는 날라갑니다.',
+								modalTitle: '취소시 데이터가 삭제됩니다.',
 								modalSubTitle: '그래도 나가시겠습니까?',
 								modalFunction: () => {
 									navigation.popToTop();

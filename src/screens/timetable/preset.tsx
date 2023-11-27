@@ -21,7 +21,7 @@ export default function Preset({navigation}: any) {
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '경고',
+				modalTitle: '주의사항',
 				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
 				modalLeft: true,
 				modalFunction: goNext,
@@ -49,7 +49,7 @@ export default function Preset({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로 이동시 데이터는 날라갑니다.',
+								modalTitle: '취소시 데이터가 삭제됩니다.',
 								modalSubTitle: '그래도 나가시겠습니까?',
 								modalFunction: () => {
 									navigation.popToTop();
@@ -153,7 +153,7 @@ export default function Preset({navigation}: any) {
 			if (navigation.isFocused()) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '뒤로 이동시 데이터는 날라갑니다.',
+						modalTitle: '취소시 데이터가 삭제됩니다.',
 						modalSubTitle: '그래도 나가시겠습니까?',
 						modalFunction: () => {
 							navigation.popToTop();

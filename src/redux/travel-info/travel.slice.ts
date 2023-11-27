@@ -50,6 +50,7 @@ const initialState: LiteState = {
 	bandwidth: false,
 	saveFlag: false,
 	checKStep: 0,
+	freeTicket: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -300,6 +301,7 @@ export const travelSlice = createSlice({
 			//state.tableShowFlag = true;
 			state.editMode = '';
 			state.season = payload.season;
+			state.freeTicket = false;
 		},
 		setPopuarityClickStart: (state, {payload}) => {
 			Object.assign(state, initialState);
@@ -309,6 +311,7 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
+			state.freeTicket = false;
 		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
@@ -464,6 +467,7 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 			state.selectEndDate = payload.selectEndDate;
 			state.tendency = payload.tendency;
+			state.freeTicket = true;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -562,6 +566,7 @@ interface LiteState {
 	bandwidth: boolean;
 	saveFlag: boolean;
 	checKStep: number;
+	freeTicket: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
@@ -671,6 +676,7 @@ interface travelAiType {
 	transit: number;
 	distanceSensitivity: number;
 	bandwidth: boolean;
+	freeTicket: boolean;
 }
 
 interface myTravelListType {

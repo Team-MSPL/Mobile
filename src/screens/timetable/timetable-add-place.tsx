@@ -35,15 +35,18 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		let lat = 0;
 		let lng = 0;
 		let radius = 2000;
+		let status = timetable[route.params.x][timetable[route.params.x].length - 1];
 		switch (newY.current) {
 			case timetable[route.params.x].length:
 				lat = timetable[route.params.x][timetable[route.params.x].length - 1].lat;
 				lng = timetable[route.params.x][timetable[route.params.x].length - 1].lng;
+				status = timetable[route.params.x][timetable[route.params.x].length - 1];
 
 				break;
 			case 0:
 				lat = timetable[route.params.x][0].lat;
 				lng = timetable[route.params.x][0].lng;
+				status = timetable[route.params.x][0];
 				break;
 			case -1:
 				dispatch(
@@ -69,7 +72,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				lng =
 					(timetable[route.params.x][newY.current - 1].lng + timetable[route.params.x][newY.current].lng) / 2;
 				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
-
+				status = timetable[route.params.x][newY.current - 1];
 				break;
 		}
 		const categoryIndex = category == 'AD5' ? 4 : category == 'FD6' ? 1 : 3;
@@ -83,6 +86,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			lng: lng,
 			apiCategory: category,
 			radius: radius,
+			status: status,
 		});
 	};
 	const addTimetable = () => {

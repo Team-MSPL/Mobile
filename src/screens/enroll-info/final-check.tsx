@@ -33,6 +33,7 @@ export default function FinalCheck({navigation}: any) {
 		minuteLimitArray,
 		season,
 		bandwidth,
+		freeTicket,
 	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
@@ -56,12 +57,13 @@ export default function FinalCheck({navigation}: any) {
 					modalLeft: true,
 				}),
 			);
+		} else if (freeTicket) {
+			goNext();
 		} else {
 			functionToken >= 1
 				? dispatch(
 						modalSliceActions.setOpenModal({
 							modalTitle: `이용권이 하나 소모됩니다.\n현재 이용권은 ${functionToken}개입니다. 실행하시겠습니까?`,
-							modalSubTitle: '사용자가 많을시 최대 1분까지 소요됩니다.',
 							modalFunction: goNext,
 							modalLeft: true,
 						}),
@@ -137,6 +139,7 @@ export default function FinalCheck({navigation}: any) {
 					transit: transit,
 					distanceSensitivity: distance,
 					bandwidth: bandwidth,
+					freeTicket: freeTicket,
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));
@@ -151,7 +154,7 @@ export default function FinalCheck({navigation}: any) {
 						}),
 					);
 
-				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				!freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({

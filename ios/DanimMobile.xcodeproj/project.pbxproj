@@ -616,7 +616,7 @@
 				CODE_SIGN_ENTITLEMENTS = DanimMobile/DanimMobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 6A68QPK22L;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -774,7 +774,7 @@
 				CODE_SIGN_ENTITLEMENTS = DanimMobile/DanimMobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 6A68QPK22L;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
