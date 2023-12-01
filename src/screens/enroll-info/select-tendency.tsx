@@ -36,7 +36,7 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 			if (name == '반려동물과' && flag == 0) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '주의사항',
+						modalTitle: '잠깐!',
 						modalSubTitle: '반려견 출입이 제한된 곳은 추천되지않아 관광지 수가 적을 수 있습니다.',
 					}),
 				);
@@ -78,7 +78,7 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 							<TendencyContainer key={index}>
 								<TendencyStepText>Step {index + 3}</TendencyStepText>
 								<TendencyText>{item.title}</TendencyText>
-								<MultiText> * 중복 선택, 선택 안 하셔도 됩니다.</MultiText>
+								<MultiText> * 중복 선택 가능.</MultiText>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (
@@ -140,7 +140,7 @@ export const tendencyList = [
 
 export const MultiText = styled.Text`
 	color: ${colors.selectButton};
-	font-size: ${devicesWidth * 0.03}px;
+	font-size: ${devicesWidth * 0.034}px;
 	margin: 5px 0px 0px 0px;
 `;
 export const TendencyText = styled.Text`

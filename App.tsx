@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useLayoutEffect} from 'react';
-import {Alert, BackHandler, Linking, StatusBar, useColorScheme} from 'react-native';
+import {Alert, BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
 
 import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,7 +55,6 @@ function App(): JSX.Element {
 				'userToken',
 				'loginProvider',
 			]);
-			console.log(userName, userProfileImage, userToken, loginProvider);
 			if (userToken && userName && loginProvider) {
 				dispatch(
 					socialConnect({
@@ -83,21 +82,15 @@ function App(): JSX.Element {
 	const getDeepLink = async () => {
 		Linking.getInitialURL().then(async res => {
 			try {
-				console.log(res);
 				if (res == null || res == undefined || res == '') {
-					console.log('첫번째 if요', res);
 					// 그냥 앱을 켰을때
 
 					return;
 				} else {
-					console.log('첫번쨰 else요', res);
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
-					console.log('하하하하하');
-					console.log(match);
 					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-					console.log('아니아나이');
 					if (q.payload == 'ERR_BAD_REQUEST') {
 						dispatch(
 							modalSliceActions.setOpenModal({
@@ -106,7 +99,6 @@ function App(): JSX.Element {
 							}),
 						);
 					} else {
-						console.log('두번쨰 else요', res);
 						dispatch(travelSliceActions.setMakeMode('share'));
 					}
 				}
@@ -122,7 +114,6 @@ function App(): JSX.Element {
 		Linking.addEventListener('url', async e => {
 			try {
 				//앱이 켜져있는데 켰을때
-				console.log('1', e);
 				const pattern = /whatId=([a-zA-Z0-9]+)/;
 				const match = e.url.match(pattern) ?? '';
 				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
@@ -134,7 +125,6 @@ function App(): JSX.Element {
 						}),
 					);
 				} else {
-					console.log('3', e);
 					dispatch(travelSliceActions.setMakeMode('share'));
 				}
 			} catch (err) {
@@ -189,6 +179,12 @@ function App(): JSX.Element {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);
 	};
 	const {checkVersion} = useVersion();
+
+	const getFcmToken = async () => {
+		const fcmToken = await messaging().getToken();
+		dispatch(userSliceActions.setFcmToken({fcmToken: fcmToken}));
+		//console.log('[FCM Token] ', fcmToken);
+	};
 	useEffect(() => {
 		checkInitialPermission();
 	}, [hasPermission, noPermission]);
@@ -201,9 +197,18 @@ function App(): JSX.Element {
 		lottieHide();
 		checkVersion();
 		setNetInfoEvent();
-		// return () => {
-		// 	setNetInfoEvent();
-		// };
+		getFcmToken();
+		const unsubscribe = messaging().onMessage(async remoteMessage => {
+			Vibration.vibrate(400);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: remoteMessage.notification?.title,
+					modalSubTitle: remoteMessage.notification?.body,
+				}),
+			);
+		});
+
+		return unsubscribe;
 	}, []);
 	const linking = {
 		prefixes: [`kakao${KAKAO_NATIVE_KEY}://`],
@@ -217,24 +222,6 @@ function App(): JSX.Element {
 		dispatch(userSliceActions.setIsFirstLaunch('false'));
 		await AsyncStorage.setItem('isFirstLaunch', 'true');
 	};
-
-	// const getFcmToken = async () => {
-	// 	const fcmToken = await messaging().getToken();
-	// 	console.log('[FCM Token] ', fcmToken);
-	// };
-	// useEffect(() => {
-	// 	getFcmToken();
-	// 	const unsubscribe = messaging().onMessage(async remoteMessage => {
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: remoteMessage.notification?.body,
-	// 				modalSubTitle: remoteMessage.notification?.title,
-	// 			}),
-	// 		);
-	// 	});
-
-	// 	return unsubscribe;
-	// }, []);
 
 	return (
 		<SafeAreaProvider>

@@ -18,7 +18,7 @@ export default function Join1({navigation, route}: any) {
 	const [check, setCheck] = useState([false, false]);
 	const dispatch = useAppDispatch();
 	const [nickname, setNickname] = useState('');
-	const {anonymousKeep} = useAppSelector(state => state.userSlice);
+	const {anonymousKeep, fcmToken} = useAppSelector(state => state.userSlice);
 	const CheckLogoContainer = styled(Icon)`
 		border-radius: 5px;
 		margin: 0px 5px 0px 0px;
@@ -32,6 +32,7 @@ export default function Join1({navigation, route}: any) {
 				userToken: route.params.userToken,
 				loginProvider: route.params.loginProvider,
 				signUpFlag: true,
+				fcmToken: fcmToken,
 			};
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));
@@ -124,7 +125,7 @@ export default function Join1({navigation, route}: any) {
 				</InputWrap>
 				<TermsContainer>
 					{checkList.map((item, idx) => (
-						<CheckContainer>
+						<CheckContainer key={idx}>
 							<CheckTouchableOpacity onPress={item.checkFunction}>
 								<CheckLogoContainer
 									name={'checkcircleo'}

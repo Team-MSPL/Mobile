@@ -1,24 +1,22 @@
-import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
-import {regionRecommendSliceActions, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
-import {HStack, MainContainer, VStack} from '../../../utill/layout/layout';
+import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import {HStack, MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
-export default function SelectPopularity({navigation}: any) {
+export default function SelectPopularity({goNextStep}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-	const [selectedId, setSelectedId] = useState(0);
+	const {popularity} = useAppSelector(state => state.regionRecommendSlice);
 
 	const changeSelectId = (e: number) => {
-		setSelectedId(e);
+		let data = radioButtons[e].id * 20;
+		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
 	};
 	const goNext = async () => {
-		let data = radioButtons[selectedId].id * 20;
-		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
-		navigation.navigate('RegionSelectDistance');
+		goNextStep();
 	};
 	const radioButtons = [
 		{
@@ -61,31 +59,34 @@ export default function SelectPopularity({navigation}: any) {
 			{radioButtons.map((item, index) => (
 				<PopularButton key={index} onPress={() => changeSelectId(index)}>
 					<HStack key={index}>
-						<SvgCheck color={index == selectedId ? colors.selectButton : colors.regionNormal} />
-						<PopularButtonText color={index == selectedId ? colors.selectButton : colors.regionNormal}>
+						<SvgCheck
+							color={index == (100 - popularity[0]) / 20 ? colors.selectButton : colors.regionNormal}
+						/>
+						<PopularButtonText
+							color={index == (100 - popularity[0]) / 20 ? colors.selectButton : colors.regionNormal}>
 							{item.label}
 						</PopularButtonText>
 					</HStack>
 				</PopularButton>
 			))}
-			<ExplainText>{radioButtons[selectedId].explain}</ExplainText>
+			<ExplainText>{radioButtons[(100 - popularity[0]) / 20].explain}</ExplainText>
 			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
 		</MainContainer>
 	);
 }
 
 const ExplainText = styled.Text`
-	font-size: 13px;
+	font-size: 15px;
 	font-weight: bold;
 	color: black;
 	margin: 1% 0% 5% 0%;
 `;
 const PopularButton = styled.TouchableOpacity`
 	padding: 5%;
-	margin: 1% 0% 1% 0%;
+	margin: 0.1% 0% 0% 0%;
 `;
 const PopularButtonText = styled.Text<{color: string}>`
-	font-size: 20px;
+	font-size: 17px;
 	font-weight: bold;
 	color: ${props => props.color};
 	margin: 0px 0px 0px 20px;

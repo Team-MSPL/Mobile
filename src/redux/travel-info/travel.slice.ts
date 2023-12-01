@@ -1,4 +1,4 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id, Tour_API_KEY} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -51,6 +51,7 @@ const initialState: LiteState = {
 	saveFlag: false,
 	checKStep: 0,
 	freeTicket: false,
+	cityDistance: 0,
 };
 
 export const axiosGoogle = axios.create({
@@ -70,6 +71,11 @@ export const axiosNaver = axios.create({
 		'X-NCP-APIGW-API-KEY-ID': NAVER_API_KEY_id,
 		'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
 	},
+});
+export const axiosTour = axios.create({
+	baseURL: 'https://apis.data.go.kr/B551011/KorService1',
+
+	headers: {'content-type': 'application/json'},
 });
 
 //-------------------------------------------------------------
@@ -218,7 +224,7 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 		const response = await axiosKakao.get(
 			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
 		);
-		console.log(response.data.documents);
+		// console.log(response.data.documents);
 
 		//제로리절트 처리하기
 		return response.data.documents;
@@ -239,6 +245,24 @@ export const reCourseName = createAsyncThunk(
 		}
 	},
 );
+
+//투어 api 정보가져오기
+export const getTourTest = createAsyncThunk('/getTourTest', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosTour.get(
+			`/locationBasedList1?MobileOS=${data.platform}&MobileApp=다님&mapX=${data.lng}&mapY=${data.lat}&radius=20000&numOfRows=1&_type=json&serviceKey=${Tour_API_KEY}`,
+		);
+		let params = response.data.response.body.items.item[0];
+		const responseData = await axiosTour.get(
+			`/detailInfo1?MobileOS=${data.platform}&MobileApp=다님&contentId=${params.contentid}&contentTypeId=${params.contenttypeid}&_type=json&serviceKey=${Tour_API_KEY}`,
+		);
+		//console.log('하위요', responseData.data.response.body.items.item);
+		return responseData.data.response.body.items.item;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -248,6 +272,10 @@ export const travelSlice = createSlice({
 		},
 		selectRegion: (state, {payload}) => {
 			state.region = payload;
+		},
+		firstSelectRegion: (state, {payload}) => {
+			state.region = payload.region;
+			state.cityDistance = payload.cityDistance;
 		},
 		enrollCityIndex: (state, {payload}) => {
 			state.cityIndex = payload;
@@ -439,6 +467,9 @@ export const travelSlice = createSlice({
 		editModeChange: (state, {payload}) => {
 			state.editMode = payload;
 		},
+		setSaveFlag: (state, {payload}) => {
+			state.saveFlag = payload;
+		},
 		changeTimetable: (state, {payload}) => {
 			state.timetable = payload;
 			state.editMode = '';
@@ -567,6 +598,7 @@ interface LiteState {
 	saveFlag: boolean;
 	checKStep: number;
 	freeTicket: boolean;
+	cityDistance: number;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

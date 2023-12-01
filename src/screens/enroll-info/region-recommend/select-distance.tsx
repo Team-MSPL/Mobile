@@ -9,7 +9,7 @@ import {MainContainer, Center, Divider, MainText, HStack} from '../../../utill/l
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {DistanceExplain} from '../select-distance';
+import {CircleCenter, CircleContainer, DistanceExplain, MapContainer, Qwe} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
@@ -17,26 +17,15 @@ import {useFocusEffect} from '@react-navigation/native';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 import {openSettings} from 'react-native-permissions';
+import MapView from 'react-native-maps';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
-	const [geoInfo, setGeoInfo] = useState({lat: 0, lng: 0, name: ''});
+	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {tendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 
 	const {appsflyerLogEvent} = useAppsflyer();
-	const checkDistance = () => {
-		geoInfo.name == ''
-			? dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '위치정보',
-						modalSubTitle: '현재 위치가 설정되지 않아 위치기반 추천이 어렵습니다. 그래도 진행하시겠습니까?',
-						modalLeft: true,
-						modalFunction: checkToken,
-					}),
-			  )
-			: checkToken();
-	};
 	const goNext = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -186,8 +175,36 @@ export default function SelectDistance({navigation}: any) {
 				mainText='지역 추천 반경 설정'
 				subText='본인의 위치에서 추천받고자하는 여행 반경을 설정해주세요'
 			/>
+			<Center>
+				<GetContainer onPress={goReverseGeocoding}>
+					<GetContainerText>위치정보 받아오기</GetContainerText>
+				</GetContainer>
+				<GetText>{geoInfo.name}</GetText>
+			</Center>
+			<DistanceDivider />
+			<MapContainer>
+				<Qwe>
+					{/* <SvgMap /> */}
+					<MapView
+						//provider={PROVIDER_GOOGLE}
+						showsMyLocationButton={true}
+						style={{width: '100%', height: 300, position: 'absolute'}}
+						showsUserLocation={true}
+						scrollEnabled={false}
+						maxDelta={1}
+						region={{
+							latitude: geoInfo.lat,
+							longitude: geoInfo.lng,
+							latitudeDelta: 8,
+							longitudeDelta: 8,
+						}}></MapView>
+
+					<CircleContainer size={range}></CircleContainer>
+					<CircleCenter></CircleCenter>
+				</Qwe>
+			</MapContainer>
 			<DistanceCenter>
-				<DistanceText>{range * 50}km</DistanceText>
+				{/* <DistanceText>{range * 50}km</DistanceText> */}
 				<Slider
 					style={{width: '100%', height: 40}}
 					minimumValue={1}
@@ -205,17 +222,23 @@ export default function SelectDistance({navigation}: any) {
 					<DistanceExplain>한국 전체</DistanceExplain>
 				</DistanceSpace>
 			</DistanceCenter>
-			<DistanceDivider />
-			<StepText mainText='내 위치 정보' subText='선택시 내 위치를 기준으로 추천을 진행해요' />
+			{/* <DistanceDivider /> */}
+			<DistanceExplain>
+				*그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
+				{/* {range >= 5
+								? '숫자가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
+								: '숫자가 낮으면, 성향과는 조금 멀어질 수 있어요'} */}
+			</DistanceExplain>
+			{/* <StepText mainText='내 위치 정보' subText='선택시 내 위치를 기준으로 추천을 진행해요' />
 			<Center>
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
 				</GetContainer>
-				<GetText>{geoInfo.name ? geoInfo.name : '기본값:서울특별시'}</GetText>
+				<GetText>{geoInfo.name}</GetText>
 			</Center>
-			<DistanceDivider />
+			<DistanceDivider /> */}
 
-			<CustomButton label='추천 받기' onPress={checkDistance}></CustomButton>
+			<CustomButton label='선택 완료' onPress={checkToken}></CustomButton>
 		</MainContainer>
 	);
 }

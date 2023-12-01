@@ -17,6 +17,7 @@ const initialUserState: UserState = {
 	anonymousKeep: false,
 	blockUserList: [],
 	pushNotify: false,
+	fcmToken: '',
 };
 
 //회원탈퇴
@@ -114,10 +115,9 @@ const userSlice = createSlice({
 			state.socialloginProvider = payload.loginProvider;
 			state.blockUserList = payload.blockUserList;
 			state.isLogin = true;
-			console.log('왔는데용?');
+			state.fcmToken = payload.fcmToken;
 		},
 		reset: state => {
-			console.log('오긴함');
 			Object.assign(state, initialUserState);
 		},
 		login(state) {
@@ -141,6 +141,9 @@ const userSlice = createSlice({
 		},
 		setAnonymousKeep(state, {payload}) {
 			state.anonymousKeep = payload;
+		},
+		setFcmToken(state, {payload}) {
+			state.fcmToken = payload.fcmToken;
 		},
 		setAnonymous(state) {
 			state.isLogin = true;
@@ -191,6 +194,7 @@ export interface UserState {
 	anonymousKeep: boolean;
 	blockUserList: string[];
 	pushNotify: boolean;
+	fcmToken: string;
 }
 
 export interface TokenLogType {

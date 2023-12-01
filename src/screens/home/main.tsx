@@ -5,13 +5,14 @@ import Icons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 import {RootState, useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getTourTest, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {HStack, HeaderContianer, MainContainer, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import messaging from '@react-native-firebase/messaging';
+import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -44,7 +45,9 @@ export default function Main({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const regionRecommend = () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
-		navigation.navigate('RegionSelectTendency');
+		dispatch(regionRecommendSliceActions.reset());
+		//dispatch(regionRecommendSliceActions.enrollCheckStep(0));
+		navigation.navigate('RegionEnrollInfo');
 	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
@@ -73,7 +76,7 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
 	};
 	useEffect(() => {
-		// pushPermission();
+		pushPermission();
 		if (signUpReward) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -196,18 +199,11 @@ export default function Main({navigation}: any) {
 			onPress: goEnroll,
 			image: require('../../../public/images/destination.png'),
 			text: '일정 추천받을래요',
-			boldText: '여행 일정 만들기',
+			boldText: '여행 일정 추천받기',
 		},
 	];
 	const DeviceWidth = Dimensions.get('window').width;
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
-	// const handleFirstLaunch = async () => {
-	// 	dispatch(userSliceActions.setIsFirstLaunch('false'));
-	// 	await AsyncStorage.setItem('isFirstLaunch', 'true');
-	// };
-	// if (isFirstLaunch == 'true') {
-	// 	return <ViewPager handleFunction={handleFirstLaunch} />;
-	// }
 	return (
 		<SafeAreaView>
 			<MainContainer>

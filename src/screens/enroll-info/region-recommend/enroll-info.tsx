@@ -1,26 +1,24 @@
 import styled from 'styled-components/native';
-import SelectDay from './select-day';
-import {useEffect, useLayoutEffect, useState} from 'react';
-import SelectTendency from './select-tendency';
+import {useEffect, useState} from 'react';
 import {BackHandler, ScrollView} from 'react-native';
-import SelectCity from './select-city';
-import SelectMulti from './select-multi';
-import {colors} from '../../utill/colors';
+import {colors} from '../../../utill/colors';
 import SelectDistance from './select-distance';
-import {useAppDispatch, useAppSelector} from '../../redux';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import SelectTendency from './select-tendency';
+import SelectPopularity from './select-popularity';
+import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 
 export default function EnrollInfo({navigation}: any) {
 	const changeComponent = (e: number) => {
 		setViewComponent(e);
 	};
-	const {regionRecommendFlag, checKStep} = useAppSelector(state => state.travelSlice);
+	const {checKStep} = useAppSelector(state => state.regionRecommendSlice);
 
 	const [viewComponent, setViewComponent] = useState(checKStep);
 	const goNextStep = () => {
 		setViewComponent(viewComponent + 1);
-		checKStep == viewComponent && dispatch(travelSliceActions.changeChecKStep(viewComponent + 1));
+		checKStep == viewComponent && dispatch(regionRecommendSliceActions.enrollCheckStep(viewComponent + 1));
 	};
 	const dispatch = useAppDispatch();
 	useEffect(() => {
@@ -28,7 +26,7 @@ export default function EnrollInfo({navigation}: any) {
 			if (navigation.isFocused()) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 코스 추천이 종료됩니다.',
+						modalTitle: '취소시 지역 추천이 종료됩니다.',
 						modalSubTitle: '그래도 나가시겠습니까?',
 						modalLeft: true,
 						modalFunction: () => {
@@ -47,57 +45,22 @@ export default function EnrollInfo({navigation}: any) {
 	const enrollComponentList = [
 		{
 			title: '성향',
-			component: (
-				<SelectTendency
-					setViewComponent={setViewComponent}
-					viewComponent={viewComponent}
-					goNextStep={goNextStep}
-				/>
-			),
+			component: <SelectTendency goNextStep={goNextStep} />,
 		},
 		{
-			title: '날짜',
-			component: (
-				<SelectDay setViewComponent={setViewComponent} viewComponent={viewComponent} goNextStep={goNextStep} />
-			),
-		},
-		{
-			title: '지역',
-			component: (
-				<SelectCity setViewComponent={setViewComponent} viewComponent={viewComponent} goNextStep={goNextStep} />
-			),
-		},
-		{
-			title: '여행 요소',
-			component: (
-				<SelectMulti
-					navigation={navigation}
-					setViewComponent={setViewComponent}
-					viewComponent={viewComponent}
-					goNextStep={goNextStep}
-				/>
-			),
+			title: '인기도 설정',
+			component: <SelectPopularity goNextStep={goNextStep} />,
 		},
 		{
 			title: '여행 반경',
-			component: (
-				<SelectDistance
-					navigation={navigation}
-					setViewComponent={setViewComponent}
-					viewComponent={viewComponent}
-				/>
-			),
+			component: <SelectDistance navigation={navigation} />,
 		},
 	];
-	const blackList = ['지역', '성향'];
-	const viewComponentList = regionRecommendFlag
-		? enrollComponentList.filter(item => !blackList.includes(item.title))
-		: enrollComponentList;
 	return (
 		<MainContainer>
 			<TitleViewContainer>
 				<ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
-					{viewComponentList.map((item, idx) => (
+					{enrollComponentList.map((item, idx) => (
 						<TitleContainer
 							key={idx}
 							select={viewComponent == idx}
@@ -113,7 +76,7 @@ export default function EnrollInfo({navigation}: any) {
 					))}
 				</ScrollView>
 			</TitleViewContainer>
-			{viewComponentList[viewComponent].component}
+			{enrollComponentList[viewComponent].component}
 		</MainContainer>
 	);
 }

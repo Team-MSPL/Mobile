@@ -3,7 +3,7 @@ import {Modal, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {updateFunctionToken, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
@@ -105,7 +105,7 @@ export default function MoreInfo({navigation}: any) {
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 		{title: '사용 가이드', function: goViewPager},
-		//{title: '알림', function: goPushNotify},
+		{title: '알림', function: goPushNotify},
 	];
 	return (
 		<MainContainer>

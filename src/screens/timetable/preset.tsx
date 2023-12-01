@@ -21,7 +21,7 @@ export default function Preset({navigation}: any) {
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '주의사항',
+				modalTitle: '잠깐!',
 				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
 				modalLeft: true,
 				modalFunction: goNext,
@@ -49,8 +49,8 @@ export default function Preset({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '취소시 데이터가 삭제됩니다.',
-								modalSubTitle: '그래도 나가시겠습니까?',
+								modalTitle: '홈으로 이동시 지역추천이 종료됩니다.',
+								modalSubTitle: '그래도 나가시겠습니까?\n변경 사항이 있다면 저장하기 버튼을 눌러주세요.',
 								modalFunction: () => {
 									navigation.popToTop();
 								},
@@ -83,7 +83,7 @@ export default function Preset({navigation}: any) {
 	};
 
 	const mapRef = useRef<MapView>(null);
-
+	let markerCount = 0;
 	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
 	const polylines:
 		| string
@@ -98,7 +98,6 @@ export default function Preset({navigation}: any) {
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
 		}));
-		let count = 0;
 		value.map(vvalue =>
 			positions.push({
 				latitude: vvalue.lat,
@@ -107,7 +106,7 @@ export default function Preset({navigation}: any) {
 		),
 			markers.push(
 				value.map((vvalue, iindex) => {
-					count += 1;
+					markerCount += 1;
 					return (
 						<Marker
 							key={`marker_${index}_${iindex}`}
@@ -115,7 +114,7 @@ export default function Preset({navigation}: any) {
 							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
 							anchor={{x: 0.5, y: 0.9}}
 							title={vvalue.name}>
-							<MarkerText>{count}</MarkerText>
+							<MarkerText>{markerCount}</MarkerText>
 							<SvgPlace color={mapColor[index]} width={50} height={50} />
 						</Marker>
 					);
@@ -153,8 +152,8 @@ export default function Preset({navigation}: any) {
 			if (navigation.isFocused()) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 데이터가 삭제됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?',
+						modalTitle: '취소시 지역추천이 종료됩니다.',
+						modalSubTitle: '그래도 나가시겠습니까?\n변경 사항이 있다면 저장하기 버튼을 눌러주세요.',
 						modalFunction: () => {
 							navigation.popToTop();
 						},
@@ -169,6 +168,7 @@ export default function Preset({navigation}: any) {
 
 		return () => backHandler.remove();
 	}, []);
+	let count = 0;
 	return (
 		<>
 			<MainContainer>
@@ -200,12 +200,17 @@ export default function Preset({navigation}: any) {
 				</PresetContainer>
 				{presetDatas[select].map((vava, inin) => (
 					<Fragment key={inin}>
-						<DayText>{inin + 1}일차 코스</DayText>
-						{vava.map((qwe, asd) => (
-							<InfoContainer key={asd}>
-								<ElementText>{qwe.name}</ElementText>
-							</InfoContainer>
-						))}
+						<DayText color={mapColor[inin]}>{inin + 1}일차 코스</DayText>
+						{vava.map((qwe, asd) => {
+							count += 1;
+							return (
+								<InfoContainer key={asd}>
+									<ElementText>
+										{qwe.name} {count}
+									</ElementText>
+								</InfoContainer>
+							);
+						})}
 					</Fragment>
 				))}
 
@@ -255,8 +260,8 @@ const InfoContainer = styled(DayElementContainer)`
 	margin: 10px 0px 10px 0px;
 	align-items: center;
 `;
-const DayText = styled.Text`
+const DayText = styled.Text<{color: string}>`
 	font-size: 20px;
 	font-weight: bold;
-	color: ${colors.selectButton};
+	color: ${props => props.color};
 `;

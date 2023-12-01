@@ -38,9 +38,8 @@ export default function LoginScreen({navigation}: any) {
 		dispatch(userSliceActions.setAnonymous());
 		navigation.replace('Tab');
 	};
-	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
+	const {isLogin, socialloginProvider, anonymousKeep, fcmToken} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
-		console.log('dnpioqdniop', isLogin);
 		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
 	}, [isLogin]);
 	// 랜덤으로 문자열 생성
@@ -65,6 +64,7 @@ export default function LoginScreen({navigation}: any) {
 				userToken: userInfo.id,
 				loginProvider: 'kakao',
 				signUpFlag: false,
+				fcmToken: fcmToken,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -100,6 +100,7 @@ export default function LoginScreen({navigation}: any) {
 				userToken: userInfo.user.id,
 				loginProvider: 'google',
 				signUpFlag: false,
+				fcmToken: fcmToken,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -172,6 +173,7 @@ export default function LoginScreen({navigation}: any) {
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
+					fcmToken: fcmToken,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
@@ -207,6 +209,7 @@ export default function LoginScreen({navigation}: any) {
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
+					fcmToken: fcmToken,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
@@ -254,8 +257,6 @@ export default function LoginScreen({navigation}: any) {
 			useNativeDriver: false, // useNativeDriver를 false로 설정
 		}).start(() => {
 			// 애니메이션 완료 후 호출되는 콜백
-			console.log(fadeAnim);
-			console.log('헤헤');
 			setBackgroundImageIndex(prevIndex => (prevIndex + 1) % backgroundImages.length);
 			// 다음 애니메이션 시작
 			fadeAnim.setValue(0); // fadeAnim 초기화
@@ -265,7 +266,6 @@ export default function LoginScreen({navigation}: any) {
 	useEffect(() => {
 		const interval = setInterval(startBackgroundAnimation, 5000);
 		return () => {
-			console.log('에ㅔ에에에에에');
 			clearInterval(interval);
 		};
 	}, []);

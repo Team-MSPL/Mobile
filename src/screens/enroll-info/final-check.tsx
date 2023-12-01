@@ -1,4 +1,4 @@
-import {Alert, BackHandler, Image} from 'react-native';
+import {Alert, BackHandler, Image, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -12,7 +12,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg';
+import {SvgCancel, SvgDanimText, SvgHome, SvgLoginLogo, SvgPlace} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {DefalutLogoContainer} from './search-place';
 
@@ -178,6 +178,14 @@ export default function FinalCheck({navigation}: any) {
 		navigation.navigate('SelectCity');
 		dispatch(travelSliceActions.reset());
 	};
+	const removeTendency = ({index, idx}: {index: number; idx: number}) => {
+		console.log(tendency[index][idx]);
+		let copy = [...tendency];
+		let seCopy = [...tendency[index]];
+		seCopy[idx] = 0;
+		copy[index] = seCopy;
+		dispatch(travelSliceActions.enrollTendency(copy));
+	};
 	const schedule = ['출발일', '종료일'];
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
@@ -206,6 +214,12 @@ export default function FinalCheck({navigation}: any) {
 									return q ? (
 										<SelectTendencyContainer key={a}>
 											<SelectTendencyText># {tendencyList[inx]?.list[a]}</SelectTendencyText>
+											<SelectTendencyTouchable
+												onPress={() => {
+													removeTendency({index: inx, idx: a});
+												}}>
+												<SvgCancel color={'white'} width={10} height={10} />
+											</SelectTendencyTouchable>
 										</SelectTendencyContainer>
 									) : null;
 								});
@@ -350,6 +364,14 @@ export const SelectTendencyContainer = styled.View`
 	border-radius: 10px;
 	background-color: white;
 	margin: 0px 10px 10px 0px;
+`;
+const SelectTendencyTouchable = styled(SelectTendencyContainer).attrs({as: TouchableOpacity})`
+	position: absolute;
+	right: -17px;
+	top: -5px;
+	background-color: black;
+	border-radius: 99px;
+	padding: 3px;
 `;
 export const SelectTendencyListContainer = styled.View`
 	display: inline-block;

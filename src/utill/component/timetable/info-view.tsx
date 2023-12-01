@@ -38,33 +38,58 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 		if (timetable[e.idx].length < 2) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '참고할 관광지가 없습니다.',
-					modalSubTitle: '동일한 날짜에 아무것도 없으면 추천을 해줄 수 없습니다.',
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
 				}),
 			);
 		} else {
 			let lat = 0;
 			let lng = 0;
-			e.index != 0
-				? ((lat = timetable[e.idx][e.index - 1].lat), (lng = timetable[e.idx][e.index - 1].lng))
-				: ((lat = timetable[e.idx][e.index + 1].lat), (lng = timetable[e.idx][e.index + 1].lng));
-			const startNumber = e.value.y; // 시작 숫자
-			const count = e.value.takenTime / 30; // 원하는 갯수
-			const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-			navigation.navigate('Recommend', {
-				name: '숙소 추천',
-				x: e.value.x,
-				index: e.index,
-				y: sequentialArray,
-				category: e.value.category,
-				lat: lat,
-				lng: lng,
-				apiCategory: 'AD5',
-				radius: 2000,
-				backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
-				backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
-				status: timetable[e.idx][e.index - 1],
-			});
+			let goCheck = true;
+			if (e.index == 0) {
+				if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index + 1].lat;
+					lng = timetable[e.idx][e.index + 1].lng;
+				}
+			} else {
+				if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index - 1].lat;
+					lng = timetable[e.idx][e.index - 1].lng;
+				}
+			}
+			// e.index != 0
+			// 	? ((lat = timetable[e.idx][e.index - 1].lat), (lng = timetable[e.idx][e.index - 1].lng))
+			// 	: ((lat = timetable[e.idx][e.index + 1].lat), (lng = timetable[e.idx][e.index + 1].lng));
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+				navigation.navigate('Recommend', {
+					name: '숙소 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					apiCategory: 'AD5',
+					radius: 2000,
+					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
+					status: e.index != 0 ? timetable[e.idx][e.index - 1] : timetable[e.idx][e.index + 1],
+				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
+			}
 		}
 	};
 	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
@@ -72,41 +97,65 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 		// let temp = copy.filter(
 		// 	item => item.name != '숙소 추천' && item.name != '점심 추천' && item.name != '저녁 추천',
 		// );
-		if (timetable[e.idx].length == 0) {
+		// let whereItem = temp.find(q => q.id == timetable[e.idx][e.index].id);
+		// console.log(timetable[e.idx][e.index].id, temp);
+		// if (timetable[e.idx].length == 0) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '참고할게 부족해서 추천이 불가합니다.',
+		// 		}),
+		// 	);
+		// } else {
+		let lat = 0;
+		let lng = 0;
+		let radius = 2000;
+		let status = timetable[e.idx][e.index - 1];
+		let goCheck = true;
+		if (timetable[e.idx].length == 1) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '참고할게 부족해서 추천이 불가합니다.',
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
 				}),
 			);
 		} else {
-			let lat = 0;
-			let lng = 0;
-			let radius = 2000;
-			let status = timetable[e.idx][e.index - 1];
-			if (timetable[e.idx].length == 1) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '참고할게 부족해서 추천이 불가합니다.',
-					}),
-				);
-			} else {
-				if (e.index == timetable[e.idx].length - 1) {
+			console.log(timetable[e.idx]);
+			if (e.index == timetable[e.idx].length - 1) {
+				if (timetable[e.idx][timetable[e.idx].length - 2].name.includes('추천')) {
+					goCheck = false;
+				} else {
 					lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
 					lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
 					status = timetable[e.idx][timetable[e.idx].length - 2];
-				} else if (e.index == 0) {
+				}
+			} else if (e.index == 0) {
+				if (timetable[e.idx][1].name.includes('추천')) {
+					goCheck = false;
+				} else {
 					lat = timetable[e.idx][1].lat;
 					lng = timetable[e.idx][1].lng;
 					status = timetable[e.idx][1];
-				} else {
-					const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
-					const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
-					const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
-					lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
-					lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
-					radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				}
+			} else {
+				const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
+				const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
+				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
+				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
+				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				if (
+					timetable[e.idx][e.index - 1].name.includes('추천') &&
+					timetable[e.idx][e.index + 1].name.includes('추천')
+				) {
+					goCheck = false;
+				} else if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index + 1];
+				} else if (timetable[e.idx][e.index + 1].name.includes('추천')) {
 					status = timetable[e.idx][e.index - 1];
 				}
+				//status = timetable[e.idx][e.index - 1];
+			}
+			if (goCheck) {
 				const startNumber = e.value.y; // 시작 숫자
 				const count = e.value.takenTime / 30; // 원하는 갯수
 
@@ -126,8 +175,16 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
 					status: status,
 				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
 			}
 		}
+		// }
 	};
 
 	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];

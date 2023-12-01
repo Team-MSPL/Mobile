@@ -2,13 +2,17 @@ import {GOOGLE_API_KEY} from '@env';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {axiosGoogle} from './travel.slice';
 import axiosAuth from '../api/api';
+import {regionTendencyList} from '../../screens/enroll-info/region-recommend/select-tendency';
 const initialState: LiteState = {
-	tendency: [[]],
+	tendency: regionTendencyList.map(item => {
+		return Array(item.list.length).fill(0);
+	}), //성향
 	distance: 0,
-	popularity: [],
+	popularity: [100, 100],
 	lat: 0,
 	lng: 0,
 	recommendList: [{name: '', photo: '', takenDay: 0, tendency: [''], topPopularPlaceList: {name: '', photo: ''}}],
+	checKStep: 0,
 };
 
 export const regionRecommendSlice = createSlice({
@@ -25,6 +29,12 @@ export const regionRecommendSlice = createSlice({
 		},
 		enrollPopularity: (state, {payload}) => {
 			state.popularity = payload;
+		},
+		enrollCheckStep: (state, {payload}) => {
+			state.checKStep = payload;
+		},
+		reset: state => {
+			Object.assign(state, initialState);
 		},
 	},
 	extraReducers: builder => {
@@ -88,6 +98,7 @@ interface LiteState {
 	lat: number;
 	lng: number;
 	recommendList: RegionRecommend[];
+	checKStep: number;
 }
 
 interface RegionRecommend {

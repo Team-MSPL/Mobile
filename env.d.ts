@@ -10,4 +10,5 @@ declare module '@env' {
 	export const Google_Ads_Key: string;
 	export const Appsflyer_key: string;
 	export const Appsflyer_ios_id: string;
+	export const Tour_API_KEY: string;
 }

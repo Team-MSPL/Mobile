@@ -31,22 +31,31 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
 	const newY = useRef(0);
+
 	const goRecommend = (category: string) => {
 		let lat = 0;
 		let lng = 0;
 		let radius = 2000;
+		let goCheck = true;
 		let status = timetable[route.params.x][timetable[route.params.x].length - 1];
 		switch (newY.current) {
 			case timetable[route.params.x].length:
-				lat = timetable[route.params.x][timetable[route.params.x].length - 1].lat;
-				lng = timetable[route.params.x][timetable[route.params.x].length - 1].lng;
-				status = timetable[route.params.x][timetable[route.params.x].length - 1];
-
+				if (timetable[route.params.x][timetable[route.params.x].length - 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[route.params.x][timetable[route.params.x].length - 1].lat;
+					lng = timetable[route.params.x][timetable[route.params.x].length - 1].lng;
+					status = timetable[route.params.x][timetable[route.params.x].length - 1];
+				}
 				break;
 			case 0:
-				lat = timetable[route.params.x][0].lat;
-				lng = timetable[route.params.x][0].lng;
-				status = timetable[route.params.x][0];
+				if (timetable[route.params.x][0].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[route.params.x][0].lat;
+					lng = timetable[route.params.x][0].lng;
+					status = timetable[route.params.x][0];
+				}
 				break;
 			case -1:
 				dispatch(
@@ -57,14 +66,40 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				);
 				return 0;
 			default:
-				const departure = {
+				let departure = {
 					lat: timetable[route.params.x][newY.current - 1].lat,
 					lng: timetable[route.params.x][newY.current - 1].lng,
 				};
-				const arrival = {
+				let arrival = {
 					lat: timetable[route.params.x][newY.current].lat,
 					lng: timetable[route.params.x][newY.current].lng,
 				};
+				if (
+					timetable[route.params.x][newY.current - 1].name.includes('추천') &&
+					timetable[route.params.x][newY.current].name.includes('추천')
+				) {
+					goCheck = false;
+				} else if (timetable[route.params.x][newY.current - 1].name.includes('추천')) {
+					departure = {
+						lat: timetable[route.params.x][newY.current].lat,
+						lng: timetable[route.params.x][newY.current].lng,
+					};
+					arrival = {
+						lat: timetable[route.params.x][newY.current].lat,
+						lng: timetable[route.params.x][newY.current].lng,
+					};
+					status = timetable[route.params.x][newY.current];
+				} else {
+					departure = {
+						lat: timetable[route.params.x][newY.current - 1].lat,
+						lng: timetable[route.params.x][newY.current - 1].lng,
+					};
+					arrival = {
+						lat: timetable[route.params.x][newY.current - 1].lat,
+						lng: timetable[route.params.x][newY.current - 1].lng,
+					};
+					status = timetable[route.params.x][newY.current - 1];
+				}
 
 				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival})); // 두 지점 간의 거리 (단위: km)
 				lat =
@@ -72,22 +107,31 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				lng =
 					(timetable[route.params.x][newY.current - 1].lng + timetable[route.params.x][newY.current].lng) / 2;
 				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
-				status = timetable[route.params.x][newY.current - 1];
+				// status = timetable[route.params.x][newY.current - 1];
 				break;
 		}
-		const categoryIndex = category == 'AD5' ? 4 : category == 'FD6' ? 1 : 3;
-		navigation.navigate('Recommend', {
-			name: '',
-			x: route.params.x,
-			index: newY.current,
-			y: route.params.y,
-			category: categoryIndex,
-			lat: lat,
-			lng: lng,
-			apiCategory: category,
-			radius: radius,
-			status: status,
-		});
+		if (goCheck) {
+			const categoryIndex = category == 'AD5' ? 4 : category == 'FD6' ? 1 : 3;
+			navigation.navigate('Recommend', {
+				name: '',
+				x: route.params.x,
+				index: newY.current,
+				y: route.params.y,
+				category: categoryIndex,
+				lat: lat,
+				lng: lng,
+				apiCategory: category,
+				radius: radius,
+				status: status,
+			});
+		} else {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '참고할 관광지가 없어서 보여줄 수 없습니다!',
+					modalSubTitle: '동일한 날짜에 아무것도 없으면 추천을 해줄 수 없습니다.',
+				}),
+			);
+		}
 	};
 	const addTimetable = () => {
 		const updateItem = {

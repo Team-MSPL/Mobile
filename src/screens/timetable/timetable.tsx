@@ -78,6 +78,7 @@ export default function Timetable({navigation, route}: any) {
 			}
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',
@@ -132,6 +133,7 @@ export default function Timetable({navigation, route}: any) {
 				tendency: tendency,
 				travelName: travelName,
 			};
+			dispatch(travelSliceActions.setSaveFlag(false));
 			await dispatch(saveTravel(data));
 		} catch (err) {
 			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
@@ -228,7 +230,7 @@ export default function Timetable({navigation, route}: any) {
 					</TouchableOpacity>
 				),
 		});
-	}, [editMode, timetable, addList, x, makeMode]);
+	}, [editMode, timetable, addList, x, makeMode, travelId]);
 
 	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		setMapViewState(usePosition(e));

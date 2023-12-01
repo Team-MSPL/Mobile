@@ -58,7 +58,6 @@ const usePermission = () => {
 					hasBlocked = true;
 				}
 			}
-			console.log('번', hasBlocked, '게', deniedList);
 		}
 		return {hasBlocked, deniedList};
 	};

@@ -16,6 +16,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [reviewValue, setReviewValue] = useState('');
 	const [pointValue, setPointValue] = useState(5);
+	const [detailView, setDetailView] = useState(false);
 	const [tedencyPointList, setTedencyPointList] = useState<number[][]>(
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
@@ -57,6 +58,9 @@ export default function InputReviewAndPoint({navigation}: any) {
 		copy[e.index][e.iindex] = e.inex;
 		setTedencyPointList(copy);
 	};
+	const changeDetailView = () => {
+		setDetailView(!detailView);
+	};
 	useFocusEffect(
 		useCallback(() => {
 			goMyTravelDetail();
@@ -87,10 +91,11 @@ export default function InputReviewAndPoint({navigation}: any) {
 				style={{color: 'black'}}
 				value={reviewValue}
 				onChangeText={(value: string) => changeReview(value)}></RatingReview>
-
-			{tendency.map(
-				(value, index) =>
-					value.includes(1) &&
+			<DetailRating onPress={changeDetailView}>
+				<ElementText>상세 리뷰 {!detailView ? '열기' : '닫기'}</ElementText>
+			</DetailRating>
+			{detailView &&
+				tendency.map((value, index) =>
 					value.map(
 						(vvalue, iindex) =>
 							vvalue == 1 && (
@@ -116,13 +121,17 @@ export default function InputReviewAndPoint({navigation}: any) {
 								</HStack>
 							),
 					),
-			)}
+				)}
 
 			<CustomButton label='리뷰 저장하기' onPress={goSaveReviewAndPoint} />
 		</ReviewAndPointContainer>
 	);
 }
-
+const DetailRating = styled.TouchableOpacity`
+	width: 100%;
+	justify-content: center;
+	flex-direction: row;
+`;
 const reviewTendencyList = [
 	...tendencyList,
 	{title: '계절이 언제인가?', multi: true, list: ['봄', '여름', '가을', '겨울']},

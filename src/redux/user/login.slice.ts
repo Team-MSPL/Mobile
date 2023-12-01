@@ -8,13 +8,13 @@ const initialState: LiteState = {
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
-		console.log(data.userName, data.userProfileImage, data.userToken, data.loginProvider, data.signUpFlag);
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,
 			userProfileImage: data.userProfileImage,
 			userToken: data.userToken,
 			loginProvider: data.loginProvider,
 			signUpFlag: data.signUpFlag,
+			fcmToken: data.fcmToken,
 		});
 		let userData = response.data;
 		//성공했을때
@@ -76,4 +76,5 @@ interface socialConnectType {
 	userToken: string | null;
 	loginProvider: string;
 	signUpFlag: boolean;
+	fcmToken: string;
 }

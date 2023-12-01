@@ -207,7 +207,7 @@ export default function DetailInfo({navigation}: any) {
 						autoFocus={true}
 						value={text}
 						onChangeText={(value: string) => setText(value)}
-						maxLength={10}></CustomTextInput>
+						maxLength={20}></CustomTextInput>
 					<ReName onPress={checkChange}>
 						<Icons name={'save'} size={30} color={'black'} />
 					</ReName>

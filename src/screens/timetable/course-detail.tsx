@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, Pressable} from 'react-native';
-import {googleKeywordApi, CourseDetailType} from '../../redux/travel-info/travel.slice';
+import {Image, Platform, Pressable} from 'react-native';
+import {googleKeywordApi, CourseDetailType, getTourTest} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -19,6 +19,15 @@ export default function CourseDetail({navigation, route}: any) {
 	const getDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
+			// const a = await dispatch(
+			// 	getTourTest({
+			// 		platform: Platform.OS == 'android' ? 'AND' : 'IOS',
+			// 		lat: route.params.value.lat,
+			// 		lng: route.params.value.lng,
+			// 	}),
+			// ).unwrap();
+			// console.log(a);
 			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			setCourseDetail(a);
 		} catch (err) {
@@ -187,11 +196,11 @@ const DetailInfoContainer = styled(HStack)`
 `;
 export const ImageViewFooterComponent = styled.View`
 	width: 100%;
-	height: 50;
+	height: 50px;
 	align-items: center;
 `;
 const ImageScroll = styled.ScrollView`
-	height: 20%;
+	height: 35%;
 `;
 const RatingContainer = styled(VStack)`
 	padding: 1%;

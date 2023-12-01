@@ -180,6 +180,7 @@ export default function Recommend({navigation, route}: any) {
 
 	useLayoutEffect(() => {
 		getRecommendList();
+		console.log(route.params.status);
 	}, []);
 
 	const mapRef = useRef<MapView>(null);
@@ -192,8 +193,8 @@ export default function Recommend({navigation, route}: any) {
 				ref={mapRef}
 				style={{width: '100%', height: 300}}
 				region={{
-					latitude: recommendItem[0].lat,
-					longitude: recommendItem[0].lng,
+					latitude: route.params.status.lat,
+					longitude: route.params.status.lng,
 					latitudeDelta: 0.04,
 					longitudeDelta: 0.04,
 				}}>

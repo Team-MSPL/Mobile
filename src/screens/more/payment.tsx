@@ -107,7 +107,7 @@ export default function Payment({navigation}: any) {
 									</InfoText>
 								</HStack>
 								<HStack>
-									<BonusText>출시 오픈 기념 세일 진행 중</BonusText>
+									<BonusText>출시 기념 세일 진행 중</BonusText>
 								</HStack>
 							</InfoContainer>
 							<SvgRightAdd width={30} height={30} color={'black'} />

@@ -8,6 +8,7 @@ import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 import {RecommendContainer, RecommendElement} from './view-result';
+import ImageView from 'react-native-image-viewing';
 import {
 	SelectListContainer,
 	SelectListText,
@@ -15,6 +16,8 @@ import {
 	SelectTendencyContainer,
 	SelectTendencyText,
 } from '../final-check';
+import {useState} from 'react';
+import {ImageText, ImageViewFooterComponent} from '../../timetable/course-detail';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -64,10 +67,14 @@ export default function DetailResult({navigation, route}: any) {
 		const data = {name: e.name, lat: e.lat, lng: e.lng};
 		navigation.navigate('CourseDetail', {value: data});
 	};
+	const [visible, setVisible] = useState(false);
 	return (
 		<>
 			<MainContainer>
-				<RecommendMainContainer>
+				<RecommendMainContainer
+					onPress={() => {
+						setVisible(true);
+					}}>
 					{route.params.item.photo != '' ? (
 						<TitleImage source={{uri: route.params.item.photo}}></TitleImage>
 					) : (
@@ -117,11 +124,27 @@ export default function DetailResult({navigation, route}: any) {
 					<SvgRight color={colors.selectButton} />
 				</ButtonHStack>
 			</GoRecommendButton>
+			<ImageView
+				images={[{uri: route.params.item.photo}]}
+				onImageIndexChange={item => console.log(item)}
+				imageIndex={0}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+				FooterComponent={index => {
+					return (
+						<ImageViewFooterComponent>
+							<ImageText>
+								{index.imageIndex + 1}/{1}
+							</ImageText>
+						</ImageViewFooterComponent>
+					);
+				}}
+			/>
 		</>
 	);
 }
 
-const RecommendMainContainer = styled(RecommendContainer).attrs({as: View})`
+const RecommendMainContainer = styled(RecommendContainer)`
 	width: 100%;
 	margin: 0px 0px 20px 0px;
 `;

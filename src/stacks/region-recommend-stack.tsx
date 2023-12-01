@@ -5,29 +5,37 @@ import SelectDistance from '../screens/enroll-info/region-recommend/select-dista
 import SelectPopularity from '../screens/enroll-info/region-recommend/select-popularity';
 import SelectTendency from '../screens/enroll-info/region-recommend/select-tendency';
 import ViewResult from '../screens/enroll-info/region-recommend/view-result';
+import EnrollInfo from '../screens/enroll-info/region-recommend/enroll-info';
 const Stack = createNativeStackNavigator();
 export default function RegionRecommendStack() {
 	return (
 		<Fragment>
 			<Stack.Screen
+				name='RegionEnrollInfo'
+				component={EnrollInfo}
+				options={{
+					title: '지역 추천',
+				}}
+			/>
+			<Stack.Screen
 				name='RegionSelectTendency'
 				component={SelectTendency}
 				options={{
-					title: '지역 추천 1',
+					title: '성향 선택',
 				}}
 			/>
 			<Stack.Screen
 				name='RegionSelectDistance'
 				component={SelectDistance}
 				options={{
-					title: '지역 추천 3',
+					title: '여행 반경 설정',
 				}}
 			/>
 			<Stack.Screen
 				name='RegionSelectPopularity'
 				component={SelectPopularity}
 				options={{
-					title: '지역 추천 2',
+					title: '인기도 설정',
 				}}
 			/>
 			<Stack.Screen

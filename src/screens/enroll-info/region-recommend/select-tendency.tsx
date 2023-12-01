@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {useAppDispatch} from '../../../redux';
+import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {FlexWrap, MainContainer, HStack, VStack} from '../../../utill/layout/layout';
@@ -16,30 +16,34 @@ import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
 import {ButtonContainer, MarginContainder} from '../select-multi';
 
-export default function SelectTendency({navigation}: any) {
+export default function SelectTendency({navigation, goNextStep}: any) {
 	const dispatch = useAppDispatch();
-
-	const [select, setSelect] = useState(
-		tendencyList.map(item => {
-			return Array(item.list.length).fill(false);
-		}),
-	);
+	const {tendency} = useAppSelector(state => state.regionRecommendSlice);
+	// const [select, setSelect] = useState(
+	// 	regionTendencyList.map(item => {
+	// 		return Array(item.list.length).fill(false);
+	// 	}),
+	//);
 
 	const goNext = () => {
-		console.log(navigation);
-		let copy = [...select];
-		copy = copy.map(item => {
-			return item.map(data => {
-				return data ? 1 : 0;
-			});
-		});
-		dispatch(regionRecommendSliceActions.enrollTendency(copy));
-		navigation.navigate('RegionSelectPopularity');
+		// console.log(navigation);
+		// let copy = [...select];
+		// copy = copy.map(item => {
+		// 	return item.map(data => {
+		// 		return data ? 1 : 0;
+		// 	});
+		// });
+		// dispatch(regionRecommendSliceActions.enrollTendency(copy));
+		goNextStep();
+		//navigation.navigate('RegionSelectPopularity');
 	};
 	const selectData = ({index, idx}: {index: number; idx: number}) => {
-		let copy = [...select];
-		copy[index][idx] = !copy[index][idx];
-		setSelect(copy);
+		let copy = [...tendency];
+		let secCopy = [...tendency[index]];
+		secCopy[idx] = secCopy[idx] == 0 ? 1 : 0;
+		copy[index] = secCopy;
+		dispatch(regionRecommendSliceActions.enrollTendency(copy));
+		//setSelect(copy);
 	};
 
 	return (
@@ -47,12 +51,12 @@ export default function SelectTendency({navigation}: any) {
 			<MainContainer showsVerticalScrollIndicator={false}>
 				<StepText mainText='추천 성향 설정' subText='어떤 스타일의 여행을 가실 계획이신가요?' />
 				<VStack>
-					{tendencyList.map((item, index) => {
+					{regionTendencyList.map((item, index) => {
 						return (
 							<TendencyContainer key={index}>
 								<TendencyStepText>Step {index + 1}</TendencyStepText>
 								<TendencyText>{item.title}</TendencyText>
-								<MultiText>* 중복 선택 가능, 선택 안 하셔도 됩니다.</MultiText>
+								<MultiText>* 중복 선택 가능</MultiText>
 								<FlexWrap>
 									{item.list.map((data, idx) => {
 										return (
@@ -61,7 +65,7 @@ export default function SelectTendency({navigation}: any) {
 												onPress={() => selectData({index, idx})}>
 												<SvgCheck
 													color={
-														select[index][idx] == 1
+														tendency[index][idx] == 1
 															? colors.selectButton
 															: colors.regionNormal
 													}
@@ -69,7 +73,7 @@ export default function SelectTendency({navigation}: any) {
 												<TendencyButton
 													key={idx}
 													label={data}
-													bgColor={select[index][idx] == 1}></TendencyButton>
+													bgColor={tendency[index][idx] == 1}></TendencyButton>
 											</TendencyElementContainer>
 										);
 									})}
@@ -87,7 +91,7 @@ export default function SelectTendency({navigation}: any) {
 	);
 }
 
-const tendencyList = [
+export const regionTendencyList = [
 	{
 		title: '누구와 떠나시나요?',
 		multi: true,

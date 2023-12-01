@@ -36,10 +36,6 @@ export default function MyTravelList({navigation}: any) {
 	const goLogin = () => {
 		navigation.replace('LoginScreen');
 	};
-	const goMakeTravel = () => {
-		navigation.navigate('Home');
-		navigation.navigate('SelectCity');
-	};
 	const getTravelList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -104,7 +100,7 @@ export default function MyTravelList({navigation}: any) {
 			) : myTravelList.length == 0 ? (
 				<NewTravelContainer>
 					<Center>
-						<TouchableOpacity onPress={goMakeTravel}>
+						<TouchableOpacity onPress={goEnroll}>
 							<MainText>아직 만들어진 여행이 없어요!</MainText>
 						</TouchableOpacity>
 					</Center>
