@@ -95,12 +95,15 @@ export default function MoreInfo({navigation}: any) {
 	const goPushNotify = () => {
 		navigation.navigate('PushNotify');
 	};
+	const goUserManage = () => {
+		navigation.navigate('UserManage');
+	};
 	const [viewPagerView, setViewPagerView] = useState(false);
+	const goNotice = () => {
+		navigation.navigate('Notice');
+	};
 	const useInfo = [
-		{
-			title: '공지사항',
-			function: () => dispatch(modalSliceActions.setOpenModal({modalTitle: '등록된 공지사항이 없습니다'})),
-		},
+		{title: '공지사항', function: goNotice},
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
@@ -153,6 +156,9 @@ export default function MoreInfo({navigation}: any) {
 						)}
 						<SettingElement onPress={goNoteList}>
 							<SettingElementText>쪽지함</SettingElementText>
+						</SettingElement>
+						<SettingElement onPress={goUserManage}>
+							<SettingElementText>계정 설정</SettingElementText>
 						</SettingElement>
 					</SettingContainer>
 				</>

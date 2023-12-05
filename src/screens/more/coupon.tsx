@@ -60,7 +60,7 @@ export default function Coupon({navigation}: any) {
 					</ClearTouchableOpacity>
 				)}
 			</InputWrap>
-			<InfoText>{`⦁ 유효 기간이 지난 쿠폰은 등록이 불가합니다.\n\n⦁ 쿠폰으로 지급받은 아이템은 환불 및 교환이 불가능합니다.`}</InfoText>
+			<InfoText>{`⦁ 유효 기간이 지난 쿠폰은 등록이 불가합니다.\n\n⦁ 쿠폰으로 지급받은 상품은 환불 및 교환이 불가능합니다.`}</InfoText>
 			<SelectButton label={'쿠폰 등록'} onPress={checkCoupon}></SelectButton>
 		</CouponContainer>
 	);

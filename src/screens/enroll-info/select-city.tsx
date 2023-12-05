@@ -17,11 +17,12 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
-	const selectPopularity = (e: {id: number; subTitle: string}) => {
+	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
 		dispatch(
 			travelSliceActions.selectPopularity({
 				region: checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle],
 				cityIndex: e.id,
+				cityDistance: e.subId,
 			}),
 		);
 	};
@@ -271,19 +272,19 @@ export const cityViewList = [
 		id: 0,
 		title: '인기',
 		sub: [
-			{id: 1, subTitle: '서울'},
-			{id: 2, subTitle: '부산'},
-			{id: 17, subTitle: '제주'},
-			{id: 4, subTitle: '인천'},
-			{id: 3, subTitle: '대구'},
-			{id: 5, subTitle: '광주'},
-			{id: 6, subTitle: '대전'},
-			{id: 7, subTitle: '울산'},
-			{id: 10, subTitle: '강릉시'},
-			{id: 10, subTitle: '속초시'},
-			{id: 15, subTitle: '경주시'},
-			{id: 15, subTitle: '포항시'},
-			{id: 14, subTitle: '여수시'},
+			{id: 1, subId: 0, subTitle: '서울'},
+			{id: 2, subId: 0, subTitle: '부산'},
+			{id: 17, subId: 0, subTitle: '제주'},
+			{id: 4, subId: 0, subTitle: '인천'},
+			{id: 3, subId: 0, subTitle: '대구'},
+			{id: 5, subId: 0, subTitle: '광주'},
+			{id: 6, subId: 0, subTitle: '대전'},
+			{id: 7, subId: 0, subTitle: '울산'},
+			{id: 10, subId: 1, subTitle: '강릉시'},
+			{id: 10, subId: 5, subTitle: '속초시'},
+			{id: 15, subId: 2, subTitle: '경주시'},
+			{id: 15, subId: 21, subTitle: '포항시'},
+			{id: 14, subId: 13, subTitle: '여수시'},
 		],
 	},
 	{

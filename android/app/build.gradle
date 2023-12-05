@@ -132,6 +132,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.2.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation project(':react-native-lottie-splash-screen')
     implementation project(':react-native-version-check')

@@ -66,7 +66,7 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 					<FlexWrap>
 						<TendencyElementContainer onPress={() => dispatch(travelSliceActions.enrollBandwidth(false))}>
 							<SvgCheck color={!bandwidth ? colors.selectButton : colors.regionNormal} />
-							<TendencyButton label='바쁜 일정' bgColor={!bandwidth}></TendencyButton>
+							<TendencyButton label='알찬 일정' bgColor={!bandwidth}></TendencyButton>
 						</TendencyElementContainer>
 						<TendencyElementContainer onPress={() => dispatch(travelSliceActions.enrollBandwidth(true))}>
 							<SvgCheck color={bandwidth ? colors.selectButton : colors.regionNormal} />

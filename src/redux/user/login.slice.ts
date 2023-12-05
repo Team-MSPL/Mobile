@@ -16,7 +16,7 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			signUpFlag: data.signUpFlag,
 			fcmToken: data.fcmToken,
 		});
-		let userData = response.data;
+		let userData = {...response.data, userIdToken: data.userToken};
 		//성공했을때
 		if (response.status != 202) {
 			axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;

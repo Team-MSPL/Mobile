@@ -18,6 +18,7 @@ const initialUserState: UserState = {
 	blockUserList: [],
 	pushNotify: false,
 	fcmToken: '',
+	userIdToken: '',
 };
 
 //회원탈퇴
@@ -78,6 +79,15 @@ export const getNoteList = createAsyncThunk('/user/noteList', async (_, {rejectW
 		throw rejectWithValue(err.response.data);
 	}
 });
+//공지사항 조회
+export const getNotice = createAsyncThunk('/user/noteList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get('/user/noteList');
+		return response.data;
+	} catch (err: any) {
+		throw rejectWithValue(err.response.data);
+	}
+});
 
 //사용자 프로필 변경하기
 export const updateProfile = createAsyncThunk(
@@ -116,6 +126,7 @@ const userSlice = createSlice({
 			state.blockUserList = payload.blockUserList;
 			state.isLogin = true;
 			state.fcmToken = payload.fcmToken;
+			state.userIdToken = payload.userIdToken;
 		},
 		reset: state => {
 			Object.assign(state, initialUserState);
@@ -195,6 +206,7 @@ export interface UserState {
 	blockUserList: string[];
 	pushNotify: boolean;
 	fcmToken: string;
+	userIdToken: string;
 }
 
 export interface TokenLogType {

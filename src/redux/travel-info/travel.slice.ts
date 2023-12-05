@@ -287,6 +287,7 @@ export const travelSlice = createSlice({
 		selectPopularity: (state, {payload}) => {
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
+			state.cityDistance = payload.cityDistance;
 		},
 		enrollPlace: (state, {payload}) => {
 			state.Place = payload;

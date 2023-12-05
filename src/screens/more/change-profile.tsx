@@ -12,6 +12,11 @@ import {Center, ClearTouchableOpacity, InputWrap, MainContainer} from '../../uti
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel} from '../../utill/svg/svg';
 import {FilterList} from '../../utill/filter';
+import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
+import {storage, firebase} from '../../../config';
+import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
+// import firebase from '../../../';
+
 export default function ChangeProfile({navigation}: any) {
 	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
@@ -23,6 +28,24 @@ export default function ChangeProfile({navigation}: any) {
 		border-radius: 10px;
 		padding: 3px;
 	`;
+	const uploadImage = async (e: string) => {
+		const response = await useUriToBlob(e);
+		const filename = 'photo.jpg';
+		var ref = firebase.storage().ref().child(filename).put(response);
+		try {
+			await ref;
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	// const getImage = async () => {
+	// 	const storage = getStorage();
+	// 	const reference = ref(storage, 'photo.jpg');
+	// 	await getDownloadURL(reference).then(x => {
+	// 		console.log(x);
+	// 	});
+	// };
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			width: 300,
@@ -33,11 +56,14 @@ export default function ChangeProfile({navigation}: any) {
 			croppingQuality: 0.6,
 			compressImageQuality: 0.3,
 			cropping: true,
-			includeBase64: true,
+			//includeBase64: true,
 		}).then(response => {
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			setImage(`data:${response.mime};base64,${response?.data}`);
-			console.log('이미지 주소', response.path);
+			//setImage(`data:${response.mime};base64,${response?.data}`);
+			console.log('이미지 주소', response);
+
+			//setImage(response?.sourceURL);
+			uploadImage(response.path);
 		});
 	};
 	const goChangeProfile = () => {

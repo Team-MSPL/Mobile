@@ -4,7 +4,6 @@ import {BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import CustomButton from '../../utill/component/custom-button';
-import ImageCropPicker from 'react-native-image-crop-picker';
 import {updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';

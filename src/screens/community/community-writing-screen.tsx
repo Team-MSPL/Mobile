@@ -1,7 +1,6 @@
 import moment from 'moment';
 import React, {useState} from 'react';
 import {Alert, SafeAreaView} from 'react-native';
-import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
