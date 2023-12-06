@@ -196,12 +196,11 @@ export default function Timetable({navigation, route}: any) {
 						<>
 							{makeMode != 'share' && (
 								<>
-									<TouchableOpacity onPress={goSave}>
-										<HeaderText>저장</HeaderText>
-									</TouchableOpacity>
-
 									<TouchableOpacity onPress={goViewPager}>
 										<HeaderText>설명</HeaderText>
+									</TouchableOpacity>
+									<TouchableOpacity onPress={goSave}>
+										<HeaderText>저장</HeaderText>
 									</TouchableOpacity>
 								</>
 							)}

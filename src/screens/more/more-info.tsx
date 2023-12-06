@@ -11,6 +11,7 @@ import {Divider, MainContainer, devicesHeight} from '../../utill/layout/layout';
 import {SvgLoginLogo} from '../../utill/svg/svg';
 import {useState} from 'react';
 import ViewPager from '../../utill/view-pager';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
 		state => state.userSlice,
@@ -31,8 +32,10 @@ export default function MoreInfo({navigation}: any) {
 			}),
 		);
 	};
+	const {firebaseImageRemove} = useFirebaseStorage();
 	const goWithdraw = async () => {
 		try {
+			await firebaseImageRemove({pictureList: ['profile'], id: userId, category: 'profile'});
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase};
 			dispatch(userWithdraw(data));

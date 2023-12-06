@@ -78,7 +78,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 						/>
 						<DistanceExplain>
 							그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
-							{cityViewList[cityIndex].sub[cityDistance].subTitle}
+							{/* {cityViewList[cityIndex].sub[cityDistance].subTitle} */}
 							{/* {range >= 5
 								? '숫자가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
 								: '숫자가 낮으면, 성향과는 조금 멀어질 수 있어요'} */}

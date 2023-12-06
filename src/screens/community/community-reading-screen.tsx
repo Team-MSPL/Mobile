@@ -39,6 +39,9 @@ import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 
+import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
+import {storage, firebase} from '../../../config';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 const {StatusBarManager} = NativeModules;
 
 export default function CommunityReadingScreen({navigation, route}: any) {
@@ -281,10 +284,12 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		}
 	};
 
+	const {firebaseImageRemove} = useFirebaseStorage();
 	// * 게시글 삭제
 	const handleDeletePost = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			await firebaseImageRemove({pictureList: postData.postImage, id: postData._id, category: 'post'});
 			await dispatch(deletePost({postId: postData._id}));
 			dispatch(communitySliceActions.resetPostList());
 			await dispatch(getPostList({page: 1, sort: 1, blockList: blockUserList}));

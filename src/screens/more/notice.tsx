@@ -1,20 +1,26 @@
 import styled from 'styled-components/native';
-import {useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getNoteList} from '../../redux/user/user.slice';
+import {getNotice} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
+import {HStack, VStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
+import Icon from 'react-native-vector-icons/AntDesign';
+import {TouchableOpacity} from 'react-native';
+import moment from 'moment';
 export default function Notice({navigation}: any) {
 	const dispatch = useAppDispatch();
 
-	const [noticeList, setNoticeList] = useState([]);
+	const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const [select, setSelect] = useState(-1);
 	const getNoteListData = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const dataList = await dispatch(getNoteList()).unwrap();
+			const dataList = await dispatch(getNotice()).unwrap();
 			setNoticeList(dataList);
+			console.log(dataList);
 		} catch (err) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
 		} finally {
@@ -25,6 +31,13 @@ export default function Notice({navigation}: any) {
 		getNoteListData();
 	}, []);
 	if (isLoading) return <></>;
+	const clickNotice = (e: number) => {
+		if (e == select) {
+			setSelect(-1);
+		} else {
+			setSelect(e);
+		}
+	};
 	return (
 		<MainContainer>
 			{noticeList.length == 0 ? (
@@ -32,9 +45,26 @@ export default function Notice({navigation}: any) {
 			) : (
 				<ElementScrollView>
 					{noticeList.map((item, idx) => (
-						<ElementContainer key={idx}>
-							<ElementText>{item}</ElementText>
-						</ElementContainer>
+						<Fragment key={idx}>
+							<ElementContainer
+								onPress={() => {
+									clickNotice(idx);
+								}}>
+								<VStack>
+									<ElementText>{item.noticeTitle}</ElementText>
+									<ElementAtText>{moment(item.noticedAt).format('YY-MM-DD')}</ElementAtText>
+								</VStack>
+								<Icon name={idx == select ? 'up' : 'down'} size={25} color={'black'}></Icon>
+							</ElementContainer>
+							{select == idx && (
+								<NoticeElementContainer>
+									<NoticeElementText>{item.noticeContent}</NoticeElementText>
+									{item.noticeImage.map((value, index) => (
+										<NoticeImage key={index} source={{uri: value}}></NoticeImage>
+									))}
+								</NoticeElementContainer>
+							)}
+						</Fragment>
 					))}
 				</ElementScrollView>
 			)}
@@ -42,6 +72,21 @@ export default function Notice({navigation}: any) {
 	);
 }
 
+const NoticeElementText = styled.Text`
+	font-size: 17px;
+	font-weight: 500;
+	color: black;
+`;
+const NoticeImage = styled.Image`
+	width: 300px;
+	height: 500px;
+	align-self: center;
+`;
+const ElementAtText = styled.Text`
+	font-size: 15px;
+	font-weight: 500;
+	color: black;
+`;
 const ElementText = styled.Text`
 	font-size: 20px;
 	font-weight: 500;
@@ -54,12 +99,25 @@ const MainContainer = styled.View`
 	padding: 10px;
 	background-color: ${colors.main};
 `;
-const ElementContainer = styled.View`
+const ElementContainer = styled(HStack).attrs({as: TouchableOpacity})`
 	width: 100%;
 	border-bottom-width: 1px;
+	justify-content: space-between;
 	padding: 10px;
 	border-bottom-color: ${colors.regionNormal};
+`;
+const NoticeElementContainer = styled.View`
+	padding: 10px;
+	flex: 1;
 `;
 const ElementScrollView = styled.ScrollView`
 	width: 100%;
 `;
+interface NoticeType {
+	_id: string;
+	noticeTitle: string;
+	noticeContent: string;
+	noticeImage: [string, string];
+	noticedAt: string;
+	__v: number;
+}

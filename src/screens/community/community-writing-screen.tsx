@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Alert, SafeAreaView} from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -14,7 +14,10 @@ import CustomButton from '../../utill/component/custom-button';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
 import {SvgCancel} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
-import {FilterList} from '../../utill/filter';
+import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
+import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
+import {storage, firebase} from '../../../config';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -51,6 +54,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
 		}
 	};
+
+	let diaryImageRef = useRef<string[]>([]);
+
+	const {uploadImage} = useFirebaseStorage();
 	// * 게시글 등록
 	const handlePostSubmit = async () => {
 		try {
@@ -59,10 +66,23 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				const data = {
 					postTitle: postData.postTitle,
 					postContent: postData.postContent,
-					postImage: postData.postImage,
+					postImage: [],
 					postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 				};
-				await dispatch(savePost(data));
+				let postId = await dispatch(savePost(data)).unwrap();
+				diaryImageRef.current = [];
+				const ImageFunction = postData.postImage.map(async (item, idx) => {
+					let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
+					diaryImageRef.current.push(data);
+				});
+				await Promise.all(ImageFunction);
+				const uploadData = {
+					postTitle: postData.postTitle,
+					postContent: postData.postContent,
+					postImage: diaryImageRef.current,
+					postId: postId.postId,
+				};
+				await dispatch(updatePost(uploadData));
 			} else {
 				const data = {
 					postTitle: postData.postTitle,
@@ -198,16 +218,6 @@ const ImageContainer = styled.ScrollView`
 	margin-bottom: 24px;
 	border-radius: 12px;
 `;
-const ImageInputButton = styled.TouchableOpacity`
-	height: 160px;
-	aspect-ratio: 0.8;
-	border: ${colors.border};
-	border-radius: 12px;
-	align-items: center;
-	justify-content: space-evenly;
-	background-color: #2698fa13;
-	margin-right: 12px;
-`;
 const ImageInputButtonText = styled.Text`
 	font-size: 16px;
 	color: ${colors.selectButton};
@@ -215,28 +225,4 @@ const ImageInputButtonText = styled.Text`
 const ImageInputButtonIcon = styled(AntDesignIcon)`
 	font-size: 24px;
 	color: ${colors.border};
-`;
-
-// 사진을 누를 수 있게 하기 위한 componenet
-const ImageWrapper = styled.TouchableOpacity``;
-const PostImage = styled.Image`
-	height: 160px;
-	aspect-ratio: 0.8;
-	border-radius: 12px;
-	margin-right: 12px;
-`;
-
-const SubmitText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: ${colors.main};
-`;
-const SubmitButton = styled.TouchableOpacity`
-	border-radius: 12px;
-	height: 48px;
-	align-items: center;
-	justify-content: center;
-	background-color: ${colors.selectButton};
-	width: 100%;
-	margin-bottom: 24px;
 `;

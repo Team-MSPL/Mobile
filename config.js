@@ -10,7 +10,7 @@ const firebaseConfig = {
 	apiKey: 'AIzaSyAVoHWH5XI2Xe4k2Sz_u_M2YXCUwGcgano',
 	authDomain: 'danim-3439e.firebaseapp.com',
 	projectId: 'danim-3439e',
-	storageBucket: 'danim-profile-image',
+	storageBucket: 'danim-image',
 	messagingSenderId: '70367155908',
 	appId: '1:70367155908:web:39c1344d65ecce16141b91',
 	measurementId: 'G-VXZTLNFY84',

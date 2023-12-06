@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {TouchableOpacity, Image, View, Pressable, Keyboard} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -15,11 +15,13 @@ import {FilterList} from '../../utill/filter';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
 import {storage, firebase} from '../../../config';
 import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 // import firebase from '../../../';
 
 export default function ChangeProfile({navigation}: any) {
-	const {userName, userProfileImage} = useAppSelector(state => state.userSlice);
+	const {userName, userProfileImage, userId} = useAppSelector(state => state.userSlice);
 	const [image, setImage] = useState(userProfileImage);
+	const uploadImageRef = useRef('');
 	const dispatch = useAppDispatch();
 	//애뮬레이터 확인 불가
 	const IconContainer = styled(Icon)`
@@ -30,22 +32,26 @@ export default function ChangeProfile({navigation}: any) {
 	`;
 	const uploadImage = async (e: string) => {
 		const response = await useUriToBlob(e);
-		const filename = 'photo.jpg';
-		var ref = firebase.storage().ref().child(filename).put(response);
+		var ref = firebase.storage().ref('profile').child(`${userId}/profile.png`).put(response);
+		//var ref = firebase.storage().ref('test').child(`test/photo1.png`).delete();
 		try {
 			await ref;
+			let copy = await getImage();
+			return copy;
 		} catch (e) {
 			console.log(e);
 		}
 	};
 
-	// const getImage = async () => {
-	// 	const storage = getStorage();
-	// 	const reference = ref(storage, 'photo.jpg');
-	// 	await getDownloadURL(reference).then(x => {
-	// 		console.log(x);
-	// 	});
-	// };
+	const getImage = async () => {
+		const storage = getStorage();
+		const reference = ref(storage, `profile/${userId}/profile.png`);
+		let downloadUrl = '';
+		await getDownloadURL(reference).then(x => {
+			downloadUrl = x;
+		});
+		return downloadUrl;
+	};
 	const handleImagePickerLaunch = () => {
 		ImageCropPicker.openPicker({
 			width: 300,
@@ -56,18 +62,19 @@ export default function ChangeProfile({navigation}: any) {
 			croppingQuality: 0.6,
 			compressImageQuality: 0.3,
 			cropping: true,
-			//includeBase64: true,
+			includeBase64: true,
 		}).then(response => {
 			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
-			//setImage(`data:${response.mime};base64,${response?.data}`);
-			console.log('이미지 주소', response);
+			uploadImageRef.current = response.path;
+			setImage(`data:${response.mime};base64,${response?.data}`);
 
 			//setImage(response?.sourceURL);
-			uploadImage(response.path);
+			//uploadImage(response.path);
 		});
 	};
-	const goChangeProfile = () => {
+	const goChangeProfile = async () => {
 		try {
+			dispatch(LoadingSliceActions.onLoading());
 			if (FilterList.includes(nickname)) {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -76,16 +83,17 @@ export default function ChangeProfile({navigation}: any) {
 					}),
 				);
 			} else {
+				let userProfileImage = (await uploadImage(uploadImageRef.current)) ?? '';
 				dispatch(
 					updateProfile({
 						userName: nickname,
-						userProfileImage: image,
+						userProfileImage: userProfileImage,
 					}),
 				);
 				dispatch(
 					userSliceActions.setNicknameAndImage({
 						userName: nickname,
-						userProfileImage: image,
+						userProfileImage: userProfileImage,
 					}),
 				);
 
@@ -98,6 +106,8 @@ export default function ChangeProfile({navigation}: any) {
 					modalFunction: () => {},
 				}),
 			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	const [nickname, setNickname] = useState(userName);

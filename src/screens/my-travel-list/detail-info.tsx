@@ -31,6 +31,9 @@ import InputDiary from './input-diary';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-toast-message';
+import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
+import {storage, firebase} from '../../../config';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -54,9 +57,11 @@ export default function DetailInfo({navigation}: any) {
 			modalSliceActions.setOpenModal({modalTitle: '삭제하시겠습니까?', modalFunction: goRemove, modalLeft: true}),
 		);
 	};
+	const {firebaseImageRemove} = useFirebaseStorage();
 	const goRemove = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'});
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
 		} catch (err) {

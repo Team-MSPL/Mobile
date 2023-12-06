@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {BackHandler} from 'react-native';
 
@@ -11,6 +11,10 @@ import {colors} from '../../utill/colors';
 import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
 import {VStack} from '../../utill/layout/layout';
 import {usePhoto} from '../../utill/hooks/usePhoto';
+import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
+import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
+import {storage, firebase} from '../../../config';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -46,10 +50,18 @@ export default function InputDiary({navigation}: any) {
 
 		return () => backHandler.remove();
 	}, [saveCheck]);
+	const {uploadImage} = useFirebaseStorage();
+	let diaryImageRef = useRef<string[]>([]);
 	const goSaveDiary = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {travelId: travelId, diary: diaryValue, picture: pictureValue};
+			diaryImageRef.current = [];
+			const ImageFunction = pictureValue.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: travelId, category: 'diary'})) ?? '';
+				diaryImageRef.current.push(data);
+			});
+			await Promise.all(ImageFunction);
+			const data = {travelId: travelId, diary: diaryValue, picture: diaryImageRef.current};
 			await dispatch(updateDiary(data));
 			navigation.goBack();
 		} catch (err) {

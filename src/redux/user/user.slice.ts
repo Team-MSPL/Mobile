@@ -80,9 +80,9 @@ export const getNoteList = createAsyncThunk('/user/noteList', async (_, {rejectW
 	}
 });
 //공지사항 조회
-export const getNotice = createAsyncThunk('/user/noteList', async (_, {rejectWithValue}) => {
+export const getNotice = createAsyncThunk('/notice/noticeList', async (_, {rejectWithValue}) => {
 	try {
-		const response = await axiosAuth.get('/user/noteList');
+		const response = await axiosAuth.get('/notice/noticeList');
 		return response.data;
 	} catch (err: any) {
 		throw rejectWithValue(err.response.data);
