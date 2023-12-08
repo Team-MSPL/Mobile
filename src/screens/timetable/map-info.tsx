@@ -22,16 +22,17 @@ export default function MapInfo({navigation, route}: any) {
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
-		setSecletPinIndex(e);
-		mapRef.current?.animateCamera(
-			{
-				center: {
-					latitude: timetable[select][e].lat,
-					longitude: timetable[select][e].lng,
-				},
-			},
-			{duration: 1000},
-		);
+		navigation.navigate('CourseDetail', {value: timetable[select][e]});
+		// setSecletPinIndex(e);
+		// mapRef.current?.animateCamera(
+		// 	{
+		// 		center: {
+		// 			latitude: timetable[select][e].lat,
+		// 			longitude: timetable[select][e].lng,
+		// 		},
+		// 	},
+		// 	{duration: 1000},
+		// );
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
@@ -111,19 +112,20 @@ export default function MapInfo({navigation, route}: any) {
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	useEffect(() => {
-		if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
-			setSelect(route.params.mapIndex);
-			setVisible(false);
-		} else {
-			for (let i = 0; i < timetable.length; i++) {
-				if (timetable[i].length != 0) {
-					a.current = true;
-					setVisible(false);
-					setSelect(i);
-					break;
-				}
+		// if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
+		// 	setSelect(route.params.mapIndex);
+		// 	setVisible(false);
+		// } else {
+
+		for (let i = 0; i < timetable.length; i++) {
+			if (timetable[i].length != 0) {
+				a.current = true;
+				setVisible(false);
+				setSelect(i);
+				break;
 			}
 		}
+		//}
 		if (polylineCoordinates.length == 0) {
 			dispatch(
 				modalSliceActions.setOpenModal({

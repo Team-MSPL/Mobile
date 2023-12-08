@@ -109,10 +109,7 @@ function CommunityMain({
 				}}>
 				<PostItemContainer>
 					<PostWriterInfoContainer>
-						<PostWriterProfileImage
-							source={require('../../../../public/images/danim_logo2.png')}
-							resizeMode='contain'
-						/>
+						<PostWriterProfileImage source={{uri: data.item.postWriterProfileImage}} resizeMode='contain' />
 						<PostWriterText>{data.item.postWriter}</PostWriterText>
 					</PostWriterInfoContainer>
 					<PostTitleText numberOfLines={1} ellipsizeMode='tail'>
@@ -123,6 +120,12 @@ function CommunityMain({
 						<LikeNumText>{data.item.likerLength}</LikeNumText>
 						<CommentIcon size={12} name={'message1'} />
 						<CommentNumText>{data.item.commentLength}</CommentNumText>
+						{data.item.ImageLength != 0 && (
+							<>
+								<ImageIcon size={12} name={'picture'} />
+								<CommentNumText>{data.item.ImageLength}</CommentNumText>
+							</>
+						)}
 						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
 					</PostDetailInfoContainer>
 				</PostItemContainer>
@@ -167,6 +170,10 @@ const LikeNumText = styled.Text`
 `;
 const CommentIcon = styled(Icon)`
 	color: green;
+	margin-right: 4px;
+`;
+const ImageIcon = styled(Icon)`
+	color: grey;
 	margin-right: 4px;
 `;
 const CommentNumText = styled.Text`

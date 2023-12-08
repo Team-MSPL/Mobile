@@ -65,6 +65,7 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'kakao',
 				signUpFlag: false,
 				fcmToken: fcmToken,
+				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -101,6 +102,7 @@ export default function LoginScreen({navigation}: any) {
 				loginProvider: 'google',
 				signUpFlag: false,
 				fcmToken: fcmToken,
+				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -174,6 +176,7 @@ export default function LoginScreen({navigation}: any) {
 					loginProvider: 'apple',
 					signUpFlag: false,
 					fcmToken: fcmToken,
+					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
@@ -210,6 +213,7 @@ export default function LoginScreen({navigation}: any) {
 					loginProvider: 'apple',
 					signUpFlag: false,
 					fcmToken: fcmToken,
+					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {

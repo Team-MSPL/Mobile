@@ -17,7 +17,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 import {openSettings} from 'react-native-permissions';
-import MapView from 'react-native-maps';
+import MapView, {Circle} from 'react-native-maps';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(5);
@@ -184,59 +184,53 @@ export default function SelectDistance({navigation}: any) {
 			<DistanceDivider />
 			<MapContainer>
 				<Qwe>
-					{/* <SvgMap /> */}
 					<MapView
 						//provider={PROVIDER_GOOGLE}
-						showsMyLocationButton={true}
+						showsMyLocationButton={false}
+						showsUserLocation={false}
 						style={{width: '100%', height: 300, position: 'absolute'}}
-						showsUserLocation={true}
-						scrollEnabled={false}
-						maxDelta={1}
 						region={{
 							latitude: geoInfo.lat,
 							longitude: geoInfo.lng,
 							latitudeDelta: 8,
 							longitudeDelta: 8,
-						}}></MapView>
-
-					<CircleContainer size={range}></CircleContainer>
-					<CircleCenter></CircleCenter>
+						}}>
+						{geoInfo.name != '기본값:서울역' && (
+							<Circle
+								center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
+								style={{alignItems: 'center', justifyContent: 'center'}}
+								fillColor='rgba(38, 152, 251, 0.3);'
+								radius={range * 50000}></Circle>
+						)}
+					</MapView>
 				</Qwe>
 			</MapContainer>
-			<DistanceCenter>
-				{/* <DistanceText>{range * 50}km</DistanceText> */}
-				<Slider
-					style={{width: '100%', height: 40}}
-					minimumValue={1}
-					maximumValue={10}
-					minimumTrackTintColor='#123123'
-					maximumTrackTintColor='#000000'
-					value={range}
-					step={1}
-					onValueChange={item => {
-						setRange(item);
-					}}
-				/>
-				<DistanceSpace>
-					<DistanceExplain>내 근처</DistanceExplain>
-					<DistanceExplain>한국 전체</DistanceExplain>
-				</DistanceSpace>
-			</DistanceCenter>
-			{/* <DistanceDivider /> */}
-			<DistanceExplain>
-				*그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
-				{/* {range >= 5
-								? '숫자가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
-								: '숫자가 낮으면, 성향과는 조금 멀어질 수 있어요'} */}
-			</DistanceExplain>
-			{/* <StepText mainText='내 위치 정보' subText='선택시 내 위치를 기준으로 추천을 진행해요' />
-			<Center>
-				<GetContainer onPress={goReverseGeocoding}>
-					<GetContainerText>위치정보 받아오기</GetContainerText>
-				</GetContainer>
-				<GetText>{geoInfo.name}</GetText>
-			</Center>
-			<DistanceDivider /> */}
+			{geoInfo.name != '기본값:서울역' && (
+				<>
+					<DistanceCenter>
+						<Slider
+							style={{width: '100%', height: 40}}
+							minimumValue={1}
+							maximumValue={10}
+							minimumTrackTintColor='#123123'
+							maximumTrackTintColor='#000000'
+							value={range}
+							step={1}
+							onValueChange={item => {
+								setRange(item);
+							}}
+						/>
+						<DistanceSpace>
+							<DistanceExplain>내 근처</DistanceExplain>
+							<DistanceExplain>한국 전체</DistanceExplain>
+						</DistanceSpace>
+					</DistanceCenter>
+					{/* <DistanceDivider /> */}
+					<DistanceExplain>
+						*그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
+					</DistanceExplain>
+				</>
+			)}
 
 			<CustomButton label='선택 완료' onPress={checkToken}></CustomButton>
 		</MainContainer>

@@ -51,6 +51,7 @@ export const communitySlice = createSlice({
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
 			//console.log('게시글 하나 가져오기', payload);
+			console.log('안녕', payload);
 			state.postData = payload;
 		});
 	},
@@ -248,6 +249,7 @@ interface postDataType {
 	postedAt: string;
 	liker: string[];
 	comment: commentType[];
+	postWriterProfileImage: string;
 }
 
 export interface postListParameterType {
@@ -265,6 +267,9 @@ export interface postListType {
 	postContent: string;
 	likerLength: number;
 	commentLength: number;
+	postWriterProfileImage: string;
+	ImageLength: number;
+	postCategory: number;
 }
 
 export interface updatePostType {

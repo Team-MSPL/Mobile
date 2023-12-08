@@ -15,6 +15,7 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			loginProvider: data.loginProvider,
 			signUpFlag: data.signUpFlag,
 			fcmToken: data.fcmToken,
+			version: data.version,
 		});
 		let userData = {...response.data, userIdToken: data.userToken};
 		//성공했을때
@@ -77,4 +78,5 @@ interface socialConnectType {
 	loginProvider: string;
 	signUpFlag: boolean;
 	fcmToken: string;
+	version: number;
 }

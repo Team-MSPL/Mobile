@@ -52,6 +52,7 @@ const initialState: LiteState = {
 	checKStep: 0,
 	freeTicket: false,
 	cityDistance: 0,
+	modifyCheck: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -468,17 +469,22 @@ export const travelSlice = createSlice({
 		editModeChange: (state, {payload}) => {
 			state.editMode = payload;
 		},
+		changeModify: (state, {payload}) => {
+			state.modifyCheck = payload;
+		},
 		setSaveFlag: (state, {payload}) => {
 			state.saveFlag = payload;
 		},
 		changeTimetable: (state, {payload}) => {
 			state.timetable = payload;
 			state.editMode = '';
+			state.modifyCheck = true;
 		},
 		setMakeMode: (state, {payload}) => {
 			state.makeMode = payload;
 			state.tableShowFlag = true;
 			state.editMode = '';
+			state.modifyCheck = false;
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);
@@ -600,6 +606,7 @@ interface LiteState {
 	checKStep: number;
 	freeTicket: boolean;
 	cityDistance: number;
+	modifyCheck: boolean;
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';

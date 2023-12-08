@@ -285,6 +285,7 @@ const TravleHStack = styled(HStack)`
 	margin: 0px 0px 5px 0px;
 `;
 const TravelNameText = styled.Text`
+	width: 90%;
 	font-size: ${devicesWidth * 0.08}px;
 	color: ${colors.selectButton};
 	margin: ${devicesWidth * 0.01}px;

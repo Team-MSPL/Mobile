@@ -106,9 +106,10 @@ export default function Payment({navigation}: any) {
 										{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
 									</InfoText>
 								</HStack>
-								<HStack>
-									<BonusText>출시 기념 세일 진행 중</BonusText>
-								</HStack>
+								<BonusText>
+									출시 기념 <Percent>{((item.before - item.after) / item.before) * 100}% </Percent>
+									세일 진행 중
+								</BonusText>
 							</InfoContainer>
 							<SvgRightAdd width={30} height={30} color={'black'} />
 						</HStack>
@@ -157,4 +158,7 @@ const TitleText = styled(InfoText)`
 	font-weight: 900;
 	line-height: 20px;
 	margin: 0px 0px 30px 0px;
+`;
+const Percent = styled(BonusText)`
+	text-decoration: underline;
 `;

@@ -23,10 +23,7 @@ export default function CommunityPost() {
 		<>
 			<PostInfoContainer>
 				<PostWriterInfoContainer>
-					<PostWriterProfileImage
-						source={require('../../../../public/images/danim_logo2.png')}
-						resizeMode='contain'
-					/>
+					<PostWriterProfileImage source={{uri: postData.postWriterProfileImage}} resizeMode='contain' />
 					<PostDetailInfoContainer>
 						<PostWriterText>{postData.postWriter}</PostWriterText>
 						<PostDetailInfoText>{postData.postedAt.slice(0, 10)}</PostDetailInfoText>

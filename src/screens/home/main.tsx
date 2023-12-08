@@ -245,7 +245,7 @@ export default function Main({navigation}: any) {
 				</ButtonContainer>
 
 				<CollectionContainer>
-					<CollectionTitle>다님이 추천하는 이색 여행지</CollectionTitle>
+					<CollectionTitle>다님이 추천하는 여행지</CollectionTitle>
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
 					<CollectionContentContainer>
 						{uniqueTravelList.map(item => (

@@ -48,11 +48,7 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 					(item, idx) =>
 						idx >= viewDayIndex &&
 						idx <= viewDayIndex + 4 && (
-							<DayTouchableOpacity
-								onPress={() => {
-									goMapInfo(idx);
-								}}
-								key={idx}>
+							<DayTouchableOpacity key={idx}>
 								<DaySubText>{dayList[moment(item).day()]}</DaySubText>
 								<DayText>{moment(item).date()}</DayText>
 							</DayTouchableOpacity>
@@ -90,7 +86,7 @@ const TimetableDayContainer = styled.View<{center: boolean}>`
 const DayHStack = styled(HStack)`
 	flex: 1;
 `;
-const DayTouchableOpacity = styled.TouchableOpacity`
+const DayTouchableOpacity = styled.View`
 	flex: 0.18;
 	height: 70px;
 	align-items: center;

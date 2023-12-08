@@ -1,7 +1,6 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {
 	TouchableOpacity,
-	View,
 	Dimensions,
 	NativeSyntheticEvent,
 	NativeScrollEvent,
@@ -23,13 +22,14 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import {HStack, HeaderContianer, HeaderText} from '../../utill/layout/layout';
-import {SVGHelp, SvgMapIcon} from '../../utill/svg/svg';
+import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
+import {SvgMapIcon} from '../../utill/svg/svg';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
 import ViewPager from '../../utill/view-pager';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import MapInfo from './map-info';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -44,6 +44,7 @@ export default function Timetable({navigation, route}: any) {
 		tableShowFlag,
 		travelName,
 		saveFlag,
+		modifyCheck,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -51,6 +52,7 @@ export default function Timetable({navigation, route}: any) {
 	const [x, setX] = useState(-1);
 	const [viewDayIndex, setViewDayIndex] = useState(0);
 	const [mapViewState, setMapViewState] = useState(true);
+	const [mapORtable, setMapORtable] = useState(false); //트루면 탐테
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
@@ -90,7 +92,8 @@ export default function Timetable({navigation, route}: any) {
 		}
 	};
 	const goMapInfo = () => {
-		navigation.navigate('MapInfo', {mapIndex: -1});
+		setMapORtable(!mapORtable);
+		//navigation.navigate('MapInfo', {mapIndex: -1});
 	};
 	const goMyTravelList = () => {
 		navigation.popToTop();
@@ -105,7 +108,9 @@ export default function Timetable({navigation, route}: any) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '홈으로',
-						modalSubTitle: '홈으로 이동하시겠습니까?',
+						modalSubTitle: modifyCheck
+							? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+							: '홈으로 이동하시겠습니까?',
 						modalFunction: goHome,
 						modalLeft: true,
 					}),
@@ -118,7 +123,7 @@ export default function Timetable({navigation, route}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
 		return () => backHandler.remove();
-	}, []);
+	}, [modifyCheck]);
 	const {appsflyerLogEvent} = useAppsflyer();
 	const firstSave = async () => {
 		try {
@@ -194,15 +199,21 @@ export default function Timetable({navigation, route}: any) {
 						</TouchableOpacity>
 					) : (
 						<>
-							{makeMode != 'share' && (
+							{makeMode != 'share' && mapORtable ? (
 								<>
 									<TouchableOpacity onPress={goViewPager}>
 										<HeaderText>설명</HeaderText>
 									</TouchableOpacity>
-									<TouchableOpacity onPress={goSave}>
-										<HeaderText>저장</HeaderText>
-									</TouchableOpacity>
 								</>
+							) : (
+								<TouchableOpacity onPress={goMapInfo}>
+									<HeaderText>수정</HeaderText>
+								</TouchableOpacity>
+							)}
+							{modifyCheck && (
+								<TouchableOpacity onPress={goSave}>
+									<HeaderText>저장</HeaderText>
+								</TouchableOpacity>
 							)}
 						</>
 					)}
@@ -216,7 +227,9 @@ export default function Timetable({navigation, route}: any) {
 							dispatch(
 								modalSliceActions.setOpenModal({
 									modalTitle: '홈으로',
-									modalSubTitle: '홈으로 이동하시겠습니까?',
+									modalSubTitle: modifyCheck
+										? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+										: '홈으로 이동하시겠습니까?',
 									modalLeft: true,
 									modalFunction: goHome,
 								}),
@@ -229,7 +242,7 @@ export default function Timetable({navigation, route}: any) {
 					</TouchableOpacity>
 				),
 		});
-	}, [editMode, timetable, addList, x, makeMode, travelId]);
+	}, [editMode, timetable, addList, x, makeMode, travelId, mapORtable, modifyCheck]);
 
 	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		setMapViewState(usePosition(e));
@@ -242,7 +255,7 @@ export default function Timetable({navigation, route}: any) {
 	};
 	const [viewPagerView, setViewPagerView] = useState(false);
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
-	return (
+	return mapORtable ? (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
 			{mapViewState && (
@@ -270,6 +283,8 @@ export default function Timetable({navigation, route}: any) {
 				<ViewPager handleFunction={goBack} timetable={true} />
 			</Modal>
 		</TimeTableContainer>
+	) : (
+		<MapInfo navigation={navigation}></MapInfo>
 	);
 }
 

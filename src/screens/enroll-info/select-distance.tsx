@@ -10,7 +10,7 @@ import {colors} from '../../utill/colors';
 import {SvgMap, SvgPlace} from '../../utill/svg/svg';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer, MarginContainder} from './select-multi';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, {Circle, Marker, Polyline} from 'react-native-maps';
 import {cityViewList} from './select-city';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
@@ -37,23 +37,26 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 				<VStack>
 					<MapContainer>
 						<Qwe>
-							{/* <SvgMap /> */}
 							<MapView
 								//provider={PROVIDER_GOOGLE}
-								showsMyLocationButton={true}
+								showsMyLocationButton={false}
+								showsUserLocation={false}
 								style={{width: '100%', height: 300, position: 'absolute'}}
-								showsUserLocation={true}
-								scrollEnabled={false}
-								maxDelta={1}
 								region={{
 									latitude: cityViewList[cityIndex].sub[cityDistance].lat,
 									longitude: cityViewList[cityIndex].sub[cityDistance].lng,
 									latitudeDelta: cityDistance == 0 ? 0.8 : 0.2,
 									longitudeDelta: cityDistance == 0 ? 0.8 : 0.2,
-								}}></MapView>
-
-							<CircleContainer size={range}></CircleContainer>
-							<CircleCenter></CircleCenter>
+								}}>
+								<Circle
+									center={{
+										latitude: cityViewList[cityIndex].sub[cityDistance].lat,
+										longitude: cityViewList[cityIndex].sub[cityDistance].lng,
+									}}
+									style={{alignItems: 'center', justifyContent: 'center'}}
+									fillColor='rgba(38, 152, 251, 0.3);'
+									radius={range * 5000}></Circle>
+							</MapView>
 						</Qwe>
 					</MapContainer>
 					<DistanceExplainContainer>
@@ -78,10 +81,6 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 						/>
 						<DistanceExplain>
 							그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
-							{/* {cityViewList[cityIndex].sub[cityDistance].subTitle} */}
-							{/* {range >= 5
-								? '숫자가 높으면, 성향에 알맞은 여행 정보를 얻기 좋아요'
-								: '숫자가 낮으면, 성향과는 조금 멀어질 수 있어요'} */}
 						</DistanceExplain>
 					</DistanceExplainContainer>
 				</VStack>

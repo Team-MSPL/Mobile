@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {Image, Platform, Pressable} from 'react-native';
 import {googleKeywordApi, CourseDetailType, getTourTest} from '../../redux/travel-info/travel.slice';
@@ -7,7 +7,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import ImageView from 'react-native-image-viewing';
 import styled from 'styled-components/native';
-import {Center, HStack, MainText, VStack} from '../../utill/layout/layout';
+import {Center, HStack, MainText, VStack, devicesWidth} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 export default function CourseDetail({navigation, route}: any) {
@@ -43,11 +43,15 @@ export default function CourseDetail({navigation, route}: any) {
 	useEffect(() => {
 		getDetail();
 	}, []);
+	const tabBarRef = useRef();
 	const [tabView, setTabView] = useState(0);
-
+	const changeTab = (e: any) => {
+		Math.round(e.nativeEvent.contentOffset.x / devicesWidth) != tabView &&
+			setTabView(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
+	};
 	const tabList = [
-		{title: '상세 정보', function: () => setTabView(0)},
-		{title: '리뷰', function: () => setTabView(1)},
+		{title: '상세 정보', function: () => tabBarRef.current.scrollTo({x: 0, y: 0, animated: true})},
+		{title: '리뷰', function: () => tabBarRef.current.scrollToEnd({animated: true})},
 	];
 	const detailList = [
 		{title: courseDetail?.formatted_address ?? null, logo: <SvgLocation color={colors.regionNormal} />},
@@ -98,9 +102,21 @@ export default function CourseDetail({navigation, route}: any) {
 						</TabTouchableOpacity>
 					))}
 				</HStack>
-				<TabScrollView>
-					{tabView == 0 ? (
-						<>
+				<TabScrollView
+					horizontal={true}
+					nestedScrollEnabled={true}
+					pagingEnabled
+					snapToInterval={devicesWidth}
+					scrollEventThrottle={180}
+					decelerationRate={'fast'}
+					ref={tabBarRef}
+					disableIntervalMomentum={true}
+					onScroll={e => {
+						changeTab(e);
+					}}
+					showsHorizontalScrollIndicator={false}>
+					<HStack>
+						<ReviewContainer>
 							{detailList.map(
 								(detail, detailIndex) =>
 									detail.title != null && (
@@ -126,8 +142,7 @@ export default function CourseDetail({navigation, route}: any) {
 									</HStack>
 								</OpenContainer>
 							)}
-						</>
-					) : (
+						</ReviewContainer>
 						<ReviewContainer>
 							{courseDetail?.reviews ? (
 								courseDetail.reviews.map((item, idx) => (
@@ -148,7 +163,9 @@ export default function CourseDetail({navigation, route}: any) {
 								</ReviewCenter>
 							)}
 						</ReviewContainer>
-					)}
+					</HStack>
+
+					{/* )} */}
 				</TabScrollView>
 				{courseDetail?.photos && (
 					<ImageView
@@ -275,7 +292,10 @@ const ReviewText = styled.Text`
 	color: ${colors.selectButton};
 `;
 
-const ReviewContainer = styled.View``;
+const ReviewContainer = styled.ScrollView`
+	width: ${devicesWidth}px;
+	align-self: flex-start;
+`;
 const ReviewTitleText = styled.Text`
 	font-size: 20px;
 	font-weight: 900;
