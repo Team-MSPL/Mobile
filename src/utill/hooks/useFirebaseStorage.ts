@@ -4,7 +4,11 @@ import {useUriToBlob} from './useUriToBlob';
 const useFirebaseStorage = () => {
 	const firebaseImageRemove = async (e: {pictureList: string[]; id: string; category: string}) => {
 		const removeData = e.pictureList.map(async (item, idx) => {
-			await firebase.storage().ref(e.category).child(`${e.id}/${idx}${e.category}.png`).delete();
+			await firebase
+				.storage()
+				.ref(e.category)
+				.child(`${e.id}/${e.category == 'profile' ? '' : idx}${e.category}.png`)
+				.delete();
 		});
 		await Promise.all(removeData);
 	};

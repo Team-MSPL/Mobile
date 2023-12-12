@@ -640,6 +640,10 @@ export interface TimetableType {
 	y?: number;
 	id?: string;
 	photo: string;
+	partner: number[];
+	play: number[];
+	concept: number[];
+	tour: number[];
 }
 
 export interface CourseDetailType {

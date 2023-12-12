@@ -2,6 +2,7 @@ import {useCallback} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import 'moment/locale/ko';
 
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
@@ -63,6 +64,20 @@ export default function MyTravelList({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
+	const dDayCalculate = (e: any) => {
+		let sign = Math.sign(moment.duration(moment(e).hours(0).diff(moment())).asDays());
+		let result = '';
+		let totday = moment.duration(moment(e).hours(0).diff(moment())).asDays() * -1;
+		if (totday > 0 && totday < 1) {
+			result = '여행을 떠나는 날이에요';
+		} else if (sign == 1) {
+			result = '여행가기' + Math.ceil(moment.duration(moment(e).hours(0).diff(moment())).asDays()) + '일 전';
+		} else if (sign == -1) {
+			result =
+				'여행 후' + (Math.floor(moment.duration(moment(e).hours(0).diff(moment())).asDays()) + 1) * -1 + '일';
+		}
+		return result;
+	};
 
 	return (
 		<MainContainer>
@@ -118,6 +133,7 @@ export default function MyTravelList({navigation}: any) {
 									'~' +
 									moment(item.day[item.nDay - 1]).format('MM월-DD일')}
 							</DayText>
+							{/* <DayText>{dDayCalculate(item.day[0])}</DayText> */}
 							<TravelTitleText>{item.travelName}</TravelTitleText>
 						</VStack>
 						<SvgRightAdd color={colors.selectButton} />

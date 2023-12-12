@@ -49,12 +49,16 @@ function App(): JSX.Element {
 		try {
 			// await AsyncStorage.clear();
 			dispatch(LoadingSliceActions.onLoading());
-			const [userName, userProfileImage, userToken, loginProvider] = await AsyncStorage.multiGet([
+			let [userName, userProfileImage, userToken, loginProvider, fcmToken] = await AsyncStorage.multiGet([
 				'userName',
 				'userProfileImage',
 				'userToken',
 				'loginProvider',
+				'fcmToken',
 			]);
+			if (!fcmToken[1]) {
+				fcmToken[1] = await getFcmToken();
+			}
 			if (userToken && userName && loginProvider) {
 				dispatch(
 					socialConnect({
@@ -62,7 +66,9 @@ function App(): JSX.Element {
 						userProfileImage: userProfileImage[1],
 						userToken: userToken[1],
 						loginProvider: loginProvider[1] ?? '',
+						fcmToken: fcmToken[1] ?? '',
 						signUpFlag: false,
+						version: 2,
 					}),
 				);
 			}
@@ -183,6 +189,7 @@ function App(): JSX.Element {
 	const getFcmToken = async () => {
 		const fcmToken = await messaging().getToken();
 		dispatch(userSliceActions.setFcmToken({fcmToken: fcmToken}));
+		return fcmToken;
 		//console.log('[FCM Token] ', fcmToken);
 	};
 	useEffect(() => {

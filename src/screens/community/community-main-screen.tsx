@@ -13,7 +13,7 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
-import {Google_Ads_Key} from '@env';
+import {Google_Ads_Banner_Android} from '@env';
 
 export default function CommunityMainScreen({navigation}: any) {
 	const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +83,7 @@ export default function CommunityMainScreen({navigation}: any) {
 
 	useBackHandler();
 
-	const adUnitId = __DEV__ ? TestIds.BANNER : Google_Ads_Key;
+	const adUnitId = __DEV__ ? TestIds.BANNER : Google_Ads_Banner_Android;
 	return (
 		<CommunityMainContainer>
 			{/* <DropDownButton

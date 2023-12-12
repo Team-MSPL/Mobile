@@ -1,9 +1,9 @@
 import {Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {updateFunctionToken} from '../../redux/user/user.slice';
+import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
 import {HStack, MainContainer, MainText, VStack} from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {useEffect, useRef} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
@@ -15,6 +15,7 @@ import Toast from 'react-native-toast-message';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const {purchaseItems, requestItemPurchase} = useShopping();
+	const [watchAD, setWatchAD] = useState(0);
 	useShopping();
 	const dispatch = useAppDispatch();
 	const adUnitId = __DEV__ ? TestIds.REWARDED : Google_Ads_Key;
@@ -24,6 +25,14 @@ export default function Payment({navigation}: any) {
 		{title: '10', before: 10000, after: 2000},
 		{title: '20', before: 20000, after: 3000},
 	];
+	const getWatchData = async () => {
+		const data = await dispatch(getWatchADTime()).unwrap();
+		setWatchAD(data.watchADTime);
+	};
+
+	useLayoutEffect(() => {
+		getWatchData();
+	}, []);
 	useEffect(() => {
 		// 광고 생성
 		const rewarded = RewardedAd.createForAdRequest(adUnitId, {
@@ -43,6 +52,7 @@ export default function Payment({navigation}: any) {
 			rewarded.removeAllListeners();
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
+			dispatch(setWatchADTime({watchADTime: watchAD + 1}));
 			navigation.goBack();
 		});
 
@@ -71,14 +81,19 @@ export default function Payment({navigation}: any) {
 				수 있습니다.
 			</TitleText>
 			<DayViewContainer>
-				<TouchableOpacity style={{marginVertical: 2}} onPress={openAd}>
+				<TouchableOpacity
+					style={{marginVertical: 2, opacity: watchAD > 1 ? 0.5 : 1}}
+					onPress={openAd}
+					disabled={watchAD > 1}>
 					<HStack>
 						<TotalContainer>
 							<TotalText>1</TotalText>
 						</TotalContainer>
 						<InfoContainer>
 							<InfoText>1개 - 광고보상</InfoText>
-							<BonusText>수령 가능</BonusText>
+							<BonusText>
+								*1일 2회 수령 가능{`\n`} 오늘 남은 횟수 {2 - watchAD}회
+							</BonusText>
 						</InfoContainer>
 						<SvgRightAdd width={30} height={30} color={'black'} />
 					</HStack>

@@ -1,4 +1,4 @@
-import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {BackHandler, Alert, View, Image, TouchableOpacity, Platform} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
@@ -12,12 +12,14 @@ import {cityViewList} from '../enroll-info/select-city';
 import {DayElementContainer, MarkerText} from './map-info';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {SvgPlace} from '../../utill/svg/svg';
+import {tendencyList} from '../enroll-info/select-tendency';
 
 export default function Preset({navigation}: any) {
-	const {nDay, presetDatas} = useAppSelector(state => state.travelSlice);
+	const {nDay, presetDatas, tendency} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
+	const [tendencyLists, setTendency] = useState<number[][] | null>(null);
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -28,6 +30,9 @@ export default function Preset({navigation}: any) {
 			}),
 		);
 	};
+	useLayoutEffect(() => {
+		checkTendency(0);
+	}, []);
 	const goNext = () => {
 		let copy = [...presetDatas[select]];
 		if (presetDatas[select].length != nDay + 1) {
@@ -67,7 +72,34 @@ export default function Preset({navigation}: any) {
 			),
 		});
 	}, []);
+	const checkTendency = (idx: number) => {
+		let copy = [
+			[0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0],
+		];
+		let count = 0;
+		presetDatas[idx].forEach((item, idx) => {
+			item.forEach((value, index) => {
+				count += 1;
+				let list = [value.partner, value.concept, value.play, value.tour];
+				list.forEach((plus, plusIndex) => {
+					let lindexList = [...copy[plusIndex]];
+					plus.forEach((litem, lIndex) => {
+						lindexList[lIndex] += litem;
+						if (idx == presetDatas[idx].length - 1 && index == item.length - 1) {
+							lindexList[lIndex] = Math.floor(lindexList[lIndex] / count);
+						}
+					});
+					copy[plusIndex] = lindexList;
+				});
+			});
+		});
+		setTendency(copy);
+	};
 	const change = (idx: number) => {
+		checkTendency(idx);
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(
 				{
@@ -172,6 +204,16 @@ export default function Preset({navigation}: any) {
 	return (
 		<>
 			<MainContainer>
+				{/* {tendency.map((item, idx) =>
+					item.map((value, index) => {
+						return value ? (
+							<PresetSubText>
+								{tendencyList[idx].list[index]}
+								{tendencyLists && tendencyLists[idx][index]}
+							</PresetSubText>
+						) : null;
+					}),
+				)} */}
 				<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
 				<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
 

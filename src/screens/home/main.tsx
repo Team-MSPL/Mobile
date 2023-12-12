@@ -40,7 +40,7 @@ export default function Main({navigation}: any) {
 		navigation.navigate('EnrollTravelTitle');
 	};
 
-	const {userName, functionToken, signUpReward} = useAppSelector(state => state.userSlice);
+	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const regionRecommend = () => {
@@ -82,6 +82,14 @@ export default function Main({navigation}: any) {
 				modalSliceActions.setOpenModal({
 					modalTitle: '회원가입 축하드립니다',
 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+					modalFunction: checkSignUpReward,
+				}),
+			);
+		} else if (reLogin) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '보고싶었어요',
+					modalSubTitle: `다시 오신 것을 환영합니다! ${userName}님!`,
 					modalFunction: checkSignUpReward,
 				}),
 			);

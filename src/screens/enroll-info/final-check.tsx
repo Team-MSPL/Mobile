@@ -143,7 +143,6 @@ export default function FinalCheck({navigation}: any) {
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));
-			console.log(result.data);
 			if (result) {
 				navigation.popToTop();
 				navigation.navigate('Preset');

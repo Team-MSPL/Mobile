@@ -33,6 +33,7 @@ export default function Join1({navigation, route}: any) {
 				loginProvider: route.params.loginProvider,
 				signUpFlag: true,
 				fcmToken: fcmToken,
+				version: 2,
 			};
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));

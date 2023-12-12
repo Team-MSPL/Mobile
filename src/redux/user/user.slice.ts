@@ -19,6 +19,7 @@ const initialUserState: UserState = {
 	pushNotify: false,
 	fcmToken: '',
 	userIdToken: '',
+	reLogin: false,
 };
 
 //회원탈퇴
@@ -27,8 +28,10 @@ export const userWithdraw = createAsyncThunk(
 	async (data: {userId: string; signUpFirebase: boolean}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.delete('/user/withdraw', {data});
+			console.log('잘왓다');
 			return response.data;
 		} catch (err: any) {
+			console.log('안왔다', err);
 			throw rejectWithValue(err.response.data);
 		}
 	},
@@ -112,6 +115,28 @@ export const getTokenLog = createAsyncThunk('/tokenLog', async (_, {rejectWithVa
 	}
 });
 
+//광고 시청 횟수 확인
+export const getWatchADTime = createAsyncThunk('/manageUser/watchADTime', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/manageUser/watchADTime`);
+		return response.data;
+	} catch (err: any) {
+		throw rejectWithValue(err.response.data);
+	}
+});
+
+//광고 시청 횟수 업데이트
+export const setWatchADTime = createAsyncThunk(
+	'/manageUser/setWatchADTime',
+	async (data: {watchADTime: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch(`/manageUser/setWatchADTime`, data);
+			return response.data;
+		} catch (err: any) {
+			throw rejectWithValue(err.response.data);
+		}
+	},
+);
 const userSlice = createSlice({
 	name: 'user',
 	initialState: initialUserState,
@@ -127,6 +152,9 @@ const userSlice = createSlice({
 			state.isLogin = true;
 			state.fcmToken = payload.fcmToken;
 			state.userIdToken = payload.userIdToken;
+		},
+		setReLogin(state, {payload}) {
+			state.reLogin = payload;
 		},
 		reset: state => {
 			Object.assign(state, initialUserState);
@@ -207,6 +235,7 @@ export interface UserState {
 	pushNotify: boolean;
 	fcmToken: string;
 	userIdToken: string;
+	reLogin: boolean;
 }
 
 export interface TokenLogType {

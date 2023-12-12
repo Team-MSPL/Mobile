@@ -36,9 +36,13 @@ export default function MoreInfo({navigation}: any) {
 	const goWithdraw = async () => {
 		try {
 			await firebaseImageRemove({pictureList: ['profile'], id: userId, category: 'profile'});
+		} catch (err) {
+			console.log('이유', err);
+		}
+		try {
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase};
-			dispatch(userWithdraw(data));
+			await dispatch(userWithdraw(data));
 			await AsyncStorage.getAllKeys().then(allKeys => {
 				const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
 				AsyncStorage.multiRemove(removeList);

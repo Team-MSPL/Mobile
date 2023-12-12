@@ -12,4 +12,5 @@ declare module '@env' {
 	export const Appsflyer_ios_id: string;
 	export const Tour_API_KEY: string;
 	export const CRYPTO_KEY: string;
+	export const Google_Ads_Banner_Android: string;
 }
