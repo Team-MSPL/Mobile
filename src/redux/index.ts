@@ -11,6 +11,7 @@ import settingSliceReducer from './setting/settingSlice';
 import modalSliceReducer from './modal/modalSlice';
 import networkSliceReducer from './network/networkSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import eventSliceReducer from './event/event.slice';
 
 const persistConfig = {
 	key: 'root',
@@ -27,6 +28,7 @@ const appReducer = combineReducers({
 	settingSlice: settingSliceReducer,
 	modalSlice: modalSliceReducer,
 	networkSlice: networkSliceReducer,
+	eventSlice: eventSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {

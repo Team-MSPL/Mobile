@@ -53,6 +53,7 @@ const initialState: LiteState = {
 	freeTicket: false,
 	cityDistance: 0,
 	modifyCheck: false,
+	presetTendencyList: [],
 };
 
 export const axiosGoogle = axios.create({
@@ -219,12 +220,26 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 	}
 });
 
+//탐테에서 눌렀을때 관광지정보 가져오기 서버 연결버전
+export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: any, {rejectWithValue}) => {
+	try {
+		console.log('빠졌어', data);
+		const response = await axiosAuth.get(
+			`/place/placeInfo?region=${data.region}&name=${data.name}&lat:${data.lat}&lng:${data.lng}`,
+		);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 //카카오 식당,카페 등 추천 장소 얻는 거
 export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosKakao.get(
-			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
+			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=distance`,
 		);
+		console.log(response.data.documents);
 		// console.log(response.data.documents);
 
 		//제로리절트 처리하기
@@ -445,7 +460,7 @@ export const travelSlice = createSlice({
 							lng: value.lng,
 							photo: '',
 						});
-					} else if (value.category == 4 && index != 0) {
+					} else if (value.category == 4 && index == item.length - 1) {
 						//copy[idx].pop();
 						copy[idx].push({
 							...value,
@@ -534,6 +549,7 @@ export const travelSlice = createSlice({
 			state.courseDetail = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
+			state.presetTendencyList = payload.data.bestPointList;
 			state.presetDatas = payload.data.resultData;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
@@ -607,6 +623,12 @@ interface LiteState {
 	freeTicket: boolean;
 	cityDistance: number;
 	modifyCheck: boolean;
+	presetTendencyList: presetTendencyListType[];
+}
+export interface presetTendencyListType {
+	tendencyNameList: string[];
+	tendencyPointList: number[];
+	tendencyRanking: number[];
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
@@ -644,6 +666,7 @@ export interface TimetableType {
 	play: number[];
 	concept: number[];
 	tour: number[];
+	regionIndex: number;
 }
 
 export interface CourseDetailType {
@@ -651,7 +674,6 @@ export interface CourseDetailType {
 	rating: number;
 	reviews: Reviews[];
 	photos: Photos[];
-	editorial_summary: EditorialSummary;
 	formatted_phone_number: string;
 	opening_hours: OpeninHoursType;
 	formatted_address: string;
@@ -688,11 +710,6 @@ interface Photos {
 	html_attributions: string;
 	photo_reference: string;
 	width: number;
-}
-
-interface EditorialSummary {
-	language: string;
-	overview: string;
 }
 
 export interface RecommendList {
@@ -750,4 +767,24 @@ interface reviewAndPointType {
 	review: string;
 	point: number;
 	tendencyPoint: number[][];
+}
+
+export interface courseInfoType {
+	status: string;
+	name: string;
+	openInfo: string[];
+	review: InfoReviewType[];
+	rating: number | null;
+	address: string | null;
+	expense: string | null;
+	information: string;
+	infoTitle: string | null;
+	infoContent: string | null;
+	photo: string[];
+}
+
+interface InfoReviewType {
+	name: string;
+	content: string;
+	rating: number | null;
 }

@@ -97,7 +97,8 @@ export default function SelectDistance({navigation}: any) {
 			functionToken >= 1
 				? dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: `이용권이 하나 소모됩니다.\n현재 이용권은 ${functionToken}개입니다. 실행하시겠습니까?`,
+							modalTitle: `이용권이 하나 소모됩니다.`,
+							modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
 							modalFunction: goNext,
 							modalLeft: true,
 						}),

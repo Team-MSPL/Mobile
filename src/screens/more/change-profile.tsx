@@ -83,7 +83,8 @@ export default function ChangeProfile({navigation}: any) {
 					}),
 				);
 			} else {
-				let userProfileImage = (await uploadImage(uploadImageRef.current)) ?? '';
+				let userProfileImage =
+					uploadImageRef.current != '' ? (await uploadImage(uploadImageRef.current)) ?? '' : image;
 				dispatch(
 					updateProfile({
 						userName: nickname,

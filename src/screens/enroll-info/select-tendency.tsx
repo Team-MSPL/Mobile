@@ -62,7 +62,7 @@ export default function SelectTendency({setViewComponent, viewComponent, goNextS
 						</TendencyElementContainer>
 					</FlexWrap>
 					<TendencyStepText>Step 2</TendencyStepText>
-					<TendencyText>어떤 스타일을 원하시나요?</TendencyText>
+					<TendencyText>어떤 여행 스타일을 원하시나요?</TendencyText>
 					<FlexWrap>
 						<TendencyElementContainer onPress={() => dispatch(travelSliceActions.enrollBandwidth(false))}>
 							<SvgCheck color={!bandwidth ? colors.selectButton : colors.regionNormal} />

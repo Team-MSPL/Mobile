@@ -34,12 +34,16 @@ import ViewPager from './src/utill/view-pager';
 import useVersion from './src/utill/hooks/useVersion';
 import Toast from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
+import Event from './src/utill/component/event/event';
+import moment from 'moment';
+import {eventSliceActions, getEventList} from './src/redux/event/event.slice';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
+	const {eventState} = useAppSelector(state => state.eventSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -204,7 +208,7 @@ function App(): JSX.Element {
 		lottieHide();
 		checkVersion();
 		setNetInfoEvent();
-		getFcmToken();
+		//getFcmToken();
 		const unsubscribe = messaging().onMessage(async remoteMessage => {
 			Vibration.vibrate(400);
 			dispatch(
@@ -249,6 +253,7 @@ function App(): JSX.Element {
 					// 	<NeedPermissions />
 					// )
 				}
+				{eventState && <Event />}
 				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
 				{Boolean(isLoading) && <Loading />}

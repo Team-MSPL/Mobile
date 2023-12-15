@@ -1,4 +1,4 @@
-import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
 import {BackHandler, Alert, View, Image, TouchableOpacity, Platform} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
@@ -8,18 +8,21 @@ import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.sl
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
-import {cityViewList} from '../enroll-info/select-city';
 import {DayElementContainer, MarkerText} from './map-info';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {SvgPlace} from '../../utill/svg/svg';
-import {tendencyList} from '../enroll-info/select-tendency';
 
+import Icon from 'react-native-vector-icons/AntDesign';
 export default function Preset({navigation}: any) {
-	const {nDay, presetDatas, tendency} = useAppSelector(state => state.travelSlice);
-	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const {nDay, presetDatas, tendency, presetTendencyList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const IconElement = styled(Icon)`
+		width: 5%;
+		align-self: flex-start;
+		margin: 4px 0px 0px 0px;
+	`;
 	const [select, setSelect] = useState(0);
-	const [tendencyLists, setTendency] = useState<number[][] | null>(null);
+	const [viewTendency, setViewTendency] = useState(false);
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -30,10 +33,8 @@ export default function Preset({navigation}: any) {
 			}),
 		);
 	};
-	useLayoutEffect(() => {
-		checkTendency(0);
-	}, []);
 	const goNext = () => {
+		console.log(presetDatas[select]);
 		let copy = [...presetDatas[select]];
 		if (presetDatas[select].length != nDay + 1) {
 			const check = nDay + 1 - presetDatas[select].length;
@@ -72,34 +73,7 @@ export default function Preset({navigation}: any) {
 			),
 		});
 	}, []);
-	const checkTendency = (idx: number) => {
-		let copy = [
-			[0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
-		];
-		let count = 0;
-		presetDatas[idx].forEach((item, idx) => {
-			item.forEach((value, index) => {
-				count += 1;
-				let list = [value.partner, value.concept, value.play, value.tour];
-				list.forEach((plus, plusIndex) => {
-					let lindexList = [...copy[plusIndex]];
-					plus.forEach((litem, lIndex) => {
-						lindexList[lIndex] += litem;
-						if (idx == presetDatas[idx].length - 1 && index == item.length - 1) {
-							lindexList[lIndex] = Math.floor(lindexList[lIndex] / count);
-						}
-					});
-					copy[plusIndex] = lindexList;
-				});
-			});
-		});
-		setTendency(copy);
-	};
 	const change = (idx: number) => {
-		checkTendency(idx);
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(
 				{
@@ -204,19 +178,8 @@ export default function Preset({navigation}: any) {
 	return (
 		<>
 			<MainContainer>
-				{/* {tendency.map((item, idx) =>
-					item.map((value, index) => {
-						return value ? (
-							<PresetSubText>
-								{tendencyList[idx].list[index]}
-								{tendencyLists && tendencyLists[idx][index]}
-							</PresetSubText>
-						) : null;
-					}),
-				)} */}
 				<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
 				<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
-
 				<MapView
 					ref={mapRef}
 					style={{width: '100%', height: 300}}
@@ -230,6 +193,27 @@ export default function Preset({navigation}: any) {
 					{markers}
 					{polylines}
 				</MapView>
+				{presetTendencyList[select].tendencyNameList.length != 1 && (
+					<TendencyTouchable onPress={() => setViewTendency(!viewTendency)}>
+						<TendencyContainer>
+							{presetTendencyList[select].tendencyNameList.map((item, idx) => {
+								return (
+									(viewTendency ? true : idx < 2) && (
+										<TendencyText>
+											#{item}
+											<TendencyPointText>
+												{' ' + presetTendencyList[select].tendencyRanking[idx]}
+											</TendencyPointText>
+											등
+										</TendencyText>
+									)
+								);
+							})}
+						</TendencyContainer>
+						<IconElement name={viewTendency ? 'up' : 'down'} size={16} color='black' />
+					</TendencyTouchable>
+				)}
+
 				<PresetContainer>
 					{presetDatas.map(
 						(item, idx) =>
@@ -255,7 +239,6 @@ export default function Preset({navigation}: any) {
 						})}
 					</Fragment>
 				))}
-
 				<MarginContainder></MarginContainder>
 			</MainContainer>
 			<ButtonContainer>
@@ -306,4 +289,29 @@ const DayText = styled.Text<{color: string}>`
 	font-size: 20px;
 	font-weight: bold;
 	color: ${props => props.color};
+`;
+const TendencyText = styled.Text`
+	font-size: 16px;
+	font-weight: 500;
+	color: black;
+	width: 45%;
+`;
+const TendencyPointText = styled.Text`
+	font-size: 18px;
+	font-weight: 500;
+	color: ${colors.selectButton};
+`;
+
+const TendencyTouchable = styled.TouchableOpacity`
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+	flex-direction: row;
+`;
+const TendencyContainer = styled.View`
+	width: 95%;
+	align-items: center;
+	justify-content: flex-end;
+	flex-direction: row;
+	flex-wrap: wrap;
 `;

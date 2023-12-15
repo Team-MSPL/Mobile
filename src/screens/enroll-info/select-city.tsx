@@ -292,11 +292,11 @@ export const cityViewList = [
 		title: '서울',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.5518911, lng: 126.9917937},
-			{id: 1, subTitle: '도심권', example: ' 예)용산구,종로구', lat: 37.5518911, lng: 126.9917937},
-			{id: 2, subTitle: '동남권', example: ' 예)강남구,송파구', lat: 37.5518911, lng: 126.9917937},
-			{id: 3, subTitle: '동북권', example: ' 예)강북구,동대문구', lat: 37.5518911, lng: 126.9917937},
-			{id: 4, subTitle: '서남권', example: ' 예)강서구,영등포구', lat: 37.5518911, lng: 126.9917937},
-			{id: 5, subTitle: '서북권', example: ' 예)마포구,서대문구', lat: 37.5518911, lng: 126.9917937},
+			{id: 1, subTitle: '도심권', example: ' 예)용산구,종로구', lat: 37.5658049, lng: 126.9751461},
+			{id: 2, subTitle: '동남권', example: ' 예)강남구,송파구', lat: 37.497952, lng: 127.027619},
+			{id: 3, subTitle: '동북권', example: ' 예)강북구,동대문구', lat: 37.6105288, lng: 127.0563905},
+			{id: 4, subTitle: '서남권', example: ' 예)강서구,영등포구', lat: 37.5360367, lng: 126.8745334},
+			{id: 5, subTitle: '서북권', example: ' 예)마포구,서대문구', lat: 37.5663937, lng: 126.9387066},
 		],
 	},
 	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체', lat: 35.2100142, lng: 129.0688702}]},
@@ -517,8 +517,8 @@ export const cityViewList = [
 		title: '제주',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 33.3846216, lng: 126.5534925},
-			{id: 1, subTitle: '서귀포시', lat: 33.3846216, lng: 126.5534925},
-			{id: 2, subTitle: '제주시', lat: 33.3846216, lng: 126.5534925},
+			{id: 1, subTitle: '서귀포시', lat: 33.2541205, lng: 126.560076},
+			{id: 2, subTitle: '제주시', lat: 33.4996213, lng: 126.5311884},
 		],
 	},
 ];

@@ -13,6 +13,9 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {HStack, HeaderContianer, MainContainer, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import messaging from '@react-native-firebase/messaging';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
+import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -75,6 +78,13 @@ export default function Main({navigation}: any) {
 		const authStatus = await messaging().requestPermission();
 		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
 	};
+	const checkEvent = async () => {
+		const eventExist = await dispatch(getEventList()).unwrap();
+		const state = await AsyncStorage.getItem('eventState');
+		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
+			dispatch(eventSliceActions.setEventState(true));
+		}
+	};
 	useEffect(() => {
 		pushPermission();
 		if (signUpReward) {
@@ -94,6 +104,7 @@ export default function Main({navigation}: any) {
 				}),
 			);
 		}
+		checkEvent();
 	}, []);
 	useBackHandler();
 

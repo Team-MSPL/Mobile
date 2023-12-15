@@ -116,7 +116,6 @@ export default function MapInfo({navigation, route}: any) {
 		// 	setSelect(route.params.mapIndex);
 		// 	setVisible(false);
 		// } else {
-
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
@@ -126,14 +125,14 @@ export default function MapInfo({navigation, route}: any) {
 			}
 		}
 		//}
-		if (polylineCoordinates.length == 0) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '보여질 정보가 없습니다.',
-					modalFunction: goBack,
-				}),
-			);
-		}
+		// if (polylineCoordinates.length == 0) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '보여질 정보가 없습니다.',
+		// 			modalFunction: goBack,
+		// 		}),
+		// 	);
+		// }
 		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
 	const goBack = () => {

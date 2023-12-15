@@ -55,7 +55,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 									}}
 									style={{alignItems: 'center', justifyContent: 'center'}}
 									fillColor='rgba(38, 152, 251, 0.3);'
-									radius={range * 5000}></Circle>
+									radius={range * (cityDistance == 0 ? 5000 : 1500)}></Circle>
 							</MapView>
 						</Qwe>
 					</MapContainer>
@@ -80,7 +80,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 							}}
 						/>
 						<DistanceExplain>
-							그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
+							*그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
 						</DistanceExplain>
 					</DistanceExplainContainer>
 				</VStack>

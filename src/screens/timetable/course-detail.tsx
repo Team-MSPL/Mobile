@@ -1,7 +1,13 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {Image, Platform, Pressable} from 'react-native';
-import {googleKeywordApi, CourseDetailType, getTourTest} from '../../redux/travel-info/travel.slice';
+import {
+	googleKeywordApi,
+	CourseDetailType,
+	getTourTest,
+	getPlaceInfo,
+	courseInfoType,
+} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -11,26 +17,65 @@ import {Center, HStack, MainText, VStack, devicesWidth} from '../../utill/layout
 import {colors} from '../../utill/colors';
 import {SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 export default function CourseDetail({navigation, route}: any) {
-	const [courseDetail, setCourseDetail] = useState<CourseDetailType>();
+	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
 	const [imageIndex, setImageIndex] = useState(0);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const {region} = useAppSelector(state => state.travelSlice);
 	const getDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-
-			// const a = await dispatch(
-			// 	getTourTest({
-			// 		platform: Platform.OS == 'android' ? 'AND' : 'IOS',
-			// 		lat: route.params.value.lat,
-			// 		lng: route.params.value.lng,
-			// 	}),
-			// ).unwrap();
-			// console.log(a);
-			const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
-			setCourseDetail(a);
+			const a = await dispatch(
+				getPlaceInfo({
+					name: route.params.value.name,
+					lat: route.params.value.lat,
+					lng: route.params.value.lng,
+					region: region[route.params.value.regionIndex],
+				}),
+			).unwrap();
+			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
+			const data = a.data;
+			if (a.status == 200) {
+				setCourseDetail({
+					status: 'firebase',
+					name: data.name,
+					openInfo: [data.operationTime],
+					review: data.review.map((item, value) => ({
+						name: item.reviewerName,
+						content: item.reviewContent,
+						rating: null,
+					})),
+					rating: null,
+					address: null,
+					expense: data.expense,
+					information: data.information,
+					infoTitle: data.infoTitle,
+					infoContent: data.infoContent,
+					photo: data.photo,
+				});
+			} else {
+				setCourseDetail({
+					status: 'google',
+					name: data.name,
+					openInfo: data.opening_hours?.weekday_text ?? '',
+					review: data.reviews.map((item, value) => ({
+						name: item?.author_name,
+						content: item?.text,
+						rating: item?.rating,
+					})),
+					expense: null,
+					rating: data?.rating,
+					address: data?.formatted_address,
+					information: data?.formatted_phone_number,
+					infoTitle: null,
+					infoContent: null,
+					photo: data.photos.map((item, idx) => item.photo_reference),
+				});
+			}
+			//setCourseDetail(a);
 		} catch (err) {
+			console.log('이유', err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '여행 정보가 없습니다',
@@ -54,15 +99,18 @@ export default function CourseDetail({navigation, route}: any) {
 		{title: '리뷰', function: () => tabBarRef.current.scrollToEnd({animated: true})},
 	];
 	const detailList = [
-		{title: courseDetail?.formatted_address ?? null, logo: <SvgLocation color={colors.regionNormal} />},
-		{title: courseDetail?.formatted_phone_number ?? null, logo: <SvgCall color={colors.regionNormal} />},
+		{title: courseDetail?.infoTitle, logo: <SvgInfos color={colors.regionNormal} />},
+		{title: courseDetail?.infoContent, logo: <SvgInfos color={colors.regionNormal} />},
+		{title: courseDetail?.address, logo: <SvgLocation color={colors.regionNormal} />},
+		{title: courseDetail?.information, logo: <SvgCall color={colors.regionNormal} />},
+		{title: courseDetail?.expense, logo: <SvgInfos color={colors.regionNormal} />},
 	];
 	if (courseDetail?.name)
 		return (
 			<DetailContainer>
-				{courseDetail.photos && (
+				{courseDetail.photo && (
 					<ImageScroll horizontal={true}>
-						{courseDetail.photos.map((value, index) => (
+						{courseDetail.photo.map((value, index) => (
 							<Pressable
 								onPress={() => {
 									setImageIndex(index);
@@ -71,7 +119,10 @@ export default function CourseDetail({navigation, route}: any) {
 								key={index}>
 								<Image
 									source={{
-										uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
+										uri:
+											courseDetail.status == 'google'
+												? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
+												: value,
 									}}
 									style={{width: 200, height: 200}}
 									alt='Place Image'
@@ -82,14 +133,16 @@ export default function CourseDetail({navigation, route}: any) {
 				)}
 				<TitleInfoContainer>
 					<DetailInfoContainer>
-						<TitleText>{courseDetail.name ?? '정보가 없습니다'}</TitleText>
-						<RatingContainer>
-							<RatingHStack>
-								<SvgStart color={colors.selectButton} width={20} height={20} />
-								<RatingText>{courseDetail.rating ?? '0'}</RatingText>
-							</RatingHStack>
-							<RatinInfoText>* 구글 검색 기준</RatinInfoText>
-						</RatingContainer>
+						<TitleText>{courseDetail.name}</TitleText>
+						{courseDetail.rating && (
+							<RatingContainer>
+								<RatingHStack>
+									<SvgStart color={colors.selectButton} width={20} height={20} />
+									<RatingText>{courseDetail.rating}</RatingText>
+								</RatingHStack>
+								<RatinInfoText>* 구글 검색 기준</RatinInfoText>
+							</RatingContainer>
+						)}
 					</DetailInfoContainer>
 				</TitleInfoContainer>
 				<HStack>
@@ -128,14 +181,14 @@ export default function CourseDetail({navigation, route}: any) {
 										</DetailElementContainer>
 									),
 							)}
-							{courseDetail?.opening_hours?.weekday_text && (
+							{courseDetail?.openInfo && (
 								<OpenContainer>
 									<HStack>
 										<LogoContainer>
 											<SvgInfos color={colors.regionNormal} />
 										</LogoContainer>
 										<OpenVStack>
-											{courseDetail?.opening_hours.weekday_text.map((item, itemIndex) => (
+											{courseDetail?.openInfo.map((item, itemIndex) => (
 												<DetailText key={itemIndex}>{item}</DetailText>
 											))}
 										</OpenVStack>
@@ -144,17 +197,19 @@ export default function CourseDetail({navigation, route}: any) {
 							)}
 						</ReviewContainer>
 						<ReviewContainer>
-							{courseDetail?.reviews ? (
-								courseDetail.reviews.map((item, idx) => (
+							{courseDetail?.review.length != 0 ? (
+								courseDetail.review.map((item, idx) => (
 									<OpenContainer key={idx}>
 										<OpenVStack>
-											<ReviewTitleText>{item.author_name}</ReviewTitleText>
-											<ReviewElementText>{item.text}</ReviewElementText>
+											<ReviewTitleText>{item.name}</ReviewTitleText>
+											<ReviewElementText>{item.content}</ReviewElementText>
 										</OpenVStack>
-										<ReviewRating>
-											<SvgStart color={colors.selectButton} width={18} height={18} />
-											<ReviewText>{item.rating}</ReviewText>
-										</ReviewRating>
+										{item.rating && (
+											<ReviewRating>
+												<SvgStart color={colors.selectButton} width={18} height={18} />
+												<ReviewText>{item.rating}</ReviewText>
+											</ReviewRating>
+										)}
 									</OpenContainer>
 								))
 							) : (
@@ -167,10 +222,13 @@ export default function CourseDetail({navigation, route}: any) {
 
 					{/* )} */}
 				</TabScrollView>
-				{courseDetail?.photos && (
+				{courseDetail?.photo && (
 					<ImageView
-						images={courseDetail?.photos.map((value, index) => ({
-							uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value.photo_reference}&key=${GOOGLE_API_KEY}`,
+						images={courseDetail?.photo.map((value, index) => ({
+							uri:
+								courseDetail.status == 'google'
+									? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
+									: value,
 						}))}
 						onImageIndexChange={item => console.log(item)}
 						imageIndex={imageIndex}
@@ -180,7 +238,7 @@ export default function CourseDetail({navigation, route}: any) {
 							return (
 								<ImageViewFooterComponent>
 									<ImageText>
-										{index.imageIndex + 1}/{courseDetail.photos.length}
+										{index.imageIndex + 1}/{courseDetail.photo.length}
 									</ImageText>
 								</ImageViewFooterComponent>
 							);
@@ -266,6 +324,7 @@ const DetailText = styled.Text`
 	font-size: 15px;
 	color: black;
 	margin: 2% 0% 0% 0%;
+	width: 80%;
 `;
 const LogoContainer = styled.View`
 	width: 20%;

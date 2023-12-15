@@ -13,7 +13,6 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 	]);
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
-		console.log(e.nativeEvent.contentOffset.x);
 	};
 	useEffect(() => {
 		if (timetable ?? false) {
