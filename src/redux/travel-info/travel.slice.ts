@@ -225,7 +225,7 @@ export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: an
 	try {
 		console.log('빠졌어', data);
 		const response = await axiosAuth.get(
-			`/place/placeInfo?region=${data.region}&name=${data.name}&lat:${data.lat}&lng:${data.lng}`,
+			`/place/placeInfo?region=${data.region}&name=${data.name}&lat=${data.lat}&lng=${data.lng}`,
 		);
 		return response;
 	} catch (error: any) {
