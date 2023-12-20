@@ -1,13 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, Platform, Pressable} from 'react-native';
-import {
-	googleKeywordApi,
-	CourseDetailType,
-	getTourTest,
-	getPlaceInfo,
-	courseInfoType,
-} from '../../redux/travel-info/travel.slice';
+import {Image, Pressable} from 'react-native';
+import {getPlaceInfo, courseInfoType} from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -16,6 +10,8 @@ import styled from 'styled-components/native';
 import {Center, HStack, MainText, VStack, devicesWidth} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
@@ -31,7 +27,7 @@ export default function CourseDetail({navigation, route}: any) {
 					name: route.params.value.name,
 					lat: route.params.value.lat,
 					lng: route.params.value.lng,
-					region: region[route.params.value.regionIndex],
+					region: route.params.value.region ?? region[route.params.value.regionIndex],
 				}),
 			).unwrap();
 			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
@@ -105,6 +101,14 @@ export default function CourseDetail({navigation, route}: any) {
 		{title: courseDetail?.information, logo: <SvgCall color={colors.regionNormal} />},
 		{title: courseDetail?.expense, logo: <SvgInfos color={colors.regionNormal} />},
 	];
+	const handleCopyClipBoard = (e: string) => {
+		try {
+			Clipboard.setString(e);
+			Toast.show({type: 'success', text1: '복사가 완료되었습니다.', position: 'bottom'});
+		} catch (err) {
+			console.log('qwe', err);
+		}
+	};
 	if (courseDetail?.name)
 		return (
 			<DetailContainer>
@@ -173,7 +177,12 @@ export default function CourseDetail({navigation, route}: any) {
 							{detailList.map(
 								(detail, detailIndex) =>
 									detail.title != null && (
-										<DetailElementContainer key={detailIndex}>
+										<DetailElementContainer
+											key={detailIndex}
+											disabled={detailIndex != 3}
+											onPress={() => {
+												handleCopyClipBoard(detail.title ?? '');
+											}}>
 											<HStack>
 												<LogoContainer>{detail.logo}</LogoContainer>
 												<DetailText>{detail.title}</DetailText>
@@ -315,7 +324,7 @@ const TabText = styled.Text<{color: string}>`
 	font-weight: 700;
 	color: ${props => props.color};
 `;
-const DetailElementContainer = styled.View`
+const DetailElementContainer = styled.TouchableOpacity`
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};
 	padding: 5%;

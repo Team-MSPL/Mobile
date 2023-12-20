@@ -1,11 +1,10 @@
 import styled from 'styled-components/native';
 import {colors} from '../../colors';
-import {HStack, devicesHeight, devicesWidth} from '../../layout/layout';
+import {HStack, devicesWidth} from '../../layout/layout';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {eventSliceActions} from '../../../redux/event/event.slice';
-import {ScrollView} from 'react-native';
 import {useState} from 'react';
 
 export default function Event() {
@@ -22,11 +21,6 @@ export default function Event() {
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
-	const qwe = [
-		'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AWU5eFjhd8dO8D_7Ohgb9BWzyWC37gMHjNaKbKf_tOICN-xa2gFegcZRXJ4JFO9tPxwCrLnpE0eSgJuWVg5QrIG-T16S1iUV1DB5tmGhAXm9zZcZiRR09cnWAGoztizWrtldSiWVGymLWlbYZUrW6iHpqgJxmm8Z1KcgnHsiNzqkDDxJvk6l&key=AIzaSyA_nsvAajvyiWj-FeJO6u1-yZYsOBkoPOk',
-		'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AWU5eFgajhssT3jS86mSMU4TFN2R3xK47aZyCjSQfWN0vql3LOWVnVou_vV1Qzle2Kd7ir_xqv_36OkbbB9KC1xX7qNsMf_n1ndRDIUjsm2UlSW0om8FplIMnkaaPQCsP5qzoXqIy7HHj9QQcafqvxOUOvRyHcbNKqfPzrXihQCq4qU4HarG&key=AIzaSyA_nsvAajvyiWj-FeJO6u1-yZYsOBkoPOk',
-		'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AWU5eFjhd8dO8D_7Ohgb9BWzyWC37gMHjNaKbKf_tOICN-xa2gFegcZRXJ4JFO9tPxwCrLnpE0eSgJuWVg5QrIG-T16S1iUV1DB5tmGhAXm9zZcZiRR09cnWAGoztizWrtldSiWVGymLWlbYZUrW6iHpqgJxmm8Z1KcgnHsiNzqkDDxJvk6l&key=AIzaSyA_nsvAajvyiWj-FeJO6u1-yZYsOBkoPOk',
-	];
 	return (
 		<Container>
 			<ViewContaniner>
@@ -41,18 +35,18 @@ export default function Event() {
 						newPage(e);
 					}}
 					showsHorizontalScrollIndicator={false}>
-					{qwe.map((item, idx) => (
+					{eventList.map((item, idx) => (
 						<ScrollContainer key={idx}>
 							<EventImage
 								source={{
-									uri: item,
+									uri: item._id,
 								}}></EventImage>
 						</ScrollContainer>
 					))}
 				</Scroll>
 				<IndexHStack>
-					{qwe.map((item, idx) => (
-						<Ball index={viewIndex == idx} />
+					{eventList.map((item, idx) => (
+						<Ball key={idx} index={viewIndex == idx} />
 					))}
 				</IndexHStack>
 				<EventHStack>
@@ -68,8 +62,7 @@ export default function Event() {
 	);
 }
 const ScrollContainer = styled.View`
-	width: ${devicesWidth}px;
-	height: 100%;
+	width: ${devicesWidth * 0.95}px;
 	align-items: center;
 	justify-content: center;
 `;
@@ -96,8 +89,8 @@ const Guide = styled.Text`
 	color: black;
 `;
 const EventImage = styled.Image`
-	width: 100%;
-	height: 90%;
+	width: ${devicesWidth * 0.95}px;
+	height: ${devicesWidth * 0.95}px;
 	object-fit: contain;
 `;
 const ViewContaniner = styled.View`
@@ -113,6 +106,7 @@ const EventHStack = styled(HStack)`
 const IndexHStack = styled(HStack)`
 	align-items: center;
 	justify-content: center;
+	height: 10%;
 `;
 const Ball = styled.View<{index: boolean}>`
 	width: ${devicesWidth * 0.02}px;

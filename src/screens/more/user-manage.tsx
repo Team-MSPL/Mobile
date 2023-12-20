@@ -69,12 +69,12 @@ const ProviderText = styled.Text`
 	font-weight: 400;
 	color: black;
 `;
-const ClipText = styled(ProviderText)`
+export const ClipText = styled(ProviderText)`
 	width: 60%;
 	font-size: 18px;
 `;
 
-const ClipCopy = styled.TouchableOpacity`
+export const ClipCopy = styled.TouchableOpacity`
 	flex-direction: row;
 	justify-content: flex-end;
 `;

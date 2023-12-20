@@ -34,7 +34,7 @@ export default function Preset({navigation}: any) {
 		);
 	};
 	const goNext = () => {
-		console.log(presetDatas[select]);
+		// console.log(presetDatas[select]);
 		let copy = [...presetDatas[select]];
 		if (presetDatas[select].length != nDay + 1) {
 			const check = nDay + 1 - presetDatas[select].length;

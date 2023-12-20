@@ -8,6 +8,8 @@ const initialState: SettingState = {
 	noPermission: false,
 	nowVersion: 0,
 	latestVersion: 0,
+	needVersionUpdate: false,
+	updateStoreUrl: '',
 };
 
 const settingSlice = createSlice({
@@ -30,6 +32,10 @@ const settingSlice = createSlice({
 			state.nowVersion = payload.nowVersion;
 			state.latestVersion = payload.latestVersion;
 		},
+		setNeedVersionUpdate: (state, {payload}) => {
+			state.needVersionUpdate = payload.status;
+			state.updateStoreUrl = payload.updateStoreUrl;
+		},
 	},
 });
 
@@ -40,7 +46,10 @@ interface SettingState {
 	noPermission: boolean;
 	nowVersion: number;
 	latestVersion: number;
+	needVersionUpdate: boolean;
+	updateStoreUrl: string;
 }
 
-export const {setAppLoaded, setFirstLaunched, setPermission, setNopermission, setVersion} = settingSlice.actions;
+export const {setAppLoaded, setFirstLaunched, setPermission, setNopermission, setVersion, setNeedVersionUpdate} =
+	settingSlice.actions;
 export default settingSlice.reducer;

@@ -60,15 +60,15 @@ export default function Timetable({navigation, route}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(travelSliceActions.resetMoveTimeList());
-			for (let i = 0; i < timetable.length; i++) {
-				if (timetable[i].length > 1) {
-					for (let j = 0; j < timetable[i].length; j++) {
+			const driveDurationList = timetable.map(async (item, idx) => {
+				if (timetable[idx].length > 1) {
+					for (let j = 0; j < timetable[idx].length; j++) {
 						if (j === 0) {
-							wayPoint.start = `${timetable[i][j].lng},${timetable[i][j].lat}`;
-						} else if (j === timetable[i].length - 1) {
-							wayPoint.goal = `${timetable[i][j].lng},${timetable[i][j].lat}`;
+							wayPoint.start = `${timetable[idx][j].lng},${timetable[idx][j].lat}`;
+						} else if (j === timetable[idx].length - 1) {
+							wayPoint.goal = `${timetable[idx][j].lng},${timetable[idx][j].lat}`;
 						} else {
-							wayPoint.wayPoint += `${timetable[i][j].lng},${timetable[i][j].lat}|`;
+							wayPoint.wayPoint += `${timetable[idx][j].lng},${timetable[idx][j].lat}|`;
 						}
 					}
 					wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
@@ -77,7 +77,8 @@ export default function Timetable({navigation, route}: any) {
 				} else {
 					dispatch(travelSliceActions.pushMoveTimeList());
 				}
-			}
+			});
+			await Promise.all(driveDurationList);
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
 			console.log(err);

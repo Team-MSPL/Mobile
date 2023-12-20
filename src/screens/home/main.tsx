@@ -56,7 +56,7 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
 	const goCourseDetaile = (e: any) => {
-		const data = {name: e.city + e.title, lat: e.lat, lng: e.lng};
+		const data = {name: e.title, lat: e.lat, lng: e.lng, region: e.city};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {

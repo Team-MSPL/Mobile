@@ -95,7 +95,6 @@ export default function FinalCheck({navigation}: any) {
 		}, [signUpReward]),
 	);
 	useEffect(() => {
-		console.log('하위용', accommodations);
 		const backAction = () => {
 			if (navigation.isFocused() && loading) {
 				dispatch(
@@ -128,7 +127,7 @@ export default function FinalCheck({navigation}: any) {
 			}
 			let copy = [...tendency];
 			copy.push(season);
-			console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
+			// console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
 			const result = await dispatch(
 				getTravelAi({
 					regionList: a,

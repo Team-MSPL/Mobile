@@ -37,6 +37,7 @@ import messaging from '@react-native-firebase/messaging';
 import Event from './src/utill/component/event/event';
 import moment from 'moment';
 import {eventSliceActions, getEventList} from './src/redux/event/event.slice';
+import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -44,6 +45,7 @@ function App(): JSX.Element {
 	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
 	const {eventState} = useAppSelector(state => state.eventSlice);
+	const {needVersionUpdate} = useAppSelector(state => state.settingSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -253,6 +255,7 @@ function App(): JSX.Element {
 					// 	<NeedPermissions />
 					// )
 				}
+				{needVersionUpdate && <NeedVersionUpdate />}
 				{eventState && <Event />}
 				{!(networkConn && serverConn) && <Connection />}
 				{<BaseModal />}
