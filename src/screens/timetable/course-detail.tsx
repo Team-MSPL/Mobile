@@ -27,7 +27,9 @@ export default function CourseDetail({navigation, route}: any) {
 					name: route.params.value.name,
 					lat: route.params.value.lat,
 					lng: route.params.value.lng,
-					region: route.params.value.region ?? region[route.params.value.regionIndex],
+					region:
+						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : '') ??
+						region[route.params.value.regionIndex],
 				}),
 			).unwrap();
 			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
@@ -72,11 +74,11 @@ export default function CourseDetail({navigation, route}: any) {
 			//setCourseDetail(a);
 		} catch (err) {
 			console.log('이유', err);
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '여행 정보가 없습니다',
-				}),
-			);
+			// dispatch(
+			// 	modalSliceActions.setOpenModal({
+			// 		modalTitle: '여행 정보가 없습니다',
+			// 	}),
+			// );
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

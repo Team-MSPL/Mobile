@@ -51,7 +51,7 @@ const initialState: LiteState = {
 	saveFlag: false,
 	checKStep: 0,
 	freeTicket: false,
-	cityDistance: 0,
+	cityDistance: [],
 	modifyCheck: false,
 	presetTendencyList: [],
 };
@@ -621,7 +621,7 @@ interface LiteState {
 	saveFlag: boolean;
 	checKStep: number;
 	freeTicket: boolean;
-	cityDistance: number;
+	cityDistance: number[];
 	modifyCheck: boolean;
 	presetTendencyList: presetTendencyListType[];
 }

@@ -26,12 +26,11 @@ export default function Main({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		let region = checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle];
+		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle];
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
@@ -56,7 +55,8 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
 	const goCourseDetaile = (e: any) => {
-		const data = {name: e.title, lat: e.lat, lng: e.lng, region: e.city};
+		let metropolitanStatus = metropolitanCheckList.includes(e.city);
+		const data = {name: e.title, lat: e.lat, lng: e.lng, region: e.city, metropolitan: metropolitanStatus};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {
@@ -134,75 +134,75 @@ export default function Main({navigation}: any) {
 	const uniqueTravelList = [
 		{
 			id: 0,
-			imagePath: require('../../../public/images/uniqueTravelImage/danyang.jpeg'),
-			city: '단양',
-			title: '패러글라이딩',
-			hashtag: '#액티비티 #교통이편한 #나홀로\n#연인과 #친구와 #레저스포츠',
-			lat: 36.9966,
-			lng: 128.3965,
+			imagePath: require('../../../public/images/uniqueTravelImage/daedunsan.jpg'),
+			city: '전북 완주군',
+			title: '대둔산',
+			hashtag: '#반려견과 #사진 명소 #산',
+			lat: 36.1200497,
+			lng: 127.3233093,
 		},
 		{
 			id: 1,
-			imagePath: require('../../../public/images/uniqueTravelImage/daejeon.jpeg'),
-			city: '대전',
-			title: '성심당 본점',
-			hashtag: '#쇼핑 #실내여행지 #맛있는\n#교통이편한 #이색체험',
-			lat: 36.3277,
-			lng: 127.4273,
+			imagePath: require('../../../public/images/uniqueTravelImage/samyngdaesa.jpg'),
+			city: '경북 김천시',
+			title: '사명대사공원',
+			hashtag: '#반려견과 #공원 #산책 \n#교통이편한',
+			lat: 36.1178929,
+			lng: 128.0090301,
 		},
 		{
 			id: 2,
-			imagePath: require('../../../public/images/uniqueTravelImage/donghae.jpeg'),
-			city: '동해',
-			title: '묵호항',
-			hashtag: '#교통이편한#쇼핑#연인과#친구와#산책',
-			lat: 37.5519,
-			lng: 129.1149,
+			imagePath: require('../../../public/images/uniqueTravelImage/jungdongjin.jpg'),
+			city: '강원 강릉시',
+			title: '정동진해변',
+			hashtag: '#바다 #산책 #사진 명소 #교통이편한',
+			lat: 37.6904194,
+			lng: 129.0348774,
 		},
 		{
 			id: 3,
-			imagePath: require('../../../public/images/uniqueTravelImage/sejong.jpeg'),
-			city: '세종',
-			title: '고복자연공원',
-			hashtag: '#알뜰한 #반려동물과 #공원\n#산책 #사진명소',
-			lat: 36.6113,
-			lng: 127.2385,
+			imagePath: require('../../../public/images/uniqueTravelImage/onedaeri.jpg'),
+			city: '강원 인제군',
+			title: '원대리 자작나무 숲',
+			hashtag: '#연인과 #친구와 #산책\n#사진명소',
+			lat: 37.9780079,
+			lng: 128.2513123,
 		},
 		{
 			id: 4,
-			imagePath: require('../../../public/images/uniqueTravelImage/asan.jpeg'),
-			city: '아산',
-			title: '지중해마을',
-			hashtag: '#알뜰한 #가족과 #사진명소\n#시티투어 #산책',
-			lat: 36.7975,
-			lng: 127.0605,
+			imagePath: require('../../../public/images/uniqueTravelImage/alps.jpg'),
+			city: '충남 청양군',
+			title: '알프스마을',
+			hashtag: '#겨울 #연인과 #사진명소',
+			lat: 36.4098965,
+			lng: 126.9138686,
 		},
 		{
 			id: 5,
-			imagePath: require('../../../public/images/uniqueTravelImage/osan.jpeg'),
-			city: '오산',
-			title: '반려동물테마파크',
-			hashtag: '#힐링 #교통이편한 #반려동물과\n#이색체험 #산책',
-			lat: 37.1396,
-			lng: 127.064,
+			imagePath: require('../../../public/images/uniqueTravelImage/samyang.jpg'),
+			city: '강원 평창군',
+			title: '대관령 삼양목장',
+			hashtag: '#이색체험 #사진 명소 #산책',
+			lat: 37.7219065,
+			lng: 128.7193134,
 		},
 		{
 			id: 6,
-			imagePath: require('../../../public/images/uniqueTravelImage/jangsu.jpeg'),
-			city: '장수',
-			title: '의암주논개생가지',
-			hashtag: '#교통이편한 #알뜰한 #유적지\n#전통한옥',
-			lat: 35.6802,
-			lng: 127.6208,
+			imagePath: require('../../../public/images/uniqueTravelImage/vibaldi.jpg'),
+			city: '강원 홍청군',
+			title: '비발디파크 스키장',
+			hashtag: '#겨울 #레저 스포츠 #액티비티 #교통이 편한',
+			lat: 37.6481426,
+			lng: 127.684126,
 		},
 		{
 			id: 7,
-			imagePath: require('../../../public/images/uniqueTravelImage/chungdo.jpeg'),
-			city: '청도',
-			title: '프로방스',
-			hashtag: '#교통이편한 #사진명소 #산책',
-			lat: 35.6843,
-			lng: 128.7182,
+			imagePath: require('../../../public/images/uniqueTravelImage/jantaesan.jpg'),
+			city: '대전',
+			title: '장태산 자연휴양림',
+			hashtag: '#가족과 #힐링 #산 #산책',
+			lat: 36.2187201,
+			lng: 127.3401569,
 		},
 	];
 	const buttonList: ButtonListType[] = [
@@ -294,6 +294,7 @@ export default function Main({navigation}: any) {
 		</SafeAreaView>
 	);
 }
+export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
 const SafeAreaView = styled.SafeAreaView`
 	height: 100%;

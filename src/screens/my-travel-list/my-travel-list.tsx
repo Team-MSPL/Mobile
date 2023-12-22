@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import 'moment/locale/ko';
@@ -78,31 +78,51 @@ export default function MyTravelList({navigation}: any) {
 		}
 		return result;
 	};
-
+	const renderItem = (item: any) => {
+		return (
+			<MyTravelContainer
+				onPress={() => {
+					goMyTravelDetail(item.item._id);
+				}}>
+				<VStack>
+					<DayText>
+						{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
+							'~' +
+							moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
+					</DayText>
+					{/* <DayText>{dDayCalculate(item.day[0])}</DayText> */}
+					<TravelTitleText>{item.item.travelName}</TravelTitleText>
+				</VStack>
+				<SvgRightAdd color={colors.selectButton} />
+			</MyTravelContainer>
+		);
+	};
 	return (
-		<MainContainer>
-			<NewTravelContainer>
-				<HStack>
-					<SubTitleColorText>{userName}</SubTitleColorText>
-					<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
-				</HStack>
-				<NewTravelHStack>
-					<MainText>
-						새로운
-						{'\n'}여행 일정 만들기
-					</MainText>
-					<NewTravelButton onPress={goEnroll}>
-						<ButtonText>출발</ButtonText>
-						<ButtonRight>
-							<SvgRight color={colors.selectButton} />
-						</ButtonRight>
-					</NewTravelButton>
-				</NewTravelHStack>
-			</NewTravelContainer>
-			<NewTravelContainer>
-				<SubTitleBlackText>잠시 머물렀던 그곳</SubTitleBlackText>
-				<MainText>내 여행 기록</MainText>
-			</NewTravelContainer>
+		<TravelContainer>
+			<TopContainer>
+				<NewTravelContainer>
+					<HStack>
+						<SubTitleColorText>{userName}</SubTitleColorText>
+						<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
+					</HStack>
+					<NewTravelHStack>
+						<MainText>
+							새로운
+							{'\n'}여행 일정 만들기
+						</MainText>
+						<NewTravelButton onPress={goEnroll}>
+							<ButtonText>출발</ButtonText>
+							<ButtonRight>
+								<SvgRight color={colors.selectButton} />
+							</ButtonRight>
+						</NewTravelButton>
+					</NewTravelHStack>
+				</NewTravelContainer>
+				<NewTravelContainer>
+					<SubTitleBlackText>잠시 머물렀던 그곳</SubTitleBlackText>
+					<MainText>내 여행 기록</MainText>
+				</NewTravelContainer>
+			</TopContainer>
 			{socialloginProvider == 'anonymous' ? (
 				<NewTravelContainer>
 					<Center>
@@ -121,28 +141,25 @@ export default function MyTravelList({navigation}: any) {
 					</Center>
 				</NewTravelContainer>
 			) : (
-				myTravelList.map((item, idx) => (
-					<MyTravelContainer
-						key={idx}
-						onPress={() => {
-							goMyTravelDetail(item._id);
-						}}>
-						<VStack>
-							<DayText>
-								{moment(item.day[0]).format('YYYY년-MM월-DD일') +
-									'~' +
-									moment(item.day[item.nDay - 1]).format('MM월-DD일')}
-							</DayText>
-							{/* <DayText>{dDayCalculate(item.day[0])}</DayText> */}
-							<TravelTitleText>{item.travelName}</TravelTitleText>
-						</VStack>
-						<SvgRightAdd color={colors.selectButton} />
-					</MyTravelContainer>
-				))
+				<FlatList
+					data={myTravelList}
+					renderItem={renderItem}
+					initialNumToRender={20}
+					showsVerticalScrollIndicator={false}
+					keyExtractor={item => item._id}
+					nestedScrollEnabled></FlatList>
 			)}
-		</MainContainer>
+		</TravelContainer>
 	);
 }
+const TopContainer = styled.View`
+	height: 50%;
+`;
+const TravelContainer = styled.View`
+	background-color: ${colors.main};
+	padding: 0px 24px 0px 24px;
+	height: 100%;
+`;
 const NewTravelContainer = styled.View`
 	width: 100%;
 	padding: 10px;

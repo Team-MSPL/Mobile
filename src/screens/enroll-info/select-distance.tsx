@@ -43,19 +43,19 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 								showsUserLocation={false}
 								style={{width: '100%', height: 300, position: 'absolute'}}
 								region={{
-									latitude: cityViewList[cityIndex].sub[cityDistance].lat,
-									longitude: cityViewList[cityIndex].sub[cityDistance].lng,
-									latitudeDelta: cityDistance == 0 ? 0.8 : 0.2,
-									longitudeDelta: cityDistance == 0 ? 0.8 : 0.2,
+									latitude: cityViewList[cityIndex].sub[cityDistance[0]].lat,
+									longitude: cityViewList[cityIndex].sub[cityDistance[0]].lng,
+									latitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
+									longitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
 								}}>
 								<Circle
 									center={{
-										latitude: cityViewList[cityIndex].sub[cityDistance].lat,
-										longitude: cityViewList[cityIndex].sub[cityDistance].lng,
+										latitude: cityViewList[cityIndex].sub[cityDistance[0]].lat,
+										longitude: cityViewList[cityIndex].sub[cityDistance[0]].lng,
 									}}
 									style={{alignItems: 'center', justifyContent: 'center'}}
 									fillColor='rgba(38, 152, 251, 0.3);'
-									radius={range * (cityDistance == 0 ? 5000 : 1500)}></Circle>
+									radius={range * (cityDistance[0] == 0 ? 5000 : 1500)}></Circle>
 							</MapView>
 						</Qwe>
 					</MapContainer>

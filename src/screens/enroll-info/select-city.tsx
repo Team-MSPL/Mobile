@@ -13,7 +13,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
 export default function SelectCity({viewComponent, goNextStep}: any) {
-	const {region, regionRecommendFlag, cityIndex} = useAppSelector(state => state.travelSlice);
+	const {region, regionRecommendFlag, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [search, setSearch] = useState('');
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
@@ -22,26 +22,35 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 			travelSliceActions.selectPopularity({
 				region: checkList.includes(e.subTitle) ? ['전체'] : [e.subTitle],
 				cityIndex: e.id,
-				cityDistance: e.subId,
+				cityDistance: [e.subId],
 			}),
 		);
 	};
 	const selectRegion = (e: any) => {
 		if (e.subTitle === '전체' || region.includes('전체')) {
-			dispatch(travelSliceActions.firstSelectRegion({region: [e.subTitle], cityDistance: e.id}));
+			dispatch(travelSliceActions.firstSelectRegion({region: [e.subTitle], cityDistance: [e.id]}));
 		} else if (region.includes(e.subTitle)) {
 			const copy = region.filter(item => item !== e.subTitle);
-			dispatch(travelSliceActions.selectRegion(copy));
+			const copyIndex = cityDistance.filter(item => item !== e.id);
+			copy.length == 0 && dispatch(travelSliceActions.changeChecKStep(3));
+			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		} else {
 			let copy = [...region];
 			copy.push(e.subTitle);
-			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: e.id}));
+			let copyIndex = [...cityDistance];
+			copyIndex.push(e.id);
+			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		}
 	};
 
 	const deleteRegion = (e: string) => {
-		const copy = region.filter(item => item != e);
-		dispatch(travelSliceActions.selectRegion(copy));
+		let searchIndex = region.findIndex(item => item == e);
+		let copy = [...region];
+		let copyIndex = [...cityDistance];
+		copy.splice(searchIndex, 1);
+		copyIndex.splice(searchIndex, 1);
+		copy.length == 0 && dispatch(travelSliceActions.changeChecKStep(3));
+		dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 	};
 
 	const selectCity = (e: number) => {
@@ -305,7 +314,7 @@ export const cityViewList = [
 	{id: 5, title: '광주', sub: [{id: 0, subTitle: '전체', lat: 35.1557358, lng: 126.8354271}]},
 	{id: 6, title: '대전', sub: [{id: 0, subTitle: '전체', lat: 36.3398175, lng: 127.3940486}]},
 	{id: 7, title: '울산', sub: [{id: 0, subTitle: '전체', lat: 35.5537228, lng: 129.2380554}]},
-	{id: 8, title: '세종', sub: [{id: 0, subTitle: '전체', lat: 37.5725254, lng: 126.9756429}]},
+	{id: 8, title: '세종', sub: [{id: 0, subTitle: '전체', lat: 36.5606976, lng: 127.2587334}]},
 	{
 		id: 9,
 		title: '경기',

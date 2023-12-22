@@ -7,6 +7,7 @@ import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import moment from 'moment';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {FlatList} from 'react-native';
 
 export default function TokenLog({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -26,38 +27,47 @@ export default function TokenLog({navigation}: any) {
 	useLayoutEffect(() => {
 		getTokenList();
 	}, []);
+	const renderItem = (item: any) => {
+		return (
+			<ElementContainer>
+				<HStack>
+					<LogTitleText>사용처 : </LogTitleText>
+					<LogText>{item.item.tokenLogContent}</LogText>
+				</HStack>
+				<HStack>
+					<LogTitleText>변동 내역 : </LogTitleText>
+					<LogText>{item.item.tokenLogNumber}</LogText>
+				</HStack>
+
+				<HStack>
+					<LogTitleText>이용 시간 : </LogTitleText>
+					<LogText>{moment(item.item.tokenLogDate).format('YY-MM-DD HH:mm')}</LogText>
+				</HStack>
+				{/* <LogText>사용처:{moment(item.tokenLogDate)}</LogText> */}
+			</ElementContainer>
+		);
+	};
 	return (
 		<MainContainer>
+			<LogDeadlineText>*이용로그는 23년11월18일 이후 기록만 보여집니다.</LogDeadlineText>
 			{logList.length == 0 ? (
 				<NonLogText>이용한 기록이 없습니다.</NonLogText>
 			) : (
-				<>
-					<LogDeadlineText>*이용로그는 23년11월18일 이후 기록만 보여집니다.</LogDeadlineText>
-					<LogScrollView>
-						{logList.map((item, idx) => (
-							<ElementContainer key={idx}>
-								<HStack>
-									<LogTitleText>사용처 : </LogTitleText>
-									<LogText>{item.tokenLogContent}</LogText>
-								</HStack>
-								<HStack>
-									<LogTitleText>변동 내역 : </LogTitleText>
-									<LogText>{item.tokenLogNumber}</LogText>
-								</HStack>
-
-								<HStack>
-									<LogTitleText>이용 시간 : </LogTitleText>
-									<LogText>{moment(item.tokenLogDate).format('YY-MM-DD HH:mm')}</LogText>
-								</HStack>
-								{/* <LogText>사용처:{moment(item.tokenLogDate)}</LogText> */}
-							</ElementContainer>
-						))}
-					</LogScrollView>
-				</>
+				<LogContainer>
+					<FlatList
+						data={logList}
+						renderItem={renderItem}
+						keyExtractor={item => item._id}
+						showsVerticalScrollIndicator={false}
+						initialScrollIndex={20}></FlatList>
+				</LogContainer>
 			)}
 		</MainContainer>
 	);
 }
+const LogContainer = styled.View`
+	width: 100%;
+`;
 const LogDeadlineText = styled.Text`
 	font-size: ${devicesWidth * 0.04}px;
 	font-weight: bold;

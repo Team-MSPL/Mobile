@@ -58,10 +58,10 @@ export default function Notice({navigation}: any) {
 									onPress={() => {
 										clickNotice(idx);
 									}}>
-									<VStack>
+									<TextVStack>
 										<ElementText>{item.noticeTitle}</ElementText>
 										<ElementAtText>{moment(item.noticedAt).format('YY-MM-DD')}</ElementAtText>
-									</VStack>
+									</TextVStack>
 									<Icon name={idx == select ? 'up' : 'down'} size={25} color={'black'}></Icon>
 								</ElementContainer>
 								{select == idx && (
@@ -101,6 +101,9 @@ export default function Notice({navigation}: any) {
 	);
 }
 
+const TextVStack = styled(VStack)`
+	width: 80%;
+`;
 const NoticeElementText = styled.Text`
 	font-size: 17px;
 	font-weight: 500;

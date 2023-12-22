@@ -18,6 +18,7 @@ import {
 } from '../final-check';
 import {useState} from 'react';
 import {ImageText, ImageViewFooterComponent} from '../../timetable/course-detail';
+import {metropolitanCheckList} from '../../home/main';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -64,7 +65,14 @@ export default function DetailResult({navigation, route}: any) {
 		navigation.navigate('EnrollTravelTitle');
 	};
 	const goDetail = (e: {name: string; lat: number; lng: number}) => {
-		const data = {name: e.name, lat: e.lat, lng: e.lng};
+		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
+		const data = {
+			name: e.name,
+			lat: e.lat,
+			lng: e.lng,
+			region: route.params.item.name,
+			metropolitan: metropolitanStatus,
+		};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const [visible, setVisible] = useState(false);
