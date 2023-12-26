@@ -45,6 +45,7 @@ export default function Timetable({navigation, route}: any) {
 		travelName,
 		saveFlag,
 		modifyCheck,
+		moveTimeList,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -60,25 +61,25 @@ export default function Timetable({navigation, route}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(travelSliceActions.resetMoveTimeList());
-			const driveDurationList = timetable.map(async (item, idx) => {
-				if (timetable[idx].length > 1) {
-					for (let j = 0; j < timetable[idx].length; j++) {
+			for await (const timetableSubItems of timetable) {
+				if (timetableSubItems.length > 1) {
+					for (let j = 0; j < timetableSubItems.length; j++) {
 						if (j === 0) {
-							wayPoint.start = `${timetable[idx][j].lng},${timetable[idx][j].lat}`;
-						} else if (j === timetable[idx].length - 1) {
-							wayPoint.goal = `${timetable[idx][j].lng},${timetable[idx][j].lat}`;
+							wayPoint.start = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
+						} else if (j === timetableSubItems.length - 1) {
+							wayPoint.goal = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
 						} else {
-							wayPoint.wayPoint += `${timetable[idx][j].lng},${timetable[idx][j].lat}|`;
+							wayPoint.wayPoint += `${timetableSubItems[j].lng},${timetableSubItems[j].lat}|`;
 						}
 					}
 					wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
+					//console.log(wayPoint);
 					await dispatch(getDrivingDuration(wayPoint));
 					wayPoint = {start: '', goal: '', wayPoint: ''};
 				} else {
 					dispatch(travelSliceActions.pushMoveTimeList());
 				}
-			});
-			await Promise.all(driveDurationList);
+			}
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
 			console.log(err);

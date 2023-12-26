@@ -28,8 +28,8 @@ export default function CourseDetail({navigation, route}: any) {
 					lat: route.params.value.lat,
 					lng: route.params.value.lng,
 					region:
-						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : '') ??
-						region[route.params.value.regionIndex],
+						region[route.params.value.regionIndex] ??
+						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				}),
 			).unwrap();
 			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();

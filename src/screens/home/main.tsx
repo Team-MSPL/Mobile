@@ -189,7 +189,7 @@ export default function Main({navigation}: any) {
 		{
 			id: 6,
 			imagePath: require('../../../public/images/uniqueTravelImage/vibaldi.jpg'),
-			city: '강원 홍청군',
+			city: '강원 홍천군',
 			title: '비발디파크 스키장',
 			hashtag: '#겨울 #레저 스포츠 #액티비티 #교통이 편한',
 			lat: 37.6481426,

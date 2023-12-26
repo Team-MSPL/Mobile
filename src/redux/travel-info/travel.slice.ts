@@ -182,6 +182,7 @@ export const getDrivingDuration = createAsyncThunk(
 					data.wayPoint && `&waypoints=${data.wayPoint}`
 				}&option=trafast`,
 			);
+			console.log('왜안됨', response.data.route.trafast[0].summary);
 			return response.data.route.trafast[0].summary;
 		} catch (error: any) {
 			throw rejectWithValue(error.code);
@@ -387,6 +388,7 @@ export const travelSlice = createSlice({
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			state.timetable.forEach((item, idx) => {
+				console.log('왜이러노', state.moveTimeList);
 				let time = 6;
 				let dinnerTime = [22, 29];
 				let lunchTime = [8, 15];
