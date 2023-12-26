@@ -388,7 +388,6 @@ export const travelSlice = createSlice({
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			state.timetable.forEach((item, idx) => {
-				console.log('왜이러노', state.moveTimeList);
 				let time = 6;
 				let dinnerTime = [22, 29];
 				let lunchTime = [8, 15];

@@ -99,7 +99,7 @@ const PostWriterProfileImage = styled.Image`
 	width: 36px;
 	height: 36px;
 	border-radius: 18px;
-	border: ${colors.border};
+	border: ${colors.regionNormal};
 	margin-right: 12px;
 `;
 const PostDetailInfoContainer = styled.View`
