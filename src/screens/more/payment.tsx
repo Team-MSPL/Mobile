@@ -77,8 +77,8 @@ export default function Payment({navigation}: any) {
 	return (
 		<MainContainer>
 			<TitleText>
-				코인을 구매하고, 다님의 다양한 기능을 즐겨보세요!{'\n'}여행 지역 추천 또는 여행 코스 추천 AI를 사용하실
-				수 있습니다.
+				이용권을 구매하고, 다님의 다양한 기능을 즐겨보세요!{'\n'}여행 지역 추천 또는 여행 코스 추천 AI를
+				사용하실 수 있습니다.
 			</TitleText>
 			<DayViewContainer>
 				<TouchableOpacity

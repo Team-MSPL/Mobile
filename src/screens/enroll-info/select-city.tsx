@@ -149,7 +149,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 						</CityViewContainer>
 					</CityAllContainer>
 				</HStack>
-				<CityDivider></CityDivider>
+				{/* <CityDivider></CityDivider>
 				<SelectRegion>검색으로 지역 찾기</SelectRegion>
 				<InputAllContainter>
 					<SearchInput
@@ -171,7 +171,7 @@ export default function SelectCity({viewComponent, goNextStep}: any) {
 					<SearchTouchableOpacity onPress={addCity}>
 						<SelectRegion>{searchData?.title + ' ' + (searchCity ?? '')}</SelectRegion>
 					</SearchTouchableOpacity>
-				)}
+				)} */}
 				<MarginContainder />
 			</MainContainer>
 			<ButtonContainer>

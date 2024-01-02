@@ -124,7 +124,7 @@ export default function InputDiary({navigation}: any) {
 
 			<CustomButton
 				width={40}
-				label={diary == '' ? '일기 저장' : '일기 수정'}
+				label={diary == '' ? '일기 & 사진 저장' : '일기 & 사진 수정'}
 				onPress={goSaveDiary}></CustomButton>
 		</>
 	);

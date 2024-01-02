@@ -49,7 +49,7 @@ export default function TokenLog({navigation}: any) {
 	};
 	return (
 		<MainContainer>
-			<LogDeadlineText>*이용로그는 23년11월18일 이후 기록만 보여집니다.</LogDeadlineText>
+			<LogDeadlineText>*이용기록은 23년11월18일 이후 기록만 보여집니다.</LogDeadlineText>
 			{logList.length == 0 ? (
 				<NonLogText>이용한 기록이 없습니다.</NonLogText>
 			) : (

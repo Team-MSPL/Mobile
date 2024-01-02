@@ -20,7 +20,7 @@ import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const [range, setRange] = useState(5);
+	const [range, setRange] = useState(10);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {tendency, popularity} = useAppSelector(state => state.regionRecommendSlice);

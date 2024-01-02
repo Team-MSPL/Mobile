@@ -14,7 +14,7 @@ const DayView = ({viewDayIndex, setViewDayIndex, navigation}: any) => {
 		viewDayIndex + 10 > nDay ? setViewDayIndex(nDay - 4) : setViewDayIndex(viewDayIndex + 5);
 	};
 	const goLeft = () => {
-		viewDayIndex - 5 < 0 ? setViewDayIndex(0) : setViewDayIndex(viewDayIndex - 4);
+		viewDayIndex - 5 < 0 ? setViewDayIndex(0) : setViewDayIndex(viewDayIndex - 5);
 	};
 	const goMapInfo = (e: number) => {
 		nDay < e || timetable[e].length == 0

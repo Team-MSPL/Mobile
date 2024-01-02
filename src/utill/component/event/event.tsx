@@ -39,7 +39,7 @@ export default function Event() {
 						<ScrollContainer key={idx}>
 							<EventImage
 								source={{
-									uri: item._id,
+									uri: item.eventImage,
 								}}></EventImage>
 						</ScrollContainer>
 					))}

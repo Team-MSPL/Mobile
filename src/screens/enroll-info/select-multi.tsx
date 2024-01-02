@@ -126,7 +126,11 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 			</MainContainer>
 			<ButtonContainer>
 				<CustomButton
-					label={`건너뛰기 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					label={`${
+						accommodations.find(value => value.name != '') || essentialPlaces.length != 0
+							? '다음'
+							: '건너뛰기'
+					} (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
 					onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
