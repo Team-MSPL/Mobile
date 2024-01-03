@@ -15,6 +15,8 @@ import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
 import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
+import ImageView from 'react-native-image-viewing';
+import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -90,6 +92,12 @@ export default function InputDiary({navigation}: any) {
 		copy.splice(e, 1);
 		setpictureValue(copy);
 	};
+	const [visible, setVisible] = useState(false);
+	const [imageIndex, setImageIndex] = useState(0);
+	const viewingImgae = (e: number) => {
+		setVisible(true);
+		setImageIndex(e);
+	};
 	return (
 		<>
 			<PictureCotainer>
@@ -101,7 +109,11 @@ export default function InputDiary({navigation}: any) {
 						</PictuerVstack>
 					</PictureElementContainer>
 					{pictureValue.map((item, idx) => (
-						<PictureElementContainer key={idx}>
+						<PictureElementContainer
+							key={idx}
+							onPress={() => {
+								viewingImgae(idx);
+							}}>
 							<CancelContainer
 								onPress={() => {
 									deletePicture(idx);
@@ -121,7 +133,24 @@ export default function InputDiary({navigation}: any) {
 				style={{color: 'black'}}
 				placeholder='여행 일기로 추억을 기록해보세요'
 				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
-
+			<ImageView
+				images={pictureValue.map((item, idx) => ({
+					uri: item,
+				}))}
+				onImageIndexChange={item => console.log(item)}
+				imageIndex={imageIndex}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+				FooterComponent={index => {
+					return (
+						<ImageViewFooterComponent>
+							<ImageText>
+								{index.imageIndex + 1}/{1}
+							</ImageText>
+						</ImageViewFooterComponent>
+					);
+				}}
+			/>
 			<CustomButton
 				width={40}
 				label={diary == '' ? '일기 & 사진 저장' : '일기 & 사진 수정'}

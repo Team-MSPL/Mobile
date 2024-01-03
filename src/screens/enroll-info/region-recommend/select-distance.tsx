@@ -78,6 +78,7 @@ export default function SelectDistance({navigation}: any) {
 		}, [signUpReward]),
 	);
 	const goNewLogin = () => {
+		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
 	const goPayment = async () => {

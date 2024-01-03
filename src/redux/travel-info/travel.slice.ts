@@ -54,6 +54,7 @@ const initialState: LiteState = {
 	cityDistance: [],
 	modifyCheck: false,
 	presetTendencyList: [],
+	moveTimeErrorIndex: 0,
 };
 
 export const axiosGoogle = axios.create({
@@ -182,7 +183,6 @@ export const getDrivingDuration = createAsyncThunk(
 					data.wayPoint && `&waypoints=${data.wayPoint}`
 				}&option=trafast`,
 			);
-			console.log('왜안됨', response.data.route.trafast[0].summary);
 			return response.data.route.trafast[0].summary;
 		} catch (error: any) {
 			throw rejectWithValue(error.code);
@@ -358,6 +358,7 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.freeTicket = false;
+			state.cityDistance = payload.cityDistance;
 		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
@@ -387,6 +388,7 @@ export const travelSlice = createSlice({
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
+			console.log('내ㅔ', state.moveTimeList);
 			state.timetable.forEach((item, idx) => {
 				let time = 6;
 				let dinnerTime = [22, 29];
@@ -526,6 +528,13 @@ export const travelSlice = createSlice({
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
 		},
+		pushCatchMoveTimeList: (state, {payload}) => {
+			state.moveTimeList.push([10800000, 10800000, 10800000, 10800000, 10800000]);
+			state.moveTimeErrorIndex = payload;
+		},
+		checkMoveTimeError: state => {
+			state.moveTimeErrorIndex = 0;
+		},
 		resetMoveTimeList: state => {
 			state.moveTimeList = [];
 		},
@@ -625,6 +634,7 @@ interface LiteState {
 	cityDistance: number[];
 	modifyCheck: boolean;
 	presetTendencyList: presetTendencyListType[];
+	moveTimeErrorIndex: number;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];

@@ -34,7 +34,7 @@ const settingSlice = createSlice({
 		},
 		setNeedVersionUpdate: (state, {payload}) => {
 			state.needVersionUpdate = payload.status;
-			state.updateStoreUrl = payload.updateStoreUrl;
+			state.updateStoreUrl = payload.storeUrl;
 		},
 	},
 });

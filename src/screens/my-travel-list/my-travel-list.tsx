@@ -14,6 +14,7 @@ import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
 import {DayViewContainer} from '../enroll-info/select-multi';
+import {userSliceActions} from '../../redux/user/user.slice';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
@@ -35,6 +36,7 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	const goLogin = () => {
+		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
 	};
 	const getTravelList = async () => {

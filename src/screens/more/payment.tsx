@@ -123,7 +123,7 @@ export default function Payment({navigation}: any) {
 								</HStack>
 								<BonusText>
 									출시 기념 <Percent>{((item.before - item.after) / item.before) * 100}% </Percent>
-									세일 진행 중
+									할인 진행 중
 								</BonusText>
 							</InfoContainer>
 							<SvgRightAdd width={30} height={30} color={'black'} />

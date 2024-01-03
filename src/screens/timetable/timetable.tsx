@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
 	TouchableOpacity,
 	Dimensions,
@@ -28,7 +28,6 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
 import ViewPager from '../../utill/view-pager';
 import Skeleton from '../../utill/component/skeleton/skeleton';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import MapInfo from './map-info';
 export default function Timetable({navigation, route}: any) {
 	const {
@@ -45,9 +44,9 @@ export default function Timetable({navigation, route}: any) {
 		travelName,
 		saveFlag,
 		modifyCheck,
-		moveTimeList,
+		moveTimeErrorIndex,
 	} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
+	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
@@ -61,28 +60,32 @@ export default function Timetable({navigation, route}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(travelSliceActions.resetMoveTimeList());
+			let count = 0;
 			for await (const timetableSubItems of timetable) {
-				if (timetableSubItems.length > 1) {
-					for (let j = 0; j < timetableSubItems.length; j++) {
-						if (j === 0) {
-							wayPoint.start = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
-						} else if (j === timetableSubItems.length - 1) {
-							wayPoint.goal = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
-						} else {
-							wayPoint.wayPoint += `${timetableSubItems[j].lng},${timetableSubItems[j].lat}|`;
+				count += 1;
+				try {
+					if (timetableSubItems.length > 1) {
+						for (let j = 0; j < timetableSubItems.length; j++) {
+							if (j === 0) {
+								wayPoint.start = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
+							} else if (j === timetableSubItems.length - 1) {
+								wayPoint.goal = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
+							} else {
+								wayPoint.wayPoint += `${timetableSubItems[j].lng},${timetableSubItems[j].lat}|`;
+							}
 						}
+						wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
+						await dispatch(getDrivingDuration(wayPoint)).unwrap();
+						wayPoint = {start: '', goal: '', wayPoint: ''};
+					} else {
+						dispatch(travelSliceActions.pushMoveTimeList());
 					}
-					wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
-					//console.log(wayPoint);
-					await dispatch(getDrivingDuration(wayPoint));
-					wayPoint = {start: '', goal: '', wayPoint: ''};
-				} else {
-					dispatch(travelSliceActions.pushMoveTimeList());
+				} catch {
+					dispatch(travelSliceActions.pushCatchMoveTimeList(count));
 				}
 			}
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',
@@ -93,13 +96,42 @@ export default function Timetable({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const checkMoveTimeError = () => {
+		dispatch(travelSliceActions.checkMoveTimeError());
+	};
+	useEffect(() => {
+		if (moveTimeErrorIndex != 0) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '알림',
+					modalSubTitle: `${moveTimeErrorIndex}번째 날 여행지의 이동거리는 \n섬 등 자동차 이동이 불가한 지역으로 인해 오차가 있을 수 있습니다.`,
+					modalFunction: checkMoveTimeError,
+				}),
+			);
+		}
+	}, [moveTimeErrorIndex]);
 	const goMapInfo = () => {
 		setMapORtable(!mapORtable);
 		//navigation.navigate('MapInfo', {mapIndex: -1});
 	};
+	const goReview = () => {
+		navigation.navigate('InputReviewAndPoint');
+	};
+	const timeRef = useRef(null);
 	const goMyTravelList = () => {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
+		timeRef.current = setTimeout(() => {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: `${userName}님`,
+					modalSubTitle: `다님이 추천하는 여행 코스는 어떠셨나요?? \n리뷰를 남겨주시면 다님에 큰 도움이 됩니다!`,
+					modalLeft: true,
+					modalFunction: goReview,
+				}),
+			);
+			clearTimeout(timeRef.current);
+		}, 1000);
 	};
 	const goHome = () => {
 		navigation.popToTop();

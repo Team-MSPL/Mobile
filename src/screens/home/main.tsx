@@ -16,6 +16,7 @@ import {regionRecommendSliceActions} from '../../redux/travel-info/region-recomm
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {cityViewList} from '../enroll-info/select-city';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -31,12 +32,16 @@ export default function Main({navigation}: any) {
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle];
+		let cityDistance = metropolitanCheckList.includes(e.subTitle)
+			? 0
+			: cityViewList[e.id].sub.findIndex(item => item.subTitle == e.subTitle);
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
 				season: season,
 				cityIndex: e.id,
 				region: region,
+				cityDistance: [cityViewList[e.id].sub[cityDistance].id],
 			}),
 		);
 		navigation.navigate('EnrollTravelTitle');
@@ -136,10 +141,10 @@ export default function Main({navigation}: any) {
 			id: 0,
 			imagePath: require('../../../public/images/uniqueTravelImage/daedunsan.jpg'),
 			city: '전북 완주군',
-			title: '대둔산',
-			hashtag: '#반려견과 #사진 명소 #산',
-			lat: 36.1200497,
-			lng: 127.3233093,
+			title: '대둔산 케이블카',
+			hashtag: '#나홀로 #연인과 #사진 명소 \n#이색체험 #산',
+			lat: 36.1166444,
+			lng: 127.329728,
 		},
 		{
 			id: 1,
