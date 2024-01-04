@@ -38,9 +38,6 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
-
-import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
-import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 const {StatusBarManager} = NativeModules;
 
@@ -62,7 +59,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	};
 
 	const [commentContent, setCommentContent] = useState<string>('');
-	const [imageSize, setImageSize] = useState(Dimensions.get('window').width / 4 - 16);
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -168,23 +164,12 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	// 댓글 등록 버튼 활성 및 비활성화
 	useEffect(() => {
-		setCommentButtonDisabled(commentContent.trim() === '');
+		if (commentContent.trim() === '') {
+			setCommentButtonDisabled(true);
+		} else if (commentContent.length >= 1 && isCommentButtonDisabled) {
+			setCommentButtonDisabled(false);
+		}
 	}, [commentContent]);
-
-	useEffect(() => {
-		// 화면 크기 변경 시 사진 크기 조정
-		const handleResize = () => {
-			const newSize = Dimensions.get('window').width / 4 - 16;
-			setImageSize(newSize);
-		};
-
-		const resizeSubscription = Dimensions.addEventListener('change', handleResize);
-
-		// 컴포넌트가 언마운트될 때 이벤트 리스너 구독 제거
-		return () => {
-			resizeSubscription.remove();
-		};
-	}, []);
 
 	// 앱 바 우측 더보기
 	useEffect(() => {
