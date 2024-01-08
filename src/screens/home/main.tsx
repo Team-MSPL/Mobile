@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {Dimensions, Platform, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icons from 'react-native-vector-icons/Ionicons';
@@ -17,6 +17,8 @@ import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {cityViewList} from '../enroll-info/select-city';
+import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {tendencyList} from '../enroll-info/select-tendency';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -60,8 +62,8 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
 	const goCourseDetaile = (e: any) => {
-		let metropolitanStatus = metropolitanCheckList.includes(e.city);
-		const data = {name: e.title, lat: e.lat, lng: e.lng, region: e.city, metropolitan: metropolitanStatus};
+		let metropolitanStatus = metropolitanCheckList.includes(e.region);
+		const data = {name: e.name, lat: e.lat, lng: e.lng, region: e.region, metropolitan: metropolitanStatus};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {
@@ -90,6 +92,14 @@ export default function Main({navigation}: any) {
 			dispatch(eventSliceActions.setEventState(true));
 		}
 	};
+	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
+	const getMainScreen = async () => {
+		const data = await dispatch(getPlaceRecommendInMainScreen()).unwrap();
+		setMainScreens(data);
+	};
+	useLayoutEffect(() => {
+		getMainScreen();
+	}, []);
 	useEffect(() => {
 		pushPermission();
 		if (signUpReward) {
@@ -112,6 +122,21 @@ export default function Main({navigation}: any) {
 		checkEvent();
 	}, []);
 	useBackHandler();
+	interface mainScreensType {
+		region: string;
+		name: string;
+		lat: number;
+		lng: number;
+		takenTime: number;
+		popular: number;
+		partner: number[];
+		concept: number[];
+		play: number[];
+		tour: number[];
+		season: number[];
+		category: number;
+		photo: string;
+	}
 
 	interface ButtonListType {
 		id: number;
@@ -136,80 +161,6 @@ export default function Main({navigation}: any) {
 		{id: 15, subTitle: '포항시'},
 		{id: 14, subTitle: '여수시'},
 	];
-	const uniqueTravelList = [
-		{
-			id: 0,
-			imagePath: require('../../../public/images/uniqueTravelImage/daedunsan.jpg'),
-			city: '전북 완주군',
-			title: '대둔산 케이블카',
-			hashtag: '#나홀로 #연인과 #사진 명소 \n#이색체험 #산',
-			lat: 36.1166444,
-			lng: 127.329728,
-		},
-		{
-			id: 1,
-			imagePath: require('../../../public/images/uniqueTravelImage/samyngdaesa.jpg'),
-			city: '경북 김천시',
-			title: '사명대사공원',
-			hashtag: '#반려견과 #공원 #산책 \n#교통이편한',
-			lat: 36.1178929,
-			lng: 128.0090301,
-		},
-		{
-			id: 2,
-			imagePath: require('../../../public/images/uniqueTravelImage/jungdongjin.jpg'),
-			city: '강원 강릉시',
-			title: '정동진해변',
-			hashtag: '#바다 #산책 #사진 명소 #교통이편한',
-			lat: 37.6904194,
-			lng: 129.0348774,
-		},
-		{
-			id: 3,
-			imagePath: require('../../../public/images/uniqueTravelImage/onedaeri.jpg'),
-			city: '강원 인제군',
-			title: '원대리 자작나무 숲',
-			hashtag: '#연인과 #친구와 #산책\n#사진명소',
-			lat: 37.9780079,
-			lng: 128.2513123,
-		},
-		{
-			id: 4,
-			imagePath: require('../../../public/images/uniqueTravelImage/alps.jpg'),
-			city: '충남 청양군',
-			title: '알프스마을',
-			hashtag: '#겨울 #연인과 #사진명소',
-			lat: 36.4098965,
-			lng: 126.9138686,
-		},
-		{
-			id: 5,
-			imagePath: require('../../../public/images/uniqueTravelImage/samyang.jpg'),
-			city: '강원 평창군',
-			title: '대관령 삼양목장',
-			hashtag: '#이색체험 #사진 명소 #산책',
-			lat: 37.7219065,
-			lng: 128.7193134,
-		},
-		{
-			id: 6,
-			imagePath: require('../../../public/images/uniqueTravelImage/vibaldi.jpg'),
-			city: '강원 홍천군',
-			title: '비발디파크 스키장',
-			hashtag: '#겨울 #레저 스포츠 #액티비티 #교통이 편한',
-			lat: 37.6481426,
-			lng: 127.684126,
-		},
-		{
-			id: 7,
-			imagePath: require('../../../public/images/uniqueTravelImage/jantaesan.jpg'),
-			city: '대전',
-			title: '장태산 자연휴양림',
-			hashtag: '#가족과 #힐링 #산 #산책',
-			lat: 36.2187201,
-			lng: 127.3401569,
-		},
-	];
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
@@ -226,6 +177,10 @@ export default function Main({navigation}: any) {
 			boldText: '여행 일정 추천받기',
 		},
 	];
+	function tendencyMake(index: number, list: number[]) {
+		let data = tendencyList[index].list[list.findIndex(value => value == Math.max(...list))];
+		return data;
+	}
 	const DeviceWidth = Dimensions.get('window').width;
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
 	return (
@@ -272,21 +227,25 @@ export default function Main({navigation}: any) {
 					<CollectionTitle>다님이 추천하는 여행지</CollectionTitle>
 					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
 					<CollectionContentContainer>
-						{uniqueTravelList.map(item => (
+						{mainScreens.map((item, idx) => (
 							<CollectionTouchableOpacity
-								key={item.id}
+								key={idx}
 								onPress={() => {
 									goCourseDetaile(item);
 								}}>
-								<CollectionRecommendContentItem width={DeviceWidth * 0.9} key={item.id}>
-									<CollectionRecommendContentItemImage source={item.imagePath} />
+								<CollectionRecommendContentItem width={DeviceWidth * 0.9}>
+									<CollectionRecommendContentItemImage source={{uri: item.photo}} />
 									<CollectionRecommendContentItemDescriptionContainer>
 										<CollectionContentItemText>
-											{item.city + '\n'}
-											{item.title}
+											{item.region + '\n'}
+											{item.name}
 										</CollectionContentItemText>
 										<CollectionContentItemHashtagText>
-											{item.hashtag}
+											#{tendencyMake(0, item.partner)}
+											{' #' + tendencyMake(1, item.concept)}
+											{'\n'}#{tendencyMake(2, item.play)}
+											{' #' + tendencyMake(3, item.tour)}
+											{/* {item.hashtag} */}
 										</CollectionContentItemHashtagText>
 									</CollectionRecommendContentItemDescriptionContainer>
 									<RightArrowIcon name='right' size={16} color={'#ccc'} />

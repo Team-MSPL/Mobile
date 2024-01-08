@@ -1,4 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import axiosAuth from '../api/api';
 
 const name = 'setting';
 const initialState: SettingState = {
@@ -12,6 +13,17 @@ const initialState: SettingState = {
 	updateStoreUrl: '',
 };
 
+export const getPlaceRecommendInMainScreen = createAsyncThunk(
+	'/placeRecommendInMainScreen',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.get(`/place/placeRecommendInMainScreen`);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 const settingSlice = createSlice({
 	name,
 	initialState,

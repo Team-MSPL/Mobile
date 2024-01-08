@@ -55,16 +55,13 @@ function App(): JSX.Element {
 		try {
 			// await AsyncStorage.clear();
 			dispatch(LoadingSliceActions.onLoading());
-			let [userName, userProfileImage, userToken, loginProvider, fcmToken] = await AsyncStorage.multiGet([
+			let [userName, userProfileImage, userToken, loginProvider] = await AsyncStorage.multiGet([
 				'userName',
 				'userProfileImage',
 				'userToken',
 				'loginProvider',
-				'fcmToken',
 			]);
-			if (!fcmToken[1]) {
-				fcmToken[1] = await getFcmToken();
-			}
+			const fcmToken = await getFcmToken();
 			if (userToken && userName && loginProvider) {
 				dispatch(
 					socialConnect({
@@ -72,7 +69,7 @@ function App(): JSX.Element {
 						userProfileImage: userProfileImage[1],
 						userToken: userToken[1],
 						loginProvider: loginProvider[1] ?? '',
-						fcmToken: fcmToken[1] ?? '',
+						fcmToken: fcmToken ?? '',
 						signUpFlag: false,
 						version: 2,
 					}),
