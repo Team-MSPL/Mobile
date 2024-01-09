@@ -58,6 +58,7 @@ export default function Timetable({navigation, route}: any) {
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
 	const getDuration = async () => {
 		try {
+			console.log('듀레이션시작');
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(travelSliceActions.resetMoveTimeList());
 			let count = 0;
@@ -84,8 +85,11 @@ export default function Timetable({navigation, route}: any) {
 					dispatch(travelSliceActions.pushCatchMoveTimeList(count));
 				}
 			}
+
+			console.log('듀레이션시작2');
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
+			console.log('듀레이션에러');
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',
@@ -93,6 +97,7 @@ export default function Timetable({navigation, route}: any) {
 			);
 			navigation.goBack();
 		} finally {
+			console.log('듀레이션파이널');
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
@@ -162,6 +167,8 @@ export default function Timetable({navigation, route}: any) {
 	const firstSave = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
+			console.log('세이브시작1', userId, makeMode, day, nDay, transit, tendency, travelName);
 			const data = {
 				userId: userId,
 				region: makeMode == 'recommend' ? region : ['자유여행'],
@@ -172,11 +179,19 @@ export default function Timetable({navigation, route}: any) {
 				tendency: tendency,
 				travelName: travelName,
 			};
+
+			console.log('세이브시작2');
 			dispatch(travelSliceActions.setSaveFlag(false));
+
+			console.log('세이브시작3');
 			await dispatch(saveTravel(data));
+
+			console.log('세이브시작4');
 		} catch (err) {
+			console.log('세이브에러');
 			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
 		} finally {
+			console.log('세이브끝남');
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};

@@ -2,9 +2,8 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {HStack, MainContainer, VStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import {TouchableOpacity} from 'react-native';
-import {openSettings} from 'react-native-permissions';
+import {openSettings, checkNotifications} from 'react-native-permissions';
 import {useEffect} from 'react';
-import messaging from '@react-native-firebase/messaging';
 import {userSliceActions} from '../../redux/user/user.slice';
 export default function PushNotify({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -14,8 +13,8 @@ export default function PushNotify({navigation}: any) {
 		navigation.goBack();
 	};
 	const checkPermission = async () => {
-		const authStatus = await messaging().requestPermission();
-		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
+		const authStatus = await checkNotifications();
+		dispatch(userSliceActions.setPushNotify(authStatus.status == 'granted' ? true : false));
 	};
 	useEffect(() => {
 		checkPermission();

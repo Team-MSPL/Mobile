@@ -102,6 +102,7 @@ export default function Main({navigation}: any) {
 	}, []);
 	useEffect(() => {
 		pushPermission();
+		checkCache();
 		if (signUpReward) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -183,6 +184,60 @@ export default function Main({navigation}: any) {
 	}
 	const DeviceWidth = Dimensions.get('window').width;
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
+	const setPreset = (data: {
+		preset: any;
+		presetTendency: any;
+		day: any;
+		nDay: any;
+		transit: any;
+		tendency: any;
+		travelName: any;
+	}) => {
+		console.log(JSON.parse(data.day).length);
+		dispatch(
+			travelSliceActions.setCache({
+				presetDatas: JSON.parse(data.preset),
+				presetTendency: JSON.parse(data.presetTendency),
+				day: JSON.parse(data.day),
+				nDay: Number(data.nDay),
+				transit: Number(data.transit),
+				tendency: JSON.parse(data.tendency),
+				travelName: data.travelName,
+			}),
+		);
+		navigation.navigate('Preset');
+	};
+	const checkCache = async () => {
+		let [preset, presetTendency, day, nDay, transit, tendency, travelName] = await AsyncStorage.multiGet([
+			'preset',
+			'presetTendency',
+			'day',
+			'nDay',
+			'transit',
+			'tendency',
+			'travelName',
+		]);
+		if (preset[1] != null) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '코스추천',
+					modalSubTitle: '저장되지않은 추천결과가 있습니다. 확인하러가시겠습니까?',
+					modalFunction: () =>
+						setPreset({
+							preset: preset[1],
+							presetTendency: presetTendency[1],
+							day: day[1],
+							nDay: nDay[1],
+							transit: transit[1],
+							tendency: tendency[1],
+							travelName: travelName[1],
+						}),
+					modalLeft: true,
+				}),
+			);
+		}
+		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
+	};
 	return (
 		<SafeAreaView>
 			<MainContainer>

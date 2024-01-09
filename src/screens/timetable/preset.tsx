@@ -13,8 +13,11 @@ import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {SvgPlace} from '../../utill/svg/svg';
 
 import Icon from 'react-native-vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Preset({navigation}: any) {
-	const {nDay, presetDatas, tendency, presetTendencyList} = useAppSelector(state => state.travelSlice);
+	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const IconElement = styled(Icon)`
 		width: 5%;
@@ -35,6 +38,7 @@ export default function Preset({navigation}: any) {
 	};
 	const goNext = () => {
 		// console.log(presetDatas[select]);
+		removeCache();
 		let copy = [...presetDatas[select]];
 		if (presetDatas[select].length != nDay + 1) {
 			const check = nDay + 1 - presetDatas[select].length;
@@ -153,14 +157,38 @@ export default function Preset({navigation}: any) {
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+	const saveCache = async () => {
+		const cacheValues: [string, string][] = [
+			['preset', JSON.stringify(presetDatas)],
+			['presetTendency', JSON.stringify(presetTendencyList)],
+			['day', JSON.stringify(day)],
+			['nDay', nDay.toString()],
+			['transit', transit.toString()],
+			['tendency', JSON.stringify(tendency)],
+			['travelName', travelName.toString()],
+		];
+		AsyncStorage.multiSet(cacheValues);
+	};
+	const removeCache = async () => {
+		await AsyncStorage.multiRemove([
+			'preset',
+			'presetTendency',
+			'day',
+			'nDay',
+			'transit',
+			'tendency',
+			'travelName',
+		]);
+	};
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '취소시 지역추천이 종료됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?\n변경 사항이 있다면 저장하기 버튼을 눌러주세요.',
+						modalSubTitle: '그래도 나가시겠습니까?',
 						modalFunction: () => {
+							removeCache();
 							navigation.popToTop();
 						},
 						modalLeft: true,
@@ -175,6 +203,9 @@ export default function Preset({navigation}: any) {
 		return () => backHandler.remove();
 	}, []);
 	let count = 0;
+	useEffect(() => {
+		saveCache();
+	}, []);
 	return (
 		<>
 			<MainContainer>

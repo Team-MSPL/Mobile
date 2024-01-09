@@ -382,6 +382,18 @@ export const travelSlice = createSlice({
 		enrollPreset: (state, {payload}) => {
 			state.presetDatas = payload;
 		},
+		setCache: (state, {payload}) => {
+			state.presetDatas = payload.presetDatas;
+			state.presetTendencyList = payload.presetTendency;
+			state.makeMode = 'recommend';
+			state.editMode = '';
+			state.freeTicket = false;
+			state.day = payload.day;
+			state.nDay = payload.nDay;
+			state.transit = payload.transit;
+			state.tendency = payload.tendency;
+			state.travelName = payload.travelName;
+		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = payload;
 			//state.tableShowFlag = true;
@@ -524,6 +536,7 @@ export const travelSlice = createSlice({
 			state.selectEndDate = payload.selectEndDate;
 			state.tendency = payload.tendency;
 			state.freeTicket = true;
+			state.cityDistance = payload.cityDistance;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
