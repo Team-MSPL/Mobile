@@ -18,6 +18,7 @@ import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
 import {View, Image} from 'react-native';
 import {colors} from '../utill/colors';
+import {CourseReview} from '../utill/component/timetable/course-review';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -147,6 +148,13 @@ export default function TimetableStack() {
 				component={EnrollTravelTitle}
 				options={{
 					title: '새 여행',
+				}}
+			/>
+			<Stack.Screen
+				name='CourseReview'
+				component={CourseReview}
+				options={{
+					title: '리뷰작성',
 				}}
 			/>
 		</Fragment>

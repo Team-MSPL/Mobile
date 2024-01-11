@@ -128,7 +128,7 @@ export default function DetailResult({navigation, route}: any) {
 					))}
 				</RecommendAllContainer>
 			</MainContainer>
-			<GoRecommendButton onPress={goEnrollInfo}>
+			<GoRecommendButton onPress={goEnrollInfo} state={false}>
 				<ButtonHStack>
 					<ButtonText>이 지역의 여행 코스 추천 받기</ButtonText>
 					<SvgRight color={colors.selectButton} />
@@ -212,9 +212,10 @@ const TendencyText = styled(SelectTendencyText)`
 const ListContainer = styled(SelectListContainer)`
 	margin: 0px 0px 40px 0px;
 `;
-const GoRecommendButton = styled.TouchableOpacity`
-	width: 85%;
-	align-self: center;
+export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
+	width: ${props => (props.state ? '20%' : '85%')};
+	align-self: ${props => (props.state ? 'flex-end' : 'center')};
+	right: 20px;
 	border-radius: 20px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};
@@ -223,9 +224,9 @@ const GoRecommendButton = styled.TouchableOpacity`
 	bottom: 20px;
 	background-color: ${colors.main};
 `;
-const ButtonText = styled(TitleText)`
+export const ButtonText = styled(TitleText)`
 	color: ${colors.selectButton};
 `;
-const ButtonHStack = styled(HStack)`
+export const ButtonHStack = styled(HStack)`
 	justify-content: space-between;
 `;

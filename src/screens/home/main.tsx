@@ -63,7 +63,15 @@ export default function Main({navigation}: any) {
 	};
 	const goCourseDetaile = (e: any) => {
 		let metropolitanStatus = metropolitanCheckList.includes(e.region);
-		const data = {name: e.name, lat: e.lat, lng: e.lng, region: e.region, metropolitan: metropolitanStatus};
+		const data = {
+			name: e.name,
+			lat: e.lat,
+			lng: e.lng,
+			region: e.region,
+			metropolitan: metropolitanStatus,
+			mainFlag: true,
+			photo: e.photo,
+		};
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {
@@ -193,7 +201,6 @@ export default function Main({navigation}: any) {
 		tendency: any;
 		travelName: any;
 	}) => {
-		console.log(JSON.parse(data.day).length);
 		dispatch(
 			travelSliceActions.setCache({
 				presetDatas: JSON.parse(data.preset),
@@ -415,7 +422,7 @@ const CollectionContentContainer = styled.View`
 	justify-content: space-between;
 	width: 100%;
 `;
-const CollectionTouchableOpacity = styled.TouchableOpacity``;
+const CollectionTouchableOpacity = styled.Pressable``;
 const CollectionRecommendContentItem = styled.View<{width: number}>`
 	width: ${props => props.width}px;
 	flex-direction: row;

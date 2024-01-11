@@ -280,6 +280,36 @@ export const getTourTest = createAsyncThunk('/getTourTest', async (data: any, {r
 	}
 });
 
+//관광지 리뷰 등록
+export const savePlaceReview = createAsyncThunk(
+	'/place/savePlaceReview',
+	async (
+		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		{rejectWithValue},
+	) => {
+		try {
+			const response = await axiosAuth.patch(`/place/savePlaceReview`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+//관광지 리뷰 삭제
+export const deletePlaceReview = createAsyncThunk(
+	'/place/deletePlaceReview',
+	async (
+		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		{rejectWithValue},
+	) => {
+		try {
+			const response = await axiosAuth.patch(`/place/deletePlaceReview`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -554,6 +584,17 @@ export const travelSlice = createSlice({
 		enrollBandwidth: (state, {payload}) => {
 			state.bandwidth = payload;
 		},
+		setInclueRecommend: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
+			state.makeMode = 'recommend';
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.cityDistance = payload.cityDistance;
+			state.essentialPlaces = [payload.essential];
+			state.season = payload.season;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
@@ -811,4 +852,6 @@ interface InfoReviewType {
 	name: string;
 	content: string;
 	rating: number | null;
+	reviewUserToken: string | null;
+	reviewPhotoList: string | null;
 }
