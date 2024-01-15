@@ -55,6 +55,7 @@ const initialState: LiteState = {
 	modifyCheck: false,
 	presetTendencyList: [],
 	moveTimeErrorIndex: 0,
+	shareLoginFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -306,6 +307,19 @@ export const deletePlaceReview = createAsyncThunk(
 			const response = await axiosAuth.patch(`/place/deletePlaceReview`, data);
 			return response.data;
 		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+export const updateShareUserList = createAsyncThunk(
+	'/travelCourse/updateSharedUserList',
+	async (data: {travelId: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch('/travelCourse/updateSharedUserList', data);
+			return response.status;
+		} catch (error: any) {
+			console.log('에러임', error);
 			throw rejectWithValue(error.code);
 		}
 	},
@@ -595,6 +609,12 @@ export const travelSlice = createSlice({
 			state.essentialPlaces = [payload.essential];
 			state.season = payload.season;
 		},
+		setShareLoginFlag: (state, {payload}) => {
+			state.shareLoginFlag = payload;
+		},
+		setMyTravelList: (state, {payload}) => {
+			state.myTravelList = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
@@ -639,7 +659,6 @@ export const travelSlice = createSlice({
 			//state.myTravelList = payload;
 		});
 		builder.addCase(saveTravel.fulfilled, (state, {payload}) => {
-			console.log('벤이요', payload);
 			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
 		});
@@ -689,6 +708,7 @@ interface LiteState {
 	modifyCheck: boolean;
 	presetTendencyList: presetTendencyListType[];
 	moveTimeErrorIndex: number;
+	shareLoginFlag: boolean;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];

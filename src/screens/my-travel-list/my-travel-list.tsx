@@ -42,13 +42,9 @@ export default function MyTravelList({navigation}: any) {
 	const getTravelList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			await dispatch(getMyTravelList());
+			const data = await dispatch(getMyTravelList()).unwrap();
 		} catch (err) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '내 여행 리스트를 가져오던 중 에러가 발생했습니다.',
-				}),
-			);
+			dispatch(travelSliceActions.setMyTravelList([]));
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

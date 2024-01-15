@@ -1,6 +1,6 @@
 import {GOOGLE_API_KEY} from '@env';
-import {memo, useRef, useState} from 'react';
-import {Dimensions, Modal} from 'react-native';
+import {memo, useEffect, useRef, useState} from 'react';
+import {Dimensions, Modal, Animated, PanResponder, Vibration} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
@@ -189,6 +189,25 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 
 	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
 	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
+
+	const pan = useRef(new Animated.ValueXY()).current;
+
+	const panResponder = useRef(
+		PanResponder.create({
+			onMoveShouldSetPanResponder: () => true,
+			onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
+			onPanResponderRelease: () => {
+				pan.extractOffset();
+			},
+		}),
+	).current;
+	pan.addListener(e => {
+		console.log(e.x, e.y);
+	});
+	// pan.stopAnimation(() => {
+	// 	pan.resetAnimation();
+	// });
+	const [recommendState, setRecommendState] = useState({state: false, day: 0, index: 0});
 	return (
 		<InfoViewContainter>
 			<SpacerView />
@@ -198,7 +217,41 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 					idx <= viewDayIndex + 4 && (
 						<InfoVStack key={idx}>
 							{item.map((value, index) => {
-								return (
+								return recommendState.state &&
+									recommendState.day == idx &&
+									recommendState.index == index ? (
+									<Animated.View
+										key={index}
+										onTouchEnd={() => {
+											pan.setOffset({x: 0, y: 0});
+											setRecommendState({state: false, day: 0, index: 0});
+										}}
+										style={{
+											width: '100%',
+											position: 'absolute',
+											zIndex: 100,
+											transform: [{translateX: pan.x}, {translateY: pan.y}],
+										}}
+										{...panResponder.panHandlers}>
+										<InfoPressable
+											backgroundColor={
+												(value.category == 4 || value.category == 1) &&
+												!value.name.includes('추천')
+													? selectCategortColors[value.category]
+													: categortColors[value.category]
+											}
+											height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
+											top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+											state={false}
+											key={index}>
+											<InfoText>{value.name}</InfoText>
+
+											{value.photo != '' && (
+												<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
+											)}
+										</InfoPressable>
+									</Animated.View>
+								) : (
 									<InfoPressable
 										backgroundColor={
 											(value.category == 4 || value.category == 1) && !value.name.includes('추천')
@@ -207,7 +260,12 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 										}
 										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
 										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+										state={recommendState.state}
 										key={index}
+										onLongPress={() => {
+											setRecommendState({state: true, day: idx, index: index});
+											Vibration.vibrate(100);
+										}}
 										onPress={() => {
 											indexRef.current = {
 												value: value,
@@ -367,7 +425,7 @@ const SpacerView = styled.View`
 	background-color: black;
 `;
 
-const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number}>`
+const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number; state: boolean}>`
 	width: 100%;
 	height: ${props => props.height}px;
 	top: ${props => props.top}px;
@@ -376,6 +434,7 @@ const InfoPressable = styled.Pressable<{backgroundColor: string; height: number;
 	z-index: 3;
 	padding: 4px;
 	border-radius: ${devicesWidth * 0.01}px;
+	opacity: ${props => (props.state ? 0.6 : 1)};
 `;
 const InfoText = styled.Text`
 	font-size: ${devicesWidth * 0.036}px;
@@ -387,4 +446,11 @@ const InfoImage = styled.Image`
 	width: 100%;
 	height: 50%;
 `;
+
+const QWE = styled.TouchableOpacity`
+	width: 100px;
+	height: 100px;
+	background-color: red;
+`;
+
 export default memo(InfoView);

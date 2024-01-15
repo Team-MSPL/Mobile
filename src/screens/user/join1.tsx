@@ -18,6 +18,7 @@ export default function Join1({navigation, route}: any) {
 	const [check, setCheck] = useState([false, false]);
 	const dispatch = useAppDispatch();
 	const [nickname, setNickname] = useState('');
+	const {shareLoginFlag} = useAppSelector(state => state.travelSlice);
 	const {anonymousKeep, fcmToken} = useAppSelector(state => state.userSlice);
 	const CheckLogoContainer = styled(Icon)`
 		border-radius: 5px;
@@ -37,9 +38,8 @@ export default function Join1({navigation, route}: any) {
 			};
 			const result = await dispatch(socialConnect(data));
 			dispatch(userSliceActions.setSignUpReward(true));
-			anonymousKeep
-				? (navigation.goBack(), navigation.goBack())
-				: (navigation.goBack(), navigation.replace('Tab'));
+			anonymousKeep && (navigation.goBack(), navigation.goBack());
+			// : (navigation.goBack(), navigation.replace('Tab'));
 		} catch (err) {
 			console.log('왜 이래', err);
 			dispatch(

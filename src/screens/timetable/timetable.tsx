@@ -16,6 +16,7 @@ import {
 	getDrivingDuration,
 	saveTravel,
 	travelSliceActions,
+	updateShareUserList,
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
@@ -29,6 +30,7 @@ import {usePosition} from '../../utill/hooks/usePosition';
 import ViewPager from '../../utill/view-pager';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
+import Toast from 'react-native-toast-message';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -45,8 +47,9 @@ export default function Timetable({navigation, route}: any) {
 		saveFlag,
 		modifyCheck,
 		moveTimeErrorIndex,
+		shareLoginFlag,
 	} = useAppSelector(state => state.travelSlice);
-	const {userId, userName} = useAppSelector(state => state.userSlice);
+	const {userId, userName, isLogin} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [addList, setAddList] = useState<number[]>([]);
 	const [x, setX] = useState(-1);
@@ -136,19 +139,31 @@ export default function Timetable({navigation, route}: any) {
 	const goHome = () => {
 		navigation.popToTop();
 	};
+	const exitApp = () => {
+		BackHandler.exitApp();
+	};
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '홈으로',
-						modalSubTitle: modifyCheck
-							? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
-							: '홈으로 이동하시겠습니까?',
-						modalFunction: goHome,
-						modalLeft: true,
-					}),
-				);
+				userId == ''
+					? dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '앱 종료',
+								modalSubTitle: '앱을 종료하시겠습니까?',
+								modalFunction: exitApp,
+								modalLeft: true,
+							}),
+					  )
+					: dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '홈으로',
+								modalSubTitle: modifyCheck
+									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+									: '홈으로 이동하시겠습니까?',
+								modalFunction: goHome,
+								modalLeft: true,
+							}),
+					  );
 
 				return true;
 			}
@@ -157,7 +172,7 @@ export default function Timetable({navigation, route}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
 		return () => backHandler.remove();
-	}, [modifyCheck]);
+	}, [modifyCheck, userId]);
 	const {appsflyerLogEvent} = useAppsflyer();
 	const firstSave = async () => {
 		try {
@@ -165,7 +180,7 @@ export default function Timetable({navigation, route}: any) {
 			const data = {
 				userId: userId,
 				region: makeMode == 'recommend' ? region : ['자유여행'],
-				day: day,
+				day: day.slice(0, nDay + 1),
 				nDay: nDay + 1,
 				transit: transit,
 				timetable: timetable,
@@ -207,6 +222,35 @@ export default function Timetable({navigation, route}: any) {
 
 		//혼자짤래요면 지역 '자유여행'으로
 	};
+	const addSharedList = async () => {
+		if (userId == '') {
+			dispatch(travelSliceActions.setShareLoginFlag(true));
+			navigation.replace('LoginScreen');
+		} else {
+			try {
+				dispatch(LoadingSliceActions.onLoading());
+				const response = await dispatch(updateShareUserList({travelId: travelId})).unwrap();
+				Toast.show({
+					type: 'success',
+					text1: response == 202 ? '이미 추가된 일정입니다.' : '추가가 완료되었습니다.',
+					position: 'bottom',
+				});
+				dispatch(travelSliceActions.setShareLoginFlag(false));
+			} catch (err: any) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '다시 시도',
+						modalSubTitle: '잠시후 다시 시도해주세요',
+					}),
+				);
+			} finally {
+				dispatch(LoadingSliceActions.offLoading());
+			}
+		}
+	};
+	useEffect(() => {
+		shareLoginFlag && isLogin && addSharedList();
+	}, [isLogin]);
 	useEffect(() => {
 		makeMode == 'recommend' && saveFlag && firstSave();
 	}, [saveFlag]);
@@ -216,6 +260,22 @@ export default function Timetable({navigation, route}: any) {
 	useEffect(() => {
 		makeMode == 'recommend' && setViewPagerView(true);
 	}, []);
+	useEffect(() => {
+		makeMode == 'share' &&
+			!shareLoginFlag &&
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '공유자',
+					modalSubTitle: `${
+						userId == '' ? '로그인 후 ' : ''
+					}공유 받은 여행 일정을 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
+					modalLeft: true,
+					modalRightText: '추가할래요',
+					modalLeftText: '보기만할래요',
+					modalFunction: addSharedList,
+				}),
+			);
+	}, [makeMode]);
 	useEffect(() => {
 		navigation.setOptions({
 			headerBackVisible: makeMode == 'recommend' ? false : true,

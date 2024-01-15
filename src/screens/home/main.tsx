@@ -50,7 +50,7 @@ export default function Main({navigation}: any) {
 	};
 
 	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
-	const {selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const regionRecommend = () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
@@ -77,6 +77,10 @@ export default function Main({navigation}: any) {
 	const goTokenLog = () => {
 		navigation.navigate('TokenLog');
 	};
+	useEffect(() => {
+		console.log('qwe');
+		shareLoginFlag && navigation.navigate('Timetable');
+	}, []);
 
 	useEffect(() => {
 		navigation.setOptions({

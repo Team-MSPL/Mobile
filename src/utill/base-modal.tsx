@@ -6,7 +6,8 @@ import {colors} from './colors';
 import {SubText, TitleText} from './component/policy/policy1';
 
 export default function BaseModal() {
-	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction} = useAppSelector(state => state.modalSlice);
+	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction, modalRightText, modalLeftText} =
+		useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
 		close();
@@ -31,11 +32,11 @@ export default function BaseModal() {
 					<Footer left={Boolean(modalLeft)}>
 						{modalLeft && (
 							<ModalButton left={Boolean(modalLeft)} onPress={close}>
-								<ModalText>취소</ModalText>
+								<ModalText>{modalLeftText}</ModalText>
 							</ModalButton>
 						)}
 						<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
-							<ModalText>확인</ModalText>
+							<ModalText>{modalRightText}</ModalText>
 						</ModalButton>
 					</Footer>
 				</ViewContaniner>

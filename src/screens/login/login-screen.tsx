@@ -38,9 +38,18 @@ export default function LoginScreen({navigation}: any) {
 		dispatch(userSliceActions.setAnonymous());
 		navigation.replace('Tab');
 	};
+	const {shareLoginFlag} = useAppSelector(state => state.travelSlice);
 	const {isLogin, socialloginProvider, anonymousKeep, fcmToken} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
-		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
+		if (socialloginProvider != 'anonymous' && isLogin) {
+			navigation.reset({index: 0, routes: [{name: 'Tab'}]});
+			//navigation.replace('Tab');
+		}
+		// if (shareLoginFlag && isLogin) {
+		// 	navigation.goBack();
+		// } else {
+		// 	socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
+		// }
 	}, [isLogin]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
