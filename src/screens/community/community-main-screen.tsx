@@ -105,7 +105,7 @@ export default function CommunityMainScreen({navigation}: any) {
 				}}
 			/>
 			<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
-			{socialloginProvider != 'anonymous' && <ScrollButton viewState={viewState} navigation={navigation} />}
+			<ScrollButton viewState={viewState} navigation={navigation} />
 		</CommunityMainContainer>
 	);
 }

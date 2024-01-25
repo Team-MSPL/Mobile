@@ -32,16 +32,14 @@ export default function LiKeCommentBar() {
 	}, []);
 	return (
 		<>
-			{socialloginProvider != 'anonymous' && (
-				<PostLikeCommentNumContainer>
-					<LikeButton onPress={handleLikePress}>
-						<HeartIcon name={isLiked ? 'heart' : 'hearto'} selected={isLiked}></HeartIcon>
-						<LikeCommentText>{isLiked ? '좋아요 취소' : '좋아요'}</LikeCommentText>
-					</LikeButton>
-					<CommentIcon name='message-circle' />
-					<LikeCommentText>{postData.comment.length}</LikeCommentText>
-				</PostLikeCommentNumContainer>
-			)}
+			<PostLikeCommentNumContainer>
+				<LikeButton onPress={handleLikePress}>
+					<HeartIcon name={isLiked ? 'heart' : 'hearto'} selected={isLiked}></HeartIcon>
+					<LikeCommentText>{isLiked ? '좋아요 취소' : '좋아요'}</LikeCommentText>
+				</LikeButton>
+				<CommentIcon name='message-circle' />
+				<LikeCommentText>{postData.comment.length}</LikeCommentText>
+			</PostLikeCommentNumContainer>
 			<LikeCommentText>{totalLike}명이 좋아합니다</LikeCommentText>
 		</>
 	);

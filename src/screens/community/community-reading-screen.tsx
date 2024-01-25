@@ -174,18 +174,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	// 앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () =>
-				socialloginProvider != 'anonymous' && (
-					<View>
-						<TouchableOpacity
-							onPress={() => {
-								actionSheetType.current = '게시글';
-								showCommunityReadingOptionActionSheet();
-							}}>
-							<MenuIcon name='more-horizontal'></MenuIcon>
-						</TouchableOpacity>
-					</View>
-				),
+			headerRight: () => (
+				<View>
+					<TouchableOpacity
+						onPress={() => {
+							actionSheetType.current = '게시글';
+							showCommunityReadingOptionActionSheet();
+						}}>
+						<MenuIcon name='more-horizontal'></MenuIcon>
+					</TouchableOpacity>
+				</View>
+			),
 		});
 	}, []);
 
@@ -296,15 +295,13 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						<CommentWriterText>{data.item.commentWriter}</CommentWriterText>
 					</CommentWriterInfoContainer>
 					{/* 더보기 버튼 */}
-					{socialloginProvider != 'anonymous' && (
-						<CommentMenu
-							onPress={() => {
-								setCommentData(data.item);
-								actionSheetType.current = '댓글';
-							}}>
-							<CommentMenuIcon name='more-horizontal' />
-						</CommentMenu>
-					)}
+					<CommentMenu
+						onPress={() => {
+							setCommentData(data.item);
+							actionSheetType.current = '댓글';
+						}}>
+						<CommentMenuIcon name='more-horizontal' />
+					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
 				<CommentContent>{data.item.commentContent}</CommentContent>
 				<CommentInfoText>{data.item.commentedAt.slice(0, 10)}</CommentInfoText>
@@ -457,25 +454,19 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			<CommentInputContainer
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				keyboardVerticalOffset={statusBarHeight + 44}>
-				{socialloginProvider == 'anonymous' ? (
-					<View>
-						<Text>로그인 후 이용 가능합니다.</Text>
-					</View>
-				) : (
-					<CommentTextInputContainer>
-						<CommentTextInput
-							placeholderTextColor={'grey'}
-							style={{color: 'black'}}
-							value={commentContent}
-							multiline={true}
-							onChangeText={text => setCommentContent(text)}
-							placeholder='댓글을 입력하세요...'
-						/>
-						<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
-							<CommentSubmitButtonIcon name='send' isDisabled={isCommentButtonDisabled} />
-						</ClearContainer>
-					</CommentTextInputContainer>
-				)}
+				<CommentTextInputContainer>
+					<CommentTextInput
+						placeholderTextColor={'grey'}
+						style={{color: 'black'}}
+						value={commentContent}
+						multiline={true}
+						onChangeText={text => setCommentContent(text)}
+						placeholder='댓글을 입력하세요...'
+					/>
+					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
+						<CommentSubmitButtonIcon name='send' isDisabled={isCommentButtonDisabled} />
+					</ClearContainer>
+				</CommentTextInputContainer>
 			</CommentInputContainer>
 		</CommunityReadingContainer>
 	);

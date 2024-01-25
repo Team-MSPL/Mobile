@@ -2,9 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {userSliceActions} from './user.slice';
 import axiosAuth from '../api/api';
-const initialState: LiteState = {
-	anonymous: false,
-};
+const initialState: LiteState = {};
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
@@ -44,11 +42,7 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 export const loginSlice = createSlice({
 	name: 'login',
 	initialState,
-	reducers: {
-		setAnonymous: (state, {payload}) => {
-			state.anonymous = payload;
-		},
-	},
+	reducers: {},
 	extraReducers: builder => {},
 });
 
@@ -71,9 +65,7 @@ export const removeStorage = async (key: string) => {
 export const loginSliceActions = loginSlice.actions;
 export default loginSlice.reducer;
 
-interface LiteState {
-	anonymous: boolean;
-}
+interface LiteState {}
 
 interface socialConnectType {
 	userName: string | null;

@@ -136,41 +136,37 @@ export default function MoreInfo({navigation}: any) {
 					<ProfileImage source={{uri: userProfileImage}}></ProfileImage>
 				)}
 				<ProfileNameText>
-					{userName} {socialloginProvider != 'anonymous' && socialloginProvider}
+					{userName} {socialloginProvider}
 				</ProfileNameText>
-				{socialloginProvider != 'anonymous' && (
-					<ProfileChangeContainer onPress={changeInfo}>
-						<ProfileChangeText>프로필 편집</ProfileChangeText>
-					</ProfileChangeContainer>
-				)}
+				<ProfileChangeContainer onPress={changeInfo}>
+					<ProfileChangeText>프로필 편집</ProfileChangeText>
+				</ProfileChangeContainer>
 			</ProfileContainer>
 
-			{socialloginProvider != 'anonymous' && (
-				<>
-					<ProfileDivider />
-					<SettingContainer>
-						<TitleText>계정</TitleText>
-						<SettingElement onPress={goTokenLog}>
-							<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
-						</SettingElement>
+			<>
+				<ProfileDivider />
+				<SettingContainer>
+					<TitleText>계정</TitleText>
+					<SettingElement onPress={goTokenLog}>
+						<SettingElementText>이용권 갯수 {functionToken} 개</SettingElementText>
+					</SettingElement>
 
-						<SettingElement onPress={goPayment}>
-							<SettingElementText>이용권 구매하기</SettingElementText>
+					<SettingElement onPress={goPayment}>
+						<SettingElementText>이용권 구매하기</SettingElementText>
+					</SettingElement>
+					{Platform.OS != 'ios' && (
+						<SettingElement onPress={goCoupon}>
+							<SettingElementText>쿠폰 입력하기</SettingElementText>
 						</SettingElement>
-						{Platform.OS != 'ios' && (
-							<SettingElement onPress={goCoupon}>
-								<SettingElementText>쿠폰 입력하기</SettingElementText>
-							</SettingElement>
-						)}
-						<SettingElement onPress={goNoteList}>
-							<SettingElementText>쪽지함</SettingElementText>
-						</SettingElement>
-						<SettingElement onPress={goUserManage}>
-							<SettingElementText>계정 설정</SettingElementText>
-						</SettingElement>
-					</SettingContainer>
-				</>
-			)}
+					)}
+					<SettingElement onPress={goNoteList}>
+						<SettingElementText>쪽지함</SettingElementText>
+					</SettingElement>
+					<SettingElement onPress={goUserManage}>
+						<SettingElementText>계정 설정</SettingElementText>
+					</SettingElement>
+				</SettingContainer>
+			</>
 			<ProfileDivider />
 			<SettingContainer>
 				<TitleText>이용안내</TitleText>
@@ -185,48 +181,33 @@ export default function MoreInfo({navigation}: any) {
 				<TitleText>
 					앱 버전 {nowVersion} (최신{latestVersion})
 				</TitleText>
-				{socialloginProvider != 'anonymous' ? (
-					<>
-						<SettingElement
-							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '로그아웃 하시겠습니까?',
-										modalFunction: goLogout,
-										modalLeft: true,
-									}),
-								);
-							}}>
-							<LogoutText>로그아웃</LogoutText>
-						</SettingElement>
-
-						<SettingElement
-							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '회원 탈퇴 하시겠습니까?',
-										modalFunction: goWithdraw,
-										modalLeft: true,
-									}),
-								);
-							}}>
-							<LogoutText>회원탈퇴</LogoutText>
-						</SettingElement>
-					</>
-				) : (
+				<>
 					<SettingElement
 						onPress={() => {
 							dispatch(
 								modalSliceActions.setOpenModal({
-									modalTitle: '로그인 페이지로 이동하시겠습니까?',
-									modalFunction: goLogin,
+									modalTitle: '로그아웃 하시겠습니까?',
+									modalFunction: goLogout,
 									modalLeft: true,
 								}),
 							);
 						}}>
-						<LogoutText>로그인</LogoutText>
+						<LogoutText>로그아웃</LogoutText>
 					</SettingElement>
-				)}
+
+					<SettingElement
+						onPress={() => {
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '회원 탈퇴 하시겠습니까?',
+									modalFunction: goWithdraw,
+									modalLeft: true,
+								}),
+							);
+						}}>
+						<LogoutText>회원탈퇴</LogoutText>
+					</SettingElement>
+				</>
 			</SettingContainer>
 		</MainContainer>
 	);

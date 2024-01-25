@@ -44,20 +44,10 @@ export default function FinalCheck({navigation}: any) {
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const goNewLogin = () => {
-		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
 	const checkToken = () => {
-		if (socialloginProvider == 'anonymous') {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '로그인 없이는 이용 불가합니다',
-					modalSubTitle: '로그인 하러 가시겠습니까?',
-					modalFunction: goNewLogin,
-					modalLeft: true,
-				}),
-			);
-		} else if (freeTicket) {
+		if (freeTicket) {
 			goNext();
 		} else {
 			functionToken >= 1

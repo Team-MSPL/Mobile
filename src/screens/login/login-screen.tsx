@@ -34,22 +34,13 @@ interface tokenType {
 }
 
 export default function LoginScreen({navigation}: any) {
-	const goNext = () => {
-		dispatch(userSliceActions.setAnonymous());
-		navigation.replace('Tab');
-	};
 	const {shareLoginFlag} = useAppSelector(state => state.travelSlice);
-	const {isLogin, socialloginProvider, anonymousKeep, fcmToken} = useAppSelector(state => state.userSlice);
+	const {isLogin, socialloginProvider, fcmToken} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
-		if (socialloginProvider != 'anonymous' && isLogin) {
+		if (isLogin) {
 			navigation.reset({index: 0, routes: [{name: 'Tab'}]});
 			//navigation.replace('Tab');
 		}
-		// if (shareLoginFlag && isLogin) {
-		// 	navigation.goBack();
-		// } else {
-		// 	socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
-		// }
 	}, [isLogin]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
@@ -84,8 +75,6 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.profileImageUrl,
 					nickname: userInfo.nickname,
 				});
-			} else {
-				anonymousKeep && navigation.goBack();
 			}
 		} catch (err) {
 			console.log(err);
@@ -121,8 +110,6 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.user.photo,
 					nickname: userInfo.user.name,
 				});
-			} else {
-				anonymousKeep && navigation.goBack();
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
@@ -195,8 +182,6 @@ export default function LoginScreen({navigation}: any) {
 						profileImage: 'https://danim.me/square_logo.png',
 						nickname: `나그네${shortid.generate()}`,
 					});
-				} else {
-					anonymousKeep && navigation.goBack();
 				}
 			} else {
 				console.log('안드로이드다!!');
@@ -232,8 +217,6 @@ export default function LoginScreen({navigation}: any) {
 						profileImage: 'https://danim.me/square_logo.png',
 						nickname: `나그네${shortid.generate()}`,
 					});
-				} else {
-					anonymousKeep && navigation.goBack();
 				}
 			}
 		} catch (error) {
@@ -310,14 +293,6 @@ export default function LoginScreen({navigation}: any) {
 								</LogoHStack>
 							</LongCircleButton>
 						))}
-						<LongCircleButton bgColor={colors.selectButton} onPress={goNext}>
-							<LogoHStack>
-								<LogoContainer>
-									<SvgGuest />
-								</LogoContainer>
-								<LogoText color={'white'}>로그인없이 앱 둘러보기</LogoText>
-							</LogoHStack>
-						</LongCircleButton>
 					</CircleContainer>
 				</LoginSCreenContainer>
 			</SafeAreaView>

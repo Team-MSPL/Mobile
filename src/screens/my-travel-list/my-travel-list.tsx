@@ -61,7 +61,7 @@ export default function MyTravelList({navigation}: any) {
 	useBackHandler();
 	useFocusEffect(
 		useCallback(() => {
-			socialloginProvider != 'anonymous' && getTravelList();
+			getTravelList();
 		}, []),
 	);
 	const goEnroll = () => {
@@ -147,16 +147,7 @@ export default function MyTravelList({navigation}: any) {
 					<MainText>내 여행 기록</MainText>
 				</NewTravelContainer>
 			</TopContainer>
-			{socialloginProvider == 'anonymous' ? (
-				<NewTravelContainer>
-					<Center>
-						<AnonymousText>로그인을 하면 추억을 남길수 있어요 </AnonymousText>
-						<TouchableOpacity onPress={goLogin}>
-							<SubTitleColorText>로그인하러가기</SubTitleColorText>
-						</TouchableOpacity>
-					</Center>
-				</NewTravelContainer>
-			) : myTravelList.length == 0 ? (
+			{myTravelList.length == 0 ? (
 				<NewTravelContainer>
 					<Center>
 						<TouchableOpacity onPress={goEnroll}>
@@ -243,7 +234,4 @@ const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})
 const TravelTitleText = styled(SubTitleColorText)`
 	font-size: 22px;
 	font-weight: 900;
-`;
-const AnonymousText = styled(MainText)`
-	color: ${colors.regionNormal};
 `;

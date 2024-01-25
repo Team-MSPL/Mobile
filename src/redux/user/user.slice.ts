@@ -14,7 +14,6 @@ const initialUserState: UserState = {
 	isLogin: false,
 	isFirstLaunch: 'false',
 	signUpReward: false,
-	anonymousKeep: false,
 	blockUserList: [],
 	pushNotify: false,
 	fcmToken: '',
@@ -178,21 +177,8 @@ const userSlice = createSlice({
 		setSignUpReward(state, {payload}) {
 			state.signUpReward = payload;
 		},
-		setAnonymousKeep(state, {payload}) {
-			state.anonymousKeep = payload;
-		},
 		setFcmToken(state, {payload}) {
 			state.fcmToken = payload.fcmToken;
-		},
-		setAnonymous(state) {
-			state.isLogin = true;
-			state.userId = 'x';
-			state.userName = '나그네';
-			state.userProfileImage = '';
-			state.userJwtToken = '';
-			state.functionToken = 0;
-			state.socialloginProvider = 'anonymous';
-			axiosAuth.defaults.headers.Authorization = `Bearer x`;
 		},
 	},
 	extraReducers: builder => {
@@ -223,14 +209,13 @@ export default userSlice.reducer;
 export interface UserState {
 	userId: string;
 	userName: string;
-	socialloginProvider: 'apple' | 'google' | 'kakao' | 'anonymous' | null | undefined;
+	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
 	userJwtToken: string | null;
 	isLogin: boolean;
 	functionToken: number;
 	userProfileImage: string;
 	isFirstLaunch: string;
 	signUpReward: boolean;
-	anonymousKeep: boolean;
 	blockUserList: string[];
 	pushNotify: boolean;
 	fcmToken: string;

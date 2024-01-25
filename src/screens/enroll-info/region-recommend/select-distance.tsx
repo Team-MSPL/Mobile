@@ -78,40 +78,28 @@ export default function SelectDistance({navigation}: any) {
 		}, [signUpReward]),
 	);
 	const goNewLogin = () => {
-		dispatch(userSliceActions.setAnonymousKeep(true));
 		navigation.navigate('LoginScreen');
 	};
 	const goPayment = async () => {
 		navigation.navigate('Payment');
 	};
 	const checkToken = () => {
-		if (socialloginProvider == 'anonymous') {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '로그인 없이는 이용 불가합니다',
-					modalSubTitle: '로그인 하러 가시겠습니까?',
-					modalFunction: goNewLogin,
-					modalLeft: true,
-				}),
-			);
-		} else {
-			functionToken >= 1
-				? dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: `이용권이 하나 소모됩니다.`,
-							modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
-							modalFunction: goNext,
-							modalLeft: true,
-						}),
-				  )
-				: dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-							modalFunction: goPayment,
-							modalLeft: true,
-						}),
-				  );
-		}
+		functionToken >= 1
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `이용권이 하나 소모됩니다.`,
+						modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
+						modalFunction: goNext,
+						modalLeft: true,
+					}),
+			  )
+			: dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+						modalFunction: goPayment,
+						modalLeft: true,
+					}),
+			  );
 	};
 	const requestPermission = async () => {
 		try {
