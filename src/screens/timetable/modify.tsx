@@ -67,7 +67,7 @@ export default function Modify({navigation, route}: any) {
 				360) /
 				30 +
 			endTime.current.minute / 30;
-		console.log(newEnd);
+		console.log(newY, newEnd);
 		if (newEnd >= 49) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
 		} else {
@@ -87,7 +87,10 @@ export default function Modify({navigation, route}: any) {
 				}
 			}
 			let changeInputIndex = copy.findIndex(item => item.y >= newY);
-			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+			changeInputIndex =
+				changeInputIndex == -1
+					? copy.length
+					: changeInputIndex - (changeDay == route.params.item.value.x ? 1 : 0);
 			if (changeFlag) {
 				dispatch(
 					modalSliceActions.setOpenModal({

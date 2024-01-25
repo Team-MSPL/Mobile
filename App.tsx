@@ -78,7 +78,8 @@ function App(): JSX.Element {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '로그인 중 에러가 발생했습니다.',
+					modalTitle: '네트워크 연결이 불안정합니다',
+					modalSubTitle: '확인후 다시 시도해주세요',
 				}),
 			);
 		} finally {
@@ -103,18 +104,18 @@ function App(): JSX.Element {
 					if (q.payload == 'ERR_BAD_REQUEST') {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '사라진 여행입니다.',
+								modalTitle: '일정 소유자가 일정을 삭제했어요!',
 								modalFunction: goOffApp,
 							}),
 						);
 					} else {
-						dispatch(travelSliceActions.setMakeMode('share'));
+						dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
 					}
 				}
 			} catch (err) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+						modalTitle: '일정 소유자가 일정을 삭제했어요!',
 						modalFunction: goOffApp,
 					}),
 				);
@@ -129,17 +130,17 @@ function App(): JSX.Element {
 				if (q.payload == 0) {
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+							modalTitle: '일정 소유자가 일정을 삭제했어요!',
 							modalFunction: goOffApp,
 						}),
 					);
 				} else {
-					dispatch(travelSliceActions.setMakeMode('share'));
+					dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
 				}
 			} catch (err) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '타임 테이블 로딩 중 에러가 발생했습니다.',
+						modalTitle: '일정 소유자가 일정을 삭제했어요!',
 						modalFunction: goOffApp,
 					}),
 				);

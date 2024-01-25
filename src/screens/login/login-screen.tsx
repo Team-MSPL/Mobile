@@ -128,8 +128,8 @@ export default function LoginScreen({navigation}: any) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '구글 에러',
-						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
 				console.log('구글 로그인 취소됨', error);
@@ -137,8 +137,8 @@ export default function LoginScreen({navigation}: any) {
 			} else if (error === statusCodes.IN_PROGRESS) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '구글 에러',
-						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
 				console.log('구글 로그인 이미 실행 중', error);
@@ -146,8 +146,8 @@ export default function LoginScreen({navigation}: any) {
 			} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '구글 에러',
-						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
 				console.log('구글 로그인 서비스 이용 불가 및 만료');
@@ -155,8 +155,8 @@ export default function LoginScreen({navigation}: any) {
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '구글 에러',
-						modalSubTitle: '구글 로그인 중 에러가 발생했습니다. 잠시후 다시 시도해주세요.',
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
 				console.log('구글 로그인 다른 에러 발생', error);

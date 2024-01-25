@@ -78,7 +78,6 @@ export default function Main({navigation}: any) {
 		navigation.navigate('TokenLog');
 	};
 	useEffect(() => {
-		console.log('qwe');
 		shareLoginFlag && navigation.navigate('Timetable');
 	}, []);
 

@@ -14,7 +14,10 @@ export default function Connection() {
 			await dispatch(networkCheck());
 		} catch (err) {
 			dispatch(
-				modalSliceActions.setOpenModal({modalTitle: '에러', modalSubTitle: '네트워크 오류가 발생했습니다.'}),
+				modalSliceActions.setOpenModal({
+					modalTitle: '연결확인',
+					modalSubTitle: '네트워크 오류가 발생했습니다.',
+				}),
 			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
@@ -23,7 +26,7 @@ export default function Connection() {
 	return (
 		<Container>
 			<ViewContaniner>
-				<Guide>네트워크 연결에 실패했습니다.{'\n'}확인 후 다시 시도해주세요.</Guide>
+				<Guide>네트워크 연결이 불안정합니다{'\n'}확인 후 다시 시도해주세요.</Guide>
 				<CustomButton label={'새로고침'} onPress={checkNetwork} width={50} />
 			</ViewContaniner>
 		</Container>

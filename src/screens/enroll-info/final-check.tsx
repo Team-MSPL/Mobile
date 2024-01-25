@@ -157,7 +157,8 @@ export default function FinalCheck({navigation}: any) {
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
 			}
@@ -165,7 +166,8 @@ export default function FinalCheck({navigation}: any) {
 			console.log(error, 'qwe');
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '추천을 받는 중 에러가 발생했습니다.',
+					modalTitle: '네트워크 연결이 불안정합니다',
+					modalSubTitle: '확인후 다시 시도해주세요',
 				}),
 			);
 		} finally {

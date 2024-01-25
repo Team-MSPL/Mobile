@@ -44,7 +44,8 @@ export default function Join1({navigation, route}: any) {
 			console.log('왜 이래', err);
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '회원가입 중 에러가 발생했습니다.',
+					modalTitle: '회원가입에 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {

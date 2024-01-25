@@ -56,6 +56,7 @@ const initialState: LiteState = {
 	presetTendencyList: [],
 	moveTimeErrorIndex: 0,
 	shareLoginFlag: false,
+	shareViewWithStartFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -319,7 +320,6 @@ export const updateShareUserList = createAsyncThunk(
 			const response = await axiosAuth.patch('/travelCourse/updateSharedUserList', data);
 			return response.status;
 		} catch (error: any) {
-			console.log('에러임', error);
 			throw rejectWithValue(error.code);
 		}
 	},
@@ -555,10 +555,11 @@ export const travelSlice = createSlice({
 			state.modifyCheck = true;
 		},
 		setMakeMode: (state, {payload}) => {
-			state.makeMode = payload;
+			state.makeMode = payload.makeMode;
 			state.tableShowFlag = true;
 			state.editMode = '';
 			state.modifyCheck = false;
+			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);
@@ -709,6 +710,7 @@ interface LiteState {
 	presetTendencyList: presetTendencyListType[];
 	moveTimeErrorIndex: number;
 	shareLoginFlag: boolean;
+	shareViewWithStartFlag: boolean;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];

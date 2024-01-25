@@ -34,6 +34,7 @@ import Toast from 'react-native-toast-message';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
 import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
+import useKakaoShare from '../../utill/hooks/useKakaoShare';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -45,7 +46,8 @@ export default function DetailInfo({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '여행 정보를 가져오던 중 에러가 발생했습니다.',
+					modalTitle: '여행에 대한 기억을 되찾는 중 문제가 발생했습니다.',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {
@@ -67,7 +69,8 @@ export default function DetailInfo({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '여행 삭제 중 에러가 발생했습니다.',
+					modalTitle: '여행 삭제가 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {
@@ -88,47 +91,23 @@ export default function DetailInfo({navigation}: any) {
 		}
 	}; //여행 리뷰 별점 저장하기
 	const goTimetable = () => {
-		dispatch(travelSliceActions.setMakeMode('modify'));
+		dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'modify'}));
 		navigation.navigate('Timetable');
 		if (editing) {
 			setEditing(false);
 			setText(travelName);
 		}
 	};
-
+	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
 		try {
 			if (editing) {
 				setEditing(false);
 				setText(travelName);
 			}
-			const response = await KakaoShareLink.sendFeed({
-				content: {
-					title: travelName,
-					imageUrl: 'https://danim.me/square_logo.png',
-					link: {
-						webUrl: 'http://danim.me',
-						mobileWebUrl: 'http://danim.me',
-					},
-					description: moment(day[0]).format('YY-MM-DD') + '~' + moment(day[nDay]).format('YY-MM-DD'),
-				},
-				buttons: [
-					{
-						title: '앱에서 보기',
-						link: {
-							androidExecutionParams: [
-								{key: 'kakaolink', value: 'Timetable'},
-								{key: 'whatId', value: travelId},
-							],
-							iosExecutionParams: [
-								{key: 'kakaolink', value: 'Timetable'},
-								{key: 'whatId', value: travelId},
-							],
-						},
-					},
-				],
-			});
+			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 공유 중 문제가 발생했습니다.',

@@ -31,6 +31,7 @@ import ViewPager from '../../utill/view-pager';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
 import Toast from 'react-native-toast-message';
+import useKakaoShare from '../../utill/hooks/useKakaoShare';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -48,6 +49,7 @@ export default function Timetable({navigation, route}: any) {
 		modifyCheck,
 		moveTimeErrorIndex,
 		shareLoginFlag,
+		shareViewWithStartFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -56,6 +58,7 @@ export default function Timetable({navigation, route}: any) {
 	const [viewDayIndex, setViewDayIndex] = useState(0);
 	const [mapViewState, setMapViewState] = useState(true);
 	const [mapORtable, setMapORtable] = useState(false); //트루면 탐테
+	const [modifyState, setmodifyState] = useState({state: false, day: 0, index: 0, value: {}});
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
@@ -115,10 +118,28 @@ export default function Timetable({navigation, route}: any) {
 	}, [moveTimeErrorIndex]);
 	const goMapInfo = () => {
 		setMapORtable(!mapORtable);
-		//navigation.navigate('MapInfo', {mapIndex: -1});
 	};
 	const goReview = () => {
 		navigation.navigate('InputReviewAndPoint');
+	};
+	const handleModify = () => {
+		// let copy = [...timetable[modifyState.day]];
+		// copy[modifyState.index] = {
+		// 	...copy[modifyState.index],
+		// 	y: (copy[modifyState.index]?.y ?? 0) + modifyRef.current.y,
+		// };
+		// console.log(copy[modifyState.index], modifyRef.current.y);
+		// let copy2 = [...timetable];
+		// copy2[modifyState.day] = copy;
+		modifyRef.current.status
+			? dispatch(travelSliceActions.changeTimetable(modifyRef.current.timetable))
+			: dispatch(
+					modalSliceActions.setOpenModal({modalTitle: '불가', modalSubTitle: '시간표를 다시 확인해주세요'}),
+			  );
+	};
+	const modifyRef = useRef({x: 0, y: 0, timetable: [], status: false});
+	const setModifyRef = (e: any) => {
+		modifyRef.current = {x: e.x, y: e.y, timetable: e.timetable, status: e.status};
 	};
 	const timeRef = useRef(null);
 	const goMyTravelList = () => {
@@ -213,7 +234,8 @@ export default function Timetable({navigation, route}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '여행 저장 중 에러가 발생했습니다.',
+					modalTitle: '여행 저장에 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {
@@ -246,6 +268,19 @@ export default function Timetable({navigation, route}: any) {
 			} finally {
 				dispatch(LoadingSliceActions.offLoading());
 			}
+		}
+	};
+	const {kakaoShare} = useKakaoShare();
+	const goKakaoShare = async () => {
+		try {
+			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
+		} catch (err) {
+			console.log(err);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
+				}),
+			);
 		}
 	};
 	useEffect(() => {
@@ -282,7 +317,15 @@ export default function Timetable({navigation, route}: any) {
 			gestureEnabled: makeMode == 'recommend' ? false : true,
 			headerRight: () => (
 				<HeaderContianer>
-					{editMode == 'add' ? (
+					{modifyState.state ? (
+						<TouchableOpacity
+							onPress={() => {
+								handleModify();
+								setmodifyState({state: false, day: 0, index: 0, value: {}});
+							}}>
+							<HeaderText>완료</HeaderText>
+						</TouchableOpacity>
+					) : editMode == 'add' ? (
 						<TouchableOpacity
 							onPress={() => {
 								navigation.navigate('TimetableAddPlace', {x: x, y: addList});
@@ -295,6 +338,11 @@ export default function Timetable({navigation, route}: any) {
 						<>
 							{makeMode != 'share' && mapORtable ? (
 								<>
+									{shareViewWithStartFlag && (
+										<TouchableOpacity onPress={goKakaoShare}>
+											<HeaderText>공유</HeaderText>
+										</TouchableOpacity>
+									)}
 									<TouchableOpacity onPress={goViewPager}>
 										<HeaderText>설명</HeaderText>
 									</TouchableOpacity>
@@ -336,10 +384,43 @@ export default function Timetable({navigation, route}: any) {
 					</TouchableOpacity>
 				),
 		});
-	}, [editMode, timetable, addList, x, makeMode, travelId, mapORtable, modifyCheck]);
-
+	}, [
+		editMode,
+		timetable,
+		addList,
+		x,
+		makeMode,
+		travelId,
+		mapORtable,
+		modifyCheck,
+		modifyState,
+		shareViewWithStartFlag,
+	]);
+	const goScrollRef = useRef({now: 0, content: 0, layout: 0, wantGoing: 0});
+	const goScroll = async (value: {data: number; up: boolean}) => {
+		if (value.up) {
+			goScrollRef.current.wantGoing =
+				goScrollRef.current.now - goScrollRef.current.layout * 0.8 < 0
+					? goScrollRef.current.now
+					: goScrollRef.current.layout * 0.8;
+			testRef.current.scrollTo({y: goScrollRef.current.now - goScrollRef.current.wantGoing});
+			goScrollRef.current.now -= goScrollRef.current.wantGoing;
+		} else {
+			goScrollRef.current.wantGoing =
+				goScrollRef.current.now + goScrollRef.current.layout * 0.8 >
+				goScrollRef.current.content - goScrollRef.current.layout
+					? goScrollRef.current.content - goScrollRef.current.layout - goScrollRef.current.now
+					: goScrollRef.current.layout * 0.8;
+			await testRef.current.scrollTo({
+				y: goScrollRef.current.now + goScrollRef.current.wantGoing,
+			});
+			goScrollRef.current.now += goScrollRef.current.wantGoing;
+		}
+		return goScrollRef.current;
+	};
 	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-		setMapViewState(usePosition(e));
+		const state = usePosition(e);
+		state != mapViewState && setMapViewState(state);
 	};
 	const goBack = () => {
 		setViewPagerView(false);
@@ -347,12 +428,25 @@ export default function Timetable({navigation, route}: any) {
 	const goViewPager = () => {
 		setViewPagerView(true);
 	};
+	const firstFlag = useRef(true);
+	const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		firstFlag.current &&
+			(goScrollRef.current = {
+				now: e.nativeEvent.contentOffset.y,
+				content: e.nativeEvent.contentSize.height,
+				layout: e.nativeEvent.layoutMeasurement.height,
+				wantGoing: 0,
+			});
+	};
+	const testRef = useRef();
+	const panHandler = () => {};
+
 	const [viewPagerView, setViewPagerView] = useState(false);
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
 	return mapORtable ? (
 		<TimeTableContainer>
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
-			{mapViewState && (
+			{!modifyState.state && mapViewState && (
 				<MapContainer onPress={goMapInfo} right={WINDOW_WIDTH * 0.1} bottom={WINDOW_HEIGHT * 0.05}>
 					<SvgMapIcon width={30} height={30} color={'white'} />
 					<MapText>지도</MapText>
@@ -361,10 +455,22 @@ export default function Timetable({navigation, route}: any) {
 
 			<ScrollVIewContainer>
 				<TimetableScrollView
+					ref={testRef}
+					contentOffset={{x: 0, y: 1}}
+					onScroll={onScroll}
 					showsVerticalScrollIndicator={false}
-					onScroll={changeViewState}
+					onMomentumScrollEnd={changeViewState}
+					// onScroll={changeViewState}
 					scrollEventThrottle={16}>
-					<InfoView navigation={navigation} viewDayIndex={viewDayIndex} />
+					<InfoView
+						navigation={navigation}
+						viewDayIndex={viewDayIndex}
+						goScroll={goScroll}
+						setmodifyState={setmodifyState}
+						modifyState={modifyState}
+						panHandler={panHandler}
+						setModifyRef={setModifyRef}
+					/>
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 				</TimetableScrollView>
 			</ScrollVIewContainer>

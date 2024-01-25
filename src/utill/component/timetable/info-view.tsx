@@ -1,6 +1,6 @@
 import {GOOGLE_API_KEY} from '@env';
-import {memo, useEffect, useRef, useState} from 'react';
-import {Dimensions, Modal, Animated, PanResponder, Vibration} from 'react-native';
+import {memo, useEffect, useMemo, useRef, useState} from 'react';
+import {Dimensions, Modal, Animated, PanResponder, Vibration, View} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
@@ -10,8 +10,8 @@ import {colors} from '../../colors';
 import {useDistance} from '../../hooks/useDistance';
 import {VStack, devicesWidth} from '../../layout/layout';
 import {SvgInfos} from '../../svg/svg';
-const InfoView = ({navigation, viewDayIndex}: any) => {
-	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
+const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyState, setModifyRef}: any) => {
+	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	const dispatch = useAppDispatch();
@@ -189,25 +189,121 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 
 	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
 	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
-
+	const nowValue = useRef({state: true, day: 0, index: 0, value: {}});
 	const pan = useRef(new Animated.ValueXY()).current;
-
-	const panResponder = useRef(
-		PanResponder.create({
-			onMoveShouldSetPanResponder: () => true,
-			onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
-			onPanResponderRelease: () => {
-				pan.extractOffset();
-			},
-		}),
-	).current;
-	pan.addListener(e => {
-		console.log(e.x, e.y);
+	const beforeAddress = useRef({x: 0, y: 0});
+	const panResponder = useMemo(
+		() =>
+			PanResponder.create({
+				onMoveShouldSetPanResponder: () => true,
+				onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
+				onPanResponderRelease: () => {
+					let moveX = Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18));
+					let moveY = Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20));
+					let afterX = (WINDOW_WIDTH - 24) * 0.18 * moveX;
+					let afterY = (WINDOW_HEIGHT / 20) * moveY;
+					testRef.current?.measureInWindow((x, y, width, height) => {
+						try {
+							let changeDay = nowValue.current.value.x + moveX;
+							let copy = [...timetable[changeDay]];
+							let newY = nowValue.current.value.y + moveY;
+							let newEnd = nowValue.current.value.takenTime / 30 + nowValue.current.value?.y + moveY;
+							let changeCopy = [...timetable];
+							let changeFlag = null;
+							//부터 가능
+							for (let i = 0; i < copy.length; i++) {
+								if (
+									((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+										(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+											newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+									copy[i].id != nowValue.current.value.id
+								) {
+									changeFlag = copy[i];
+									break;
+								}
+							}
+							let changeInputIndex = copy.findIndex(item => item.y >= newY);
+							changeInputIndex =
+								changeInputIndex == -1
+									? copy.length
+									: changeInputIndex == 0
+									? changeInputIndex
+									: changeInputIndex - (changeDay == nowValue.current.day ? 1 : 0);
+							if (x - WINDOW_WIDTH * 0.1 < 0 || x + width > WINDOW_WIDTH || newY < 0 || newEnd > 48) {
+								pan.setOffset({
+									x: beforeAddress.current.x,
+									y: beforeAddress.current.y,
+								});
+								pan.setValue({
+									x: 0,
+									y: 0,
+								});
+							} else {
+								pan.setOffset({
+									x: afterX,
+									y: afterY,
+								});
+								pan.setValue({
+									x: 0,
+									y: 0,
+								});
+								beforeAddress.current = {
+									x: afterX,
+									y: afterY,
+								};
+								if (!changeFlag) {
+									let copyValue = {
+										...changeCopy[nowValue.current.value.x][nowValue.current.index],
+										y: newY,
+										x: changeDay,
+										takenTime: (newEnd - newY) * 30,
+									};
+									let deleteCopy = [...timetable[nowValue.current.day]];
+									deleteCopy.splice(nowValue.current.index, 1);
+									changeCopy[nowValue.current.day] = deleteCopy;
+									let addCopy = [...changeCopy[changeDay]];
+									console.log('ㅂㅈㄷ', addCopy, changeInputIndex);
+									addCopy.splice(changeInputIndex, 0, copyValue);
+									console.log(addCopy);
+									changeCopy[changeDay] = addCopy;
+									setModifyRef({
+										x: Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18)),
+										y: Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20)),
+										timetable: changeCopy,
+										status: true,
+									});
+								} else {
+									setModifyRef({
+										x: 0,
+										y: 0,
+										timetable: [],
+										status: false,
+									});
+								}
+							}
+						} catch (e) {
+							pan.setOffset({
+								x: beforeAddress.current.x,
+								y: beforeAddress.current.y,
+							});
+							pan.setValue({
+								x: 0,
+								y: 0,
+							});
+						}
+					});
+				},
+			}),
+		[timetable],
+	);
+	const locationRef = useRef({x: 0, y: 0});
+	pan.addListener(async e => {
+		locationRef.current = {x: e.x, y: e.y};
 	});
-	// pan.stopAnimation(() => {
-	// 	pan.resetAnimation();
-	// });
-	const [recommendState, setRecommendState] = useState({state: false, day: 0, index: 0});
+	useEffect(() => {
+		!modifyState.state && pan.setOffset({x: 0, y: 0});
+	}, [modifyState]);
+	const testRef = useRef<View>();
 	return (
 		<InfoViewContainter>
 			<SpacerView />
@@ -217,15 +313,9 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 					idx <= viewDayIndex + 4 && (
 						<InfoVStack key={idx}>
 							{item.map((value, index) => {
-								return recommendState.state &&
-									recommendState.day == idx &&
-									recommendState.index == index ? (
+								return modifyState.state && modifyState.day == idx && modifyState.index == index ? (
 									<Animated.View
 										key={index}
-										onTouchEnd={() => {
-											pan.setOffset({x: 0, y: 0});
-											setRecommendState({state: false, day: 0, index: 0});
-										}}
 										style={{
 											width: '100%',
 											position: 'absolute',
@@ -233,7 +323,8 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 											transform: [{translateX: pan.x}, {translateY: pan.y}],
 										}}
 										{...panResponder.panHandlers}>
-										<InfoPressable
+										<InfoViews
+											ref={testRef}
 											backgroundColor={
 												(value.category == 4 || value.category == 1) &&
 												!value.name.includes('추천')
@@ -249,7 +340,7 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 											{value.photo != '' && (
 												<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
 											)}
-										</InfoPressable>
+										</InfoViews>
 									</Animated.View>
 								) : (
 									<InfoPressable
@@ -260,33 +351,44 @@ const InfoView = ({navigation, viewDayIndex}: any) => {
 										}
 										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
 										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
-										state={recommendState.state}
+										state={modifyState.state}
 										key={index}
 										onLongPress={() => {
-											setRecommendState({state: true, day: idx, index: index});
-											Vibration.vibrate(100);
-										}}
-										onPress={() => {
-											indexRef.current = {
-												value: value,
-												index: index,
-												idx: idx,
-												category: value.category,
-												flag:
+											if (
+												!(
 													value.name == '점심 추천' ||
 													value.name == '저녁 추천' ||
 													value.name == '숙소 추천'
-														? true
-														: false,
-											};
-											if (makeMode == 'share') {
-												value.name == '점심 추천' ||
-												value.name == '저녁 추천' ||
-												value.name == '숙소 추천'
-													? () => {}
-													: viewDetail(indexRef.current);
-											} else {
-												setVisible(true);
+												)
+											) {
+												nowValue.current = {state: true, day: idx, index: index, value: value};
+												setmodifyState({state: true, day: idx, index: index, value: value});
+												Vibration.vibrate(100);
+											}
+										}}
+										onPress={() => {
+											if (!modifyState.state) {
+												indexRef.current = {
+													value: value,
+													index: index,
+													idx: idx,
+													category: value.category,
+													flag:
+														value.name == '점심 추천' ||
+														value.name == '저녁 추천' ||
+														value.name == '숙소 추천'
+															? true
+															: false,
+												};
+												if (makeMode == 'share') {
+													value.name == '점심 추천' ||
+													value.name == '저녁 추천' ||
+													value.name == '숙소 추천'
+														? () => {}
+														: viewDetail(indexRef.current);
+												} else {
+													setVisible(true);
+												}
 											}
 										}}>
 										<InfoText>{value.name}</InfoText>
@@ -424,7 +526,17 @@ const SpacerView = styled.View`
 	z-index: 10;
 	background-color: black;
 `;
-
+const InfoViews = styled.View<{backgroundColor: string; height: number; top: number; state: boolean}>`
+	width: 100%;
+	height: ${props => props.height}px;
+	top: ${props => props.top}px;
+	background-color: ${props => props.backgroundColor};
+	position: absolute;
+	z-index: 3;
+	padding: 4px;
+	border-radius: ${devicesWidth * 0.01}px;
+	opacity: ${props => (props.state ? 0.6 : 1)};
+`;
 const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number; state: boolean}>`
 	width: 100%;
 	height: ${props => props.height}px;

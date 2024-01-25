@@ -127,7 +127,7 @@ export default function SearchPlace({navigation, route}: any) {
 										</TimeHStack>
 									) : (
 										<TimeSelectContainer>
-											{[...Array(4)].map((time, number) => (
+											{[...Array(3)].map((time, number) => (
 												<TimeContainer onPress={() => selectTime(number)} key={number}>
 													<SearchPlaceSecondText>{number + 1} 시간</SearchPlaceSecondText>
 												</TimeContainer>

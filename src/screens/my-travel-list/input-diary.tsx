@@ -70,7 +70,8 @@ export default function InputDiary({navigation}: any) {
 			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '다이어리 저장 중 에러가 발생했습니다.',
+					modalTitle: '다이어리 저장이 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {

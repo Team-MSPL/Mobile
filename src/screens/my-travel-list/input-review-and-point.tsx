@@ -46,7 +46,8 @@ export default function InputReviewAndPoint({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '리뷰 저장 중 에러가 발생했습니다.',
+					modalTitle: '리뷰 저장이 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {

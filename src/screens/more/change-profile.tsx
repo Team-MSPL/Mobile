@@ -103,7 +103,8 @@ export default function ChangeProfile({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '프로필 변경 중 에러가 발생했습니다.',
+					modalTitle: '프로필 변경이 실패하였습니다.',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 					modalFunction: () => {},
 				}),
 			);

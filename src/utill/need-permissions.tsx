@@ -75,7 +75,7 @@ export default function NeedPermissions() {
 		} catch (e) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '권한요청 중 에러가 발생했습니다.',
+					modalTitle: '권한요청이 실패했습니다.',
 				}),
 			);
 		}

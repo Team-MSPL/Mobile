@@ -57,7 +57,8 @@ export default function MoreInfo({navigation}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '회원 탈퇴 중 에러가 발생했습니다.',
+					modalTitle: '회원 탈퇴가 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		}

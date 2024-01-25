@@ -111,6 +111,7 @@ export default function MapInfo({navigation, route}: any) {
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
 		// if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
 		// 	setSelect(route.params.mapIndex);
@@ -211,16 +212,15 @@ export default function MapInfo({navigation, route}: any) {
 										</PlaceContainer>
 									</DayElementContainer>
 									<DayElementContainer>
-										{index !== timetable[select].length - 1 &&
-											timetable[select][index + 1].name != '숙소 추천' && (
-												<MoveContainer
-													onPress={() => {
-														goNavigation(index);
-													}}>
-													<PlaceText>이동</PlaceText>
-													<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
-												</MoveContainer>
-											)}
+										{value.id != noMove[noMove.length - 1].id && (
+											<MoveContainer
+												onPress={() => {
+													goNavigation(index);
+												}}>
+												<PlaceText>이동</PlaceText>
+												<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
+											</MoveContainer>
+										)}
 									</DayElementContainer>
 								</DaysContainer>
 							);
