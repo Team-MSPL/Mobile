@@ -10,7 +10,7 @@ import {colors} from '../../colors';
 import {useDistance} from '../../hooks/useDistance';
 import {VStack, devicesWidth} from '../../layout/layout';
 import {SvgInfos} from '../../svg/svg';
-const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyState, setModifyRef}: any) => {
+const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyState, setModifyRef, setStop}: any) => {
 	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -198,6 +198,7 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 				onMoveShouldSetPanResponder: () => true,
 				onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
 				onPanResponderRelease: () => {
+					setStop(true);
 					let moveX = Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18));
 					let moveY = Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20));
 					let afterX = (WINDOW_WIDTH - 24) * 0.18 * moveX;
@@ -317,6 +318,9 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 								return modifyState.state && modifyState.day == idx && modifyState.index == index ? (
 									<Animated.View
 										key={index}
+										onTouchStart={() => {
+											setStop(false);
+										}}
 										style={{
 											width: '100%',
 											position: 'absolute',

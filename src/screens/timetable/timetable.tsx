@@ -440,7 +440,7 @@ export default function Timetable({navigation, route}: any) {
 	};
 	const testRef = useRef();
 	const panHandler = () => {};
-
+	const [stop, setStop] = useState(true);
 	const [viewPagerView, setViewPagerView] = useState(false);
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
 	return mapORtable ? (
@@ -455,6 +455,7 @@ export default function Timetable({navigation, route}: any) {
 
 			<ScrollVIewContainer>
 				<TimetableScrollView
+					scrollEnabled={stop}
 					ref={testRef}
 					contentOffset={{x: 0, y: 1}}
 					onScroll={onScroll}
@@ -470,6 +471,7 @@ export default function Timetable({navigation, route}: any) {
 						modifyState={modifyState}
 						panHandler={panHandler}
 						setModifyRef={setModifyRef}
+						setStop={setStop}
 					/>
 					<Background setAddList={setAddList} addList={addList} setX={setX} x={x} />
 				</TimetableScrollView>
