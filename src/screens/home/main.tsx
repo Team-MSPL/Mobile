@@ -189,9 +189,15 @@ export default function Main({navigation}: any) {
 			boldText: '여행 일정 추천받기',
 		},
 	];
-	function tendencyMake(index: number, list: number[]) {
-		let data = tendencyList[index].list[list.findIndex(value => value == Math.max(...list))];
-		return data;
+	function tendencyMake(list: number[]) {
+		let copy = [...tendencyList[1].list, ...tendencyList[2].list, ...tendencyList[3].list];
+		let result: string[] = [];
+		list.forEach((item, idx) => {
+			if (item >= 80) {
+				result.push(copy[idx]);
+			}
+		});
+		return result;
 	}
 	const DeviceWidth = Dimensions.get('window').width;
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
@@ -306,11 +312,7 @@ export default function Main({navigation}: any) {
 											{item.name}
 										</CollectionContentItemText>
 										<CollectionContentItemHashtagText>
-											#{tendencyMake(0, item.partner)}
-											{' #' + tendencyMake(1, item.concept)}
-											{'\n'}#{tendencyMake(2, item.play)}
-											{' #' + tendencyMake(3, item.tour)}
-											{/* {item.hashtag} */}
+											#{tendencyMake([...item.concept, ...item.play, ...item.tour]).join(' #')}
 										</CollectionContentItemHashtagText>
 									</CollectionRecommendContentItemDescriptionContainer>
 									<RightArrowIcon name='right' size={16} color={'#ccc'} />
