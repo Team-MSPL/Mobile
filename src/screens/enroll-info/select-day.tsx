@@ -89,7 +89,9 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	};
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
 		console.log(timeData);
-		if (dateFlag.current == 1 && timeData.ampm == '오전') {
+		if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '첫날 시작은 06시 이후부터 가능합니다.'}));
+		} else if (dateFlag.current == 1 && timeData.ampm == '오전') {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '13시 이전은 불가능합니다.'}));
 		} else {
 			let timeCopy = [...timeLimitArray];

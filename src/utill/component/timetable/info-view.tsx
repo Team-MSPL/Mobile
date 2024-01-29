@@ -251,6 +251,7 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 									x: afterX,
 									y: afterY,
 								};
+								//!changeFlag
 								if (!changeFlag) {
 									let copyValue = {
 										...changeCopy[nowValue.current.value.x][nowValue.current.index],
@@ -361,9 +362,16 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 													value.name == '숙소 추천'
 												)
 											) {
-												nowValue.current = {state: true, day: idx, index: index, value: value};
-												setmodifyState({state: true, day: idx, index: index, value: value});
-												Vibration.vibrate(100);
+												if (!modifyState.state) {
+													nowValue.current = {
+														state: true,
+														day: idx,
+														index: index,
+														value: value,
+													};
+													setmodifyState({state: true, day: idx, index: index, value: value});
+													Vibration.vibrate(100);
+												}
 											}
 										}}
 										onPress={() => {
