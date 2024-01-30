@@ -226,7 +226,6 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 //탐테에서 눌렀을때 관광지정보 가져오기 서버 연결버전
 export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: any, {rejectWithValue}) => {
 	try {
-		console.log('빠졌어', data);
 		const response = await axiosAuth.get(
 			`/place/placeInfo?region=${data.region}&name=${data.name}&lat=${data.lat}&lng=${data.lng}`,
 		);
@@ -313,6 +312,7 @@ export const deletePlaceReview = createAsyncThunk(
 	},
 );
 
+//공유자 추가
 export const updateShareUserList = createAsyncThunk(
 	'/travelCourse/updateSharedUserList',
 	async (data: {travelId: string}, {rejectWithValue}) => {

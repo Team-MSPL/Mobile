@@ -204,7 +204,10 @@ export default function CourseDetail({navigation, route}: any) {
 	};
 	const goReviewEnroll = () => {
 		navigation.navigate('CourseReview', {
-			value: {region: route.params.value.region, name: route.params.value.name},
+			value: {
+				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
+				name: route.params.value.name,
+			},
 		});
 	};
 	if (courseDetail?.name)
