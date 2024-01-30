@@ -6,7 +6,8 @@ import {colors} from './colors';
 import {SubText, TitleText} from './component/policy/policy1';
 
 export default function BaseModal() {
-	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction} = useAppSelector(state => state.modalSlice);
+	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction, modalRightText, modalLeftText} =
+		useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
 		close();
@@ -18,11 +19,10 @@ export default function BaseModal() {
 	return (
 		<Modal
 			animationType={'fade'}
-			presentationStyle={'formSheet'}
 			//transparent={true}
 			visible={modalOpen}
 			onRequestClose={close}>
-			<ModalContainer onPress={close}>
+			<ModalContainer onPress={() => {}}>
 				<ViewContaniner>
 					<Body>
 						<TitleText>{modalTitle}</TitleText>
@@ -32,11 +32,11 @@ export default function BaseModal() {
 					<Footer left={Boolean(modalLeft)}>
 						{modalLeft && (
 							<ModalButton left={Boolean(modalLeft)} onPress={close}>
-								<ModalText>취소</ModalText>
+								<ModalText>{modalLeftText}</ModalText>
 							</ModalButton>
 						)}
 						<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
-							<ModalText>확인</ModalText>
+							<ModalText>{modalRightText}</ModalText>
 						</ModalButton>
 					</Footer>
 				</ViewContaniner>
@@ -50,7 +50,7 @@ const ModalContainer = styled.Pressable`
 	justify-content: center;
 	flex-directrion: row;
 	flex: 1;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(250, 250, 255, 0.8);
 `;
 
 const ViewContaniner = styled.Pressable`

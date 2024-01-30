@@ -7,8 +7,8 @@
 #import <GoogleMaps/GoogleMaps.h>
 #import "RNSplashScreen.h"
 #import "DanimMobile-Swift.h"
-
-
+#import "RNFBMessagingModule.h"
+#import <CodePush/CodePush.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
@@ -31,7 +31,7 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
-  
+  self.initialProps = [RNFBMessagingModule addCustomPropsToUserProps:nil withLaunchOptions:launchOptions];
   BOOL success = [super application:application didFinishLaunchingWithOptions:launchOptions];
    // return [super application:application didFinishLaunchingWithOptions:launchOptions];
 
@@ -71,7 +71,7 @@
 #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
-  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+  return [CodePush bundleURL];
 #endif
 }
 

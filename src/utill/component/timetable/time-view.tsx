@@ -1,7 +1,8 @@
 import React, {memo} from 'react';
-import styled from 'styled-components/native';
-import {VStack} from '../../layout/layout';
 import {Dimensions} from 'react-native';
+import {colors} from '../../colors';
+import styled from 'styled-components/native';
+import {VStack, devicesWidth} from '../../layout/layout';
 
 const TimeView = () => {
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -17,13 +18,14 @@ const TimeView = () => {
 };
 const TimeViewVStack = styled(VStack)`
 	flex: 0.1;
+	background-color: ${colors.main};
 `;
 const TimeViewContainer = styled.View<{height: number}>`
 	height: ${props => props.height}px;
 	align-items: center;
 `;
 const TimeViewText = styled.Text`
-	font-size: 15px;
+	font-size: ${devicesWidth * 0.04}px;
 	color: black;
 `;
 export default memo(TimeView);

@@ -3,10 +3,12 @@ import styled from 'styled-components/native';
 import {colors} from '../../colors';
 import {MainText} from '../../layout/layout';
 import LoadingLottie from '../../loading-lottie';
+import {useAppSelector} from '../../../redux';
 
 export default function LoadingTimetable({navigation}: any) {
 	const [view, setView] = useState(0);
 	const viewList = ['선호 지역 탐색 중 🗺', '여행 동선 설계 중 ✈', '수집 자료 정리 중 📑', '맞춤 성향 분석 중 ✍'];
+	const {userName} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		navigation.setOptions({
 			headerBackVisible: false,
@@ -15,7 +17,6 @@ export default function LoadingTimetable({navigation}: any) {
 	useEffect(() => {
 		var a = 0;
 		const interval = setInterval(() => {
-			console.log('네네네네');
 			a += 1;
 			setView(view => {
 				return a;
@@ -33,7 +34,9 @@ export default function LoadingTimetable({navigation}: any) {
 			<BarContainer>
 				<BarContinueContainer size={view}></BarContinueContainer>
 			</BarContainer>
-			<LimitText>사용자가 많을 수록 시간이 오래 걸릴 수 있어요</LimitText>
+			<LimitText>
+				다님만의 ai를 바탕으로 <NicknameText>{userName}</NicknameText>님께 {'\n'}꼭 맞는 여행지를 생성중이에요!
+			</LimitText>
 			<MainText>{viewList[view]}</MainText>
 		</LoadingTimetableContainer>
 	);
@@ -41,7 +44,7 @@ export default function LoadingTimetable({navigation}: any) {
 
 const LoadingTimetableContainer = styled.View`
 	align-items: center;
-	background-color: white;
+	background-color: ${colors.main};
 	flex: 1;
 `;
 const LimitText = styled.Text`
@@ -49,9 +52,8 @@ const LimitText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-const AdImage = styled.Image`
-	width: 342px;
-	height: 400px;
+const NicknameText = styled(LimitText)`
+	color: ${colors.selectButton};
 `;
 const BarContainer = styled.View`
 	width: 80%;

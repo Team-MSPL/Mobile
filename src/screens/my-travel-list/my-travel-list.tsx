@@ -1,33 +1,43 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback} from 'react';
+import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {TouchableOpacity} from 'react-native';
+import 'moment/locale/ko';
 
-import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {DayViewContainer} from '../enroll-info/select-multi';
+import moment from 'moment';
 import styled from 'styled-components/native';
-import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
 import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import {DayViewContainer} from '../enroll-info/select-multi';
+import {userSliceActions} from '../../redux/user/user.slice';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
 
 	const dispatch = useAppDispatch();
-	const [view, setView] = useState(0);
-	const goMyTravelDetail = async (e: string) => {
+	const goMyTravelDetail = async (e: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			await dispatch(getOneTravelCourse({travelId: e}));
-			navigation.navigate('DetailInfo');
+			const whenDday = dDayCalculate({startDay: e.day[0], endDay: e.day[e.nDay - 1]});
+			await dispatch(getOneTravelCourse({travelId: e._id}));
+			if (!whenDday.endFlag) {
+				dispatch(
+					travelSliceActions.setMakeMode({shareViewWithStartFlag: !whenDday.endFlag, makeMode: 'modify'}),
+				);
+				navigation.navigate('Timetable');
+			} else {
+				navigation.navigate('DetailInfo');
+			}
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '코스를 가져오던 중 에러가 발생했습니다',
+					modalTitle: '코스 가져오기가 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
 		} finally {
@@ -35,44 +45,23 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	const goLogin = () => {
+		dispatch(userSliceActions.reset());
 		navigation.replace('LoginScreen');
-	};
-	const goMakeTravel = () => {
-		navigation.navigate('Home');
-		navigation.navigate('SelectCity');
 	};
 	const getTravelList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			await dispatch(getMyTravelList());
+			const data = await dispatch(getMyTravelList()).unwrap();
 		} catch (err) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '내 여행 리스트를 가져오던 중 에러가 발생했습니다.',
-				}),
-			);
+			dispatch(travelSliceActions.setMyTravelList([]));
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
 	useBackHandler();
-	useEffect(() => {
-		navigation.setOptions({
-			headerTitle: () => <MainText>내 여행</MainText>,
-			// headerRight: () =>
-			// 	socialloginProvider != 'anonymous' && (
-			// 		<TouchableOpacity
-			// 			onPress={() => {
-			// 				setView(view + 1);
-			// 			}}>
-			// 			<MainText>새로고침</MainText>
-			// 		</TouchableOpacity>
-			// 	),
-		});
-	}, []);
 	useFocusEffect(
 		useCallback(() => {
-			socialloginProvider != 'anonymous' && getTravelList();
+			getTravelList();
 		}, []),
 	);
 	const goEnroll = () => {
@@ -82,70 +71,110 @@ export default function MyTravelList({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-
+	const dDayCalculate = (e: any) => {
+		//e.startDay=시작날짜e.endDay=끝나느날짜
+		// 0~1 당일  -1 미래 1과거
+		//여행 전, 여행 당일 ,여행 중, 여행 끝나는날, 여행 끝나고
+		let startSign = Math.sign(moment.duration(moment(e.startDay).hours(0).diff(moment())).asDays());
+		let endSign = Math.sign(moment.duration(moment(e.endDay).hours(0).diff(moment())).asDays());
+		let result = '';
+		let startStatus = moment.duration(moment(e.startDay).hours(0).diff(moment())).asDays() * -1;
+		let endStatus = moment.duration(moment(e.endDay).hours(0).diff(moment())).asDays() * -1;
+		let endFlag = false;
+		if (startStatus > 0 && startStatus < 1) {
+			result = '여행을 떠나는 날이에요';
+		} else if (startSign == 1) {
+			result =
+				'여행가기' + Math.ceil(moment.duration(moment(e.startDay).hours(0).diff(moment())).asDays()) + '일 전';
+		} else if (startSign == -1 && endSign == 1) {
+			result = '신나는 여행 중이에요!';
+		} else if (endStatus > 0 && endStatus < 1) {
+			result = '여행의 마지막 날이에요!';
+		} else if (endSign == -1) {
+			result =
+				'여행 후' +
+				(Math.floor(moment.duration(moment(e.endDay).hours(0).diff(moment())).asDays()) + 1) * -1 +
+				'일';
+			endFlag = true;
+		}
+		let data = {result: result, endFlag: endFlag};
+		return data;
+	};
+	const renderItem = (item: any) => {
+		return (
+			<MyTravelContainer
+				onPress={() => {
+					goMyTravelDetail(item.item);
+				}}>
+				<VStack>
+					<DayText>
+						{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
+							'~' +
+							moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
+					</DayText>
+					<DayText>
+						{dDayCalculate({startDay: item.item.day[0], endDay: item.item.day[item.item.nDay - 1]}).result}
+					</DayText>
+					<TravelTitleText>{item.item.travelName}</TravelTitleText>
+				</VStack>
+				<SvgRightAdd color={colors.selectButton} />
+			</MyTravelContainer>
+		);
+	};
 	return (
-		<MainContainer>
-			<NewTravelContainer>
-				<HStack>
-					<SubTitleColorText>{userName}</SubTitleColorText>
-					<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
-				</HStack>
-				<NewTravelHStack>
-					<MainText>
-						새로운
-						{'\n'}여행 일정 만들기
-					</MainText>
-					<NewTravelButton onPress={goEnroll}>
-						<ButtonText>출발</ButtonText>
-						<ButtonRight>
-							<SvgRight color={colors.selectButton} />
-						</ButtonRight>
-					</NewTravelButton>
-				</NewTravelHStack>
-			</NewTravelContainer>
-			<NewTravelContainer>
-				<SubTitleBlackText>잠시 머물렀던 그곳</SubTitleBlackText>
-				<MainText>내 여행 기록</MainText>
-			</NewTravelContainer>
-			{socialloginProvider == 'anonymous' ? (
+		<TravelContainer>
+			<TopContainer>
 				<NewTravelContainer>
-					<Center>
-						<AnonymousText>로그인을 하면 추억을 남길수 있어요 </AnonymousText>
-						<TouchableOpacity onPress={goLogin}>
-							<SubTitleColorText>로그인하러가기</SubTitleColorText>
-						</TouchableOpacity>
-					</Center>
+					<HStack>
+						<SubTitleColorText>{userName}</SubTitleColorText>
+						<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
+					</HStack>
+					<NewTravelHStack>
+						<MainText>
+							새로운
+							{'\n'}여행 일정 만들기
+						</MainText>
+						<NewTravelButton onPress={goEnroll}>
+							<ButtonText>출발</ButtonText>
+							<ButtonRight>
+								<SvgRight color={colors.selectButton} />
+							</ButtonRight>
+						</NewTravelButton>
+					</NewTravelHStack>
 				</NewTravelContainer>
-			) : myTravelList.length == 0 ? (
+				<NewTravelContainer>
+					<SubTitleBlackText>잠시 머물렀던 그곳</SubTitleBlackText>
+					<MainText>내 여행 기록</MainText>
+				</NewTravelContainer>
+			</TopContainer>
+			{myTravelList.length == 0 ? (
 				<NewTravelContainer>
 					<Center>
-						<TouchableOpacity onPress={goMakeTravel}>
+						<TouchableOpacity onPress={goEnroll}>
 							<MainText>아직 만들어진 여행이 없어요!</MainText>
 						</TouchableOpacity>
 					</Center>
 				</NewTravelContainer>
 			) : (
-				myTravelList.map((item, idx) => (
-					<MyTravelContainer
-						key={idx}
-						onPress={() => {
-							goMyTravelDetail(item._id);
-						}}>
-						<VStack>
-							<DayText>
-								{moment(item.day[0]).format('YYYY년-MM월-DD일') +
-									'~' +
-									moment(item.day[item.nDay - 1]).format('MM월-DD일')}
-							</DayText>
-							<TravelTitleText>{item.travelName}</TravelTitleText>
-						</VStack>
-						<SvgRightAdd color={colors.selectButton} />
-					</MyTravelContainer>
-				))
+				<FlatList
+					data={myTravelList}
+					renderItem={renderItem}
+					initialNumToRender={20}
+					showsVerticalScrollIndicator={false}
+					keyExtractor={item => item._id}
+					nestedScrollEnabled></FlatList>
 			)}
-		</MainContainer>
+		</TravelContainer>
 	);
 }
+const TopContainer = styled.View`
+	height: 50%;
+`;
+const TravelContainer = styled.View`
+	background-color: ${colors.main};
+	padding: 0px 24px 0px 24px;
+	height: 100%;
+`;
 const NewTravelContainer = styled.View`
 	width: 100%;
 	padding: 10px;
@@ -153,6 +182,7 @@ const NewTravelContainer = styled.View`
 `;
 const NewTravelHStack = styled(HStack)`
 	justify-content: space-between;
+	margin: 10px 0px 0px 0px;
 `;
 const MainText = styled.Text`
 	font-size: 22px;
@@ -188,6 +218,7 @@ const SubTitleColorText = styled(MainText)`
 const SubTitleBlackText = styled(MainText)`
 	font-size: 17px;
 	color: black;
+	font-weight: 500;
 `;
 export const DayText = styled.Text`
 	font-size: 17px;
@@ -203,7 +234,4 @@ const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})
 const TravelTitleText = styled(SubTitleColorText)`
 	font-size: 22px;
 	font-weight: 900;
-`;
-const AnonymousText = styled(MainText)`
-	color: ${colors.regionNormal};
 `;

@@ -15,8 +15,9 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {networkCheck} from '../../redux/network/networkSlice';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -33,15 +34,14 @@ interface tokenType {
 }
 
 export default function LoginScreen({navigation}: any) {
-	const goNext = () => {
-		dispatch(userSliceActions.setAnonymous());
-		navigation.replace('Tab');
-	};
-	const {isLogin, socialloginProvider, anonymousKeep} = useAppSelector(state => state.userSlice);
+	const {shareLoginFlag} = useAppSelector(state => state.travelSlice);
+	const {isLogin, socialloginProvider, fcmToken} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
-		socialloginProvider != 'anonymous' && isLogin && navigation.replace('Tab');
-	}, []);
-
+		if (isLogin) {
+			navigation.reset({index: 0, routes: [{name: 'Tab'}]});
+			//navigation.replace('Tab');
+		}
+	}, [isLogin]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
 		const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -52,22 +52,20 @@ export default function LoginScreen({navigation}: any) {
 		return result;
 	};
 
-	const goAI = () => {
-		navigation.navigate('LocalSearchAITest');
-	};
 	const dispatch = useAppDispatch();
 
 	const kakaoLogin = async () => {
 		try {
 			await KakaoLogin.login();
 			const userInfo = await KakaoLogin.getProfile();
-			console.log('띠영', userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo.profileImageUrl,
 				userToken: userInfo.id,
 				loginProvider: 'kakao',
 				signUpFlag: false,
+				fcmToken: fcmToken,
+				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -77,10 +75,9 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.profileImageUrl,
 					nickname: userInfo.nickname,
 				});
-			} else {
-				anonymousKeep ? navigation.goBack() : navigation.replace('Tab');
 			}
-		} catch {
+		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',
@@ -102,6 +99,8 @@ export default function LoginScreen({navigation}: any) {
 				userToken: userInfo.user.id,
 				loginProvider: 'google',
 				signUpFlag: false,
+				fcmToken: fcmToken,
+				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
 			if (result == 202) {
@@ -111,20 +110,42 @@ export default function LoginScreen({navigation}: any) {
 					profileImage: userInfo.user.photo,
 					nickname: userInfo.user.name,
 				});
-			} else {
-				navigation.replace('Tab');
 			}
 		} catch (error) {
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
+					}),
+				);
 				console.log('구글 로그인 취소됨', error);
 				// user cancelled the login flow
 			} else if (error === statusCodes.IN_PROGRESS) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
+					}),
+				);
 				console.log('구글 로그인 이미 실행 중', error);
 				// operation (e.g. sign in) is in progress already
 			} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
+					}),
+				);
 				console.log('구글 로그인 서비스 이용 불가 및 만료');
 				// play services not available or outdated
 			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '네트워크 연결이 불안정합니다',
+						modalSubTitle: '확인후 다시 시도해주세요',
+					}),
+				);
 				console.log('구글 로그인 다른 에러 발생', error);
 				// some other error happened
 			}
@@ -145,22 +166,22 @@ export default function LoginScreen({navigation}: any) {
 				}
 				const decodeToken: tokenType = jwtDecode(appleAuthRequestResponse.identityToken);
 				const data = {
-					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userName: `나그네${shortid.generate()}`,
+					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
+					fcmToken: fcmToken,
+					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
-						nickname: `김다님${shortid.generate()}`,
+						profileImage: 'https://danim.me/square_logo.png',
+						nickname: `나그네${shortid.generate()}`,
 					});
-				} else {
-					navigation.replace('Tab');
 				}
 			} else {
 				console.log('안드로이드다!!');
@@ -180,47 +201,23 @@ export default function LoginScreen({navigation}: any) {
 				const decodeToken: tokenType = jwtDecode(response.id_token!);
 				console.log('같아라!', decodeToken.sub);
 				const data = {
-					userName: `김다님${shortid.generate()}`,
-					userProfileImage: '../public/images/danim_logo.png',
+					userName: `나그네${shortid.generate()}`,
+					userProfileImage: 'https://danim.me/square_logo.png',
 					userToken: decodeToken.sub,
 					loginProvider: 'apple',
 					signUpFlag: false,
+					fcmToken: fcmToken,
+					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
 				if (result == 202) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
-						profileImage: '../public/images/danim_logo.png',
-						nickname: `김다님${shortid.generate()}`,
+						profileImage: 'https://danim.me/square_logo.png',
+						nickname: `나그네${shortid.generate()}`,
 					});
-				} else {
-					navigation.replace('Tab');
 				}
-
-				// if (response.state === state) {
-				// 	const credential = auth.AppleAuthProvider.credential(response.id_token!, rawNonce);
-				// 	const userInfo = await auth().signInWithCredential(credential);
-				// 	console.log('안드로이드로 애플 로그인 성공', userInfo.user);
-				// 	const data = {
-				// 		userName: `김다님${shortid.generate()}`,
-				// 		userProfileImage: '../public/images/danim_logo.png',
-				// 		userToken: userInfo.user.uid,
-				// 		loginProvider: 'apple',
-				// 		signUpFlag: false,
-				// 	};
-				// 	const result = await dispatch(socialConnect(data)).unwrap();
-				// 	if (result == 202) {
-				// 		navigation.navigate('Join1', {
-				// 			userToken: userInfo.user.uid,
-				// 			loginProvider: 'apple',
-				// 			profileImage: '../public/images/danim_logo.png',
-				// 			nickname: `김다님${shortid.generate()}`,
-				// 		});
-				// 	} else {
-				// 		navigation.replace('Tab');
-				// 	}
-				// }
 			}
 		} catch (error) {
 			console.error('애플 로그인 실패', error);
@@ -233,12 +230,11 @@ export default function LoginScreen({navigation}: any) {
 		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
-	const [view, setView] = useState(0);
 	const viewList = [
 		require('../../../public/images/login1.png'),
-		require('../../../public/images/danim_logo.png'),
-		require('../../../public/images/apple_logo.png'),
-		require('../../../public/images/kakao_logo.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
+		require('../../../public/images/login1.png'),
 	];
 	const [backgroundImageIndex, setBackgroundImageIndex] = useState(0);
 	const [fadeAnim] = useState(new Animated.Value(1));
@@ -248,7 +244,7 @@ export default function LoginScreen({navigation}: any) {
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
 			require('../../../public/images/login1.png'),
-			require('../../../public/images/kakao_logo.png'),
+			require('../../../public/images/login1.png'),
 		];
 		Animated.timing(fadeAnim, {
 			toValue: 0,
@@ -257,8 +253,6 @@ export default function LoginScreen({navigation}: any) {
 			useNativeDriver: false, // useNativeDriver를 false로 설정
 		}).start(() => {
 			// 애니메이션 완료 후 호출되는 콜백
-			console.log(fadeAnim);
-			console.log('헤헤');
 			setBackgroundImageIndex(prevIndex => (prevIndex + 1) % backgroundImages.length);
 			// 다음 애니메이션 시작
 			fadeAnim.setValue(0); // fadeAnim 초기화
@@ -272,17 +266,17 @@ export default function LoginScreen({navigation}: any) {
 		};
 	}, []);
 	return (
-		<SafeAreaView>
-			<BackgroundImage source={viewList[backgroundImageIndex]}>
+		<BackgroundImage source={viewList[backgroundImageIndex]}>
+			<SafeAreaView>
 				<LoginSCreenContainer>
 					<TitleTextContainer>
 						<LoginText>여행 일정을 이렇게</LoginText>
 						<TextContainer>
 							<LoginText>쉽게 짤 수 있</LoginText>
-							<SvgDanimText color='white' />
+							<SvgDanimText color='white' height={devicesHeight * 0.09} />
 						</TextContainer>
 					</TitleTextContainer>
-					<SvgLoginLogo color='white' />
+					<SvgLoginLogo color='white' width={devicesWidth} height={devicesHeight * 0.2} />
 					<CircleContainer>
 						{platforms.map((platform, index) => (
 							<LongCircleButton
@@ -299,39 +293,10 @@ export default function LoginScreen({navigation}: any) {
 								</LogoHStack>
 							</LongCircleButton>
 						))}
-						<LongCircleButton bgColor={colors.selectButton} onPress={goNext}>
-							<LogoHStack>
-								<LogoContainer>
-									<SvgGuest />
-								</LogoContainer>
-								<LogoText color={'white'}>로그인없이 앱 둘러보기</LogoText>
-							</LogoHStack>
-						</LongCircleButton>
 					</CircleContainer>
-					<HStack>
-						{/* {platforms.map((platform, index) => (
-						<CircleButton
-							key={index}
-							bgColor={platform.color}
-							onPress={() => {
-								platform.onPress();
-							}}>
-							{platform.image}
-						</CircleButton>
-					))} */}
-						{/* <AppleButton
-						buttonStyle={AppleButton.Style.WHITE}
-						buttonType={AppleButton.Type.SIGN_IN}
-						style={{
-							width: 160, // You must specify a width
-							height: 45, // You must specify a height
-						}}
-						onPress={() => appleLogin()}
-					/> */}
-					</HStack>
 				</LoginSCreenContainer>
-			</BackgroundImage>
-		</SafeAreaView>
+			</SafeAreaView>
+		</BackgroundImage>
 	);
 }
 
@@ -340,7 +305,6 @@ const LoginSCreenContainer = styled.View`
 	padding: 20px;
 	align-items: center;
 	justify-content: center;
-	margin: 10% 0% 0% 0%;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;
@@ -351,10 +315,11 @@ const TextContainer = styled(HStack)`
 `;
 const TitleTextContainer = styled.View`
 	align-items: flex-start;
-	margin: 0% 0% 15% 0%;
+	justify-content: center;
+	height: ${devicesHeight * 0.2}px;
 `;
 const LoginText = styled.Text`
-	font-size: 23px;
+	font-size: ${devicesHeight * 0.03}px;
 	font-weight: bold;
 	color: white;
 	margin: 0px 10px 0px 0px;
@@ -372,7 +337,8 @@ const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
 `;
 const CircleContainer = styled.View`
 	width: 100%;
-	margin: 10% 0% 0% 0%;
+	justify-content: center;
+	height: ${devicesHeight * 0.6}px;
 `;
 const LongCircleButton = styled(CircleButton)`
 	width: 100%;
@@ -389,9 +355,6 @@ const LogoText = styled.Text<{color: string}>`
 const LogoContainer = styled.View`
 	position: absolute;
 	left: 10px;
-`;
-const LogoTextContainer = styled.View`
-	width: 80%;
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

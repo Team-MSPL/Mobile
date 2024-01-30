@@ -1,12 +1,11 @@
 import React, {memo} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import TimeView from './time-view';
-import {Dimensions} from 'react-native';
 import {colors} from '../../colors';
+import TimeView from './time-view';
 
 const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 	const {editMode, nDay, makeMode} = useAppSelector(state => state.travelSlice);
@@ -68,7 +67,9 @@ const Background = ({navigation, addList, setAddList, x, setX}: any) => {
 					{[...Array(48)].map((value, index) => (
 						<BackgroundTouchable
 							key={index}
-							background={editMode === 'add' && x === inx && addList.includes(index) ? 'black' : 'white'}
+							background={
+								editMode === 'add' && x === inx && addList.includes(index) ? 'black' : colors.main
+							}
 							valueIndex={index}
 							borderColor={
 								editMode === 'add' && x === inx && addList.includes(index)

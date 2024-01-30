@@ -1,53 +1,48 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {axiosAuth} from '../travel-info/travel.slice';
 import {userSliceActions} from './user.slice';
-const initialState: LiteState = {
-	anonymous: false,
-};
+import axiosAuth from '../api/api';
+const initialState: LiteState = {};
 //로그인&회원가입
 export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: socialConnectType, thunkAPI) => {
 	try {
-		console.log('왔긴한데', data.userName, data.userProfileImage);
 		const response = await axiosAuth.post('/user/signUpAndIn', {
 			userName: data.userName,
 			userProfileImage: data.userProfileImage,
 			userToken: data.userToken,
 			loginProvider: data.loginProvider,
 			signUpFlag: data.signUpFlag,
+			fcmToken: data.fcmToken,
+			version: data.version,
 		});
-		console.log('ㅂㅈㄷ');
-		let userData = response.data;
+		let userData = {...response.data, userIdToken: data.userToken};
 		//성공했을때
 		if (response.status != 202) {
 			axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
-
-			console.log('qwe', userData.userJwtToken);
 			thunkAPI.dispatch(userSliceActions.setUserInfo(userData));
-			thunkAPI.dispatch(userSliceActions.login());
+			if (response.status == 203) {
+				thunkAPI.dispatch(userSliceActions.setReLogin(true));
+			}
 			const loginValues: [string, string][] = [
 				['userName', userData.userName],
 				['userProfileImage', data.userProfileImage],
 				['userToken', data.userToken?.toString()],
 				['loginProvider', data.loginProvider],
+				['fcmToken', data.fcmToken.toString()],
 			];
 			await AsyncStorage.multiSet(loginValues);
 			//axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
 		}
 		return response.status;
 	} catch (error) {
-		return thunkAPI.rejectWithValue(error);
+		throw thunkAPI.rejectWithValue(error);
 	}
 });
 
 export const loginSlice = createSlice({
 	name: 'login',
 	initialState,
-	reducers: {
-		setAnonymous: (state, {payload}) => {
-			state.anonymous = payload;
-		},
-	},
+	reducers: {},
 	extraReducers: builder => {},
 });
 
@@ -70,9 +65,7 @@ export const removeStorage = async (key: string) => {
 export const loginSliceActions = loginSlice.actions;
 export default loginSlice.reducer;
 
-interface LiteState {
-	anonymous: boolean;
-}
+interface LiteState {}
 
 interface socialConnectType {
 	userName: string | null;
@@ -80,4 +73,6 @@ interface socialConnectType {
 	userToken: string | null;
 	loginProvider: string;
 	signUpFlag: boolean;
+	fcmToken: string;
+	version: number;
 }

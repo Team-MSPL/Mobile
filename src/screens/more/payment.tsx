@@ -1,41 +1,179 @@
-import {Touchable, TouchableOpacity, Linking, Alert} from 'react-native';
+import {Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {logout, updateFunctionToken, updateProfile, userSliceActions, userWithdraw} from '../../redux/user/user.slice';
-import {MainContainer, MainText} from '../../utill/layout/layout';
+import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
+import {HStack, MainContainer, MainText, VStack} from '../../utill/layout/layout';
+import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import styled from 'styled-components/native';
+import {Google_Ads_Key} from '@env';
+import {DayViewContainer} from '../enroll-info/select-multi';
+import {useShopping} from '../../utill/hooks/useShopping';
+import {colors} from '../../utill/colors';
+import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import Toast from 'react-native-toast-message';
 export default function Payment({navigation}: any) {
-	const {isLogin, userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
-		state => state.userSlice,
-	);
-
-	const {anonymous} = useAppSelector(state => state.loginSlice);
+	const {functionToken} = useAppSelector(state => state.userSlice);
+	const {purchaseItems, requestItemPurchase} = useShopping();
+	const [watchAD, setWatchAD] = useState(0);
+	useShopping();
 	const dispatch = useAppDispatch();
+	const adUnitId = __DEV__ ? TestIds.REWARDED : Google_Ads_Key;
+	const rewardedRef = useRef<RewardedAd | null>(null);
+	const viewList = [
+		{title: '5', before: 5000, after: 1000},
+		{title: '10', before: 10000, after: 2000},
+		{title: '20', before: 20000, after: 3000},
+	];
+	const getWatchData = async () => {
+		const data = await dispatch(getWatchADTime()).unwrap();
+		setWatchAD(data.watchADTime);
+	};
 
-	const changeInfo = () => {
-		navigation.navigate('ChangeProfile');
+	useLayoutEffect(() => {
+		getWatchData();
+	}, []);
+	useEffect(() => {
+		// 광고 생성
+		const rewarded = RewardedAd.createForAdRequest(adUnitId, {
+			requestNonPersonalizedAdsOnly: true, // 맞춤형 광고 여부
+			keywords: ['fashion', 'clothing'], // 광고 카테고리 고르기
+		});
+		//생성된 광고는 ref 변수로 관리
+		rewardedRef.current = rewarded;
+
+		// 광고 로드 이벤트 리스너
+		const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+			// setLoaded(true);
+		});
+
+		// 라워드를 받았을 때 이벤트 리스너
+		const unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, reward => {
+			rewarded.removeAllListeners();
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
+			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
+			dispatch(setWatchADTime({watchADTime: watchAD + 1}));
+			navigation.goBack();
+		});
+
+		rewarded.load();
+
+		return () => {
+			unsubscribeLoaded();
+			unsubscribeEarned();
+		};
+	}, []);
+	const openAd = () => {
+		if (rewardedRef.current !== null) {
+			rewardedRef?.current?.loaded
+				? rewardedRef.current.show()
+				: Toast.show({type: 'error', text1: '광고 준비중이니 잠시만 기다려 주세요', position: 'bottom'});
+		}
 	};
-	const handlePayment = (e: number) => {
-		Alert.alert(`국민 950002-00-251241 ${e}원 보내세요.`);
-	};
+	const itemSkus: any = Platform.select({
+		android: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+		ios: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
+	});
 	return (
 		<MainContainer>
-			<MainText>출석시 하루마다 무료로 1개씩 추가됩니다! </MainText>
-			{paymentViewList.map((item, idx) => (
+			<TitleText>
+				이용권을 구매하고, 다님의 다양한 기능을 즐겨보세요!{'\n'}여행 지역 추천 또는 여행 코스 추천 AI를
+				사용하실 수 있습니다.
+			</TitleText>
+			<DayViewContainer>
 				<TouchableOpacity
-					key={idx}
-					style={{marginVertical: 10}}
-					onPress={() => {
-						handlePayment(item.pay);
-					}}>
-					<MainText>{item.title}</MainText>
-					<MainText>{item.pay}원 입니다</MainText>
+					style={{marginVertical: 2, opacity: watchAD > 1 ? 0.5 : 1}}
+					onPress={openAd}
+					disabled={watchAD > 1}>
+					<HStack>
+						<TotalContainer>
+							<TotalText>1</TotalText>
+						</TotalContainer>
+						<InfoContainer>
+							<InfoText>1개 - 광고보상</InfoText>
+							<BonusText>
+								*1일 2회 수령 가능{`\n`} 오늘 남은 횟수 {2 - watchAD}회
+							</BonusText>
+						</InfoContainer>
+						<SvgRightAdd width={30} height={30} color={'black'} />
+					</HStack>
 				</TouchableOpacity>
+			</DayViewContainer>
+			{viewList?.map((item, idx) => (
+				<DayViewContainer key={idx}>
+					<TouchableOpacity
+						style={{marginVertical: 2}}
+						onPress={() => {
+							//console.log(item);
+							requestItemPurchase(itemSkus[idx]);
+						}}>
+						<HStack>
+							<TotalContainer>
+								<TotalText>{item.title}</TotalText>
+							</TotalContainer>
+							<InfoContainer>
+								<HStack>
+									<MoneyText>
+										{Platform.OS == 'ios' ? Math.floor(item.before * 1.1) : item.before}원
+									</MoneyText>
+									<SvgRight color='black' />
+									<InfoText>
+										{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
+									</InfoText>
+								</HStack>
+								<BonusText>
+									출시 기념 <Percent>{((item.before - item.after) / item.before) * 100}% </Percent>
+									할인 진행 중
+								</BonusText>
+							</InfoContainer>
+							<SvgRightAdd width={30} height={30} color={'black'} />
+						</HStack>
+					</TouchableOpacity>
+				</DayViewContainer>
 			))}
 		</MainContainer>
 	);
 }
-const paymentViewList = [
-	{title: '토큰 1개', pay: 100},
-	{title: '토큰 10개', pay: 1000},
-	{title: '토큰 50개', pay: 5000},
-	{title: '토큰 100개', pay: 10000},
-];
+const TotalContainer = styled.View`
+	width: 20%;
+	border-radius: 99px;
+	padding: 5px;
+	background-color: ${colors.selectButton};
+	align-items: center;
+	justify-content: center;
+	border-width: 1px;
+	border-color: ${colors.regionNormal};
+	margin: 0px 10px 0px 0px;
+`;
+const TotalText = styled.Text`
+	font-size: 25px;
+	font-weight: bold;
+	color: white;
+`;
+const InfoText = styled.Text`
+	font-size: 17px;
+	font-weight: bold;
+	color: black;
+`;
+const MoneyText = styled(InfoText)`
+	font-size: 13px;
+	color: grey;
+	text-decoration: line-through;
+`;
+const BonusText = styled.Text`
+	font-size: 13px;
+	font-weight: bold;
+	color: ${colors.selectButton};
+`;
+const InfoContainer = styled(VStack)`
+	width: 60%;
+`;
+const TitleText = styled(InfoText)`
+	font-size: 13px;
+	font-weight: 900;
+	line-height: 20px;
+	margin: 0px 0px 30px 0px;
+`;
+const Percent = styled(BonusText)`
+	text-decoration: underline;
+`;

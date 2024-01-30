@@ -1,9 +1,10 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id, Tour_API_KEY} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import {tendencyList} from '../../screens/enroll-info/select-tendency';
+import axiosAuth from '../api/api';
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -20,7 +21,7 @@ const initialState: LiteState = {
 	}, //숙소, 필수여행지 구글검색했을때 정보 저장하는용
 	accommodations: [], // 숙소리스트
 	essentialPlaces: [], //필수여행지 리스트
-	distance: 5, //거리민감도
+	distance: 5, //여행반경
 	transit: 0, //교통수단 0= 자차 1=대중교통
 	tendency: tendencyList.map(item => {
 		return Array(item.list.length).fill(0);
@@ -45,15 +46,18 @@ const initialState: LiteState = {
 	selectStartDate: moment().startOf('day').add(12, 'hours'),
 	selectEndDate: null,
 	travelName: '',
+	regionRecommendFlag: false,
+	bandwidth: false,
+	saveFlag: false,
+	checKStep: 0,
+	freeTicket: false,
+	cityDistance: [],
+	modifyCheck: false,
+	presetTendencyList: [],
+	moveTimeErrorIndex: 0,
+	shareLoginFlag: false,
+	shareViewWithStartFlag: false,
 };
-
-export const axiosAuth = axios.create({
-	baseURL: 'http://15.164.164.164',
-	headers: {
-		'content-type': 'application/json',
-		withCredentials: true,
-	},
-});
 
 export const axiosGoogle = axios.create({
 	baseURL: 'https://maps.googleapis.com/maps/api',
@@ -73,6 +77,11 @@ export const axiosNaver = axios.create({
 		'X-NCP-APIGW-API-KEY': NAVER_API_KEY,
 	},
 });
+export const axiosTour = axios.create({
+	baseURL: 'https://apis.data.go.kr/B551011/KorService1',
+
+	headers: {'content-type': 'application/json'},
+});
 
 //-------------------------------------------------------------
 //내 여행 목록 가져오는거
@@ -80,99 +89,96 @@ export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data,
 	try {
 		const response = await axiosAuth.get(`/travelCourse/travelList?userId=${thunkAPI.getState().userSlice.userId}`);
 		return response.data.travelCourseList;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw thunkAPI.rejectWithValue(error.code);
 	}
 });
 //여행 코스 하나 가져오기
 export const getOneTravelCourse = createAsyncThunk(
 	'/getOneTravelCourse',
-	async (data: {travelId: string}, thunkAPI) => {
+	async (data: {travelId: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.get(`/travelCourse/getOneTravelCourse?travelId=${data.travelId}`);
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return 0;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 //코스 수정하기
 export const updateTravelCourse = createAsyncThunk(
 	'/updateTravelCourse',
-	async (data: updateTravelCourseType, thunkAPI) => {
+	async (data: updateTravelCourseType, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourse`, data);
 			return response.data;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //코스 삭제하기
-export const deleteTravelCourse = createAsyncThunk('/deleteTravelCourse', async (data: {travelId: string}) => {
-	try {
-		const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
-	}
-});
+export const deleteTravelCourse = createAsyncThunk(
+	'/deleteTravelCourse',
+	async (data: {travelId: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.delete(`/travelCourse/deleteTravelCourse`, {data});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //여행일기 저장,수정
 export const updateDiary = createAsyncThunk(
 	'/updateDiary',
-	async (data: {travelId: string; diary: string; picture: string[]}) => {
+	async (data: {travelId: string; diary: string; picture: string[]}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.patch(`/travelCourse/updateDiary`, data);
 			return response;
-		} catch (error) {
-			console.log(error);
-			return error;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //여행 리뷰, 별점 저장
-export const reviewAndPoint = createAsyncThunk('/reviewAndPoint', async (data: reviewAndPointType) => {
-	try {
-		const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
-	}
-});
+export const reviewAndPoint = createAsyncThunk(
+	'/reviewAndPoint',
+	async (data: reviewAndPointType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`manageTravel/reviewAndPoint`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
-export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType) => {
+export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, {rejectWithValue}) => {
 	try {
-		const response = await axiosAuth.post(`/ai/run`, data);
-		console.log(response, '애ㅔ애ㅔ에ㅔㅔㅔㅔ');
+		const response = await axiosAuth.post(`/ai/run`, data, {timeout: 60000});
 		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 //여행 코스 저장
-export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, thunkAPI) => {
+export const saveTravel = createAsyncThunk('/saveTravel', async (data: SaveTravelType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/travelCourse/saveTravelCourse`, data);
 		return response.data;
-	} catch (error) {
-		console.log(error);
-		return error;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 //교통 시간 구하는 거
 export const getDrivingDuration = createAsyncThunk(
 	'/getDrivingDuration',
-	async (data: {start: string; goal: string; wayPoint: string}, thunkAPI) => {
+	async (data: {start: string; goal: string; wayPoint: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosNaver.get(
 				`/map-direction/v1/driving?start=${data.start}&goal=${data.goal}${
@@ -180,57 +186,144 @@ export const getDrivingDuration = createAsyncThunk(
 				}&option=trafast`,
 			);
 			return response.data.route.trafast[0].summary;
-		} catch (error) {
-			return console.log(error);
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
 		}
 	},
 );
 
 //장소 정보 얻어오는거
-export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, thunkAPI) => {
+export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
 			`/place/details/json?place_id=${data.placeId}&fields=photos%2Cname%2Crating%2Creviews%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
 		//제로리절트 처리하기
 		return response.data;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 
 // 탐테에서 눌렀을때 검색이 아니라 이름으로 장소 찾는 거
-export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, thunkAPI) => {
+export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
-			`/place/textsearch/json?query=${data.name}%20main%20street&location=${data.lng}%2C${data.lat}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
+			`/place/textsearch/json?location=${data.lng}%2C${data.lat}&query=${data.name}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
 			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
 		);
-		console.log(a);
+		//console.log(a);
 		//제로리절트 처리하기
 		return a.data.result;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		console.log(error);
+		throw rejectWithValue(error.code);
+	}
+});
+
+//탐테에서 눌렀을때 관광지정보 가져오기 서버 연결버전
+export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(
+			`/place/placeInfo?region=${data.region}&name=${data.name}&lat=${data.lat}&lng=${data.lng}`,
+		);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 
 //카카오 식당,카페 등 추천 장소 얻는 거
-export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, thunkAPI) => {
+export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosKakao.get(
-			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}`,
+			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=distance`,
 		);
 		console.log(response.data.documents);
+		// console.log(response.data.documents);
 
 		//제로리절트 처리하기
 		return response.data.documents;
-	} catch (error) {
-		return console.log(error);
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
 	}
 });
 
+//여행코스 제목 수정
+export const reCourseName = createAsyncThunk(
+	'/travelCourse/updateTravelCourseName',
+	async (data: {travelId: string; updateTravelName: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch(`/travelCourse/updateTravelCourseName`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//투어 api 정보가져오기
+export const getTourTest = createAsyncThunk('/getTourTest', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosTour.get(
+			`/locationBasedList1?MobileOS=${data.platform}&MobileApp=다님&mapX=${data.lng}&mapY=${data.lat}&radius=20000&numOfRows=1&_type=json&serviceKey=${Tour_API_KEY}`,
+		);
+		let params = response.data.response.body.items.item[0];
+		const responseData = await axiosTour.get(
+			`/detailInfo1?MobileOS=${data.platform}&MobileApp=다님&contentId=${params.contentid}&contentTypeId=${params.contenttypeid}&_type=json&serviceKey=${Tour_API_KEY}`,
+		);
+		//console.log('하위요', responseData.data.response.body.items.item);
+		return responseData.data.response.body.items.item;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//관광지 리뷰 등록
+export const savePlaceReview = createAsyncThunk(
+	'/place/savePlaceReview',
+	async (
+		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		{rejectWithValue},
+	) => {
+		try {
+			const response = await axiosAuth.patch(`/place/savePlaceReview`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+//관광지 리뷰 삭제
+export const deletePlaceReview = createAsyncThunk(
+	'/place/deletePlaceReview',
+	async (
+		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		{rejectWithValue},
+	) => {
+		try {
+			const response = await axiosAuth.patch(`/place/deletePlaceReview`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//공유자 추가
+export const updateShareUserList = createAsyncThunk(
+	'/travelCourse/updateSharedUserList',
+	async (data: {travelId: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch('/travelCourse/updateSharedUserList', data);
+			return response.status;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -241,12 +334,21 @@ export const travelSlice = createSlice({
 		selectRegion: (state, {payload}) => {
 			state.region = payload;
 		},
+		firstSelectRegion: (state, {payload}) => {
+			state.region = payload.region;
+			state.cityDistance = payload.cityDistance;
+		},
 		enrollCityIndex: (state, {payload}) => {
 			state.cityIndex = payload;
 		},
 
 		setNDay: (state, {payload}) => {
 			state.nDay = payload;
+		},
+		selectPopularity: (state, {payload}) => {
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
+			state.cityDistance = payload.cityDistance;
 		},
 		enrollPlace: (state, {payload}) => {
 			state.Place = payload;
@@ -280,12 +382,27 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.cityIndex = payload.cityIndex;
 		},
+		changeChecKStep: (state, {payload}) => {
+			state.checKStep = payload;
+		},
 		setTravelStart: (state, {payload}) => {
 			Object.assign(state, initialState);
 			state.makeMode = payload.makeMode;
-			state.tableShowFlag = true;
+			//state.tableShowFlag = true;
 			state.editMode = '';
 			state.season = payload.season;
+			state.freeTicket = false;
+		},
+		setPopuarityClickStart: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.makeMode = payload.makeMode;
+			//state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
+			state.freeTicket = false;
+			state.cityDistance = payload.cityDistance;
 		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
@@ -309,15 +426,31 @@ export const travelSlice = createSlice({
 		enrollPreset: (state, {payload}) => {
 			state.presetDatas = payload;
 		},
+		setCache: (state, {payload}) => {
+			state.presetDatas = payload.presetDatas;
+			state.presetTendencyList = payload.presetTendency;
+			state.makeMode = 'recommend';
+			state.editMode = '';
+			state.freeTicket = false;
+			state.day = payload.day;
+			state.nDay = payload.nDay;
+			state.transit = payload.transit;
+			state.tendency = payload.tendency;
+			state.travelName = payload.travelName;
+		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = payload;
-			state.tableShowFlag = true;
+			//state.tableShowFlag = true;
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
+			console.log('내ㅔ', state.moveTimeList);
 			state.timetable.forEach((item, idx) => {
 				let time = 6;
-				let eatTimeList = [8, 15, 22, 29];
+				let dinnerTime = [22, 29];
+				let lunchTime = [8, 15];
+				let lunch = false;
+				let dinner = false;
 				const updateItem = {
 					name: '', //넣을거
 					lat: 0,
@@ -332,22 +465,14 @@ export const travelSlice = createSlice({
 					if (index == 0) {
 						if (idx == 0) {
 							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-						} else if (copy[idx - 1].at(-1).name == '숙소 추천') {
+						} else if (copy[idx - 1].at(-1)?.category == 4) {
 							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
 						}
 					}
-					// if (idx == 0 && index == 0) {
-					// 	time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-					// 	console.log(state.timeLimitArray[0], state.minuteLimitArray[0], time);
-					// }
-					// if (index == 0 && idx != 0 && copy[idx - 1].at(-1).name == '숙소 추천') {
-					// 	copy[idx].push({...copy[idx - 1].at(-1), y: time, takenTime: 30, x: idx});
-					// 	time += 2;
-					// }
-					if (time >= eatTimeList[0] && time <= eatTimeList[1]) {
+					if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
 						copy[idx].push({
 							...updateItem,
-							name: eatTimeList[0] == 8 ? '점심 추천' : '저녁 추천',
+							name: '점심 추천',
 							y: time,
 							takenTime: 60,
 							id: shortId.generate(),
@@ -356,18 +481,50 @@ export const travelSlice = createSlice({
 							lng: value.lng,
 							photo: '',
 						});
-						eatTimeList.shift();
-						eatTimeList.shift();
+						lunch = true;
 						time += 3;
 					}
-					copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
-					time += value.takenTime / 30;
-					index != item.length - 1 && (time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30));
+					if (time >= dinnerTime[0] && time <= dinnerTime[1] && dinner == false) {
+						copy[idx].push({
+							...updateItem,
+							name: '저녁 추천',
+							y: time,
+							takenTime: 60,
+							id: shortId.generate(),
+							category: 1,
+							lat: value.lat,
+							lng: value.lng,
+							photo: '',
+						});
+						dinner = true;
+						time += 3;
+					}
+					if (value.category != 4) {
+						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
+						time += value.takenTime / 30;
+						let bandwidthTime = state.bandwidth ? 1 : 0;
+						index != item.length - 1 &&
+							(time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30) + bandwidthTime);
+					}
 					if (index == item.length - 1 && idx != state.timetable.length - 1 && value.category != 4) {
 						copy[idx].push({
 							...updateItem,
 							name: '숙소 추천',
-							y: time < 36 ? 36 : time,
+							y: 36,
+							//y: time < 36 ? 36 : time,
+							takenTime: time < 36 ? 360 : (48 - time) * 30,
+							id: shortId.generate(),
+							category: 4,
+							lat: value.lat,
+							lng: value.lng,
+							photo: '',
+						});
+					} else if (value.category == 4 && index == item.length - 1) {
+						//copy[idx].pop();
+						copy[idx].push({
+							...value,
+							y: 36,
+							//y: time < 36 ? 36 : time,
 							takenTime: time < 36 ? 360 : (48 - time) * 30,
 							id: shortId.generate(),
 							category: 4,
@@ -378,19 +535,31 @@ export const travelSlice = createSlice({
 					}
 				});
 			});
+
+			state.saveFlag = true;
 			state.timetable = copy;
+			state.tableShowFlag = true;
 		},
 		editModeChange: (state, {payload}) => {
 			state.editMode = payload;
 		},
+		changeModify: (state, {payload}) => {
+			state.modifyCheck = payload;
+		},
+		setSaveFlag: (state, {payload}) => {
+			state.saveFlag = payload;
+		},
 		changeTimetable: (state, {payload}) => {
 			state.timetable = payload;
 			state.editMode = '';
+			state.modifyCheck = true;
 		},
 		setMakeMode: (state, {payload}) => {
-			state.makeMode = payload;
+			state.makeMode = payload.makeMode;
 			state.tableShowFlag = true;
 			state.editMode = '';
+			state.modifyCheck = false;
+			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
 		},
 		setSingleMode: state => {
 			Object.assign(state, initialState);
@@ -405,38 +574,73 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.makeMode = 'recommend';
+			state.regionRecommendFlag = true;
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.season = payload.season;
+			state.selectEndDate = payload.selectEndDate;
+			state.tendency = payload.tendency;
+			state.freeTicket = true;
+			state.cityDistance = payload.cityDistance;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
 		},
+		pushCatchMoveTimeList: (state, {payload}) => {
+			state.moveTimeList.push([10800000, 10800000, 10800000, 10800000, 10800000]);
+			state.moveTimeErrorIndex = payload;
+		},
+		checkMoveTimeError: state => {
+			state.moveTimeErrorIndex = 0;
+		},
+		resetMoveTimeList: state => {
+			state.moveTimeList = [];
+		},
+		enrollBandwidth: (state, {payload}) => {
+			state.bandwidth = payload;
+		},
+		setInclueRecommend: (state, {payload}) => {
+			Object.assign(state, initialState);
+			state.cityIndex = payload.cityIndex;
+			state.region = payload.region;
+			state.makeMode = 'recommend';
+			state.tableShowFlag = true;
+			state.editMode = '';
+			state.cityDistance = payload.cityDistance;
+			state.essentialPlaces = [payload.essential];
+			state.season = payload.season;
+		},
+		setShareLoginFlag: (state, {payload}) => {
+			state.shareLoginFlag = payload;
+		},
+		setMyTravelList: (state, {payload}) => {
+			state.myTravelList = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
-			console.log('1', payload);
 			let list: number[] = [];
 			if (payload == undefined) {
 				list.push(30);
 			} else {
-				payload.waypoints &&
+				payload?.waypoints &&
 					((list = payload.waypoints.map(item => (state.transit == 0 ? item.duration : item.duration * 1.5))),
-					list.push(state.transit == 0 ? payload.goal.duration : payload.goal.duration * 1.5));
+					list.push(state.transit == 0 ? payload?.goal?.duration : payload?.goal?.duration * 1.5));
 				list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			}
 			state.moveTimeList.push(list);
-			console.log('2');
 		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
+			state.presetTendencyList = payload.data.bestPointList;
 			state.presetDatas = payload.data.resultData;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
-			console.log('페페', payload);
 			state.myTravelList = payload;
 		});
 		builder.addCase(getOneTravelCourse.fulfilled, (state, {payload}) => {
-			console.log('목아파', payload.timetable);
 			state.day = payload.day;
 			state.nDay = payload.nDay - 1;
 			state.region = payload.region;
@@ -451,9 +655,12 @@ export const travelSlice = createSlice({
 			//state.myTravelList = payload;
 		});
 		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
-			console.log(payload, 'qwe');
 			state.diary = payload.diary;
 			state.picture = payload.picture;
+			//state.myTravelList = payload;
+		});
+		builder.addCase(saveTravel.fulfilled, (state, {payload}) => {
+			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
 		});
 	},
@@ -493,6 +700,22 @@ interface LiteState {
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
 	travelName: string;
+	regionRecommendFlag: boolean;
+	bandwidth: boolean;
+	saveFlag: boolean;
+	checKStep: number;
+	freeTicket: boolean;
+	cityDistance: number[];
+	modifyCheck: boolean;
+	presetTendencyList: presetTendencyListType[];
+	moveTimeErrorIndex: number;
+	shareLoginFlag: boolean;
+	shareViewWithStartFlag: boolean;
+}
+export interface presetTendencyListType {
+	tendencyNameList: string[];
+	tendencyPointList: number[];
+	tendencyRanking: number[];
 }
 
 type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
@@ -526,6 +749,11 @@ export interface TimetableType {
 	y?: number;
 	id?: string;
 	photo: string;
+	partner: number[];
+	play: number[];
+	concept: number[];
+	tour: number[];
+	regionIndex: number;
 }
 
 export interface CourseDetailType {
@@ -533,7 +761,6 @@ export interface CourseDetailType {
 	rating: number;
 	reviews: Reviews[];
 	photos: Photos[];
-	editorial_summary: EditorialSummary;
 	formatted_phone_number: string;
 	opening_hours: OpeninHoursType;
 	formatted_address: string;
@@ -572,11 +799,6 @@ interface Photos {
 	width: number;
 }
 
-interface EditorialSummary {
-	language: string;
-	overview: string;
-}
-
 export interface RecommendList {
 	address_name: string;
 	category_group_code: string;
@@ -601,6 +823,8 @@ interface travelAiType {
 	nDay: number;
 	transit: number;
 	distanceSensitivity: number;
+	bandwidth: boolean;
+	freeTicket: boolean;
 }
 
 interface myTravelListType {
@@ -630,4 +854,26 @@ interface reviewAndPointType {
 	review: string;
 	point: number;
 	tendencyPoint: number[][];
+}
+
+export interface courseInfoType {
+	status: string;
+	name: string;
+	openInfo: string[];
+	review: InfoReviewType[];
+	rating: number | null;
+	address: string | null;
+	expense: string | null;
+	information: string;
+	infoTitle: string | null;
+	infoContent: string | null;
+	photo: string[];
+}
+
+interface InfoReviewType {
+	name: string;
+	content: string;
+	rating: number | null;
+	reviewUserToken: string | null;
+	reviewPhotoList: string | null;
 }

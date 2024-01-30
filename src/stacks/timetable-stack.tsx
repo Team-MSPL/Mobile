@@ -16,6 +16,9 @@ import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
 import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
+import {View, Image} from 'react-native';
+import {colors} from '../utill/colors';
+import {CourseReview} from '../utill/component/timetable/course-review';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -32,7 +35,7 @@ export default function TimetableStack() {
 				component={SelectCity}
 				options={{
 					title: '새 여행 (1/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -41,7 +44,7 @@ export default function TimetableStack() {
 				component={SelectDay}
 				options={{
 					title: '새 여행 (2/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -50,7 +53,7 @@ export default function TimetableStack() {
 				component={SelectMulti}
 				options={{
 					title: '새 여행 (3/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -58,8 +61,8 @@ export default function TimetableStack() {
 				name='SearchPlace'
 				component={SearchPlace}
 				options={{
-					title: '숙소 추가하기',
-					headerStyle: {backgroundColor: 'white'},
+					title: '요소 추가하기',
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 					headerTitleAlign: 'center',
 				}}
@@ -69,7 +72,7 @@ export default function TimetableStack() {
 				component={SelectDistance}
 				options={{
 					title: '새 여행 (4/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -78,7 +81,7 @@ export default function TimetableStack() {
 				component={SelectTendency}
 				options={{
 					title: '새 여행 (5/5)',
-					headerStyle: {backgroundColor: '#EFFBFB'},
+					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -93,6 +96,8 @@ export default function TimetableStack() {
 				name='Preset'
 				component={Preset}
 				options={{
+					headerBackVisible: false,
+					gestureEnabled: false,
 					title: '다님의 제안이에요',
 				}}
 			/>
@@ -142,7 +147,14 @@ export default function TimetableStack() {
 				name='EnrollTravelTitle'
 				component={EnrollTravelTitle}
 				options={{
-					title: '새여행',
+					title: '새 여행',
+				}}
+			/>
+			<Stack.Screen
+				name='CourseReview'
+				component={CourseReview}
+				options={{
+					title: '리뷰작성',
 				}}
 			/>
 		</Fragment>

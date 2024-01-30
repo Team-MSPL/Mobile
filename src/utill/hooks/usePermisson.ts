@@ -1,7 +1,8 @@
-import {Platform} from 'react-native';
-import {PERMISSIONS, checkMultiple, Permission} from 'react-native-permissions';
+import {AppState, Platform} from 'react-native';
+import {PERMISSIONS, checkMultiple, Permission, requestMultiple, request} from 'react-native-permissions';
 import {useAppDispatch} from '../../redux';
-import {setPermission} from '../../redux/setting/settingSlice';
+import {setNopermission, setPermission} from '../../redux/setting/settingSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const usePermission = () => {
 	const dispatch = useAppDispatch();
@@ -12,7 +13,11 @@ const usePermission = () => {
 		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
 		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
 	];
-	const iosPermissions = [PERMISSIONS.IOS.PHOTO_LIBRARY, PERMISSIONS.IOS.LOCATION_WHEN_IN_USE];
+	const iosPermissions = [
+		// PERMISSIONS.IOS.PHOTO_LIBRARY,
+		// PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+		PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY,
+	];
 	const androidSDKVersion = Platform.Version;
 	const needPermission =
 		Platform.OS === 'android'
@@ -23,7 +28,6 @@ const usePermission = () => {
 
 	// 앱 실행했을 때 혹은 로그아웃 이후 권한 체크
 	const checkInitialPermission = async () => {
-		console.log('ddddddddddddddddddddddddddddddddddddddd', androidSDKVersion);
 		const {hasBlocked, deniedList} = await checkPermissions();
 		if (hasBlocked || deniedList.length) dispatch(setPermission(false));
 		else dispatch(setPermission(true));
@@ -34,17 +38,27 @@ const usePermission = () => {
 		let checkResult: {[key: string]: string} = {};
 		let hasBlocked = false; // blocked가 있으면 설정창 이동 모달 오픈
 		let deniedList: Permission[] = [];
-
-		checkResult = props || (await checkMultiple(needPermission));
-		console.log(checkResult);
-		for (let permission in checkResult) {
-			if (checkResult[permission] === 'denied') {
-				deniedList.push(permission as PermissionStatus);
-			} else if (checkResult[permission] === 'blocked') {
-				hasBlocked = true;
+		const noPermissionCheck = await AsyncStorage.getItem('noPermission');
+		if (noPermissionCheck == 'true') {
+			dispatch(setNopermission(true));
+		} else {
+			const listener = AppState.addEventListener('change', status => {
+				if (Platform.OS === 'ios' && status === 'active') {
+					request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
+						.then(result => console.log(result))
+						.catch(error => console.log(error));
+				}
+			});
+			// await requestMultiple(needPermission);
+			checkResult = props || (await checkMultiple(needPermission));
+			for (let permission in checkResult) {
+				if (checkResult[permission] === 'denied') {
+					deniedList.push(permission as PermissionStatus);
+				} else if (checkResult[permission] === 'blocked') {
+					hasBlocked = true;
+				}
 			}
 		}
-		console.log('번', hasBlocked, '게', deniedList);
 		return {hasBlocked, deniedList};
 	};
 

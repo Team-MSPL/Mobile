@@ -6,6 +6,8 @@ const initialState: LiteState = {
 	modalTitle: '', // 모달의 title
 	modalSubTitle: '', //  title 밑에 있는 작은 글씨
 	modalFunction: () => {}, //모달 오른쪽 버튼을 눌렀을때 실행될 함수.
+	modalRightText: '확인',
+	modalLeftText: '취소',
 };
 
 export const modalSlice = createSlice({
@@ -18,6 +20,8 @@ export const modalSlice = createSlice({
 			state.modalTitle = payload.modalTitle;
 			state.modalSubTitle = payload.modalSubTitle ?? '';
 			state.modalFunction = payload.modalFunction ?? (() => {});
+			state.modalRightText = payload.modalRightText ?? '확인';
+			state.modalLeftText = payload.modalLeftText ?? '취소';
 		},
 		setCloseModal: state => {
 			state.modalOpen = false;
@@ -37,4 +41,6 @@ interface LiteState {
 	modalTitle: string;
 	modalSubTitle: string;
 	modalFunction: () => void | Promise<void>;
+	modalRightText: string;
+	modalLeftText: string;
 }

@@ -2,15 +2,28 @@
  * @format
  */
 
-import {AppRegistry} from 'react-native';
+import {AppRegistry, Vibration} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {store} from './src/redux/index';
 import {Provider} from 'react-redux';
-
-const appRedux = () => (
-	<Provider store={store}>
-		<App />
-	</Provider>
-);
+import messaging from '@react-native-firebase/messaging';
+messaging().setBackgroundMessageHandler(async msg => {
+	Vibration.vibrate(400);
+});
+//messaging().getInitialNotification().then(console.log('김치제육아닌가?'));
+// messaging().onNotificationOpenedApp(async a => {
+// 	console.log(a);
+// 	console.log('눌러서들옴');
+// });
+const appRedux = ({isHeadless}) => {
+	if (isHeadless) {
+		return null;
+	}
+	return (
+		<Provider store={store}>
+			<App />
+		</Provider>
+	);
+};
 AppRegistry.registerComponent(appName, () => appRedux);

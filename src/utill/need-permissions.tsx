@@ -1,20 +1,18 @@
 import React, {useState, useRef} from 'react';
 import {Permission, requestMultiple, openSettings} from 'react-native-permissions';
 import styled from 'styled-components/native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Alert, TouchableOpacity} from 'react-native';
 import {useAppDispatch} from '../redux';
 import usePermission from './hooks/usePermisson';
-import {setPermission} from '../redux/setting/settingSlice';
-import {Box, Text} from 'native-base';
+import {setPermission, setNopermission} from '../redux/setting/settingSlice';
 import AccessDialog from './access-dialog';
 import {modalSliceActions} from '../redux/modal/modalSlice';
-import {Center, MainContainer, MainText} from './layout/layout';
 import {SvgApple} from './svg/svg';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Platform, SafeAreaView} from 'react-native';
 /**
  * 필수 권한 허용 요청 페이지
  */
@@ -49,6 +47,12 @@ export default function NeedPermissions() {
 			desc: '내여행,프로필사진에서 사진 업로드',
 			logo: <IconContainer name={'camera'} size={25} color={colors.selectButton} />,
 		},
+		Platform.OS == 'ios' && {
+			id: '4',
+			title: '추적',
+			desc: '광고 최적화와 사용자 경험 개선을 위해 데이터 추적',
+			logo: <IconContainer name={'filetext1'} size={25} color={colors.selectButton} />,
+		},
 	];
 
 	const clickConfirmBtn = async () => {
@@ -71,7 +75,7 @@ export default function NeedPermissions() {
 		} catch (e) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '권한요청 중 에러가 발생했습니다.',
+					modalTitle: '권한요청이 실패했습니다.',
 				}),
 			);
 		}
@@ -107,33 +111,41 @@ export default function NeedPermissions() {
 		await openSettings();
 		setShowModal(false);
 	};
+	const noPermissions = async () => {
+		dispatch(setNopermission(true));
+		await AsyncStorage.setItem('noPermission', 'true');
+		setShowModal(false);
+	};
 
 	return (
-		<PermissionMainContainer>
-			<PermissionText>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PermissionText>
-			{items.map(item => (
-				<PermissionElementContainer>
-					<SvgApple color={'black'} />
-					<ItemBox key={item.id}>
-						{item.logo}
-						<TextBox>
-							<TitleText>{item.title}</TitleText>
-							<SubText>{item.desc}</SubText>
-						</TextBox>
-					</ItemBox>
-				</PermissionElementContainer>
-			))}
-			<CustomButtonContainer>
-				<CustomButton label='확인' width={80} onPress={clickConfirmBtn}></CustomButton>
-			</CustomButtonContainer>
-			<AccessDialog
-				type={modalProps.current.type}
-				open={showModal}
-				onClose={closeModal}
-				onRequestAgain={requestAgain}
-				onOpenSetting={openSetting}
-			/>
-		</PermissionMainContainer>
+		<SafeAreaView style={{flex: 1}}>
+			<PermissionMainContainer>
+				<PermissionText>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PermissionText>
+				{items.map((item, idx) => (
+					<PermissionElementContainer key={idx}>
+						<SvgApple color={'black'} />
+						<ItemBox key={item.id}>
+							{item.logo}
+							<TextBox>
+								<TitleText>{item.title}</TitleText>
+								<SubText>{item.desc}</SubText>
+							</TextBox>
+						</ItemBox>
+					</PermissionElementContainer>
+				))}
+				<CustomButtonContainer>
+					<CustomButton label='확인' width={80} onPress={clickConfirmBtn}></CustomButton>
+				</CustomButtonContainer>
+				<AccessDialog
+					type={modalProps.current.type}
+					open={showModal}
+					onClose={closeModal}
+					onRequestAgain={requestAgain}
+					onOpenSetting={openSetting}
+					noPermissions={noPermissions}
+				/>
+			</PermissionMainContainer>
+		</SafeAreaView>
 	);
 }
 const PermissionText = styled.Text`
@@ -142,7 +154,7 @@ const PermissionText = styled.Text`
 	color: black;
 `;
 const PermissionMainContainer = styled.ScrollView`
-	background-color: white;
+	background-color: ${colors.main};
 	padding: 10%;
 `;
 const TitleText = styled.Text`

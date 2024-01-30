@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, Divider} from '../../utill/layout/layout';
+import {MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -9,10 +9,12 @@ import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/tr
 import {Pressable} from 'react-native';
 import {SvgCancel, SvgPlace, SvgHome} from '../../utill/svg/svg';
 
-export default function SelectMulti({setViewComponent, viewComponent, navigation}: any) {
+export default function SelectMulti({viewComponent, navigation, goNextStep}: any) {
 	const [accommodation, setAccommodation] = useState(false);
 	const [essential, setEssential] = useState(false);
-	const {nDay, day, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const goSearchPlace = (data: {idx: number; index: number}) => {
 		console.log(navigation);
@@ -39,15 +41,6 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
-	// const StyledHome = styled(Home)<{color: string}>`
-	// 	color: color;
-	// `;
-	// const StyledPlace = styled(Place)<{color: string}>`
-	// 	color: color;
-	// `;
-	// const StyledCancel = styled(Cancel)<{color: string}>`
-	// 	color: color;
-	// `;
 	const openEssential = () => {
 		setEssential(!essential);
 	};
@@ -127,36 +120,18 @@ export default function SelectMulti({setViewComponent, viewComponent, navigation
 							</DayViewContainer>
 						);
 					})}
-					{/* <HStack>
-					<Text>로고</Text>
-					<Text fontSize='lg' bold>
-						숙소
-					</Text>
-					<Spacer />
-					<Text onPress={openAccommodation}>열어보자</Text>
-				</HStack>
-				<Divider />
-				{accommodation && <SelectAccommodation navigation={navigation} />}
-				<HStack>
-					<Text>로고</Text>
-					<Text fontSize='lg' bold>
-						필수 여행지
-					</Text>
-					<Spacer />
-					<Text onPress={openEssential}>열어보자</Text>
-				</HStack>
-				<Divider />
-				{essential && <SelectEssential navigation={navigation} />} */}
 				</VStack>
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>
 			<ButtonContainer>
 				<CustomButton
-					label={'다음 (' + (viewComponent + 1) + '/5)'}
-					onPress={() => {
-						setViewComponent(viewComponent + 1);
-					}}></CustomButton>
+					label={`${
+						accommodations.find(value => value.name != '') || essentialPlaces.length != 0
+							? '다음'
+							: '건너뛰기'
+					} (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
+					onPress={goNextStep}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
@@ -176,13 +151,13 @@ export const DayViewContainer = styled.View`
 
 const DayText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 	margin: 0px 10px 0px 0px;
 `;
 const DayInfoText = styled.Text`
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const ElementContainer = styled.TouchableOpacity`
@@ -204,7 +179,7 @@ const MultiAllContainer = styled.View`
 `;
 const MultiText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: black;
 `;
 const MultiContainer = styled.View`
@@ -221,12 +196,12 @@ const MultiContainer = styled.View`
 `;
 const MultiElementText = styled.Text`
 	font-size: 15px;
-	font-weight: bold;
+	font-weight: 500;
 	color: ${colors.selectButton};
 `;
 export const ButtonContainer = styled.View`
-	width: 100%;
-	background-color: rgba(255, 255, 255, 0.8);
+	width: ${devicesWidth}px;
+	background-color: rgba(250, 250, 255, 0.8);
 	position: absolute;
 	bottom: 0;
 `;

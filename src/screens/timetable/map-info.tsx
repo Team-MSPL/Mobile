@@ -1,41 +1,45 @@
 import moment from 'moment';
 import {useEffect, useRef, useState} from 'react';
-import {Linking, Platform, TouchableOpacity, View} from 'react-native';
+import {Image, Linking, Platform, TouchableOpacity, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
-import SelectButton from '../../utill/component/select-button';
 import {MainContainer, VStack} from '../../utill/layout/layout';
 import {PresetButton} from './preset';
+import {SvgApple, SvgPlace} from '../../utill/svg/svg';
 
 export default function MapInfo({navigation, route}: any) {
-	const {timetable, day} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
 	const viewRef = useRef(0);
+	const [selectPinIndex, setSecletPinIndex] = useState(-1);
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
-		mapRef.current?.animateCamera(
-			{
-				center: {
-					latitude: timetable[select][e].lat,
-					longitude: timetable[select][e].lng,
-				},
-			},
-			{duration: 1000},
-		);
+		navigation.navigate('CourseDetail', {value: timetable[select][e]});
+		// setSecletPinIndex(e);
+		// mapRef.current?.animateCamera(
+		// 	{
+		// 		center: {
+		// 			latitude: timetable[select][e].lat,
+		// 			longitude: timetable[select][e].lng,
+		// 		},
+		// 	},
+		// 	{duration: 1000},
+		// );
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
 		let navigationIndex = e + 1;
+		let transitCondition = transit == 1 ? 'public' : 'car';
 		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
-		const url = `nmap://route/car?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
+		const url = `nmap://route/${transitCondition}?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
 		const supported = await Linking.canOpenURL(url);
 		if (supported) {
 			await Linking.openURL(url);
@@ -59,15 +63,23 @@ export default function MapInfo({navigation, route}: any) {
 			return null;
 		})
 		.filter(items => items !== null);
+	let count = 0;
 	const markers = timetable[select]
 		.map((value, idx) => {
 			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+				count += 1;
 				return (
 					<Marker
 						key={`marker_${idx}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-					/>
+						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+						anchor={{x: 0.5, y: 0.9}}
+						pinColor={idx == selectPinIndex ? 'yellow' : 'red'}
+						style={{width: 50, height: 50}}>
+						<MarkerText>{count}</MarkerText>
+						<SvgPlace color={'#F08676'} width={50} height={50} />
+					</Marker>
 				);
 			}
 			return null;
@@ -99,31 +111,29 @@ export default function MapInfo({navigation, route}: any) {
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
-		if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
-			setSelect(route.params.mapIndex);
-			setVisible(false);
-		} else {
-			for (let i = 0; i < timetable.length; i++) {
-				if (timetable[i].length != 0) {
-					a.current = true;
-					setVisible(false);
-					setSelect(i);
-					break;
-				}
+		// if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
+		// 	setSelect(route.params.mapIndex);
+		// 	setVisible(false);
+		// } else {
+		for (let i = 0; i < timetable.length; i++) {
+			if (timetable[i].length != 0) {
+				a.current = true;
+				setVisible(false);
+				setSelect(i);
+				break;
 			}
 		}
-		console.log(route.params.mapIndex);
-		console.log(select);
-		console.log('하이이이', markers);
-		if (polylineCoordinates.length == 0) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '보여줄게 없습니다.',
-					modalFunction: goBack,
-				}),
-			);
-		}
+		//}
+		// if (polylineCoordinates.length == 0) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '보여질 정보가 없습니다.',
+		// 			modalFunction: goBack,
+		// 		}),
+		// 	);
+		// }
 		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
 	const goBack = () => {
@@ -159,7 +169,7 @@ export default function MapInfo({navigation, route}: any) {
 						),
 				)}
 
-				<DayContainer>
+				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 					{timetable.map(
 						(item, idx) =>
 							item.length != 0 && (
@@ -202,15 +212,15 @@ export default function MapInfo({navigation, route}: any) {
 										</PlaceContainer>
 									</DayElementContainer>
 									<DayElementContainer>
-										{index !== timetable[select].length - 1 &&
-											timetable[select][index + 1].name != '숙소 추천' && (
-												<MoveContainer
-													onPress={() => {
-														goNavigation(index);
-													}}>
-													<PlaceText>이동</PlaceText>
-												</MoveContainer>
-											)}
+										{value.id != noMove[noMove.length - 1].id && (
+											<MoveContainer
+												onPress={() => {
+													goNavigation(index);
+												}}>
+												<PlaceText>이동</PlaceText>
+												<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
+											</MoveContainer>
+										)}
 									</DayElementContainer>
 								</DaysContainer>
 							);
@@ -225,20 +235,22 @@ export default function MapInfo({navigation, route}: any) {
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-export const DayContainer = styled.View`
-	flex-direction: row;
-	flex-wrap: wrap;
+export const DayContainer = styled.ScrollView`
+	height: 80px;
 `;
 const PlaceText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
 	color: black;
 `;
-export const DayButton = styled(PresetButton)<{select: boolean}>`
+export const DayButton = styled(PresetButton)`
+	width: 130px;
+	height: 60px;
 	border-radius: 15px;
-	padding: 3%;
+	padding: 10px;
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
 	align-items: center;
+	justify-content: center;
 `;
 
 export const DayTitle = styled(PlaceText)<{select: boolean}>`
@@ -246,7 +258,7 @@ export const DayTitle = styled(PlaceText)<{select: boolean}>`
 `;
 export const DaySubTitle = styled(DayTitle)`
 	font-weight: 500;
-	font-size: 14px;
+	font-size: 12px;
 `;
 export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
@@ -268,6 +280,8 @@ const MoveContainer = styled.TouchableOpacity`
 	width: 100%;
 	padding: 5%;
 	align-items: center;
+	justify-content: space-around;
+	flex-direction: row;
 `;
 const PlaceContainer = styled(MoveContainer)`
 	flex-direction: row;
@@ -276,4 +290,13 @@ const PlaceContainer = styled(MoveContainer)`
 const DayTimeText = styled.Text`
 	font-size: 14px;
 	color: ${colors.selectButton};
+`;
+export const MarkerText = styled.Text`
+	position: absolute;
+	font-size: 15px;
+	font-weight: bold;
+	color: black;
+	z-index: 1;
+	left: 20px;
+	bottom: 10px;
 `;

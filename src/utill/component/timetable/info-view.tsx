@@ -1,16 +1,17 @@
 import {GOOGLE_API_KEY} from '@env';
-import {memo, useRef, useState} from 'react';
-import {Image, Modal, Pressable, TouchableOpacity, View, Dimensions} from 'react-native';
+import {memo, useEffect, useMemo, useRef, useState} from 'react';
+import {Dimensions, Modal, Animated, PanResponder, Vibration, View} from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {TimetableType, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../colors';
-import {HStack, VStack} from '../../layout/layout';
+import {useDistance} from '../../hooks/useDistance';
+import {VStack, devicesWidth} from '../../layout/layout';
 import {SvgInfos} from '../../svg/svg';
-import Icon from 'react-native-vector-icons/AntDesign';
-const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) => {
-	const {timetable, editMode, makeMode} = useAppSelector(state => state.travelSlice);
+const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyState, setModifyRef, setStop}: any) => {
+	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
 	const dispatch = useAppDispatch();
@@ -34,83 +35,277 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 		setVisible(false);
 	};
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
-		let lat = 0;
-		let lng = 0;
-		e.index != 0
-			? ((lat = timetable[e.idx][e.index - 1].lat), (lng = timetable[e.idx][e.index - 1].lng))
-			: ((lat = timetable[e.idx][e.index + 1].lat), (lng = timetable[e.idx][e.index + 1].lng));
-		const startNumber = e.value.y; // 시작 숫자
-		const count = e.value.takenTime / 30; // 원하는 갯수
-		const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
-		navigation.navigate('Recommend', {
-			name: '숙소 추천',
-			x: e.value.x,
-			index: e.index,
-			y: sequentialArray,
-			category: e.value.category,
-			lat: lat,
-			lng: lng,
-			apiCategory: 'AD5',
-			radius: 2000,
-			backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
-			backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
-		});
-	};
-	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
-		if (timetable[e.idx].length == 0) {
+		if (timetable[e.idx].length < 2) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '참고할게 부족해서 추천이 불가합니다.',
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
 				}),
 			);
 		} else {
 			let lat = 0;
 			let lng = 0;
-			let radius = 2000;
-			if (e.index == timetable[e.idx].length - 1) {
-				lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
-				lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
-			} else if (e.index == 0) {
-				lat = timetable[e.idx][1].lat;
-				lng = timetable[e.idx][1].lng;
+			let goCheck = true;
+			if (e.index == 0) {
+				if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index + 1].lat;
+					lng = timetable[e.idx][e.index + 1].lng;
+				}
 			} else {
-				const dLat = (timetable[e.idx][e.index - 1].lat - timetable[e.idx][e.index + 1].lat) * (Math.PI / 180);
-				const dLon = (timetable[e.idx][e.index - 1].lng - timetable[e.idx][e.index + 1].lng) * (Math.PI / 180);
-
-				const a =
-					Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-					Math.cos(timetable[e.idx][e.index - 1].lat * (Math.PI / 180)) *
-						Math.cos(timetable[e.idx][e.index + 1].lat * (Math.PI / 180)) *
-						Math.sin(dLon / 2) *
-						Math.sin(dLon / 2);
-				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-				const distance = Math.ceil(6371 * c); // 두 지점 간의 거리 (단위: km)
+				if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index - 1].lat;
+					lng = timetable[e.idx][e.index - 1].lng;
+				}
+			}
+			// e.index != 0
+			// 	? ((lat = timetable[e.idx][e.index - 1].lat), (lng = timetable[e.idx][e.index - 1].lng))
+			// 	: ((lat = timetable[e.idx][e.index + 1].lat), (lng = timetable[e.idx][e.index + 1].lng));
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+				navigation.navigate('Recommend', {
+					name: '숙소 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					apiCategory: 'AD5',
+					radius: 2000,
+					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
+					status: e.index != 0 ? timetable[e.idx][e.index - 1] : timetable[e.idx][e.index + 1],
+				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
+			}
+		}
+	};
+	const restaurantRecommend = (e: {value: any; index: number; idx: number}) => {
+		// let copy = timetable[e.idx];
+		// let temp = copy.filter(
+		// 	item => item.name != '숙소 추천' && item.name != '점심 추천' && item.name != '저녁 추천',
+		// );
+		// let whereItem = temp.find(q => q.id == timetable[e.idx][e.index].id);
+		// console.log(timetable[e.idx][e.index].id, temp);
+		// if (timetable[e.idx].length == 0) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '참고할게 부족해서 추천이 불가합니다.',
+		// 		}),
+		// 	);
+		// } else {
+		let lat = 0;
+		let lng = 0;
+		let radius = 2000;
+		let status = timetable[e.idx][e.index - 1];
+		let goCheck = true;
+		if (timetable[e.idx].length == 1) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+				}),
+			);
+		} else {
+			console.log(timetable[e.idx]);
+			if (e.index == timetable[e.idx].length - 1) {
+				if (timetable[e.idx][timetable[e.idx].length - 2].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
+					lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
+					status = timetable[e.idx][timetable[e.idx].length - 2];
+				}
+			} else if (e.index == 0) {
+				if (timetable[e.idx][1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][1].lat;
+					lng = timetable[e.idx][1].lng;
+					status = timetable[e.idx][1];
+				}
+			} else {
+				const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
+				const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
 				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
 				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
 				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				if (
+					timetable[e.idx][e.index - 1].name.includes('추천') &&
+					timetable[e.idx][e.index + 1].name.includes('추천')
+				) {
+					goCheck = false;
+				} else if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index + 1];
+				} else if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index - 1];
+				}
+				//status = timetable[e.idx][e.index - 1];
 			}
-			const startNumber = e.value.y; // 시작 숫자
-			const count = e.value.takenTime / 30; // 원하는 갯수
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
 
-			const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
 
-			navigation.navigate('Recommend', {
-				name: '식당 추천',
-				x: e.value.x,
-				index: e.index,
-				y: sequentialArray,
-				category: e.value.category,
-				lat: lat,
-				lng: lng,
-				apiCategory: 'FD6',
-				radius: radius,
-				backupLat: timetable[e.idx][e.index - 1].lat,
-				backupLng: timetable[e.idx][e.index - 1].lng,
-			});
+				navigation.navigate('Recommend', {
+					name: '식당 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					apiCategory: 'FD6',
+					radius: radius,
+					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
+					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
+					status: status,
+				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
+			}
 		}
+		// }
 	};
-	const categortColors = ['#89C7FD', '#FFA700', 'green', 'pink', '#E0E0E0', 'gray'];
 
+	const categortColors = ['#7AA1DC', '#F08676', 'green', 'pink', '#8DE7C6', '#ECC369'];
+	const selectCategortColors = ['#89C7FD', '#E78D9F', 'green', 'pink', '#86D0C2', 'gray'];
+	const nowValue = useRef({state: true, day: 0, index: 0, value: {}});
+	const pan = useRef(new Animated.ValueXY()).current;
+	const beforeAddress = useRef({x: 0, y: 0});
+	const panResponder = useMemo(
+		() =>
+			PanResponder.create({
+				onMoveShouldSetPanResponder: () => true,
+				onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
+				onPanResponderRelease: () => {
+					setStop(true);
+					let moveX = Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18));
+					let moveY = Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20));
+					let afterX = (WINDOW_WIDTH - 24) * 0.18 * moveX;
+					let afterY = (WINDOW_HEIGHT / 20) * moveY;
+					testRef.current?.measureInWindow((x, y, width, height) => {
+						try {
+							let changeDay = nowValue.current.value.x + moveX;
+							let copy = [...timetable[changeDay]];
+							let newY = nowValue.current.value.y + moveY;
+							let newEnd = nowValue.current.value.takenTime / 30 + nowValue.current.value?.y + moveY;
+							let changeCopy = [...timetable];
+							let changeFlag = null;
+							//부터 가능
+							for (let i = 0; i < copy.length; i++) {
+								if (
+									((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+										(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+											newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+									copy[i].id != nowValue.current.value.id
+								) {
+									changeFlag = copy[i];
+									break;
+								}
+							}
+							let changeInputIndex = copy.findIndex(item => item.y >= newY);
+							changeInputIndex =
+								changeInputIndex == -1
+									? copy.length
+									: changeInputIndex == 0
+									? changeInputIndex
+									: changeInputIndex - (changeDay == nowValue.current.day ? 1 : 0);
+							if (x - WINDOW_WIDTH * 0.1 < 0 || x + width > WINDOW_WIDTH || newY < 0 || newEnd > 48) {
+								pan.setOffset({
+									x: beforeAddress.current.x,
+									y: beforeAddress.current.y,
+								});
+								pan.setValue({
+									x: 0,
+									y: 0,
+								});
+							} else {
+								pan.setOffset({
+									x: afterX,
+									y: afterY,
+								});
+								pan.setValue({
+									x: 0,
+									y: 0,
+								});
+								beforeAddress.current = {
+									x: afterX,
+									y: afterY,
+								};
+								//!changeFlag
+								if (!changeFlag) {
+									let copyValue = {
+										...changeCopy[nowValue.current.value.x][nowValue.current.index],
+										y: newY,
+										x: changeDay,
+										takenTime: (newEnd - newY) * 30,
+									};
+									let deleteCopy = [...timetable[nowValue.current.day]];
+									deleteCopy.splice(nowValue.current.index, 1);
+									changeCopy[nowValue.current.day] = deleteCopy;
+									let addCopy = [...changeCopy[changeDay]];
+									console.log('ㅂㅈㄷ', addCopy, changeInputIndex);
+									addCopy.splice(changeInputIndex, 0, copyValue);
+									console.log(addCopy);
+									changeCopy[changeDay] = addCopy;
+									setModifyRef({
+										x: Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18)),
+										y: Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20)),
+										timetable: changeCopy,
+										status: true,
+									});
+								} else {
+									setModifyRef({
+										x: 0,
+										y: 0,
+										timetable: [],
+										status: false,
+									});
+								}
+							}
+						} catch (e) {
+							pan.setOffset({
+								x: beforeAddress.current.x,
+								y: beforeAddress.current.y,
+							});
+							pan.setValue({
+								x: 0,
+								y: 0,
+							});
+						}
+					});
+				},
+			}),
+		[timetable],
+	);
+	const locationRef = useRef({x: 0, y: 0});
+	pan.addListener(async e => {
+		locationRef.current = {x: e.x, y: e.y};
+	});
+	useEffect(() => {
+		!modifyState.state && pan.setOffset({x: 0, y: 0});
+	}, [modifyState]);
+	const testRef = useRef<View>();
 	return (
 		<InfoViewContainter>
 			<SpacerView />
@@ -120,61 +315,94 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 					idx <= viewDayIndex + 4 && (
 						<InfoVStack key={idx}>
 							{item.map((value, index) => {
-								return (
+								return modifyState.state && modifyState.day == idx && modifyState.index == index ? (
+									<Animated.View
+										key={index}
+										onTouchStart={() => {
+											setStop(false);
+										}}
+										style={{
+											width: '100%',
+											position: 'absolute',
+											zIndex: 100,
+											transform: [{translateX: pan.x}, {translateY: pan.y}],
+										}}
+										{...panResponder.panHandlers}>
+										<InfoViews
+											ref={testRef}
+											backgroundColor={
+												(value.category == 4 || value.category == 1) &&
+												!value.name.includes('추천')
+													? selectCategortColors[value.category]
+													: categortColors[value.category]
+											}
+											height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
+											top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+											state={false}
+											key={index}>
+											<InfoText>{value.name}</InfoText>
+
+											{value.photo != '' && (
+												<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
+											)}
+										</InfoViews>
+									</Animated.View>
+								) : (
 									<InfoPressable
 										backgroundColor={
-											editMode == 'delete' && deleteList.includes(value.id)
-												? 'red'
+											(value.category == 4 || value.category == 1) && !value.name.includes('추천')
+												? selectCategortColors[value.category]
 												: categortColors[value.category]
 										}
 										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
 										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+										state={modifyState.state}
 										key={index}
-										onPress={() => {
-											indexRef.current = {
-												value: value,
-												index: index,
-												idx: idx,
-												category: value.category,
-												flag:
+										onLongPress={() => {
+											if (
+												!(
 													value.name == '점심 추천' ||
 													value.name == '저녁 추천' ||
 													value.name == '숙소 추천'
-														? true
-														: false,
-											};
-											if (makeMode == 'share') {
-												viewDetail(indexRef.current);
-											} else {
-												if (editMode == 'delete') {
-													let copy = [...deleteList];
-													if (deleteList.includes(value.id)) {
-														copy = copy.filter(item => item != value.id);
-													} else {
-														copy.push(value.id);
-													}
-													setDeleteList(copy);
+												)
+											) {
+												if (!modifyState.state) {
+													nowValue.current = {
+														state: true,
+														day: idx,
+														index: index,
+														value: value,
+													};
+													setmodifyState({state: true, day: idx, index: index, value: value});
+													Vibration.vibrate(100);
+												}
+											}
+										}}
+										onPress={() => {
+											if (!modifyState.state) {
+												indexRef.current = {
+													value: value,
+													index: index,
+													idx: idx,
+													category: value.category,
+													flag:
+														value.name == '점심 추천' ||
+														value.name == '저녁 추천' ||
+														value.name == '숙소 추천'
+															? true
+															: false,
+												};
+												if (makeMode == 'share') {
+													value.name == '점심 추천' ||
+													value.name == '저녁 추천' ||
+													value.name == '숙소 추천'
+														? () => {}
+														: viewDetail(indexRef.current);
 												} else {
 													setVisible(true);
 												}
 											}
-										}}
-										// onLongPress={() => {
-
-										//    if (makeMode != 'share') {
-										//       if (editMode == 'delete') {
-										//          setDeleteList([]);
-										//          dispatch(travelSliceActions.editModeChange(''));
-										//       } else {
-										//          let copy = [...deleteList];
-										//          copy.push(value.id);
-										//          setDeleteList(copy);
-										//          dispatch(travelSliceActions.editModeChange('delete'));
-										//       }
-										//    }
-										// }}
-									>
-										{/* h= takenTime top=시간위치 */}
+										}}>
 										<InfoText>{value.name}</InfoText>
 
 										{value.photo != '' && (
@@ -188,7 +416,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 			)}
 			<Modal
 				visible={visible}
-				animationType={'slide'}
+				animationType={'fade'}
 				transparent={true}
 				statusBarTranslucent={true}
 				onRequestClose={() => setVisible(false)}>
@@ -214,7 +442,7 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 									<ModalIconContainer>
 										<DeleteContainer name={'like2'} size={20} color={'black'} />
 									</ModalIconContainer>
-									<ModalText>추천 받기</ModalText>
+									<ModalText>추천받기</ModalText>
 								</ModalElementContainer>
 							</>
 						) : (
@@ -245,18 +473,19 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 						)}
 						<ModalElementContainer
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '삭제하시겠습니까?',
-										modalLeft: true,
-										modalFunction: goRemove,
-									}),
-								);
+								setVisible(false),
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '삭제하시겠습니까?',
+											modalLeft: true,
+											modalFunction: goRemove,
+										}),
+									);
 							}}>
 							<ModalIconContainer>
 								<DeleteContainer name={'delete'} size={20} color={'black'} />
 							</ModalIconContainer>
-							<ModalText>삭제 하기</ModalText>
+							<ModalText>삭제하기</ModalText>
 						</ModalElementContainer>
 					</InfoModalContainer>
 				</ModalContainer>
@@ -267,6 +496,8 @@ const InfoView = ({navigation, setDeleteList, deleteList, viewDayIndex}: any) =>
 
 const InfoVStack = styled(VStack)`
 	flex: 0.18;
+	align-items: center;
+	padding: 0px 0px 0px 1px;
 `;
 const ModalElementContainer = styled.TouchableOpacity`
 	width: 100%;
@@ -294,7 +525,7 @@ const InfoModalContainer = styled.View`
 	flex: 0.5;
 	position: absolute;
 	bottom: 0px;
-	background-color: white;
+	background-color: ${colors.main};
 	width: 100%;
 `;
 const InfoViewContainter = styled.View`
@@ -307,24 +538,43 @@ const SpacerView = styled.View`
 	z-index: 10;
 	background-color: black;
 `;
-
-const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number}>`
+const InfoViews = styled.View<{backgroundColor: string; height: number; top: number; state: boolean}>`
 	width: 100%;
 	height: ${props => props.height}px;
 	top: ${props => props.top}px;
 	background-color: ${props => props.backgroundColor};
 	position: absolute;
 	z-index: 3;
-	border-radius: 10px;
 	padding: 4px;
+	border-radius: ${devicesWidth * 0.01}px;
+	opacity: ${props => (props.state ? 0.6 : 1)};
+`;
+const InfoPressable = styled.Pressable<{backgroundColor: string; height: number; top: number; state: boolean}>`
+	width: 100%;
+	height: ${props => props.height}px;
+	top: ${props => props.top}px;
+	background-color: ${props => props.backgroundColor};
+	position: absolute;
+	z-index: 3;
+	padding: 4px;
+	border-radius: ${devicesWidth * 0.01}px;
+	opacity: ${props => (props.state ? 0.6 : 1)};
 `;
 const InfoText = styled.Text`
-	font-size: 13px;
-	color: black;
+	font-size: ${devicesWidth * 0.036}px;
+	color: white;
+	font-weight: 500;
 `;
 const InfoImage = styled.Image`
 	margin: 5px 0px 0px 0px;
 	width: 100%;
 	height: 50%;
 `;
+
+const QWE = styled.TouchableOpacity`
+	width: 100px;
+	height: 100px;
+	background-color: red;
+`;
+
 export default memo(InfoView);
