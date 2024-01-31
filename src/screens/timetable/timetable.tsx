@@ -119,9 +119,6 @@ export default function Timetable({navigation, route}: any) {
 	const goMapInfo = () => {
 		setMapORtable(!mapORtable);
 	};
-	const goReview = () => {
-		navigation.navigate('InputReviewAndPoint');
-	};
 	const handleModify = () => {
 		// let copy = [...timetable[modifyState.day]];
 		// copy[modifyState.index] = {
@@ -149,9 +146,9 @@ export default function Timetable({navigation, route}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: `${userName}님`,
-					modalSubTitle: `다님이 추천하는 여행 코스는 어떠셨나요?? \n리뷰를 남겨주시면 다님에 큰 도움이 됩니다!`,
+					modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
 					modalLeft: true,
-					modalFunction: goReview,
+					modalFunction: goKakaoShare,
 				}),
 			);
 			clearTimeout(timeRef.current);
@@ -270,6 +267,10 @@ export default function Timetable({navigation, route}: any) {
 			}
 		}
 	};
+	const [modifyView, setModifyView] = useState(true);
+	const noModifyView = () => {
+		setModifyView(false);
+	};
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
 		try {
@@ -308,12 +309,14 @@ export default function Timetable({navigation, route}: any) {
 					modalRightText: '추가할래요',
 					modalLeftText: '보기만할래요',
 					modalFunction: addSharedList,
+					modalLeftFunctionUse: true,
+					modalLeftFunction: noModifyView,
 				}),
 			);
 	}, [makeMode]);
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackVisible: makeMode == 'recommend' ? false : true,
+			headerBackVisible: false,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
 			headerRight: () => (
 				<HeaderContianer>
@@ -336,25 +339,20 @@ export default function Timetable({navigation, route}: any) {
 						</TouchableOpacity>
 					) : (
 						<>
-							{makeMode != 'share' && mapORtable ? (
+							{mapORtable ? (
 								<>
-									{shareViewWithStartFlag && (
-										<TouchableOpacity onPress={goKakaoShare}>
-											<HeaderText>공유</HeaderText>
-										</TouchableOpacity>
-									)}
 									<TouchableOpacity onPress={goViewPager}>
 										<HeaderText>설명</HeaderText>
 									</TouchableOpacity>
+									{modifyView && (
+										<TouchableOpacity onPress={goSave}>
+											<HeaderText>저장</HeaderText>
+										</TouchableOpacity>
+									)}
 								</>
 							) : (
 								<TouchableOpacity onPress={goMapInfo}>
 									<HeaderText>수정</HeaderText>
-								</TouchableOpacity>
-							)}
-							{modifyCheck && (
-								<TouchableOpacity onPress={goSave}>
-									<HeaderText>저장</HeaderText>
 								</TouchableOpacity>
 							)}
 						</>
@@ -362,27 +360,32 @@ export default function Timetable({navigation, route}: any) {
 				</HeaderContianer>
 			),
 			headerLeft: () =>
-				makeMode == 'recommend' && (
-					<TouchableOpacity
-						style={{justifyContent: 'center'}}
-						onPress={() => {
-							dispatch(
-								modalSliceActions.setOpenModal({
-									modalTitle: '홈으로',
-									modalSubTitle: modifyCheck
-										? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
-										: '홈으로 이동하시겠습니까?',
-									modalLeft: true,
-									modalFunction: goHome,
-								}),
-							);
-						}}>
-						<Image
-							source={require('../../../public/images/danim_logo_row.png')}
-							style={{height: 36, aspectRatio: 2.054}}
-						/>
+				shareViewWithStartFlag && (
+					<TouchableOpacity onPress={goKakaoShare}>
+						<HeaderText>공유</HeaderText>
 					</TouchableOpacity>
 				),
+			// makeMode == 'recommend' && (
+			// 	<TouchableOpacity
+			// 		style={{justifyContent: 'center'}}
+			// 		onPress={() => {
+			// 			dispatch(
+			// 				modalSliceActions.setOpenModal({
+			// 					modalTitle: '홈으로',
+			// 					modalSubTitle: modifyCheck
+			// 						? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+			// 						: '홈으로 이동하시겠습니까?',
+			// 					modalLeft: true,
+			// 					modalFunction: goHome,
+			// 				}),
+			// 			);
+			// 		}}>
+			// 		<Image
+			// 			source={require('../../../public/images/danim_logo_row.png')}
+			// 			style={{height: 36, aspectRatio: 2.054}}
+			// 		/>
+			// 	</TouchableOpacity>
+			// ),
 		});
 	}, [
 		editMode,
@@ -395,6 +398,8 @@ export default function Timetable({navigation, route}: any) {
 		modifyCheck,
 		modifyState,
 		shareViewWithStartFlag,
+		shareLoginFlag,
+		modifyView,
 	]);
 	const goScrollRef = useRef({now: 0, content: 0, layout: 0, wantGoing: 0});
 	const goScroll = async (value: {data: number; up: boolean}) => {

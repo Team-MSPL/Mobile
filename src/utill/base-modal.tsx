@@ -6,8 +6,17 @@ import {colors} from './colors';
 import {SubText, TitleText} from './component/policy/policy1';
 
 export default function BaseModal() {
-	const {modalOpen, modalLeft, modalTitle, modalSubTitle, modalFunction, modalRightText, modalLeftText} =
-		useAppSelector(state => state.modalSlice);
+	const {
+		modalOpen,
+		modalLeft,
+		modalTitle,
+		modalSubTitle,
+		modalFunction,
+		modalRightText,
+		modalLeftText,
+		modalLeftFunctionUse,
+		modalLeftFunction,
+	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
 		close();
@@ -15,6 +24,10 @@ export default function BaseModal() {
 	};
 	const close = () => {
 		dispatch(modalSliceActions.setCloseModal());
+	};
+	const handleLeftFunction = () => {
+		close();
+		modalLeftFunction();
 	};
 	return (
 		<Modal
@@ -31,7 +44,9 @@ export default function BaseModal() {
 
 					<Footer left={Boolean(modalLeft)}>
 						{modalLeft && (
-							<ModalButton left={Boolean(modalLeft)} onPress={close}>
+							<ModalButton
+								left={Boolean(modalLeft)}
+								onPress={modalLeftFunctionUse ? handleLeftFunction : close}>
 								<ModalText>{modalLeftText}</ModalText>
 							</ModalButton>
 						)}
