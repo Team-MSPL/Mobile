@@ -9,7 +9,7 @@ import AirPlain from '../../../public/airplain.svg';
 import Calendar from '../../../public/calendar.svg';
 import Community from '../../../public/community.svg';
 import Profile from '../../../public/profile.svg';
-import RightAdd from '../../../public/rightAdd.svg';
+// import RightAdd from '../../../public/rightAdd.svg';
 import Picture from '../../../public/picture.svg';
 import MileStone from '../../../public/milestone.svg';
 import Review from '../../../public/review.svg';
@@ -28,6 +28,9 @@ import Location from '../../../public/location.svg';
 import Infos from '../../../public/infos.svg';
 import Share from '../../../public/share.svg';
 import Help from '../../../public/ic_help.svg';
+import RightAdd from '../../../public/right-add.svg';
+import RegionRecommend from '../../../public/region-recommend.svg';
+import CalendarRecommend from '../../../public/calendar-recommend.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -62,9 +65,9 @@ export const SvgCommunity = styled(Community)<{color?: string}>`
 export const SvgProfile = styled(Profile)<{color?: string}>`
 	color: color;
 `;
-export const SvgRightAdd = styled(RightAdd)<{color?: string}>`
-	color: color;
-`;
+// export const SvgRightAdd = styled(RightAdd)<{color?: string}>`
+// 	color: color;
+// `;
 export const SvgPicture = styled(Picture)<{color?: string}>`
 	color: color;
 `;
@@ -114,5 +117,14 @@ export const SvgShare = styled(Share)<{color?: string}>`
 	color: color;
 `;
 export const SVGHelp = styled(Help)<{color?: string}>`
+	color: color;
+`;
+export const SVGRightAdd = styled(RightAdd)<{color?: string}>`
+	color: color;
+`;
+export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string}>`
+	color: color;
+`;
+export const SVGCalendarRecommend = styled(CalendarRecommend)<{color?: string}>`
 	color: color;
 `;

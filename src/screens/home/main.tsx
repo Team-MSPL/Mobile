@@ -19,6 +19,8 @@ import moment from 'moment';
 import {cityViewList} from '../enroll-info/select-city';
 import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 import {tendencyList} from '../enroll-info/select-tendency';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {SVGCalendarRecommend, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 export default function Main({navigation}: any) {
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goEnroll = () => {
@@ -105,8 +107,10 @@ export default function Main({navigation}: any) {
 	};
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const getMainScreen = async () => {
-		const data = await dispatch(getPlaceRecommendInMainScreen()).unwrap();
-		setMainScreens(data);
+		try {
+			const data = await dispatch(getPlaceRecommendInMainScreen()).unwrap();
+			setMainScreens(data);
+		} catch (err) {}
 	};
 	useLayoutEffect(() => {
 		getMainScreen();
@@ -155,9 +159,7 @@ export default function Main({navigation}: any) {
 		onPress: () => void;
 		image: any;
 		text: string;
-		boldText: string;
 	}
-	const emojiList = ['🏖', '🏕', '🍲', '📸', '🏃', '🗼', '🚅', '🛫', '🛳', '🚗', '🦐'];
 	const regionList = [
 		{id: 1, subTitle: '서울'},
 		{id: 2, subTitle: '부산'},
@@ -177,29 +179,34 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: regionRecommend,
-			image: require('../../../public/images/map.png'),
-			text: '지역 추천받을래요',
-			boldText: '여행 지역 추천받기',
+			image: <SVGRegionRecommend></SVGRegionRecommend>,
+			text: '여행 지역 ',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: require('../../../public/images/destination.png'),
-			text: '일정 추천받을래요',
-			boldText: '여행 일정 추천받기',
+			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
+			text: '여행 일정 ',
 		},
 	];
 	function tendencyMake(list: number[]) {
 		let copy = [...tendencyList[1].list, ...tendencyList[2].list, ...tendencyList[3].list];
-		let result: string[] = [];
+		let result: any[] = [];
 		list.forEach((item, idx) => {
 			if (item >= 80) {
-				result.push(copy[idx]);
+				result.push(
+					<TagElement key={idx}>
+						<HStack>
+							<TagShopText># </TagShopText>
+							<TagText>{copy[idx]}</TagText>
+						</HStack>
+					</TagElement>,
+				);
 			}
 		});
+
 		return result;
 	}
-	const DeviceWidth = Dimensions.get('window').width;
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
 	const setPreset = (data: {
 		preset: any;
@@ -255,209 +262,219 @@ export default function Main({navigation}: any) {
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
 	return (
-		<SafeAreaView>
-			<MainContainer>
-				<TopBannerContainer>
-					<BannerTextContainer>
+		<HomeContainer>
+			<BackgroundImage source={require('../../../public/images/home-image.png')}>
+				<BrighnessBox>
+					<TicketTouchable onPress={goTokenLog}>
+						<TicketText>이용권</TicketText>
+					</TicketTouchable>
+					<HomeTextContainer
+						onPress={() => {
+							selectPopularity({id: randomRegion.id, subTitle: randomRegion.subTitle});
+						}}>
+						<HomeText>{userName} 님,</HomeText>
+						<HomeText>현재 인기 여행지</HomeText>
 						<HStack>
-							<TouchableOpacity
-								onPress={() => {
-									navigation.navigate('More');
-								}}>
-								<BannerColoredText>{userName}</BannerColoredText>
-							</TouchableOpacity>
-							<BannerText>님,</BannerText>
+							<HomePrimaryText>{randomRegion.subTitle}</HomePrimaryText>
+							<HomeText> 여행은 어때요?</HomeText>
+							<SVGRightAdd
+								color='white'
+								width={heightPercentage(24)}
+								height={heightPercentage(24)}
+								style={{marginLeft: 10}}></SVGRightAdd>
 						</HStack>
-						<BannerText>현재 인기 여행지</BannerText>
-						<HStack>
-							<TouchableOpacity
-								onPress={() => {
-									selectPopularity({id: randomRegion.id, subTitle: randomRegion.subTitle});
-								}}>
-								<BannerColoredText>{randomRegion.subTitle}</BannerColoredText>
-							</TouchableOpacity>
-							<BannerText>여행은 어떠세요?</BannerText>
-						</HStack>
-					</BannerTextContainer>
-					<BannerEmoji>{emojiList[Math.floor(Math.random() * emojiList.length)]}</BannerEmoji>
-				</TopBannerContainer>
-
-				<ButtonContainer>
-					{buttonList.map(item => (
-						<NewTravelButton onPress={item.onPress} key={item.id}>
-							<NewTravelButtonTextContainer>
-								<NewTravelButtonDescriptionText>{item.text}</NewTravelButtonDescriptionText>
-							</NewTravelButtonTextContainer>
-							<NewTravelButtonImage source={item.image} />
-							<NewTravelButtonTitleText>{item.boldText}</NewTravelButtonTitleText>
-						</NewTravelButton>
-					))}
-				</ButtonContainer>
-
+					</HomeTextContainer>
+				</BrighnessBox>
+			</BackgroundImage>
+			{/* <BlackFence /> */}
+			<HomeBottomContainer>
+				<HomeRecommendText>다님에게 추천받기</HomeRecommendText>
+				{buttonList.map(item => (
+					<RecommendContainer onPress={item.onPress} key={item.id}>
+						<RecommendContainerText>
+							{item.text}
+							<HomeRecommendText>추천</HomeRecommendText>
+						</RecommendContainerText>
+						{item.image}
+					</RecommendContainer>
+				))}
 				<CollectionContainer>
-					<CollectionTitle>다님이 추천하는 여행지</CollectionTitle>
-					<CollectionSubtitle>이곳으로 여행을 떠나보는건 어떠세요?</CollectionSubtitle>
-					<CollectionContentContainer>
+					<HomeRecommendText>다님이 추천하는 여행지</HomeRecommendText>
+					<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						{mainScreens.map((item, idx) => (
 							<CollectionTouchableOpacity
 								key={idx}
 								onPress={() => {
 									goCourseDetaile(item);
 								}}>
-								<CollectionRecommendContentItem width={DeviceWidth * 0.9}>
-									<CollectionRecommendContentItemImage source={{uri: item.photo}} />
+								<ImageContainer>
+									<CollectionRecommendContentItemImage
+										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
+									<ImageRegionText>{item.region + '\n'}</ImageRegionText>
+									<ImageTargetText>{item.name}</ImageTargetText>
+								</ImageContainer>
+								{/* <CollectionRecommendContentItem width={DeviceWidth * 0.9}>
 									<CollectionRecommendContentItemDescriptionContainer>
-										<CollectionContentItemText>
-											{item.region + '\n'}
-											{item.name}
-										</CollectionContentItemText>
+			
 										<CollectionContentItemHashtagText>
 											#{tendencyMake([...item.concept, ...item.play, ...item.tour]).join(' #')}
 										</CollectionContentItemHashtagText>
 									</CollectionRecommendContentItemDescriptionContainer>
 									<RightArrowIcon name='right' size={16} color={'#ccc'} />
-								</CollectionRecommendContentItem>
+								</CollectionRecommendContentItem> */}
+								<TagContainer>
+									{tendencyMake([...item.concept, ...item.play, ...item.tour])}
+								</TagContainer>
 							</CollectionTouchableOpacity>
 						))}
 					</CollectionContentContainer>
 				</CollectionContainer>
-			</MainContainer>
-		</SafeAreaView>
+			</HomeBottomContainer>
+		</HomeContainer>
 	);
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
-const SafeAreaView = styled.SafeAreaView`
-	height: 100%;
+const TagElement = styled.View`
+	height: ${heightPercentage(22)}px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.Gray1};
+	border-radius: 4px;
+	padding: 0px ${widthPercentage(6)}px;
+	margin: 2px;
+`;
+const TagShopText = styled.Text`
+	font-size: ${heightPercentage(12)}px;
+	color: ${colors.Primary};
+	line-height: ${heightPercentage(12)}px;
+`;
+const TagText = styled.Text`
+	font-size: ${heightPercentage(12)}px;
+	color: ${colors.Gray5};
+	font-weight: 600;
+	line-height: ${heightPercentage(12)}px;
+`;
+const ImageRegionText = styled.Text`
+	font-size: ${fontPercentage(14)}px;
+	font-weight: 400;
+	color: ${colors.backgroundWhite};
+	line-height: ${heightPercentage(16.8)}px;
+`;
+const ImageTargetText = styled.Text`
+	width: ${widthPercentage(152)}px;
+	font-size: ${fontPercentage(20)}px;
+	font-weight: 600;
+	color: ${colors.backgroundWhite};
+	line-height: ${heightPercentage(24)}px;
+`;
+const TagContainer = styled.View`
+	width: ${widthPercentage(152)}px;
+	flex-direction: row;
+	flex-wrap: wrap;
+`;
+const RecommendContainer = styled.Pressable`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(88)}px;
+	background-color: ${colors.Gray1};
+	border-radius: 12px;
+	top: ${heightPercentage(18)}px;
+	margin: 0px 0px ${heightPercentage(9)}px 0px;
+	flex-direction: row;
+	overflow: hidden;
+`;
+
+const HomeRecommendText = styled.Text`
+	font-size: ${fontPercentage(18)}px;
+	font-weight: 600;
+	color: ${colors.Black};
+`;
+const RecommendContainerText = styled(HomeRecommendText)`
+	color: #5350ff;
+	width: 50%;
+	top: ${heightPercentage(48)}px;
+	left: ${widthPercentage(21)}px;
+`;
+const HomeContainer = styled.ScrollView`
+	background-color: ${colors.Black};
+	width: 100%;
+`;
+const HomeBottomContainer = styled.View`
+	width: 100%;
+	border-radius: 30px 30px 0px 0px;
+	background-color: ${colors.backgroundWhite};
+	padding: ${widthPercentage(35)}px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
+`;
+const BrighnessBox = styled.View`
+	flex: 1;
+	background-color: rgba(0, 0, 0, 0.3);
+`;
+const BackgroundImage = styled.ImageBackground`
+	width: 100%;
+	height: ${heightPercentage(408)}px;
+`;
+const TicketText = styled.Text`
+	color: ${colors.Black};
+	font-size: ${fontPercentage(15)}px;
+	font-weight: 600;
+`;
+const TicketTouchable = styled.TouchableOpacity`
+	border-radius: 99px;
+	top: ${heightPercentage(59)}px;
+	left: ${widthPercentage(295)}px;
+	width: ${widthPercentage(63)}px;
+	height: ${heightPercentage(31)}px;
+	background-color: ${colors.Primary};
+	align-items: center;
+	justify-content: center;
+`;
+const HomeTextContainer = styled.Pressable`
+	top: ${heightPercentage(244)}px;
+	left: ${widthPercentage(26)}px;
+`;
+const HomeText = styled.Text`
+	font-size: ${fontPercentage(23)}px;
+	font-weight: 600;
+	color: ${colors.backgroundWhite};
+	line-height: ${heightPercentage(34.5)}px;
+`;
+const HomePrimaryText = styled(HomeText)`
+	color: ${colors.Primary};
+	font-weight: 700;
 `;
 const HeaderHStack = styled(HStack).attrs({as: TouchableOpacity})`
 	padding: 0px 24px;
-`;
-
-const TopBannerContainer = styled.View`
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	margin-vertical: 24px;
-	width: 100%;
-`;
-const BannerTextContainer = styled.View`
-	flex-direction: column;
 `;
 const BannerColoredText = styled.Text`
 	font-size: 24px;
 	font-weight: bold;
 	color: ${colors.TextPrimary};
 `;
-const BannerText = styled.Text`
-	font-size: 24px;
-	font-weight: bold;
-	color: black;
-`;
-const BannerEmoji = styled.Text`
-	font-size: 88px;
-`;
-
-const ButtonContainer = styled.View`
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-around;
-	align-self: center;
-	width: ${devicesWidth * 0.9}px;
-	aspect-ratio: 2.4;
-	margin-bottom: 48px;
-`;
-
-const NewTravelButton = styled.TouchableOpacity`
-	width: ${devicesWidth * 0.36}px;
-	aspect-ratio: 1;
-	align-items: center;
-	border-radius: ${devicesWidth * 0.04}px;
-	background-color: ${colors.main};
-	${Platform.OS === 'android' ? 'elevation: 4;' : 'box-shadow: 0px 2px 4px #ccc;'}
-`;
-const NewTravelButtonTextContainer = styled.View`
-	align-items: center;
-	justify-content: center;
-	background-color: ${colors.selectButton};
-	border-top-left-radius: ${devicesWidth * 0.04}px;
-	border-top-right-radius: ${devicesWidth * 0.04}px;
-	width: ${devicesWidth * 0.36}px;
-	aspect-ratio: 5;
-	margin-bottom: ${devicesWidth * 0.05}px;
-`;
-const NewTravelButtonDescriptionText = styled.Text`
-	color: ${colors.main};
-	font-size: ${devicesWidth * 0.032}px;
-	font-weight: 600;
-	font-family: '';
-`;
-const NewTravelButtonImage = styled.ImageBackground`
-	width: ${devicesHeight * 0.05}px;
-	aspect-ratio: 1;
-	overflow: hidden;
-	margin-bottom: ${devicesWidth * 0.05}px;
-`;
-const NewTravelButtonTitleText = styled.Text`
-	color: black;
-	font-size: ${devicesWidth * 0.04}px;
-	font-weight: bold;
-`;
-
-const RightArrowIcon = styled(Icon)``;
 const Ticket = styled(Icons)`
 	margin: 0px 5px 0px 0px;
 `;
 
 const CollectionContainer = styled.View`
+	margin-top: ${heightPercentage(36)}px;
 	margin-bottom: 12px;
 `;
-const CollectionTitle = styled.Text`
-	font-size: 18px;
-	font-weight: bold;
-	margin-bottom: 4px;
-	color: black;
-`;
-const CollectionSubtitle = styled.Text`
-	font-size: 14px;
-	margin-bottom: 12px;
-`;
-const CollectionContentContainer = styled.View`
-	align-items: center;
-	justify-content: space-between;
+const CollectionContentContainer = styled.ScrollView`
+	margin-top: ${heightPercentage(18)}px;
 	width: 100%;
 `;
 const CollectionTouchableOpacity = styled.Pressable``;
-const CollectionRecommendContentItem = styled.View<{width: number}>`
-	width: ${props => props.width}px;
-	flex-direction: row;
-	padding-vertical: 8px;
-	padding-horizontal: 16px;
-	align-items: center;
-	border-radius: 16px;
-	background-color: ${colors.main};
-	${Platform.OS === 'android' ? 'elevation: 4;' : 'box-shadow: 0px 2px 4px #ccc;'}
-	margin-bottom: 12px;
-`;
 const CollectionRecommendContentItemImage = styled.Image`
-	width: ${devicesWidth * 0.2}px;
-	aspect-ratio: 1;
-	margin-right: 24px;
+	position: absolute;
+	width: ${widthPercentage(152)}px;
+	height: ${heightPercentage(196)}px;
 	border-radius: 12px;
 `;
-const CollectionRecommendContentItemDescriptionContainer = styled.View`
-	flex-direction: column;
-	width: ${devicesWidth * 0.5}px;
-	padding: 8px;
-`;
-const CollectionContentItemText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: black;
-	margin-bottom: 4px;
-`;
-
-const CollectionContentItemHashtagText = styled.Text`
-	font-size: 12px;
-	color: ${colors.TextPrimary};
+const ImageContainer = styled.View`
+	width: ${widthPercentage(152)}px;
+	height: ${heightPercentage(196)}px;
+	margin-right: 24px;
+	padding: ${widthPercentage(6)}px;
+	align-items: start;
+	justify-content: flex-end;
+	margin-bottom: ${heightPercentage(10)}px;
 `;

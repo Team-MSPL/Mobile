@@ -82,7 +82,7 @@ function TabBar() {
 						</View>
 					),
 					title: '홈',
-					headerShown: true,
+					headerShown: false,
 					headerStyle: {backgroundColor: colors.main},
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}

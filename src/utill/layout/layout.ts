@@ -30,7 +30,7 @@ export const Divider = styled.View`
 
 export const MainContainer = styled.ScrollView`
 	background-color: ${colors.main};
-	padding: 0px 24px 24px 24px;
+	width: 100%;
 `;
 export const MainText = styled.Text`
 	font-size: 22px;
