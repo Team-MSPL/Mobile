@@ -119,7 +119,6 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 				}),
 			);
 		} else {
-			console.log(timetable[e.idx]);
 			if (e.index == timetable[e.idx].length - 1) {
 				if (timetable[e.idx][timetable[e.idx].length - 2].name.includes('추천')) {
 					goCheck = false;
@@ -264,9 +263,7 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 									deleteCopy.splice(nowValue.current.index, 1);
 									changeCopy[nowValue.current.day] = deleteCopy;
 									let addCopy = [...changeCopy[changeDay]];
-									console.log('ㅂㅈㄷ', addCopy, changeInputIndex);
 									addCopy.splice(changeInputIndex, 0, copyValue);
-									console.log(addCopy);
 									changeCopy[changeDay] = addCopy;
 									setModifyRef({
 										x: Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18)),

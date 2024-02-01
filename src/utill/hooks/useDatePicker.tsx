@@ -14,7 +14,7 @@ export default function UseDatePicker({
 	goConfirm,
 }: PickerType) {
 	const ampmList = ['', '오전', '오후', ''];
-	const hourList = ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ''];
+	const hourList = ['', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ''];
 	const minuteList = ['', '0', '30', ''];
 	const [ampm, setAmpm] = useState(0);
 	const [hour, setHour] = useState(0);
@@ -25,7 +25,6 @@ export default function UseDatePicker({
 	const hourRef = useRef<ScrollView>();
 	const minuteRef = useRef<ScrollView>();
 	useEffect(() => {
-		console.log(minuteData, 'qwp');
 		setMinute(minuteData);
 		setAmpm(ampmData);
 		setHour(hourData);
@@ -47,7 +46,11 @@ export default function UseDatePicker({
 			ampm: string;
 			hour: string;
 			minute: string;
-		} = {ampm: ampmList[ampm], hour: hourList[hour], minute: minuteList[minute]};
+		} = {
+			ampm: ampmList[ampm],
+			hour: hourList[hour] == '12' ? String(parseInt(hourList[hour]) - 12) : hourList[hour],
+			minute: minuteList[minute],
+		};
 		goConfirm(timeData);
 	};
 	const viewList = [

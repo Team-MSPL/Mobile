@@ -4,8 +4,8 @@ import {
 	responsiveScreenFontSize,
 } from 'react-native-responsive-dimensions';
 
-const FIGMA_WINDOW_WIDTH = 360;
-const FIGMA_WINDOW_HEIGHT = 760;
+const FIGMA_WINDOW_WIDTH = 375;
+const FIGMA_WINDOW_HEIGHT = 904;
 
 export function widthPercentage(width: number) {
 	const percentage = (width / FIGMA_WINDOW_WIDTH) * 100;
