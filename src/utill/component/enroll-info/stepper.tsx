@@ -1,0 +1,28 @@
+import styled from 'styled-components/native';
+import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {colors} from '../../colors';
+
+export default function Stepper({total, now}: {total: number; now: number}) {
+	return (
+		<StepperBar>
+			<NowBar now={(now / total) * 100}></NowBar>
+		</StepperBar>
+	);
+}
+
+const StepperBar = styled.View`
+	width: ${widthPercentage(343)}px;
+	height: ${heightPercentage(10)}px;
+	background-color: ${colors.Gray1};
+	align-items: start;
+	border-radius: 6px;
+	align-self: center;
+`;
+const NowBar = styled.View<{now: number}>`
+	position: absolute;
+	border-radius: 6px;
+	z-index: 10;
+	width: ${props => props.now}%;
+	height: ${heightPercentage(10)}px;
+	background-color: ${colors.Primary};
+`;

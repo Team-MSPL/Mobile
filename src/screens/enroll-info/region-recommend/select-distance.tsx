@@ -4,7 +4,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {MainContainer, Center, Divider, MainText, HStack} from '../../../utill/layout/layout';
+import {MainContainer, Center, Divider, MainText, HStack, BackgroundGray} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -18,6 +18,8 @@ import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.sl
 import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
+import Stepper from '../../../utill/component/enroll-info/stepper';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(10);
@@ -160,11 +162,12 @@ export default function SelectDistance({navigation}: any) {
 		}
 	};
 	return (
-		<MainContainer>
+		<BackgroundGray>
+			<Stepper total={7} now={7}></Stepper>
 			<StepText
-				mainText='지역 추천 반경 설정'
-				subText='본인의 위치에서 추천받고자하는 여행 반경을 설정해주세요'
-			/>
+				styleText='3.원하는 반경의 지역을 추천해드려요.'
+				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
+				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 			<Center>
 				<GetContainer onPress={goReverseGeocoding}>
 					<GetContainerText>위치정보 받아오기</GetContainerText>
@@ -178,7 +181,11 @@ export default function SelectDistance({navigation}: any) {
 						//provider={PROVIDER_GOOGLE}
 						showsMyLocationButton={false}
 						showsUserLocation={false}
-						style={{width: '100%', height: 300, position: 'absolute'}}
+						style={{
+							width: widthPercentage(327),
+							height: heightPercentage(240),
+							position: 'absolute',
+						}}
 						region={{
 							latitude: geoInfo.lat,
 							longitude: geoInfo.lng,
@@ -204,6 +211,7 @@ export default function SelectDistance({navigation}: any) {
 							maximumValue={10}
 							minimumTrackTintColor='#123123'
 							maximumTrackTintColor='#000000'
+							thumbTintColor='#5350FF'
 							value={range}
 							step={1}
 							onValueChange={item => {
@@ -215,15 +223,11 @@ export default function SelectDistance({navigation}: any) {
 							<DistanceExplain>한국 전체</DistanceExplain>
 						</DistanceSpace>
 					</DistanceCenter>
-					{/* <DistanceDivider /> */}
-					<DistanceExplain>
-						*그림은 이해를 돕기위함으로 실제 결과와는 차이가 있을 수 있습니다.
-					</DistanceExplain>
 				</>
 			)}
 
-			<CustomButton label='선택 완료' onPress={checkToken}></CustomButton>
-		</MainContainer>
+			<CustomButton label='맞춤형 여행지를 확인해볼게요!' onPress={checkToken}></CustomButton>
+		</BackgroundGray>
 	);
 }
 const DistanceDivider = styled(Divider)`

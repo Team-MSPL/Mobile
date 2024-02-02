@@ -12,6 +12,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer, MarginContainder} from './select-multi';
 import MapView, {Circle, Marker, Polyline} from 'react-native-maps';
 import {cityViewList} from './select-city';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -41,7 +42,11 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 								//provider={PROVIDER_GOOGLE}
 								showsMyLocationButton={false}
 								showsUserLocation={false}
-								style={{width: '100%', height: 300, position: 'absolute'}}
+								style={{
+									width: widthPercentage(327),
+									height: heightPercentage(240),
+									position: 'absolute',
+								}}
 								region={{
 									latitude: cityViewList[cityIndex].sub[cityDistance[0]].lat,
 									longitude: cityViewList[cityIndex].sub[cityDistance[0]].lng,
@@ -114,14 +119,14 @@ export const DistanceExplain = styled.Text`
 	color: black;
 `;
 export const MapContainer = styled.View`
-	width: 100%;
-	height: 300px;
-	align-items: center;
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(240)}px;
+	align-self: center;
 	justify-content: center;
 `;
 export const Qwe = styled.View`
-	width: 100%;
-	height: 300px;
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(240)}px;
 	position: absolute;
 	align-items: center;
 	justify-content: center;

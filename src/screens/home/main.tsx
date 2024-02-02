@@ -1,28 +1,41 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {Dimensions, Platform, TouchableOpacity} from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign';
-import Icons from 'react-native-vector-icons/Ionicons';
-import styled from 'styled-components/native';
-import {RootState, useAppDispatch, useAppSelector} from '../../redux';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {getTourTest, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
-import {colors} from '../../utill/colors';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {HStack, HeaderContianer, MainContainer, devicesHeight, devicesWidth} from '../../utill/layout/layout';
+import {TouchableOpacity} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import moment from 'moment';
-import {cityViewList} from '../enroll-info/select-city';
 import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
-import {tendencyList} from '../enroll-info/select-tendency';
+
+import {colors} from '../../utill/colors';
+import {HStack} from '../../utill/layout/layout';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
+import Icons from 'react-native-vector-icons/Ionicons';
+import styled from 'styled-components/native';
+import {cityViewList} from '../enroll-info/select-city';
+import {tendencyList} from '../enroll-info/select-tendency';
+
+import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import moment from 'moment';
+
 export default function Main({navigation}: any) {
+	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
+	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
+	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
+
+	const regionRecommend = () => {
+		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
+		dispatch(regionRecommendSliceActions.reset());
+		navigation.navigate('RegionSelectWho');
+	};
 	const goEnroll = () => {
 		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
 		let season = Array(4).fill(0);
@@ -31,6 +44,7 @@ export default function Main({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
 	};
+
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
@@ -51,15 +65,6 @@ export default function Main({navigation}: any) {
 		navigation.navigate('EnrollTravelTitle');
 	};
 
-	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
-	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
-	const regionRecommend = () => {
-		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
-		dispatch(regionRecommendSliceActions.reset());
-		//dispatch(regionRecommendSliceActions.enrollCheckStep(0));
-		navigation.navigate('RegionEnrollInfo');
-	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
@@ -79,6 +84,27 @@ export default function Main({navigation}: any) {
 	const goTokenLog = () => {
 		navigation.navigate('TokenLog');
 	};
+
+	const pushPermission = async () => {
+		const authStatus = await messaging().requestPermission();
+		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
+	};
+	const checkEvent = async () => {
+		const eventExist = await dispatch(getEventList()).unwrap();
+		const state = await AsyncStorage.getItem('eventState');
+		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
+			dispatch(eventSliceActions.setEventState(true));
+		}
+	};
+	const getMainScreen = async () => {
+		try {
+			const data = await dispatch(getPlaceRecommendInMainScreen()).unwrap();
+			setMainScreens(data);
+		} catch (err) {}
+	};
+	useLayoutEffect(() => {
+		getMainScreen();
+	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');
 	}, []);
@@ -94,27 +120,6 @@ export default function Main({navigation}: any) {
 		});
 	}, [functionToken]);
 
-	const pushPermission = async () => {
-		const authStatus = await messaging().requestPermission();
-		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
-	};
-	const checkEvent = async () => {
-		const eventExist = await dispatch(getEventList()).unwrap();
-		const state = await AsyncStorage.getItem('eventState');
-		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
-			dispatch(eventSliceActions.setEventState(true));
-		}
-	};
-	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
-	const getMainScreen = async () => {
-		try {
-			const data = await dispatch(getPlaceRecommendInMainScreen()).unwrap();
-			setMainScreens(data);
-		} catch (err) {}
-	};
-	useLayoutEffect(() => {
-		getMainScreen();
-	}, []);
 	useEffect(() => {
 		pushPermission();
 		checkCache();
@@ -138,43 +143,6 @@ export default function Main({navigation}: any) {
 		checkEvent();
 	}, []);
 	useBackHandler();
-	interface mainScreensType {
-		region: string;
-		name: string;
-		lat: number;
-		lng: number;
-		takenTime: number;
-		popular: number;
-		partner: number[];
-		concept: number[];
-		play: number[];
-		tour: number[];
-		season: number[];
-		category: number;
-		photo: string;
-	}
-
-	interface ButtonListType {
-		id: number;
-		onPress: () => void;
-		image: any;
-		text: string;
-	}
-	const regionList = [
-		{id: 1, subTitle: '서울'},
-		{id: 2, subTitle: '부산'},
-		{id: 17, subTitle: '제주'},
-		{id: 4, subTitle: '인천'},
-		{id: 3, subTitle: '대구'},
-		{id: 5, subTitle: '광주'},
-		{id: 6, subTitle: '대전'},
-		{id: 7, subTitle: '울산'},
-		{id: 10, subTitle: '강릉시'},
-		{id: 10, subTitle: '속초시'},
-		{id: 15, subTitle: '경주시'},
-		{id: 15, subTitle: '포항시'},
-		{id: 14, subTitle: '여수시'},
-	];
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
@@ -195,10 +163,10 @@ export default function Main({navigation}: any) {
 		list.forEach((item, idx) => {
 			if (item >= 80) {
 				result.push(
-					<TagElement key={idx}>
+					<TagElement key={idx} opacityStatus={false}>
 						<HStack>
 							<TagShopText># </TagShopText>
-							<TagText>{copy[idx]}</TagText>
+							<TagText color={colors.Gray5}>{copy[idx]}</TagText>
 						</HStack>
 					</TagElement>,
 				);
@@ -313,15 +281,6 @@ export default function Main({navigation}: any) {
 									<ImageRegionText>{item.region + '\n'}</ImageRegionText>
 									<ImageTargetText>{item.name}</ImageTargetText>
 								</ImageContainer>
-								{/* <CollectionRecommendContentItem width={DeviceWidth * 0.9}>
-									<CollectionRecommendContentItemDescriptionContainer>
-			
-										<CollectionContentItemHashtagText>
-											#{tendencyMake([...item.concept, ...item.play, ...item.tour]).join(' #')}
-										</CollectionContentItemHashtagText>
-									</CollectionRecommendContentItemDescriptionContainer>
-									<RightArrowIcon name='right' size={16} color={'#ccc'} />
-								</CollectionRecommendContentItem> */}
 								<TagContainer>
 									{tendencyMake([...item.concept, ...item.play, ...item.tour])}
 								</TagContainer>
@@ -335,23 +294,23 @@ export default function Main({navigation}: any) {
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
-const TagElement = styled.View`
+export const TagElement = styled.View<{opacityStatus: boolean}>`
 	height: ${heightPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${colors.Gray1};
+	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : colors.Gray1)};
 	border-radius: 4px;
 	padding: 0px ${widthPercentage(6)}px;
 	margin: 2px;
 `;
-const TagShopText = styled.Text`
+export const TagShopText = styled.Text`
 	font-size: ${heightPercentage(12)}px;
 	color: ${colors.Primary};
 	line-height: ${heightPercentage(12)}px;
 `;
-const TagText = styled.Text`
+export const TagText = styled.Text<{color: string}>`
 	font-size: ${heightPercentage(12)}px;
-	color: ${colors.Gray5};
+	color: ${props => props.color};
 	font-weight: 600;
 	line-height: ${heightPercentage(12)}px;
 `;
@@ -390,7 +349,7 @@ const HomeRecommendText = styled.Text`
 	color: ${colors.Black};
 `;
 const RecommendContainerText = styled(HomeRecommendText)`
-	color: #5350ff;
+	color: ${colors.PointYellow};
 	width: 50%;
 	top: ${heightPercentage(48)}px;
 	left: ${widthPercentage(21)}px;
@@ -478,3 +437,41 @@ const ImageContainer = styled.View`
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
+interface mainScreensType {
+	region: string;
+	name: string;
+	lat: number;
+	lng: number;
+	takenTime: number;
+	popular: number;
+	partner: number[];
+	concept: number[];
+	play: number[];
+	tour: number[];
+	season: number[];
+	category: number;
+	photo: string;
+}
+
+interface ButtonListType {
+	id: number;
+	onPress: () => void;
+	image: any;
+	text: string;
+}
+
+const regionList = [
+	{id: 1, subTitle: '서울'},
+	{id: 2, subTitle: '부산'},
+	{id: 17, subTitle: '제주'},
+	{id: 4, subTitle: '인천'},
+	{id: 3, subTitle: '대구'},
+	{id: 5, subTitle: '광주'},
+	{id: 6, subTitle: '대전'},
+	{id: 7, subTitle: '울산'},
+	{id: 10, subTitle: '강릉시'},
+	{id: 10, subTitle: '속초시'},
+	{id: 15, subTitle: '경주시'},
+	{id: 15, subTitle: '포항시'},
+	{id: 14, subTitle: '여수시'},
+];

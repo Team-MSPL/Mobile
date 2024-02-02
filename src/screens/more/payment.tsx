@@ -10,7 +10,7 @@ import {Google_Ads_Key} from '@env';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import {useShopping} from '../../utill/hooks/useShopping';
 import {colors} from '../../utill/colors';
-import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
@@ -95,7 +95,7 @@ export default function Payment({navigation}: any) {
 								*1일 2회 수령 가능{`\n`} 오늘 남은 횟수 {2 - watchAD}회
 							</BonusText>
 						</InfoContainer>
-						<SvgRightAdd width={30} height={30} color={'black'} />
+						<SVGRightAdd width={30} height={30} color={'black'} />
 					</HStack>
 				</TouchableOpacity>
 			</DayViewContainer>
@@ -126,7 +126,7 @@ export default function Payment({navigation}: any) {
 									할인 진행 중
 								</BonusText>
 							</InfoContainer>
-							<SvgRightAdd width={30} height={30} color={'black'} />
+							<SVGRightAdd width={30} height={30} color={'black'} />
 						</HStack>
 					</TouchableOpacity>
 				</DayViewContainer>

@@ -12,7 +12,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
-import {SvgRight, SvgRightAdd} from '../../utill/svg/svg';
+import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
 export default function MyTravelList({navigation}: any) {
@@ -117,7 +117,7 @@ export default function MyTravelList({navigation}: any) {
 					</DayText>
 					<TravelTitleText>{item.item.travelName}</TravelTitleText>
 				</VStack>
-				<SvgRightAdd color={colors.selectButton} />
+				<SVGRightAdd color={colors.selectButton} />
 			</MyTravelContainer>
 		);
 	};

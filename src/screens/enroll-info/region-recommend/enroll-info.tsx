@@ -8,6 +8,9 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import SelectTendency from './select-tendency';
 import SelectPopularity from './select-popularity';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import SelectWho from './select-who';
+import SelectSeason from './select-season';
+import SelectTour from './select-tour';
 
 export default function EnrollInfo({navigation}: any) {
 	const changeComponent = (e: number) => {
@@ -45,7 +48,7 @@ export default function EnrollInfo({navigation}: any) {
 	const enrollComponentList = [
 		{
 			title: '성향',
-			component: <SelectTendency goNextStep={goNextStep} />,
+			component: <SelectTour />,
 		},
 		{
 			title: '인기도 설정',
@@ -58,7 +61,7 @@ export default function EnrollInfo({navigation}: any) {
 	];
 	return (
 		<MainContainer>
-			<TitleViewContainer>
+			{/* <TitleViewContainer>
 				<ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
 					{enrollComponentList.map((item, idx) => (
 						<TitleContainer
@@ -75,14 +78,13 @@ export default function EnrollInfo({navigation}: any) {
 						</TitleContainer>
 					))}
 				</ScrollView>
-			</TitleViewContainer>
+			</TitleViewContainer> */}
 			{enrollComponentList[viewComponent].component}
 		</MainContainer>
 	);
 }
 const MainContainer = styled.View`
 	background-color: ${colors.main};
-	padding: 10px;
 	flex: 1;
 `;
 const TitleViewContainer = styled.View`

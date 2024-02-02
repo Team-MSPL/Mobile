@@ -1,46 +1,49 @@
-import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {colors} from '../colors';
+import {fontPercentage, heightPercentage, widthPercentage} from '../layout/responsive-size';
 
-export default function CustomButton({label, onPress, isDisabled, width}: CustomButtonProps) {
+export default function CustomButton({marginTop, marginBottom, label, onPress, isDisabled, width}: CustomButtonProps) {
 	return (
-		<CustomButtonContainer>
-			<ButtonContainer
-				disabled={isDisabled ?? false}
-				isDisabledOpacity={isDisabled ?? false}
-				onPress={onPress}
-				width={width ?? 60}>
-				<ButtonText>{label}</ButtonText>
-			</ButtonContainer>
-		</CustomButtonContainer>
+		<ButtonContainer
+			marginTop={marginTop ?? 0}
+			marginBottom={marginBottom ?? 0}
+			disabled={isDisabled ?? false}
+			isDisabledOpacity={isDisabled ?? false}
+			onPress={onPress}
+			width={width ?? 60}>
+			<ButtonText>{label}</ButtonText>
+		</ButtonContainer>
 	);
 }
 
 type CustomButtonProps = {
+	marginBottom?: number;
+	marginTop?: number;
 	label: string;
 	onPress: () => void;
 	isDisabled?: boolean;
 	width?: number;
 };
 
-const CustomButtonContainer = styled.View`
-	width: 100%;
-	justify-content: center;
-	align-items: center;
-	margin: 10px 0px 20px 0px;
-`;
-const ButtonContainer = styled.TouchableOpacity<{width: number; isDisabledOpacity: boolean}>`
-	background-color: ${colors.selectButton};
-	border-radius: 30px;
-	width: ${props => props.width}%;
-	height: 50px;
-	justify-content: center;
-	align-items: center;
-	margin: 0px 10px 0px 10px;
+const ButtonContainer = styled.TouchableOpacity<{
+	marginBottom: number;
+	marginTop: number;
+	width: number;
+	isDisabledOpacity: boolean;
+}>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
+	width: ${widthPercentage(343)}px;
+	align-self: center;
+	align-items: center;
+	height: ${heightPercentage(67)}px;
+	justify-content: center;
+	border-radius: 17px;
+	background-color: ${colors.Gray5};
+	margin-top: ${props => props.marginTop}px;
+	margin-bottom: ${props => props.marginBottom}px;
 `;
 const ButtonText = styled.Text`
-	color: white;
-	font-size: 18px;
-	font-weight: 500;
+	font-size: ${fontPercentage(18)}px;
+	font-weight: 600;
+	color: ${colors.Primary};
 `;

@@ -122,8 +122,9 @@ export const SVGHelp = styled(Help)<{color?: string}>`
 export const SVGRightAdd = styled(RightAdd)<{color?: string}>`
 	color: color;
 `;
-export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string}>`
+export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string; transform?: boolean}>`
 	color: color;
+	transform: scaleX(${props => (props.transform ? -1 : 1)});
 `;
 export const SVGCalendarRecommend = styled(CalendarRecommend)<{color?: string}>`
 	color: color;

@@ -19,4 +19,6 @@ export const colors = {
 	Gray5: '#2E3240',
 	Black: '#000000',
 	Primary: '#C3F550',
+	PointYellow: '#5350FF',
+	Blue2: '#DBF3C9',
 };

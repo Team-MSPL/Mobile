@@ -40,7 +40,8 @@ export const regionRecommendSlice = createSlice({
 	extraReducers: builder => {
 		builder.addCase(regionSearch.fulfilled, (state, {payload}) => {
 			console.log(payload);
-			state.recommendList = payload;
+			let sort = payload.sort((a, b) => a.takenDay - b.takenDay);
+			state.recommendList = sort;
 			//state.myTravelList = payload;
 		});
 	},

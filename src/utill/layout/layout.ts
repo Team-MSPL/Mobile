@@ -72,3 +72,8 @@ export const ClearTouchableOpacity = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 `;
+
+export const BackgroundGray = styled.View`
+	flex: 1;
+	background-color: ${colors.backgroundGray};
+`;

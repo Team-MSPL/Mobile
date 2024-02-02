@@ -1,12 +1,13 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
-import {HStack, MainContainer} from '../../../utill/layout/layout';
+import {BackgroundGray, HStack, MainContainer} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
-export default function SelectPopularity({goNextStep}: any) {
+import Stepper from '../../../utill/component/enroll-info/stepper';
+export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {popularity} = useAppSelector(state => state.regionRecommendSlice);
@@ -16,7 +17,7 @@ export default function SelectPopularity({goNextStep}: any) {
 		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
 	};
 	const goNext = async () => {
-		goNextStep();
+		navigation.navigate('RegionSelectDistance');
 	};
 	const radioButtons = [
 		{
@@ -53,8 +54,11 @@ export default function SelectPopularity({goNextStep}: any) {
 	];
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
-		<MainContainer>
-			<StepText mainText='인기도 선택' subText='가고자 하는 여행지의 느낌을 선택해주세요.' />
+		<BackgroundGray>
+			<Stepper total={7} now={6}></Stepper>
+			<StepText
+				styleText='2.여행지의 인기도를 선택해주세요.'
+				mainText={'가고자 하는 여행지가 \n어떤 느낌이었으면 하나요?'}></StepText>
 			<Info>* 인기도의 기준은 각 지역별 여행객 수 통계를 참조했어요.</Info>
 			{radioButtons.map((item, index) => (
 				<PopularButton key={index} onPress={() => changeSelectId(index)}>
@@ -70,8 +74,8 @@ export default function SelectPopularity({goNextStep}: any) {
 				</PopularButton>
 			))}
 			<ExplainText>{radioButtons[(100 - popularity[0]) / 20].explain}</ExplainText>
-			<CustomButton label='다음 단계' onPress={goNext}></CustomButton>
-		</MainContainer>
+			<CustomButton label='다음' onPress={goNext}></CustomButton>
+		</BackgroundGray>
 	);
 }
 
