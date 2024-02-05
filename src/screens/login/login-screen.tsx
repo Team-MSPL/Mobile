@@ -13,11 +13,11 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
-import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
 import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {networkCheck} from '../../redux/network/networkSlice';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -230,71 +230,30 @@ export default function LoginScreen({navigation}: any) {
 		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
 	];
 
-	const viewList = [
-		require('../../../public/images/login1.png'),
-		require('../../../public/images/login1.png'),
-		require('../../../public/images/login1.png'),
-		require('../../../public/images/login1.png'),
-	];
-	const [backgroundImageIndex, setBackgroundImageIndex] = useState(0);
-	const [fadeAnim] = useState(new Animated.Value(1));
-
-	const startBackgroundAnimation = () => {
-		const backgroundImages = [
-			require('../../../public/images/login1.png'),
-			require('../../../public/images/login1.png'),
-			require('../../../public/images/login1.png'),
-			require('../../../public/images/login1.png'),
-		];
-		Animated.timing(fadeAnim, {
-			toValue: 0,
-			duration: 4000,
-			// easing: Easing.linear,
-			useNativeDriver: false, // useNativeDriver를 false로 설정
-		}).start(() => {
-			// 애니메이션 완료 후 호출되는 콜백
-			setBackgroundImageIndex(prevIndex => (prevIndex + 1) % backgroundImages.length);
-			// 다음 애니메이션 시작
-			fadeAnim.setValue(0); // fadeAnim 초기화
-		});
-	};
-
-	useEffect(() => {
-		const interval = setInterval(startBackgroundAnimation, 5000);
-		return () => {
-			clearInterval(interval);
-		};
-	}, []);
 	return (
-		<BackgroundImage source={viewList[backgroundImageIndex]}>
+		<BackgroundImage source={require('../../../public/images/login-image.png')}>
 			<SafeAreaView>
 				<LoginSCreenContainer>
-					<TitleTextContainer>
-						<LoginText>여행 일정을 이렇게</LoginText>
-						<TextContainer>
-							<LoginText>쉽게 짤 수 있</LoginText>
-							<SvgDanimText color='white' height={devicesHeight * 0.09} />
-						</TextContainer>
-					</TitleTextContainer>
-					<SvgLoginLogo color='white' width={devicesWidth} height={devicesHeight * 0.2} />
-					<CircleContainer>
-						{platforms.map((platform, index) => (
-							<LongCircleButton
-								key={index}
-								bgColor={platform.color}
-								onPress={() => {
-									platform.onPress();
-								}}>
-								<LogoHStack>
-									<LogoContainer>{platform.image}</LogoContainer>
-									<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
-										{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
-									</LogoText>
-								</LogoHStack>
-							</LongCircleButton>
-						))}
-					</CircleContainer>
+					<SvgLoginLogo color='white' width={widthPercentage(151)} height={heightPercentage(44)} />
+					<LoginText>당신을 위한 여행 길잡이,다님</LoginText>
 				</LoginSCreenContainer>
+				<CircleContainer>
+					{platforms.map((platform, index) => (
+						<LongCircleButton
+							key={index}
+							bgColor={platform.color}
+							onPress={() => {
+								platform.onPress();
+							}}>
+							<LogoHStack>
+								<LogoContainer>{platform.image}</LogoContainer>
+								<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
+									{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
+								</LogoText>
+							</LogoHStack>
+						</LongCircleButton>
+					))}
+				</CircleContainer>
 			</SafeAreaView>
 		</BackgroundImage>
 	);
@@ -302,9 +261,9 @@ export default function LoginScreen({navigation}: any) {
 
 const LoginSCreenContainer = styled.View`
 	width: 100%;
-	padding: 20px;
 	align-items: center;
 	justify-content: center;
+	top: ${heightPercentage(215)}px;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;
@@ -319,10 +278,10 @@ const TitleTextContainer = styled.View`
 	height: ${devicesHeight * 0.2}px;
 `;
 const LoginText = styled.Text`
-	font-size: ${devicesHeight * 0.03}px;
-	font-weight: bold;
-	color: white;
-	margin: 0px 10px 0px 0px;
+	font-size: ${fontPercentage(12)}px;
+	font-weight: 600;
+	color: ${colors.backgroundWhite};
+	line-height: ${heightPercentage(18)}px;
 `;
 
 const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
@@ -336,9 +295,11 @@ const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
 	background-color: ${props => props.bgColor};
 `;
 const CircleContainer = styled.View`
-	width: 100%;
+	width: ${widthPercentage(326)}px;
 	justify-content: center;
-	height: ${devicesHeight * 0.6}px;
+	position: absolute;
+	top: ${heightPercentage(555)}px;
+	align-self: center;
 `;
 const LongCircleButton = styled(CircleButton)`
 	width: 100%;

@@ -12,7 +12,8 @@ import CustomButton from '../../utill/component/custom-button';
 import {ClearTouchableOpacity, MainContainer} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import {SvgCancel, SvgRight} from '../../utill/svg/svg';
+import {SvgCancel, SvgCheck, SvgRight} from '../../utill/svg/svg';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
@@ -116,11 +117,11 @@ export default function Join1({navigation, route}: any) {
 					/>
 					{nickname && (
 						<ClearTouchableOpacity
-							style={{position: 'absolute', right: 8, top: 8}}
+							style={{position: 'absolute', right: 0, height: heightPercentage(52)}}
 							onPress={() => {
 								setNickname('');
 							}}>
-							<SvgCancel width='20' height='20' color='black' />
+							<SvgCancel width={heightPercentage(20)} height={heightPercentage(20)} color='black' />
 						</ClearTouchableOpacity>
 					)}
 				</InputWrap>
@@ -128,31 +129,43 @@ export default function Join1({navigation, route}: any) {
 					{checkList.map((item, idx) => (
 						<CheckContainer key={idx}>
 							<CheckTouchableOpacity onPress={item.checkFunction}>
-								<CheckLogoContainer
-									name={'checkcircleo'}
-									size={25}
-									color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}
-								/>
-								<Text>{item.title}</Text>
+								<SvgCheck color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}></SvgCheck>
+								<CheckBoxText>{item.title}</CheckBoxText>
 							</CheckTouchableOpacity>
 							{idx != 0 && (
 								<PlusTouchableOpacity onPress={item.detaileFunction}>
-									<SvgRight color={'grey'} />
+									<CheckBoxText>(약관보기)</CheckBoxText>
 								</PlusTouchableOpacity>
 							)}
 						</CheckContainer>
 					))}
 				</TermsContainer>
-				<CustomButton label={'회원가입'} onPress={goSignUp} isDisabled={!(allCheck && nickname.length != 0)} />
 			</InputProfileContainer>
+			<ButtonContainer>
+				<CustomButton label={'회원가입'} onPress={goSignUp} isDisabled={!(allCheck && nickname.length != 0)} />
+			</ButtonContainer>
 		</JoinContainer>
 	);
 }
+const ButtonContainer = styled.View`
+	width: ${widthPercentage(375)}px;
+	position: absolute;
+	bottom: ${heightPercentage(0)}px;
+	align-items: center;
+`;
 const PlusTouchableOpacity = styled.TouchableOpacity`
 	padding: 5px;
 `;
 const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
 	flex: 1;
+	padding: 0px ${widthPercentage(25)}px;
+`;
+const CheckBoxText = styled.Text`
+	margin-left: ${widthPercentage(5)}px;
+	font-size: ${fontPercentage(14)}px;
+	color: ${colors.Gray4};
+	font-weight: 500;
+	line-weight: ${fontPercentage(17.47)}px;
 `;
 
 const CheckTouchableOpacity = styled.TouchableOpacity`
@@ -163,30 +176,35 @@ const CheckTouchableOpacity = styled.TouchableOpacity`
 `;
 const InputProfileContainer = styled.View`
 	display: flex;
-	margin-top: 10px;
 	background-color: ${colors.main};
-	padding: 10px;
+	margin-top: ${heightPercentage(20)}px;
+	margin-bottom: ${heightPercentage(40)}px;
 `;
 
 const InputWrap = styled.View`
 	flex-direction: row;
 	display: flex;
-	width: 100%;
+	width: ${widthPercentage(326)}px;
+	background-color: ${colors.Gray1};
+	border-radius: 8px;
+	align-items: center;
 `;
 const Text = styled.Text`
-	font-size: 20px;
-	line-height: 30px;
-	color: black;
+	font-size: ${fontPercentage(16)}px;
+	line-height: ${heightPercentage(24)}px;
+	font-weight: 500;
+	color: ${colors.Black};
 `;
 
 const CustomTextInput = styled.TextInput<{text: string}>`
-	width: 100%;
-	padding: 8px;
-	font-size: 16px;
-	font-weight: 400;
-	border-width: 1px;
+	width: 80%;
+	height: ${heightPercentage(52)}px;
+	padding: ${heightPercentage(15)}px ${widthPercentage(20)}px ${heightPercentage(15)}px ${widthPercentage(20)}px;
+	font-size: ${heightPercentage(16)}px;
+	font-weight: 500;
 	border-radius: 8px;
-	border-color: ${({text}: {text: string}) => (text == '' ? 'grey' : 'black')};
+	border-color: ${({text}: {text: string}) => (text == '' ? colors.Gray3 : 'black')};
+	background-color: ${colors.Gray1};
 `;
 
 const TermsContainer = styled.View`

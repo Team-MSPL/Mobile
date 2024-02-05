@@ -82,7 +82,7 @@ export default function Main({navigation}: any) {
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {
-		navigation.navigate('TokenLog');
+		navigation.navigate('HomeModal');
 	};
 
 	const pushPermission = async () => {
@@ -119,29 +119,36 @@ export default function Main({navigation}: any) {
 			),
 		});
 	}, [functionToken]);
+	const [modalView, setModalView] = useState({status: false, value: ''});
 
 	useEffect(() => {
 		pushPermission();
 		checkCache();
 		if (signUpReward) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '회원가입 축하드립니다',
-					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-					modalFunction: checkSignUpReward,
-				}),
-			);
+			//setModalView({status: true, value: '회원가입'});
+
+			navigation.navigate('HomeModal', {status: '회원가입'});
+			// dispatch(
+			// 	modalSliceActions.setOpenModal({
+			// 		modalTitle: '회원가입 축하드립니다',
+			// 		modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+			// 		modalFunction: checkSignUpReward,
+			// 	}),
+			// );
 		} else if (reLogin) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '보고싶었어요',
-					modalSubTitle: `다시 오신 것을 환영합니다! ${userName}님!`,
-					modalFunction: checkSignUpReward,
-				}),
-			);
+			navigation.navigate('HomeModal', {status: '재가입'});
+			setModalView({status: true, value: '재가입'});
+
+			// dispatch(
+			// 	modalSliceActions.setOpenModal({
+			// 		modalTitle: '보고싶었어요',
+			// 		modalSubTitle: `다시 오신 것을 환영합니다! ${userName}님!`,
+			// 		modalFunction: checkSignUpReward,
+			// 	}),
+			// );
 		}
 		checkEvent();
-	}, []);
+	}, [signUpReward]);
 	useBackHandler();
 	const buttonList: ButtonListType[] = [
 		{
@@ -229,6 +236,9 @@ export default function Main({navigation}: any) {
 		}
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
+	// if (modalView.status) {
+	// 	return <HomeModal></HomeModal>;
+	// }
 	return (
 		<HomeContainer>
 			<BackgroundImage source={require('../../../public/images/home-image.png')}>
@@ -254,7 +264,6 @@ export default function Main({navigation}: any) {
 					</HomeTextContainer>
 				</BrighnessBox>
 			</BackgroundImage>
-			{/* <BlackFence /> */}
 			<HomeBottomContainer>
 				<HomeRecommendText>다님에게 추천받기</HomeRecommendText>
 				{buttonList.map(item => (

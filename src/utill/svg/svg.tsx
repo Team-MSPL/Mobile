@@ -31,6 +31,8 @@ import Help from '../../../public/ic_help.svg';
 import RightAdd from '../../../public/right-add.svg';
 import RegionRecommend from '../../../public/region-recommend.svg';
 import CalendarRecommend from '../../../public/calendar-recommend.svg';
+import HomeUp from '../../../public/home-up.svg';
+import HomeDown from '../../../public/home-down.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -127,5 +129,11 @@ export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string; trans
 	transform: scaleX(${props => (props.transform ? -1 : 1)});
 `;
 export const SVGCalendarRecommend = styled(CalendarRecommend)<{color?: string}>`
+	color: color;
+`;
+export const SVGHomeUp = styled(HomeUp)<{color?: string}>`
+	color: color;
+`;
+export const SVGHomeDown = styled(HomeDown)<{color?: string}>`
 	color: color;
 `;

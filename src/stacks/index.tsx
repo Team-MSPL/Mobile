@@ -16,6 +16,7 @@ import MyTravelListStack from './my-travel-list-stack';
 import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
 import {colors} from '../utill/colors';
+import HomeModal from '../screens/login/home-modal';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -33,6 +34,7 @@ export default function StackNavigator() {
 			})}>
 			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
+			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
 
 			{TimetableStack()}
 			{CommunityStack()}
