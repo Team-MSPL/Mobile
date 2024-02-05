@@ -21,10 +21,10 @@ export const FlexWrap = styled.View`
 	margin-bottom: 15px;
 `;
 
-export const Divider = styled.View`
+export const Divider = styled.View<{color?: string; height: number}>`
 	width: 100%;
-	height: 2px;
-	background-color: black;
+	height: ${props => props.height ?? 2}px;
+	background-color: ${props => props.color ?? 'black'};
 	margin: 10px 0px 10px 0px;
 `;
 

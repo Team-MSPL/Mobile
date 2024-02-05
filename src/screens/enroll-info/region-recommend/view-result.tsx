@@ -78,7 +78,7 @@ export default function ViewResult({navigation}: any) {
 				</SvgContainer>
 				<RecommendBorderContainer>
 					{recommendList.map((item, idx) => (
-						<>
+						<Fragment key={idx}>
 							{(item.takenDay != recommendList[idx - 1]?.takenDay ?? 0) && (
 								<DayRecommendContainer>
 									<HStack>
@@ -92,7 +92,6 @@ export default function ViewResult({navigation}: any) {
 								</DayRecommendContainer>
 							)}
 							<RecommendContainer
-								key={idx}
 								onPress={() => {
 									navigation.navigate('DetailResult', {item: item});
 									//goEnrollInfo(item.name);
@@ -118,7 +117,7 @@ export default function ViewResult({navigation}: any) {
 									</TagContainer>
 								</ImageContainer>
 							</RecommendContainer>
-						</>
+						</Fragment>
 					))}
 				</RecommendBorderContainer>
 			</ScrollView>

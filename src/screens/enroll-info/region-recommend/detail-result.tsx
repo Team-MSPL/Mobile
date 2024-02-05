@@ -1,24 +1,19 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import {View} from 'react-native';
 import {cityViewList} from '../select-city';
-import {MainContainer, HStack, VStack} from '../../../utill/layout/layout';
+import {Divider, HStack, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 import {RecommendContainer, RecommendElement} from './view-result';
 import ImageView from 'react-native-image-viewing';
-import {
-	SelectListContainer,
-	SelectListText,
-	SelectTendencyListContainer,
-	SelectTendencyContainer,
-	SelectTendencyText,
-} from '../final-check';
+import {SelectTendencyText} from '../final-check';
 import {useState} from 'react';
 import {ImageText, ImageViewFooterComponent} from '../../timetable/course-detail';
-import {metropolitanCheckList} from '../../home/main';
+import {TagElement, TagShopText, TagText, metropolitanCheckList} from '../../home/main';
+import CustomButton from '../../../utill/component/custom-button';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -92,48 +87,58 @@ export default function DetailResult({navigation, route}: any) {
 							<SvgLoginLogo color={'white'} width={40} />
 						</LogoCOntainer>
 					)}
-
-					<TitleTextContainer>
-						<TitleText>{route.params.item.name}</TitleText>
-					</TitleTextContainer>
 				</RecommendMainContainer>
-				<ListContainer>
-					<SelectListText>여행 성향</SelectListText>
-					<SelectTendencyListContainer>
+				<RecommendBorderContainer>
+					<TitleText>{route.params.item.name}</TitleText>
+					<Divider color={colors.Gray2} height={0.5}></Divider>
+					<TagContainer>
 						{route.params.item.tendency.map((tendency, index) => (
-							<SelectTendencyContainer key={index}>
-								<TendencyText># {tendency}</TendencyText>
-							</SelectTendencyContainer>
+							<TagElement key={index} opacityStatus={false} height={heightPercentage(26)}>
+								<HStack>
+									<TagShopText size={fontPercentage(14)}># </TagShopText>
+									<TagText size={fontPercentage(14)} color={colors.Gray5}>
+										{tendency}
+									</TagText>
+								</HStack>
+							</TagElement>
 						))}
-					</SelectTendencyListContainer>
-				</ListContainer>
-				<StepText mainText='인기 관광지 Top 5' subText='해당 지역의 인기 관광지를 확인하세요' />
-				<RecommendAllContainer>
-					{route.params.item.topPopularPlaceList.map((item, idx) => (
-						<PopularityContainer
-							key={idx}
-							onPress={() => {
-								goDetail(item);
-							}}>
-							<IndexText>{idx + 1}</IndexText>
-							{item.photo != '' ? (
-								<RecommendImage source={{uri: item.photo}}></RecommendImage>
-							) : (
-								<LogoCOntainer>
-									<SvgLoginLogo color={'white'} width={20} />
-								</LogoCOntainer>
-							)}
-							<PopularityInfoTitleText>{item.name}</PopularityInfoTitleText>
-						</PopularityContainer>
-					))}
-				</RecommendAllContainer>
+					</TagContainer>
+
+					<StepText
+						mainText='인기 관광지 Top 5'
+						subText='해당 지역의 인기 관광지를 확인하세요'
+						mainTextSize={fontPercentage(18)}
+						subTextSize={fontPercentage(12)}
+						marginLeft={0}
+						marginTop={0}
+						marginBottom={heightPercentage(14)}
+					/>
+					<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						{route.params.item.topPopularPlaceList.map((item, idx) => (
+							<PopularityContainer
+								key={idx}
+								onPress={() => {
+									goDetail(item);
+								}}>
+								<IndexContainer>
+									<IndexText>{idx + 1}</IndexText>
+								</IndexContainer>
+								{item.photo != '' ? (
+									<RecommendImage source={{uri: item.photo}}></RecommendImage>
+								) : (
+									<LogoCOntainer>
+										<SvgLoginLogo color={'white'} width={20} />
+									</LogoCOntainer>
+								)}
+								<PopularityInfoTitleTextContainer>
+									<PopularityInfoTitleText>{item.name}</PopularityInfoTitleText>
+								</PopularityInfoTitleTextContainer>
+							</PopularityContainer>
+						))}
+					</RecommendAllContainer>
+				</RecommendBorderContainer>
 			</MainContainer>
-			<GoRecommendButton onPress={goEnrollInfo} state={false}>
-				<ButtonHStack>
-					<ButtonText>이 지역의 여행 코스 추천 받기</ButtonText>
-					<SvgRight color={colors.selectButton} />
-				</ButtonHStack>
-			</GoRecommendButton>
+			<CustomButton label='이 지역의 여행코스 추천받기' onPress={goEnrollInfo}></CustomButton>
 			<ImageView
 				images={[{uri: route.params.item.photo}]}
 				onImageIndexChange={item => console.log(item)}
@@ -153,23 +158,55 @@ export default function DetailResult({navigation, route}: any) {
 		</>
 	);
 }
-
-const RecommendMainContainer = styled(RecommendContainer)`
-	width: 100%;
-	margin: 0px 0px 20px 0px;
+const PopularityInfoTitleTextContainer = styled.View`
+	width: 80%;
+	position: absolute;
+	z-index: 1;
+	align-self: flex-end;
+	left: ${widthPercentage(10)}px;
+	bottom: ${widthPercentage(10)}px;
 `;
-const RecommendAllContainer = styled.View`
-	width: 100%;
-	margin: 0px 0px 90px 0px;
+const IndexContainer = styled.View`
+	width: ${widthPercentage(24)}px;
+	height: ${widthPercentage(24)}px;
+	background-color: ${colors.Primary};
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	z-index: 1;
+	top: ${widthPercentage(12)}px;
+	left: ${widthPercentage(12)}px;
+	border-radius: 6px;
 `;
+const TagContainer = styled.View`
+	width: 100%;
+	flex-direction: row;
+	flex-wrap: wrap;
+`;
+const MainContainer = styled.ScrollView`
+	width: 100%;
+	background-color: ${colors.backgroundWhite};
+`;
+const RecommendBorderContainer = styled.View`
+	width: 100%;
+	border-radius: 30px 30px 0px 0px;
+	background-color: ${colors.backgroundWhite};
+	padding: 0px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
+	top: -30px;
+`;
+const RecommendMainContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(266)}px;
+`;
+const RecommendAllContainer = styled.ScrollView``;
 const TitleImage = styled.Image`
-	width: 100%;
-	height: 200px;
-	border-radius: 10px;
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(266)}px;
+	resize-mode: cover;
 `;
 const RecommendImage = styled.Image`
-	width: 50px;
-	height: 50px;
+	width: ${widthPercentage(152)}px;
+	height: ${heightPercentage(196)}px;
 	margin: 0px 10px 0px 0px;
 	border-radius: 10px;
 `;
@@ -186,31 +223,32 @@ const TitleTextContainer = styled(RecommendElement)`
 	justify-content: center;
 `;
 const TitleText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: white;
+	font-size: ${fontPercentage(24)}px;
+	font-weight: 600;
+	color: ${colors.Gray5};
+	margin-top: ${heightPercentage(38)}px;
 `;
-const IndexText = styled(TitleText)`
-	font-size: 22px;
-	font-weight: bold;
-	color: black;
-	width: 15%;
-	text-align: center;
+const IndexText = styled.Text`
+	font-size: ${fontPercentage(14)}px;
+	font-weight: 600;
+	color: ${colors.Black};
+	line-height: ${fontPercentage(14)}px;
 `;
 const PopularityContainer = styled.TouchableOpacity`
-	margin: 0px 0px 10px 0px;
+	margin: 0px ${widthPercentage(12)}px 0px 0px;
 	display: inline-block;
 	flex-direction: row;
-	align-items: center;
+	width: ${widthPercentage(152)}px;
+	height: ${heightPercentage(196)}px;
 `;
-const PopularityInfoTitleText = styled(TitleText)`
-	color: black;
+const PopularityInfoTitleText = styled.Text`
+	font-size: ${fontPercentage(20)}px;
+	font-weight: 600;
+	color: ${colors.backgroundWhite};
+	z-index: 2;
 `;
 const TendencyText = styled(SelectTendencyText)`
 	font-size: 14px;
-`;
-const ListContainer = styled(SelectListContainer)`
-	margin: 0px 0px 40px 0px;
 `;
 export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
 	width: ${props => (props.state ? '20%' : '85%')};

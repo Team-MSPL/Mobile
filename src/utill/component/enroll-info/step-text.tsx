@@ -4,6 +4,10 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/re
 import {colors} from '../../colors';
 
 export default function StepText({
+	marginTop,
+	marginLeft,
+	marginBottom,
+	marginRight,
 	styleText,
 	mainText,
 	subText,
@@ -15,7 +19,11 @@ export default function StepText({
 	subTextColor,
 }: StepTextProps) {
 	return (
-		<StepTextVStack>
+		<StepTextVStack
+			marginBottom={marginBottom ?? undefined}
+			marginLeft={marginLeft ?? undefined}
+			marginRight={marginRight ?? undefined}
+			marginTop={marginTop ?? undefined}>
 			<StyleText size={styleTextSize ?? fontPercentage(14)} color={styleTextColor ?? colors.Gray3}>
 				{styleText}
 			</StyleText>
@@ -30,8 +38,12 @@ export default function StepText({
 }
 
 type StepTextProps = {
-	styleText: string;
-	mainText: string;
+	marginTop?: number;
+	marginLeft?: number;
+	marginBottom?: number;
+	marginRight?: number;
+	styleText?: string;
+	mainText?: string;
 	subText?: string;
 	styleTextSize?: number;
 	mainTextSize?: number;
@@ -60,7 +72,14 @@ const SubText = styled.Text<{size: number; color: string}>`
 	line-height: ${fontPercentage(18)}px;
 `;
 
-const StepTextVStack = styled(VStack)`
-	margin-top: ${heightPercentage(27)}px;
-	margin-left: ${widthPercentage(24)}px;
+const StepTextVStack = styled(VStack)<{
+	marginTop?: number;
+	marginLeft?: number;
+	marginBottom?: number;
+	marginRight?: number;
+}>`
+	margin-top: ${props => props.marginTop ?? heightPercentage(27)}px;
+	margin-left: ${props => props.marginLeft ?? widthPercentage(24)}px;
+	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	margin-right: ${props => props.marginRight ?? 0}px;
 `;

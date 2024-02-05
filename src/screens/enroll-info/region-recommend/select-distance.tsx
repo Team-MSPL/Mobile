@@ -4,12 +4,12 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {MainContainer, Center, Divider, MainText, HStack, BackgroundGray} from '../../../utill/layout/layout';
+import {Center, BackgroundGray} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {CircleCenter, CircleContainer, DistanceExplain, MapContainer, Qwe} from '../select-distance';
+import {DistanceExplain, MapContainer, Qwe} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
@@ -169,16 +169,16 @@ export default function SelectDistance({navigation}: any) {
 				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 			<Center>
-				<GetContainer onPress={goReverseGeocoding}>
-					<GetContainerText>위치정보 받아오기</GetContainerText>
-				</GetContainer>
+				{geoInfo.name == '기본값:서울역' && (
+					<GetContainer onPress={goReverseGeocoding}>
+						<GetContainerText>위치정보 받아오기</GetContainerText>
+					</GetContainer>
+				)}
 				<GetText>{geoInfo.name}</GetText>
 			</Center>
-			<DistanceDivider />
 			<MapContainer>
 				<Qwe>
 					<MapView
-						//provider={PROVIDER_GOOGLE}
 						showsMyLocationButton={false}
 						showsUserLocation={false}
 						style={{
@@ -225,20 +225,20 @@ export default function SelectDistance({navigation}: any) {
 					</DistanceCenter>
 				</>
 			)}
-
-			<CustomButton label='맞춤형 여행지를 확인해볼게요!' onPress={checkToken}></CustomButton>
+			<ButtonContainer>
+				<CustomButton label='맞춤형 여행지를 확인해볼게요!' onPress={checkToken}></CustomButton>
+			</ButtonContainer>
 		</BackgroundGray>
 	);
 }
-const DistanceDivider = styled(Divider)`
-	background-color: ${colors.regionNormal};
+const ButtonContainer = styled.View`
+	flex: 1;
+	align-items: center;
+	justify-content: flex-end;
+	margin-bottom: 2px;
 `;
 const DistanceCenter = styled(Center)`
 	margin: 20px 0px 20px 0px;
-`;
-const DistanceText = styled(MainText)`
-	font-size: 14px;
-	margin: 10px 0px 10px 0px;
 `;
 const GetContainer = styled.TouchableOpacity`
 	padding: 10px;

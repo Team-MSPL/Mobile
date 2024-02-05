@@ -294,8 +294,8 @@ export default function Main({navigation}: any) {
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
-export const TagElement = styled.View<{opacityStatus: boolean}>`
-	height: ${heightPercentage(22)}px;
+export const TagElement = styled.View<{opacityStatus: boolean; height?: number}>`
+	height: ${props => props.height ?? heightPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
 	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : colors.Gray1)};
@@ -303,16 +303,16 @@ export const TagElement = styled.View<{opacityStatus: boolean}>`
 	padding: 0px ${widthPercentage(6)}px;
 	margin: 2px;
 `;
-export const TagShopText = styled.Text`
-	font-size: ${heightPercentage(12)}px;
+export const TagShopText = styled.Text<{size?: number}>`
+	font-size: ${props => props.size ?? heightPercentage(12)}px;
 	color: ${colors.Primary};
-	line-height: ${heightPercentage(12)}px;
+	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
-export const TagText = styled.Text<{color: string}>`
-	font-size: ${heightPercentage(12)}px;
+export const TagText = styled.Text<{color: string; size?: number}>`
+	font-size: ${props => props.size ?? heightPercentage(12)}px;
 	color: ${props => props.color};
 	font-weight: 600;
-	line-height: ${heightPercentage(12)}px;
+	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
 const ImageRegionText = styled.Text`
 	font-size: ${fontPercentage(14)}px;
