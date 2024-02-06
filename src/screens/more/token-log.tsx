@@ -82,7 +82,6 @@ const LogTitleText = styled.Text`
 const MainContainer = styled.View`
 	flex: 1;
 	align-items: center;
-	justify-content: center;
 	padding: 10px;
 	background-color: ${colors.main};
 `;

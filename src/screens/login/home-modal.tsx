@@ -5,6 +5,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {SVGHomeDown, SVGHomeUp} from '../../utill/svg/svg';
+import {PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
 
 export default function HomeModal({navigation, route}: {navigation: any; route: {params: ParamsType}}) {
 	const goHome = () => {
@@ -53,7 +54,7 @@ const HomeModalContainer = styled.View`
 	background-color: ${colors.backgroundWhite};
 	align-items: center;
 `;
-const MainText = styled.Text`
+const MainText = styled(PretendardVariable)`
 	font-size: ${fontPercentage(20)}px;
 	font-weight: 600;
 	color: ${colors.Gray5};
@@ -61,7 +62,7 @@ const MainText = styled.Text`
 	margin-bottom: ${heightPercentage(10)}px;
 	margin-top: ${heightPercentage(209)}px;
 `;
-const SubText = styled.Text`
+const SubText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(16)}px;
 	font-weight: 600;
 	color: ${colors.Gray4};

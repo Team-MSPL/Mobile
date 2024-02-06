@@ -2,7 +2,7 @@ import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {BackHandler, Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {BackgroundGray, HStack, MainContainer} from '../../../utill/layout/layout';
+import {BackgroundGray, HStack, MainContainer, PretendardSemiBold} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
@@ -150,7 +150,7 @@ const DayRecommendContainer = styled.View`
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
 `;
-const DayRecommendText = styled.Text<{color: string}>`
+const DayRecommendText = styled(PretendardSemiBold)<{color: string}>`
 	font-size: ${fontPercentage(16)}px;
 	font-weight: 600;
 	color: ${props => props.color};
@@ -161,7 +161,7 @@ const ImageContainer = styled.View`
 	height: ${widthPercentage(200)}px;
 	margin-top: ${widthPercentage(12)}px;
 `;
-const RegionText = styled.Text`
+const RegionText = styled(PretendardSemiBold)`
 	position: absolute;
 	font-size: ${fontPercentage(20)}px;
 	font-weight: 600;

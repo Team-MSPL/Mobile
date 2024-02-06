@@ -9,7 +9,7 @@ import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import {ClearTouchableOpacity, MainContainer} from '../../utill/layout/layout';
+import {ClearTouchableOpacity, MainContainer, PretendardVariable} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel, SvgCheck, SvgRight} from '../../utill/svg/svg';
@@ -189,7 +189,7 @@ const InputWrap = styled.View`
 	border-radius: 8px;
 	align-items: center;
 `;
-const Text = styled.Text`
+const Text = styled(PretendardVariable)`
 	font-size: ${fontPercentage(16)}px;
 	line-height: ${heightPercentage(24)}px;
 	font-weight: 500;

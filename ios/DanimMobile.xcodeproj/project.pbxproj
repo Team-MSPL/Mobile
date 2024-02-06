@@ -12,6 +12,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		24898BBA054EC4C84F0CABBE /* Pods_DanimMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E06AFEE820299F9D13EA69 /* Pods_DanimMobile.framework */; };
+		3341421D2B71D3FE00C76EC1 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 3341421C2B71D3FE00C76EC1 /* Fonts */; };
 		6B001E9D2ADF7FCC009535FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B001E9C2ADF7FCC009535FC /* Assets.xcassets */; };
 		6B001E9F2ADF802E009535FC /* loading.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B001E9E2ADF802E009535FC /* loading.json */; };
 		6B11C9022A7A420C00A32397 /* Swift Bridging Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C9012A7A420C00A32397 /* Swift Bridging Header.swift */; };
@@ -45,6 +46,7 @@
 		1806795ABFA7922C91013BE4 /* Pods-DanimMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.debug.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2778A2B62DFAAACCC42CB0CA /* Pods-DanimMobile.staging.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.staging.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.staging.xcconfig"; sourceTree = "<group>"; };
 		2F52BBD6DFF2005D77C42206 /* Pods_DanimMobile_DanimMobileTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DanimMobile_DanimMobileTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3341421C2B71D3FE00C76EC1 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		3370DF1A2AE11B7A002B8BD4 /* react_native_kakao_share_link.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = react_native_kakao_share_link.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AA2825828FC86D4BC587BFE /* Pods-DanimMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DanimMobile.release.xcconfig"; path = "Target Support Files/Pods-DanimMobile/Pods-DanimMobile.release.xcconfig"; sourceTree = "<group>"; };
 		6B001E9C2ADF7FCC009535FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = AppIcons/Assets.xcassets; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				6B38229B2A8248C700A1F0CF /* Fonts */,
+				3341421C2B71D3FE00C76EC1 /* Fonts */,
 				6B83D4462A7B6B2300CBCBB3 /* RCTAppDelegate.h */,
 				13B07FAE1A68108700A75B9A /* DanimMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -328,6 +331,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3341421D2B71D3FE00C76EC1 /* Fonts in Resources */,
 				6BA4817B2A9DDE4800F08403 /* LaunchScreen.storyboard in Resources */,
 				6B001E9D2ADF7FCC009535FC /* Assets.xcassets in Resources */,
 				6B001E9F2ADF802E009535FC /* loading.json in Resources */,

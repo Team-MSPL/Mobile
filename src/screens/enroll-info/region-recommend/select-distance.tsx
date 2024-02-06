@@ -4,7 +4,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {Center, BackgroundGray} from '../../../utill/layout/layout';
+import {Center, BackgroundGray, PretendardVariable} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -205,8 +205,12 @@ export default function SelectDistance({navigation}: any) {
 			{geoInfo.name != '기본값:서울역' && (
 				<>
 					<DistanceCenter>
+						<DistanceSpace>
+							<DistanceExplain>내 근처</DistanceExplain>
+							<DistanceExplain>한국 전체</DistanceExplain>
+						</DistanceSpace>
 						<Slider
-							style={{width: '100%', height: 40}}
+							style={{width: '80%', height: 40}}
 							minimumValue={1}
 							maximumValue={10}
 							minimumTrackTintColor='#123123'
@@ -218,10 +222,6 @@ export default function SelectDistance({navigation}: any) {
 								setRange(item);
 							}}
 						/>
-						<DistanceSpace>
-							<DistanceExplain>내 근처</DistanceExplain>
-							<DistanceExplain>한국 전체</DistanceExplain>
-						</DistanceSpace>
 					</DistanceCenter>
 				</>
 			)}
@@ -246,19 +246,19 @@ const GetContainer = styled.TouchableOpacity`
 	align-items: center;
 	background-color: ${colors.selectButton};
 `;
-const GetContainerText = styled.Text`
+const GetContainerText = styled(PretendardVariable)`
 	font-size: 15px;
 	font-weight: bold;
 	color: white;
 `;
-const GetText = styled.Text`
+const GetText = styled(PretendardVariable)`
 	font-size: 15px;
 	font-weight: bold;
 	color: black;
 	margin: 10px 0px 0px 0px;
 `;
 const DistanceSpace = styled.View`
-	width: 100%;
+	width: 80%;
 	flex-direction: row;
 	justify-content: space-between;
 `;

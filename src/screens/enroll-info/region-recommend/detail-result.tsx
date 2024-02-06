@@ -1,7 +1,7 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {cityViewList} from '../select-city';
-import {Divider, HStack, VStack} from '../../../utill/layout/layout';
+import {Divider, HStack, PretendardSemiBold, VStack} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
@@ -222,13 +222,13 @@ const LogoCOntainer = styled.View`
 const TitleTextContainer = styled(RecommendElement)`
 	justify-content: center;
 `;
-const TitleText = styled.Text`
+const TitleText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(24)}px;
 	font-weight: 600;
 	color: ${colors.Gray5};
 	margin-top: ${heightPercentage(38)}px;
 `;
-const IndexText = styled.Text`
+const IndexText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(14)}px;
 	font-weight: 600;
 	color: ${colors.Black};
@@ -241,7 +241,7 @@ const PopularityContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(152)}px;
 	height: ${heightPercentage(196)}px;
 `;
-const PopularityInfoTitleText = styled.Text`
+const PopularityInfoTitleText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(20)}px;
 	font-weight: 600;
 	color: ${colors.backgroundWhite};

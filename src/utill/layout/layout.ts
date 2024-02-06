@@ -77,3 +77,13 @@ export const BackgroundGray = styled.View`
 	flex: 1;
 	background-color: ${colors.backgroundGray};
 `;
+
+export const PretendardVariable = styled.Text`
+	font-family: PretendardVariable;
+`;
+export const PretendardBold = styled.Text`
+	font-family: Pretendard-Bold;
+`;
+export const PretendardSemiBold = styled.Text`
+	font-family: Pretendard-SemiBold;
+`;

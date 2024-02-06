@@ -3,7 +3,15 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import Slider from '@react-native-community/slider';
-import {HStack, MainContainer, VStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
+import {
+	HStack,
+	MainContainer,
+	PretendardSemiBold,
+	PretendardVariable,
+	VStack,
+	devicesHeight,
+	devicesWidth,
+} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -12,7 +20,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer, MarginContainder} from './select-multi';
 import MapView, {Circle, Marker, Polyline} from 'react-native-maps';
 import {cityViewList} from './select-city';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -113,10 +121,11 @@ const DistanceExplainContainer = styled.View`
 	align-items: center;
 `;
 
-export const DistanceExplain = styled.Text`
-	font-size: 14px;
-	font-weight: bold;
-	color: black;
+export const DistanceExplain = styled(PretendardSemiBold)`
+	font-size: ${fontPercentage(12)}px;
+	font-weight: 600;
+	color: ${colors.Gray3};
+	ling-height: 14.4px;
 `;
 export const MapContainer = styled.View`
 	width: ${widthPercentage(327)}px;

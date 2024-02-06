@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {VStack} from '../../layout/layout';
+import {PretendardBold, PretendardSemiBold, PretendardVariable, VStack} from '../../layout/layout';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {colors} from '../../colors';
 
@@ -52,20 +52,20 @@ type StepTextProps = {
 	mainTextColor?: string;
 	subTextColor?: string;
 };
-const StyleText = styled.Text<{size: number; color: string}>`
+const StyleText = styled(PretendardSemiBold)<{size: number; color: string}>`
 	font-size: ${props => props.size}px;
 	font-weight: 600;
 	line-height: ${fontPercentage(21)}px;
 	color: ${props => props.color};
 `;
-const MainText = styled.Text<{size: number; color: string}>`
+const MainText = styled(PretendardBold)<{size: number; color: string}>`
 	color: ${props => props.color};
 	font-size: ${props => props.size}px;
 	font-weight: 700;
 	line-height: ${fontPercentage(35.1)}px;
 `;
 
-const SubText = styled.Text<{size: number; color: string}>`
+const SubText = styled(PretendardVariable)<{size: number; color: string}>`
 	color: ${props => props.color};
 	font-size: ${props => props.size}px;
 	font-weight: 500;

@@ -12,7 +12,7 @@ import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import Icons from 'react-native-vector-icons/Ionicons';
@@ -82,7 +82,7 @@ export default function Main({navigation}: any) {
 		navigation.navigate('CourseDetail', {value: data});
 	};
 	const goTokenLog = () => {
-		navigation.navigate('HomeModal');
+		navigation.navigate('TokenLog');
 	};
 
 	const pushPermission = async () => {
@@ -312,24 +312,24 @@ export const TagElement = styled.View<{opacityStatus: boolean; height?: number}>
 	padding: 0px ${widthPercentage(6)}px;
 	margin: 2px;
 `;
-export const TagShopText = styled.Text<{size?: number}>`
+export const TagShopText = styled(PretendardVariable)<{size?: number}>`
 	font-size: ${props => props.size ?? heightPercentage(12)}px;
 	color: ${colors.Primary};
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
-export const TagText = styled.Text<{color: string; size?: number}>`
+export const TagText = styled(PretendardVariable)<{color: string; size?: number}>`
 	font-size: ${props => props.size ?? heightPercentage(12)}px;
 	color: ${props => props.color};
 	font-weight: 600;
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
-const ImageRegionText = styled.Text`
+const ImageRegionText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(14)}px;
 	font-weight: 400;
 	color: ${colors.backgroundWhite};
 	line-height: ${heightPercentage(16.8)}px;
 `;
-const ImageTargetText = styled.Text`
+const ImageTargetText = styled(PretendardSemiBold)`
 	width: ${widthPercentage(152)}px;
 	font-size: ${fontPercentage(20)}px;
 	font-weight: 600;
@@ -352,7 +352,7 @@ const RecommendContainer = styled.Pressable`
 	overflow: hidden;
 `;
 
-const HomeRecommendText = styled.Text`
+const HomeRecommendText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(18)}px;
 	font-weight: 600;
 	color: ${colors.Black};
@@ -400,9 +400,8 @@ const HomeTextContainer = styled.Pressable`
 	top: ${heightPercentage(244)}px;
 	left: ${widthPercentage(26)}px;
 `;
-const HomeText = styled.Text`
+const HomeText = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(23)}px;
-	font-weight: 600;
 	color: ${colors.backgroundWhite};
 	line-height: ${heightPercentage(34.5)}px;
 `;
@@ -413,7 +412,7 @@ const HomePrimaryText = styled(HomeText)`
 const HeaderHStack = styled(HStack).attrs({as: TouchableOpacity})`
 	padding: 0px 24px;
 `;
-const BannerColoredText = styled.Text`
+const BannerColoredText = styled(PretendardSemiBold)`
 	font-size: 24px;
 	font-weight: bold;
 	color: ${colors.TextPrimary};

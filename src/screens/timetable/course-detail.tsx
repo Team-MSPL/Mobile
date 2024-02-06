@@ -112,7 +112,7 @@ export default function CourseDetail({navigation, route}: any) {
 	const deleteReview = async (e: any) => {
 		try {
 			let data = {
-				region: route.params.value.region,
+				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				name: route.params.value.name,
 				reviewContent: e.content,
 				reviewUserToken: userIdToken,
