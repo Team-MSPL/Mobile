@@ -239,10 +239,8 @@ export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: an
 export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosKakao.get(
-			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=distance`,
+			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=accuracy`,
 		);
-		console.log(response.data.documents);
-		// console.log(response.data.documents);
 
 		//제로리절트 처리하기
 		return response.data.documents;

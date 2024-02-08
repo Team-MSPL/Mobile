@@ -97,6 +97,7 @@
 		"react-native-version-check": "^3.4.7",
 		"react-redux": "^8.1.1",
 		"redux-persist": "^6.0.0",
+		"rn-range-slider": "^2.2.2",
 		"shortid": "^2.2.16",
 		"styled-components": "^6.0.7"
 	},

@@ -58,8 +58,7 @@ export default function TokenLog({navigation}: any) {
 						data={logList}
 						renderItem={renderItem}
 						keyExtractor={item => item._id}
-						showsVerticalScrollIndicator={false}
-						initialScrollIndex={20}></FlatList>
+						showsVerticalScrollIndicator={false}></FlatList>
 				</LogContainer>
 			)}
 		</MainContainer>

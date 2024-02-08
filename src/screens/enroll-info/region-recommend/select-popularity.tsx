@@ -7,16 +7,18 @@ import {SvgCheck} from '../../../utill/svg/svg';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
 import Stepper from '../../../utill/component/enroll-info/stepper';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import RangeSlider from 'rn-range-slider';
+import {useCallback, useRef} from 'react';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {popularity} = useAppSelector(state => state.regionRecommendSlice);
 
-	const changeSelectId = (e: number) => {
-		let data = radioButtons[e].id * 20;
-		dispatch(regionRecommendSliceActions.enrollPopularity([data, data]));
-	};
 	const goNext = async () => {
+		dispatch(
+			regionRecommendSliceActions.enrollPopularity([rangeRef.current.low * 20, rangeRef.current.hight * 20]),
+		);
 		navigation.navigate('RegionSelectDistance');
 	};
 	const radioButtons = [
@@ -52,6 +54,7 @@ export default function SelectPopularity({navigation}: any) {
 			explain: '발길이 많이 닿지 않은 이색 여행 지역들이에요. \n( 강원 양구군, 경남 함안군 등 37개 지역 )',
 		},
 	];
+	const rangeRef = useRef({low: 1, hight: 5});
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<BackgroundGray>
@@ -60,7 +63,25 @@ export default function SelectPopularity({navigation}: any) {
 				styleText='2.여행지의 인기도를 선택해주세요.'
 				mainText={'가고자 하는 여행지가 \n어떤 느낌이었으면 하나요?'}></StepText>
 			<Info>* 인기도의 기준은 각 지역별 여행객 수 통계를 참조했어요.</Info>
-			{radioButtons.map((item, index) => (
+			<BarContainer>
+				<RangeSlider
+					min={1}
+					max={5}
+					step={1}
+					minRange={1}
+					renderRail={() => <Rail />}
+					renderThumb={() => (
+						<Thumb>
+							<ThumbInside></ThumbInside>
+						</Thumb>
+					)}
+					onValueChanged={(low, high) => {
+						rangeRef.current.low = low;
+						rangeRef.current.hight = high;
+					}}
+					renderRailSelected={() => <SelectRail />}></RangeSlider>
+			</BarContainer>
+			{/* {radioButtons.map((item, index) => (
 				<PopularButton key={index} onPress={() => changeSelectId(index)}>
 					<HStack key={index}>
 						<SvgCheck
@@ -72,29 +93,53 @@ export default function SelectPopularity({navigation}: any) {
 						</PopularButtonText>
 					</HStack>
 				</PopularButton>
-			))}
+			))} */}
+
 			<ExplainText>{radioButtons[(100 - popularity[0]) / 20].explain}</ExplainText>
 			<CustomButton label='다음' onPress={goNext}></CustomButton>
 		</BackgroundGray>
 	);
 }
-
+const ThumbInside = styled.View`
+	width: ${widthPercentage(15.53)}px;
+	height: ${widthPercentage(15.53)}px;
+	background-color: ${colors.Blue3};
+	border-width: 2.12px;
+	border-color: ${colors.backgroundWhite};
+	border-radius: 99px;
+`;
+const Thumb = styled.View`
+	width: ${widthPercentage(24)}px;
+	height: ${widthPercentage(24)}px;
+	background-color: rgba(132, 255, 3, 0.3);
+	align-items: center;
+	border-radius: 99px;
+	justify-content: center;
+`;
+const SelectRail = styled.View`
+	height: ${heightPercentage(10)}px;
+	background-color: ${colors.Blue3};
+	border-radius: 6px;
+`;
+const BarContainer = styled.View`
+	width: ${widthPercentage(300)}px;
+	height: ${heightPercentage(30)}px;
+	align-self: center;
+	border-radius: 6px;
+`;
+const Rail = styled.View`
+	width: 100%;
+	height: ${heightPercentage(10)}px;
+	background-color: ${colors.Gray1};
+	border-radius: 6px;
+`;
 const ExplainText = styled.Text`
 	font-size: 15px;
 	font-weight: bold;
 	color: black;
 	margin: 1% 0% 5% 0%;
 `;
-const PopularButton = styled.TouchableOpacity`
-	padding: 5%;
-	margin: 0.1% 0% 0% 0%;
-`;
-const PopularButtonText = styled.Text<{color: string}>`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${props => props.color};
-	margin: 0px 0px 0px 20px;
-`;
+
 const Info = styled.Text`
 	margin: 0px 0px 10px 0px;
 `;
