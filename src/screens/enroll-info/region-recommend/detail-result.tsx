@@ -93,10 +93,14 @@ export default function DetailResult({navigation, route}: any) {
 					<Divider color={colors.Gray2} height={0.5}></Divider>
 					<TagContainer>
 						{route.params.item.tendency.map((tendency, index) => (
-							<TagElement key={index} opacityStatus={false} height={heightPercentage(26)}>
+							<TagElement
+								backgroundColor={colors.Gray5}
+								key={index}
+								opacityStatus={false}
+								height={heightPercentage(26)}>
 								<HStack>
 									<TagShopText size={fontPercentage(14)}># </TagShopText>
-									<TagText size={fontPercentage(14)} color={colors.Gray5}>
+									<TagText size={fontPercentage(14)} color={colors.backgroundWhite}>
 										{tendency}
 									</TagText>
 								</HStack>

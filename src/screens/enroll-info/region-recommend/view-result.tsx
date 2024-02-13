@@ -82,7 +82,7 @@ export default function ViewResult({navigation}: any) {
 							{(item.takenDay != recommendList[idx - 1]?.takenDay ?? 0) && (
 								<DayRecommendContainer>
 									<HStack>
-										<DayRecommendText color={colors.PointYellow}>
+										<DayRecommendText color={colors.PointGreen1}>
 											{item.takenDay == 0
 												? '당일치기'
 												: item.takenDay + '박 ' + (item.takenDay + 1) + '일 '}
@@ -146,7 +146,7 @@ const DayRecommendContainer = styled.View`
 	height: ${heightPercentage(35)}px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${colors.Blue2};
+	background-color: ${colors.Gray1};
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
 `;

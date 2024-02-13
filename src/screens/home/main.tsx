@@ -170,7 +170,7 @@ export default function Main({navigation}: any) {
 		list.forEach((item, idx) => {
 			if (item >= 80) {
 				result.push(
-					<TagElement key={idx} opacityStatus={false}>
+					<TagElement backgroundColor={colors.Gray1} key={idx} opacityStatus={false}>
 						<HStack>
 							<TagShopText># </TagShopText>
 							<TagText color={colors.Gray5}>{copy[idx]}</TagText>
@@ -303,11 +303,11 @@ export default function Main({navigation}: any) {
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
-export const TagElement = styled.View<{opacityStatus: boolean; height?: number}>`
+export const TagElement = styled.View<{opacityStatus: boolean; height?: number; backgroundColor?: string}>`
 	height: ${props => props.height ?? heightPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : colors.Gray1)};
+	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : props.backgroundColor)};
 	border-radius: 4px;
 	padding: 0px ${widthPercentage(6)}px;
 	margin: 2px;

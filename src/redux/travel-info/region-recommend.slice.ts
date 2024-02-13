@@ -2,7 +2,7 @@ import {GOOGLE_API_KEY} from '@env';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {axiosGoogle} from './travel.slice';
 import axiosAuth from '../api/api';
-import {regionTendencyList} from '../../screens/enroll-info/region-recommend/select-tendency';
+import {regionTendencyList} from '../../screens/enroll-info/region-recommend/select-who';
 const initialState: LiteState = {
 	tendency: regionTendencyList.map(item => {
 		return Array(item.list.length).fill(0);

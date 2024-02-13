@@ -23,7 +23,9 @@ const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolea
 	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(48) + 'px' : '0px')};
 	justify-content: center;
 	border-radius: 17px;
-	background-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
+	border-width: ${props => (props.select ? '1px' : '0px')};
+	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
+	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};
 	margin-bottom: ${heightPercentage(10)}px;
 	margin-left: ${widthPercentage(16)}px;
 `;

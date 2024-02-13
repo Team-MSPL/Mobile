@@ -5,8 +5,12 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {useState} from 'react';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
+import {BackgroundGray, ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import {SvgCancel} from '../../utill/svg/svg';
+import Stepper from '../../utill/component/enroll-info/stepper';
+import StepText from '../../utill/component/enroll-info/step-text';
+import {ButtonContainer} from './select-multi';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [textValue, setTextValue] = useState('신나는 여행');
@@ -16,18 +20,19 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('EnrollInfo');
+		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('SelectCity');
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	return (
-		<EnrollTravelTitleContainer>
+		<BackgroundGray>
+			<Stepper total={11} now={1}></Stepper>
+			<StepText styleText='새 여행' mainText='여행 이름을 입력해주세요.'></StepText>
 			<TouchableWithoutFeedback
 				onPress={() => {
 					Keyboard.dismiss();
 				}}>
 				<InputContainer>
-					<TitleText>여행 제목을 입력해주세요</TitleText>
-					{(onFocus || textValue) && <FocusTitleText>신나는 여행</FocusTitleText>}
+					{/* {(onFocus || textValue) && <FocusTitleText>신나는 여행</FocusTitleText>} */}
 					<InputAllContainter>
 						<TravelTitleTextInput
 							style={{color: 'black'}}
@@ -47,29 +52,34 @@ export default function EnrollTravelTitle({navigation}: any) {
 							</ClearTouchableOpacity>
 						)}
 					</InputAllContainter>
-					<CustomButton
-						isDisabled={textValue == '' || textValue.startsWith(' ')}
-						label='다음'
-						onPress={goNext}
-					/>
 				</InputContainer>
 			</TouchableWithoutFeedback>
-		</EnrollTravelTitleContainer>
+			<ButtonContainer>
+				<CustomButton
+					marginBottom={12}
+					isDisabled={textValue == '' || textValue.startsWith(' ')}
+					label='다음'
+					onPress={goNext}
+				/>
+			</ButtonContainer>
+		</BackgroundGray>
 	);
 }
 const InputAllContainter = styled(InputWrap)`
-	border-color: ${colors.selectButton};
-	height: 72px;
+	border-color: ${colors.backgroundWhite};
+	background-color: ${colors.backgroundWhite};
+	height: ${heightPercentage(52)}px;
 `;
 
 const TravelTitleTextInput = styled.TextInput`
-	font-weight: bold;
-	font-size: 22px;
+	font-family: PretendardVariable;
+	font-size: ${fontPercentage(14)}px;
+	line-height: ${heightPercentage(21)}px;
 	flex: 1;
-	padding: 8px;
 `;
 const InputContainer = styled.View`
 	width: 90%;
+	align-self: center;
 `;
 const EnrollTravelTitleContainer = styled.View`
 	width: 100%;

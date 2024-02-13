@@ -185,7 +185,7 @@ const InputWrap = styled.View`
 	flex-direction: row;
 	display: flex;
 	width: ${widthPercentage(326)}px;
-	background-color: ${colors.Gray1};
+	background-color: ${colors.backgroundWhite};
 	border-radius: 8px;
 	align-items: center;
 `;
@@ -204,7 +204,7 @@ const CustomTextInput = styled.TextInput<{text: string}>`
 	font-weight: 500;
 	border-radius: 8px;
 	border-color: ${({text}: {text: string}) => (text == '' ? colors.Gray3 : 'black')};
-	background-color: ${colors.Gray1};
+	background-color: ${colors.backgroundWhite};
 `;
 
 const TermsContainer = styled.View`

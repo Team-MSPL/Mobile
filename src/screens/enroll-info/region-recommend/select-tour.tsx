@@ -2,12 +2,12 @@ import styled from 'styled-components/native';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
-import {regionTendencyList} from './select-tendency';
 import CustomButton from '../../../utill/component/custom-button';
 import {heightPercentage} from '../../../utill/layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {BackgroundGray} from '../../../utill/layout/layout';
+import {regionTendencyList} from './select-who';
 
 export default function SelectTour({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.regionRecommendSlice);

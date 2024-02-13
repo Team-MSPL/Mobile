@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
-import {regionTendencyList} from './select-tendency';
+import {regionTendencyList} from './select-who';
 import CustomButton from '../../../utill/component/custom-button';
 import {heightPercentage} from '../../../utill/layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';

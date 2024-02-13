@@ -4,7 +4,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {Center, BackgroundGray, PretendardVariable} from '../../../utill/layout/layout';
+import {Center, BackgroundGray} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -20,6 +20,7 @@ import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import PrimaryButton from '../../../utill/component/primary-button';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(10);
@@ -79,9 +80,6 @@ export default function SelectDistance({navigation}: any) {
 			}
 		}, [signUpReward]),
 	);
-	const goNewLogin = () => {
-		navigation.navigate('LoginScreen');
-	};
 	const goPayment = async () => {
 		navigation.navigate('Payment');
 	};
@@ -168,15 +166,16 @@ export default function SelectDistance({navigation}: any) {
 				styleText='3.원하는 반경의 지역을 추천해드려요.'
 				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
-			<Center>
-				{geoInfo.name == '기본값:서울역' && (
-					<GetContainer onPress={goReverseGeocoding}>
-						<GetContainerText>위치정보 받아오기</GetContainerText>
-					</GetContainer>
-				)}
-				<GetText>{geoInfo.name}</GetText>
-			</Center>
 			<MapContainer>
+				{geoInfo.name == '기본값:서울역' && (
+					<GeolocationGetContainer>
+						<PrimaryButton
+							onPress={goReverseGeocoding}
+							width={widthPercentage(280)}
+							height={heightPercentage(50)}
+							label='위치정보 불러오기'></PrimaryButton>
+					</GeolocationGetContainer>
+				)}
 				<Qwe>
 					<MapView
 						showsMyLocationButton={false}
@@ -213,9 +212,9 @@ export default function SelectDistance({navigation}: any) {
 							style={{width: '80%', height: 40}}
 							minimumValue={1}
 							maximumValue={10}
-							minimumTrackTintColor='#123123'
-							maximumTrackTintColor='#000000'
-							thumbTintColor='#5350FF'
+							minimumTrackTintColor={colors.Primary}
+							maximumTrackTintColor={colors.Gray2}
+							thumbTintColor={colors.Primary}
 							value={range}
 							step={1}
 							onValueChange={item => {
@@ -226,11 +225,24 @@ export default function SelectDistance({navigation}: any) {
 				</>
 			)}
 			<ButtonContainer>
-				<CustomButton label='맞춤형 여행지를 확인해볼게요!' onPress={checkToken}></CustomButton>
+				<CustomButton
+					label='맞춤형 여행지를 확인해볼게요!'
+					onPress={checkToken}
+					marginBottom={12}></CustomButton>
 			</ButtonContainer>
 		</BackgroundGray>
 	);
 }
+const GeolocationGetContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(240)}px;
+	position: absolute;
+	background-color: rgba(112, 118, 142, 0.6);
+	z-index: 1;
+	align-items: center;
+	justify-content: flex-end;
+	padding-bottom: ${heightPercentage(20)}px;
+`;
 const ButtonContainer = styled.View`
 	flex: 1;
 	align-items: center;
@@ -239,23 +251,6 @@ const ButtonContainer = styled.View`
 `;
 const DistanceCenter = styled(Center)`
 	margin: 20px 0px 20px 0px;
-`;
-const GetContainer = styled.TouchableOpacity`
-	padding: 10px;
-	border-radius: 10px;
-	align-items: center;
-	background-color: ${colors.selectButton};
-`;
-const GetContainerText = styled(PretendardVariable)`
-	font-size: 15px;
-	font-weight: bold;
-	color: white;
-`;
-const GetText = styled(PretendardVariable)`
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-	margin: 10px 0px 0px 0px;
 `;
 const DistanceSpace = styled.View`
 	width: 80%;
