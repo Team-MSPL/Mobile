@@ -21,6 +21,7 @@ export const colors = {
 	Primary: '#C3F550',
 	PointYellow: '#5350FF',
 	PointGreen1: '#FF5A4D',
+	PointGreen3: '#E8F9D7',
 	Blue2: '#DBF3C9',
 	Blue3: '#84FF03',
 };

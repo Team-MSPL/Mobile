@@ -9,7 +9,7 @@ import {Center, BackgroundGray} from '../../../utill/layout/layout';
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {DistanceExplain, MapContainer, Qwe} from '../select-distance';
+import {DistanceCenter, DistanceExplain, DistanceSpace, MapContainer, Qwe} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
@@ -248,12 +248,4 @@ const ButtonContainer = styled.View`
 	align-items: center;
 	justify-content: flex-end;
 	margin-bottom: 2px;
-`;
-const DistanceCenter = styled(Center)`
-	margin: 20px 0px 20px 0px;
-`;
-const DistanceSpace = styled.View`
-	width: 80%;
-	flex-direction: row;
-	justify-content: space-between;
 `;

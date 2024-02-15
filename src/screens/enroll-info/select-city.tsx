@@ -13,7 +13,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer} from './select-multi';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-export default function SelectCity() {
+export default function SelectCity({navigation}: any) {
 	const {region, regionRecommendFlag, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
@@ -61,12 +61,14 @@ export default function SelectCity() {
 	};
 
 	const goNext = () => {
-		region.length != 0 ? () => {} : dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
+		region.length != 0
+			? navigation.navigate('SelectDay')
+			: dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
 	};
 
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={1}></Stepper>
+			<Stepper total={11} now={2}></Stepper>
 			<StepText styleText='1.여행 계획을 알려주세요.' mainText='어디로 떠나시나요?'></StepText>
 			<Container>
 				<SelectAllContainer>
@@ -215,6 +217,7 @@ const SelectListContainer = styled.ScrollView`
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;
+	height: ${heightPercentage(30)}px;
 `;
 export const cityViewList = [
 	{

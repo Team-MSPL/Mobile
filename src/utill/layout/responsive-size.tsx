@@ -5,7 +5,7 @@ import {
 } from 'react-native-responsive-dimensions';
 
 const FIGMA_WINDOW_WIDTH = 375;
-const FIGMA_WINDOW_HEIGHT = 904;
+const FIGMA_WINDOW_HEIGHT = 812;
 
 export function widthPercentage(width: number) {
 	const percentage = (width / FIGMA_WINDOW_WIDTH) * 100;

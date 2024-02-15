@@ -33,6 +33,7 @@ import RegionRecommend from '../../../public/region-recommend.svg';
 import CalendarRecommend from '../../../public/calendar-recommend.svg';
 import HomeUp from '../../../public/home-up.svg';
 import HomeDown from '../../../public/home-down.svg';
+import Plus from '../../../public/plus.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -136,4 +137,8 @@ export const SVGHomeUp = styled(HomeUp)<{color?: string}>`
 `;
 export const SVGHomeDown = styled(HomeDown)<{color?: string}>`
 	color: color;
+`;
+export const SVGPlus = styled(Plus)<{color?: string; rotate?: number}>`
+	color: color;
+	transform: rotate(${props => props.rotate ?? 0}deg);
 `;

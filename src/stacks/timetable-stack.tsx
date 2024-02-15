@@ -19,6 +19,12 @@ import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
 import {View, Image} from 'react-native';
 import {colors} from '../utill/colors';
 import {CourseReview} from '../utill/component/timetable/course-review';
+import RecommendSelectWho from '../screens/enroll-info/select-who';
+import RecommendSelectMove from '../screens/enroll-info/select-move';
+import RecommendSelectCost from '../screens/enroll-info/select-cost';
+import RecommendSelectConcept from '../screens/enroll-info/select-concept';
+import RecommendSelectPlay from '../screens/enroll-info/select-play';
+import RecommendSelectTour from '../screens/enroll-info/select-tour';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -155,6 +161,48 @@ export default function TimetableStack() {
 				component={CourseReview}
 				options={{
 					title: '리뷰작성',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectWho'
+				component={RecommendSelectWho}
+				options={{
+					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectMove'
+				component={RecommendSelectMove}
+				options={{
+					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectCost'
+				component={RecommendSelectCost}
+				options={{
+					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectConcept'
+				component={RecommendSelectConcept}
+				options={{
+					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectPlay'
+				component={RecommendSelectPlay}
+				options={{
+					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectTour'
+				component={RecommendSelectTour}
+				options={{
+					title: '여행일정추천',
 				}}
 			/>
 		</Fragment>

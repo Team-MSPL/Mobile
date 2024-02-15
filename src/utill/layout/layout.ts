@@ -4,10 +4,11 @@ import {colors} from '../colors';
 
 export const devicesWidth = Dimensions.get('window').width;
 export const devicesHeight = Dimensions.get('window').height;
-export const HStack = styled.View`
+export const HStack = styled.View<{justifyContent?: string}>`
 	display: inline-block;
 	flex-direction: row;
 	align-items: center;
+	justify-content: ${props => props.justifyContent ?? null};
 `;
 export const VStack = styled.View`
 	display: inline-block;
@@ -29,7 +30,7 @@ export const Divider = styled.View<{color?: string; height: number}>`
 `;
 
 export const MainContainer = styled.ScrollView`
-	background-color: ${colors.main};
+	background-color: ${colors.backgroundGray};
 	width: 100%;
 `;
 export const MainText = styled.Text`
