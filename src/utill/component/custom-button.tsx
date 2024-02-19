@@ -32,10 +32,10 @@ const ButtonContainer = styled.TouchableOpacity<{
 	isDisabledOpacity: boolean;
 }>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
-	width: ${widthPercentage(343)}px;
+	width: ${widthPercentage(327)}px;
 	align-self: center;
 	align-items: center;
-	height: ${heightPercentage(67)}px;
+	height: ${heightPercentage(60)}px;
 	justify-content: center;
 	border-radius: 17px;
 	background-color: ${colors.Gray5};

@@ -246,7 +246,7 @@ export default function LoginScreen({navigation}: any) {
 								platform.onPress();
 							}}>
 							<LogoHStack>
-								<LogoContainer>{platform.image}</LogoContainer>
+								{platform.image}
 								<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
 									{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
 								</LogoText>
@@ -263,19 +263,11 @@ const LoginSCreenContainer = styled.View`
 	width: 100%;
 	align-items: center;
 	justify-content: center;
-	top: ${heightPercentage(215)}px;
+	top: ${heightPercentage(271)}px;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;
 	height: 100%;
-`;
-const TextContainer = styled(HStack)`
-	align-items: flex-start;
-`;
-const TitleTextContainer = styled.View`
-	align-items: flex-start;
-	justify-content: center;
-	height: ${devicesHeight * 0.2}px;
 `;
 const LoginText = styled.Text`
 	font-size: ${fontPercentage(12)}px;
@@ -284,38 +276,25 @@ const LoginText = styled.Text`
 	line-height: ${heightPercentage(18)}px;
 `;
 
-const CircleButton = styled.TouchableOpacity<{bgColor: string}>`
-	width: 50px;
-	height: 50px;
-	border-radius: 99px;
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-	margin: 0px 10px 0px 10px;
-	background-color: ${props => props.bgColor};
-`;
 const CircleContainer = styled.View`
 	width: ${widthPercentage(326)}px;
 	justify-content: center;
 	position: absolute;
-	top: ${heightPercentage(555)}px;
+	top: ${heightPercentage(511)}px;
 	align-self: center;
+	gap: ${heightPercentage(10)}px;
 `;
-const LongCircleButton = styled(CircleButton)`
-	width: 100%;
-	margin: 5% 0% 0% 0%;
-	elevation: 3;
-	shadow-color: black;
-	shadow-opacity: 0.5;
+const LongCircleButton = styled.TouchableOpacity<{bgColor: string}>`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(52)}px;
+	background-color: ${props => props.bgColor};
 	align-items: center;
+	border-radius: 12px;
+	justify-content: center;
 `;
 const LogoText = styled.Text<{color: string}>`
 	font-size: 15px;
 	color: ${props => props.color};
-`;
-const LogoContainer = styled.View`
-	position: absolute;
-	left: 10px;
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

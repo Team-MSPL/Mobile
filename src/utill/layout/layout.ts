@@ -1,6 +1,7 @@
 import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {colors} from '../colors';
+import {heightPercentage, widthPercentage} from './responsive-size';
 
 export const devicesWidth = Dimensions.get('window').width;
 export const devicesHeight = Dimensions.get('window').height;
@@ -74,9 +75,10 @@ export const ClearTouchableOpacity = styled.TouchableOpacity`
 	justify-content: center;
 `;
 
-export const BackgroundGray = styled.View`
+export const BackgroundGray = styled.View<{paddingHorizental?: number}>`
 	flex: 1;
 	background-color: ${colors.backgroundGray};
+	padding: 0px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 `;
 
 export const PretendardVariable = styled.Text`

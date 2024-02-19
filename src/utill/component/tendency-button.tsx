@@ -17,9 +17,9 @@ type CustomButtonProps = {
 	divide?: boolean;
 };
 const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolean}>`
-	width: ${props => (props.divide ? 'null' : widthPercentage(343) + 'px')};
+	width: ${props => (props.divide ? 'null' : widthPercentage(327) + 'px')};
 	align-items: center;
-	height: ${heightPercentage(67)}px;
+	height: ${heightPercentage(60)}px;
 	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(48) + 'px' : '0px')};
 	justify-content: center;
 	border-radius: 17px;
@@ -27,7 +27,6 @@ const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolea
 	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
 	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};
 	margin-bottom: ${heightPercentage(10)}px;
-	margin-left: ${widthPercentage(16)}px;
 `;
 const ButtonText = styled.Text<{select: boolean}>`
 	color: ${props => (props.select ? colors.Gray5 : colors.Gray4)};

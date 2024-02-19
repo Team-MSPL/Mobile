@@ -84,10 +84,16 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				};
 				await dispatch(updatePost(uploadData));
 			} else {
+				diaryImageRef.current = [];
+				const ImageFunction = postData.postImage.map(async (item, idx) => {
+					let data = (await uploadImage({item: item, idx: idx, id: postData._id, category: 'post'})) ?? '';
+					diaryImageRef.current.push(data);
+				});
+				await Promise.all(ImageFunction);
 				const data = {
 					postTitle: postData.postTitle,
 					postContent: postData.postContent,
-					postImage: postData.postImage,
+					postImage: diaryImageRef.current,
 					postId: postData._id,
 				};
 				await dispatch(updatePost(data));

@@ -61,9 +61,10 @@ export default function ViewResult({navigation}: any) {
 	}, []);
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
-		<BackgroundGray>
+		<BackgroundGray paddingHorizental={0}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<StepText
+					marginLeft={widthPercentage(24)}
 					mainTextSize={23}
 					styleTextColor={colors.PointYellow}
 					styleText='지역 추천'
@@ -132,10 +133,9 @@ const SvgContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	left: ${widthPercentage(182)}px;
-	top: ${heightPercentage(74)}px;
+	top: ${heightPercentage(51)}px;
 `;
 const RecommendBorderContainer = styled.View`
-	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
 	padding: 0px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;

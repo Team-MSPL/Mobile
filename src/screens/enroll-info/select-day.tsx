@@ -133,6 +133,7 @@ export default function SelectDay({navigation}: any) {
 			}}>
 			<Stepper total={11} now={3}></Stepper>
 			<StepText
+				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='언제 떠나시나요?'
 				subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
@@ -150,13 +151,11 @@ export default function SelectDay({navigation}: any) {
 								onPress={() => {
 									onPressTime(idx);
 								}}>
-								<HStack justifyContent='space-around'>
+								<HStack justifyContent='space-between'>
 									<SelectText>{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}</SelectText>
-									<SelectText>
-										{String(timeLimitArray[idx]).padStart(2, '0') +
-											' : ' +
-											String(minuteLimitArray[idx]).padStart(2, '0')}
-									</SelectText>
+									<SelectText>{String(timeLimitArray[idx]).padStart(2, '0')}</SelectText>
+									<SelectText>:</SelectText>
+									<SelectText>{String(minuteLimitArray[idx]).padStart(2, '0')}</SelectText>
 								</HStack>
 							</SelectContainer>
 							{dateFlag.current == idx && (
@@ -233,10 +232,11 @@ const SelectText = styled(PretendardSemiBold)`
 `;
 export const TimeContainer = styled.View`
 	flex-direction: row;
-	padding: 0px ${widthPercentage(24)}px;
+	margin-top: ${heightPercentage(10)}px;
 `;
 export const TimeItemContainer = styled.View`
 	width: 50%;
+	gap: ${heightPercentage(5)}px;
 `;
 export const TimeItemText = styled.Text`
 	font-size: 15px;
@@ -256,4 +256,5 @@ export const DayPressable = styled.Pressable`
 export const TimeStepText = styled(PretendardVariable)`
 	color: ${colors.PointYellow};
 	font-size: ${fontPercentage(12)}px;
+	margin-left: ${widthPercentage(10)}px;
 `;

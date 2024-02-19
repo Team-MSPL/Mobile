@@ -34,6 +34,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 		<BackgroundGray>
 			<Stepper total={11} now={11}></Stepper>
 			<StepText
+				marginTop={heightPercentage(10)}
 				styleText='3.원하는 반경의 지역을 추천해드려요.'
 				mainText='선택하신 지역에서의 여행 반경을 설정해주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>

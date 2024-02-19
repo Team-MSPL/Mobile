@@ -26,6 +26,7 @@ export default function RecommendSelectTour({navigation}: any) {
 		<BackgroundGray>
 			<Stepper total={11} now={9}></Stepper>
 			<StepText
+				marginTop={heightPercentage(10)}
 				styleText='1.여행 스타일을 알아볼게요.'
 				mainText='어디를 가고 싶으신가요?'
 				subText='* 중복 선택 가능'></StepText>
@@ -42,7 +43,7 @@ export default function RecommendSelectTour({navigation}: any) {
 				))}
 			</ButtonsContainer>
 			<CustomButton
-				marginTop={heightPercentage(48)}
+				marginTop={heightPercentage(10)}
 				marginBottom={12}
 				onPress={goNext}
 				label='다음'></CustomButton>

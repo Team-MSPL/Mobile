@@ -69,7 +69,10 @@ export default function SelectCity({navigation}: any) {
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={2}></Stepper>
-			<StepText styleText='1.여행 계획을 알려주세요.' mainText='어디로 떠나시나요?'></StepText>
+			<StepText
+				marginTop={heightPercentage(10)}
+				styleText='1.여행 계획을 알려주세요.'
+				mainText='어디로 떠나시나요?'></StepText>
 			<Container>
 				<SelectAllContainer>
 					<SelectListContainer horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -119,7 +122,7 @@ export default function SelectCity({navigation}: any) {
 					<SeoulContainer>
 						{cityViewList[1].sub.map((item, idx) => {
 							return idx != 0 ? (
-								<SeoulInsideAllContainer>
+								<SeoulInsideAllContainer key={idx}>
 									<SeoulInsideContainer width={widthPercentage(125)}>
 										<SeoulText color={colors.Gray4}>{item.subTitle}</SeoulText>
 									</SeoulInsideContainer>
@@ -166,7 +169,6 @@ const SeoulText = styled(PretendardVariable)<{color: string}>`
 	color: ${props => props.color};
 `;
 const Container = styled.View`
-	left: ${widthPercentage(24)}px;
 	gap: ${heightPercentage(20)}px;
 `;
 const WrapContainer = styled.View`

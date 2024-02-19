@@ -1,6 +1,14 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, devicesWidth, PretendardSemiBold, FlexWrap} from '../../utill/layout/layout';
+import {
+	MainContainer,
+	VStack,
+	HStack,
+	devicesWidth,
+	PretendardSemiBold,
+	FlexWrap,
+	BackgroundGray,
+} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -48,81 +56,83 @@ export default function SelectMulti({navigation}: any) {
 	return (
 		<>
 			<MainContainer>
-				<Stepper total={11} now={3}></Stepper>
-				<StepText
-					styleText='1.여행 계획을 알려주세요.'
-					mainText='미리 정해놓은 장소가 있나요?'
-					subText='일정에 포함시키고 싶은 곳들을 추가해주세요.'></StepText>
-				<VStack>
-					{[...Array(nDay + 1)].map((item, idx) => {
-						const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+				<BackgroundGray>
+					<Stepper total={11} now={3}></Stepper>
+					<StepText
+						styleText='1.여행 계획을 알려주세요.'
+						mainText='미리 정해놓은 장소가 있나요?'
+						subText='일정에 포함시키고 싶은 곳들을 추가해주세요.'></StepText>
+					<VStack>
+						{[...Array(nDay + 1)].map((item, idx) => {
+							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
-						return (
-							<DayViewContainer key={idx}>
-								<HStack>
-									<DayText>{'DAY' + (idx + 1)}</DayText>
-									<DayInfoText>
-										{'   '}
-										{day[idx].format('YY.MM.DD') + ' (' + weekdays[day[idx].days()] + ')'}
-									</DayInfoText>
-								</HStack>
-								<HStack>
-									{MultiViewList.map(
-										(value, index) =>
-											!(idx == nDay && index == 1) && (
-												<ElementContainer
-													color={colors.PointYellow}
-													key={index}
-													onPress={() => {
-														value.function({idx: idx, index: index});
-													}}>
-													<ElementText>
-														{accommodations[idx + 1]?.name && index == 1
-															? '숙소 변경'
-															: value.title}
-													</ElementText>
-													<SVGPlus color={colors.Primary} />
-												</ElementContainer>
-											),
+							return (
+								<DayViewContainer key={idx}>
+									<HStack>
+										<DayText>{'DAY' + (idx + 1)}</DayText>
+										<DayInfoText>
+											{'   '}
+											{day[idx].format('YY.MM.DD') + ' (' + weekdays[day[idx].days()] + ')'}
+										</DayInfoText>
+									</HStack>
+									<HStack>
+										{MultiViewList.map(
+											(value, index) =>
+												!(idx == nDay && index == 1) && (
+													<ElementContainer
+														color={colors.PointYellow}
+														key={index}
+														onPress={() => {
+															value.function({idx: idx, index: index});
+														}}>
+														<ElementText>
+															{accommodations[idx + 1]?.name && index == 1
+																? '숙소 변경'
+																: value.title}
+														</ElementText>
+														<SVGPlus color={colors.Primary} />
+													</ElementContainer>
+												),
+										)}
+									</HStack>
+									{filteredPlaces.length != 0 && (
+										<MultiAllContainer>
+											<MultiText>여행지</MultiText>
+											<FlexWrap>
+												{filteredPlaces.map((data, index) => (
+													<ElementContainer
+														onPress={() => {
+															deleteEssential(data);
+														}}
+														color={colors.Gray5}
+														key={index}>
+														<ElementText>{data.name}</ElementText>
+														<SVGPlus color={colors.Primary} rotate={45} />
+													</ElementContainer>
+												))}
+											</FlexWrap>
+										</MultiAllContainer>
 									)}
-								</HStack>
-								{filteredPlaces.length != 0 && (
-									<MultiAllContainer>
-										<MultiText>여행지</MultiText>
-										<FlexWrap>
-											{filteredPlaces.map((data, index) => (
+									{accommodations[idx + 1].name && (
+										<MultiAllContainer>
+											<MultiText>숙소</MultiText>
+											<FlexWrap>
 												<ElementContainer
 													onPress={() => {
-														deleteEssential(data);
+														deleteAccommodation(idx + 1);
 													}}
-													color={colors.Gray5}
-													key={index}>
-													<ElementText>{data.name}</ElementText>
+													color={colors.Gray5}>
+													<ElementText>{accommodations[idx + 1].name}</ElementText>
 													<SVGPlus color={colors.Primary} rotate={45} />
 												</ElementContainer>
-											))}
-										</FlexWrap>
-									</MultiAllContainer>
-								)}
-								{accommodations[idx + 1].name && (
-									<MultiAllContainer>
-										<MultiText>숙소</MultiText>
-										<FlexWrap>
-											<ElementContainer
-												onPress={() => {
-													deleteAccommodation(idx + 1);
-												}}
-												color={colors.Gray5}>
-												<ElementText>{accommodations[idx + 1].name}</ElementText>
-												<SVGPlus color={colors.Primary} rotate={45} />
-											</ElementContainer>
-										</FlexWrap>
-									</MultiAllContainer>
-								)}
-							</DayViewContainer>
-						);
-					})}
-				</VStack>
+											</FlexWrap>
+										</MultiAllContainer>
+									)}
+								</DayViewContainer>
+							);
+						})}
+					</VStack>
+				</BackgroundGray>
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>

@@ -26,13 +26,15 @@ export default function EnrollTravelTitle({navigation}: any) {
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={1}></Stepper>
-			<StepText styleText='새 여행' mainText='여행 이름을 입력해주세요.'></StepText>
+			<StepText
+				marginTop={heightPercentage(10)}
+				styleText='새 여행'
+				mainText='여행 이름을 입력해주세요.'></StepText>
 			<TouchableWithoutFeedback
 				onPress={() => {
 					Keyboard.dismiss();
 				}}>
 				<InputContainer>
-					{/* {(onFocus || textValue) && <FocusTitleText>신나는 여행</FocusTitleText>} */}
 					<InputAllContainter>
 						<TravelTitleTextInput
 							style={{color: 'black'}}
@@ -79,26 +81,6 @@ const TravelTitleTextInput = styled.TextInput`
 	flex: 1;
 `;
 const InputContainer = styled.View`
-	width: 90%;
-	align-self: center;
-`;
-const EnrollTravelTitleContainer = styled.View`
 	width: 100%;
-	flex: 1;
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-	background-color: ${colors.main};
-`;
-const TitleText = styled.Text`
-	font-size: 22px;
-	font-weight: bold;
-	color: black;
-	margin: 0px 0px 30px 0px;
-`;
-const FocusTitleText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: grey;
-	margin: 0px 0px 5px 0px;
+	align-self: center;
 `;

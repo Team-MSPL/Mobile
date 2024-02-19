@@ -21,7 +21,7 @@ import {colors} from '../utill/colors';
 import {CourseReview} from '../utill/component/timetable/course-review';
 import RecommendSelectWho from '../screens/enroll-info/select-who';
 import RecommendSelectMove from '../screens/enroll-info/select-move';
-import RecommendSelectCost from '../screens/enroll-info/select-cost';
+import RecommendSelectBusy from '../screens/enroll-info/select-busy';
 import RecommendSelectConcept from '../screens/enroll-info/select-concept';
 import RecommendSelectPlay from '../screens/enroll-info/select-play';
 import RecommendSelectTour from '../screens/enroll-info/select-tour';
@@ -178,8 +178,8 @@ export default function TimetableStack() {
 				}}
 			/>
 			<Stack.Screen
-				name='RecommendSelectCost'
-				component={RecommendSelectCost}
+				name='RecommendSelectBusy'
+				component={RecommendSelectBusy}
 				options={{
 					title: '여행일정추천',
 				}}

@@ -3,11 +3,10 @@ import StepText from '../../../utill/component/enroll-info/step-text';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
 import CustomButton from '../../../utill/component/custom-button';
-import {heightPercentage} from '../../../utill/layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
-import {colors} from '../../../utill/colors';
 import {BackgroundGray} from '../../../utill/layout/layout';
+import {heightPercentage} from '../../../utill/layout/responsive-size';
 
 export default function SelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.regionRecommendSlice);
@@ -26,10 +25,11 @@ export default function SelectWho({navigation}: any) {
 		<BackgroundGray>
 			<Stepper total={7} now={1}></Stepper>
 			<StepText
+				marginTop={heightPercentage(10)}
 				styleText='1.여행 스타일을 알아볼게요.'
 				mainText='누구와 떠나시나요?'
 				subText='* 중복 선택 가능'></StepText>
-			<ButtonsContainer>
+			<SelectButtonsContainer>
 				{regionTendencyList[0].list.map((item, idx) => (
 					<TendencyButton
 						bgColor={tendency[0][idx] == 1}
@@ -39,16 +39,12 @@ export default function SelectWho({navigation}: any) {
 							handleSelect(idx);
 						}}></TendencyButton>
 				))}
-			</ButtonsContainer>
-			<CustomButton
-				marginTop={heightPercentage(48)}
-				marginBottom={12}
-				onPress={goNext}
-				label='다음'></CustomButton>
+			</SelectButtonsContainer>
+			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
 		</BackgroundGray>
 	);
 }
-const ButtonsContainer = styled.View`
+export const SelectButtonsContainer = styled.View`
 	flex: 1;
 	justify-content: flex-end;
 `;
