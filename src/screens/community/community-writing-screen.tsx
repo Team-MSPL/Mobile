@@ -14,10 +14,8 @@ import CustomButton from '../../utill/component/custom-button';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
 import {SvgCancel} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
-import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
-import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
-import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
+import {heightPercentage} from '../../utill/layout/responsive-size';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -116,6 +114,15 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	// 변화되는 인덱스
 	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
+	//direction true=오른쪽
+	const moveImage = ({index, direction}: {index: number; direction: boolean}) => {
+		let copy = [...postData.postImage];
+		let temp = copy[index + (direction ? 1 : -1)];
+		copy[index + (direction ? 1 : -1)] = copy[index];
+		copy[index] = temp;
+		changeImage(copy);
+	};
+
 	return (
 		<SafeAreaView>
 			<CommunityWritingContainer>
@@ -159,6 +166,24 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 									<SvgCancel color='white' width={13} height={13}></SvgCancel>
 								</CancelContainer>
 								<PictureElement source={{uri: uri}} />
+								<BarContainer>
+									{index != 0 && (
+										<MoveButton
+											onPress={() => {
+												moveImage({index: index, direction: false});
+											}}>
+											<ImageInputButtonText>왼</ImageInputButtonText>
+										</MoveButton>
+									)}
+									{index != postData.postImage.length - 1 && (
+										<MoveButton
+											onPress={() => {
+												moveImage({index: index, direction: true});
+											}}>
+											<ImageInputButtonText>오</ImageInputButtonText>
+										</MoveButton>
+									)}
+								</BarContainer>
 							</PictureElementContainer>
 						);
 					})}
@@ -189,7 +214,18 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		</SafeAreaView>
 	);
 }
-
+const BarContainer = styled.View`
+	width: 100%;
+	position: absolute;
+	height: ${heightPercentage(40)}px;
+	bottom: 0px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+`;
+const MoveButton = styled.TouchableOpacity`
+	width: 50%;
+`;
 const CommunityWritingContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding-horizontal: 24px;

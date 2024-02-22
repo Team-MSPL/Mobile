@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 import SelectDay from './select-day';
 import {useEffect, useLayoutEffect, useState} from 'react';
 import SelectTendency from './select-tendency';
-import {BackHandler, ScrollView} from 'react-native';
+import {ScrollView} from 'react-native';
 import SelectCity from './select-city';
 import SelectMulti from './select-multi';
 import {colors} from '../../utill/colors';
@@ -10,6 +10,7 @@ import SelectDistance from './select-distance';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function EnrollInfo({navigation}: any) {
 	const changeComponent = (e: number) => {
@@ -23,27 +24,8 @@ export default function EnrollInfo({navigation}: any) {
 		checKStep == viewComponent && dispatch(travelSliceActions.changeChecKStep(viewComponent + 1));
 	};
 	const dispatch = useAppDispatch();
-	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 코스 추천이 종료됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?',
-						modalLeft: true,
-						modalFunction: () => {
-							navigation.popToTop();
-						},
-					}),
-				);
-				return true;
-			}
-		};
 
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-		return () => backHandler.remove();
-	}, []);
+	useBackHandler({type: 'popToTop'});
 	const enrollComponentList = [
 		{
 			title: '성향',

@@ -58,7 +58,7 @@ export default function MyTravelList({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useBackHandler();
+	useBackHandler({type: 'exit'});
 	useFocusEffect(
 		useCallback(() => {
 			getTravelList();

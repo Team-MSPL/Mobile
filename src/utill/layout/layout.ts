@@ -5,11 +5,12 @@ import {heightPercentage, widthPercentage} from './responsive-size';
 
 export const devicesWidth = Dimensions.get('window').width;
 export const devicesHeight = Dimensions.get('window').height;
-export const HStack = styled.View<{justifyContent?: string}>`
+export const HStack = styled.View<{justifyContent?: string; gap?: number}>`
 	display: inline-block;
 	flex-direction: row;
 	align-items: center;
 	justify-content: ${props => props.justifyContent ?? null};
+	gap: ${props => props.gap ?? 0}px;
 `;
 export const VStack = styled.View`
 	display: inline-block;

@@ -77,7 +77,7 @@ export default function TimetableStack() {
 				name='SelectDistance'
 				component={SelectDistance}
 				options={{
-					title: '새 여행 (4/5)',
+					title: '여행일정추천',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}

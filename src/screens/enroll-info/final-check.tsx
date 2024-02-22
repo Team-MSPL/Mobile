@@ -2,7 +2,6 @@ import {Alert, BackHandler, Image, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {tendencyList} from './select-tendency';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from './select-city';
 import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
@@ -18,7 +17,10 @@ import {DefalutLogoContainer} from './search-place';
 
 import {ButtonContainer, MarginContainder} from './select-multi';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function FinalCheck({navigation}: any) {
+	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const {
 		day,
 		region,

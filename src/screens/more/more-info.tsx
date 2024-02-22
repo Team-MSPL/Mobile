@@ -64,7 +64,7 @@ export default function MoreInfo({navigation}: any) {
 		}
 	};
 	const {appsflyerLogEvent} = useAppsflyer();
-	useBackHandler();
+	useBackHandler({type: 'exit'});
 	const changeInfo = () => {
 		navigation.navigate('ChangeProfile');
 	};

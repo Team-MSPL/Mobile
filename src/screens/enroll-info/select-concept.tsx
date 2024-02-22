@@ -3,24 +3,20 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
 import CustomButton from '../../utill/component/custom-button';
-import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {tendencyList} from './select-tendency';
+import {useAppSelector} from '../../redux';
 import {SelectButtonsContainer} from './region-recommend/select-who';
 import {heightPercentage} from '../../utill/layout/responsive-size';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 
 export default function RecommendSelectConcept({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
 	const goNext = () => {
 		navigation.navigate('RecommendSelectPlay');
 	};
+
+	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
-		let copy = [...tendency];
-		let copy2 = [...tendency[1]];
-		copy2[item] = copy2[item] == 1 ? 0 : 1;
-		copy[1] = copy2;
-		dispatch(travelSliceActions.enrollTendency(copy));
+		handleButtonClick({index: 1, region: false, item: item});
 	};
 	return (
 		<BackgroundGray>
@@ -31,7 +27,7 @@ export default function RecommendSelectConcept({navigation}: any) {
 				mainText='테마는 무엇인가요?'
 				subText='* 중복 선택 가능'></StepText>
 			<SelectButtonsContainer>
-				{tendencyList[1].list.map((item, idx) => (
+				{tendencyList[1]?.list.map((item, idx) => (
 					<TendencyButton
 						bgColor={tendency[1][idx] == 1}
 						label={item}

@@ -44,6 +44,11 @@ export default function CourseDetail({navigation, route}: any) {
 						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				}),
 			).unwrap();
+			console.log(route.params.value);
+			console.log(
+				region[route.params.value.regionIndex] ??
+					route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
+			);
 			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			const data = a.data;
 			if (a.status == 200) {

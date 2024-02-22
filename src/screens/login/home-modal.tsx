@@ -3,7 +3,6 @@ import {colors} from '../../utill/colors';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {userSliceActions} from '../../redux/user/user.slice';
 import {SVGHomeDown, SVGHomeUp} from '../../utill/svg/svg';
 import {PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
 

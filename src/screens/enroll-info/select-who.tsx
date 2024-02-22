@@ -4,23 +4,18 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
 import CustomButton from '../../utill/component/custom-button';
-import {heightPercentage} from '../../utill/layout/responsive-size';
-import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {tendencyList} from './select-tendency';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {useAppSelector} from '../../redux';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
 	const goNext = () => {
 		navigation.navigate('RecommendSelectMove');
 	};
+	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
-		let copy = [...tendency];
-		let copy2 = [...tendency[0]];
-		copy2[item] = copy2[item] == 1 ? 0 : 1;
-		copy[0] = copy2;
-		dispatch(travelSliceActions.enrollTendency(copy));
+		handleButtonClick({index: 0, region: false, item: item});
 	};
 	return (
 		<BackgroundGray>
@@ -31,7 +26,7 @@ export default function RecommendSelectWho({navigation}: any) {
 				mainText='누구와 떠나시나요?'
 				subText='* 중복 선택 가능'></StepText>
 			<ButtonsContainer>
-				{tendencyList[0].list.map((item, idx) => (
+				{tendencyList[0]?.list.map((item, idx) => (
 					<TendencyButton
 						bgColor={tendency[0][idx] == 1}
 						label={item}
@@ -53,4 +48,5 @@ const ButtonsContainer = styled.View`
 	flex-wrap: wrap;
 	align-items: center;
 	margin-top: ${heightPercentage(155)}px;
+	gap: ${widthPercentage(4)}px;
 `;

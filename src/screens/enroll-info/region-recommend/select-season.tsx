@@ -1,25 +1,21 @@
 import StepText from '../../../utill/component/enroll-info/step-text';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
-import {SelectButtonsContainer, regionTendencyList} from './select-who';
+import {SelectButtonsContainer} from './select-who';
 import CustomButton from '../../../utill/component/custom-button';
-import {useAppDispatch, useAppSelector} from '../../../redux';
-import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
+import {useAppSelector} from '../../../redux';
 import {BackgroundGray} from '../../../utill/layout/layout';
 import {heightPercentage} from '../../../utill/layout/responsive-size';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 
 export default function SelectSeason({navigation}: any) {
-	const {tendency} = useAppSelector(state => state.regionRecommendSlice);
-	const dispatch = useAppDispatch();
+	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goNext = () => {
 		navigation.navigate('RegionSelectConcept');
 	};
+	const {handleButtonClick, regionTendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
-		let copy = [...tendency];
-		let copy2 = [...tendency[4]];
-		copy2[item] = copy2[item] == 1 ? 0 : 1;
-		copy[4] = copy2;
-		dispatch(regionRecommendSliceActions.enrollTendency(copy));
+		handleButtonClick({index: 4, region: true, item: item});
 	};
 	return (
 		<BackgroundGray>
@@ -32,7 +28,7 @@ export default function SelectSeason({navigation}: any) {
 			<SelectButtonsContainer>
 				{regionTendencyList[4].list.map((item, idx) => (
 					<TendencyButton
-						bgColor={tendency[4][idx] == 1}
+						bgColor={regionTendency[4][idx] == 1}
 						label={item}
 						key={idx}
 						onPress={() => {

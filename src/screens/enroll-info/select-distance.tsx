@@ -97,7 +97,7 @@ export const DistanceExplain = styled(PretendardSemiBold)`
 	font-size: ${fontPercentage(12)}px;
 	font-weight: 600;
 	color: ${colors.Gray3};
-	ling-height: ${heightPercentage(14.4)}px;
+	line-height: ${heightPercentage(14.4)}px;
 `;
 export const MapContainer = styled.View`
 	width: ${widthPercentage(327)}px;

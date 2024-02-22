@@ -4,13 +4,13 @@ import {getOneTravelCourse, reviewAndPoint} from '../../redux/travel-info/travel
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {useFocusEffect} from '@react-navigation/native';
 import CustomButton from '../../utill/component/custom-button';
-import {tendencyList} from '../enroll-info/select-tendency';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {MainContainer, MainText, HStack} from '../../utill/layout/layout';
 import {SvgStart} from '../../utill/svg/svg';
 import {colors} from '../../utill/colors';
 import styled from 'styled-components/native';
 import {DiaryTextInput} from './input-diary';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 export default function InputReviewAndPoint({navigation}: any) {
 	const {travelId, tendency} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -21,6 +21,12 @@ export default function InputReviewAndPoint({navigation}: any) {
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
 
+	const {tendencyList} = useTendencyHandler();
+
+	const reviewTendencyList = [
+		...tendencyList,
+		{title: '계절이 언제인가?', multi: true, list: ['봄', '여름', '가을', '겨울']},
+	];
 	const goMyTravelDetail = async () => {
 		await dispatch(getOneTravelCourse({travelId: travelId}));
 	};
@@ -133,10 +139,6 @@ const DetailRating = styled.TouchableOpacity`
 	justify-content: center;
 	flex-direction: row;
 `;
-const reviewTendencyList = [
-	...tendencyList,
-	{title: '계절이 언제인가?', multi: true, list: ['봄', '여름', '가을', '겨울']},
-];
 
 const ReviewAndPointContainer = styled(MainContainer)`
 	flex: 1;

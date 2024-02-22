@@ -17,10 +17,10 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
-	const {tendency} = useAppSelector(state => state.regionRecommendSlice);
+	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = () => {
-		let copy = [...tendency];
-		let copy2 = [...tendency[2]];
+		let copy = [...regionTendency];
+		let copy2 = [...regionTendency[2]];
 		if (copy2[4] == 1) {
 			copy2.push(1);
 			copy2.push(0);
@@ -33,7 +33,7 @@ export default function DetailResult({navigation, route}: any) {
 			copy2.push(0);
 		}
 		copy[2] = copy2;
-		let copy3 = [...tendency[3]];
+		let copy3 = [...regionTendency[3]];
 		if (copy3[5] == 1) {
 			copy3[0] = 1;
 			copy3[1] = 1;
@@ -167,8 +167,8 @@ const PopularityInfoTitleTextContainer = styled.View`
 	position: absolute;
 	z-index: 1;
 	align-self: flex-end;
-	left: ${widthPercentage(10)}px;
-	bottom: ${widthPercentage(10)}px;
+	left: ${widthPercentage(12)}px;
+	bottom: ${widthPercentage(12)}px;
 `;
 const IndexContainer = styled.View`
 	width: ${widthPercentage(24)}px;
@@ -195,7 +195,7 @@ const RecommendBorderContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: 0px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
+	padding: 0px 0px 0px ${widthPercentage(24)}px;
 	top: -30px;
 `;
 const RecommendMainContainer = styled.TouchableOpacity`

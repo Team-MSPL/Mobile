@@ -14,6 +14,7 @@ import {SvgPlace} from '../../utill/svg/svg';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName} = useAppSelector(
 		state => state.travelSlice,
@@ -180,28 +181,8 @@ export default function Preset({navigation}: any) {
 			'travelName',
 		]);
 	};
-	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 지역추천이 종료됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?',
-						modalFunction: () => {
-							removeCache();
-							navigation.popToTop();
-						},
-						modalLeft: true,
-					}),
-				);
-				return true;
-			}
-		};
 
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-		return () => backHandler.remove();
-	}, []);
+	useBackHandler({type: 'popToTop'});
 	let count = 0;
 	useEffect(() => {
 		saveCache();

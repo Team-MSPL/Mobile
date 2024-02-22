@@ -81,7 +81,7 @@ export default function CommunityMainScreen({navigation}: any) {
 		}
 	};
 
-	useBackHandler();
+	useBackHandler({type: 'exit'});
 
 	const adUnitId = __DEV__ ? TestIds.BANNER : Google_Ads_Banner_Android;
 	return (

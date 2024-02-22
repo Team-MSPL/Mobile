@@ -26,7 +26,7 @@ export default function SelectDistance({navigation}: any) {
 	const [range, setRange] = useState(10);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
-	const {tendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
+	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
@@ -34,7 +34,7 @@ export default function SelectDistance({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			let datas = {
-				selectList: tendency,
+				selectList: regionTendency,
 				selectPopular: popularity,
 				recentPosition: {lat: geoInfo.lat, lng: geoInfo.lng},
 				distanceSensitivity: range,

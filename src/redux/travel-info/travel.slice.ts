@@ -3,8 +3,23 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
-import {tendencyList} from '../../screens/enroll-info/select-tendency';
 import axiosAuth from '../api/api';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+// const {tendencyList} = useTendencyHandler();
+const tendencyList = [
+	{
+		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
+	},
+	{
+		list: ['힐링', '액티비티', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+	},
+	{
+		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '유적지', '박물관', '공원', '사찰', '성지'],
+	},
+	{
+		list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+	},
+];
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남

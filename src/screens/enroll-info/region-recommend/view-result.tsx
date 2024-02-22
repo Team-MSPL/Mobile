@@ -1,6 +1,6 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {BackHandler, Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {BackgroundGray, HStack, MainContainer, PretendardSemiBold} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -10,30 +10,15 @@ import {SVGRegionRecommend, SvgLoginLogo, SvgRight} from '../../../utill/svg/svg
 import {ScrollView} from 'react-native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {TagElement, TagShopText, TagText} from '../../home/main';
+import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
+
+	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 지역 추천이 종료됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?',
-						modalLeft: true,
-						modalFunction: () => {
-							navigation.popToTop();
-						},
-					}),
-				);
-				return true;
-			}
-		};
-
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
 		navigation.setOptions({
 			headerLeft: () => (
 				<TouchableOpacity
@@ -57,7 +42,6 @@ export default function ViewResult({navigation}: any) {
 				</TouchableOpacity>
 			),
 		});
-		return () => backHandler.remove();
 	}, []);
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
@@ -66,7 +50,7 @@ export default function ViewResult({navigation}: any) {
 				<StepText
 					marginLeft={widthPercentage(24)}
 					mainTextSize={23}
-					styleTextColor={colors.PointYellow}
+					styleTextColor={colors.Gray4}
 					styleText='지역 추천'
 					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
 					subText='여행 성향을 기반으로 추천된 여행지에요!'
@@ -149,6 +133,7 @@ const DayRecommendContainer = styled.View`
 	background-color: ${colors.Gray1};
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
+	top: -${heightPercentage(17.5)}px;
 `;
 const DayRecommendText = styled(PretendardSemiBold)<{color: string}>`
 	font-size: ${fontPercentage(16)}px;

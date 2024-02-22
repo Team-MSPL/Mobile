@@ -14,19 +14,20 @@ import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 import {colors} from '../../utill/colors';
 import {HStack, PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import Icons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
-import {tendencyList} from '../enroll-info/select-tendency';
 
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 
 export default function Main({navigation}: any) {
 	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
+	const {tendencyList} = useTendencyHandler();
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
@@ -149,7 +150,7 @@ export default function Main({navigation}: any) {
 		}
 		checkEvent();
 	}, [signUpReward]);
-	useBackHandler();
+	useBackHandler({type: 'exit'});
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
@@ -265,7 +266,10 @@ export default function Main({navigation}: any) {
 				</BrighnessBox>
 			</BackgroundImage>
 			<HomeBottomContainer>
-				<HomeRecommendText>다님에게 추천받기</HomeRecommendText>
+				<HStack gap={5}>
+					<SVGGood />
+					<HomeRecommendText>다님에게 추천받기</HomeRecommendText>
+				</HStack>
 				{buttonList.map(item => (
 					<RecommendContainer onPress={item.onPress} key={item.id}>
 						<RecommendContainerText>
@@ -287,12 +291,12 @@ export default function Main({navigation}: any) {
 								<ImageContainer>
 									<CollectionRecommendContentItemImage
 										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-									<ImageRegionText>{item.region + '\n'}</ImageRegionText>
+									{/* <ImageRegionText>{item.region + '\n'}</ImageRegionText> */}
 									<ImageTargetText>{item.name}</ImageTargetText>
 								</ImageContainer>
-								<TagContainer>
+								{/* <TagContainer>
 									{tendencyMake([...item.concept, ...item.play, ...item.tour])}
-								</TagContainer>
+								</TagContainer> */}
 							</CollectionTouchableOpacity>
 						))}
 					</CollectionContentContainer>
@@ -371,7 +375,7 @@ const HomeBottomContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: ${widthPercentage(35)}px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
+	padding: ${widthPercentage(35)}px 0px 0px ${widthPercentage(24)}px;
 `;
 const BrighnessBox = styled.View`
 	flex: 1;
@@ -439,8 +443,8 @@ const CollectionRecommendContentItemImage = styled.Image`
 const ImageContainer = styled.View`
 	width: ${widthPercentage(152)}px;
 	height: ${heightPercentage(196)}px;
-	margin-right: 24px;
-	padding: ${widthPercentage(6)}px;
+	margin-right: ${widthPercentage(12)}px;
+	padding: ${widthPercentage(12)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
