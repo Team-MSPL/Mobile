@@ -11,12 +11,15 @@ export default function StepText({
 	styleText,
 	mainText,
 	subText,
+	warningText,
 	styleTextSize,
 	mainTextSize,
 	subTextSize,
+	warningTextSize,
 	styleTextColor,
 	mainTextColor,
 	subTextColor,
+	warningTextColor,
 }: StepTextProps) {
 	return (
 		<StepTextVStack
@@ -33,6 +36,9 @@ export default function StepText({
 			<SubText size={subTextSize ?? fontPercentage(12)} color={subTextColor ?? '#b1b6cc'}>
 				{subText ?? ''}
 			</SubText>
+			<SubText size={warningTextSize ?? fontPercentage(12)} color={warningTextColor ?? colors.PointGreen1}>
+				{warningText ?? ''}
+			</SubText>
 		</StepTextVStack>
 	);
 }
@@ -45,12 +51,15 @@ type StepTextProps = {
 	styleText?: string;
 	mainText?: string;
 	subText?: string;
+	warningText?: string;
 	styleTextSize?: number;
 	mainTextSize?: number;
 	subTextSize?: number;
+	warningTextSize?: number;
 	styleTextColor?: string;
 	mainTextColor?: string;
 	subTextColor?: string;
+	warningTextColor?: string;
 };
 const StyleText = styled(PretendardSemiBold)<{size: number; color: string}>`
 	font-size: ${props => props.size}px;

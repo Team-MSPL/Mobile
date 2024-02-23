@@ -25,7 +25,62 @@ export default function SearchPlace({navigation, route}: any) {
 		category: number;
 		takenTime: number;
 		formatted_address: string | undefined;
+		region: string;
 	} | null>();
+	const regionOneList = {
+		서울특별시: '서울',
+		부산광역시: '부산',
+		대구광역시: '대구',
+		인천광역시: '인천',
+		광주광역시: '광주',
+		대전광역시: '대전',
+		울산광역시: '울산',
+		세종특별시: '세종',
+		경기도: '경기',
+		강원도: '강원',
+		충청북도: '충북',
+		충청남도: '충남',
+		전라북도: '전북',
+		전라남도: '전남',
+		경상북도: '경북',
+		경상남도: '경남',
+		제주도: '제주',
+	};
+	const regionList = {
+		부산광역시: '전체',
+		대구광역시: '전체',
+		인천광역시: '전체',
+		광주광역시: '전체',
+		대전광역시: '전체',
+		울산광역시: '전체',
+		세종특별시: '전체',
+	};
+	const cityList = {
+		종로구: '도심권',
+		중구: '도심권',
+		용산구: '도심권',
+		강남구: '동남권',
+		서초구: '동남권',
+		송파구: '동남권',
+		강북구: '동북권',
+		도봉구: '동북권',
+		노원구: '동북권',
+		성북구: '동북권',
+		동대문구: '동북권',
+		중랑구: '동북권',
+		성동구: '동북권',
+		광진구: '동북권',
+		강서구: '서남권',
+		양천구: '서남권',
+		구로구: '서남권',
+		영등포구: '서남권',
+		동작구: '서남권',
+		관악구: '서남권',
+		금천구: '서남권',
+		은평구: '서북권',
+		서대문구: '서북권',
+		마포구: '서북권',
+	};
 	const SearchList = [
 		{
 			title: '방문 예정인 여행지를 등록해 주세요',
@@ -175,6 +230,12 @@ export default function SearchPlace({navigation, route}: any) {
 						} else {
 							imageUrl = null;
 						}
+						console.log(
+							regionOneList[details?.formatted_address.split(' ')[1]] +
+								' ' +
+								(regionList[details?.formatted_address.split(' ')[1]] ??
+									cityList[details?.formatted_address.split(' ')[2]]),
+						);
 						const datas = {
 							...Place,
 							name: details?.name,
@@ -182,6 +243,11 @@ export default function SearchPlace({navigation, route}: any) {
 							lng: details?.geometry.location.lng,
 							formatted_address: details?.formatted_address.replace('대한민국 ', ''),
 							photo: imageUrl,
+							region:
+								regionOneList[details?.formatted_address.split(' ')[1]] +
+								' ' +
+								(regionList[details?.formatted_address.split(' ')[1]] ??
+									cityList[details?.formatted_address.split(' ')[2]]),
 						};
 						setPlaceState(datas);
 						dispatch(travelSliceActions.enrollPlace(datas));

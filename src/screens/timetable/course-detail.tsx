@@ -200,6 +200,9 @@ export default function CourseDetail({navigation, route}: any) {
 				takenTime: 120,
 				id: shortId.generate(),
 				photo: route.params.value.photo,
+				cityDistance: [cityDistance],
+				cityIndex: cityIndex,
+				region: region[0] + ' ' + region[1],
 			},
 			season: season,
 		};

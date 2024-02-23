@@ -24,7 +24,10 @@ export default function RecommendSelectWho({navigation}: any) {
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 스타일을 알아볼게요.'
 				mainText='누구와 떠나시나요?'
-				subText='* 중복 선택 가능'></StepText>
+				subText='* 중복 선택 가능'
+				warningText={
+					tendency[0][tendency[0].length - 1] == 1 ? '반려동물과 실내 관광지는 함께 선택할 수 없어요' : ''
+				}></StepText>
 			<ButtonsContainer>
 				{tendencyList[0]?.list.map((item, idx) => (
 					<TendencyButton

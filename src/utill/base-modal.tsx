@@ -4,6 +4,8 @@ import {useAppDispatch, useAppSelector} from '../redux';
 import {modalSliceActions} from '../redux/modal/modalSlice';
 import {colors} from './colors';
 import {SubText, TitleText} from './component/policy/policy1';
+import {heightPercentage, widthPercentage} from './layout/responsive-size';
+import PrimaryButton from './component/primary-button';
 
 export default function BaseModal() {
 	const {
@@ -30,50 +32,68 @@ export default function BaseModal() {
 		modalLeftFunction();
 	};
 	return (
-		<Modal
-			animationType={'fade'}
-			//transparent={true}
-			visible={modalOpen}
-			onRequestClose={close}>
-			<ModalContainer onPress={() => {}}>
-				<ViewContaniner>
-					<Body>
-						<TitleText>{modalTitle}</TitleText>
-					</Body>
-					{modalSubTitle && <SubText>{modalSubTitle}</SubText>}
+		<>
+			{modalOpen && (
+				<Container>
+					<ModalContainer onPress={() => {}}>
+						<ViewContaniner>
+							<Body>
+								<TitleText>{modalTitle}</TitleText>
+							</Body>
+							{modalSubTitle && <SubText>{modalSubTitle}</SubText>}
 
-					<Footer left={Boolean(modalLeft)}>
-						{modalLeft && (
-							<ModalButton
-								left={Boolean(modalLeft)}
-								onPress={modalLeftFunctionUse ? handleLeftFunction : close}>
-								<ModalText>{modalLeftText}</ModalText>
-							</ModalButton>
-						)}
-						<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
-							<ModalText>{modalRightText}</ModalText>
-						</ModalButton>
-					</Footer>
-				</ViewContaniner>
-			</ModalContainer>
-		</Modal>
+							<PrimaryButton
+								onPress={() => {}}
+								width={widthPercentage(327)}
+								height={heightPercentage(50)}
+								label='위치정보 불러오기'></PrimaryButton>
+
+							<Footer left={Boolean(modalLeft)}>
+								{modalLeft && (
+									<ModalButton
+										left={Boolean(modalLeft)}
+										onPress={modalLeftFunctionUse ? handleLeftFunction : close}>
+										<ModalText>{modalLeftText}</ModalText>
+									</ModalButton>
+								)}
+								<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
+									<ModalText>{modalRightText}</ModalText>
+								</ModalButton>
+							</Footer>
+						</ViewContaniner>
+					</ModalContainer>
+				</Container>
+			)}
+		</>
 	);
 }
 
-const ModalContainer = styled.Pressable`
+const Container = styled.View`
+	position: absolute;
 	align-items: center;
 	justify-content: center;
+	width: ${widthPercentage(375)}px;
+	height: 100%;
+	background-color: rgba(128, 128, 128, 0);
+`;
+const ModalContainer = styled.Pressable`
+	align-items: center;
+	justify-content: flex-end;
 	flex-directrion: row;
-	flex: 1;
-	background-color: rgba(250, 250, 255, 0.8);
+	width: ${widthPercentage(375)}px;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
 `;
 
 const ViewContaniner = styled.Pressable`
 	background-color: white;
-	width: 80%;
-	border-radius: 5px;
-	border-width: 1px;
-	padding: 20px;
+	width: 100%;
+	height: ${heightPercentage(269)}px;
+	border-top-right-radius: 16px;
+	border-top-left-radius: 16px;
+	align-items: center;
+	justify-content: center;
+	padding: ${widthPercentage(24)}px;
 	border-color: ${colors.selectButton};
 `;
 const Header = styled.View`

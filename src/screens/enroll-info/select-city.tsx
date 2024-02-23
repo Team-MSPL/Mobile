@@ -247,7 +247,7 @@ export const cityViewList = [
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.5518911, lng: 126.9917937},
 			{id: 1, subTitle: '도심권', example: '종로구,중구,용산구', lat: 37.5658049, lng: 126.9751461},
-			{id: 2, subTitle: '동남권(강남)', example: '강남구,서초구,송파구', lat: 37.497952, lng: 127.027619},
+			{id: 2, subTitle: '동남권', example: '강남구,서초구,송파구', lat: 37.497952, lng: 127.027619},
 			{
 				id: 3,
 				subTitle: '동북권',
@@ -257,7 +257,7 @@ export const cityViewList = [
 			},
 			{
 				id: 4,
-				subTitle: '서남권(강서)',
+				subTitle: '서남권',
 				example: '강서구,양천구,구로구,영등포구,동작구,관악구,금천구',
 				lat: 37.5360367,
 				lng: 126.8745334,

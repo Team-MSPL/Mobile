@@ -751,6 +751,9 @@ export interface EssentialPlaceType {
 	takenTime: number;
 	id: string;
 	photo: string;
+	cityDistance?: [number];
+	cityIndex?: number;
+	region?: [string];
 }
 export interface TimetableType {
 	category: number;
