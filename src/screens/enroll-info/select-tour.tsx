@@ -51,7 +51,6 @@ const ButtonsContainer = styled.View`
 	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
-	align-items: center;
-	margin-top: ${heightPercentage(155)}px;
+	align-content: flex-end;
 	gap: ${widthPercentage(4)}px;
 `;

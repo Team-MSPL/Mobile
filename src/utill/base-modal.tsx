@@ -10,14 +10,14 @@ import PrimaryButton from './component/primary-button';
 export default function BaseModal() {
 	const {
 		modalOpen,
-		modalLeft,
+		modalBottom,
 		modalTitle,
 		modalSubTitle,
 		modalFunction,
-		modalRightText,
-		modalLeftText,
-		modalLeftFunctionUse,
-		modalLeftFunction,
+		modalTopText,
+		modalBottomText,
+		modalBottomFunctionUse,
+		modalBottomFunction,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
@@ -29,25 +29,33 @@ export default function BaseModal() {
 	};
 	const handleLeftFunction = () => {
 		close();
-		modalLeftFunction();
+		modalBottomFunction();
 	};
 	return (
 		<>
 			{modalOpen && (
 				<Container>
-					<ModalContainer onPress={() => {}}>
+					<ModalContainer onPress={close}>
 						<ViewContaniner>
-							<Body>
-								<TitleText>{modalTitle}</TitleText>
-							</Body>
+							<TitleText>{modalTitle}</TitleText>
 							{modalSubTitle && <SubText>{modalSubTitle}</SubText>}
-
-							<PrimaryButton
-								onPress={() => {}}
-								width={widthPercentage(327)}
-								height={heightPercentage(50)}
-								label='위치정보 불러오기'></PrimaryButton>
-
+							<ButtonContainer>
+								<PrimaryButton
+									backgroundColor={colors.Primary}
+									textColor={colors.Gray5}
+									onPress={handleModalFunction}
+									width={widthPercentage(327)}
+									height={heightPercentage(50)}
+									label={modalTopText}></PrimaryButton>
+								<PrimaryButton
+									backgroundColor={colors.Gray1}
+									textColor={colors.Gray4}
+									onPress={modalBottomFunctionUse ? handleLeftFunction : close}
+									width={widthPercentage(327)}
+									height={heightPercentage(50)}
+									label={modalBottomText}></PrimaryButton>
+							</ButtonContainer>
+							{/* 
 							<Footer left={Boolean(modalLeft)}>
 								{modalLeft && (
 									<ModalButton
@@ -59,7 +67,7 @@ export default function BaseModal() {
 								<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
 									<ModalText>{modalRightText}</ModalText>
 								</ModalButton>
-							</Footer>
+							</Footer> */}
 						</ViewContaniner>
 					</ModalContainer>
 				</Container>
@@ -67,6 +75,10 @@ export default function BaseModal() {
 		</>
 	);
 }
+const ButtonContainer = styled.View`
+	margin-top: ${heightPercentage(22)}px;
+	gap: ${heightPercentage(11)}px;
+`;
 
 const Container = styled.View`
 	position: absolute;

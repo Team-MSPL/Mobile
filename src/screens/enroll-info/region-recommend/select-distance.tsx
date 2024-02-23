@@ -170,6 +170,8 @@ export default function SelectDistance({navigation}: any) {
 				{geoInfo.name == '기본값:서울역' && (
 					<GeolocationGetContainer>
 						<PrimaryButton
+							backgroundColor={colors.Primary}
+							textColor={colors.Gray5}
 							onPress={goReverseGeocoding}
 							width={widthPercentage(280)}
 							height={heightPercentage(50)}

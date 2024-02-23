@@ -5,11 +5,26 @@ import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
 import CustomButton from '../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
+	const checkNext = () => {
+		if (tendency[0][tendency[0].length - 1] == 1) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '반려동물 출입 관광지를 찾으시나요?',
+					modalSubTitle: `반려동물 출입이 허용되지 않은 곳은\n추천되지 않아 관광지가 적을 수 있습니다.`,
+					modalFunction: goNext,
+					modalTopText: '확인했어요',
+					modalBottomText: '수정할래요',
+				}),
+			);
+		}
+	};
 	const goNext = () => {
 		navigation.navigate('RecommendSelectMove');
 	};
@@ -40,7 +55,7 @@ export default function RecommendSelectWho({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
+			<CustomButton marginBottom={12} onPress={checkNext} label='다음'></CustomButton>
 		</BackgroundGray>
 	);
 }

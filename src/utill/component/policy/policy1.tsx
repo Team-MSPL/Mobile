@@ -1,4 +1,7 @@
 import styled from 'styled-components/native';
+import {PretendardSemiBold, PretendardVariable} from '../../layout/layout';
+import {fontPercentage, heightPercentage} from '../../layout/responsive-size';
+import {colors} from '../../colors';
 export default function Policy1() {
 	return (
 		<>
@@ -83,10 +86,10 @@ const TextContainer = styled.View`
 	margin-bottom: 30px;
 	padding-horizontal: 10px;
 `;
-export const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
+export const TitleText = styled(PretendardSemiBold)`
+	font-size: ${fontPercentage(20)}px;
+	color: ${colors.Gray5};
+	line-height: ${heightPercentage(27)}px;
 `;
 
 const MainText = styled.Text`
@@ -97,9 +100,10 @@ const MainText = styled.Text`
 	font-weight: bold;
 `;
 
-export const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
+export const SubText = styled(PretendardVariable)`
+	font-size: ${fontPercentage(14)}px;
+	color: ${colors.Gray4};
+	line-height: ${heightPercentage(21)}px;
 	margin-bottom: 10px;
+	text-align: center;
 `;
