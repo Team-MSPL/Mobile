@@ -30,7 +30,7 @@ export default function StepText({
 			<StyleText size={styleTextSize ?? fontPercentage(14)} color={styleTextColor ?? colors.Gray3}>
 				{styleText}
 			</StyleText>
-			<MainText size={mainTextSize ?? fontPercentage(26)} color={mainTextColor ?? colors.Black}>
+			<MainText size={mainTextSize ?? fontPercentage(23)} color={mainTextColor ?? colors.Black}>
 				{mainText}
 			</MainText>
 			<SubText size={subTextSize ?? fontPercentage(12)} color={subTextColor ?? '#b1b6cc'}>

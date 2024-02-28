@@ -3,9 +3,22 @@ import {colors} from '../colors';
 import {PretendardVariable} from '../layout/layout';
 import {fontPercentage, heightPercentage} from '../layout/responsive-size';
 
-export default function PrimaryButton({width, height, label, backgroundColor, textColor, onPress}: PrimarybuttonType) {
+export default function PrimaryButton({
+	width,
+	height,
+	label,
+	backgroundColor,
+	textColor,
+	onPress,
+	disabled,
+}: PrimarybuttonType) {
 	return (
-		<PrimaryButtonContainer width={width} height={height} onPress={onPress} backgroundColor={backgroundColor}>
+		<PrimaryButtonContainer
+			width={width}
+			height={height}
+			onPress={onPress}
+			backgroundColor={backgroundColor}
+			disabled={disabled ?? false}>
 			<InsideText textColor={textColor}>{label}</InsideText>
 		</PrimaryButtonContainer>
 	);
@@ -38,4 +51,5 @@ interface PrimarybuttonType {
 	backgroundColor: string;
 	textColor: string;
 	onPress: () => void;
+	disabled?: boolean;
 }

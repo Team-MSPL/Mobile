@@ -23,6 +23,8 @@ export default function RecommendSelectWho({navigation}: any) {
 					modalBottomText: '수정할래요',
 				}),
 			);
+		} else {
+			goNext();
 		}
 	};
 	const goNext = () => {

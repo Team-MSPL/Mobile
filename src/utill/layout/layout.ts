@@ -1,27 +1,39 @@
 import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {colors} from '../colors';
-import {heightPercentage, widthPercentage} from './responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from './responsive-size';
 
 export const devicesWidth = Dimensions.get('window').width;
 export const devicesHeight = Dimensions.get('window').height;
-export const HStack = styled.View<{justifyContent?: string; gap?: number}>`
+export const HStack = styled.View<{
+	justifyContent?: string;
+	gap?: number;
+	width?: number;
+	marginVertical?: number;
+	marginHorizon?: number;
+}>`
+	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: row;
 	align-items: center;
 	justify-content: ${props => props.justifyContent ?? null};
 	gap: ${props => props.gap ?? 0}px;
+	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
 `;
-export const VStack = styled.View`
+export const VStack = styled.View<{width?: number; gap?: number; alignItems?: string}>`
+	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: column;
 	justify-content: center;
+	align-items: ${props => props.alignItems ?? null};
+	gap: ${props => props.gap ?? 0}px;
 `;
-export const FlexWrap = styled.View`
+export const FlexWrap = styled.View<{gap?: number; marginBottom?: number}>`
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin-bottom: 15px;
+	margin-bottom: ${props => props.marginBottom ?? 15}px;
+	gap: ${props => props.gap ?? 0}px;
 `;
 
 export const Divider = styled.View<{color?: string; height: number}>`
@@ -90,4 +102,36 @@ export const PretendardBold = styled.Text`
 `;
 export const PretendardSemiBold = styled.Text`
 	font-family: Pretendard-SemiBold;
+`;
+
+export const PretendardVariableText = styled.Text<{color: string; size: number; lineHeight: number}>`
+	font-family: PretendardVariable;
+	color: ${props => props.color};
+	font-size: ${props => fontPercentage(props.size)}px;
+	line-height: ${props => heightPercentage(props.lineHeight)}px;
+`;
+export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number}>`
+	font-family: Pretendard-Bold;
+	color: ${props => props.color ?? colors.Black};
+	font-size: ${props => fontPercentage(props.size)}px;
+	line-height: ${props => heightPercentage(props.lineHeight)}px;
+`;
+export const PretendardSemiBoldText = styled.Text<{color: string; size: number; lineHeight: number; width?: number}>`
+	font-family: Pretendard-SemiBold;
+	color: ${props => props.color ?? colors.Black};
+	font-size: ${props => fontPercentage(props.size)}px;
+	line-height: ${props => heightPercentage(props.lineHeight)}px;
+	width: ${props => props.width + 'px' ?? 'auto'};
+`;
+
+export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`
+	border-radius: 4px;
+	background-color: ${props => props.backgroundColor};
+	justify-content: space-around;
+	padding: ${props => props.padding ?? widthPercentage(3)}px;
+	flex-direction: row;
+	align-items: center;
+	height: ${props => props.height ?? heightPercentage(21)}px;
+	gap: ${widthPercentage(3)}px;
+	width: ${props => props.width + 'px' ?? null};
 `;

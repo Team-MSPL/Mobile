@@ -25,7 +25,12 @@ export default function RecommendSelectTour({navigation}: any) {
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 스타일을 알아볼게요.'
 				mainText='어디를 가고 싶으신가요?'
-				subText='* 중복 선택 가능'></StepText>
+				subText='* 중복 선택 가능'
+				warningText={
+					tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1
+						? '반려동물과 실내 여행지는 함께 선택할 수 없어요'
+						: ''
+				}></StepText>
 			<ButtonsContainer>
 				{tendencyList[3]?.list.map((item, idx) => (
 					<TendencyButton
@@ -39,6 +44,7 @@ export default function RecommendSelectTour({navigation}: any) {
 				))}
 			</ButtonsContainer>
 			<CustomButton
+				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}
 				marginTop={heightPercentage(10)}
 				marginBottom={12}
 				onPress={goNext}

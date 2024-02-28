@@ -754,6 +754,7 @@ export interface EssentialPlaceType {
 	cityDistance?: [number];
 	cityIndex?: number;
 	region?: [string];
+	formatted_address: string | undefined;
 }
 export interface TimetableType {
 	category: number;

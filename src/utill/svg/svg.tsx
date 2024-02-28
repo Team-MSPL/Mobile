@@ -35,6 +35,13 @@ import HomeUp from '../../../public/home-up.svg';
 import HomeDown from '../../../public/home-down.svg';
 import Plus from '../../../public/plus.svg';
 import Good from '../../../public/good.svg';
+import Minus from '../../../public/minus.svg';
+import Flag from '../../../public/flag.svg';
+
+import Spring from '../../../public/spring.svg';
+import Summer from '../../../public/summer.svg';
+import Fall from '../../../public/fall.svg';
+import Winter from '../../../public/winter.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -144,5 +151,24 @@ export const SVGPlus = styled(Plus)<{color?: string; rotate?: number}>`
 	transform: rotate(${props => props.rotate ?? 0}deg);
 `;
 export const SVGGood = styled(Good)<{color?: string}>`
+	color: color;
+`;
+export const SVGMinus = styled(Minus)<{color?: string}>`
+	color: color;
+`;
+export const SVGFlag = styled(Flag)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGSpring = styled(Spring)<{color?: string}>`
+	color: color;
+`;
+export const SVGSummer = styled(Summer)<{color?: string}>`
+	color: color;
+`;
+export const SVGFall = styled(Fall)<{color?: string}>`
+	color: color;
+`;
+export const SVGWinter = styled(Winter)<{color?: string}>`
 	color: color;
 `;

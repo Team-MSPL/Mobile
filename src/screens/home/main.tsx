@@ -316,9 +316,9 @@ export const TagElement = styled.View<{opacityStatus: boolean; height?: number; 
 	padding: 0px ${widthPercentage(6)}px;
 	margin: 2px;
 `;
-export const TagShopText = styled(PretendardVariable)<{size?: number}>`
+export const TagShopText = styled(PretendardVariable)<{size?: number; color?: string}>`
 	font-size: ${props => props.size ?? heightPercentage(12)}px;
-	color: ${colors.Primary};
+	color: ${props => props.color ?? colors.Primary};
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
 export const TagText = styled(PretendardVariable)<{color: string; size?: number}>`

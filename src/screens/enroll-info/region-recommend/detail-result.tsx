@@ -8,7 +8,6 @@ import {colors} from '../../../utill/colors';
 import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
 import {RecommendContainer, RecommendElement} from './view-result';
 import ImageView from 'react-native-image-viewing';
-import {SelectTendencyText} from '../final-check';
 import {useState} from 'react';
 import {ImageText, ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, TagShopText, TagText, metropolitanCheckList} from '../../home/main';
@@ -250,9 +249,6 @@ const PopularityInfoTitleText = styled(PretendardSemiBold)`
 	font-weight: 600;
 	color: ${colors.backgroundWhite};
 	z-index: 2;
-`;
-const TendencyText = styled(SelectTendencyText)`
-	font-size: 14px;
 `;
 export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
 	width: ${props => (props.state ? '20%' : '85%')};

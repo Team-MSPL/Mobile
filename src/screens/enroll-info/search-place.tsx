@@ -1,20 +1,26 @@
-import {Fragment, MutableRefObject, useRef, useState} from 'react';
+import {MutableRefObject, useRef, useState} from 'react';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {googleDetailApi, PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import shortId from 'shortid';
 import {GOOGLE_API_KEY} from '@env';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Divider, HStack, VStack, devicesWidth} from '../../utill/layout/layout';
-import {Keyboard, TouchableOpacity} from 'react-native';
-import {SvgLoginLogo} from '../../utill/svg/svg';
-import CustomButton from '../../utill/component/custom-button';
-import Icon from 'react-native-vector-icons/AntDesign';
+import {
+	BackgroundGray,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
+import {Keyboard, Pressable, TouchableOpacity} from 'react-native';
+import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import PrimaryButton from '../../utill/component/primary-button';
+import {DeleteContainer, SVGContainer} from './select-multi';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
-	const IconElement = styled(Icon)``;
 	const dispatch = useAppDispatch();
 	const {Place, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
 	const [placeState, setPlaceState] = useState<{
@@ -84,13 +90,13 @@ export default function SearchPlace({navigation, route}: any) {
 	const SearchList = [
 		{
 			title: '방문 예정인 여행지를 등록해 주세요',
-			subTitle: '여행지 검색',
+			subTitle: '여행지 추가',
 			variable: essentialPlaces,
 			function: travelSliceActions.enrollessentialPlaces,
 		},
 		{
 			title: '예정된 숙소 정보를 등록해주세요',
-			subTitle: '숙소 검색',
+			subTitle: '숙소 추가',
 			variable: accommodations,
 			function: travelSliceActions.enrollAccommodations,
 		},
@@ -113,92 +119,16 @@ export default function SearchPlace({navigation, route}: any) {
 	const clearInput = () => {
 		autocompleteRef.current?.setAddressText('');
 	};
-	const clearButton = () => (
-		<SearchClearContainer>
-			<TouchableOpacity onPress={clearInput}>
-				<SearchClearButton>취소</SearchClearButton>
-			</TouchableOpacity>
-		</SearchClearContainer>
-	);
-	const clearPlace = () => {
-		setPlaceState(null);
-	};
-	const selectTime = (e: number) => {
-		setTimeValue(e);
-		setAction(false);
-	};
-	const [action, setAction] = useState(false);
 	const [timeValue, setTimeValue] = useState(0);
 	return (
 		<SearchPlaceContainer
+			paddingHorizental={0}
 			onPress={() => {
 				Keyboard.dismiss();
 			}}>
-			<SearchPlaceText>{SearchList[route.params.id].title}</SearchPlaceText>
-			<SearchPlaceSecondText>{SearchList[route.params.id].subTitle}</SearchPlaceSecondText>
-			{placeState ? (
-				<>
-					<SearchPlaceElement>
-						{placeState.photo != null ? (
-							<SearchPlaceImage
-								source={{
-									uri: placeState.photo,
-								}}
-								alt='Place Image'
-							/>
-						) : (
-							<DefalutLogoContainer>
-								<SvgLoginLogo width={80} height={80} color='white' />
-							</DefalutLogoContainer>
-						)}
-
-						<SearchTextContainer>
-							<SearchPlaceElementText>{placeState.name}</SearchPlaceElementText>
-							<SearchPlaceElementText>{placeState.formatted_address}</SearchPlaceElementText>
-						</SearchTextContainer>
-						<SearchClearContainer>
-							<TouchableOpacity onPress={clearPlace}>
-								<SearchClearButton>취소</SearchClearButton>
-							</TouchableOpacity>
-						</SearchClearContainer>
-					</SearchPlaceElement>
-					{route.params.id == 0 && (
-						<Fragment>
-							<Divider></Divider>
-							<TimeAllContainer>
-								<SearchPlaceSecondText>머무르는 시간</SearchPlaceSecondText>
-								<TimeContainer
-									onPress={() => {
-										setAction(true);
-									}}>
-									{!action ? (
-										<TimeHStack>
-											<TimeText>{timeValue + 1} 시간</TimeText>
-											<IconElement
-												name={'down'}
-												size={devicesWidth * 0.05}
-												color={colors.selectButton}
-											/>
-										</TimeHStack>
-									) : (
-										<TimeSelectContainer>
-											{[...Array(3)].map((time, number) => (
-												<TimeContainer onPress={() => selectTime(number)} key={number}>
-													<SearchPlaceSecondText>{number + 1} 시간</SearchPlaceSecondText>
-												</TimeContainer>
-											))}
-										</TimeSelectContainer>
-									)}
-								</TimeContainer>
-							</TimeAllContainer>
-						</Fragment>
-					)}
-
-					<CustomButton label='추가하기' onPress={addPlace}></CustomButton>
-				</>
-			) : (
+			<SearchContainer height={route.params.id == 0 ? heightPercentage(450) : heightPercentage(497)}>
 				<GooglePlacesAutocomplete
-					placeholder='장소를 검색해보세요!'
+					placeholder='검색어를 입력하세요.'
 					disableScroll={true}
 					ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
 					query={{
@@ -206,17 +136,18 @@ export default function SearchPlace({navigation, route}: any) {
 						language: 'ko',
 						components: 'country:kr',
 					}}
-					renderRightButton={clearButton}
-					textInputProps={{placeholderTextColor: 'grey'}}
+					// renderRightButton={clearButton}
+					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{
 						textInputContainer: {
-							borderWidth: 1,
-							borderColor: colors.selectButton,
-							borderRadius: 10,
-							backgroundColor: colors.main,
+							width: widthPercentage(327),
+							height: heightPercentage(52),
+							borderRadius: 8,
+							backgroundColor: colors.backgroundWhite,
+							left: widthPercentage(24),
 						},
-						textInput: {margin: 1, color: 'black', backgroundColor: colors.main},
-						listView: {position: 'relative'},
+						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+						// listView: {position: 'relative'},
 						description: {color: 'black'},
 					}}
 					fetchDetails={true}
@@ -230,12 +161,6 @@ export default function SearchPlace({navigation, route}: any) {
 						} else {
 							imageUrl = null;
 						}
-						console.log(
-							regionOneList[details?.formatted_address.split(' ')[1]] +
-								' ' +
-								(regionList[details?.formatted_address.split(' ')[1]] ??
-									cityList[details?.formatted_address.split(' ')[2]]),
-						);
 						const datas = {
 							...Place,
 							name: details?.name,
@@ -255,21 +180,102 @@ export default function SearchPlace({navigation, route}: any) {
 					}}
 					onFail={error => console.log(error)}
 					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+			</SearchContainer>
+			{placeState ? (
+				<BottomContainer height={route.params.id == 0 ? heightPercentage(230) : heightPercentage(182)}>
+					<ElementContainer color={colors.backgroundGray}>
+						<VStack width={widthPercentage(243)}>
+							<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+								{placeState.name}
+							</PretendardSemiBoldText>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{placeState.formatted_address}
+							</PretendardVariableText>
+						</VStack>
+						<DeleteContainer
+							onPress={() => {
+								setPlaceState(null);
+								clearInput();
+							}}>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+								취소
+							</PretendardSemiBoldText>
+						</DeleteContainer>
+					</ElementContainer>
+					{route.params.id == 0 && (
+						<HStack justifyContent='space-around'>
+							<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={24}>
+								머무를 시간
+							</PretendardSemiBoldText>
+							<HStack justifyContent='space-around' width={widthPercentage(182)}>
+								<SVGContainer
+									disabled={timeValue < 1}
+									onPress={() => {
+										setTimeValue(timeValue - 1);
+									}}
+									color={colors.Gray1}>
+									<SVGMinus color={colors.Gray2} />
+								</SVGContainer>
+								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+									{timeValue + 1}시간
+								</PretendardSemiBoldText>
+								<SVGContainer
+									disabled={timeValue > 1}
+									onPress={() => {
+										setTimeValue(timeValue + 1);
+									}}
+									color={colors.Gray1}>
+									<SVGPlus color={colors.Gray2} />
+								</SVGContainer>
+							</HStack>
+						</HStack>
+					)}
+					<PrimaryButton
+						label={SearchList[route.params.id].subTitle}
+						width={widthPercentage(327)}
+						height={heightPercentage(60)}
+						onPress={addPlace}
+						backgroundColor='rgba(195,245,80,0.3)'
+						textColor={colors.Gray5}></PrimaryButton>
+				</BottomContainer>
+			) : (
+				<ButtonContainer>
+					<PrimaryButton
+						disabled={!placeState}
+						label={SearchList[route.params.id].subTitle}
+						width={widthPercentage(327)}
+						height={heightPercentage(60)}
+						onPress={() => {}}
+						backgroundColor={colors.Gray1}
+						textColor={colors.Gray4}></PrimaryButton>
+				</ButtonContainer>
 			)}
 		</SearchPlaceContainer>
 	);
 }
 
-const SearchPlaceElement = styled(HStack)`
+const ElementContainer = styled.View<{color: string}>`
+	border-radius: 8px;
+	background-color: ${props => props.color};
 	align-items: center;
-	margin: 10px 0px 10px 0px;
-	width: 100%;
+	justify-content: space-between;
+	padding: ${widthPercentage(5)}px ${widthPercentage(8)}px;
+	gap: ${widthPercentage(4)}px;
+	flex-direction: row;
+	margin-right: ${widthPercentage(5)}px;
+	margin-bottom: ${widthPercentage(5)}px;
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(64)}px;
 `;
-
-const SearchPlaceImage = styled.Image`
-	width: 100px;
-	height: 100px;
-	border-radius: 10px;
+const SearchContainer = styled.View<{height: number}>`
+	height: ${props => props.height}px;
+`;
+const BottomContainer = styled.View<{height: number}>`
+	width: ${widthPercentage(375)}px;
+	height: ${props => props.height}px;
+	background-color: ${colors.backgroundWhite};
+	padding: ${heightPercentage(14)}px ${widthPercentage(24)}px;
+	gap: ${heightPercentage(15)}px;
 `;
 export const DefalutLogoContainer = styled.View`
 	width: 100px;
@@ -279,31 +285,7 @@ export const DefalutLogoContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-const SearchPlaceContainer = styled.Pressable`
-	width: 100%;
-	padding: 10px;
-	flex: 1;
-	background-color: ${colors.main};
-`;
-const SearchPlaceText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-	margin: 20px 0px 70px 0px;
-`;
-const SearchPlaceSecondText = styled.Text`
-	font-size: ${devicesWidth * 0.05}px;
-	font-weight: bold;
-	color: black;
-	margin: 0px 0px 10px 0px;
-`;
-const SearchPlaceElementText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-	margin: 5px;
-	flex-wrap: wrap;
-`;
+const SearchPlaceContainer = styled(BackgroundGray).attrs({as: Pressable})``;
 
 export const SearchClearButton = styled.Text`
 	font-size: 17px;
@@ -316,30 +298,9 @@ export const SearchClearContainer = styled.View`
 	margin: 0px 10px 0px 0px;
 	width: 20%;
 `;
-const SearchTextContainer = styled(VStack)`
-	width: 50%;
-`;
-const TimeContainer = styled.TouchableOpacity`
-	padding: ${devicesWidth * 0.02}px;
-	justify-content: center;
-`;
-
-const TimeSelectContainer = styled.View`
-	padding: ${devicesWidth * 0.02}px;
-	border-width: 1px;
-	background-color: ${colors.main};
-`;
-const TimeText = styled.Text`
-	font-size: ${devicesWidth * 0.05}px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-const TimeHStack = styled(HStack)`
-	border-bottom-color: ${colors.regionNormal};
-	border-bottom-width: 1px;
-`;
-const TimeAllContainer = styled(HStack)`
-	width: 100%;
-	justify-content: space-between;
-	align-items: flex-start;
+const ButtonContainer = styled.View`
+	flex: 1;
+	align-items: center;
+	justify-content: flex-end;
+	padding-bottom: 10px;
 `;
