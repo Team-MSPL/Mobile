@@ -25,6 +25,7 @@ import RecommendSelectBusy from '../screens/enroll-info/select-busy';
 import RecommendSelectConcept from '../screens/enroll-info/select-concept';
 import RecommendSelectPlay from '../screens/enroll-info/select-play';
 import RecommendSelectTour from '../screens/enroll-info/select-tour';
+import PresetDetail from '../screens/timetable/preset-detail';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -203,6 +204,13 @@ export default function TimetableStack() {
 				component={RecommendSelectTour}
 				options={{
 					title: '여행일정추천',
+				}}
+			/>
+			<Stack.Screen
+				name='PresetDetail'
+				component={PresetDetail}
+				options={{
+					title: '일정 자세히 보기',
 				}}
 			/>
 		</Fragment>

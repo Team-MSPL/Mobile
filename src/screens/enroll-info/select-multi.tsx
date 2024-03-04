@@ -222,7 +222,6 @@ export const DayViewContainer = styled.View`
 	border-radius: 12px;
 	background-color: ${colors.backgroundWhite};
 	padding: 15px;
-	margin-top: ${heightPercentage(12)}px;
 	gap: ${widthPercentage(8)}px;
 `;
 
@@ -257,7 +256,7 @@ export const ButtonContainer = styled.View`
 	width: ${devicesWidth}px;
 	background-color: rgba(250, 250, 255, 0.8);
 	position: absolute;
-	bottom: 0;
+	bottom: 10px;
 `;
 export const DeleteContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(41)}px;

@@ -16,8 +16,8 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 	const typeList = {
 		exit: {title: '앱 종료', subTitle: '앱을 종료하시겠습니까?', handleFunction: exitApp},
 		popToTop: {
-			title: '추천이 종료됩니다.',
-			subTitle: '그래도 나가시겠습니까?',
+			title: '저장되지 않았어요',
+			subTitle: `홈으로 이동시 지역 추천이 종료돼요.\n일정 선택 후에 종료해야 저장할 수 있어요.`,
 			handleFunction: goPopToTop,
 		},
 		stop: {title: 'AI가 추천을 진행 중 입니다. 조금만 기다려주세요!', subTitle: '', handleFunction: notFunction},

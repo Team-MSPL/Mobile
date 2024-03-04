@@ -1,58 +1,33 @@
-import {Fragment, JSX, JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
-import {BackHandler, Alert, View, Image, TouchableOpacity, Platform} from 'react-native';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import {useEffect} from 'react';
+import {Image, TouchableOpacity, Platform, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, Center, MainText, SubText} from '../../utill/layout/layout';
-import {DayElementContainer, MarkerText} from './map-info';
-import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
-import {SvgPlace} from '../../utill/svg/svg';
-
-import Icon from 'react-native-vector-icons/AntDesign';
+import {
+	BackgroundGray,
+	HStack,
+	PretendardSemiBoldText,
+	FlexWrap,
+	TagContainer,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
+import {SVGCalendarRecommend, SVGFlag, SvgPlace} from '../../utill/svg/svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import StepText from '../../utill/component/enroll-info/step-text';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {WhiteContainer} from '../enroll-info/final-check';
+import {cityViewList} from '../enroll-info/select-city';
+import PrimaryButton from '../../utill/component/primary-button';
 export default function Preset({navigation}: any) {
-	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName, cityIndex, region} =
+		useAppSelector(state => state.travelSlice);
+	const {userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
-	const IconElement = styled(Icon)`
-		width: 5%;
-		align-self: flex-start;
-		margin: 4px 0px 0px 0px;
-	`;
-	const [select, setSelect] = useState(0);
-	const [viewTendency, setViewTendency] = useState(false);
-	const checkNext = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '잠깐!',
-				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
-				modalLeft: true,
-				modalFunction: goNext,
-			}),
-		);
+	const goDetail = (e: number) => {
+		navigation.navigate('PresetDetail', {index: e});
 	};
-	const goNext = () => {
-		// console.log(presetDatas[select]);
-		removeCache();
-		let copy = [...presetDatas[select]];
-		if (presetDatas[select].length != nDay + 1) {
-			const check = nDay + 1 - presetDatas[select].length;
-
-			for (let i = 0; i < check; i++) {
-				copy.push([]);
-			}
-		}
-		dispatch(travelSliceActions.enrollTimetable(copy));
-		// navigation.popToTop();
-		navigation.navigate('Timetable');
-	};
-	let positions: {latitude: number; longitude: number}[] = [];
 	useEffect(() => {
 		navigation.setOptions({
 			headerLeft: () => (
@@ -78,86 +53,6 @@ export default function Preset({navigation}: any) {
 			),
 		});
 	}, []);
-	const change = (idx: number) => {
-		if (mapRef.current) {
-			mapRef.current.animateToRegion(
-				{
-					latitude: centerLatitude,
-					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + deltaLatitude / 2,
-					longitudeDelta: deltaLongitude + deltaLongitude / 5,
-				},
-				1000,
-			); // 1000ms 동안 목표 지점으로 애니메이션 이동
-		}
-		setSelect(idx);
-	};
-
-	const mapRef = useRef<MapView>(null);
-	let markerCount = 0;
-	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
-	const polylines:
-		| string
-		| number
-		| boolean
-		| JSX.Element[]
-		| ReactElement<any, string | JSXElementConstructor<any>>
-		| null
-		| undefined = [];
-	presetDatas[select].forEach((value, index) => {
-		const polylineCoordinates = value.map(vvalue => ({
-			latitude: vvalue.lat,
-			longitude: vvalue.lng,
-		}));
-		value.map(vvalue =>
-			positions.push({
-				latitude: vvalue.lat,
-				longitude: vvalue.lng,
-			}),
-		),
-			markers.push(
-				value.map((vvalue, iindex) => {
-					markerCount += 1;
-					return (
-						<Marker
-							key={`marker_${index}_${iindex}`}
-							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
-							anchor={{x: 0.5, y: 0.9}}
-							title={vvalue.name}>
-							<MarkerText>{markerCount}</MarkerText>
-							<SvgPlace color={mapColor[index]} width={50} height={50} />
-						</Marker>
-					);
-				}),
-			);
-
-		polylines.push(
-			<Polyline
-				key={`polyline_${index}`}
-				coordinates={polylineCoordinates}
-				strokeColor={mapColor[index]}
-				strokeWidth={5} // You can change the width of the line here
-			/>,
-		);
-	});
-	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
-	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
-	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
-	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
-
-	// 경계 상자의 중심 좌표 계산
-	const centerLatitude = (maxLatitude + minLatitude) / 2;
-	const centerLongitude = (maxLongitude + minLongitude) / 2;
-
-	// 경계 상자의 너비와 높이 계산
-	const deltaLatitude = maxLatitude - minLatitude;
-	const deltaLongitude = maxLongitude - minLongitude;
-
-	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
-	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
-	const zoomLevel = Math.log2(360 / maxDelta) + 1;
-	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const saveCache = async () => {
 		const cacheValues: [string, string][] = [
 			['preset', JSON.stringify(presetDatas)],
@@ -170,160 +65,190 @@ export default function Preset({navigation}: any) {
 		];
 		AsyncStorage.multiSet(cacheValues);
 	};
-	const removeCache = async () => {
-		await AsyncStorage.multiRemove([
-			'preset',
-			'presetTendency',
-			'day',
-			'nDay',
-			'transit',
-			'tendency',
-			'travelName',
-		]);
-	};
 
 	useBackHandler({type: 'popToTop'});
-	let count = 0;
 	useEffect(() => {
 		saveCache();
 	}, []);
 	return (
-		<>
-			<MainContainer>
-				<PresetMainText>아래의 여행 코스 중 하나를 골라주세요!</PresetMainText>
-				<PresetSubText>마커를 눌러 상세한 관광정보를 확인할 수 있어요.</PresetSubText>
-				<MapView
-					ref={mapRef}
-					style={{width: '100%', height: 300}}
-					showsMyLocationButton={true}
-					region={{
-						latitude: centerLatitude,
-						longitude: centerLongitude,
-						latitudeDelta: deltaLatitude + deltaLatitude / 2,
-						longitudeDelta: deltaLongitude + deltaLongitude / 5,
-					}}>
-					{markers}
-					{polylines}
-				</MapView>
-				{presetTendencyList[select].tendencyNameList.length != 1 && (
-					<TendencyTouchable onPress={() => setViewTendency(!viewTendency)}>
-						<TendencyContainer>
-							{presetTendencyList[select].tendencyNameList.map((item, idx) => {
-								return (
-									(viewTendency ? true : idx < 2) && (
-										<TendencyText>
-											#{item}
-											<TendencyPointText>
-												{' ' + presetTendencyList[select].tendencyRanking[idx]}
-											</TendencyPointText>
-											등
-										</TendencyText>
-									)
-								);
-							})}
-						</TendencyContainer>
-						<IconElement name={viewTendency ? 'up' : 'down'} size={16} color='black' />
-					</TendencyTouchable>
-				)}
-
-				<PresetContainer>
-					{presetDatas.map(
-						(item, idx) =>
-							item != null && (
-								<PresetButton key={idx} onPress={() => change(idx)} select={idx === select}>
-									<PresetText select={idx === select}>코스 {idx + 1}</PresetText>
-								</PresetButton>
-							),
-					)}
-				</PresetContainer>
-				{presetDatas[select].map((vava, inin) => (
-					<Fragment key={inin}>
-						<DayText color={mapColor[inin]}>{inin + 1}일차 코스</DayText>
-						{vava.map((qwe, asd) => {
-							count += 1;
+		<BackgroundGray>
+			<ScrollView showsVerticalScrollIndicator={false}>
+				<StepText
+					mainTextSize={23}
+					styleTextColor={colors.Gray4}
+					styleText='일정 추천'
+					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
+					subText='순위가 낮은 일정은 간단한 동선을 우선시했어요!'
+				/>
+				<SvgContainer>
+					<SVGCalendarRecommend
+						width={widthPercentage(200)}
+						height={heightPercentage(150)}></SVGCalendarRecommend>
+				</SvgContainer>
+				<WhiteContainer>
+					<HStack>
+						<SVGFlag />
+						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+							{cityViewList[cityIndex].title}
+						</PretendardSemiBoldText>
+					</HStack>
+					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+						{presetTendencyList[0].tendencyNameList.map((item, idx) => {
 							return (
-								<InfoContainer key={asd}>
-									<ElementText>
-										{qwe.name} {count}
-									</ElementText>
-								</InfoContainer>
+								<TagContainer backgroundColor={colors.backgroundGray} key={idx}>
+									<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray4}>
+										{item}
+									</PretendardSemiBoldText>
+								</TagContainer>
 							);
 						})}
-					</Fragment>
-				))}
-				<MarginContainder></MarginContainder>
-			</MainContainer>
-			<ButtonContainer>
-				<CustomButton label='코스 선택' width={40} onPress={checkNext}></CustomButton>
-			</ButtonContainer>
-		</>
+					</FlexWrap>
+				</WhiteContainer>
+				{presetDatas.map(
+					(item, idx) =>
+						item != null && (
+							<WhiteContainer key={idx}>
+								<HStack>
+									<IndexContainer>
+										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray5}>
+											{idx + 1}
+										</PretendardSemiBoldText>
+									</IndexContainer>
+									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+										{nDay == 0 ? '당일치기 ' : nDay + '박 ' + (nDay + 1) + '일 '}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray3}>
+										일정
+									</PretendardSemiBoldText>
+								</HStack>
+								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+									{presetTendencyList[idx].tendencyNameList.map((item, index) => {
+										return (
+											<TagContainer
+												backgroundColor={colors.backgroundGray}
+												height={heightPercentage(28)}
+												key={index}>
+												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+													{item}
+												</PretendardSemiBoldText>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={17}
+													color={colors.PointYellow}>
+													{presetTendencyList[idx].tendencyPointList[index]}점
+												</PretendardSemiBoldText>
+											</TagContainer>
+										);
+									})}
+								</FlexWrap>
+								{item.map((value, index) =>
+									value.map((target, targetIndex) => {
+										return (
+											<HStack gap={widthPercentage(10)} key={targetIndex}>
+												<DashLineContainer>
+													{target.category == 4 ? (
+														<Triangle />
+													) : (
+														<Circle
+															color={
+																target.category == 5 ? colors.PointYellow : colors.Gray5
+															}
+														/>
+													)}
+													<DashLine
+														status={
+															index == 0 && targetIndex == 0
+																? 'start'
+																: index == item.length - 1 &&
+																  targetIndex == value.length - 1
+																? 'end'
+																: 'center'
+														}
+													/>
+												</DashLineContainer>
+												<PretendardVariableText
+													size={16}
+													lineHeight={19}
+													color={target.category == 5 ? colors.PointYellow : colors.Gray5}>
+													{target.name}
+												</PretendardVariableText>
+												<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
+													{index + 1}일차
+												</PretendardVariableText>
+											</HStack>
+										);
+									}),
+								)}
+								<PrimaryButton
+									width={290}
+									height={50}
+									label='일정 자세히 보기'
+									backgroundColor={colors.backgroundGray}
+									textColor={colors.PointYellow}
+									onPress={() => goDetail(idx)}></PrimaryButton>
+							</WhiteContainer>
+						),
+				)}
+			</ScrollView>
+		</BackgroundGray>
 	);
 }
-
-const mapColor = ['#F08676', '#E7A88D', '#ECC369', '#86D0C2', '#7AA1DC', '#D58DE7'];
-const PresetContainer = styled.View`
-	flex-direction: row;
-	flex-wrap: wrap;
-	width: 100%;
-	border-bottom-width: 1px;
-	padding: 10px 0px;
-	border-bottom-color: ${colors.regionNormal};
+export const DashLineContainer = styled.View`
+	width: ${widthPercentage(20)}px;
+	min-height: ${heightPercentage(46)}px;
+	justify-content: center;
+	align-items: center;
+`;
+export const Circle = styled.View<{color: string}>`
+	width: ${widthPercentage(10)}px;
+	height: ${widthPercentage(10)}px;
+	border-radius: 99px;
+	background-color: ${props => props.color};
+	z-index: 2;
+`;
+export const Triangle = styled.View`
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	border-style: solid;
+	border-left-width: ${widthPercentage(8)}px;
+	border-right-width: ${widthPercentage(8)}px;
+	border-top-width: ${widthPercentage(16)}px;
+	border-left-color: transparent;
+	border-right-color: transparent;
+	border-top-color: black;
+`;
+export const DashLine = styled.View<{status: string; dash?: boolean}>`
+	width: 1px;
+	height: ${props => (props.status == 'center' ? '100%' : '50%')};
+	border: ${props => (props.dash ?? true ? 'dashed' : '')} ${colors.Gray5};
+	position: absolute;
+	left: ${widthPercentage(9)}px;
+	bottom: 0;
+	${props => (props.status == 'start' ? 'bottom:0' : props.status == 'end' ? 'top:0' : '')};
+`;
+const IndexContainer = styled.View`
+	width: ${widthPercentage(24)}px;
+	height: ${widthPercentage(24)}px;
+	border-radius: 6px;
+	background-color: ${colors.Primary};
+	align-items: center;
+	justify-content: center;
+	margin-right: ${widthPercentage(10)}px;
+`;
+const SvgContainer = styled.View`
+	z-index: 0;
+	position: absolute;
+	width: ${widthPercentage(329.19)}px;
+	height: ${heightPercentage(204.14)}px;
+	align-items: center;
+	justify-content: center;
+	left: ${widthPercentage(122)}px;
+	top: ${heightPercentage(51)}px;
 `;
 export const PresetButton = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
 	border-radius: 20px;
 	padding: 10px;
 	margin: 10px 5px 0px 5px;
-`;
-const PresetText = styled.Text<{select: boolean}>`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${props => (props.select ? 'white' : colors.selectButton)};
-`;
-const PresetMainText = styled(MainText)`
-	font-size: 20px;
-`;
-const PresetSubText = styled(MainText)`
-	font-size: 15px;
-	margin: 0px 0px 10px 0px;
-`;
-const ElementText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-`;
-const InfoContainer = styled(DayElementContainer)`
-	padding: 10px;
-	margin: 10px 0px 10px 0px;
-	align-items: center;
-`;
-const DayText = styled.Text<{color: string}>`
-	font-size: 20px;
-	font-weight: bold;
-	color: ${props => props.color};
-`;
-const TendencyText = styled.Text`
-	font-size: 16px;
-	font-weight: 500;
-	color: black;
-	width: 45%;
-`;
-const TendencyPointText = styled.Text`
-	font-size: 18px;
-	font-weight: 500;
-	color: ${colors.selectButton};
-`;
-
-const TendencyTouchable = styled.TouchableOpacity`
-	width: 100%;
-	align-items: center;
-	justify-content: center;
-	flex-direction: row;
-`;
-const TendencyContainer = styled.View`
-	width: 95%;
-	align-items: center;
-	justify-content: flex-end;
-	flex-direction: row;
-	flex-wrap: wrap;
 `;

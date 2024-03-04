@@ -27,6 +27,7 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {MarginContainer} from '../timetable/preset-detail';
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const {
@@ -240,45 +241,60 @@ export default function FinalCheck({navigation}: any) {
 							</TagContainer>
 						</VStack>
 					</HStack>
-					<HStack gap={widthPercentage(6)}>
-						<WhiteContainer width={widthPercentage(182)}>
-							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-								이런 여행을 할래요
-							</PretendardVariableText>
-							<HStack width={widthPercentage(182)} gap={widthPercentage(9)}>
-								<SvgContainer>{seasonList[season.findIndex(item => item == 1)].svg}</SvgContainer>
-								<PretendardSemiBoldText
-									size={14}
-									lineHeight={18}
-									color={colors.Gray5}
-									width={widthPercentage(113)}>
-									{tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]}
-									{tendency[0].findIndex(item => item == 1) == 0 ||
-									tendency[0].findIndex(item => item == 1) == 4
-										? ' '
-										: ' 함께하는 '}
-									{seasonList[season.findIndex(item => item == 1)].title} 여행
-								</PretendardSemiBoldText>
-							</HStack>
-						</WhiteContainer>
-						<WhiteContainer width={widthPercentage(139)}>
-							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-								여행테마
-							</PretendardVariableText>
-							<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-								{tendency[1].map((item, inx) => {
-									return item ? (
-										<TagContainer backgroundColor={colors.backgroundGray} key={inx}>
-											<TagShopText color={colors.Gray2}>#</TagShopText>
-											<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-												{tendencyList[1]?.list[inx]}
-											</PretendardSemiBoldText>
-										</TagContainer>
-									) : null;
-								})}
-							</FlexWrap>
-						</WhiteContainer>
-					</HStack>
+					<Parent>
+						{tendency[0].find(item => item == 1) && (
+							<WhiteContainer
+								justifyContent='flex-start'
+								width={
+									tendency[1].find(item => item == 1) ? widthPercentage(182) : widthPercentage(327)
+								}>
+								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
+									이런 여행을 할래요
+								</PretendardVariableText>
+								<WhoContainer>
+									<HStack width={widthPercentage(182)} gap={widthPercentage(9)}>
+										<SvgContainer>
+											{seasonList[season.findIndex(item => item == 1)].svg}
+										</SvgContainer>
+										<PretendardSemiBoldText
+											size={14}
+											lineHeight={18}
+											color={colors.Gray5}
+											width={widthPercentage(113)}>
+											{tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]}
+											{tendency[0].findIndex(item => item == 1) == 0 ||
+											tendency[0].findIndex(item => item == 1) == 4
+												? ' '
+												: ' 함께하는 '}
+											{seasonList[season.findIndex(item => item == 1)].title} 여행
+										</PretendardSemiBoldText>
+									</HStack>
+								</WhoContainer>
+							</WhiteContainer>
+						)}
+						{tendency[1].find(item => item == 1) && (
+							<WhiteContainer
+								width={
+									tendency[0].find(item => item == 1) ? widthPercentage(139) : widthPercentage(327)
+								}>
+								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
+									여행테마
+								</PretendardVariableText>
+								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+									{tendency[1].map((item, inx) => {
+										return item ? (
+											<TagContainer backgroundColor={colors.backgroundGray} key={inx}>
+												<TagShopText color={colors.Gray2}>#</TagShopText>
+												<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+													{tendencyList[1]?.list[inx]}
+												</PretendardSemiBoldText>
+											</TagContainer>
+										) : null;
+									})}
+								</FlexWrap>
+							</WhiteContainer>
+						)}
+					</Parent>
 					{tendency[2].find(item => item == 1) && (
 						<WhiteContainer width={widthPercentage(327)}>
 							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
@@ -434,6 +450,7 @@ export default function FinalCheck({navigation}: any) {
 						);
 					})}
 				</MainContainer>
+				<MarginContainer />
 			</BackgroundGray>
 			<ButtonContainer>
 				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
@@ -449,12 +466,12 @@ const SvgContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-const WhiteContainer = styled.View<{width?: number}>`
+export const WhiteContainer = styled.View<{width?: number; justifyContent?: string}>`
 	width: ${props => props.width + 'px' ?? '100%'};
 	background-color: ${colors.backgroundWhite};
 	border-radius: 8px;
 	align-items: flex-start;
-	justify-content: center;
+	justify-content: ${props => props.justifyContent ?? 'center'};
 	padding: ${heightPercentage(8)}px ${widthPercentage(10)}px;
 	gap: ${widthPercentage(3)}px;
 	margin-bottom: ${heightPercentage(10)}px;
@@ -464,4 +481,16 @@ const MultiAllContainer = styled.View`
 	border-radius: 12px;
 	background-color: ${colors.backgroundGray};
 	gap: ${widthPercentage(3)}px;
+`;
+const Parent = styled.View`
+	flex-direction: row;
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+	gap: ${widthPercentage(6)}px;
+`;
+const WhoContainer = styled.View`
+	flex: 1;
+	align-items: center;
+	justify-content: center;
 `;

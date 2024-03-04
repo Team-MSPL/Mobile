@@ -132,6 +132,6 @@ export const TagContainer = styled.View<{backgroundColor: string; width?: number
 	flex-direction: row;
 	align-items: center;
 	height: ${props => props.height ?? heightPercentage(21)}px;
-	gap: ${widthPercentage(3)}px;
+	gap: ${widthPercentage(1.3)}px;
 	width: ${props => props.width + 'px' ?? null};
 `;

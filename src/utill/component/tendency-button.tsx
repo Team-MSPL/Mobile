@@ -20,10 +20,10 @@ const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolea
 	width: ${props => (props.divide ? 'null' : widthPercentage(327) + 'px')};
 	align-items: center;
 	height: ${heightPercentage(60)}px;
-	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(48) + 'px' : '0px')};
+	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(47) + 'px' : '0px')};
 	justify-content: center;
 	border-radius: 17px;
-	border-width: ${props => (props.select ? '1px' : '0px')};
+	border-width: ${props => (props.select ? '1px' : '1px')};
 	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
 	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};
 	margin-bottom: ${heightPercentage(10)}px;
