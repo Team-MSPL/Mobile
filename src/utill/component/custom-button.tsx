@@ -1,6 +1,7 @@
 import styled from 'styled-components/native';
 import {colors} from '../colors';
-import {fontPercentage, heightPercentage, widthPercentage} from '../layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../layout/responsive-size';
+import {PretendardSemiBoldText} from '../layout/layout';
 
 export default function CustomButton({marginTop, marginBottom, label, onPress, isDisabled, width}: CustomButtonProps) {
 	return (
@@ -11,7 +12,9 @@ export default function CustomButton({marginTop, marginBottom, label, onPress, i
 			isDisabledOpacity={isDisabled ?? false}
 			onPress={onPress}
 			width={width ?? 60}>
-			<ButtonText>{label}</ButtonText>
+			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
+				{label}
+			</PretendardSemiBoldText>
 		</ButtonContainer>
 	);
 }
@@ -41,9 +44,4 @@ const ButtonContainer = styled.TouchableOpacity<{
 	background-color: ${colors.Gray5};
 	margin-top: ${props => props.marginTop}px;
 	margin-bottom: ${props => props.marginBottom}px;
-`;
-const ButtonText = styled.Text`
-	font-size: ${fontPercentage(18)}px;
-	font-weight: 600;
-	color: ${colors.Primary};
 `;

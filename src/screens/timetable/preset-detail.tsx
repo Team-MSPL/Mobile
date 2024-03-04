@@ -87,11 +87,13 @@ export default function PresetDetail({navigation, route}: any) {
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
 		}));
-		value.map(vvalue =>
-			positions.push({
-				latitude: vvalue.lat,
-				longitude: vvalue.lng,
-			}),
+		value.map(
+			vvalue =>
+				index == select &&
+				positions.push({
+					latitude: vvalue.lat,
+					longitude: vvalue.lng,
+				}),
 		),
 			markers.push(
 				value.map((vvalue, iindex) => {
@@ -99,6 +101,7 @@ export default function PresetDetail({navigation, route}: any) {
 					return (
 						<Marker
 							key={`marker_${index}_${iindex}`}
+							style={{zIndex: 4}}
 							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
 							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
 							anchor={{x: 0.5, y: 0.5}}
@@ -227,7 +230,8 @@ export default function PresetDetail({navigation, route}: any) {
 											{value.name}
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-											{value.takenTime / 60}시간
+											{Math.floor(value.takenTime / 60)}시간
+											{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
 										</PretendardSemiBoldText>
 									</HStack>
 								))}

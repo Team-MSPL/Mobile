@@ -1,6 +1,5 @@
 import styled from 'styled-components/native';
-import {PretendardBold, PretendardSemiBold, PretendardVariable, VStack} from '../../layout/layout';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {PretendardSemiBoldText, VStack} from '../../layout/layout';
 import {colors} from '../../colors';
 
 export default function StepText({
@@ -27,18 +26,21 @@ export default function StepText({
 			marginLeft={marginLeft ?? undefined}
 			marginRight={marginRight ?? undefined}
 			marginTop={marginTop ?? undefined}>
-			<StyleText size={styleTextSize ?? fontPercentage(14)} color={styleTextColor ?? colors.Gray3}>
+			<PretendardSemiBoldText size={styleTextSize ?? 14} lineHeight={21} color={styleTextColor ?? colors.Gray3}>
 				{styleText}
-			</StyleText>
-			<MainText size={mainTextSize ?? fontPercentage(23)} color={mainTextColor ?? colors.Black}>
+			</PretendardSemiBoldText>
+			<PretendardSemiBoldText size={mainTextSize ?? 23} lineHeight={31} color={mainTextColor ?? colors.Black}>
 				{mainText}
-			</MainText>
-			<SubText size={subTextSize ?? fontPercentage(12)} color={subTextColor ?? '#b1b6cc'}>
+			</PretendardSemiBoldText>
+			<PretendardSemiBoldText size={subTextSize ?? 12} lineHeight={18} color={subTextColor ?? colors.Gray2}>
 				{subText ?? ''}
-			</SubText>
-			<SubText size={warningTextSize ?? fontPercentage(12)} color={warningTextColor ?? colors.PointGreen1}>
+			</PretendardSemiBoldText>
+			<PretendardSemiBoldText
+				size={warningTextSize ?? 12}
+				lineHeight={18}
+				color={warningTextColor ?? colors.PointGreen1}>
 				{warningText ?? ''}
-			</SubText>
+			</PretendardSemiBoldText>
 		</StepTextVStack>
 	);
 }
@@ -61,25 +63,6 @@ type StepTextProps = {
 	subTextColor?: string;
 	warningTextColor?: string;
 };
-const StyleText = styled(PretendardSemiBold)<{size: number; color: string}>`
-	font-size: ${props => props.size}px;
-	font-weight: 600;
-	line-height: ${fontPercentage(21)}px;
-	color: ${props => props.color};
-`;
-const MainText = styled(PretendardBold)<{size: number; color: string}>`
-	color: ${props => props.color};
-	font-size: ${props => props.size}px;
-	font-weight: 700;
-	line-height: ${fontPercentage(35.1)}px;
-`;
-
-const SubText = styled(PretendardVariable)<{size: number; color: string}>`
-	color: ${props => props.color};
-	font-size: ${props => props.size}px;
-	font-weight: 500;
-	line-height: ${fontPercentage(18)}px;
-`;
 
 const StepTextVStack = styled(VStack)<{
 	marginTop?: number;

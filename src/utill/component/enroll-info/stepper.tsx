@@ -17,6 +17,7 @@ const StepperBar = styled.View`
 	align-items: start;
 	border-radius: 6px;
 	align-self: center;
+	margin-bottom: ${heightPercentage(10)}px;
 `;
 const NowBar = styled.View<{now: number}>`
 	position: absolute;

@@ -9,7 +9,6 @@ import AirPlain from '../../../public/airplain.svg';
 import Calendar from '../../../public/calendar.svg';
 import Community from '../../../public/community.svg';
 import Profile from '../../../public/profile.svg';
-// import RightAdd from '../../../public/rightAdd.svg';
 import Picture from '../../../public/picture.svg';
 import MileStone from '../../../public/milestone.svg';
 import Review from '../../../public/review.svg';
@@ -21,7 +20,6 @@ import LoginLogo from '../../../public/login-logo.svg';
 import AppleLogo from '../../../public/logo-apple.svg';
 import GoogleLogo from '../../../public/logo-google.svg';
 import KakaoLogo from '../../../public/logo-kakao.svg';
-import GuestLogo from '../../../public/ic-guest.svg';
 
 import Call from '../../../public/call.svg';
 import Location from '../../../public/location.svg';
@@ -76,9 +74,6 @@ export const SvgCommunity = styled(Community)<{color?: string}>`
 export const SvgProfile = styled(Profile)<{color?: string}>`
 	color: color;
 `;
-// export const SvgRightAdd = styled(RightAdd)<{color?: string}>`
-// 	color: color;
-// `;
 export const SvgPicture = styled(Picture)<{color?: string}>`
 	color: color;
 `;
@@ -110,9 +105,6 @@ export const SvgGoogle = styled(GoogleLogo)<{color?: string}>`
 	color: color;
 `;
 export const SvgApple = styled(AppleLogo)<{color?: string}>`
-	color: color;
-`;
-export const SvgGuest = styled(GuestLogo)<{color?: string}>`
 	color: color;
 `;
 export const SvgLocation = styled(Location)<{color?: string}>`

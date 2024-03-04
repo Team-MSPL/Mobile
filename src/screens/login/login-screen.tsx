@@ -15,7 +15,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {colors} from '../../utill/colors';
 import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
-import {SvgApple, SvgDanimText, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {SvgApple, SvgDanimText, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {networkCheck} from '../../redux/network/networkSlice';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 interface tokenType {

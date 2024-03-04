@@ -29,7 +29,7 @@ import {TagShopText} from '../home/main';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarginContainer} from '../timetable/preset-detail';
 export default function FinalCheck({navigation}: any) {
-	const {handleButtonClick, tendencyList} = useTendencyHandler();
+	const {tendencyList} = useTendencyHandler();
 	const {
 		day,
 		region,

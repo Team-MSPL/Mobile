@@ -1,14 +1,14 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
-import {BackgroundGray, HStack, MainContainer, PretendardBold, PretendardVariable} from '../../../utill/layout/layout';
+import {BackgroundGray, MainContainer, PretendardSemiBoldText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
 import Stepper from '../../../utill/component/enroll-info/stepper';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import RangeSlider from 'rn-range-slider';
-import {useCallback, useRef} from 'react';
+import {useRef} from 'react';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -27,7 +27,6 @@ export default function SelectPopularity({navigation}: any) {
 			<StepText
 				styleText='2.여행지의 인기도를 선택해주세요.'
 				mainText={'가고자 하는 여행지가 \n어떤 느낌이었으면 하나요?'}></StepText>
-			<Info>* 인기도의 기준은 각 지역별 여행객 수 통계를 참조했어요.</Info>
 			<BarContainer>
 				<RangeSlider
 					min={1}
@@ -46,8 +45,12 @@ export default function SelectPopularity({navigation}: any) {
 					}}
 					renderRailSelected={() => <SelectRail />}></RangeSlider>
 				<SpaceHstack>
-					<BarExplainText>가장 이색적인</BarExplainText>
-					<BarExplainText>가장 유명한</BarExplainText>
+					<PretendardSemiBoldText size={12} lineHeight={14.4} color={colors.Gray4}>
+						가장 이색적인
+					</PretendardSemiBoldText>
+					<PretendardSemiBoldText size={12} lineHeight={14.4} color={colors.Gray4}>
+						가장 유명한
+					</PretendardSemiBoldText>
 				</SpaceHstack>
 			</BarContainer>
 
@@ -67,10 +70,6 @@ const SpaceHstack = styled.View`
 const ButtonContainer = styled.View`
 	flex: 1;
 	justify-content: flex-end;
-`;
-const BarExplainText = styled(PretendardBold)`
-	font-size: ${fontPercentage(12)}px;
-	color: ${colors.Gray4};
 `;
 const ThumbInside = styled.View`
 	width: ${widthPercentage(15.53)}px;
@@ -104,10 +103,4 @@ const Rail = styled.View`
 	height: ${heightPercentage(10)}px;
 	background-color: ${colors.Gray1};
 	border-radius: 6px;
-`;
-
-const Info = styled(PretendardVariable)`
-	font-size: ${fontPercentage(14)}px;
-	color: ${colors.Gray4};
-	align-self: center;
 `;

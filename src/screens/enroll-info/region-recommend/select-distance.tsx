@@ -4,7 +4,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {Center, BackgroundGray} from '../../../utill/layout/layout';
+import {Center, BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -207,8 +207,12 @@ export default function SelectDistance({navigation}: any) {
 				<>
 					<DistanceCenter>
 						<DistanceSpace>
-							<DistanceExplain>내 근처</DistanceExplain>
-							<DistanceExplain>한국 전체</DistanceExplain>
+							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+								내 근처
+							</PretendardSemiBoldText>
+							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+								한국 전체
+							</PretendardSemiBoldText>
 						</DistanceSpace>
 						<Slider
 							style={{width: '80%', height: 40}}

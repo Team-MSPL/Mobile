@@ -1,5 +1,4 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,22 +11,19 @@ import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
-import {HStack, PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
-import Icons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
-import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 
 export default function Main({navigation}: any) {
-	const {userName, functionToken, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
+	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
-	const {tendencyList} = useTendencyHandler();
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
@@ -66,9 +62,6 @@ export default function Main({navigation}: any) {
 		navigation.navigate('EnrollTravelTitle');
 	};
 
-	const checkSignUpReward = () => {
-		dispatch(userSliceActions.setSignUpReward(false));
-	};
 	const goCourseDetaile = (e: any) => {
 		let metropolitanStatus = metropolitanCheckList.includes(e.region);
 		const data = {
@@ -111,42 +104,12 @@ export default function Main({navigation}: any) {
 	}, []);
 
 	useEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<HeaderHStack onPress={goTokenLog}>
-					<Ticket name='ticket' size={26} color={colors.selectButton} />
-					<BannerColoredText>{functionToken}</BannerColoredText>
-				</HeaderHStack>
-			),
-		});
-	}, [functionToken]);
-	const [modalView, setModalView] = useState({status: false, value: ''});
-
-	useEffect(() => {
 		pushPermission();
 		checkCache();
 		if (signUpReward) {
-			//setModalView({status: true, value: '회원가입'});
-
 			navigation.navigate('HomeModal', {status: '회원가입'});
-			// dispatch(
-			// 	modalSliceActions.setOpenModal({
-			// 		modalTitle: '회원가입 축하드립니다',
-			// 		modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-			// 		modalFunction: checkSignUpReward,
-			// 	}),
-			// );
 		} else if (reLogin) {
 			navigation.navigate('HomeModal', {status: '재가입'});
-			setModalView({status: true, value: '재가입'});
-
-			// dispatch(
-			// 	modalSliceActions.setOpenModal({
-			// 		modalTitle: '보고싶었어요',
-			// 		modalSubTitle: `다시 오신 것을 환영합니다! ${userName}님!`,
-			// 		modalFunction: checkSignUpReward,
-			// 	}),
-			// );
 		}
 		checkEvent();
 	}, [signUpReward]);
@@ -165,24 +128,6 @@ export default function Main({navigation}: any) {
 			text: '여행 일정 ',
 		},
 	];
-	function tendencyMake(list: number[]) {
-		let copy = [...tendencyList[1].list, ...tendencyList[2].list, ...tendencyList[3].list];
-		let result: any[] = [];
-		list.forEach((item, idx) => {
-			if (item >= 80) {
-				result.push(
-					<TagElement backgroundColor={colors.Gray1} key={idx} opacityStatus={false}>
-						<HStack>
-							<TagShopText># </TagShopText>
-							<TagText color={colors.Gray5}>{copy[idx]}</TagText>
-						</HStack>
-					</TagElement>,
-				);
-			}
-		});
-
-		return result;
-	}
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
 	const setPreset = (data: {
 		preset: any;
@@ -237,25 +182,32 @@ export default function Main({navigation}: any) {
 		}
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
-	// if (modalView.status) {
-	// 	return <HomeModal></HomeModal>;
-	// }
 	return (
 		<HomeContainer>
 			<BackgroundImage source={require('../../../public/images/home-image.png')}>
 				<BrighnessBox>
 					<TicketTouchable onPress={goTokenLog}>
-						<TicketText>이용권</TicketText>
+						<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+							이용권
+						</PretendardSemiBoldText>
 					</TicketTouchable>
 					<HomeTextContainer
 						onPress={() => {
 							selectPopularity({id: randomRegion.id, subTitle: randomRegion.subTitle});
 						}}>
-						<HomeText>{userName} 님,</HomeText>
-						<HomeText>현재 인기 여행지</HomeText>
+						<PretendardSemiBoldText
+							size={23}
+							lineHeight={34.5}
+							color={
+								colors.backgroundWhite
+							}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
 						<HStack>
-							<HomePrimaryText>{randomRegion.subTitle}</HomePrimaryText>
-							<HomeText> 여행은 어때요?</HomeText>
+							<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
+								{randomRegion.subTitle + ' '}
+							</PretendardBoldText>
+							<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
+								여행은 어때요?
+							</PretendardSemiBoldText>
 							<SVGRightAdd
 								color='white'
 								width={heightPercentage(24)}
@@ -268,19 +220,27 @@ export default function Main({navigation}: any) {
 			<HomeBottomContainer>
 				<HStack gap={5}>
 					<SVGGood />
-					<HomeRecommendText>다님에게 추천받기</HomeRecommendText>
+					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+						다님에게 추천받기
+					</PretendardSemiBoldText>
 				</HStack>
 				{buttonList.map(item => (
 					<RecommendContainer onPress={item.onPress} key={item.id}>
-						<RecommendContainerText>
-							{item.text}
-							<HomeRecommendText>추천</HomeRecommendText>
-						</RecommendContainerText>
+						<RecommendTextContainer>
+							<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
+								{item.text}
+								<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
+									추천
+								</PretendardSemiBoldText>
+							</PretendardSemiBoldText>
+						</RecommendTextContainer>
 						{item.image}
 					</RecommendContainer>
 				))}
 				<CollectionContainer>
-					<HomeRecommendText>다님이 추천하는 여행지</HomeRecommendText>
+					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+						다님이 추천하는 여행지
+					</PretendardSemiBoldText>
 					<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						{mainScreens.map((item, idx) => (
 							<CollectionTouchableOpacity
@@ -291,12 +251,10 @@ export default function Main({navigation}: any) {
 								<ImageContainer>
 									<CollectionRecommendContentItemImage
 										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-									{/* <ImageRegionText>{item.region + '\n'}</ImageRegionText> */}
-									<ImageTargetText>{item.name}</ImageTargetText>
+									<PretendardSemiBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+										{item.name}
+									</PretendardSemiBoldText>
 								</ImageContainer>
-								{/* <TagContainer>
-									{tendencyMake([...item.concept, ...item.play, ...item.tour])}
-								</TagContainer> */}
 							</CollectionTouchableOpacity>
 						))}
 					</CollectionContentContainer>
@@ -327,24 +285,6 @@ export const TagText = styled(PretendardVariable)<{color: string; size?: number}
 	font-weight: 600;
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
-const ImageRegionText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(14)}px;
-	font-weight: 400;
-	color: ${colors.backgroundWhite};
-	line-height: ${heightPercentage(16.8)}px;
-`;
-const ImageTargetText = styled(PretendardSemiBold)`
-	width: ${widthPercentage(152)}px;
-	font-size: ${fontPercentage(20)}px;
-	font-weight: 600;
-	color: ${colors.backgroundWhite};
-	line-height: ${heightPercentage(24)}px;
-`;
-const TagContainer = styled.View`
-	width: ${widthPercentage(152)}px;
-	flex-direction: row;
-	flex-wrap: wrap;
-`;
 const RecommendContainer = styled.Pressable`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(88)}px;
@@ -356,13 +296,7 @@ const RecommendContainer = styled.Pressable`
 	overflow: hidden;
 `;
 
-const HomeRecommendText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(18)}px;
-	font-weight: 600;
-	color: ${colors.Black};
-`;
-const RecommendContainerText = styled(HomeRecommendText)`
-	color: ${colors.PointYellow};
+const RecommendTextContainer = styled.View`
 	width: 50%;
 	top: ${heightPercentage(48)}px;
 	left: ${widthPercentage(21)}px;
@@ -385,11 +319,6 @@ const BackgroundImage = styled.ImageBackground`
 	width: 100%;
 	height: ${heightPercentage(408)}px;
 `;
-const TicketText = styled.Text`
-	color: ${colors.Black};
-	font-size: ${fontPercentage(15)}px;
-	font-weight: 600;
-`;
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
 	top: ${heightPercentage(59)}px;
@@ -403,26 +332,6 @@ const TicketTouchable = styled.TouchableOpacity`
 const HomeTextContainer = styled.Pressable`
 	top: ${heightPercentage(244)}px;
 	left: ${widthPercentage(26)}px;
-`;
-const HomeText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(23)}px;
-	color: ${colors.backgroundWhite};
-	line-height: ${heightPercentage(34.5)}px;
-`;
-const HomePrimaryText = styled(HomeText)`
-	color: ${colors.Primary};
-	font-weight: 700;
-`;
-const HeaderHStack = styled(HStack).attrs({as: TouchableOpacity})`
-	padding: 0px 24px;
-`;
-const BannerColoredText = styled(PretendardSemiBold)`
-	font-size: 24px;
-	font-weight: bold;
-	color: ${colors.TextPrimary};
-`;
-const Ticket = styled(Icons)`
-	margin: 0px 5px 0px 0px;
 `;
 
 const CollectionContainer = styled.View`

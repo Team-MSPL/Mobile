@@ -5,9 +5,12 @@ import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {SVGHomeDown, SVGHomeUp} from '../../utill/svg/svg';
 import {PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
+import {userSliceActions} from '../../redux/user/user.slice';
 
 export default function HomeModal({navigation, route}: {navigation: any; route: {params: ParamsType}}) {
+	const dispatch = useAppDispatch();
 	const goHome = () => {
+		dispatch(userSliceActions.setSignUpReward(false));
 		navigation.goBack();
 	};
 
