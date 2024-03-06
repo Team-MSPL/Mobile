@@ -3,14 +3,13 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {VStack, HStack, BackgroundGray, PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
+import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Modal, Pressable, View} from 'react-native';
+import {Pressable} from 'react-native';
 
-import {ButtonContainer, MarginContainder} from './select-multi';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import Stepper from '../../utill/component/enroll-info/stepper';
@@ -141,21 +140,31 @@ export default function SelectDay({navigation}: any) {
 				<TimeContainer>
 					{DaySelectInfoList.map((item, idx) => (
 						<TimeItemContainer key={idx}>
-							<TimeStepText>{item.step}</TimeStepText>
+							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
+								{item.step}
+							</PretendardSemiBoldText>
 							<SelectContainer>
-								<SelectText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 									{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
-								</SelectText>
+								</PretendardSemiBoldText>
 							</SelectContainer>
 							<SelectContainer
 								onPress={() => {
 									onPressTime(idx);
 								}}>
 								<HStack justifyContent='space-between'>
-									<SelectText>{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}</SelectText>
-									<SelectText>{String(timeLimitArray[idx]).padStart(2, '0')}</SelectText>
-									<SelectText>:</SelectText>
-									<SelectText>{String(minuteLimitArray[idx]).padStart(2, '0')}</SelectText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{String(timeLimitArray[idx]).padStart(2, '0')}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										:
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{String(minuteLimitArray[idx]).padStart(2, '0')}
+									</PretendardSemiBoldText>
 								</HStack>
 							</SelectContainer>
 							{dateFlag.current == idx && (
@@ -225,10 +234,6 @@ const SelectContainer = styled.Pressable`
 	padding: 0px ${widthPercentage(16)}px;
 	justify-content: center;
 	margin-bottom: ${heightPercentage(6)}px;
-`;
-const SelectText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(13)}px;
-	color: ${colors.Black};
 `;
 export const TimeContainer = styled.View`
 	flex-direction: row;

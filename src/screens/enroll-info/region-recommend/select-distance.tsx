@@ -9,7 +9,7 @@ import {Center, BackgroundGray, PretendardSemiBoldText} from '../../../utill/lay
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {DistanceCenter, DistanceExplain, DistanceSpace, MapContainer, Qwe} from '../select-distance';
+import {DistanceCenter, DistanceSpace, MapContainer, Qwe} from '../select-distance';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';

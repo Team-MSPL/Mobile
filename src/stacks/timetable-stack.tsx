@@ -5,7 +5,6 @@ import SelectCity from '../screens/enroll-info/select-city';
 import SelectDay from '../screens/enroll-info/select-day';
 import SelectMulti from '../screens/enroll-info/select-multi';
 import SelectDistance from '../screens/enroll-info/select-distance';
-import SelectTendency from '../screens/enroll-info/select-tendency';
 import FinalCheck from '../screens/enroll-info/final-check';
 import Preset from '../screens/timetable/preset';
 import Timetable from '../screens/timetable/timetable';
@@ -14,9 +13,7 @@ import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 import Recommend from '../screens/timetable/recommend';
 import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
-import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
-import {View, Image} from 'react-native';
 import {colors} from '../utill/colors';
 import {CourseReview} from '../utill/component/timetable/course-review';
 import RecommendSelectWho from '../screens/enroll-info/select-who';
@@ -30,13 +27,6 @@ const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
 		<Fragment>
-			<Stack.Screen
-				name='EnrollInfo'
-				component={EnrollInfo}
-				options={{
-					title: '새 여행',
-				}}
-			/>
 			<Stack.Screen
 				name='SelectCity'
 				component={SelectCity}
@@ -79,15 +69,6 @@ export default function TimetableStack() {
 				component={SelectDistance}
 				options={{
 					title: '여행일정추천',
-					headerStyle: {backgroundColor: colors.main},
-					headerShadowVisible: false,
-				}}
-			/>
-			<Stack.Screen
-				name='SelectTendency'
-				component={SelectTendency}
-				options={{
-					title: '새 여행 (5/5)',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}

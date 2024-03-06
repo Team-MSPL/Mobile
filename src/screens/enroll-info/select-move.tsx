@@ -1,11 +1,9 @@
 import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {BackgroundGray, PretendardSemiBold} from '../../utill/layout/layout';
-import TendencyButton from '../../utill/component/tendency-button';
+import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {SelectButtonsContainer} from './region-recommend/select-who';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -35,7 +33,9 @@ export default function RecommendSelectMove({navigation}: any) {
 						color={idx == transit ? 'rgba(195,245,80,0.3)' : colors.Gray1}
 						key={idx}
 						onPress={item.function}>
-						<InsideText>{item.name}</InsideText>
+						<PretendardSemiBoldText size={16} lineHeight={19} color={colors.Gray4}>
+							{item.name}
+						</PretendardSemiBoldText>
 					</SelectButton>
 				))}
 			</SelectMoveContainer>
@@ -57,8 +57,4 @@ const SelectButton = styled.TouchableOpacity<{color: string}>`
 	align-items: center;
 	justify-content: flex-end;
 	padding-bottom: ${heightPercentage(5)}px;
-`;
-const InsideText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(16)}px;
-	color: ${colors.Gray4};
 `;

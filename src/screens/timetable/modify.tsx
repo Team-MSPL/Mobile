@@ -10,6 +10,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {DayButton, DayContainer, DaySubTitle, DayTitle} from './map-info';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {widthPercentage} from '../../utill/layout/responsive-size';
 export default function Modify({navigation, route}: any) {
 	const {nDay, timetable, day} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -25,6 +26,7 @@ export default function Modify({navigation, route}: any) {
 			: ((endTime.current.hours = parseInt(timeData.hour) + ampm),
 			  (endTime.current.minute = parseInt(timeData.minute)));
 		setVisible(false);
+		return true;
 	};
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -156,23 +158,34 @@ export default function Modify({navigation, route}: any) {
 				</TimeContainer>
 				<CustomButton label='수정하기' onPress={goModify}></CustomButton>
 			</MainContainer>
-			<UseDatePicker
-				title={flag.current == 0 ? '시작 시간' : '종료 시간'}
-				goConfirm={onConfirm}
-				minuteData={flag.current == 0 ? startTime.current.minute / 30 + 1 : endTime.current.minute / 30 + 1}
-				ampmData={
-					flag.current == 0 ? (startTime.current.hours < 12 ? 1 : 2) : endTime.current.hours < 12 ? 1 : 2
-				}
-				hourData={
-					flag.current == 0
-						? (startTime.current.hours < 12 ? startTime.current.hours : startTime.current.hours - 12) + 1
-						: (endTime.current.hours < 12 ? endTime.current.hours : endTime.current.hours - 12) + 1
-				}
-				visible={visible}
-				setVisible={setVisible}></UseDatePicker>
+			<TestContainer>
+				<UseDatePicker
+					title={flag.current == 0 ? '시작 시간' : '종료 시간'}
+					goConfirm={onConfirm}
+					minuteData={flag.current == 0 ? startTime.current.minute / 30 : endTime.current.minute / 30}
+					ampmData={
+						flag.current == 0 ? (startTime.current.hours < 12 ? 0 : 1) : endTime.current.hours < 12 ? 0 : 1
+					}
+					hourData={
+						flag.current == 0
+							? startTime.current.hours < 12
+								? startTime.current.hours
+								: startTime.current.hours - 12
+							: endTime.current.hours < 12
+							? endTime.current.hours
+							: endTime.current.hours - 12
+					}
+					visible={visible}
+					setVisible={setVisible}></UseDatePicker>
+			</TestContainer>
 		</>
 	);
 }
 const DayElementContainer = styled(DayPressable)`
 	width: 100%;
+`;
+const TestContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	align-items: center;
+	justify-items: center;
 `;

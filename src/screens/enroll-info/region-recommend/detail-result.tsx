@@ -1,16 +1,15 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {cityViewList} from '../select-city';
-import {Divider, HStack, PretendardSemiBold, VStack} from '../../../utill/layout/layout';
+import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
-import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
-import {RecommendContainer, RecommendElement} from './view-result';
+import {SvgLoginLogo} from '../../../utill/svg/svg';
 import ImageView from 'react-native-image-viewing';
 import {useState} from 'react';
-import {ImageText, ImageViewFooterComponent} from '../../timetable/course-detail';
-import {TagElement, TagShopText, TagText, metropolitanCheckList} from '../../home/main';
+import {ImageViewFooterComponent} from '../../timetable/course-detail';
+import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 export default function DetailResult({navigation, route}: any) {
@@ -88,7 +87,9 @@ export default function DetailResult({navigation, route}: any) {
 					)}
 				</RecommendMainContainer>
 				<RecommendBorderContainer>
-					<TitleText>{route.params.item.name}</TitleText>
+					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Gray5}>
+						{route.params.item.name}
+					</PretendardSemiBoldText>
 					<Divider color={colors.Gray2} height={0.5}></Divider>
 					<TagContainer>
 						{route.params.item.tendency.map((tendency, index) => (
@@ -98,10 +99,12 @@ export default function DetailResult({navigation, route}: any) {
 								opacityStatus={false}
 								height={heightPercentage(26)}>
 								<HStack>
-									<TagShopText size={fontPercentage(14)}># </TagShopText>
-									<TagText size={fontPercentage(14)} color={colors.backgroundWhite}>
+									<PretendardSemiBoldText size={16} lineHeight={18} color={colors.Primary}>
+										{'# '}
+									</PretendardSemiBoldText>
+									<PretendardVariableText size={14} lineHeight={16} color={colors.backgroundWhite}>
 										{tendency}
-									</TagText>
+									</PretendardVariableText>
 								</HStack>
 							</TagElement>
 						))}
@@ -124,7 +127,9 @@ export default function DetailResult({navigation, route}: any) {
 									goDetail(item);
 								}}>
 								<IndexContainer>
-									<IndexText>{idx + 1}</IndexText>
+									<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray5}>
+										{idx + 1}
+									</PretendardSemiBoldText>
 								</IndexContainer>
 								{item.photo != '' ? (
 									<RecommendImage source={{uri: item.photo}}></RecommendImage>
@@ -134,7 +139,9 @@ export default function DetailResult({navigation, route}: any) {
 									</LogoCOntainer>
 								)}
 								<PopularityInfoTitleTextContainer>
-									<PopularityInfoTitleText>{item.name}</PopularityInfoTitleText>
+									<PretendardSemiBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+										{item.name}
+									</PretendardSemiBoldText>
 								</PopularityInfoTitleTextContainer>
 							</PopularityContainer>
 						))}
@@ -151,9 +158,9 @@ export default function DetailResult({navigation, route}: any) {
 				FooterComponent={index => {
 					return (
 						<ImageViewFooterComponent>
-							<ImageText>
+							<PretendardSemiBoldText size={14} lineHeight={16} color={colors.backgroundWhite}>
 								{index.imageIndex + 1}/{1}
-							</ImageText>
+							</PretendardSemiBoldText>
 						</ImageViewFooterComponent>
 					);
 				}}
@@ -194,7 +201,7 @@ const RecommendBorderContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: 0px 0px 0px ${widthPercentage(24)}px;
+	padding: ${heightPercentage(38)}px 0px 0px ${widthPercentage(24)}px;
 	top: -30px;
 `;
 const RecommendMainContainer = styled.TouchableOpacity`
@@ -222,33 +229,12 @@ const LogoCOntainer = styled.View`
 	background-color: ${colors.regionNormal};
 	margin: 0px 10px 0px 0px;
 `;
-const TitleTextContainer = styled(RecommendElement)`
-	justify-content: center;
-`;
-const TitleText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(24)}px;
-	font-weight: 600;
-	color: ${colors.Gray5};
-	margin-top: ${heightPercentage(38)}px;
-`;
-const IndexText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(14)}px;
-	font-weight: 600;
-	color: ${colors.Black};
-	line-height: ${fontPercentage(14)}px;
-`;
 const PopularityContainer = styled.TouchableOpacity`
 	margin: 0px ${widthPercentage(12)}px 0px 0px;
 	display: inline-block;
 	flex-direction: row;
 	width: ${widthPercentage(152)}px;
 	height: ${heightPercentage(196)}px;
-`;
-const PopularityInfoTitleText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(20)}px;
-	font-weight: 600;
-	color: ${colors.backgroundWhite};
-	z-index: 2;
 `;
 export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
 	width: ${props => (props.state ? '20%' : '85%')};
@@ -261,9 +247,6 @@ export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
 	position: absolute;
 	bottom: 20px;
 	background-color: ${colors.main};
-`;
-export const ButtonText = styled(TitleText)`
-	color: ${colors.selectButton};
 `;
 export const ButtonHStack = styled(HStack)`
 	justify-content: space-between;

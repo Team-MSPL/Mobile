@@ -17,11 +17,12 @@ import {colors} from '../../utill/colors';
 import {SvgCall, SvgInfos, SvgLocation, SvgRight, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
-import {ButtonHStack, ButtonText, GoRecommendButton} from '../enroll-info/region-recommend/detail-result';
+import {ButtonHStack, GoRecommendButton} from '../enroll-info/region-recommend/detail-result';
 import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useFocusEffect} from '@react-navigation/native';
+import {fontPercentage, heightPercentage} from '../../utill/layout/responsive-size';
 export default function CourseDetail({navigation, route}: any) {
 	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
@@ -525,4 +526,10 @@ const ReviewCenter = styled(Center)`
 `;
 const DeleteContainer = styled.TouchableOpacity`
 	padding: 2px;
+`;
+const ButtonText = styled.Text`
+	font-size: ${fontPercentage(24)}px;
+	font-weight: 600;
+	color: ${colors.Gray5};
+	margin-top: ${heightPercentage(38)}px;
 `;

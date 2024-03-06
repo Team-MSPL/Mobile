@@ -3,7 +3,14 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import Slider from '@react-native-community/slider';
-import {BackgroundGray, Center, HStack, PretendardSemiBold, devicesWidth} from '../../utill/layout/layout';
+import {
+	BackgroundGray,
+	Center,
+	HStack,
+	PretendardSemiBold,
+	PretendardSemiBoldText,
+	devicesWidth,
+} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -69,8 +76,12 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 			</MapContainer>
 			<DistanceCenter>
 				<DistanceSpace>
-					<DistanceExplain>내 근처</DistanceExplain>
-					<DistanceExplain>한국 전체</DistanceExplain>
+					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+						내 근처
+					</PretendardSemiBoldText>
+					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+						한국 전체
+					</PretendardSemiBoldText>
 				</DistanceSpace>
 				<Slider
 					style={{width: '80%', height: 40}}
@@ -93,12 +104,6 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 	);
 }
 
-export const DistanceExplain = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(12)}px;
-	font-weight: 600;
-	color: ${colors.Gray3};
-	line-height: ${heightPercentage(14.4)}px;
-`;
 export const MapContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(240)}px;

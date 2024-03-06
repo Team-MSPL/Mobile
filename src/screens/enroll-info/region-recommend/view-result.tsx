@@ -2,14 +2,21 @@ import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {BackgroundGray, HStack, MainContainer, PretendardSemiBold} from '../../../utill/layout/layout';
+import {
+	BackgroundGray,
+	HStack,
+	MainContainer,
+	PretendardSemiBold,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
-import {SVGRegionRecommend, SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
+import {SVGRegionRecommend, SvgLoginLogo} from '../../../utill/svg/svg';
 import {ScrollView} from 'react-native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
-import {TagElement, TagShopText, TagText} from '../../home/main';
+import {TagElement} from '../../home/main';
 import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -67,19 +74,20 @@ export default function ViewResult({navigation}: any) {
 							{(item.takenDay != recommendList[idx - 1]?.takenDay ?? 0) && (
 								<DayRecommendContainer>
 									<HStack>
-										<DayRecommendText color={colors.PointGreen1}>
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.PointGreen1}>
 											{item.takenDay == 0
 												? '당일치기'
 												: item.takenDay + '박 ' + (item.takenDay + 1) + '일 '}
-										</DayRecommendText>
-										<DayRecommendText color={colors.Black}>추천</DayRecommendText>
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Black}>
+											추천
+										</PretendardSemiBoldText>
 									</HStack>
 								</DayRecommendContainer>
 							)}
 							<RecommendContainer
 								onPress={() => {
 									navigation.navigate('DetailResult', {item: item});
-									//goEnrollInfo(item.name);
 								}}>
 								<ImageContainer>
 									{item.photo != '' ? (
@@ -94,8 +102,18 @@ export default function ViewResult({navigation}: any) {
 										{item.tendency.map((value, index) => (
 											<TagElement key={index} opacityStatus={true}>
 												<HStack>
-													<TagShopText># </TagShopText>
-													<TagText color={colors.backgroundWhite}>{value}</TagText>
+													<PretendardVariableText
+														size={12}
+														lineHeight={14}
+														color={colors.Primary}>
+														{'# '}
+													</PretendardVariableText>
+													<PretendardVariableText
+														size={10}
+														lineHeight={12}
+														color={colors.backgroundWhite}>
+														{value}
+													</PretendardVariableText>
 												</HStack>
 											</TagElement>
 										))}
@@ -134,12 +152,6 @@ const DayRecommendContainer = styled.View`
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
 	top: -${heightPercentage(17.5)}px;
-`;
-const DayRecommendText = styled(PretendardSemiBold)<{color: string}>`
-	font-size: ${fontPercentage(16)}px;
-	font-weight: 600;
-	color: ${props => props.color};
-	line-height: ${heightPercentage(21.6)}px;
 `;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(327)}px;

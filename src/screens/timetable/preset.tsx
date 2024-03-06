@@ -143,40 +143,55 @@ export default function Preset({navigation}: any) {
 								</FlexWrap>
 								{item.map((value, index) =>
 									value.map((target, targetIndex) => {
-										return (
-											<HStack gap={widthPercentage(10)} key={targetIndex}>
-												<DashLineContainer>
-													{target.category == 4 ? (
-														<Triangle />
-													) : (
-														<Circle
-															color={
-																target.category == 5 ? colors.PointYellow : colors.Gray5
+										if (
+											(index == 0 && targetIndex == 0) ||
+											index % value.length == targetIndex ||
+											(target.category == 4 && targetIndex != 0) ||
+											target.category == 5 ||
+											(index == item.length - 1 && targetIndex == value.length - 1)
+										) {
+											return (
+												<HStack gap={widthPercentage(10)} key={targetIndex}>
+													<DashLineContainer>
+														{target.category == 4 ? (
+															<Triangle />
+														) : (
+															<Circle
+																color={
+																	target.category == 5
+																		? colors.PointYellow
+																		: colors.Gray5
+																}
+															/>
+														)}
+														<DashLine
+															status={
+																index == 0 && targetIndex == 0
+																	? 'start'
+																	: index == item.length - 1 &&
+																	  targetIndex == value.length - 1
+																	? 'end'
+																	: 'center'
 															}
 														/>
-													)}
-													<DashLine
-														status={
-															index == 0 && targetIndex == 0
-																? 'start'
-																: index == item.length - 1 &&
-																  targetIndex == value.length - 1
-																? 'end'
-																: 'center'
-														}
-													/>
-												</DashLineContainer>
-												<PretendardVariableText
-													size={16}
-													lineHeight={19}
-													color={target.category == 5 ? colors.PointYellow : colors.Gray5}>
-													{target.name}
-												</PretendardVariableText>
-												<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
-													{index + 1}일차
-												</PretendardVariableText>
-											</HStack>
-										);
+													</DashLineContainer>
+													<PretendardVariableText
+														size={16}
+														lineHeight={19}
+														color={
+															target.category == 5 ? colors.PointYellow : colors.Gray5
+														}>
+														{target.name}
+													</PretendardVariableText>
+													<PretendardVariableText
+														size={14}
+														lineHeight={17}
+														color={colors.Gray2}>
+														{index + 1}일차
+													</PretendardVariableText>
+												</HStack>
+											);
+										}
 									}),
 								)}
 								<PrimaryButton

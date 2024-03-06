@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {Platform, ScrollView, Text} from 'react-native';
+import {Platform, ScrollView} from 'react-native';
 import {BackgroundGray, FlexWrap, HStack, PretendardSemiBoldText, TagContainer} from '../../utill/layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {colors} from '../../utill/colors';
@@ -151,7 +151,7 @@ export default function PresetDetail({navigation, route}: any) {
 				<TopFixContainer>
 					<FlexWrap gap={widthPercentage(3)}>
 						{presetTendencyList[route.params.index].tendencyNameList.map((item, idx) => (
-							<TagContainer height={28} backgroundColor={colors.backgroundWhite}>
+							<TagContainer key={idx} height={28} backgroundColor={colors.backgroundWhite}>
 								<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray4}>
 									{item}
 								</PretendardSemiBoldText>
@@ -230,7 +230,8 @@ export default function PresetDetail({navigation, route}: any) {
 											{value.name}
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-											{Math.floor(value.takenTime / 60)}시간
+											{Math.floor(value.takenTime / 60) != 0 &&
+												Math.floor(value.takenTime / 60) + '시간'}
 											{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
 										</PretendardSemiBoldText>
 									</HStack>

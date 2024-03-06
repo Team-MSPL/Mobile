@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
-import {BackgroundGray, PretendardBold, PretendardSemiBold, PretendardVariable} from '../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
@@ -79,9 +79,9 @@ export default function SelectCity({navigation}: any) {
 						{region?.map((item, regionIndex) => {
 							return (
 								<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
-									<RegionElementContainerText>
+									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.backgroundWhite}>
 										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
-									</RegionElementContainerText>
+									</PretendardSemiBoldText>
 									<SvgCancel color={colors.Primary} />
 								</RegionElementContainer>
 							);
@@ -97,7 +97,12 @@ export default function SelectCity({navigation}: any) {
 								onPress={() => {
 									selectCity(item.id);
 								}}>
-								<RegionText select={cityIndex == item.id}>{item.title}</RegionText>
+								<PretendardSemiBoldText
+									size={14}
+									lineHeight={18.9}
+									color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
+									{item.title}
+								</PretendardSemiBoldText>
 							</RegionItems>
 						);
 					})}
@@ -111,7 +116,12 @@ export default function SelectCity({navigation}: any) {
 								onPress={() => {
 									cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
 								}}>
-								<CityText select={region.includes(item.subTitle)}>{item.subTitle}</CityText>
+								<PretendardSemiBoldText
+									size={14}
+									lineHeight={18.9}
+									color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
+									{item.subTitle}
+								</PretendardSemiBoldText>
 							</CityItems>
 						);
 					})}
@@ -124,10 +134,14 @@ export default function SelectCity({navigation}: any) {
 							return idx != 0 ? (
 								<SeoulInsideAllContainer key={idx}>
 									<SeoulInsideContainer width={widthPercentage(125)}>
-										<SeoulText color={colors.Gray4}>{item.subTitle}</SeoulText>
+										<PretendardVariableText size={12} lineHeight={16.2} color={colors.Gray4}>
+											{item.subTitle}
+										</PretendardVariableText>
 									</SeoulInsideContainer>
 									<SeoulInsideContainer width={widthPercentage(181)}>
-										<SeoulText color={colors.Gray2}>{item.example}</SeoulText>
+										<PretendardVariableText size={12} lineHeight={16.2} color={colors.Gray2}>
+											{item.example}
+										</PretendardVariableText>
 									</SeoulInsideContainer>
 								</SeoulInsideAllContainer>
 							) : null;
@@ -164,10 +178,6 @@ const SeoulInsideContainer = styled.View<{width: number}>`
 	width: ${props => props.width}px;
 	align-items: start;
 `;
-const SeoulText = styled(PretendardVariable)<{color: string}>`
-	font-size: ${fontPercentage(12)}px;
-	color: ${props => props.color};
-`;
 const Container = styled.View`
 	gap: ${heightPercentage(20)}px;
 `;
@@ -190,14 +200,6 @@ const CityItems = styled(RegionItems)`
 	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray3)};
 	flex-direction: row;
 `;
-const RegionText = styled(PretendardSemiBold)<{select: boolean}>`
-	color: ${props => (props.select ? colors.main : 'black')};
-	font-size: 16px;
-	font-weight: 500;
-`;
-const CityText = styled(RegionText)`
-	color: ${props => (props.select ? colors.Black : colors.Gray3)};
-`;
 const RegionElementContainer = styled.TouchableOpacity`
 	background-color: ${colors.Gray5};
 	border-radius: 99px;
@@ -208,12 +210,6 @@ const RegionElementContainer = styled.TouchableOpacity`
 	gap: ${widthPercentage(4)}px;
 	margin-right: ${widthPercentage(6)}px;
 `;
-const RegionElementContainerText = styled(PretendardBold)`
-	font-size: ${fontPercentage(14)}px;
-	color: ${colors.backgroundWhite};
-	line-height: ${heightPercentage(18.9)}px;
-`;
-
 const SelectListContainer = styled.ScrollView`
 	width: 100%;
 `;
