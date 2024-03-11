@@ -40,6 +40,9 @@ import Spring from '../../../public/spring.svg';
 import Summer from '../../../public/summer.svg';
 import Fall from '../../../public/fall.svg';
 import Winter from '../../../public/winter.svg';
+import NoteList from '../../../public/note-list.svg';
+import Copy from '../../../public/copy.svg';
+import Camera from '../../../public/camera.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -162,5 +165,14 @@ export const SVGFall = styled(Fall)<{color?: string}>`
 	color: color;
 `;
 export const SVGWinter = styled(Winter)<{color?: string}>`
+	color: color;
+`;
+export const SVGNoteList = styled(NoteList)<{color?: string}>`
+	color: color;
+`;
+export const SVGCopy = styled(Copy)<{color?: string}>`
+	color: color;
+`;
+export const SVGCamera = styled(Camera)<{color?: string}>`
 	color: color;
 `;

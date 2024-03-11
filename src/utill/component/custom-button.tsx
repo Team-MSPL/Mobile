@@ -12,7 +12,7 @@ export default function CustomButton({marginTop, marginBottom, label, onPress, i
 			isDisabledOpacity={isDisabled ?? false}
 			onPress={onPress}
 			width={width ?? 60}>
-			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
+			<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 				{label}
 			</PretendardSemiBoldText>
 		</ButtonContainer>

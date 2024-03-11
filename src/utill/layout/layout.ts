@@ -104,24 +104,35 @@ export const PretendardSemiBold = styled.Text`
 	font-family: Pretendard-SemiBold;
 `;
 
-export const PretendardVariableText = styled.Text<{color: string; size: number; lineHeight: number}>`
+export const PretendardVariableText = styled.Text<{
+	color: string;
+	size: number;
+	lineHeight: number;
+	width?: number;
+	textAlign?: string;
+}>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
 	font-size: ${props => fontPercentage(props.size)}px;
-	line-height: ${props => heightPercentage(props.lineHeight)}px;
+	line-height: ${props => fontPercentage(props.lineHeight)}px;
+	font-weight: 500;
+	width: ${props => props.width + 'px' ?? 'auto'};
+	text-align: ${props => props.textAlign ?? 'auto'};
 `;
 export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number}>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
-	line-height: ${props => heightPercentage(props.lineHeight)}px;
+	line-height: ${props => fontPercentage(props.lineHeight)}px;
+	font-weight: 700;
 `;
 export const PretendardSemiBoldText = styled.Text<{color: string; size: number; lineHeight: number; width?: number}>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
-	line-height: ${props => heightPercentage(props.lineHeight)}px;
+	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	width: ${props => props.width + 'px' ?? 'auto'};
+	font-weight: 600;
 `;
 
 export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`
@@ -131,7 +142,7 @@ export const TagContainer = styled.View<{backgroundColor: string; width?: number
 	padding: ${props => props.padding ?? widthPercentage(3)}px;
 	flex-direction: row;
 	align-items: center;
-	height: ${props => props.height ?? heightPercentage(21)}px;
+	height: ${props => props.height ?? heightPercentage(24)}px;
 	gap: ${widthPercentage(1.3)}px;
 	width: ${props => props.width + 'px' ?? null};
 `;

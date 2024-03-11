@@ -1,11 +1,10 @@
-import {Modal} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../redux';
 import {modalSliceActions} from '../redux/modal/modalSlice';
 import {colors} from './colors';
-import {SubText, TitleText} from './component/policy/policy1';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
 import PrimaryButton from './component/primary-button';
+import {PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
 
 export default function BaseModal() {
 	const {
@@ -37,8 +36,18 @@ export default function BaseModal() {
 				<Container>
 					<ModalContainer onPress={close}>
 						<ViewContaniner>
-							<TitleText>{modalTitle}</TitleText>
-							{modalSubTitle && <SubText>{modalSubTitle}</SubText>}
+							<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Gray5}>
+								{modalTitle}
+							</PretendardSemiBoldText>
+							{modalSubTitle && (
+								<PretendardVariableText
+									textAlign='center'
+									size={13}
+									lineHeight={21}
+									color={colors.Gray4}>
+									{modalSubTitle}
+								</PretendardVariableText>
+							)}
 							<ButtonContainer>
 								<PrimaryButton
 									backgroundColor={colors.Primary}
@@ -55,19 +64,6 @@ export default function BaseModal() {
 									height={heightPercentage(50)}
 									label={modalBottomText}></PrimaryButton>
 							</ButtonContainer>
-							{/* 
-							<Footer left={Boolean(modalLeft)}>
-								{modalLeft && (
-									<ModalButton
-										left={Boolean(modalLeft)}
-										onPress={modalLeftFunctionUse ? handleLeftFunction : close}>
-										<ModalText>{modalLeftText}</ModalText>
-									</ModalButton>
-								)}
-								<ModalButton left={Boolean(modalLeft)} onPress={handleModalFunction}>
-									<ModalText>{modalRightText}</ModalText>
-								</ModalButton>
-							</Footer> */}
 						</ViewContaniner>
 					</ModalContainer>
 				</Container>
@@ -99,7 +95,7 @@ const ModalContainer = styled.Pressable`
 
 const ViewContaniner = styled.Pressable`
 	background-color: white;
-	width: 100%;
+	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(269)}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
@@ -107,34 +103,4 @@ const ViewContaniner = styled.Pressable`
 	justify-content: center;
 	padding: ${widthPercentage(24)}px;
 	border-color: ${colors.selectButton};
-`;
-const Header = styled.View`
-	margin-vertical: 10px;
-`;
-const Body = styled(Header)`
-	width: 100%;
-	display: flex;
-`;
-const Footer = styled.View<{left: boolean}>`
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: ${props => (props.left ? 'space-between' : 'center')};
-	width: 100%;
-	margin-top: 30px;
-`;
-
-const ModalButton = styled.TouchableOpacity<{left: boolean}>`
-	width: ${props => (props.left ? 45 : 70)}%;
-	padding: 10px 5px 10px 5px;
-	background-color: ${colors.selectButton};
-	border-radius: 40px;
-	align-items: center;
-	justify-content: center;
-`;
-
-const ModalText = styled.Text`
-	font-size: 18px;
-	font-weight: bold;
-	color: white;
 `;

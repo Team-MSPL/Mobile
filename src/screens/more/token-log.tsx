@@ -1,13 +1,20 @@
-import {useLayoutEffect, useState} from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {TokenLogType, getTokenLog} from '../../redux/user/user.slice';
 import styled from 'styled-components/native';
-import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
+import {
+	BackgroundGray,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	TagContainer,
+} from '../../utill/layout/layout';
 import moment from 'moment';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {FlatList} from 'react-native';
+import {WhiteContainer} from '../enroll-info/final-check';
 
 export default function TokenLog({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -27,31 +34,63 @@ export default function TokenLog({navigation}: any) {
 	useLayoutEffect(() => {
 		getTokenList();
 	}, []);
+	const checkAfter = useRef('');
 	const renderItem = (item: any) => {
+		// if (checkAfter.current == '') {
+		// 	checkAfter.current = item.item.tokenLogDate;
+		// } else {
+		// 	if (moment(item.item.tokenLogDate).isSame(moment(checkAfter.current).format('YYYY-MM-DD'))) {
+		// 		return (
+		// 			<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
+		// 				{moment(item.item.tokenLogDate).format('YYYY년 M월 DD일 HH:mm')}
+		// 			</PretendardVariableText>
+		// 		);
+		// 	} else {
+		// 		return (
+		// 			<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
+		// 				{item.item.tokenLogDate}
+		// 				{/* {moment(item.item.tokenLogDate).from(moment(checkAfter.current).format('YYYY-MM-DD'))} */}
+		// 			</PretendardVariableText>
+		// 		);
+		// 	}
+		// }
 		return (
-			<ElementContainer>
-				<HStack>
-					<LogTitleText>사용처 : </LogTitleText>
-					<LogText>{item.item.tokenLogContent}</LogText>
-				</HStack>
-				<HStack>
-					<LogTitleText>변동 내역 : </LogTitleText>
-					<LogText>{item.item.tokenLogNumber}</LogText>
-				</HStack>
-
-				<HStack>
-					<LogTitleText>이용 시간 : </LogTitleText>
-					<LogText>{moment(item.item.tokenLogDate).format('YY-MM-DD HH:mm')}</LogText>
-				</HStack>
-				{/* <LogText>사용처:{moment(item.tokenLogDate)}</LogText> */}
-			</ElementContainer>
+			<>
+				<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
+					{moment(item.item.tokenLogDate).format('YYYY년 M월 DD일 HH:mm')}
+				</PretendardVariableText>
+				<WhiteContainer>
+					<HStack>
+						<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+							사용처 :
+						</PretendardVariableText>
+						<TagContainer backgroundColor={colors.backgroundGray}>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.PointYellow}>
+								{item.item.tokenLogContent}
+							</PretendardSemiBoldText>
+						</TagContainer>
+					</HStack>
+					<HStack>
+						<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+							{item.item.tokenLogNumber < 0 ? '소모 이용권' : '획득 이용권'}
+							{'   ' + Math.abs(item.item.tokenLogNumber)}개
+						</PretendardVariableText>
+					</HStack>
+				</WhiteContainer>
+			</>
 		);
 	};
 	return (
-		<MainContainer>
-			<LogDeadlineText>*이용기록은 23년11월18일 이후 기록만 보여집니다.</LogDeadlineText>
+		<BackgroundGray>
 			{logList.length == 0 ? (
-				<NonLogText>이용한 기록이 없습니다.</NonLogText>
+				<>
+					<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>
+						이용기록이 없습니다:(
+					</PretendardVariableText>
+					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
+						*이용 기록은 2023.11.18 이후 기록만 보여집니다
+					</PretendardVariableText>
+				</>
 			) : (
 				<LogContainer>
 					<FlatList
@@ -61,46 +100,9 @@ export default function TokenLog({navigation}: any) {
 						showsVerticalScrollIndicator={false}></FlatList>
 				</LogContainer>
 			)}
-		</MainContainer>
+		</BackgroundGray>
 	);
 }
 const LogContainer = styled.View`
 	width: 100%;
-`;
-const LogDeadlineText = styled.Text`
-	font-size: ${devicesWidth * 0.04}px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0px 0px ${devicesHeight * 0.01}px 0px;
-`;
-const LogTitleText = styled.Text`
-	font-size: ${devicesWidth * 0.05}px;
-	font-weight: bold;
-	color: black;
-`;
-const MainContainer = styled.View`
-	flex: 1;
-	align-items: center;
-	padding: 10px;
-	background-color: ${colors.main};
-`;
-const NonLogText = styled.Text`
-	font-size: ${devicesWidth * 0.08}px;
-	font-weight: bold;
-	color: black;
-`;
-const LogText = styled.Text`
-	font-size: ${devicesWidth * 0.05}px;
-	color: black;
-`;
-
-const LogScrollView = styled.ScrollView`
-	width: 100%;
-`;
-
-const ElementContainer = styled.View`
-	width: 100%;
-	border-bottom-width: 1px;
-	padding: 10px;
-	border-bottom-color: ${colors.regionNormal};
 `;

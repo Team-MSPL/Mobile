@@ -1,21 +1,22 @@
 import styled from 'styled-components/native';
 import React, {useRef, useState} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {TouchableOpacity, Image, View, Pressable, Keyboard} from 'react-native';
+import {TouchableOpacity, Pressable, Keyboard} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {updateProfile, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {Center, ClearTouchableOpacity, InputWrap, MainContainer} from '../../utill/layout/layout';
+import {BackgroundGray, Center, PretendardSemiBoldText} from '../../utill/layout/layout';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {SvgCancel} from '../../utill/svg/svg';
+import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
 import {FilterList} from '../../utill/filter';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
 import {storage, firebase} from '../../../config';
 import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ButtonContainer} from '../enroll-info/select-multi';
 // import firebase from '../../../';
 
 export default function ChangeProfile({navigation}: any) {
@@ -23,13 +24,6 @@ export default function ChangeProfile({navigation}: any) {
 	const [image, setImage] = useState(userProfileImage);
 	const uploadImageRef = useRef('');
 	const dispatch = useAppDispatch();
-	//애뮬레이터 확인 불가
-	const IconContainer = styled(Icon)`
-		background-color: ${colors.regionNormal};
-		margin: 0px 0px 0px 0px;
-		border-radius: 10px;
-		padding: 3px;
-	`;
 	const uploadImage = async (e: string) => {
 		const response = await useUriToBlob(e);
 		var ref = firebase.storage().ref('profile').child(`${userId}/profile.png`).put(response);
@@ -125,70 +119,68 @@ export default function ChangeProfile({navigation}: any) {
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
 					<ImageBottom>
-						<IconContainer name={'camera'} size={20} color={'grey'} />
+						<SVGCamera />
 					</ImageBottom>
 				</TouchableOpacity>
 			</Center>
 			<InputProfileContainer>
-				<NicknameText>닉네임</NicknameText>
-				<InputWrap>
-					<CustomTextInput
-						text={nickname}
-						style={{color: 'black'}}
-						placeholderTextColor={'grey'}
-						placeholder='ex)홍길동 최대 8자이내 '
-						value={nickname}
-						onChangeText={(value: string) => changeNickname(value)}
-						maxLength={8}
-					/>
-					{nickname && (
-						<ClearTouchableOpacity
-							onPress={() => {
-								setNickname('');
-							}}>
-							<SvgCancel width='20' height='20' color='black' />
-						</ClearTouchableOpacity>
-					)}
-				</InputWrap>
+				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
+					닉네임
+				</PretendardSemiBoldText>
+				<CustomTextInput
+					text={nickname}
+					placeholderTextColor={colors.Gray2}
+					placeholder='ex)홍길동 최대 8자이내 '
+					value={nickname}
+					onChangeText={(value: string) => changeNickname(value)}
+					maxLength={8}
+				/>
+			</InputProfileContainer>
+			<ButtonContainer>
 				<CustomButton
 					label={'변경'}
 					isDisabled={nickname == '' || nickname.startsWith(' ')}
 					onPress={goChangeProfile}
 				/>
-			</InputProfileContainer>
+			</ButtonContainer>
 		</ProfileContainer>
 	);
 }
 
 const InputProfileContainer = styled.View`
-	display: flex;
-	background-color: ${colors.main};
+	gap: ${heightPercentage(10)}px;
 `;
-const ProfileContainer = styled(MainContainer).attrs({as: Pressable})`
+const ProfileContainer = styled(BackgroundGray).attrs({as: Pressable})`
 	flex: 1;
-	justify-content: center;
+	padding-top: ${heightPercentage(10)}px;
+	gap: ${heightPercentage(40)}px;
 `;
 
-const NicknameText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-	margin: 30px 0px 20px 0px;
-`;
 const CustomTextInput = styled.TextInput<{text: string}>`
-	flex: 1;
-	padding: 8px;
-	font-size: 16px;
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(52)}px;
+	align-items: center;
+	font-size: ${fontPercentage(14)}px;
 	font-weight: 400;
+	background-color: ${colors.backgroundWhite};
+	border-radius: 12px;
+	color: ${colors.Black};
+	padding: 0px ${widthPercentage(5)}px;
 `;
 const ImageElement = styled.Image`
-	width: 100px;
-	height: 100px;
-	border-radius: 99px;
+	width: ${widthPercentage(90)}px;
+	height: ${widthPercentage(90)}px;
+	border-radius: 12px;
 	overflow: hidden;
 `;
 const ImageBottom = styled.View`
 	position: absolute;
-	bottom: 0;
-	right: 0;
+	bottom: -${widthPercentage(12)}px;
+	right: -${widthPercentage(12)}px;
+	width: ${widthPercentage(24)}px;
+	height: ${widthPercentage(24)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	background-color: ${colors.Black};
 `;

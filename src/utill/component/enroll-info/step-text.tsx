@@ -1,6 +1,7 @@
 import styled from 'styled-components/native';
 import {PretendardSemiBoldText, VStack} from '../../layout/layout';
 import {colors} from '../../colors';
+import {heightPercentage} from '../../layout/responsive-size';
 
 export default function StepText({
 	marginTop,
@@ -74,4 +75,5 @@ const StepTextVStack = styled(VStack)<{
 	margin-left: ${props => props.marginLeft ?? 0}px;
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	margin-right: ${props => props.marginRight ?? 0}px;
+	gap: ${heightPercentage(5)}px;
 `;

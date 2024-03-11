@@ -11,7 +11,13 @@ import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
-import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
+import {
+	HStack,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariable,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
@@ -183,7 +189,7 @@ export default function Main({navigation}: any) {
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
 	return (
-		<HomeContainer>
+		<HomeContainer showsVerticalScrollIndicator={false}>
 			<BackgroundImage source={require('../../../public/images/home-image.png')}>
 				<BrighnessBox>
 					<TicketTouchable onPress={goTokenLog}>

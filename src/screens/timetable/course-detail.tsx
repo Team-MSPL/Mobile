@@ -45,11 +45,6 @@ export default function CourseDetail({navigation, route}: any) {
 						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				}),
 			).unwrap();
-			console.log(route.params.value);
-			console.log(
-				region[route.params.value.regionIndex] ??
-					route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
-			);
 			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
 			const data = a.data;
 			if (a.status == 200) {
@@ -89,7 +84,7 @@ export default function CourseDetail({navigation, route}: any) {
 					address: data?.formatted_address,
 					information: data?.formatted_phone_number,
 					infoTitle: null,
-					infoContent: null,
+					infoContent: data?.editorial_summary.overview ?? null,
 					photo: data.photos.map((item, idx) => item.photo_reference),
 				});
 			}
@@ -388,7 +383,7 @@ export default function CourseDetail({navigation, route}: any) {
 						</ButtonHStack>
 					</GoRecommendButton>
 				)}
-				{tabView == 1 && (
+				{tabView == 1 && courseDetail.status == 'firebase' && (
 					<GoRecommendButton onPress={goReviewEnroll} state={reviewState}>
 						<ButtonHStack>
 							<ButtonText>{reviewState ? '작성' : '리뷰 작성하러가기'}</ButtonText>
