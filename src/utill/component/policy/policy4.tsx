@@ -1,14 +1,10 @@
-import styled from 'styled-components/native';
+import {PolicyMainText, PolicySubText, PolicyTextContainer} from './policy1';
 export default function Policy4() {
 	return (
 		<>
-			<TextContainer>
-				<TitleText>제4장 콘텐츠이용계약의 청약철회, 계약해제·해지 및 이용제한</TitleText>
-			</TextContainer>
-
-			<TextContainer>
-				<MainText>제26조("이용자"의 청약철회와 계약해제·해지)</MainText>
-				<SubText>
+			<PolicyTextContainer>
+				<PolicyMainText>제26조("이용자"의 청약철회와 계약해제·해지)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"와 "콘텐츠"의 이용에 관한 계약을 체결한 "이용자"는 수신확인의 통지를 받은 날로부터 7일
 					이내에는 청약의 철회를 할 수 있습니다. 다만, "회사"가 다음 각 호중 하나의 조치를 취한 경우에는
@@ -26,11 +22,11 @@ export default function Policy4() {
 					수신한 후 지체 없이 이러한 사실을 "이용자"에게 회신합니다.{'\n '}⑤ "이용자"는 제2항의 사유로
 					계약해제·해지의 의사표시를 하기 전에 상당한 기간을 정하여 완전한 "콘텐츠" 혹은 서비스이용의 하자에
 					대한 치유를 요구할 수 있습니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제27조("이용자"의 청약철회와 계약해제·해지의 효과)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제27조("이용자"의 청약철회와 계약해제·해지의 효과)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 "이용자"가 청약철회의 의사표시를 한 날로부터 또는 "이용자"에게 계약해제·해지의 의사표시에
 					대하여 회신한 날로부터 3영업일 이내에 대금의 결제와 동일한 방법으로 이를 환급하여야 하며, 동일한
@@ -45,52 +41,28 @@ export default function Policy4() {
 					계약해제·해지로 인한 대금환급과 관련한 의무의 이행에 있어서 연대하여 책임을 집니다.{'\n '}⑤ "회사"는
 					"이용자"에게 청약철회를 이유로 위약금 또는 손해배상을 청구하지 않습니다. 그러나 "이용자"의
 					계약해제·해지는 손해배상의 청구에 영향을 미치지 않습니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제28조(회사의 계약해제·해지 및 이용제한)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제28조(회사의 계약해제·해지 및 이용제한)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 "이용자"가 제12조 제2항에서 정한 행위를 하였을 경우 사전통지 없이 계약을 해제·해지하거나
 					또는 기간을 정하여 서비스이용을 제한할 수 있습니다.{'\n '}② 제1항의 해제·해지는 "회사"가 자신이 정한
 					통지방법에 따라 "이용자"에게 그 의사를 표시한 때에 효력이 발생합니다.{'\n '}③ "회사"의 해제·해지 및
 					이용제한에 대하여 "이용자"는 "회사"가 정한 절차에 따라 이의신청을 할 수 있습니다. 이 때 이의가
 					정당하다고 "회사"가 인정하는 경우, "회사"는 즉시 서비스의 이용을 재개합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제29조(회사의 계약해제·해지의 효과)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제29조(회사의 계약해제·해지의 효과)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					"이용자"의 귀책사유에 따른 이용계약의 해제·해지의 효과는 제27조를 준용합니다. 다만, "회사"는
 					"이용자"에 대하여 계약해제·해지의 의사표시를 한 날로부터 7영업일 이내에 대금의 결제와 동일한
 					방법으로 이를 환급합니다.
-				</SubText>
-			</TextContainer>
+				</PolicySubText>
+			</PolicyTextContainer>
 		</>
 	);
 }
-const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
-`;
-const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-`;
-
-const MainText = styled.Text`
-	margin-bottom: 20px;
-	font-size: 15px;
-	line-height: 20px;
-	color: black;
-	font-weight: bold;
-`;
-
-const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
-	margin-bottom: 10px;
-`;

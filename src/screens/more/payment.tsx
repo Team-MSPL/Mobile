@@ -1,17 +1,24 @@
 import {Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
-import {HStack, MainContainer, MainText, VStack} from '../../utill/layout/layout';
+import {
+	BackgroundGray,
+	HStack,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
-import {DayViewContainer} from '../enroll-info/select-multi';
 import {useShopping} from '../../utill/hooks/useShopping';
 import {colors} from '../../utill/colors';
-import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCoin, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const {purchaseItems, requestItemPurchase} = useShopping();
@@ -75,105 +82,81 @@ export default function Payment({navigation}: any) {
 		ios: ['danim_function_token_05', 'danim_function_token_10', 'danim_function_token_20'],
 	});
 	return (
-		<MainContainer>
-			<TitleText>
-				이용권을 구매하고, 다님의 다양한 기능을 즐겨보세요!{'\n'}여행 지역 추천 또는 여행 코스 추천 AI를
-				사용하실 수 있습니다.
-			</TitleText>
-			<DayViewContainer>
-				<TouchableOpacity
-					style={{marginVertical: 2, opacity: watchAD > 1 ? 0.5 : 1}}
-					onPress={openAd}
-					disabled={watchAD > 1}>
-					<HStack>
-						<TotalContainer>
-							<TotalText>1</TotalText>
-						</TotalContainer>
-						<InfoContainer>
-							<InfoText>1개 - 광고보상</InfoText>
-							<BonusText>
-								*1일 2회 수령 가능{`\n`} 오늘 남은 횟수 {2 - watchAD}회
-							</BonusText>
-						</InfoContainer>
-						<SVGRightAdd width={30} height={30} color={'black'} />
-					</HStack>
-				</TouchableOpacity>
-			</DayViewContainer>
-			{viewList?.map((item, idx) => (
-				<DayViewContainer key={idx}>
-					<TouchableOpacity
-						style={{marginVertical: 2}}
-						onPress={() => {
-							//console.log(item);
-							requestItemPurchase(itemSkus[idx]);
-						}}>
+		<BackgroundGray>
+			<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
+				다님 이용권 구매
+			</PretendardVariableText>
+			<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+				코인을 구매하고 다님의 다양한 기능을 즐겨보세요!{`\n`}여행지역 추천 또는 여행 코스 추천 ai를 사용하실 수
+				있어요.
+			</PretendardVariableText>
+			<PaymentContainer>
+				<HStack justifyContent='space-between'>
+					<VStack>
 						<HStack>
-							<TotalContainer>
-								<TotalText>{item.title}</TotalText>
-							</TotalContainer>
-							<InfoContainer>
-								<HStack>
-									<MoneyText>
-										{Platform.OS == 'ios' ? Math.floor(item.before * 1.1) : item.before}원
-									</MoneyText>
-									<SvgRight color='black' />
-									<InfoText>
-										{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
-									</InfoText>
-								</HStack>
-								<BonusText>
-									출시 기념 <Percent>{((item.before - item.after) / item.before) * 100}% </Percent>
-									할인 진행 중
-								</BonusText>
-							</InfoContainer>
-							<SVGRightAdd width={30} height={30} color={'black'} />
+							<SVGCoin />
+							<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
+								코인 1개
+							</PretendardSemiBoldText>
 						</HStack>
-					</TouchableOpacity>
-				</DayViewContainer>
+						<PretendardVariableText size={12} lineHeight={18} color={colors.backgroundWhite}>
+							1일 최대 2회 수령 가능{`\n`}오늘 남은 횟수 {2 - watchAD}회
+						</PretendardVariableText>
+					</VStack>
+					<TouchContainer onPress={openAd} disabled={watchAD > 1}>
+						<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+							광고시청
+						</PretendardSemiBoldText>
+					</TouchContainer>
+				</HStack>
+			</PaymentContainer>
+			{viewList?.map((item, idx) => (
+				<PaymentContainer key={idx}>
+					<HStack justifyContent='space-between'>
+						<VStack>
+							<HStack>
+								<SVGCoin />
+								<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
+									{item.title} 코인
+								</PretendardSemiBoldText>
+							</HStack>
+							<PretendardBoldText size={12} lineHeight={18} color={colors.Primary}>
+								{`\n`}출시 기념 {((item.before - item.after) / item.before) * 100}% 할인 진행 중
+							</PretendardBoldText>
+						</VStack>
+						<TouchContainer onPress={() => requestItemPurchase(itemSkus[idx])}>
+							<PretendardSemiBoldText
+								size={14}
+								lineHeight={21}
+								color={colors.Gray4}
+								textDecoration='line-through'>
+								{Platform.OS == 'ios' ? Math.floor(item.before * 1.1) : item.before}원
+							</PretendardSemiBoldText>
+							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+								{Platform.OS == 'ios' ? Math.floor(item.after * 1.1) : item.after}원
+							</PretendardSemiBoldText>
+						</TouchContainer>
+					</HStack>
+				</PaymentContainer>
 			))}
-		</MainContainer>
+		</BackgroundGray>
 	);
 }
-const TotalContainer = styled.View`
-	width: 20%;
-	border-radius: 99px;
-	padding: 5px;
-	background-color: ${colors.selectButton};
+
+const PaymentContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(92)}px;
+	background-color: ${colors.Gray5};
+	border-radius: 12px;
+	padding-left: ${widthPercentage(10)}px;
+	margin-top: ${heightPercentage(24)}px;
+`;
+const TouchContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(80)}px;
+	height: ${heightPercentage(92)}px;
+	background-color: ${colors.Primary};
 	align-items: center;
 	justify-content: center;
-	border-width: 1px;
-	border-color: ${colors.regionNormal};
-	margin: 0px 10px 0px 0px;
-`;
-const TotalText = styled.Text`
-	font-size: 25px;
-	font-weight: bold;
-	color: white;
-`;
-const InfoText = styled.Text`
-	font-size: 17px;
-	font-weight: bold;
-	color: black;
-`;
-const MoneyText = styled(InfoText)`
-	font-size: 13px;
-	color: grey;
-	text-decoration: line-through;
-`;
-const BonusText = styled.Text`
-	font-size: 13px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-const InfoContainer = styled(VStack)`
-	width: 60%;
-`;
-const TitleText = styled(InfoText)`
-	font-size: 13px;
-	font-weight: 900;
-	line-height: 20px;
-	margin: 0px 0px 30px 0px;
-`;
-const Percent = styled(BonusText)`
-	text-decoration: underline;
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
 `;

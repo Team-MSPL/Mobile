@@ -1,14 +1,10 @@
-import styled from 'styled-components/native';
+import {PolicyMainText, PolicySubText, PolicyTextContainer} from './policy1';
 export default function Policy2() {
 	return (
 		<>
-			<TextContainer>
-				<TitleText>제2장 회원가입</TitleText>
-			</TextContainer>
-
-			<TextContainer>
-				<MainText>제7조(회원가입)</MainText>
-				<SubText>
+			<PolicyTextContainer>
+				<PolicyMainText>제7조(회원가입)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① 회원가입은 "이용자"가 약관의 내용에 대하여 동의를 하고 회원가입신청을 한 후 "회사"가 이러한 신청에
 					대하여 승낙함으로써 체결됩니다.{'\n '}② 회원가입신청서에는 다음 사항을 기재해야 합니다. 1호 내지
@@ -29,11 +25,11 @@ export default function Policy2() {
 					"회사"는 이를 신청자에게 알려야 합니다. "회사"의 귀책사유 없이 신청자에게 통지할 수 없는 경우에는
 					예외로 합니다.{'\n '}⑥ 회원가입계약의 성립 시기는 "회사"의 승낙이 "이용자"에게 도달한 시점으로
 					합니다
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제8조(미성년자의 회원가입에 관한 특칙)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제8조(미성년자의 회원가입에 관한 특칙)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① 만 14세 미만의 "이용자"는 개인정보의 수집 및 이용목적에 대하여 충분히 숙지하고 부모 등
 					법정대리인의 동의를 얻은 후에 회원가입을 신청하고 본인의 개인정보를 제공하여야 합니다.{'\n '}②
@@ -41,42 +37,42 @@ export default function Policy2() {
 					취소 또는 불허합니다.{'\n '}③ 만 14세 미만 "이용자"의 부모 등 법정대리인은 아동에 대한 개인정보의
 					열람, 정정, 갱신을 요청하거나 회원가입에 대한 동의를 철회할 수 있으며, 이러한 경우에 "회사"는 지체
 					없이 필요한 조치를 취해야 합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제9조(회원정보의 변경)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제9조(회원정보의 변경)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회원"은 개인정보관리화면을 통하여 언제든지 자신의 개인정보를 열람하고 수정할 수 있습니다.{'\n '}②
 					"회원"은 회원가입신청 시 기재한 사항이 변경되었을 경우 온라인으로 수정을 하거나 전자우편 기타
 					방법으로 "회사"에 대하여 그 변경사항을 알려야 합니다.{'\n '}③ 제2항의 변경사항을 "회사"에 알리지
 					않아 발생한 불이익에 대하여 "회사"는 책임지지 않습니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제10조("회원"의 "아이디" 및 "비밀번호"의 관리에 대한 의무)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제10조("회원"의 "아이디" 및 "비밀번호"의 관리에 대한 의무)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회원"의 "아이디"와 "비밀번호"에 관한 관리책임은 "회원"에게 있으며, 이를 제3자가 이용하도록
 					하여서는 안 됩니다.{'\n '}② "회원"은 "아이디" 및 "비밀번호"가 도용되거나 제3자에 의해 사용되고
 					있음을 인지한 경우에는 이를 즉시 "회사"에 통지하고 "회사"의 안내에 따라야 합니다.{'\n '}③ 제2항의
 					경우에 해당 "회원"이 "회사"에 그 사실을 통지하지 않거나, 통지한 경우에도 "회사"의 안내에 따르지 않아
 					발생한 불이익에 대하여 "회사"는 책임지지 않습니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제11조("회원"에 대한 통지)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제11조("회원"에 대한 통지)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"가 "회원"에 대한 통지를 하는 경우 "회원"이 지정한 전자우편주소로 할 수 있습니다.{'\n '}②
 					"회사"는 "회원" 전체에 대한 통지의 경우 7일 이상 "회사"의 게시판에 게시함으로써 제1항의 통지에
 					갈음할 수 있습니다. 다만, "회원" 본인의 거래와 관련하여 중대한 영향을 미치는 사항에 대하여는 제1항의
 					통지를 합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제12조(회원탈퇴 및 자격 상실 등)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제12조(회원탈퇴 및 자격 상실 등)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회원"은 "회사"에 언제든지 탈퇴를 요청할 수 있으며 "회사"는 즉시 회원탈퇴를 처리합니다.{'\n '}②
 					"회원"이 다음 각호의 사유에 해당하는 경우, "회사"는 회원자격을 제한 및 정지시킬 수 있습니다.
@@ -91,33 +87,8 @@ export default function Policy2() {
 					시정되지 아니하는 경우 "회사"는 회원자격을 상실시킬 수 있습니다.{'\n '}④ "회사"가 회원자격을
 					상실시키는 경우에는 회원등록을 말소합니다. 이 경우 "회원"에게 이를 통지하고, 회원등록 말소 전에
 					최소한 30일 이상의 기간을 정하여 소명할 기회를 부여합니다.{'\n '}
-				</SubText>
-			</TextContainer>
+				</PolicySubText>
+			</PolicyTextContainer>
 		</>
 	);
 }
-
-const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
-`;
-const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-`;
-
-const MainText = styled.Text`
-	margin-bottom: 20px;
-	font-size: 15px;
-	line-height: 20px;
-	color: black;
-	font-weight: bold;
-`;
-
-const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
-	margin-bottom: 10px;
-`;

@@ -12,6 +12,7 @@ import TokenLog from '../screens/more/token-log';
 import PushNotify from '../screens/more/push-notify';
 import UserManage from '../screens/more/user-manage';
 import Notice from '../screens/more/notice';
+import NoticeDetail from '../screens/more/notice-detail';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -96,6 +97,14 @@ export default function MoreStack() {
 			<Stack.Screen
 				name='Notice'
 				component={Notice}
+				options={{
+					title: '공지 사항',
+				}}
+			/>
+
+			<Stack.Screen
+				name='NoticeDetail'
+				component={NoticeDetail}
 				options={{
 					title: '공지 사항',
 				}}

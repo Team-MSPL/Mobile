@@ -58,6 +58,7 @@ export const SubText = styled.Text`
 	color: black;
 `;
 export const Center = styled.View`
+	flex: 1;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
@@ -88,10 +89,11 @@ export const ClearTouchableOpacity = styled.TouchableOpacity`
 	justify-content: center;
 `;
 
-export const BackgroundGray = styled.View<{paddingHorizental?: number}>`
+export const BackgroundGray = styled.View<{paddingHorizental?: number; gap?: number}>`
 	flex: 1;
 	background-color: ${colors.backgroundGray};
 	padding: 0px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
+	gap: ${props => props.gap ?? 0}px;
 `;
 
 export const PretendardVariable = styled.Text`
@@ -110,6 +112,7 @@ export const PretendardVariableText = styled.Text<{
 	lineHeight: number;
 	width?: number;
 	textAlign?: string;
+	marginTop?: number;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -118,6 +121,7 @@ export const PretendardVariableText = styled.Text<{
 	font-weight: 500;
 	width: ${props => props.width + 'px' ?? 'auto'};
 	text-align: ${props => props.textAlign ?? 'auto'};
+	margin-top: ${props => props.marginTop ?? 0}px;
 `;
 export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number}>`
 	font-family: Pretendard-Bold;
@@ -126,13 +130,20 @@ export const PretendardBoldText = styled.Text<{color: string; size: number; line
 	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	font-weight: 700;
 `;
-export const PretendardSemiBoldText = styled.Text<{color: string; size: number; lineHeight: number; width?: number}>`
+export const PretendardSemiBoldText = styled.Text<{
+	color: string;
+	size: number;
+	lineHeight: number;
+	width?: number;
+	textDecoration?: string;
+}>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
 	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	width: ${props => props.width + 'px' ?? 'auto'};
 	font-weight: 600;
+	text-decoration: ${props => props.textDecoration ?? null};
 `;
 
 export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`

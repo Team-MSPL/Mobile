@@ -119,7 +119,7 @@ export default function ChangeProfile({navigation}: any) {
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
 					<ImageBottom>
-						<SVGCamera />
+						<SVGCamera color='white' />
 					</ImageBottom>
 				</TouchableOpacity>
 			</Center>

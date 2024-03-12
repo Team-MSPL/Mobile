@@ -43,6 +43,11 @@ import Winter from '../../../public/winter.svg';
 import NoteList from '../../../public/note-list.svg';
 import Copy from '../../../public/copy.svg';
 import Camera from '../../../public/camera.svg';
+import Coin from '../../../public/coin.svg';
+import DanimLogo from '../../../public/danim-logo.svg';
+import Heart from '../../../public/heart.svg';
+import MessageSquare from '../../../public/message-square.svg';
+import Pencil from '../../../public/pencil.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -174,5 +179,20 @@ export const SVGCopy = styled(Copy)<{color?: string}>`
 	color: color;
 `;
 export const SVGCamera = styled(Camera)<{color?: string}>`
+	color: color;
+`;
+export const SVGCoin = styled(Coin)<{color?: string}>`
+	color: color;
+`;
+export const SVGDanimLogo = styled(DanimLogo)<{color?: string}>`
+	color: color;
+`;
+export const SVGHeart = styled(Heart)<{color?: string}>`
+	color: color;
+`;
+export const SVGMessageSquare = styled(MessageSquare)<{color?: string}>`
+	color: color;
+`;
+export const SVGPencil = styled(Pencil)<{color?: string}>`
 	color: color;
 `;

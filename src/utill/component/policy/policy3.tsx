@@ -1,14 +1,10 @@
-import styled from 'styled-components/native';
+import {PolicyMainText, PolicySubText, PolicyTextContainer} from './policy1';
 export default function Policy3() {
 	return (
 		<>
-			<TextContainer>
-				<TitleText>제3장 콘텐츠이용계약</TitleText>
-			</TextContainer>
-
-			<TextContainer>
-				<MainText>제13조("콘텐츠"의 내용 등의 게시)</MainText>
-				<SubText>
+			<PolicyTextContainer>
+				<PolicyMainText>제13조("콘텐츠"의 내용 등의 게시)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 다음 사항을 해당 "콘텐츠"의 이용초기화면이나 그 포장에 "이용자"가 알기 쉽게 표시합니다.
 					{'\n '}
@@ -17,11 +13,11 @@ export default function Policy3() {
 					3. "콘텐츠" 제작자의 성명(법인인 경우에는 법인의 명칭), 주소, 전화번호{'\n '}
 					4. "콘텐츠"의 내용, 이용방법, 이용료 기타 이용조건{'\n '}② "회사"는 "콘텐츠"별 이용가능기기 및
 					이용에 필요한 최소한의 기술사양에 관한 정보를 계약체결과정에서 "이용자"에게 제공합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제14조(이용계약의 성립 등) </MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제14조(이용계약의 성립 등) </PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "이용자"는 "회사"가 제공하는 다음 또는 이와 유사한 절차에 의하여 이용신청을 합니다. "회사"는 계약
 					체결 전에 각 호의 사항에 관하여 "이용자"가 정확하게 이해하고 실수 또는 착오 없이 거래할 수 있도록
@@ -40,31 +36,31 @@ export default function Policy3() {
 					제16조 제1항의 수신확인통지형태로 "이용자"에게 도달한 시점에 계약이 성립한 것으로 봅니다.{'\n '}④
 					"회사"의 승낙의 의사표시에는 "이용자"의 이용신청에 대한 확인 및 서비스제공 가능여부, 이용신청의
 					정정·취소 등에 관한 정보 등을 포함합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제15조(미성년자 이용계약에 관한 특칙)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제15조(미성년자 이용계약에 관한 특칙)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					"회사"는 만 20세 미만의 미성년이용자가 유료서비스를 이용하고자 하는 경우에 부모 등 법정 대리인의
 					동의를 얻거나, 계약체결 후 추인을 얻지 않으면 미성년자 본인 또는 법정대리인이 그 계약을 취소할 수
 					있다는 내용을 계약체결 전에 고지하는 조치를 취합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제16조(수신확인통지·이용신청 변경 및 취소)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제16조(수신확인통지·이용신청 변경 및 취소)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 "이용자"의 이용신청이 있는 경우 "이용자"에게 수신확인통지를 합니다.{'\n '}②
 					수신확인통지를 받은 "이용자"는 의사표시의 불일치 등이 있는 경우에는 수신확인통지를 받은 후 즉시
 					이용신청 변경 및 취소를 요청할 수 있고, "회사"는 서비스제공 전에 "이용자"의 요청이 있는 경우에는
 					지체 없이 그 요청에 따라 처리하여야 합니다. 다만, 이미 대금을 지불한 경우에는 청약철회 등에 관한
 					제27조의 규정에 따릅니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제17조("회사"의 의무)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제17조("회사"의 의무)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 법령과 이 약관이 정하는 권리의 행사와 의무의 이행을 신의에 좇아 성실하게 하여야 합니다.
 					{'\n '}② "회사"는 "이용자"가 안전하게 "콘텐츠"를 이용할 수 있도록 개인정보(신용정보 포함)보호를 위해
@@ -74,11 +70,11 @@ export default function Policy3() {
 					이용자가 제기한 의견이나 불만사항에 대해서는 게시판을 활용하거나 전자우편 등을 통하여 그 처리과정 및
 					결과를 전달합니다.{'\n '}⑤ "회사"는 이 약관에서 정한 의무 위반으로 인하여 "이용자"가 입은 손해를
 					배상합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제18조("이용자"의 의무)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제18조("이용자"의 의무)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "이용자"는 다음 행위를 하여서는 안 됩니다.{'\n '}
 					1. 신청 또는 변경 시 허위내용의 기재{'\n '}
@@ -92,11 +88,11 @@ export default function Policy3() {
 					8. 기타 불법적이거나 부당한 행위{'\n '}② "이용자"는 관계법령, 이 약관의 규정, 이용안내 및 "콘텐츠"와
 					관련하여 공지한 주의사항, "회사"가 통지하는 사항 등을 준수하여야 하며, 기타 "회사"의 업무에 방해되는
 					행위를 하여서는 안 됩니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제19조(지급방법)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제19조(지급방법)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					"콘텐츠"의 이용에 대한 대금지급방법은 다음 각 호의 방법 중 가능한 방법으로 할 수 있습니다. 다만,
 					"회사"는 "이용자"의 지급방법에 대하여 어떠한 명목의 수수료도 추가하여 징수하지 않습니다.{'\n '}
@@ -108,11 +104,11 @@ export default function Policy3() {
 					6. "회사"와 계약을 맺었거나 "회사"가 인정한 상품권에 의한 결제{'\n '}
 					7. 전화 또는 휴대전화를 이용한 결제{'\n '}
 					8. 기타 전자적 지급방법에 의한 대금지급 등
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제20조(콘텐츠서비스의 제공 및 중단)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제20조(콘텐츠서비스의 제공 및 중단)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① 콘텐츠서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.{'\n '}② "회사"는 컴퓨터 등
 					정보통신설비의 보수점검, 교체 및 고장, 통신두절 또는 운영상 상당한 이유가 있는 경우 콘텐츠서비스의
@@ -127,11 +123,11 @@ export default function Policy3() {
 					"이용자"에게 보상합니다. 다만, "회사"가 보상기준 등을 고지하지 아니하거나, 고지한 보상기준이
 					적절하지 않은 경우에는 "이용자"들의 마일리지 또는 적립금 등을 현물 또는 현금으로 "이용자"에게
 					지급합니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제21조(콘텐츠서비스의 변경)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제21조(콘텐츠서비스의 변경)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 상당한 이유가 있는 경우에 운영상, 기술상의 필요에 따라 제공하고 있는 콘텐츠서비스를
 					변경할 수 있습니다.{'\n '}② "회사"는 콘텐츠서비스의 내용, 이용방법, 이용시간을 변경할 경우에
@@ -141,11 +137,11 @@ export default function Policy3() {
 					받습니다. 이때, "회사"는 동의를 거절한 "이용자"에 대하여는 변경전 서비스를 제공합니다. 다만, 그러한
 					서비스 제공이 불가능할 경우 계약을 해지할 수 있습니다.{'\n '}④ "회사"는 제1항에 의한 서비스의 변경
 					및 제3항에 의한 계약의 해지로 인하여 "이용자"가 입은 손해를 배상합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제22조(정보의 제공 및 광고의 게재)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제22조(정보의 제공 및 광고의 게재)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 "이용자"가 콘텐츠이용 중 필요하다고 인정되는 다양한 정보를 공지사항이나 전자우편 등의
 					방법으로 "회원"에게 제공할 수 있습니다. 다만, "회원"은 언제든지 전자우편 등을 통하여 수신 거절을 할
@@ -153,22 +149,22 @@ export default function Policy3() {
 					사전 동의를 받아서 전송합니다.{'\n '}③ "회사"는 "콘텐츠"서비스 제공과 관련하여 콘텐츠화면, 홈페이지,
 					전자우편 등에 광고를 게재할 수 있습니다. 광고가 게재된 전자우편 등을 수신한 "회원"은 수신거절을
 					"회사"에게 할 수 있습니다.{'\n '}
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제23조(게시물의 삭제)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제23조(게시물의 삭제)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 게시판에 정보통신망이용촉진 및 정보보호 등에 관한 법률을 위반한 청소년유해매체물이
 					게시되어 있는 경우에는 이를 지체 없이 삭제 합니다. 다만, 19세 이상의 "이용자"만 이용할 수 있는
 					게시판은 예외로 합니다.{'\n '}② "회사"가 운영하는 게시판 등에 게시된 정보로 인하여 법률상 이익이
 					침해된 자는 "회사"에게 당해 정보의 삭제 또는 반박내용의 게재를 요청할 수 있습니다. 이 경우 "회사"는
 					지체 없이 필요한 조치를 취하고 이를 즉시 신청인에게 통지합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제24조(저작권 등의 귀속)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제24조(저작권 등의 귀속)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"가 작성한 저작물에 대한 저작권 기타 지적재산권은 "회사"에 귀속합니다.{'\n '}② "회사"가
 					제공하는 서비스 중 제휴계약에 의해 제공되는 저작물에 대한 저작권 기타 지적재산권은 해당 제공업체에
@@ -176,11 +172,11 @@ export default function Policy3() {
 					제공업체에 지적재산권이 귀속된 정보를 "회사" 또는 제공업체의 사전승낙 없이 복제, 전송, 출판, 배포,
 					방송 기타 방법에 의하여 영리목적으로 이용하거나 제3자에게 이용하게 하여서는 안 됩니다.{'\n '}④
 					"회사"는 약정에 따라 "이용자"의 저작물을 사용하는 경우 당해 "이용자"의 허락을 받습니다..
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제25조(개인정보보호)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제25조(개인정보보호)</PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 제7조 제2항의 신청서기재사항 이외에 "이용자"의 콘텐츠이용에 필요한 최소한의 정보를 수집할
 					수 있습니다. 이를 위해 "회사"가 문의한 사항에 관해 "이용자"는 진실한 내용을 성실하게 고지하여야
@@ -207,32 +203,8 @@ export default function Policy3() {
 					정보통신망이용촉진 및 정보보호에 관한 법률 등 관계 법령이 정하는 바에 따라 "이용자"의 "개인정보"를
 					보호하기 위해 노력합니다. "개인정보"의 보호 및 사용에 대해서는 관련법령 및 "회사"의
 					개인정보보호정책이 적용됩니다.
-				</SubText>
-			</TextContainer>
+				</PolicySubText>
+			</PolicyTextContainer>
 		</>
 	);
 }
-const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
-`;
-const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-`;
-
-const MainText = styled.Text`
-	margin-bottom: 20px;
-	font-size: 15px;
-	line-height: 20px;
-	color: black;
-	font-weight: bold;
-`;
-
-const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
-	margin-bottom: 10px;
-`;

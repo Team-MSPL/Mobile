@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {Fragment, useState} from 'react';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import Policy1 from '../../utill/component/policy/policy1';
@@ -6,30 +6,33 @@ import Policy2 from '../../utill/component/policy/policy2';
 import Policy3 from '../../utill/component/policy/policy3';
 import Policy4 from '../../utill/component/policy/policy4';
 import Policy5 from '../../utill/component/policy/policy5';
-import {FlexWrap} from '../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {SVGRightAdd, SvgRight} from '../../utill/svg/svg';
 export default function PolicyMain() {
 	const [view, setView] = useState(0);
-	const PolicyComponent = policyList[view].component;
+	const PolicyComponent = policyList[view]?.component;
+	const handleViewVisible = (e: number) => {
+		setView(view == e ? -1 : e);
+	};
 	return (
-		<MainViewContainer>
-			<TextContainer>
-				<TitleText>전체 이용 약관</TitleText>
-			</TextContainer>
-			<FlexWrap>
-				{policyList.map((item, value) => (
+		<BackgroundGray>
+			{policyList.map((item, value) => (
+				<Fragment key={value}>
 					<PolicyTouchableOpacity
-						index={value}
-						viewIndex={view}
 						key={value}
 						onPress={() => {
-							setView(value);
+							handleViewVisible(value);
 						}}>
-						<PolicyText>{item.title}</PolicyText>
+						<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+							{item.title}
+						</PretendardSemiBoldText>
+						<SVGRightAdd rotation={value == view ? 90 : 180} color='black' />
 					</PolicyTouchableOpacity>
-				))}
-			</FlexWrap>
-			{PolicyComponent && <PolicyComponent />}
-		</MainViewContainer>
+					{value == view && <PolicyComponent />}
+				</Fragment>
+			))}
+		</BackgroundGray>
 	);
 }
 const policyList = [
@@ -44,28 +47,17 @@ export const MainViewContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding: 2px;
 `;
-const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
-`;
 export const TitleText = styled.Text`
 	font-size: 20px;
 	font-weight: bold;
 	color: black;
 `;
-const PolicyText = styled.Text`
-	font-size: 10px;
-	font-weight: bold;
-	color: black;
-`;
 
-const PolicyTouchableOpacity = styled.TouchableOpacity<{index: number; viewIndex: number}>`
-	justify-content: center;
+const PolicyTouchableOpacity = styled.TouchableOpacity`
+	justify-content: space-between;
 	align-items: center;
-	background-color: ${props => (props.index == props.viewIndex ? colors.selectButton : colors.main)};
-	border-width: 1px;
-	border-radius: 10px;
-	height: 30px;
-	margin: 4px;
-	padding: 0px 5px;
+	flex-direction: row;
+	border-bottom-width: 1px;
+	padding: ${heightPercentage(10)}px 0px;
+	width: ${widthPercentage(327)}px;
 `;

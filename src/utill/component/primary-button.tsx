@@ -11,9 +11,11 @@ export default function PrimaryButton({
 	textColor,
 	onPress,
 	disabled,
+	alignSelf,
 }: PrimarybuttonType) {
 	return (
 		<PrimaryButtonContainer
+			alignSelf={alignSelf ?? 'null'}
 			width={width}
 			height={height}
 			onPress={onPress}
@@ -28,6 +30,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	width: number;
 	height: number;
 	backgroundColor: string;
+	alignSelf: string;
 }>`
 	width: ${props => props.width}px;
 	height: ${props => props.height}px;
@@ -35,6 +38,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	align-items: center;
 	justify-content: center;
 	border-radius: 8px;
+	align-self: ${props => props.alignSelf};
 `;
 const InsideText = styled(PretendardVariable)<{
 	textColor: string;
@@ -52,4 +56,5 @@ interface PrimarybuttonType {
 	textColor: string;
 	onPress: () => void;
 	disabled?: boolean;
+	alignSelf?: string;
 }

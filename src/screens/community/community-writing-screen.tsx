@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, SafeAreaView} from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -12,10 +12,12 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import CustomButton from '../../utill/component/custom-button';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
-import {SvgCancel} from '../../utill/svg/svg';
+import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
-import {heightPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ButtonContainer} from '../enroll-info/select-multi';
+import PrimaryButton from '../../utill/component/primary-button';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -102,6 +104,9 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					modalTitle: '등록',
 					modalSubTitle: '게시글이 등록되었습니다.',
 					modalFunction: handleRefresh,
+					modalBottomFunctionUse: true,
+					modalBottomFunction: handleRefresh,
+					modalBottomText: '확인',
 				}),
 			);
 		} catch (error) {
@@ -122,98 +127,118 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		copy[index] = temp;
 		changeImage(copy);
 	};
-
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<PrimaryButton
+					label='작성'
+					backgroundColor={colors.Primary}
+					textColor={colors.Black}
+					width={widthPercentage(60)}
+					height={heightPercentage(28)}
+					disabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}
+					onPress={handlePostSubmit}></PrimaryButton>
+			),
+		});
+	}, [postData.postTitle, postData.postContent]);
 	return (
 		<SafeAreaView>
 			<CommunityWritingContainer>
-				<CommunityWritingTitleText>제목</CommunityWritingTitleText>
 				<TitleInput
-					placeholder='제목을 입력해주세요'
-					placeholderTextColor={'grey'}
-					style={{color: 'black'}}
+					placeholder='제목'
+					placeholderTextColor={colors.Gray2}
 					value={postData.postTitle}
 					onChangeText={changeTitle}
 					multiline={true}
 				/>
 
-				<CommunityWritingTitleText>내용</CommunityWritingTitleText>
 				<ContentInput
-					placeholder='부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.'
-					placeholderTextColor={'grey'}
-					style={{color: 'black'}}
+					placeholder={`내용을 입력하세요\n 부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.`}
+					placeholderTextColor={colors.Gray2}
 					value={postData.postContent}
 					onChangeText={changeContent}
 					multiline={true}
 				/>
-				<CommunityWritingTitleText>사진(최대 5장까지 가능합니다)</CommunityWritingTitleText>
-				<ImageContainer horizontal={true}>
-					<PictureElementContainer onPress={handleImage}>
-						<ImageInputButtonText>사진 추가하기</ImageInputButtonText>
-						<ImageInputButtonIcon name='pluscircleo' />
-					</PictureElementContainer>
-					{postData.postImage.map((uri, index) => {
-						return (
-							<PictureElementContainer
-								onPress={() => {
-									setCurrentImageIndex(index);
-									setIsImageModalVisible(true);
-								}}
-								key={index}>
-								<CancelContainer
-									onPress={() => {
-										deletePicture(index);
-									}}>
-									<SvgCancel color='white' width={13} height={13}></SvgCancel>
-								</CancelContainer>
-								<PictureElement source={{uri: uri}} />
-								<BarContainer>
-									{index != 0 && (
-										<MoveButton
-											onPress={() => {
-												moveImage({index: index, direction: false});
-											}}>
-											<ImageInputButtonText>왼</ImageInputButtonText>
-										</MoveButton>
-									)}
-									{index != postData.postImage.length - 1 && (
-										<MoveButton
-											onPress={() => {
-												moveImage({index: index, direction: true});
-											}}>
-											<ImageInputButtonText>오</ImageInputButtonText>
-										</MoveButton>
-									)}
-								</BarContainer>
-							</PictureElementContainer>
-						);
-					})}
-					<ImageView
-						images={postData.postImage.map(uri => ({uri}))}
-						imageIndex={currentImageIndex}
-						visible={isImageModalVisible}
-						onRequestClose={() => {
-							setIsImageModalVisible(false);
-						}}
-						FooterComponent={index => {
+				{postData.postImage.length > 0 && (
+					<ImageContainer horizontal={true}>
+						{postData.postImage.map((uri, index) => {
 							return (
-								<ImageViewFooterComponent>
-									<ImageText>
-										{index.imageIndex + 1}/{postData.postImage.length}
-									</ImageText>
-								</ImageViewFooterComponent>
+								<PictureElementContainer
+									onPress={() => {
+										setCurrentImageIndex(index);
+										setIsImageModalVisible(true);
+									}}
+									key={index}>
+									<CancelContainer
+										onPress={() => {
+											deletePicture(index);
+										}}>
+										<SvgCancel color='white' width={13} height={13}></SvgCancel>
+									</CancelContainer>
+									<PictureElement source={{uri: uri}} />
+									<BarContainer>
+										{index != 0 && (
+											<MoveButton
+												onPress={() => {
+													moveImage({index: index, direction: false});
+												}}>
+												<ImageInputButtonText>왼</ImageInputButtonText>
+											</MoveButton>
+										)}
+										{index != postData.postImage.length - 1 && (
+											<MoveButton
+												onPress={() => {
+													moveImage({index: index, direction: true});
+												}}>
+												<ImageInputButtonText>오</ImageInputButtonText>
+											</MoveButton>
+										)}
+									</BarContainer>
+								</PictureElementContainer>
 							);
-						}}
-					/>
-				</ImageContainer>
-				<CustomButton
+						})}
+						<ImageView
+							images={postData.postImage.map(uri => ({uri}))}
+							imageIndex={currentImageIndex}
+							visible={isImageModalVisible}
+							onRequestClose={() => {
+								setIsImageModalVisible(false);
+							}}
+							FooterComponent={index => {
+								return (
+									<ImageViewFooterComponent>
+										<ImageText>
+											{index.imageIndex + 1}/{postData.postImage.length}
+										</ImageText>
+									</ImageViewFooterComponent>
+								);
+							}}
+						/>
+					</ImageContainer>
+				)}
+				{/* <CustomButton
 					label='게시'
 					onPress={handlePostSubmit}
 					width={100}
-					isDisabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}></CustomButton>
+					isDisabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}></CustomButton> */}
 			</CommunityWritingContainer>
+			<CammeraContainer onPress={handleImage}>
+				<SVGCamera width={widthPercentage(24)} height={widthPercentage(24)} color='black' />
+			</CammeraContainer>
 		</SafeAreaView>
 	);
 }
+const CammeraContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(48)}px;
+	justify-content: center;
+	padding-left: ${widthPercentage(20)}px;
+	border-top-width: 1px;
+	position: absolute;
+	bottom: 0px;
+	background-color: ${colors.backgroundGray};
+	border-color: ${colors.Gray1};
+`;
 const BarContainer = styled.View`
 	width: 100%;
 	position: absolute;
@@ -230,6 +255,7 @@ const CommunityWritingContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding-horizontal: 24px;
 	padding-vertical: 12px;
+	margin-bottom: ${heightPercentage(48)}px;
 `;
 
 const CommunityWritingTitleText = styled.Text`
@@ -239,26 +265,25 @@ const CommunityWritingTitleText = styled.Text`
 	color: black;
 `;
 const TitleInput = styled.TextInput`
-	border: ${colors.border};
-	border-radius: 12px;
-	width: 100%;
-	padding: 12px;
-	margin-bottom: 24px;
+	border-bottom-width: 1px;
+	border-color: ${colors.Gray2};
+	width: ${widthPercentage(327)}px;
+	margin-bottom: ${heightPercentage(10)}px;
+	color: ${colors.Black};
+	font-weight: 700;
 `;
 const ContentInput = styled.TextInput`
-	border: ${colors.border};
-	border-radius: 12px;
-	width: 100%;
-	aspect-ratio: 1.5;
-	padding: 12px;
-	margin-bottom: 24px;
+	border-bottom-width: 1px;
+	border-color: ${colors.Gray2};
+	width: ${widthPercentage(327)}px;
+	margin-bottom: ${heightPercentage(10)}px;
+	color: ${colors.Black};
+	font-weight: 700;
+	height: ${heightPercentage(500)}px;
 `;
 const ImageContainer = styled.ScrollView`
-	background-color: #f0f0f0;
-	width: 100%;
-	padding: 12px;
-	margin-bottom: 24px;
-	border-radius: 12px;
+	background-color: ${colors.backgroundGray};
+	gap: ${widthPercentage(20)}px;
 `;
 const ImageInputButtonText = styled.Text`
 	font-size: 16px;
