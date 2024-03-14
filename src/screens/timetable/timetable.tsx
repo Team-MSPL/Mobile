@@ -23,7 +23,7 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
+import {HeaderContianer, HeaderText, PretendardVariableText} from '../../utill/layout/layout';
 import {SvgMapIcon} from '../../utill/svg/svg';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
@@ -352,7 +352,9 @@ export default function Timetable({navigation, route}: any) {
 								</>
 							) : (
 								<TouchableOpacity onPress={goMapInfo}>
-									<HeaderText>수정</HeaderText>
+									<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+										편집
+									</PretendardVariableText>
 								</TouchableOpacity>
 							)}
 						</>

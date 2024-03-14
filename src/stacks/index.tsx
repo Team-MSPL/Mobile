@@ -17,6 +17,7 @@ import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
 import {colors} from '../utill/colors';
 import HomeModal from '../screens/login/home-modal';
+import HikingStack from './hiking-stack';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -42,6 +43,7 @@ export default function StackNavigator() {
 			{MyTravelListStack()}
 			{MoreStack()}
 			{JoinStack()}
+			{HikingStack()}
 			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />

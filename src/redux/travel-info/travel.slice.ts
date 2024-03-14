@@ -277,28 +277,18 @@ export const reCourseName = createAsyncThunk(
 	},
 );
 
-//투어 api 정보가져오기
-export const getTourTest = createAsyncThunk('/getTourTest', async (data: any, {rejectWithValue}) => {
-	try {
-		const response = await axiosTour.get(
-			`/locationBasedList1?MobileOS=${data.platform}&MobileApp=다님&mapX=${data.lng}&mapY=${data.lat}&radius=20000&numOfRows=1&_type=json&serviceKey=${Tour_API_KEY}`,
-		);
-		let params = response.data.response.body.items.item[0];
-		const responseData = await axiosTour.get(
-			`/detailInfo1?MobileOS=${data.platform}&MobileApp=다님&contentId=${params.contentid}&contentTypeId=${params.contenttypeid}&_type=json&serviceKey=${Tour_API_KEY}`,
-		);
-		//console.log('하위요', responseData.data.response.body.items.item);
-		return responseData.data.response.body.items.item;
-	} catch (error: any) {
-		throw rejectWithValue(error.code);
-	}
-});
-
 //관광지 리뷰 등록
 export const savePlaceReview = createAsyncThunk(
 	'/place/savePlaceReview',
 	async (
-		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		data: {
+			region: any;
+			name: any;
+			reviewContent: string;
+			reviewUserToken: string;
+			reviewPhotoList: string[];
+			reviewId: string;
+		},
 		{rejectWithValue},
 	) => {
 		try {
@@ -313,7 +303,14 @@ export const savePlaceReview = createAsyncThunk(
 export const deletePlaceReview = createAsyncThunk(
 	'/place/deletePlaceReview',
 	async (
-		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		data: {
+			region: any;
+			name: any;
+			reviewContent: string;
+			reviewUserToken: string;
+			reviewPhotoList: never[];
+			reviewId: string;
+		},
 		{rejectWithValue},
 	) => {
 		try {
@@ -893,4 +890,5 @@ interface InfoReviewType {
 	rating: number | null;
 	reviewUserToken: string | null;
 	reviewPhotoList: string | null;
+	reviewId: string | null;
 }

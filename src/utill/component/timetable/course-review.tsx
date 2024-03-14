@@ -1,17 +1,41 @@
 import styled from 'styled-components/native';
-import {MainContainer} from '../../layout/layout';
+import {BackgroundGray, MainContainer} from '../../layout/layout';
 import {Keyboard} from 'react-native';
-import {useState} from 'react';
+import shortId from 'shortid';
+import {useEffect, useRef, useState} from 'react';
 import {colors} from '../../colors';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {savePlaceReview} from '../../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import CustomButton from '../custom-button';
+import {CammeraContainer, ImageScrollViewContainer} from '../../../screens/community/community-writing-screen';
+import {SVGCamera, SvgCancel} from '../../svg/svg';
+import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {usePhoto} from '../../hooks/usePhoto';
+import {CancelContainer, PictureElement, PictureElementContainer} from '../../../screens/my-travel-list/input-diary';
+import useFirebaseStorage from '../../hooks/useFirebaseStorage';
+import PrimaryButton from '../primary-button';
 
 export function CourseReview({navigation, route}: any) {
 	const [reviewData, setReviewData] = useState('');
 	const {userIdToken} = useAppSelector(state => state.userSlice);
+	const [reviewImage, setReviewImage] = useState([]);
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<PrimaryButton
+					label='등록'
+					backgroundColor={colors.Primary}
+					textColor={colors.Black}
+					width={widthPercentage(60)}
+					height={heightPercentage(28)}
+					disabled={reviewData.trim() === ''}
+					onPress={handleSavePlaceReview}></PrimaryButton>
+			),
+		});
+	}, []);
+	const {uploadImage} = useFirebaseStorage();
 	const dispatch = useAppDispatch();
 	const changeText = (e: string) => {
 		setReviewData(e);
@@ -19,15 +43,29 @@ export function CourseReview({navigation, route}: any) {
 	const goBack = () => {
 		navigation.goBack();
 	};
+	const changeImage = (e: any) => {
+		console.log(typeof e[0]);
+		setReviewImage(e);
+	};
+	const diaryImageRef = useRef<string[]>([]);
 	const handleSavePlaceReview = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			const randomId = shortId.generate();
+			// id 체크해서 변경 후에 파이어베이스 업로드 확인하기
+			diaryImageRef.current = [];
+			const ImageFunction = reviewImage.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: randomId, category: 'review'})) ?? '';
+				diaryImageRef.current.push(data);
+			});
+			await Promise.all(ImageFunction);
 			let data = {
 				region: route.params.value.region,
 				name: route.params.value.name,
 				reviewContent: reviewData,
 				reviewUserToken: userIdToken,
-				reviewPhotoList: [],
+				reviewPhotoList: diaryImageRef.current,
+				reviewId: randomId,
 			};
 			await dispatch(savePlaceReview(data));
 			dispatch(
@@ -43,36 +81,56 @@ export function CourseReview({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const {handleImagePickerLaunch} = usePhoto();
+	const handleImage = () => {
+		handleImagePickerLaunch({photoData: reviewImage, changeFunction: changeImage});
+	};
+	const deletePicture = (idx: number) => {
+		let copy = [...reviewImage];
+		copy.splice(idx, 1);
+		setReviewImage(copy);
+	};
 	return (
-		<MainContainer>
-			<ReviewPressable
-				onPress={() => {
-					Keyboard.dismiss();
-				}}>
+		<BackgroundGray>
+			<ReviewPressable showsVerticalScrollIndicator={false}>
 				<ReviewInput
 					onChangeText={e => changeText(e)}
-					placeholder='리뷰를 남겨주세요'
+					placeholder='방문했던 곳에 대해 이야기해주세요.'
 					multiline={true}
 					placeholderTextColor={'grey'}
 					value={reviewData}></ReviewInput>
 			</ReviewPressable>
-			<CustomButton label='등록' onPress={handleSavePlaceReview}></CustomButton>
-		</MainContainer>
+			{reviewImage.length > 0 && (
+				<ImageScrollViewContainer horizontal={true}>
+					{reviewImage.map((uri, index) => {
+						return (
+							<PictureElementContainer onPress={() => {}} key={index}>
+								<CancelContainer
+									onPress={() => {
+										deletePicture(index);
+									}}>
+									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+								</CancelContainer>
+								<PictureElement source={{uri: uri}} />
+							</PictureElementContainer>
+						);
+					})}
+				</ImageScrollViewContainer>
+			)}
+			<CammeraContainer onPress={handleImage}>
+				<SVGCamera width={widthPercentage(24)} height={widthPercentage(24)} color='black' />
+			</CammeraContainer>
+		</BackgroundGray>
 	);
 }
 
-const ReviewPressable = styled.Pressable`
-	flex: 1;
+const ReviewPressable = styled.ScrollView`
+	height: ${heightPercentage(300)}px;
 `;
 const ReviewInput = styled.TextInput`
-	width: 100%;
-	height: 200px;
-	border-width: 1px;
-	border-radius: 5px;
-	border-color: ${colors.selectButton};
-	padding: 8px;
-	font-size: 16px;
-	font-weight: 400;
-	color: black;
 	text-align-vertical: top;
+	width: ${widthPercentage(327)}px;
+	margin-bottom: ${heightPercentage(10)}px;
+	color: ${colors.Black};
+	font-weight: 700;
 `;

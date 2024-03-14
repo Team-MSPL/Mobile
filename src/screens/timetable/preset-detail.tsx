@@ -177,7 +177,7 @@ export default function PresetDetail({navigation, route}: any) {
 					<ScrollView horizontal>
 						<FlexWrap gap={10}>
 							{presetDatas[route.params.index].map((item, idx) => (
-								<DayContainer
+								<DayTouchablOpacity
 									key={idx}
 									select={select == idx}
 									onPress={() => {
@@ -189,7 +189,7 @@ export default function PresetDetail({navigation, route}: any) {
 										color={select == idx ? colors.Gray5 : colors.Gray3}>
 										DAY{idx + 1}
 									</PretendardSemiBoldText>
-								</DayContainer>
+								</DayTouchablOpacity>
 							))}
 						</FlexWrap>
 					</ScrollView>
@@ -252,7 +252,7 @@ export default function PresetDetail({navigation, route}: any) {
 const TopFixContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 `;
-const DayContainer = styled.TouchableOpacity<{select: boolean}>`
+export const DayTouchablOpacity = styled.TouchableOpacity<{select: boolean}>`
 	width: ${widthPercentage(59)}px;
 	height: ${heightPercentage(27)}px;
 	align-items: center;

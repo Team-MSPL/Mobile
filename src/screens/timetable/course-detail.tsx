@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, NativeScrollEvent, NativeSyntheticEvent, Pressable} from 'react-native';
+import {Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView} from 'react-native';
 import {
 	getPlaceInfo,
 	courseInfoType,
@@ -12,17 +12,37 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import ImageView from 'react-native-image-viewing';
 import styled from 'styled-components/native';
-import {Center, HStack, MainText, VStack, devicesWidth} from '../../utill/layout/layout';
+import {
+	Center,
+	Divider,
+	HStack,
+	MainText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+	devicesWidth,
+} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SvgCall, SvgInfos, SvgLocation, SvgRight, SvgStart} from '../../utill/svg/svg';
+import {
+	SVGPencil,
+	SVGReviewPencil,
+	SvgCalendar,
+	SvgCall,
+	SvgInfos,
+	SvgLocation,
+	SvgRight,
+	SvgStart,
+} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
-import {ButtonHStack, GoRecommendButton} from '../enroll-info/region-recommend/detail-result';
+import {ButtonHStack, GoRecommendButton, RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
 import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useFocusEffect} from '@react-navigation/native';
-import {fontPercentage, heightPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {WhiteContainer} from '../enroll-info/final-check';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 export default function CourseDetail({navigation, route}: any) {
 	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
@@ -58,6 +78,7 @@ export default function CourseDetail({navigation, route}: any) {
 						rating: null,
 						reviewUserToken: item.reviewUserToken,
 						reviewPhotoList: item.reviewPhotoList,
+						reviewId: item.reviewId,
 					})),
 					rating: null,
 					address: null,
@@ -78,6 +99,7 @@ export default function CourseDetail({navigation, route}: any) {
 						rating: item?.rating,
 						reviewUserToken: null,
 						reviewPhotoList: null,
+						reviewId: null,
 					})),
 					expense: null,
 					rating: data?.rating,
@@ -110,15 +132,19 @@ export default function CourseDetail({navigation, route}: any) {
 			}),
 		);
 	};
+	const {firebaseImageRemove} = useFirebaseStorage();
 	const deleteReview = async (e: any) => {
 		try {
+			//TODO api 수정 되면 파이어베이스에서 사진 삭제하는거 추가하기
 			let data = {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				name: route.params.value.name,
 				reviewContent: e.content,
 				reviewUserToken: userIdToken,
 				reviewPhotoList: e.reviewPhotoList,
+				reviewId: e.reviewId,
 			};
+			//await firebaseImageRemove({pictureList: e.reviewPhotoList, id:e.reviewId, category: 'review'});
 			await dispatch(deletePlaceReview(data));
 		} catch {
 			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
@@ -148,11 +174,18 @@ export default function CourseDetail({navigation, route}: any) {
 		{title: '리뷰', function: () => tabBarRef.current.scrollToEnd({animated: true})},
 	];
 	const detailList = [
-		{title: courseDetail?.infoTitle, logo: <SvgInfos color={colors.regionNormal} />},
-		{title: courseDetail?.infoContent, logo: <SvgInfos color={colors.regionNormal} />},
-		{title: courseDetail?.address, logo: <SvgLocation color={colors.regionNormal} />},
-		{title: courseDetail?.information, logo: <SvgCall color={colors.regionNormal} />},
-		{title: courseDetail?.expense, logo: <SvgInfos color={colors.regionNormal} />},
+		{
+			title: courseDetail?.address,
+			logo: <SvgLocation width={widthPercentage(12)} height={widthPercentage(12)} color={colors.Gray2} />,
+		},
+		{
+			title: courseDetail?.information,
+			logo: <SvgCall width={widthPercentage(12)} height={widthPercentage(12)} color={colors.Gray2} />,
+		},
+		{
+			title: courseDetail?.expense,
+			logo: <SvgInfos width={widthPercentage(12)} height={widthPercentage(12)} color={colors.Gray2} />,
+		},
 	];
 	const handleCopyClipBoard = (e: string) => {
 		try {
@@ -234,14 +267,165 @@ export default function CourseDetail({navigation, route}: any) {
 													? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
 													: value,
 										}}
-										style={{width: 200, height: 200}}
+										style={{width: widthPercentage(374), height: heightPercentage(240)}}
 										alt='Place Image'
 									/>
 								</Pressable>
 							))}
 						</ImageScroll>
 					)}
-					<TitleInfoContainer>
+					<RecommendBorderContainer height={heightPercentage(480)}>
+						<ScrollView>
+							<HStack justifyContent='space-between'>
+								<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
+									{courseDetail.name}
+								</PretendardSemiBoldText>
+								{courseDetail.rating && (
+									<HStack>
+										<PretendardSemiBoldText size={18} lineHeight={27} color={colors.PointGreen1}>
+											{courseDetail.rating}
+										</PretendardSemiBoldText>
+										<SvgStart
+											color={colors.selectButton}
+											width={widthPercentage(19)}
+											height={heightPercentage(18)}
+										/>
+									</HStack>
+								)}
+							</HStack>
+							<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+								{courseDetail?.infoTitle}
+							</PretendardVariableText>
+							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							<PretendardVariableText
+								width={widthPercentage(327)}
+								size={14}
+								lineHeight={21}
+								color={colors.Gray4}
+								numberOfLines={2}>
+								{courseDetail?.infoContent}
+							</PretendardVariableText>
+							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							{detailList.map(
+								(detail, detailIndex) =>
+									detail.title != null && (
+										<InfoContainer
+											key={detailIndex}
+											disabled={detailIndex != 1}
+											onPress={() => {
+												handleCopyClipBoard(detail.title ?? '');
+											}}>
+											<HStack>
+												<LogoContainer>{detail.logo}</LogoContainer>
+												<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+													{detail.title}
+												</PretendardVariableText>
+											</HStack>
+										</InfoContainer>
+									),
+							)}
+							{courseDetail?.openInfo && (
+								<>
+									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+									<InfoContainer disabled={true}>
+										<HStack>
+											<LogoContainer>
+												<SvgCalendar
+													width={widthPercentage(12)}
+													height={widthPercentage(12)}
+													color={colors.Gray2}
+												/>
+											</LogoContainer>
+											<OpenVStack>
+												{courseDetail?.openInfo.map((item, itemIndex) => (
+													<PretendardVariableText
+														size={14}
+														lineHeight={21}
+														color={colors.Gray5}
+														key={itemIndex}>
+														{item}
+													</PretendardVariableText>
+												))}
+											</OpenVStack>
+										</HStack>
+									</InfoContainer>
+								</>
+							)}
+							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							<HStack gap={widthPercentage(10)}>
+								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+									리뷰
+								</PretendardSemiBoldText>
+								<HStack width={widthPercentage(290)} justifyContent='space-between'>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
+										{courseDetail.review.length}
+									</PretendardSemiBoldText>
+									{courseDetail.status == 'firebase' && (
+										<ReviewButton onPress={goReviewEnroll}>
+											<SVGReviewPencil />
+											<PretendardVariableText
+												size={13}
+												lineHeight={20.8}
+												color={colors.PointYellow}>
+												리뷰 쓰기
+											</PretendardVariableText>
+										</ReviewButton>
+									)}
+								</HStack>
+							</HStack>
+							{courseDetail.review.map((item, idx) => (
+								<OpenContainer key={idx}>
+									<OpenVStack>
+										<ReviewTitleText>{item.name}</ReviewTitleText>
+										<ReviewElementText>{item.content}</ReviewElementText>
+									</OpenVStack>
+									{item.rating && (
+										<ReviewRating>
+											<SvgStart color={colors.selectButton} width={18} height={18} />
+											<ReviewText>{item.rating}</ReviewText>
+										</ReviewRating>
+									)}
+									{item.reviewUserToken == userIdToken && (
+										<DeleteContainer
+											onPress={() => {
+												checkDelete(item);
+											}}>
+											<Icons size={20} name='delete' color={'black'}></Icons>
+										</DeleteContainer>
+									)}
+								</OpenContainer>
+							))}
+							{/* {courseDetail?.review.length != 0 ? (
+								courseDetail.review.map((item, idx) => (
+									<OpenContainer key={idx}>
+										<OpenVStack>
+											<ReviewTitleText>{item.name}</ReviewTitleText>
+											<ReviewElementText>{item.content}</ReviewElementText>
+										</OpenVStack>
+										{item.rating && (
+											<ReviewRating>
+												<SvgStart color={colors.selectButton} width={18} height={18} />
+												<ReviewText>{item.rating}</ReviewText>
+											</ReviewRating>
+										)}
+										{item.reviewUserToken == userIdToken && (
+											<DeleteContainer
+												onPress={() => {
+													checkDelete(item);
+												}}>
+												<Icons size={20} name='delete' color={'black'}></Icons>
+											</DeleteContainer>
+										)}
+									</OpenContainer>
+								))
+							) : (
+								<ReviewCenter>
+									<ReviewElementText>리뷰가 없습니다!</ReviewElementText>
+								</ReviewCenter>
+							)} */}
+						</ScrollView>
+					</RecommendBorderContainer>
+					{/* <TitleInfoContainer>
 						<DetailInfoContainer>
 							<TitleText>{courseDetail.name}</TitleText>
 							{courseDetail.rating && (
@@ -254,8 +438,8 @@ export default function CourseDetail({navigation, route}: any) {
 								</RatingContainer>
 							)}
 						</DetailInfoContainer>
-					</TitleInfoContainer>
-					<HStack>
+					</TitleInfoContainer> */}
+					{/* <HStack>
 						{tabList.map((list, listIndex) => (
 							<TabTouchableOpacity
 								key={listIndex}
@@ -266,8 +450,8 @@ export default function CourseDetail({navigation, route}: any) {
 								</TabText>
 							</TabTouchableOpacity>
 						))}
-					</HStack>
-					<TabScrollView
+					</HStack> */}
+					{/* <TabScrollView
 						horizontal={true}
 						nestedScrollEnabled={true}
 						pagingEnabled
@@ -281,42 +465,6 @@ export default function CourseDetail({navigation, route}: any) {
 						}}
 						showsHorizontalScrollIndicator={false}>
 						<HStack>
-							<ReviewContainer
-								showsVerticalScrollIndicator={false}
-								onScroll={e => {
-									checkGoState(e);
-								}}>
-								{detailList.map(
-									(detail, detailIndex) =>
-										detail.title != null && (
-											<DetailElementContainer
-												key={detailIndex}
-												disabled={detailIndex != 3}
-												onPress={() => {
-													handleCopyClipBoard(detail.title ?? '');
-												}}>
-												<HStack>
-													<LogoContainer>{detail.logo}</LogoContainer>
-													<DetailText>{detail.title}</DetailText>
-												</HStack>
-											</DetailElementContainer>
-										),
-								)}
-								{courseDetail?.openInfo && (
-									<OpenContainer>
-										<HStack>
-											<LogoContainer>
-												<SvgInfos color={colors.regionNormal} />
-											</LogoContainer>
-											<OpenVStack>
-												{courseDetail?.openInfo.map((item, itemIndex) => (
-													<DetailText key={itemIndex}>{item}</DetailText>
-												))}
-											</OpenVStack>
-										</HStack>
-									</OpenContainer>
-								)}
-							</ReviewContainer>
 							<ReviewContainer showsVerticalScrollIndicator={false} onScroll={e => checkGoState(e)}>
 								{courseDetail?.review.length != 0 ? (
 									courseDetail.review.map((item, idx) => (
@@ -349,8 +497,7 @@ export default function CourseDetail({navigation, route}: any) {
 							</ReviewContainer>
 						</HStack>
 
-						{/* )} */}
-					</TabScrollView>
+					</TabScrollView> */}
 					{courseDetail?.photo && (
 						<ImageView
 							images={courseDetail?.photo.map((value, index) => ({
@@ -375,7 +522,7 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
-				{tabView == 0 && route.params.value.mainFlag && (
+				{/* {tabView == 0 && route.params.value.mainFlag && (
 					<GoRecommendButton onPress={goIncludeRecommend} state={goState}>
 						<ButtonHStack>
 							<ButtonText>{goState ? '추가' : '이 관광지를 추가하여 코스 추천받기'}</ButtonText>
@@ -390,11 +537,22 @@ export default function CourseDetail({navigation, route}: any) {
 							<SvgRight color={colors.selectButton} />
 						</ButtonHStack>
 					</GoRecommendButton>
-				)}
+				)} */}
 			</>
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
+
+const ReviewButton = styled.Pressable`
+	flex-direction: row;
+	gap: ${widthPercentage(5)}px;
+	align-items: center;
+	justify-content: center;
+`;
+const InfoContainer = styled.Pressable`
+	width: 100%;
+	margin-bottom: ${heightPercentage(15)}px;
+`;
 const NullContainer = styled(Center)`
 	flex: 1;
 `;
@@ -473,7 +631,7 @@ const DetailText = styled.Text`
 	width: 80%;
 `;
 const LogoContainer = styled.View`
-	width: 20%;
+	width: ${widthPercentage(30)}px;
 `;
 
 const OpenContainer = styled(HStack)`

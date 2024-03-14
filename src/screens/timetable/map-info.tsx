@@ -6,9 +6,20 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
-import {MainContainer, VStack} from '../../utill/layout/layout';
-import {PresetButton} from './preset';
+import {
+	FlexWrap,
+	HStack,
+	MainContainer,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	TagContainer,
+	VStack,
+} from '../../utill/layout/layout';
+import {DashLine, DashLineContainer, PresetButton} from './preset';
 import {SvgApple, SvgPlace} from '../../utill/svg/svg';
+import {DayTouchablOpacity} from './preset-detail';
+import {WhiteContainer} from '../enroll-info/final-check';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function MapInfo({navigation, route}: any) {
 	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
@@ -168,76 +179,140 @@ export default function MapInfo({navigation, route}: any) {
 							</MapView>
 						),
 				)}
-
-				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-					{timetable.map(
-						(item, idx) =>
-							item.length != 0 && (
-								<DayButton
-									key={idx}
-									select={idx === select}
-									onPress={() => {
-										console.log(deltaLatitude, deltaLongitude), change(idx);
-									}}>
-									<DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-									<DaySubTitle select={idx === select}>
-										{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-									</DaySubTitle>
-								</DayButton>
-							),
-					)}
-				</DayContainer>
-				<DayScrollView>
-					{timetable[select].map((value, index) => {
-						if (!excludeNames.includes(value.name)) {
-							return (
-								<DaysContainer key={index}>
-									<DayElementContainer>
-										<PlaceContainer
+				<BackgroundGray>
+					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						<FlexWrap gap={10}>
+							{timetable.map(
+								(item, idx) =>
+									item.length != 0 && (
+										<DayTouchablOpacity
+											key={idx}
+											select={idx === select}
 											onPress={() => {
-												moveRegion(index);
+												change(idx);
 											}}>
-											<VStack>
-												<PlaceText>{categoryTitle[value.category]}</PlaceText>
-												<DayTimeText>
-													{Math.floor((value.y * 30 + 360) / 60)}:
-													{String((value.y * 30 + 360) % 60).padStart(2, '0')}~
-													{Math.floor(((value.y + value.takenTime / 30) * 30 + 360) / 60)}:
-													{String(
-														((value.y + value.takenTime / 30) * 30 + 360) % 60,
-													).padStart(2, '0')}
-												</DayTimeText>
-											</VStack>
-											<PlaceText>{value.name}</PlaceText>
-										</PlaceContainer>
-									</DayElementContainer>
-									<DayElementContainer>
-										{value.id != noMove[noMove.length - 1].id && (
-											<MoveContainer
-												onPress={() => {
-													goNavigation(index);
-												}}>
-												<PlaceText>이동</PlaceText>
-												<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
-											</MoveContainer>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={19}
+												color={select == idx ? colors.Gray5 : colors.Gray3}>
+												{'DAY' + (idx + 1)}
+											</PretendardSemiBoldText>
+											{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
+										<DaySubTitle select={idx === select}>
+											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+										</DaySubTitle> */}
+										</DayTouchablOpacity>
+									),
+							)}
+						</FlexWrap>
+					</DayContainer>
+					<DayScrollView>
+						{timetable.map(
+							(value, index) =>
+								value.length != 0 && (
+									<WhiteContainer width={widthPercentage(327)} key={index}>
+										<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.Gray5}>
+											{moment(day[index]).format('YY.MM.DD')} (
+											{weekdays[moment(day[index]).day()]})
+										</PretendardSemiBoldText>
+										{value.map(
+											(item, idx) =>
+												!excludeNames.includes(item.name) && (
+													<HStack gap={widthPercentage(10)} key={idx}>
+														<DashLineContainer>
+															<DashLine status='center'></DashLine>
+														</DashLineContainer>
+														<InsideGrayContainer>
+															<HStack>
+																<VStack>
+																	<PretendardVariableText
+																		size={12}
+																		lineHeight={18}
+																		color={colors.Gray2}>
+																		{categoryTitle[item.category]}
+																		{Math.floor((item.y ?? 0 * 30 + 360) / 60)}:
+																		{String((item.y ?? 0 * 30 + 360) % 60).padStart(
+																			2,
+																			'0',
+																		)}
+																		~
+																		{Math.floor(
+																			((item.y ?? 0 + item.takenTime / 30) * 30 +
+																				360) /
+																				60,
+																		)}
+																		:
+																		{String(
+																			((item.y ?? 0 + item.takenTime / 30) * 30 +
+																				360) %
+																				60,
+																		).padStart(2, '0')}
+																	</PretendardVariableText>
+																	<PretendardSemiBoldText
+																		size={14}
+																		lineHeight={18.9}
+																		color={colors.Gray5}>
+																		{item.name}
+																	</PretendardSemiBoldText>
+																</VStack>
+															</HStack>
+														</InsideGrayContainer>
+													</HStack>
+												),
 										)}
-									</DayElementContainer>
-								</DaysContainer>
-							);
-						} else {
-							return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
-						}
-					})}
-				</DayScrollView>
+									</WhiteContainer>
+								),
+						)}
+						{/* {timetable[select].map((value, index) => {
+							if (!excludeNames.includes(value.name)) {
+								return (
+									<DaysContainer key={index}>
+										<DayElementContainer>
+											<PlaceContainer
+												onPress={() => {
+													moveRegion(index);
+												}}>
+												<VStack>
+													<PlaceText>{categoryTitle[value.category]}</PlaceText>
+													<DayTimeText>
+														{Math.floor((value.y * 30 + 360) / 60)}:
+														{String((value.y * 30 + 360) % 60).padStart(2, '0')}~
+														{Math.floor(((value.y + value.takenTime / 30) * 30 + 360) / 60)}
+														:
+														{String(
+															((value.y + value.takenTime / 30) * 30 + 360) % 60,
+														).padStart(2, '0')}
+													</DayTimeText>
+												</VStack>
+												<PlaceText>{value.name}</PlaceText>
+											</PlaceContainer>
+										</DayElementContainer>
+										<DayElementContainer>
+											{value.id != noMove[noMove.length - 1].id && (
+												<MoveContainer
+													onPress={() => {
+														goNavigation(index);
+													}}>
+													<PlaceText>이동</PlaceText>
+													<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
+												</MoveContainer>
+											)}
+										</DayElementContainer>
+									</DaysContainer>
+								);
+							} else {
+								return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
+							}
+						})} */}
+					</DayScrollView>
+				</BackgroundGray>
 			</VStack>
 		</MainAllContainer>
 	);
 }
 
 const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-export const DayContainer = styled.ScrollView`
-	height: 80px;
-`;
+export const DayContainer = styled.ScrollView``;
 const PlaceText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
@@ -273,7 +348,8 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 `;
 
 const DayScrollView = styled.ScrollView`
-	height: 40%;
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(400)}px;
 `;
 
 const MoveContainer = styled.TouchableOpacity`
@@ -299,4 +375,19 @@ export const MarkerText = styled.Text`
 	z-index: 1;
 	left: 20px;
 	bottom: 10px;
+`;
+
+const BackgroundGray = styled.View`
+	width: ${widthPercentage(375)}px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	background-color: ${colors.backgroundGray};
+	top: -10px;
+	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
+`;
+const InsideGrayContainer = styled.View`
+	width: ${widthPercentage(282)}px;
+	height: ${heightPercentage(66)}px;
+	border-radius: 8px;
+	background-color: ${colors.backgroundGray};
 `;

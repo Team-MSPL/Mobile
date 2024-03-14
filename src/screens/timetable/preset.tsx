@@ -144,11 +144,12 @@ export default function Preset({navigation}: any) {
 								{item.map((value, index) =>
 									value.map((target, targetIndex) => {
 										if (
-											(index == 0 && targetIndex == 0) ||
-											index % value.length == targetIndex ||
-											(target.category == 4 && targetIndex != 0) ||
-											target.category == 5 ||
-											(index == item.length - 1 && targetIndex == value.length - 1)
+											targetIndex == 0
+											// (index == 0 && targetIndex == 0) ||
+											// index % value.length == targetIndex ||
+											// (target.category == 4 && targetIndex != 0) ||
+											// target.category == 5 ||
+											// (index == item.length - 1 && targetIndex == value.length - 1)
 										) {
 											return (
 												<HStack gap={widthPercentage(10)} key={targetIndex}>
@@ -166,10 +167,15 @@ export default function Preset({navigation}: any) {
 														)}
 														<DashLine
 															status={
+																// index == 0 && targetIndex == 0
+																// 	? 'start'
+																// 	: index == item.length - 1 &&
+																// 	  targetIndex == value.length - 1
+																// 	? 'end'
+																// 	: 'center'
 																index == 0 && targetIndex == 0
 																	? 'start'
-																	: index == item.length - 1 &&
-																	  targetIndex == value.length - 1
+																	: index == item.length - 1
 																	? 'end'
 																	: 'center'
 															}
@@ -182,6 +188,12 @@ export default function Preset({navigation}: any) {
 															target.category == 5 ? colors.PointYellow : colors.Gray5
 														}>
 														{target.name}
+													</PretendardVariableText>
+													<PretendardVariableText
+														size={16}
+														lineHeight={16}
+														color={colors.Primary}>
+														+{value.length - 1}
 													</PretendardVariableText>
 													<PretendardVariableText
 														size={14}

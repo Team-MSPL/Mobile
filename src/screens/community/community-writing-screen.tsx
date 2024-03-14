@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, SafeAreaView} from 'react-native';
+import {SafeAreaView} from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
@@ -10,13 +10,11 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
-import CustomButton from '../../utill/component/custom-button';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
 import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {ButtonContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
@@ -151,7 +149,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					onChangeText={changeTitle}
 					multiline={true}
 				/>
-
 				<ContentInput
 					placeholder={`내용을 입력하세요\n 부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.`}
 					placeholderTextColor={colors.Gray2}
@@ -160,7 +157,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					multiline={true}
 				/>
 				{postData.postImage.length > 0 && (
-					<ImageContainer horizontal={true}>
+					<ImageScrollViewContainer horizontal={true}>
 						{postData.postImage.map((uri, index) => {
 							return (
 								<PictureElementContainer
@@ -214,13 +211,8 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 								);
 							}}
 						/>
-					</ImageContainer>
+					</ImageScrollViewContainer>
 				)}
-				{/* <CustomButton
-					label='게시'
-					onPress={handlePostSubmit}
-					width={100}
-					isDisabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}></CustomButton> */}
 			</CommunityWritingContainer>
 			<CammeraContainer onPress={handleImage}>
 				<SVGCamera width={widthPercentage(24)} height={widthPercentage(24)} color='black' />
@@ -228,7 +220,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		</SafeAreaView>
 	);
 }
-const CammeraContainer = styled.TouchableOpacity`
+export const CammeraContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(48)}px;
 	justify-content: center;
@@ -258,12 +250,6 @@ const CommunityWritingContainer = styled.ScrollView`
 	margin-bottom: ${heightPercentage(48)}px;
 `;
 
-const CommunityWritingTitleText = styled.Text`
-	font-weight: bold;
-	font-size: 20px;
-	margin-bottom: 16px;
-	color: black;
-`;
 const TitleInput = styled.TextInput`
 	border-bottom-width: 1px;
 	border-color: ${colors.Gray2};
@@ -281,15 +267,11 @@ const ContentInput = styled.TextInput`
 	font-weight: 700;
 	height: ${heightPercentage(500)}px;
 `;
-const ImageContainer = styled.ScrollView`
+export const ImageScrollViewContainer = styled.ScrollView`
 	background-color: ${colors.backgroundGray};
 	gap: ${widthPercentage(20)}px;
 `;
 const ImageInputButtonText = styled.Text`
 	font-size: 16px;
 	color: ${colors.selectButton};
-`;
-const ImageInputButtonIcon = styled(AntDesignIcon)`
-	font-size: 24px;
-	color: ${colors.border};
 `;

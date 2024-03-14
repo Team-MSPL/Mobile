@@ -71,7 +71,7 @@ const ButtonContainer = styled.View`
 	flex: 1;
 	justify-content: flex-end;
 `;
-const ThumbInside = styled.View`
+export const ThumbInside = styled.View`
 	width: ${widthPercentage(15.53)}px;
 	height: ${widthPercentage(15.53)}px;
 	background-color: ${colors.Blue3};
@@ -79,7 +79,7 @@ const ThumbInside = styled.View`
 	border-color: ${colors.backgroundWhite};
 	border-radius: 99px;
 `;
-const Thumb = styled.View`
+export const Thumb = styled.View`
 	width: ${widthPercentage(24)}px;
 	height: ${widthPercentage(24)}px;
 	background-color: rgba(132, 255, 3, 0.3);
@@ -87,7 +87,7 @@ const Thumb = styled.View`
 	border-radius: 99px;
 	justify-content: center;
 `;
-const SelectRail = styled.View`
+export const SelectRail = styled.View`
 	height: ${heightPercentage(10)}px;
 	background-color: ${colors.Blue3};
 	border-radius: 6px;
@@ -98,7 +98,7 @@ const BarContainer = styled.View`
 	border-radius: 6px;
 	margin-vertical: ${heightPercentage(30)}px;
 `;
-const Rail = styled.View`
+export const Rail = styled.View`
 	width: 100%;
 	height: ${heightPercentage(10)}px;
 	background-color: ${colors.Gray1};

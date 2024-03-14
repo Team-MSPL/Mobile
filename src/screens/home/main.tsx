@@ -26,6 +26,7 @@ import {cityViewList} from '../enroll-info/select-city';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
+import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice';
 
 export default function Main({navigation}: any) {
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
@@ -120,6 +121,10 @@ export default function Main({navigation}: any) {
 		checkEvent();
 	}, [signUpReward]);
 	useBackHandler({type: 'exit'});
+	const goHiking = () => {
+		dispatch(hikingRecommendSliceActions.reset());
+		navigation.navigate('HikingSelectPlay');
+	};
 	const buttonList: ButtonListType[] = [
 		{
 			id: 1,
@@ -132,6 +137,12 @@ export default function Main({navigation}: any) {
 			onPress: goEnroll,
 			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
 			text: '여행 일정 ',
+		},
+		{
+			id: 3,
+			onPress: goHiking,
+			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
+			text: '탐방 추천',
 		},
 	];
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];

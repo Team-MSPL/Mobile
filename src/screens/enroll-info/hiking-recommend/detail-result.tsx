@@ -12,7 +12,7 @@ import {ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
-export default function DetailResult({navigation, route}: any) {
+export default function HikingDetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
@@ -74,7 +74,7 @@ export default function DetailResult({navigation, route}: any) {
 	return (
 		<>
 			<MainContainer>
-				<RecommendMainContainer
+				{/* <RecommendMainContainer
 					onPress={() => {
 						setVisible(true);
 					}}>
@@ -85,7 +85,7 @@ export default function DetailResult({navigation, route}: any) {
 							<SvgLoginLogo color={'white'} width={40} />
 						</LogoCOntainer>
 					)}
-				</RecommendMainContainer>
+				</RecommendMainContainer> */}
 				<RecommendBorderContainer>
 					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Gray5}>
 						{route.params.item.name}
@@ -110,7 +110,7 @@ export default function DetailResult({navigation, route}: any) {
 						))}
 					</TagContainer>
 
-					<StepText
+					{/* <StepText
 						mainText='인기 관광지 Top 5'
 						subText='해당 지역의 인기 관광지를 확인하세요'
 						mainTextSize={fontPercentage(18)}
@@ -145,7 +145,7 @@ export default function DetailResult({navigation, route}: any) {
 								</PopularityInfoTitleTextContainer>
 							</PopularityContainer>
 						))}
-					</RecommendAllContainer>
+					</RecommendAllContainer> */}
 				</RecommendBorderContainer>
 			</MainContainer>
 			<CustomButton label='이 지역의 여행코스 추천받기' onPress={goEnrollInfo}></CustomButton>

@@ -11,11 +11,12 @@ export const HStack = styled.View<{
 	width?: number;
 	marginVertical?: number;
 	marginHorizon?: number;
+	alignItems?: string;
 }>`
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: row;
-	align-items: center;
+	align-items: ${props => props.alignItems ?? 'center'};
 	justify-content: ${props => props.justifyContent ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
@@ -36,8 +37,8 @@ export const FlexWrap = styled.View<{gap?: number; marginBottom?: number}>`
 	gap: ${props => props.gap ?? 0}px;
 `;
 
-export const Divider = styled.View<{color?: string; height: number}>`
-	width: 100%;
+export const Divider = styled.View<{width?: number; color?: string; height: number}>`
+	width: ${props => props.width + 'px' ?? '100%'};
 	height: ${props => props.height ?? 2}px;
 	background-color: ${props => props.color ?? 'black'};
 	margin: 10px 0px 10px 0px;
