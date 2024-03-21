@@ -292,6 +292,7 @@ export const savePlaceReview = createAsyncThunk(
 		{rejectWithValue},
 	) => {
 		try {
+			console.log(data);
 			const response = await axiosAuth.patch(`/place/savePlaceReview`, data);
 			return response.data;
 		} catch (error: any) {
@@ -889,6 +890,7 @@ interface InfoReviewType {
 	content: string;
 	rating: number | null;
 	reviewUserToken: string | null;
-	reviewPhotoList: string | null;
+	reviewPhotoList: string[] | null;
 	reviewId: string | null;
+	reviewerProfileImage: string;
 }

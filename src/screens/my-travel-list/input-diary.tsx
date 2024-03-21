@@ -8,8 +8,8 @@ import {updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
-import {VStack} from '../../utill/layout/layout';
+import {SVGPencil, SvgCancel, SvgPicture} from '../../utill/svg/svg';
+import {PretendardVariableText, VStack} from '../../utill/layout/layout';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
@@ -17,6 +17,7 @@ import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import ImageView from 'react-native-image-viewing';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function InputDiary({navigation}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -37,6 +38,8 @@ export default function InputDiary({navigation}: any) {
 					modalSliceActions.setOpenModal({
 						modalTitle: '저장이 필요합니다. ',
 						modalSubTitle: '변경사항이 저장되지않았습니다. 나가시겠습니까?',
+						modalTopText: '나가기',
+						modalBottomText: '수정계속하기',
 						modalLeft: true,
 						modalFunction: () => {
 							navigation.goBack();
@@ -101,6 +104,9 @@ export default function InputDiary({navigation}: any) {
 	};
 	return (
 		<>
+			<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
+				여행 일기
+			</PretendardVariableText>
 			<PictureCotainer>
 				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
 					<PictureElementContainer onPress={handelGetImage}>
@@ -126,7 +132,9 @@ export default function InputDiary({navigation}: any) {
 					))}
 				</PictureScroll>
 			</PictureCotainer>
-			<DiaryText>이번 여행은 어떠셨나요?</DiaryText>
+			<PretendardVariableText size={16} lineHeight={19.09} color={colors.Black}>
+				일기
+			</PretendardVariableText>
 			<DiaryTextInput
 				value={diaryValue}
 				multiline={true}
@@ -152,14 +160,25 @@ export default function InputDiary({navigation}: any) {
 					);
 				}}
 			/>
-			<CustomButton
-				width={40}
-				label={diary == '' ? '일기 & 사진 저장' : '일기 & 사진 수정'}
-				onPress={goSaveDiary}></CustomButton>
+			<TestButton onPress={goSaveDiary}>
+				<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+					{diary == '' ? '일기 & 사진 저장' : '일기 & 사진 수정'}
+				</PretendardVariableText>
+			</TestButton>
 		</>
 	);
 }
 
+const TestButton = styled.TouchableOpacity`
+	width: ${widthPercentage(120)}px;
+	height: ${heightPercentage(40)}px;
+	border-radius: 12px;
+	background-color: ${colors.Primary};
+	align-items: center;
+	justify-content: center;
+	align-self: center;
+	margin-top: ${widthPercentage(10)}px;
+`;
 export const CancelContainer = styled.TouchableOpacity`
 	border-radius: 99px;
 	padding: 10px;
@@ -176,10 +195,9 @@ const DiaryText = styled.Text`
 `;
 export const DiaryTextInput = styled.TextInput`
 	width: 100%;
-	height: 150px;
-	border-width: 1px;
+	height: ${heightPercentage(120)}px;
+	background-color: ${colors.Gray1};
 	border-radius: 10px;
-	border-color: ${colors.selectButton};
 	margin: 10px 0px 0px 0px;
 	text-align-vertical: top;
 	padding: 10px;
@@ -195,8 +213,8 @@ const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
 export const PictureElementContainer = styled.Pressable`
-	width: 135px;
-	height: 180px;
+	width: ${widthPercentage(150)}px;
+	height: ${widthPercentage(150)}px;
 	border-radius: 10px;
 	border-width: 1px;
 	border-color: ${colors.selectButton};

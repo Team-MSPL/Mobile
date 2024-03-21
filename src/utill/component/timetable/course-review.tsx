@@ -34,7 +34,7 @@ export function CourseReview({navigation, route}: any) {
 					onPress={handleSavePlaceReview}></PrimaryButton>
 			),
 		});
-	}, []);
+	}, [reviewData, reviewImage]);
 	const {uploadImage} = useFirebaseStorage();
 	const dispatch = useAppDispatch();
 	const changeText = (e: string) => {
@@ -53,6 +53,7 @@ export function CourseReview({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const randomId = shortId.generate();
 			// id 체크해서 변경 후에 파이어베이스 업로드 확인하기
+			console.log(randomId);
 			diaryImageRef.current = [];
 			const ImageFunction = reviewImage.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: randomId, category: 'review'})) ?? '';
@@ -97,7 +98,7 @@ export function CourseReview({navigation, route}: any) {
 					onChangeText={e => changeText(e)}
 					placeholder='방문했던 곳에 대해 이야기해주세요.'
 					multiline={true}
-					placeholderTextColor={'grey'}
+					placeholderTextColor={colors.Gray2}
 					value={reviewData}></ReviewInput>
 			</ReviewPressable>
 			{reviewImage.length > 0 && (

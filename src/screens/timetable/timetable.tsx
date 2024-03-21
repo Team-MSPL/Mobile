@@ -284,6 +284,7 @@ export default function Timetable({navigation, route}: any) {
 			);
 		}
 	};
+	const [modify, setModify] = useState(false);
 	useEffect(() => {
 		shareLoginFlag && isLogin && addSharedList();
 	}, [isLogin]);
@@ -351,9 +352,12 @@ export default function Timetable({navigation, route}: any) {
 									)}
 								</>
 							) : (
-								<TouchableOpacity onPress={goMapInfo}>
+								<TouchableOpacity
+									onPress={() => {
+										setModify(!modify);
+									}}>
 									<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-										편집
+										{modify ? '취소' : '편집'}
 									</PretendardVariableText>
 								</TouchableOpacity>
 							)}
@@ -364,7 +368,9 @@ export default function Timetable({navigation, route}: any) {
 			headerLeft: () =>
 				shareViewWithStartFlag && (
 					<TouchableOpacity onPress={goKakaoShare}>
-						<HeaderText>공유</HeaderText>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							공유
+						</PretendardVariableText>
 					</TouchableOpacity>
 				),
 			// makeMode == 'recommend' && (
@@ -402,6 +408,7 @@ export default function Timetable({navigation, route}: any) {
 		shareViewWithStartFlag,
 		shareLoginFlag,
 		modifyView,
+		modify,
 	]);
 	const goScrollRef = useRef({now: 0, content: 0, layout: 0, wantGoing: 0});
 	const goScroll = async (value: {data: number; up: boolean}) => {
@@ -493,7 +500,7 @@ export default function Timetable({navigation, route}: any) {
 			</Modal>
 		</TimeTableContainer>
 	) : (
-		<MapInfo navigation={navigation}></MapInfo>
+		<MapInfo navigation={navigation} modify={modify}></MapInfo>
 	);
 }
 

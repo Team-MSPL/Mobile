@@ -46,6 +46,7 @@ export default function Preset({navigation}: any) {
 					}}
 					style={{justifyContent: 'center'}}>
 					<Image
+						resizeMode='contain'
 						source={require('../../../public/images/danim_logo_row.png')}
 						style={{height: 30, aspectRatio: 2.054}}
 					/>
@@ -220,11 +221,12 @@ export default function Preset({navigation}: any) {
 		</BackgroundGray>
 	);
 }
-export const DashLineContainer = styled.View`
+export const DashLineContainer = styled.View<{justifyContent?: string}>`
 	width: ${widthPercentage(20)}px;
 	min-height: ${heightPercentage(46)}px;
-	justify-content: center;
+	justify-content: ${props => props.justifyContent ?? 'center'};
 	align-items: center;
+	height: 100%;
 `;
 export const Circle = styled.View<{color: string}>`
 	width: ${widthPercentage(10)}px;

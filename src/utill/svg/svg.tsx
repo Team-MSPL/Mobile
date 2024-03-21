@@ -49,6 +49,8 @@ import Heart from '../../../public/heart.svg';
 import MessageSquare from '../../../public/message-square.svg';
 import Pencil from '../../../public/pencil.svg';
 import ReviewPencil from '../../../public/review-pencil.svg';
+import Maps from '../../../public/maps.svg';
+import TravlePencil from '../../../public/travlePenceil.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -198,5 +200,11 @@ export const SVGPencil = styled(Pencil)<{color?: string}>`
 	color: color;
 `;
 export const SVGReviewPencil = styled(ReviewPencil)<{color?: string}>`
+	color: color;
+`;
+export const SVGMaps = styled(Maps)<{color?: string}>`
+	color: color;
+`;
+export const SVGTravlePencil = styled(TravlePencil)<{color?: string}>`
 	color: color;
 `;

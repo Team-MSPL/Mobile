@@ -15,6 +15,8 @@ import {colors} from '../../colors';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
+import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariableText} from '../../layout/layout';
+import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 function CommunityMain({
 	navigation,
 	setViewState,
@@ -110,24 +112,44 @@ function CommunityMain({
 				<PostItemContainer>
 					<PostWriterInfoContainer>
 						<PostWriterProfileImage source={{uri: data.item.postWriterProfileImage}} resizeMode='contain' />
-						<PostWriterText>{data.item.postWriter}</PostWriterText>
+						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+							{data.item.postWriter}
+						</PretendardSemiBoldText>
 					</PostWriterInfoContainer>
-					<PostTitleText numberOfLines={1} ellipsizeMode='tail'>
+					<PretendardBoldText size={14} lineHeight={16.71} color={colors.Black}>
 						{data.item.postTitle}
-					</PostTitleText>
-					<PostDetailInfoContainer>
-						<HeartIcon size={12} name={'hearto'} />
-						<LikeNumText>{data.item.likerLength}</LikeNumText>
-						<CommentIcon size={12} name={'message1'} />
-						<CommentNumText>{data.item.commentLength}</CommentNumText>
-						{data.item.ImageLength != 0 && (
-							<>
-								<ImageIcon size={12} name={'picture'} />
-								<CommentNumText>{data.item.ImageLength}</CommentNumText>
-							</>
-						)}
-						<PostDetailInfoText>{data.item.postedAt.slice(0, 10)}</PostDetailInfoText>
-					</PostDetailInfoContainer>
+					</PretendardBoldText>
+					<PretendardVariableText
+						size={14}
+						lineHeight={21}
+						color={colors.Gray4}
+						numberOfLines={2}
+						ellipsizeMode='tail'>
+						{data.item.postContent}
+					</PretendardVariableText>
+					<HStack gap={7} justifyContent='flex-end'>
+						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
+							{data.item.postedAt.slice(0, 10)}
+						</PretendardVariableText>
+						<HStack>
+							<HeartIcon size={12} name={'hearto'} />
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
+								{data.item.likerLength}
+							</PretendardVariableText>
+						</HStack>
+						<HStack>
+							<CommentIcon size={12} name={'message1'} />
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
+								{data.item.commentLength}
+							</PretendardVariableText>
+							{data.item.ImageLength != 0 && (
+								<>
+									<ImageIcon size={12} name={'picture'} />
+									<CommentNumText>{data.item.ImageLength}</CommentNumText>
+								</>
+							)}
+						</HStack>
+					</HStack>
 				</PostItemContainer>
 			</TouchableOpacity>
 		);
@@ -186,18 +208,16 @@ export const MenuIcon = styled(FeatherIcon)`
 	color: ${colors.selectButton};
 `;
 const PostItemContainer = styled.View`
-	align-items: 'flex-start';
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
-	background-color: ${colors.main};
+	gap: ${widthPercentage(5)}px;
+	padding: ${heightPercentage(10)}px ${widthPercentage(24)}px;
 `;
 const PostWriterInfoContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 `;
 const PostWriterProfileImage = styled.Image`
-	width: 16px;
-	height: 16px;
+	width: ${widthPercentage(32)}px;
+	height: ${widthPercentage(32)}px;
 	border-radius: 8px;
 	margin-right: 8px;
 `;

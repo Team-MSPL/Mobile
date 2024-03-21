@@ -24,4 +24,5 @@ export const colors = {
 	PointGreen3: '#E8F9D7',
 	Blue2: '#DBF3C9',
 	Blue3: '#84FF03',
+	Blue4: '#DDF2FE',
 };

@@ -10,7 +10,7 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
@@ -19,6 +19,7 @@ import {colors} from '../../utill/colors';
 import {SVGCoin, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {useFocusEffect} from '@react-navigation/native';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const {purchaseItems, requestItemPurchase} = useShopping();
@@ -37,9 +38,11 @@ export default function Payment({navigation}: any) {
 		setWatchAD(data.watchADTime);
 	};
 
-	useLayoutEffect(() => {
-		getWatchData();
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			getWatchData();
+		}, []),
+	);
 	useEffect(() => {
 		// 광고 생성
 		const rewarded = RewardedAd.createForAdRequest(adUnitId, {
@@ -59,6 +62,7 @@ export default function Payment({navigation}: any) {
 			rewarded.removeAllListeners();
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
+			console.log('dddddd', watchAD, watchAD + 1);
 			dispatch(setWatchADTime({watchADTime: watchAD + 1}));
 			navigation.goBack();
 		});
@@ -69,7 +73,7 @@ export default function Payment({navigation}: any) {
 			unsubscribeLoaded();
 			unsubscribeEarned();
 		};
-	}, []);
+	}, [watchAD]);
 	const openAd = () => {
 		if (rewardedRef.current !== null) {
 			rewardedRef?.current?.loaded

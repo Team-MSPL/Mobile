@@ -452,7 +452,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						placeholder='댓글을 입력하세요...'
 					/>
 					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
-						<SVGPencil />
+						<SVGPencil color='#70768E' />
 					</ClearContainer>
 				</CommentTextInputContainer>
 			</CommentInputContainer>

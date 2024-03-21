@@ -23,16 +23,7 @@ import {
 	devicesWidth,
 } from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {
-	SVGPencil,
-	SVGReviewPencil,
-	SvgCalendar,
-	SvgCall,
-	SvgInfos,
-	SvgLocation,
-	SvgRight,
-	SvgStart,
-} from '../../utill/svg/svg';
+import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgRight, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import {ButtonHStack, GoRecommendButton, RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
@@ -43,6 +34,10 @@ import {useFocusEffect} from '@react-navigation/native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {WhiteContainer} from '../enroll-info/final-check';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
+import CustomButton from '../../utill/component/custom-button';
+import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice';
+import {ButtonContainer} from '../enroll-info/select-multi';
+import PrimaryButton from '../../utill/component/primary-button';
 export default function CourseDetail({navigation, route}: any) {
 	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
@@ -79,6 +74,7 @@ export default function CourseDetail({navigation, route}: any) {
 						reviewUserToken: item.reviewUserToken,
 						reviewPhotoList: item.reviewPhotoList,
 						reviewId: item.reviewId,
+						reviewerProfileImage: item.reviewerProfileImage,
 					})),
 					rating: null,
 					address: null,
@@ -100,6 +96,7 @@ export default function CourseDetail({navigation, route}: any) {
 						reviewUserToken: null,
 						reviewPhotoList: null,
 						reviewId: null,
+						reviewerProfileImage: null,
 					})),
 					expense: null,
 					rating: data?.rating,
@@ -135,7 +132,6 @@ export default function CourseDetail({navigation, route}: any) {
 	const {firebaseImageRemove} = useFirebaseStorage();
 	const deleteReview = async (e: any) => {
 		try {
-			//TODO api 수정 되면 파이어베이스에서 사진 삭제하는거 추가하기
 			let data = {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				name: route.params.value.name,
@@ -144,7 +140,8 @@ export default function CourseDetail({navigation, route}: any) {
 				reviewPhotoList: e.reviewPhotoList,
 				reviewId: e.reviewId,
 			};
-			//await firebaseImageRemove({pictureList: e.reviewPhotoList, id:e.reviewId, category: 'review'});
+			e.reviewPhotoList.length != 0 &&
+				(await firebaseImageRemove({pictureList: e.reviewPhotoList, id: e.reviewId, category: 'review'}));
 			await dispatch(deletePlaceReview(data));
 		} catch {
 			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
@@ -154,6 +151,8 @@ export default function CourseDetail({navigation, route}: any) {
 					modalTitle: '삭제완료',
 					modalSubTitle: '리뷰가 삭제되었습니다.',
 					modalFunction: getDetail,
+					modalBottomFunctionUse: true,
+					modalBottomFinction: getDetail,
 				}),
 			);
 		}
@@ -163,6 +162,18 @@ export default function CourseDetail({navigation, route}: any) {
 			getDetail();
 		}, []),
 	);
+	useEffect(() => {
+		route.params.value.name == '소백산국립공원(경북)' &&
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '소백산',
+					modalSubTitle: '소백산은 탐방 코스를 추천받을수도있어요!',
+					modalFunction: goHiking,
+					modalTopText: '추천받기',
+					modalBottomText: '둘러보기',
+				}),
+			);
+	}, []);
 	const tabBarRef = useRef();
 	const [tabView, setTabView] = useState(0);
 	const changeTab = (e: any) => {
@@ -247,6 +258,10 @@ export default function CourseDetail({navigation, route}: any) {
 			},
 		});
 	};
+	const goHiking = () => {
+		dispatch(hikingRecommendSliceActions.reset());
+		navigation.navigate('HikingSelectPlay');
+	};
 	if (courseDetail?.name)
 		return (
 			<>
@@ -276,6 +291,16 @@ export default function CourseDetail({navigation, route}: any) {
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
 						<ScrollView>
+							{route.params.value.name == '소백산국립공원(경북)' && (
+								<PrimaryButton
+									marginBottom={heightPercentage(10)}
+									width={widthPercentage(200)}
+									height={heightPercentage(37)}
+									label='탐방 코스 추천받기'
+									onPress={goHiking}
+									backgroundColor={colors.Primary}
+									textColor={colors.Gray5}></PrimaryButton>
+							)}
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
 									{courseDetail.name}
@@ -374,26 +399,61 @@ export default function CourseDetail({navigation, route}: any) {
 								</HStack>
 							</HStack>
 							{courseDetail.review.map((item, idx) => (
-								<OpenContainer key={idx}>
-									<OpenVStack>
-										<ReviewTitleText>{item.name}</ReviewTitleText>
-										<ReviewElementText>{item.content}</ReviewElementText>
-									</OpenVStack>
-									{item.rating && (
-										<ReviewRating>
-											<SvgStart color={colors.selectButton} width={18} height={18} />
-											<ReviewText>{item.rating}</ReviewText>
-										</ReviewRating>
+								<ReviewContainer key={idx}>
+									<HStack justifyContent='space-between'>
+										<HStack>
+											<ReviewerProfileImage
+												source={{uri: item.reviewerProfileImage}}></ReviewerProfileImage>
+
+											<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray5}>
+												{item.name}
+											</PretendardSemiBoldText>
+										</HStack>
+										{item.rating && (
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={21}
+												color={colors.PointGreen1}>
+												{item.rating}
+											</PretendardSemiBoldText>
+										)}
+										{item.reviewUserToken == userIdToken && (
+											<Pressable
+												onPress={() => {
+													deleteReview(item);
+												}}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={21}
+													color={colors.PointGreen1}>
+													삭제
+												</PretendardSemiBoldText>
+											</Pressable>
+										)}
+									</HStack>
+									{item.reviewPhotoList?.length != 0 && (
+										<ReviewImageScroll horizontal={true} showsHorizontalScrollIndicator={false}>
+											{item.reviewPhotoList?.map((value, idx) => (
+												<ReviewImage
+													source={{uri: value}}
+													key={idx}
+													width={
+														item.reviewPhotoList?.length == 1
+															? 327
+															: item.reviewPhotoList?.length == 2
+															? 159.5
+															: 141
+													}></ReviewImage>
+											))}
+										</ReviewImageScroll>
 									)}
-									{item.reviewUserToken == userIdToken && (
-										<DeleteContainer
-											onPress={() => {
-												checkDelete(item);
-											}}>
-											<Icons size={20} name='delete' color={'black'}></Icons>
-										</DeleteContainer>
+									{idx != courseDetail.review.length - 1 && (
+										<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 									)}
-								</OpenContainer>
+									<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+										{item.content}
+									</PretendardVariableText>
+								</ReviewContainer>
 							))}
 							{/* {courseDetail?.review.length != 0 ? (
 								courseDetail.review.map((item, idx) => (
@@ -424,6 +484,11 @@ export default function CourseDetail({navigation, route}: any) {
 								</ReviewCenter>
 							)} */}
 						</ScrollView>
+						<ButtonContainer>
+							<CustomButton
+								label='이 지역의 여행코스 추천받기'
+								onPress={goIncludeRecommend}></CustomButton>
+						</ButtonContainer>
 					</RecommendBorderContainer>
 					{/* <TitleInfoContainer>
 						<DetailInfoContainer>
@@ -522,6 +587,7 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
+
 				{/* {tabView == 0 && route.params.value.mainFlag && (
 					<GoRecommendButton onPress={goIncludeRecommend} state={goState}>
 						<ButtonHStack>
@@ -542,7 +608,27 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
-
+const ReviewImage = styled.Image<{width: number}>`
+	width: ${props => props.width}px;
+	height: ${heightPercentage(120)}px;
+	resize-mode: stretch;
+	margin-right: ${widthPercentage(4)}px;
+	border-radius: 6px;
+`;
+const ReviewImageScroll = styled.ScrollView`
+	height: ${heightPercentage(120)}px;
+`;
+const ReviewContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	gap: ${heightPercentage(5)}px;
+	margin-top: ${heightPercentage(5)}px;
+`;
+const ReviewerProfileImage = styled.Image`
+	width: ${widthPercentage(28)}px;
+	height: ${widthPercentage(28)}px;
+	background-color: ${colors.Primary};
+	border-radius: 4px;
+`;
 const ReviewButton = styled.Pressable`
 	flex-direction: row;
 	gap: ${widthPercentage(5)}px;
@@ -556,22 +642,10 @@ const InfoContainer = styled.Pressable`
 const NullContainer = styled(Center)`
 	flex: 1;
 `;
-const TabScrollView = styled.ScrollView`
-	height: 50%;
-`;
-const TitleInfoContainer = styled.View`
-	background-color: ${colors.main};
-	width: 100%;
-	padding: 2%;
-`;
 
 const DetailContainer = styled.View`
 	background-color: ${colors.main};
 	flex: 1;
-`;
-const DetailInfoContainer = styled(HStack)`
-	justify-content: space-between;
-	width: 100%;
 `;
 export const ImageViewFooterComponent = styled.View`
 	width: 100%;
@@ -581,90 +655,12 @@ export const ImageViewFooterComponent = styled.View`
 const ImageScroll = styled.ScrollView`
 	height: 35%;
 `;
-const RatingContainer = styled(VStack)`
-	padding: 1%;
-	width: 20%;
-	border-radius: 20px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
-`;
-const RatingText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0% 0% 0% 4%;
-`;
-const TitleText = styled.Text`
-	font-size: 25px;
-	font-weight: 900;
-	color: black;
-	width: 80%;
-`;
-const RatinInfoText = styled(RatingText)`
-	font-size: 8px;
-`;
-const RatingHStack = styled(HStack)`
-	justify-content: center;
-`;
-const TabTouchableOpacity = styled.TouchableOpacity<{color: string}>`
-	width: 50%;
-	align-items: center;
-	justify-content: center;
-	border-bottom-width: 2px;
-	border-color: ${props => props.color};
-	padding: 5%;
-`;
-const TabText = styled.Text<{color: string}>`
-	font-size: 17px;
-	font-weight: 700;
-	color: ${props => props.color};
-`;
-const DetailElementContainer = styled.TouchableOpacity`
-	border-bottom-width: 1px;
-	border-bottom-color: ${colors.regionNormal};
-	padding: 5%;
-`;
-const DetailText = styled.Text`
-	font-size: 15px;
-	color: black;
-	margin: 2% 0% 0% 0%;
-	width: 80%;
-`;
 const LogoContainer = styled.View`
 	width: ${widthPercentage(30)}px;
 `;
 
-const OpenContainer = styled(HStack)`
-	align-items: center;
-	justify-content: space-between;
-	border-bottom-width: 1px;
-	border-bottom-color: ${colors.regionNormal};
-	padding: 5%;
-`;
 const OpenVStack = styled.View`
 	width: 80%;
-`;
-const ReviewRating = styled.View`
-	width: 20%;
-	align-items: center;
-	justify-content: center;
-	flex-direction: row;
-`;
-const ReviewText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-
-const ReviewContainer = styled.ScrollView`
-	width: ${devicesWidth}px;
-	align-self: flex-start;
-`;
-const ReviewTitleText = styled.Text`
-	font-size: 20px;
-	font-weight: 900;
-	color: black;
-	margin: 0% 0% 1% 0%;
 `;
 const ReviewElementText = styled.Text`
 	font-size: 16px;
@@ -673,16 +669,4 @@ const ReviewElementText = styled.Text`
 `;
 export const ImageText = styled(ReviewElementText)`
 	color: white;
-`;
-const ReviewCenter = styled(Center)`
-	height: 100px;
-`;
-const DeleteContainer = styled.TouchableOpacity`
-	padding: 2px;
-`;
-const ButtonText = styled.Text`
-	font-size: ${fontPercentage(24)}px;
-	font-weight: 600;
-	color: ${colors.Gray5};
-	margin-top: ${heightPercentage(38)}px;
 `;

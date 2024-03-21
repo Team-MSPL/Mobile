@@ -262,13 +262,13 @@ export const DayTouchablOpacity = styled.TouchableOpacity<{select: boolean}>`
 	border-color: ${colors.Gray3};
 	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
 `;
-const MarkerContainer = styled.View`
+export const MarkerContainer = styled.View<{backgroundColor?: string}>`
 	width: ${widthPercentage(24)}px;
 	height: ${widthPercentage(24)}px;
 	border-radius: 6px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${colors.PointYellow};
+	background-color: ${props => props.backgroundColor ?? colors.PointYellow};
 	z-index: 3;
 `;
 const InsideGray = styled.View`

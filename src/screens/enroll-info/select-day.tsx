@@ -170,7 +170,6 @@ export default function SelectDay({navigation}: any) {
 							{dateFlag.current == idx && (
 								<SelectAbsolute>
 									<UseDatePicker
-										title={dateFlag.current == 0 ? '시작 시간' : '종료 시간'}
 										goConfirm={goConfirm}
 										minuteData={minuteLimitArray[dateFlag.current] / 30}
 										ampmData={timeLimitArray[dateFlag.current] < 12 ? 0 : 1}
@@ -226,7 +225,7 @@ const SelectAbsolute = styled.View`
 	position: absolute;
 	bottom: -${heightPercentage(122)}px;
 `;
-const SelectContainer = styled.Pressable`
+export const SelectContainer = styled.Pressable`
 	width: ${widthPercentage(157)}px;
 	height: ${heightPercentage(40)}px;
 	background-color: ${colors.backgroundWhite};

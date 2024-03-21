@@ -10,7 +10,11 @@ const useFirebaseStorage = () => {
 				.child(`${e.id}/${e.category == 'profile' ? '' : idx}${e.category}.png`)
 				.delete();
 		});
-		await Promise.all(removeData);
+		try {
+			await Promise.all(removeData);
+		} catch (error: any) {
+			throw error;
+		}
 	};
 
 	const uploadImage = async (e: {item: string; idx: number; id: string; category: string}) => {

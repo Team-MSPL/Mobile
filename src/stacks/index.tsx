@@ -18,6 +18,7 @@ import TimetableStack from './timetable-stack';
 import {colors} from '../utill/colors';
 import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
+import {widthPercentage} from '../utill/layout/responsive-size';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -80,6 +81,7 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -96,8 +98,9 @@ function TabBar() {
 				component={MyTravelList}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', paddingLeft: 24}}>
+						<View style={{justifyContent: 'center', marginLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -116,6 +119,7 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -134,6 +138,7 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>

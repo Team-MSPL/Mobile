@@ -160,7 +160,6 @@ export default function Modify({navigation, route}: any) {
 			</MainContainer>
 			<TestContainer>
 				<UseDatePicker
-					title={flag.current == 0 ? '시작 시간' : '종료 시간'}
 					goConfirm={onConfirm}
 					minuteData={flag.current == 0 ? startTime.current.minute / 30 : endTime.current.minute / 30}
 					ampmData={

@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {colors} from '../colors';
-import {PretendardVariable} from '../layout/layout';
+import {PretendardSemiBoldText, PretendardVariable} from '../layout/layout';
 import {fontPercentage, heightPercentage} from '../layout/responsive-size';
 
 export default function PrimaryButton({
@@ -12,6 +12,9 @@ export default function PrimaryButton({
 	onPress,
 	disabled,
 	alignSelf,
+	marginBottom,
+	textSize,
+	lineHeight,
 }: PrimarybuttonType) {
 	return (
 		<PrimaryButtonContainer
@@ -20,8 +23,11 @@ export default function PrimaryButton({
 			height={height}
 			onPress={onPress}
 			backgroundColor={backgroundColor}
+			marginBottom={marginBottom ?? 0}
 			disabled={disabled ?? false}>
-			<InsideText textColor={textColor}>{label}</InsideText>
+			<PretendardSemiBoldText size={textSize ?? 14} lineHeight={lineHeight ?? 21} color={textColor}>
+				{label}
+			</PretendardSemiBoldText>
 		</PrimaryButtonContainer>
 	);
 }
@@ -31,6 +37,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	height: number;
 	backgroundColor: string;
 	alignSelf: string;
+	marginBottom?: number;
 }>`
 	width: ${props => props.width}px;
 	height: ${props => props.height}px;
@@ -39,6 +46,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	justify-content: center;
 	border-radius: 8px;
 	align-self: ${props => props.alignSelf};
+	margin-bottom: ${props => props.marginBottom}px;
 `;
 const InsideText = styled(PretendardVariable)<{
 	textColor: string;
@@ -57,4 +65,7 @@ interface PrimarybuttonType {
 	onPress: () => void;
 	disabled?: boolean;
 	alignSelf?: string;
+	marginBottom?: number;
+	textSize?: number;
+	lineHeight?: number;
 }

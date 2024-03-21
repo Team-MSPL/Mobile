@@ -10,7 +10,21 @@ import {colors} from '../../colors';
 import {useDistance} from '../../hooks/useDistance';
 import {VStack, devicesWidth} from '../../layout/layout';
 import {SvgInfos} from '../../svg/svg';
-const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyState, setModifyRef, setStop}: any) => {
+import PrimaryButton from '../primary-button';
+import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+const InfoView = ({
+	navigation,
+	test,
+	index,
+	idx,
+	modify,
+	viewDayIndex,
+	panHandler,
+	modifyState,
+	setmodifyState,
+	setModifyRef,
+	setStop,
+}: any) => {
 	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
 	const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -197,7 +211,7 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 				onMoveShouldSetPanResponder: () => true,
 				onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {useNativeDriver: false}),
 				onPanResponderRelease: () => {
-					setStop(true);
+					// setStop(true);
 					let moveX = Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18));
 					let moveY = Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20));
 					let afterX = (WINDOW_WIDTH - 24) * 0.18 * moveX;
@@ -265,19 +279,19 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 									let addCopy = [...changeCopy[changeDay]];
 									addCopy.splice(changeInputIndex, 0, copyValue);
 									changeCopy[changeDay] = addCopy;
-									setModifyRef({
-										x: Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18)),
-										y: Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20)),
-										timetable: changeCopy,
-										status: true,
-									});
+									// setModifyRef({
+									// 	x: Math.round(locationRef.current.x / ((WINDOW_WIDTH - 24) * 0.18)),
+									// 	y: Math.round(locationRef.current.y / (WINDOW_HEIGHT / 20)),
+									// 	timetable: changeCopy,
+									// 	status: true,
+									// });
 								} else {
-									setModifyRef({
-										x: 0,
-										y: 0,
-										timetable: [],
-										status: false,
-									});
+									// setModifyRef({
+									// 	x: 0,
+									// 	y: 0,
+									// 	timetable: [],
+									// 	status: false,
+									// });
 								}
 							}
 						} catch (e) {
@@ -299,195 +313,217 @@ const InfoView = ({navigation, viewDayIndex, panHandler, modifyState, setmodifyS
 	pan.addListener(async e => {
 		locationRef.current = {x: e.x, y: e.y};
 	});
-	useEffect(() => {
-		!modifyState.state && pan.setOffset({x: 0, y: 0});
-	}, [modifyState]);
+	// useEffect(() => {
+	// 	!modifyState.state && pan.setOffset({x: 0, y: 0});
+	// }, [modifyState]);
+
 	const testRef = useRef<View>();
 	return (
-		<InfoViewContainter>
-			<SpacerView />
-			{timetable.map(
-				(item, idx) =>
-					idx >= viewDayIndex &&
-					idx <= viewDayIndex + 4 && (
-						<InfoVStack key={idx}>
-							{item.map((value, index) => {
-								return modifyState.state && modifyState.day == idx && modifyState.index == index ? (
-									<Animated.View
-										key={index}
-										onTouchStart={() => {
-											setStop(false);
-										}}
-										style={{
-											width: '100%',
-											position: 'absolute',
-											zIndex: 100,
-											transform: [{translateX: pan.x}, {translateY: pan.y}],
-										}}
-										{...panResponder.panHandlers}>
-										<InfoViews
-											ref={testRef}
-											backgroundColor={
-												(value.category == 4 || value.category == 1) &&
-												!value.name.includes('추천')
-													? selectCategortColors[value.category]
-													: categortColors[value.category]
-											}
-											height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
-											top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
-											state={false}
-											key={index}>
-											<InfoText>{value.name}</InfoText>
+		<PrimaryButton
+			label={test.name}
+			disabled={modify}
+			backgroundColor={colors.Primary}
+			textColor={colors.Gray5}
+			onPress={() => {
+				test.category == 1
+					? restaurantRecommend({
+							value: test,
+							index: index,
+							idx: idx,
+					  })
+					: accommodationRecommend({
+							value: test,
+							index: index,
+							idx: idx,
+					  });
+			}}
+			marginBottom={heightPercentage(10)}
+			width={widthPercentage(282)}
+			height={heightPercentage(42)}></PrimaryButton>
+		// <InfoViewContainter>
+		// 	<SpacerView />
+		// 	{timetable.map(
+		// 		(item, idx) =>
+		// 			idx >= viewDayIndex &&
+		// 			idx <= viewDayIndex + 4 && (
+		// 				<InfoVStack key={idx}>
+		// 					{item.map((value, index) => {
+		// 						return modifyState.state && modifyState.day == idx && modifyState.index == index ? (
+		// 							<Animated.View
+		// 								key={index}
+		// 								onTouchStart={() => {
+		// 									setStop(false);
+		// 								}}
+		// 								style={{
+		// 									width: '100%',
+		// 									position: 'absolute',
+		// 									zIndex: 100,
+		// 									transform: [{translateX: pan.x}, {translateY: pan.y}],
+		// 								}}
+		// 								{...panResponder.panHandlers}>
+		// 								<InfoViews
+		// 									ref={testRef}
+		// 									backgroundColor={
+		// 										(value.category == 4 || value.category == 1) &&
+		// 										!value.name.includes('추천')
+		// 											? selectCategortColors[value.category]
+		// 											: categortColors[value.category]
+		// 									}
+		// 									height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
+		// 									top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+		// 									state={false}
+		// 									key={index}>
+		// 									<InfoText>{value.name}</InfoText>
 
-											{value.photo != '' && (
-												<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
-											)}
-										</InfoViews>
-									</Animated.View>
-								) : (
-									<InfoPressable
-										backgroundColor={
-											(value.category == 4 || value.category == 1) && !value.name.includes('추천')
-												? selectCategortColors[value.category]
-												: categortColors[value.category]
-										}
-										height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
-										top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
-										state={modifyState.state}
-										key={index}
-										onLongPress={() => {
-											if (
-												!(
-													value.name == '점심 추천' ||
-													value.name == '저녁 추천' ||
-													value.name == '숙소 추천'
-												)
-											) {
-												if (!modifyState.state) {
-													nowValue.current = {
-														state: true,
-														day: idx,
-														index: index,
-														value: value,
-													};
-													setmodifyState({state: true, day: idx, index: index, value: value});
-													Vibration.vibrate(100);
-												}
-											}
-										}}
-										onPress={() => {
-											if (!modifyState.state) {
-												indexRef.current = {
-													value: value,
-													index: index,
-													idx: idx,
-													category: value.category,
-													flag:
-														value.name == '점심 추천' ||
-														value.name == '저녁 추천' ||
-														value.name == '숙소 추천'
-															? true
-															: false,
-												};
-												if (makeMode == 'share') {
-													value.name == '점심 추천' ||
-													value.name == '저녁 추천' ||
-													value.name == '숙소 추천'
-														? () => {}
-														: viewDetail(indexRef.current);
-												} else {
-													setVisible(true);
-												}
-											}
-										}}>
-										<InfoText>{value.name}</InfoText>
+		// 									{value.photo != '' && (
+		// 										<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
+		// 									)}
+		// 								</InfoViews>
+		// 							</Animated.View>
+		// 						) : (
+		// 							<InfoPressable
+		// 								backgroundColor={
+		// 									(value.category == 4 || value.category == 1) && !value.name.includes('추천')
+		// 										? selectCategortColors[value.category]
+		// 										: categortColors[value.category]
+		// 								}
+		// 								height={(WINDOW_HEIGHT / 20) * Math.ceil(value.takenTime / 30)}
+		// 								top={(WINDOW_HEIGHT / 20) * (value.y ?? 1)}
+		// 								state={modifyState.state}
+		// 								key={index}
+		// 								onLongPress={() => {
+		// 									if (
+		// 										!(
+		// 											value.name == '점심 추천' ||
+		// 											value.name == '저녁 추천' ||
+		// 											value.name == '숙소 추천'
+		// 										)
+		// 									) {
+		// 										if (!modifyState.state) {
+		// 											nowValue.current = {
+		// 												state: true,
+		// 												day: idx,
+		// 												index: index,
+		// 												value: value,
+		// 											};
+		// 											setmodifyState({state: true, day: idx, index: index, value: value});
+		// 											Vibration.vibrate(100);
+		// 										}
+		// 									}
+		// 								}}
+		// 								onPress={() => {
+		// 									if (!modifyState.state) {
+		// 										indexRef.current = {
+		// 											value: value,
+		// 											index: index,
+		// 											idx: idx,
+		// 											category: value.category,
+		// 											flag:
+		// 												value.name == '점심 추천' ||
+		// 												value.name == '저녁 추천' ||
+		// 												value.name == '숙소 추천'
+		// 													? true
+		// 													: false,
+		// 										};
+		// 										if (makeMode == 'share') {
+		// 											value.name == '점심 추천' ||
+		// 											value.name == '저녁 추천' ||
+		// 											value.name == '숙소 추천'
+		// 												? () => {}
+		// 												: viewDetail(indexRef.current);
+		// 										} else {
+		// 											setVisible(true);
+		// 										}
+		// 									}
+		// 								}}>
+		// 								<InfoText>{value.name}</InfoText>
 
-										{value.photo != '' && (
-											<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
-										)}
-									</InfoPressable>
-								);
-							})}
-						</InfoVStack>
-					),
-			)}
-			<Modal
-				visible={visible}
-				animationType={'fade'}
-				transparent={true}
-				statusBarTranslucent={true}
-				onRequestClose={() => setVisible(false)}>
-				<ModalContainer onPress={() => setVisible(false)}>
-					<InfoModalContainer>
-						{indexRef.current.flag ? (
-							<>
-								<ModalElementContainer
-									onPress={() => {
-										indexRef.current.category == 1
-											? restaurantRecommend({
-													value: indexRef.current.value,
-													index: indexRef.current.index,
-													idx: indexRef.current.idx,
-											  })
-											: accommodationRecommend({
-													value: indexRef.current.value,
-													index: indexRef.current.index,
-													idx: indexRef.current.idx,
-											  });
-										setVisible(false);
-									}}>
-									<ModalIconContainer>
-										<DeleteContainer name={'like2'} size={20} color={'black'} />
-									</ModalIconContainer>
-									<ModalText>추천받기</ModalText>
-								</ModalElementContainer>
-							</>
-						) : (
-							<>
-								<ModalElementContainer
-									onPress={() => {
-										viewDetail(indexRef.current);
-										setVisible(false);
-									}}>
-									<ModalIconContainer>
-										<SvgInfos width={20} height={20} color='black' />
-									</ModalIconContainer>
+		// 								{value.photo != '' && (
+		// 									<InfoImage source={{uri: `${value.photo}&key=${GOOGLE_API_KEY}`}} />
+		// 								)}
+		// 							</InfoPressable>
+		// 						);
+		// 					})}
+		// 				</InfoVStack>
+		// 			),
+		// 	)}
+		// 	<Modal
+		// 		visible={visible}
+		// 		animationType={'fade'}
+		// 		transparent={true}
+		// 		statusBarTranslucent={true}
+		// 		onRequestClose={() => setVisible(false)}>
+		// 		<ModalContainer onPress={() => setVisible(false)}>
+		// 			<InfoModalContainer>
+		// 				{indexRef.current.flag ? (
+		// 					<>
+		// 						<ModalElementContainer
+		// 							onPress={() => {
+		// 								indexRef.current.category == 1
+		// 									? restaurantRecommend({
+		// 											value: indexRef.current.value,
+		// 											index: indexRef.current.index,
+		// 											idx: indexRef.current.idx,
+		// 									  })
+		// 									: accommodationRecommend({
+		// 											value: indexRef.current.value,
+		// 											index: indexRef.current.index,
+		// 											idx: indexRef.current.idx,
+		// 									  });
+		// 								setVisible(false);
+		// 							}}>
+		// 							<ModalIconContainer>
+		// 								<DeleteContainer name={'like2'} size={20} color={'black'} />
+		// 							</ModalIconContainer>
+		// 							<ModalText>추천받기</ModalText>
+		// 						</ModalElementContainer>
+		// 					</>
+		// 				) : (
+		// 					<>
+		// 						<ModalElementContainer
+		// 							onPress={() => {
+		// 								viewDetail(indexRef.current);
+		// 								setVisible(false);
+		// 							}}>
+		// 							<ModalIconContainer>
+		// 								<SvgInfos width={20} height={20} color='black' />
+		// 							</ModalIconContainer>
 
-									<ModalText>정보 보기</ModalText>
-								</ModalElementContainer>
+		// 							<ModalText>정보 보기</ModalText>
+		// 						</ModalElementContainer>
 
-								<ModalElementContainer
-									onPress={() => {
-										navigation.navigate('Modify', {item: indexRef.current});
-										setVisible(false);
-									}}>
-									<ModalIconContainer>
-										<DeleteContainer name={'edit'} size={20} color={'black'} />
-									</ModalIconContainer>
-									<ModalText>수정 하기</ModalText>
-								</ModalElementContainer>
-							</>
-						)}
-						<ModalElementContainer
-							onPress={() => {
-								setVisible(false),
-									dispatch(
-										modalSliceActions.setOpenModal({
-											modalTitle: '삭제하시겠습니까?',
-											modalLeft: true,
-											modalFunction: goRemove,
-										}),
-									);
-							}}>
-							<ModalIconContainer>
-								<DeleteContainer name={'delete'} size={20} color={'black'} />
-							</ModalIconContainer>
-							<ModalText>삭제하기</ModalText>
-						</ModalElementContainer>
-					</InfoModalContainer>
-				</ModalContainer>
-			</Modal>
-		</InfoViewContainter>
+		// 						<ModalElementContainer
+		// 							onPress={() => {
+		// 								navigation.navigate('Modify', {item: indexRef.current});
+		// 								setVisible(false);
+		// 							}}>
+		// 							<ModalIconContainer>
+		// 								<DeleteContainer name={'edit'} size={20} color={'black'} />
+		// 							</ModalIconContainer>
+		// 							<ModalText>수정 하기</ModalText>
+		// 						</ModalElementContainer>
+		// 					</>
+		// 				)}
+		// 				<ModalElementContainer
+		// 					onPress={() => {
+		// 						setVisible(false),
+		// 							dispatch(
+		// 								modalSliceActions.setOpenModal({
+		// 									modalTitle: '삭제하시겠습니까?',
+		// 									modalLeft: true,
+		// 									modalFunction: goRemove,
+		// 								}),
+		// 							);
+		// 					}}>
+		// 					<ModalIconContainer>
+		// 						<DeleteContainer name={'delete'} size={20} color={'black'} />
+		// 					</ModalIconContainer>
+		// 					<ModalText>삭제하기</ModalText>
+		// 				</ModalElementContainer>
+		// 			</InfoModalContainer>
+		// 		</ModalContainer>
+		// 	</Modal>
+		// </InfoViewContainter>
 	);
 };
 

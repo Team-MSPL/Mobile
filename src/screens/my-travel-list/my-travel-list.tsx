@@ -11,7 +11,14 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {Center, HStack, MainContainer, VStack} from '../../utill/layout/layout';
+import {
+	Center,
+	HStack,
+	MainContainer,
+	PretendardBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
@@ -107,17 +114,19 @@ export default function MyTravelList({navigation}: any) {
 					goMyTravelDetail(item.item);
 				}}>
 				<VStack>
-					<DayText>
+					<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
 						{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
 							'~' +
 							moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
-					</DayText>
-					<DayText>
+					</PretendardVariableText>
+					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+						{item.item.travelName}
+					</PretendardVariableText>
+					<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 						{dDayCalculate({startDay: item.item.day[0], endDay: item.item.day[item.item.nDay - 1]}).result}
-					</DayText>
-					<TravelTitleText>{item.item.travelName}</TravelTitleText>
+					</PretendardVariableText>
 				</VStack>
-				<SVGRightAdd color={colors.selectButton} />
+				<SVGRightAdd color={colors.PointYellow} />
 			</MyTravelContainer>
 		);
 	};
@@ -126,7 +135,9 @@ export default function MyTravelList({navigation}: any) {
 			<TopContainer>
 				<NewTravelContainer>
 					<HStack>
-						<SubTitleColorText>{userName}</SubTitleColorText>
+						<PretendardBoldText size={21} lineHeight={26} color={colors.PointYellow}>
+							{userName}
+						</PretendardBoldText>
 						<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
 					</HStack>
 					<NewTravelHStack>
@@ -135,9 +146,11 @@ export default function MyTravelList({navigation}: any) {
 							{'\n'}여행 일정 만들기
 						</MainText>
 						<NewTravelButton onPress={goEnroll}>
-							<ButtonText>출발</ButtonText>
+							<PretendardBoldText size={21} lineHeight={26} color={colors.Primary}>
+								출발
+							</PretendardBoldText>
 							<ButtonRight>
-								<SvgRight color={colors.selectButton} />
+								<SvgRight color={colors.Gray5} />
 							</ButtonRight>
 						</NewTravelButton>
 					</NewTravelHStack>
@@ -194,7 +207,7 @@ const NewTravelButton = styled.TouchableOpacity`
 	height: 48px;
 	padding: 10px;
 	border-radius: 30px;
-	background-color: ${colors.selectButton};
+	background-color: ${colors.Gray5};
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;

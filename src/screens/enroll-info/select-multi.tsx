@@ -133,7 +133,7 @@ export default function SelectMulti({navigation}: any) {
 											</FlexWrap>
 										)}
 									</MultiAllContainer>
-									{idx != 0 && (
+									{idx != nDay && (
 										<MultiAllContainer>
 											<ElementContainer
 												color={colors.backgroundGray}

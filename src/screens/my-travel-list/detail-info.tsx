@@ -15,18 +15,22 @@ import {useFocusEffect} from '@react-navigation/native';
 import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
+	BackgroundGray,
+	Center,
 	Divider,
 	HStack,
 	HeaderContianer,
 	HeaderText,
 	MainContainer,
+	PretendardSemiBoldText,
+	PretendardVariableText,
 	VStack,
 	devicesWidth,
 } from '../../utill/layout/layout';
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SvgMilestone, SvgReview} from '../../utill/svg/svg';
+import {SVGMaps, SVGTravlePencil, SvgMilestone, SvgReview} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
 
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -35,6 +39,8 @@ import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
 import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ScrollView} from 'react-native';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -120,6 +126,7 @@ export default function DetailInfo({navigation}: any) {
 			headerRight: () => (
 				<HeaderContianer>
 					<TouchableOpacity
+						style={{marginRight: 5}}
 						onPress={() => {
 							editing
 								? dispatch(
@@ -127,14 +134,20 @@ export default function DetailInfo({navigation}: any) {
 											modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
 											modalLeft: true,
 											modalFunction: goKakaoShare,
+											modalTopText: '나가기',
+											modalBottomText: '수정계속하기',
 										}),
 								  )
 								: goKakaoShare();
 						}}>
-						<HeaderText>공유</HeaderText>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							공유
+						</PretendardVariableText>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={removeCheck}>
-						<HeaderText>삭제</HeaderText>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							삭제
+						</PretendardVariableText>
 					</TouchableOpacity>
 				</HeaderContianer>
 			),
@@ -171,10 +184,15 @@ export default function DetailInfo({navigation}: any) {
 		}
 	};
 	return (
-		<MainContainer>
+		<Scroll>
+			<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>
+				다님과 함께한
+			</PretendardVariableText>
 			{!editing ? (
 				<TravleHStack>
-					<TravelNameText>{travelName}</TravelNameText>
+					<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
+						{travelName}
+					</PretendardVariableText>
 					<ReName
 						onPress={() => {
 							setEditing(true);
@@ -199,7 +217,8 @@ export default function DetailInfo({navigation}: any) {
 			)}
 			<DayText>{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay]).format('MM월-DD일')}</DayText>
 			<CourseAndReview>
-				<CourseContainer
+				<HandleButtonContainer
+					backgroundColor={colors.Primary}
 					onPress={() => {
 						editing
 							? dispatch(
@@ -207,19 +226,22 @@ export default function DetailInfo({navigation}: any) {
 										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
 										modalLeft: true,
 										modalFunction: goTimetable,
+										modalTopText: '코스확인하기',
+										modalBottomText: '수정계속하기',
 									}),
 							  )
 							: goTimetable();
 					}}>
-					<VStack>
-						<CourseTitleText>여행 코스 확인</CourseTitleText>
-						<CourseSubTitleText>지난 여행 코스를 확인해보세요</CourseSubTitleText>
-					</VStack>
-					<IconContainer>
+					<SVGMaps />
+					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.Gray5}>
+						여행 코스 확인
+					</PretendardSemiBoldText>
+					{/* <IconContainer>
 						<SvgMilestone color='white' />
-					</IconContainer>
-				</CourseContainer>
-				<ReviewContainer
+					</IconContainer> */}
+				</HandleButtonContainer>
+				<HandleButtonContainer
+					backgroundColor='#5350FF'
 					onPress={() => {
 						editing
 							? dispatch(
@@ -227,25 +249,39 @@ export default function DetailInfo({navigation}: any) {
 										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
 										modalLeft: true,
 										modalFunction: goReviewAndRating,
+										modalTopText: '리뷰작성하기',
+										modalBottomText: '수정계속하기',
 									}),
 							  )
 							: goReviewAndRating();
 					}}>
-					<VStack>
+					{/* <VStack>
 						<ReviewTitleText>리뷰 작성</ReviewTitleText>
 						<ReviewSubTitleText>다른 여행자들에게 도움이 되는 리뷰를 작성해주세요</ReviewSubTitleText>
 					</VStack>
 					<IconContainer>
 						<SvgReview color={colors.selectButton} />
-					</IconContainer>
-				</ReviewContainer>
+					</IconContainer> */}
+					<SVGTravlePencil />
+					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.backgroundWhite}>
+						리뷰 작성
+					</PretendardSemiBoldText>
+				</HandleButtonContainer>
 			</CourseAndReview>
-			<InfoDivider></InfoDivider>
 			<InputDiary navigation={navigation} />
-		</MainContainer>
+		</Scroll>
 	);
 }
+const Scroll = styled(BackgroundGray).attrs({as: ScrollView})``;
 
+const HandleButtonContainer = styled.TouchableOpacity<{backgroundColor: string}>`
+	width: ${widthPercentage(151)}px;
+	height: ${heightPercentage(105)}px;
+	background-color: ${props => props.backgroundColor};
+	border-radius: 12px;
+	align-items: center;
+	justify-content: center;
+`;
 const InfoDivider = styled(Divider)`
 	background-color: ${colors.regionNormal};
 `;
@@ -284,7 +320,7 @@ export const CourseContainer = styled.TouchableOpacity`
 	padding: 15px;
 	height: 150px;
 	border-radius: 10px;
-	background: ${colors.selectButton};
+	background: ${colors.Primary};
 	justify-content: space-between;
 `;
 export const CourseTitleText = styled.Text`

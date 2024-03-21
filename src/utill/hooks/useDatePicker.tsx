@@ -89,7 +89,6 @@ interface PickerType {
 	minuteData: number;
 	visible: boolean;
 	setVisible: Dispatch<SetStateAction<boolean>>;
-	title: string;
 	goConfirm: (timeData: {hour: string; ampm: string; minute: string}) => boolean;
 }
 const Container = styled.View<{width: number}>`

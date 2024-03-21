@@ -137,6 +137,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	lineHeight: number;
 	width?: number;
 	textDecoration?: string;
+	marginBottom?: number;
 }>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
@@ -145,6 +146,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	width: ${props => props.width + 'px' ?? 'auto'};
 	font-weight: 600;
 	text-decoration: ${props => props.textDecoration ?? null};
+	margin-bottom: ${props => props.marginBottom ?? 0}px;
 `;
 
 export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`
