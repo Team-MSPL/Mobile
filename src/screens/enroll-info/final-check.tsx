@@ -176,6 +176,26 @@ export default function FinalCheck({navigation}: any) {
 			setLoading(false);
 		}
 	};
+	const checkDeleteAccommodation = (e: number) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '삭제하시겠습니까?',
+				modalTopText: '삭제할래요',
+				modalBottomText: '그냥 둘래요',
+				modalFunction: () => deleteAccommodation(e),
+			}),
+		);
+	};
+	const checkDeleteEssential = (e: EssentialPlaceType) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '삭제하시겠습니까?',
+				modalTopText: '삭제할래요',
+				modalBottomText: '그냥 둘래요',
+				modalFunction: () => deleteEssential(e),
+			}),
+		);
+	};
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
@@ -306,11 +326,11 @@ export default function FinalCheck({navigation}: any) {
 										<TagContainer
 											backgroundColor={colors.backgroundGray}
 											key={inx}
-											padding={widthPercentage(6)}
+											padding={widthPercentage(3)}
 											height={heightPercentage(27)}>
 											<PretendardSemiBoldText
 												size={12}
-												lineHeight={14}
+												lineHeight={16}
 												color={colors.PointYellow}>
 												{tendencyList[2]?.list[inx]}
 											</PretendardSemiBoldText>
@@ -331,9 +351,9 @@ export default function FinalCheck({navigation}: any) {
 										<TagContainer
 											backgroundColor={colors.backgroundGray}
 											key={inx}
-											padding={widthPercentage(6)}
+											padding={widthPercentage(3)}
 											height={heightPercentage(27)}>
-											<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+											<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray5}>
 												{tendencyList[3]?.list[inx]}
 											</PretendardSemiBoldText>
 										</TagContainer>
@@ -392,7 +412,7 @@ export default function FinalCheck({navigation}: any) {
 													</VStack>
 													<DeleteContainer
 														onPress={() => {
-															deleteEssential(data);
+															checkDeleteEssential(data);
 														}}>
 														<PretendardSemiBoldText
 															size={12}
@@ -406,7 +426,7 @@ export default function FinalCheck({navigation}: any) {
 										</FlexWrap>
 									)}
 								</MultiAllContainer>
-								{idx != 0 && (
+								{idx != nDay && (
 									<MultiAllContainer>
 										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
 											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
@@ -433,7 +453,7 @@ export default function FinalCheck({navigation}: any) {
 
 												<DeleteContainer
 													onPress={() => {
-														deleteAccommodation(idx + 1);
+														checkDeleteAccommodation(idx + 1);
 													}}>
 													<PretendardSemiBoldText
 														size={12}

@@ -403,6 +403,7 @@ export const travelSlice = createSlice({
 			state.editMode = '';
 			state.season = payload.season;
 			state.freeTicket = false;
+			state.shareViewWithStartFlag = true;
 		},
 		setPopuarityClickStart: (state, {payload}) => {
 			Object.assign(state, initialState);
@@ -593,6 +594,7 @@ export const travelSlice = createSlice({
 			state.tendency = payload.tendency;
 			state.freeTicket = true;
 			state.cityDistance = payload.cityDistance;
+			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);

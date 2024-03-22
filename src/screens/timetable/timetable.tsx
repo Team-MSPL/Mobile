@@ -176,10 +176,12 @@ export default function Timetable({navigation, route}: any) {
 							modalSliceActions.setOpenModal({
 								modalTitle: '홈으로',
 								modalSubTitle: modifyCheck
-									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
 									: '홈으로 이동하시겠습니까?',
 								modalFunction: goHome,
 								modalLeft: true,
+								modalTopText: '그냥 나가기',
+								modalBottomText: '저장하러 가기',
 							}),
 					  );
 
@@ -295,7 +297,7 @@ export default function Timetable({navigation, route}: any) {
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
-		makeMode == 'recommend' && setViewPagerView(true);
+		// makeMode == 'recommend' && setViewPagerView(true);
 	}, []);
 	useEffect(() => {
 		makeMode == 'share' &&
@@ -342,9 +344,9 @@ export default function Timetable({navigation, route}: any) {
 						<>
 							{mapORtable ? (
 								<>
-									<TouchableOpacity onPress={goViewPager}>
+									{/* <TouchableOpacity onPress={goViewPager}>
 										<HeaderText>설명</HeaderText>
-									</TouchableOpacity>
+									</TouchableOpacity> */}
 									{modifyView && (
 										<TouchableOpacity onPress={goSave}>
 											<HeaderText>저장</HeaderText>
@@ -500,7 +502,7 @@ export default function Timetable({navigation, route}: any) {
 			</Modal>
 		</TimeTableContainer>
 	) : (
-		<MapInfo navigation={navigation} modify={modify}></MapInfo>
+		<MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>
 	);
 }
 

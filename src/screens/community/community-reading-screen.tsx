@@ -30,7 +30,7 @@ import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGPencil} from '../../utill/svg/svg';
+import {SVGMoreHorizontal, SVGPencil} from '../../utill/svg/svg';
 const {StatusBarManager} = NativeModules;
 
 export default function CommunityReadingScreen({navigation, route}: any) {
@@ -172,7 +172,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							actionSheetType.current = '게시글';
 							showCommunityReadingOptionActionSheet();
 						}}>
-						<MenuIcon name='more-horizontal'></MenuIcon>
+						<SVGMoreHorizontal />
 					</TouchableOpacity>
 				</View>
 			),
@@ -289,7 +289,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							setCommentData(data.item);
 							actionSheetType.current = '댓글';
 						}}>
-						<CommentMenuIcon name='more-horizontal' />
+						<SVGMoreHorizontal />
 					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
 				<CommentContent>{data.item.commentContent}</CommentContent>

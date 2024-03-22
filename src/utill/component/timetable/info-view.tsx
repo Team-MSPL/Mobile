@@ -24,6 +24,7 @@ const InfoView = ({
 	setmodifyState,
 	setModifyRef,
 	setStop,
+	CancelModify,
 }: any) => {
 	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -49,6 +50,7 @@ const InfoView = ({
 		setVisible(false);
 	};
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
+		CancelModify(false);
 		if (timetable[e.idx].length < 2) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -120,6 +122,7 @@ const InfoView = ({
 		// 		}),
 		// 	);
 		// } else {
+		CancelModify(false);
 		let lat = 0;
 		let lng = 0;
 		let radius = 2000;

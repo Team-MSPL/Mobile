@@ -38,6 +38,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice';
 import {ButtonContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
+import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/community-post';
 export default function CourseDetail({navigation, route}: any) {
 	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
@@ -267,8 +268,14 @@ export default function CourseDetail({navigation, route}: any) {
 			<>
 				<DetailContainer>
 					{courseDetail.photo && (
-						<ImageScroll horizontal={true}>
-							{courseDetail.photo.map((value, index) => (
+						<PostImageSwiper
+							dot={<Dot />}
+							activeDot={<ActiveDot />}
+							paginationStyle={{
+								marginBottom: 24,
+							}}
+							loop={false}>
+							{courseDetail.photo.map((uri, index) => (
 								<Pressable
 									onPress={() => {
 										setImageIndex(index);
@@ -280,14 +287,35 @@ export default function CourseDetail({navigation, route}: any) {
 											uri:
 												courseDetail.status == 'google'
 													? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
-													: value,
+													: uri,
 										}}
 										style={{width: widthPercentage(374), height: heightPercentage(240)}}
 										alt='Place Image'
 									/>
 								</Pressable>
 							))}
-						</ImageScroll>
+						</PostImageSwiper>
+						// <ImageScroll horizontal={true}>
+						// 	{courseDetail.photo.map((value, index) => (
+						// 		<Pressable
+						// 			onPress={() => {
+						// 				setImageIndex(index);
+						// 				setVisible(true);
+						// 			}}
+						// 			key={index}>
+						// 			<Image
+						// 				source={{
+						// 					uri:
+						// 						courseDetail.status == 'google'
+						// 							? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
+						// 							: value,
+						// 				}}
+						// 				style={{width: widthPercentage(374), height: heightPercentage(240)}}
+						// 				alt='Place Image'
+						// 			/>
+						// 		</Pressable>
+						// 	))}
+						// </ImageScroll>
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
 						<ScrollView>
@@ -447,12 +475,12 @@ export default function CourseDetail({navigation, route}: any) {
 											))}
 										</ReviewImageScroll>
 									)}
-									{idx != courseDetail.review.length - 1 && (
-										<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-									)}
 									<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
 										{item.content}
 									</PretendardVariableText>
+									{idx != courseDetail.review.length - 1 && (
+										<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+									)}
 								</ReviewContainer>
 							))}
 							{/* {courseDetail?.review.length != 0 ? (
@@ -608,34 +636,34 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
-const ReviewImage = styled.Image<{width: number}>`
+export const ReviewImage = styled.Image<{width: number}>`
 	width: ${props => props.width}px;
 	height: ${heightPercentage(120)}px;
 	resize-mode: stretch;
 	margin-right: ${widthPercentage(4)}px;
 	border-radius: 6px;
 `;
-const ReviewImageScroll = styled.ScrollView`
+export const ReviewImageScroll = styled.ScrollView`
 	height: ${heightPercentage(120)}px;
 `;
-const ReviewContainer = styled.View`
+export const ReviewContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	gap: ${heightPercentage(5)}px;
 	margin-top: ${heightPercentage(5)}px;
 `;
-const ReviewerProfileImage = styled.Image`
+export const ReviewerProfileImage = styled.Image`
 	width: ${widthPercentage(28)}px;
 	height: ${widthPercentage(28)}px;
 	background-color: ${colors.Primary};
 	border-radius: 4px;
 `;
-const ReviewButton = styled.Pressable`
+export const ReviewButton = styled.Pressable`
 	flex-direction: row;
 	gap: ${widthPercentage(5)}px;
 	align-items: center;
 	justify-content: center;
 `;
-const InfoContainer = styled.Pressable`
+export const InfoContainer = styled.Pressable`
 	width: 100%;
 	margin-bottom: ${heightPercentage(15)}px;
 `;
@@ -655,7 +683,7 @@ export const ImageViewFooterComponent = styled.View`
 const ImageScroll = styled.ScrollView`
 	height: 35%;
 `;
-const LogoContainer = styled.View`
+export const LogoContainer = styled.View`
 	width: ${widthPercentage(30)}px;
 `;
 

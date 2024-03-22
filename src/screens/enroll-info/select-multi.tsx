@@ -134,7 +134,7 @@ export default function SelectMulti({navigation}: any) {
 										)}
 									</MultiAllContainer>
 									{idx != nDay && (
-										<MultiAllContainer>
+										<MultiAllContainer marginBottom={15}>
 											<ElementContainer
 												color={colors.backgroundGray}
 												height={heightPercentage(43)}>
@@ -160,7 +160,7 @@ export default function SelectMulti({navigation}: any) {
 												</SVGContainer>
 											</ElementContainer>
 											{accommodations[idx + 1].name && (
-												<ElementContainer color={colors.backgroundGray}>
+												<ElementContainer color={colors.backgroundGray} marginBottom={20}>
 													<VStack width={widthPercentage(243)}>
 														<PretendardSemiBoldText
 															size={16}
@@ -233,20 +233,20 @@ export const SVGContainer = styled.TouchableOpacity<{color: string}>`
 	align-items: center;
 	justify-content: center;
 `;
-export const ElementContainer = styled.View<{color: string; height?: number}>`
+export const ElementContainer = styled.View<{color: string; height?: number; marginBottom?: number}>`
 	border-radius: 8px;
 	background-color: ${props => props.color};
 	align-items: center;
 	justify-content: space-between;
-	padding: ${widthPercentage(5)}px ${widthPercentage(8)}px;
+	padding: 0px ${widthPercentage(8)}px;
 	gap: ${widthPercentage(4)}px;
 	flex-direction: row;
 	margin-right: ${widthPercentage(5)}px;
-	margin-bottom: ${widthPercentage(5)}px;
+	margin-bottom: ${props => props.marginBottom ?? widthPercentage(5)}px;
 	width: ${widthPercentage(300)}px;
 	height: ${props => props.height + 'px' ?? 'auto'};
 `;
-const MultiAllContainer = styled.View`
+const MultiAllContainer = styled.View<{marginBottom?: number}>`
 	width: ${widthPercentage(300)}px;
 	border-radius: 12px;
 	background-color: ${colors.backgroundGray};

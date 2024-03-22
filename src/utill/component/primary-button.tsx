@@ -13,6 +13,7 @@ export default function PrimaryButton({
 	disabled,
 	alignSelf,
 	marginBottom,
+	marginTop,
 	textSize,
 	lineHeight,
 }: PrimarybuttonType) {
@@ -24,6 +25,7 @@ export default function PrimaryButton({
 			onPress={onPress}
 			backgroundColor={backgroundColor}
 			marginBottom={marginBottom ?? 0}
+			marginTop={marginTop ?? 0}
 			disabled={disabled ?? false}>
 			<PretendardSemiBoldText size={textSize ?? 14} lineHeight={lineHeight ?? 21} color={textColor}>
 				{label}
@@ -38,6 +40,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	backgroundColor: string;
 	alignSelf: string;
 	marginBottom?: number;
+	marginTop?: number;
 }>`
 	width: ${props => props.width}px;
 	height: ${props => props.height}px;
@@ -47,6 +50,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	border-radius: 8px;
 	align-self: ${props => props.alignSelf};
 	margin-bottom: ${props => props.marginBottom}px;
+	margin-top: ${props => props.marginTop}px;
 `;
 const InsideText = styled(PretendardVariable)<{
 	textColor: string;
@@ -68,4 +72,5 @@ interface PrimarybuttonType {
 	marginBottom?: number;
 	textSize?: number;
 	lineHeight?: number;
+	marginTop?: number;
 }

@@ -114,7 +114,7 @@ export default function CommunityMainScreen({navigation}: any) {
 				}}
 			/>
 			<SortButton
-				margin={sortOnOff}
+				margin={false}
 				onPress={() => {
 					setSortOnOff(!sortOnOff);
 				}}>
@@ -150,8 +150,9 @@ const SelectSort = styled.Pressable`
 	height: ${heightPercentage(28)}px;
 	align-self: flex-end;
 	border-width: 1px;
-	padding: 0px ${widthPercentage(5)}px;
+	padding: 0px ${widthPercentage(10)}px;
 	justify-content: center;
+	margin-right: ${widthPercentage(15)}px;
 `;
 const CommunityMainContainer = styled.SafeAreaView`
 	height: 100%;
@@ -172,5 +173,6 @@ const SortButton = styled.Pressable<{margin: boolean}>`
 	border-radius: 6px;
 	padding: ${heightPercentage(4)}px 0px;
 	border-width: 1px;
-	margin-vertical: ${props => (props.margin ? 0 : heightPercentage(10))}px;
+	margin-right: ${widthPercentage(15)}px;
+	margin-top: ${props => (props.margin ? 0 : heightPercentage(10))}px;
 `;

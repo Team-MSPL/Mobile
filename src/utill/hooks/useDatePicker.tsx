@@ -19,7 +19,7 @@ export default function UseDatePicker({hourData, minuteData, ampmData, visible, 
 		setHour(hourData);
 		setAmpm(ampmData);
 		setMinute(minuteData);
-		hourRef.current?.scrollTo({y: hourData * 50});
+		//hourRef.current?.scrollTo({y: hourData * 50});
 	}, [visible]);
 	const hoursCalculate = (e: any) => {
 		goConfirms({status: 'hour', value: e}) && setHour(e);

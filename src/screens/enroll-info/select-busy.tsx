@@ -24,7 +24,7 @@ export default function RecommendSelectBusy({navigation}: any) {
 			<Stepper total={11} now={6}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='어떤 여행을 원하시나요?'
 				subText='* 기본값: 알찬 일정'></StepText>
 			<SelectButtonsContainer>

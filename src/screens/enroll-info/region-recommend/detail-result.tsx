@@ -12,6 +12,7 @@ import {ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {ButtonContainer} from '../select-multi';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -55,6 +56,7 @@ export default function DetailResult({navigation, route}: any) {
 			tendency: copy,
 			season: season,
 			selectEndDate: selectEndDate,
+			shareViewWithStartFlag: true,
 		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
@@ -148,7 +150,9 @@ export default function DetailResult({navigation, route}: any) {
 					</RecommendAllContainer>
 				</RecommendBorderContainer>
 			</MainContainer>
-			<CustomButton label='이 지역의 여행코스 추천받기' onPress={goEnrollInfo}></CustomButton>
+			<ButtonContainer>
+				<CustomButton label='이 지역의 여행코스 추천받기' onPress={goEnrollInfo}></CustomButton>
+			</ButtonContainer>
 			<ImageView
 				images={[{uri: route.params.item.photo}]}
 				onImageIndexChange={item => console.log(item)}

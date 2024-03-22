@@ -53,7 +53,7 @@ const LimitText = styled.Text`
 	color: black;
 `;
 const NicknameText = styled(LimitText)`
-	color: ${colors.selectButton};
+	color: ${colors.Primary};
 `;
 const BarContainer = styled.View`
 	width: 80%;
@@ -66,5 +66,5 @@ const BarContinueContainer = styled.View<{size: number}>`
 	width: ${props => props.size * 25 + 25}%;
 	height: 10px;
 	border-radius: 10px;
-	background-color: ${colors.selectButton};
+	background-color: ${colors.Primary};
 `;

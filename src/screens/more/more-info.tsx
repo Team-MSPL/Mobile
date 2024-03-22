@@ -108,10 +108,11 @@ export default function MoreInfo({navigation}: any) {
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
-		{title: '사용 가이드', function: goViewPager},
+		// {title: '사용 가이드', function: goViewPager},
 	];
 	return (
 		<ScrollView>
+			<Test></Test>
 			<BackgroundGray>
 				<Modal
 					animationType={'fade'}
@@ -242,14 +243,22 @@ export default function MoreInfo({navigation}: any) {
 						</SettingElement>
 					</WhiteContainer>
 				</SettingContainer>
-				<PretendardSemiBoldText size={14} lineHeight={30} color={colors.Black}>
+				<PretendardSemiBoldText
+					size={14}
+					lineHeight={30}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					앱 버전 {nowVersion} (최신{latestVersion})
 				</PretendardSemiBoldText>
 			</BackgroundGray>
 		</ScrollView>
 	);
 }
-
+const Test = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(10)}px;
+	background-color: ${colors.backgroundGray};
+`;
 const ProfileImage = styled.Image`
 	width: ${widthPercentage(40)}px;
 	height: ${widthPercentage(40)}px;

@@ -140,80 +140,82 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		});
 	}, [postData.postTitle, postData.postContent]);
 	return (
-		<SafeAreaView>
-			<CommunityWritingContainer>
-				<TitleInput
-					placeholder='제목'
-					placeholderTextColor={colors.Gray2}
-					value={postData.postTitle}
-					onChangeText={changeTitle}
-					multiline={true}
-				/>
-				<ContentInput
-					placeholder={`내용을 입력하세요\n 부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.`}
-					placeholderTextColor={colors.Gray2}
-					value={postData.postContent}
-					onChangeText={changeContent}
-					multiline={true}
-				/>
-				{postData.postImage.length > 0 && (
-					<ImageScrollViewContainer horizontal={true}>
-						{postData.postImage.map((uri, index) => {
-							return (
-								<PictureElementContainer
-									onPress={() => {
-										setCurrentImageIndex(index);
-										setIsImageModalVisible(true);
-									}}
-									key={index}>
-									<CancelContainer
-										onPress={() => {
-											deletePicture(index);
-										}}>
-										<SvgCancel color='white' width={13} height={13}></SvgCancel>
-									</CancelContainer>
-									<PictureElement source={{uri: uri}} />
-									<BarContainer>
-										{index != 0 && (
-											<MoveButton
-												onPress={() => {
-													moveImage({index: index, direction: false});
-												}}>
-												<ImageInputButtonText>왼</ImageInputButtonText>
-											</MoveButton>
-										)}
-										{index != postData.postImage.length - 1 && (
-											<MoveButton
-												onPress={() => {
-													moveImage({index: index, direction: true});
-												}}>
-												<ImageInputButtonText>오</ImageInputButtonText>
-											</MoveButton>
-										)}
-									</BarContainer>
-								</PictureElementContainer>
-							);
-						})}
-						<ImageView
-							images={postData.postImage.map(uri => ({uri}))}
-							imageIndex={currentImageIndex}
-							visible={isImageModalVisible}
-							onRequestClose={() => {
-								setIsImageModalVisible(false);
-							}}
-							FooterComponent={index => {
+		<SafeAreaView style={{flex: 1}}>
+			<Container>
+				<CommunityWritingContainer>
+					<TitleInput
+						placeholder='제목'
+						placeholderTextColor={colors.Gray2}
+						value={postData.postTitle}
+						onChangeText={changeTitle}
+						multiline={true}
+					/>
+					<ContentInput
+						placeholder={`내용을 입력하세요\n 부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.`}
+						placeholderTextColor={colors.Gray2}
+						value={postData.postContent}
+						onChangeText={changeContent}
+						multiline={true}
+					/>
+					{postData.postImage.length > 0 && (
+						<ImageScrollViewContainer horizontal={true}>
+							{postData.postImage.map((uri, index) => {
 								return (
-									<ImageViewFooterComponent>
-										<ImageText>
-											{index.imageIndex + 1}/{postData.postImage.length}
-										</ImageText>
-									</ImageViewFooterComponent>
+									<PictureElementContainer
+										onPress={() => {
+											setCurrentImageIndex(index);
+											setIsImageModalVisible(true);
+										}}
+										key={index}>
+										<CancelContainer
+											onPress={() => {
+												deletePicture(index);
+											}}>
+											<SvgCancel color='white' width={13} height={13}></SvgCancel>
+										</CancelContainer>
+										<PictureElement source={{uri: uri}} />
+										<BarContainer>
+											{index != 0 && (
+												<MoveButton
+													onPress={() => {
+														moveImage({index: index, direction: false});
+													}}>
+													<ImageInputButtonText>왼</ImageInputButtonText>
+												</MoveButton>
+											)}
+											{index != postData.postImage.length - 1 && (
+												<MoveButton
+													onPress={() => {
+														moveImage({index: index, direction: true});
+													}}>
+													<ImageInputButtonText>오</ImageInputButtonText>
+												</MoveButton>
+											)}
+										</BarContainer>
+									</PictureElementContainer>
 								);
-							}}
-						/>
-					</ImageScrollViewContainer>
-				)}
-			</CommunityWritingContainer>
+							})}
+							<ImageView
+								images={postData.postImage.map(uri => ({uri}))}
+								imageIndex={currentImageIndex}
+								visible={isImageModalVisible}
+								onRequestClose={() => {
+									setIsImageModalVisible(false);
+								}}
+								FooterComponent={index => {
+									return (
+										<ImageViewFooterComponent>
+											<ImageText>
+												{index.imageIndex + 1}/{postData.postImage.length}
+											</ImageText>
+										</ImageViewFooterComponent>
+									);
+								}}
+							/>
+						</ImageScrollViewContainer>
+					)}
+				</CommunityWritingContainer>
+			</Container>
 			<CammeraContainer onPress={handleImage}>
 				<SVGCamera width={widthPercentage(24)} height={widthPercentage(24)} color='black' />
 			</CammeraContainer>
@@ -242,6 +244,9 @@ const BarContainer = styled.View`
 `;
 const MoveButton = styled.TouchableOpacity`
 	width: 50%;
+`;
+const Container = styled.View`
+	flex: 1;
 `;
 const CommunityWritingContainer = styled.ScrollView`
 	background-color: ${colors.main};

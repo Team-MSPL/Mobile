@@ -90,6 +90,7 @@ function TabBar() {
 					title: '홈',
 					headerShown: false,
 					headerStyle: {backgroundColor: colors.main},
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
@@ -109,6 +110,7 @@ function TabBar() {
 					title: '내 여행',
 					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
 			/>
@@ -128,6 +130,7 @@ function TabBar() {
 					title: '커뮤니티',
 					headerShown: true,
 					headerStyle: {backgroundColor: colors.main},
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
 				}}
 			/>
@@ -147,6 +150,7 @@ function TabBar() {
 					title: '내 정보',
 					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}
 			/>

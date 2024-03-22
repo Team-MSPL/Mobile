@@ -139,13 +139,15 @@ export default function SearchPlace({navigation, route}: any) {
 					// renderRightButton={clearButton}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{
+						container: {alignItems: 'center'},
 						textInputContainer: {
 							width: widthPercentage(327),
 							height: heightPercentage(52),
 							borderRadius: 8,
 							backgroundColor: colors.backgroundWhite,
-							left: widthPercentage(24),
+							alignItems: 'center',
 						},
+						listView: {width: widthPercentage(327)},
 						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
 						// listView: {position: 'relative'},
 						description: {color: 'black'},

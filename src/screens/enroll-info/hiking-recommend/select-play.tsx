@@ -27,7 +27,7 @@ export default function HikingSelectPlay({navigation}: any) {
 			<Stepper total={3} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='1.탐방 스타일을 알아볼게요.'
 				mainText='어떤 코스를 원하시나요?'
 				subText='* 중복 선택 가능'></StepText>
 			<ButtonsContainer>

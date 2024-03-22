@@ -33,7 +33,7 @@ export default function HikingSelectDifficulty({navigation, setViewComponent}: a
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const rangeRef = useRef({low: 1, hight: 5});
+	const rangeRef = useRef({low: 1, hight: 4});
 	return (
 		<BackgroundGray>
 			<Stepper total={3} now={3}></Stepper>
@@ -44,7 +44,7 @@ export default function HikingSelectDifficulty({navigation, setViewComponent}: a
 				subText={`난이도를 최우선으로 고려하여 추천드려요`}></StepText>
 			<RangeSlider
 				min={1}
-				max={5}
+				max={4}
 				step={1}
 				minRange={1}
 				renderRail={() => <Rail />}

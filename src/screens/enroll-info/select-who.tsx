@@ -39,7 +39,7 @@ export default function RecommendSelectWho({navigation}: any) {
 			<Stepper total={11} now={4}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='누구와 떠나시나요?'
 				subText='* 중복 선택 가능'
 				warningText={
@@ -48,6 +48,7 @@ export default function RecommendSelectWho({navigation}: any) {
 			<ButtonsContainer>
 				{tendencyList[0]?.list.map((item, idx) => (
 					<TendencyButton
+						marginBottom={0}
 						bgColor={tendency[0][idx] == 1}
 						label={item}
 						key={idx}
@@ -68,5 +69,5 @@ const ButtonsContainer = styled.View`
 	flex-wrap: wrap;
 	align-items: center;
 	margin-top: ${heightPercentage(155)}px;
-	gap: ${widthPercentage(4)}px;
+	gap: ${widthPercentage(10)}px;
 `;

@@ -17,6 +17,7 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariableText} from '../../layout/layout';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {SVGCamera, SVGEmptyHeart, SVGMessageSquare, SvgPicture} from '../../svg/svg';
 function CommunityMain({
 	navigation,
 	setViewState,
@@ -131,21 +132,23 @@ function CommunityMain({
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 							{data.item.postedAt.slice(0, 10)}
 						</PretendardVariableText>
-						<HStack>
-							<HeartIcon size={12} name={'hearto'} />
+						<HStack gap={2}>
+							<SVGEmptyHeart />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.likerLength}
 							</PretendardVariableText>
 						</HStack>
-						<HStack>
-							<CommentIcon size={12} name={'message1'} />
+						<HStack gap={2}>
+							<SVGMessageSquare />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.commentLength}
 							</PretendardVariableText>
 							{data.item.ImageLength != 0 && (
 								<>
-									<ImageIcon size={12} name={'picture'} />
-									<CommentNumText>{data.item.ImageLength}</CommentNumText>
+									<SVGCamera color={colors.Gray3} />
+									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
+										{data.item.ImageLength}
+									</PretendardVariableText>
 								</>
 							)}
 						</HStack>
@@ -201,7 +204,6 @@ const ImageIcon = styled(Icon)`
 const CommentNumText = styled.Text`
 	font-size: 12px;
 	color: green;
-	margin-right: 8px;
 `;
 export const MenuIcon = styled(FeatherIcon)`
 	font-size: 24px;

@@ -42,7 +42,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 			<Stepper total={11} now={11}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='3.원하는 반경의 지역을 추천해드려요.'
+				styleText='3.여행 반경 스타일을 알아볼게요.'
 				mainText='선택하신 지역에서의 여행 반경을 설정해주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 
@@ -80,11 +80,11 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 						내 근처
 					</PretendardSemiBoldText>
 					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
-						한국 전체
+						전체
 					</PretendardSemiBoldText>
 				</DistanceSpace>
 				<Slider
-					style={{width: '80%', height: 40}}
+					style={{width: '100%', height: 40}}
 					minimumValue={1}
 					maximumValue={10}
 					minimumTrackTintColor={colors.Primary}
@@ -119,10 +119,11 @@ export const Qwe = styled.View`
 	justify-content: center;
 `;
 export const DistanceSpace = styled.View`
-	width: 80%;
+	width: 95%;
 	flex-direction: row;
 	justify-content: space-between;
 `;
-export const DistanceCenter = styled(Center)`
-	margin: 20px 0px 20px 0px;
+export const DistanceCenter = styled.View`
+	align-items: center;
+	margin-top: ${heightPercentage(10)}px;
 `;

@@ -1,6 +1,16 @@
 import moment from 'moment';
 import {useEffect, useRef, useState} from 'react';
-import {Image, Linking, Modal, Platform, Pressable, TouchableOpacity, View} from 'react-native';
+import {
+	Image,
+	Linking,
+	Modal,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	Platform,
+	Pressable,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -26,9 +36,10 @@ import CustomButton from '../../utill/component/custom-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {SVGContainer} from '../enroll-info/select-multi';
+import {ButtonContainer, SVGContainer} from '../enroll-info/select-multi';
+import {usePosition} from '../../utill/hooks/usePosition';
 
-export default function MapInfo({navigation, modify}: any) {
+export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -44,11 +55,11 @@ export default function MapInfo({navigation, modify}: any) {
 	const scrollRef = useRef();
 	const change = (idx: number) => {
 		setSelect(idx);
-		let totalScroll = 0;
-		for (let i = 0; i < idx; i++) {
-			totalScroll += timetable[i].length;
-		}
-		scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
+		// let totalScroll = 0;
+		// for (let i = 0; i < idx; i++) {
+		// 	totalScroll += timetable[i].length;
+		// }
+		// scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
@@ -187,7 +198,12 @@ export default function MapInfo({navigation, modify}: any) {
 		seA(qw + 1);
 		return true;
 	};
-	const [test, setTest] = useState(0);
+
+	const [saveView, setSaveView] = useState(false);
+	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const state = usePosition(e);
+		state != saveView && setSaveView(state);
+	};
 	const openModal = (index, idx) => {
 		viewRef.current = {
 			...timetable[index][idx],
@@ -252,6 +268,9 @@ export default function MapInfo({navigation, modify}: any) {
 				dispatch(travelSliceActions.changeTimetable(changeCopy));
 			}
 		}
+	};
+	const CancelModify = () => {
+		setModify(false);
 	};
 	if (polylineCoordinates.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
@@ -330,10 +349,11 @@ export default function MapInfo({navigation, modify}: any) {
 							</HStack>
 						</WhiteContainer>
 					</HStack> */}
-					<DayScrollView modify={modify} ref={scrollRef}>
+					<DayScrollView modify={modify} ref={scrollRef} onMomentumScrollEnd={changeViewState}>
 						{timetable.map(
 							(value, index) =>
-								value.length != 0 && (
+								value.length != 0 &&
+								select == index && (
 									<WhiteContainer width={widthPercentage(327)} key={index}>
 										<PretendardSemiBoldText
 											marginBottom={heightPercentage(10)}
@@ -448,7 +468,9 @@ export default function MapInfo({navigation, modify}: any) {
 															test={item}
 															index={idx}
 															idx={index}
-															modify={modify}
+															modify={false}
+															CancelModify={CancelModify}
+															//modify TODO 바꾸기
 														/>
 													</InsideGrayContainer>
 												</HStack>
@@ -499,7 +521,14 @@ export default function MapInfo({navigation, modify}: any) {
 							}
 						})} */}
 					</DayScrollView>
-					{modify && <CustomButton label='저장' onPress={() => {}}></CustomButton>}
+					{saveView && (
+						<AbsoluteButton onPress={goSave}>
+							<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
+								저장
+							</PretendardSemiBoldText>
+						</AbsoluteButton>
+					)}
+					{/* {modify && <CustomButton label='저장' onPress={() => {}}></CustomButton>} */}
 				</BackgroundGray>
 				<Modal
 					visible={visible}
@@ -597,7 +626,7 @@ export default function MapInfo({navigation, modify}: any) {
 									setVisible={setVisible}></UseDatePicker>
 							</TimePickerContainer>
 							<HStack justifyContent='space-between'>
-								<ButtonContainer
+								<ButtonsContainer
 									backgroundColor={colors.Gray1}
 									onPress={() => {
 										setVisible(false);
@@ -614,12 +643,12 @@ export default function MapInfo({navigation, modify}: any) {
 									<PretendardVariableText size={16} lineHeight={19} color={colors.PointGreen1}>
 										삭제
 									</PretendardVariableText>
-								</ButtonContainer>
-								<ButtonContainer backgroundColor='#D5FF734D' onPress={goModify}>
+								</ButtonsContainer>
+								<ButtonsContainer backgroundColor='#D5FF734D' onPress={goModify}>
 									<PretendardVariableText size={16} lineHeight={19} color={colors.Gray5}>
 										저장
 									</PretendardVariableText>
-								</ButtonContainer>
+								</ButtonsContainer>
 							</HStack>
 						</InfoModalContainer>
 					</ModalContainer>
@@ -646,7 +675,18 @@ export default function MapInfo({navigation, modify}: any) {
 		</MainAllContainer>
 	);
 }
-const ButtonContainer = styled.TouchableOpacity<{backgroundColor: string}>`
+const AbsoluteButton = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(60)}px;
+	border-radius: 8px;
+	background-color: ${colors.Gray5};
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	bottom: ${heightPercentage(50)}px;
+	align-self: center;
+`;
+const ButtonsContainer = styled.TouchableOpacity<{backgroundColor: string}>`
 	width: ${widthPercentage(160)}px;
 	height: ${heightPercentage(50)}px;
 	border-radius: 8px;
@@ -729,7 +769,7 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 
 const DayScrollView = styled.ScrollView<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modify ? heightPercentage(550) : heightPercentage(300))}px;
+	height: ${props => (props.modify ? heightPercentage(600) : heightPercentage(300))}px;
 `;
 
 const MoveContainer = styled.TouchableOpacity`

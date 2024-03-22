@@ -43,7 +43,7 @@ export default function LiKeCommentBar() {
 						{totalLike}
 					</PretendardVariableText>
 				</LikeButton>
-				<HStack>
+				<HStack gap={widthPercentage(3)}>
 					<SVGMessageSquare />
 					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
 						{postData.comment.length}
@@ -57,4 +57,5 @@ export default function LiKeCommentBar() {
 const LikeButton = styled.TouchableOpacity`
 	align-items: center;
 	flex-direction: row;
+	gap: ${widthPercentage(3)}px;
 `;

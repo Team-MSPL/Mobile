@@ -14,6 +14,7 @@ import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ButtonContainer} from './select-multi';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -143,7 +144,7 @@ export default function SelectDay({navigation}: any) {
 							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
 								{item.step}
 							</PretendardSemiBoldText>
-							<SelectContainer>
+							<SelectContainer backgroundColor={colors.backgroundGray}>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 									{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
 								</PretendardSemiBoldText>
@@ -207,11 +208,13 @@ export default function SelectDay({navigation}: any) {
 					selectYearTitle='년도 선택'
 				/>
 			</CalendarContainer>
-			<CustomButton
-				label={`다음`}
-				onPress={() => {
-					navigation.navigate('SelectMulti');
-				}}></CustomButton>
+			<ButtonContainer>
+				<CustomButton
+					label={`다음`}
+					onPress={() => {
+						navigation.navigate('SelectMulti');
+					}}></CustomButton>
+			</ButtonContainer>
 		</DayBackground>
 	);
 }
@@ -225,10 +228,10 @@ const SelectAbsolute = styled.View`
 	position: absolute;
 	bottom: -${heightPercentage(122)}px;
 `;
-export const SelectContainer = styled.Pressable`
+export const SelectContainer = styled.Pressable<{backgroundColor?: string}>`
 	width: ${widthPercentage(157)}px;
 	height: ${heightPercentage(40)}px;
-	background-color: ${colors.backgroundWhite};
+	background-color: ${props => props.backgroundColor ?? colors.backgroundWhite};
 	border-radius: 12px;
 	padding: 0px ${widthPercentage(16)}px;
 	justify-content: center;

@@ -46,11 +46,13 @@ import Camera from '../../../public/camera.svg';
 import Coin from '../../../public/coin.svg';
 import DanimLogo from '../../../public/danim-logo.svg';
 import Heart from '../../../public/heart.svg';
+import EmptyHeart from '../../../public/emptyHeart.svg';
 import MessageSquare from '../../../public/message-square.svg';
 import Pencil from '../../../public/pencil.svg';
 import ReviewPencil from '../../../public/review-pencil.svg';
 import Maps from '../../../public/maps.svg';
 import TravlePencil from '../../../public/travlePenceil.svg';
+import MoreHorizontal from '../../../public/more-horizontal.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -206,5 +208,11 @@ export const SVGMaps = styled(Maps)<{color?: string}>`
 	color: color;
 `;
 export const SVGTravlePencil = styled(TravlePencil)<{color?: string}>`
+	color: color;
+`;
+export const SVGEmptyHeart = styled(EmptyHeart)<{color?: string}>`
+	color: color;
+`;
+export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
 	color: color;
 `;

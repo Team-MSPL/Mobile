@@ -215,7 +215,7 @@ export default function SelectDistance({navigation}: any) {
 							</PretendardSemiBoldText>
 						</DistanceSpace>
 						<Slider
-							style={{width: '80%', height: 40}}
+							style={{width: '100%', height: 40}}
 							minimumValue={1}
 							maximumValue={10}
 							minimumTrackTintColor={colors.Primary}

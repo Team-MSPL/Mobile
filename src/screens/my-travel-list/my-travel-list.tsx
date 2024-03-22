@@ -22,6 +22,7 @@ import {
 import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
 import {DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
+import {widthPercentage} from '../../utill/layout/responsive-size';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
@@ -211,6 +212,8 @@ const NewTravelButton = styled.TouchableOpacity`
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	padding-left: ${widthPercentage(20)}px;
+	padding-right: ${widthPercentage(10)}px;
 `;
 const ButtonText = styled(MainText)`
 	color: white;

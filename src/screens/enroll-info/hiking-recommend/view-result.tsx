@@ -194,12 +194,12 @@ const RecommendImage = styled.Image`
 	height: 100%;
 	border-radius: 10px;
 `;
-const GraientBackground = styled.View`
+export const GraientBackground = styled.View`
 	position: absolute;
 	bottom: 0px;
 	width: ${widthPercentage(327)}px;
 	height: ${widthPercentage(100)}px;
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(0, 0, 0, 0.4);
 	justify-content: flex-end;
 	border-bottom-right-radius: 12px;
 	border-bottom-left-radius: 12px;

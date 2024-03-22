@@ -245,8 +245,9 @@ function App(): JSX.Element {
 				{
 					// isFirstLaunch == 'true' ? (
 					// 	<ViewPager handleFunction={handleFirstLaunch} />
-					// ) :
-					isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
+					//
+					<StackNavigator />
+					// isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
 					// hasPermission || noPermission ? (
 
 					// ) : (

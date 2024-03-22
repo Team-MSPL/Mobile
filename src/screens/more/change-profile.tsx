@@ -115,14 +115,14 @@ export default function ChangeProfile({navigation}: any) {
 			onPress={() => {
 				Keyboard.dismiss();
 			}}>
-			<Center>
+			<ImageContainer>
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
 					<ImageBottom>
 						<SVGCamera color='white' />
 					</ImageBottom>
 				</TouchableOpacity>
-			</Center>
+			</ImageContainer>
 			<InputProfileContainer>
 				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
 					닉네임
@@ -147,6 +147,12 @@ export default function ChangeProfile({navigation}: any) {
 	);
 }
 
+const ImageContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(125)}px;
+	align-items: center;
+	margin-top: ${widthPercentage(4)}px;
+`;
 const InputProfileContainer = styled.View`
 	gap: ${heightPercentage(10)}px;
 `;
@@ -165,7 +171,7 @@ const CustomTextInput = styled.TextInput<{text: string}>`
 	background-color: ${colors.backgroundWhite};
 	border-radius: 12px;
 	color: ${colors.Black};
-	padding: 0px ${widthPercentage(5)}px;
+	padding: 0px ${widthPercentage(10)}px;
 `;
 const ImageElement = styled.Image`
 	width: ${widthPercentage(90)}px;

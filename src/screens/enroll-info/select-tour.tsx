@@ -23,7 +23,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			<Stepper total={11} now={9}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='어디를 가고 싶으신가요?'
 				subText='* 중복 선택 가능'
 				warningText={
@@ -34,6 +34,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			<ButtonsContainer>
 				{tendencyList[3]?.list.map((item, idx) => (
 					<TendencyButton
+						marginBottom={0}
 						bgColor={tendency[3][idx] == 1}
 						label={item}
 						divide={true}
@@ -58,5 +59,5 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-content: flex-end;
-	gap: ${widthPercentage(4)}px;
+	gap: ${widthPercentage(10)}px;
 `;

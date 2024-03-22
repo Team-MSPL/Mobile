@@ -16,6 +16,7 @@ import {usePhoto} from '../../hooks/usePhoto';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../../../screens/my-travel-list/input-diary';
 import useFirebaseStorage from '../../hooks/useFirebaseStorage';
 import PrimaryButton from '../primary-button';
+import {hikingSaveReview} from '../../../redux/travel-info/hiking.slice';
 
 export function CourseReview({navigation, route}: any) {
 	const [reviewData, setReviewData] = useState('');
@@ -68,7 +69,9 @@ export function CourseReview({navigation, route}: any) {
 				reviewPhotoList: diaryImageRef.current,
 				reviewId: randomId,
 			};
-			await dispatch(savePlaceReview(data));
+			route.params.value.region == '소백산국립공원(경북)'
+				? await dispatch(hikingSaveReview(data))
+				: await dispatch(savePlaceReview(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '등록완료',

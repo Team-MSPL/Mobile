@@ -18,6 +18,7 @@ import {ScrollView} from 'react-native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {TagElement} from '../../home/main';
 import {useBackHandler} from '../../../utill/hooks/useBackhandler';
+import {GraientBackground} from '../hiking-recommend/view-result';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {userName} = useAppSelector(state => state.userSlice);
@@ -98,27 +99,39 @@ export default function ViewResult({navigation}: any) {
 											<SvgLoginLogo color={'white'} width={40} />
 										</LogoCOntainer>
 									)}
-									<RegionText>{item.name}</RegionText>
-									<TagContainer>
-										{item.tendency.map((value, index) => (
-											<TagElement key={index} opacityStatus={true}>
-												<HStack>
-													<PretendardVariableText
-														size={12}
-														lineHeight={14}
-														color={colors.Primary}>
-														{'# '}
-													</PretendardVariableText>
-													<PretendardVariableText
-														size={10}
-														lineHeight={12}
-														color={colors.backgroundWhite}>
-														{value}
-													</PretendardVariableText>
-												</HStack>
-											</TagElement>
-										))}
-									</TagContainer>
+									<GraientBackground>
+										<RegionText>{item.name}</RegionText>
+										<TagContainer>
+											{item.tendency.slice(0, 5).map((value, index) => (
+												<Fragment key={index}>
+													<TagElement opacityStatus={true}>
+														<HStack>
+															<PretendardVariableText
+																size={12}
+																lineHeight={14}
+																color={colors.Primary}>
+																{'# '}
+															</PretendardVariableText>
+															<PretendardVariableText
+																size={10}
+																lineHeight={12}
+																color={colors.backgroundWhite}>
+																{value}
+															</PretendardVariableText>
+														</HStack>
+													</TagElement>
+													{index == 1 && item.tendency.length > 5 && (
+														<PretendardSemiBoldText
+															size={15}
+															lineHeight={21}
+															color={colors.Primary}>
+															+{item.tendency.length - 5}
+														</PretendardSemiBoldText>
+													)}
+												</Fragment>
+											))}
+										</TagContainer>
+									</GraientBackground>
 								</ImageContainer>
 							</RecommendContainer>
 						</Fragment>
@@ -145,14 +158,15 @@ const RecommendBorderContainer = styled.View`
 	margin-top: ${heightPercentage(52)}px;
 `;
 const DayRecommendContainer = styled.View`
-	width: ${widthPercentage(111)}px;
+	width: ${widthPercentage(112)}px;
 	height: ${heightPercentage(35)}px;
 	align-items: center;
 	justify-content: center;
 	background-color: ${colors.Gray1};
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
-	top: -${heightPercentage(17.5)}px;
+	margin-top: ${widthPercentage(22)}px;
+	top: -${heightPercentage(2.5)}px;
 `;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(327)}px;
@@ -165,8 +179,8 @@ const RegionText = styled(PretendardSemiBold)`
 	font-weight: 600;
 	line-height: ${heightPercentage(27)}px;
 	color: ${colors.backgroundWhite};
-	left: ${widthPercentage(19)}px;
-	top: ${widthPercentage(159)}px;
+	bottom: ${heightPercentage(10)}px;
+	left: ${widthPercentage(10)}px;
 `;
 const TagContainer = styled.View`
 	position: absolute;
@@ -189,7 +203,7 @@ const LogoCOntainer = styled.View`
 export const RecommendContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 	border-radius: 12px;
-	margin: 0px 0px ${widthPercentage(12)}px 0px;
+	margin: 0px 0px ${widthPercentage(5)}px 0px;
 	top: -${heightPercentage(17.5)}px;
 `;
 const RecommendImage = styled.Image`

@@ -58,6 +58,7 @@ export default function PresetDetail({navigation, route}: any) {
 	};
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const mapRef = useRef<MapView>(null);
+	const scrollRef = useRef();
 	const change = (idx: number) => {
 		if (mapRef.current) {
 			mapRef.current.animateToRegion(
@@ -70,6 +71,11 @@ export default function PresetDetail({navigation, route}: any) {
 				1000,
 			); // 1000ms 동안 목표 지점으로 애니메이션 이동
 		}
+		let totalScroll = 0;
+		for (let i = 0; i < idx; i++) {
+			totalScroll += presetDatas[route.params.index][i].length;
+		}
+		scrollRef.current.scrollTo({y: totalScroll * 48 + idx * 17 + idx * widthPercentage(10), animate: true});
 		setSelect(idx);
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -174,7 +180,7 @@ export default function PresetDetail({navigation, route}: any) {
 						{markers}
 						{polylines}
 					</MapView>
-					<ScrollView horizontal>
+					{/* <ScrollView horizontal>
 						<FlexWrap gap={10}>
 							{presetDatas[route.params.index].map((item, idx) => (
 								<DayTouchablOpacity
@@ -192,9 +198,9 @@ export default function PresetDetail({navigation, route}: any) {
 								</DayTouchablOpacity>
 							))}
 						</FlexWrap>
-					</ScrollView>
+					</ScrollView> */}
 				</TopFixContainer>
-				<ScrollView showsVerticalScrollIndicator={false}>
+				<ScrollView showsVerticalScrollIndicator={false} ref={scrollRef}>
 					{presetDatas[route.params.index].map((item, index) => (
 						<WhiteContainer key={index}>
 							<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray5}>

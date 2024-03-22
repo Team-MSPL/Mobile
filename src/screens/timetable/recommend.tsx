@@ -275,7 +275,7 @@ export default function Recommend({navigation, route}: any) {
 								textSize={12}
 								lineHeight={18}
 								width={widthPercentage(75)}
-								height={heightPercentage(22)}
+								height={heightPercentage(30)}
 								backgroundColor={colors.Primary}
 								textColor={colors.Gray5}
 								onPress={() => {

@@ -90,10 +90,11 @@ export const ClearTouchableOpacity = styled.TouchableOpacity`
 	justify-content: center;
 `;
 
-export const BackgroundGray = styled.View<{paddingHorizental?: number; gap?: number}>`
+export const BackgroundGray = styled.View<{paddingHorizental?: number; gap?: number; marginTop?: number}>`
 	flex: 1;
 	background-color: ${colors.backgroundGray};
-	padding: 0px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
+	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
+		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
 `;
 

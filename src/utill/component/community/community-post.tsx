@@ -98,18 +98,18 @@ const PostImageContainer = styled.View`
 	margin-vertical: 12px;
 	background-color: ${colors.main};
 `;
-const PostImageSwiper = styled(Swiper)`
-	height: ${Dimensions.get('window').width}px;
+export const PostImageSwiper = styled(Swiper)<{height?: number}>`
+	height: ${props => props.height ?? Dimensions.get('window').width}px;
 `;
-const Dot = styled.View`
-	background-color: #ccc;
+export const Dot = styled.View`
+	background-color: #b1b6cc80;
 	width: 8px;
 	height: 8px;
 	border-radius: 4px;
 	margin: 4px;
 `;
-const ActiveDot = styled.View`
-	background-color: ${colors.border};
+export const ActiveDot = styled.View`
+	background-color: ${colors.backgroundWhite};
 	width: 8px;
 	height: 8px;
 	border-radius: 4px;

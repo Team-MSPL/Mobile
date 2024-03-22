@@ -28,6 +28,7 @@ export default function SelectTour({navigation}: any) {
 			<ButtonsContainer>
 				{regionTendencyList[3].list.map((item, idx) => (
 					<TendencyButton
+						marginBottom={0}
 						bgColor={regionTendency[3][idx] == 1}
 						label={item}
 						key={idx}
@@ -48,5 +49,5 @@ const ButtonsContainer = styled.View`
 	flex-wrap: wrap;
 	align-items: center;
 	margin-top: ${heightPercentage(155)}px;
-	gap: ${widthPercentage(4)}px;
+	gap: ${widthPercentage(10)}px;
 `;

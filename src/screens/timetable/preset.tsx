@@ -109,7 +109,7 @@ export default function Preset({navigation}: any) {
 					(item, idx) =>
 						item != null && (
 							<WhiteContainer key={idx}>
-								<HStack>
+								<HStack marginVertical={heightPercentage(10)}>
 									<IndexContainer>
 										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray5}>
 											{idx + 1}
@@ -122,7 +122,7 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+								<FlexWrap gap={widthPercentage(10)} marginBottom={10}>
 									{presetTendencyList[idx].tendencyNameList.map((item, index) => {
 										return (
 											<TagContainer
@@ -208,6 +208,9 @@ export default function Preset({navigation}: any) {
 									}),
 								)}
 								<PrimaryButton
+									alignSelf='center'
+									marginBottom={heightPercentage(10)}
+									marginTop={heightPercentage(10)}
 									width={290}
 									height={50}
 									label='일정 자세히 보기'

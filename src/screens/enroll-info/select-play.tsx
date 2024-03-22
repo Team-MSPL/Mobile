@@ -23,12 +23,13 @@ export default function RecommendSelectPlay({navigation}: any) {
 			<Stepper total={11} now={8}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='무엇을 하고 싶으신가요?'
 				subText='* 중복 선택 가능'></StepText>
 			<ButtonsContainer>
 				{tendencyList[2]?.list.map((item, idx) => (
 					<TendencyButton
+						marginBottom={0}
 						bgColor={tendency[2][idx] == 1}
 						label={item}
 						key={idx}
@@ -38,7 +39,11 @@ export default function RecommendSelectPlay({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
+			<CustomButton
+				marginBottom={12}
+				marginTop={heightPercentage(10)}
+				onPress={goNext}
+				label='다음'></CustomButton>
 		</BackgroundGray>
 	);
 }
@@ -48,5 +53,5 @@ const ButtonsContainer = styled.View`
 	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
-	gap: ${widthPercentage(4)}px;
+	gap: ${widthPercentage(10)}px;
 `;
