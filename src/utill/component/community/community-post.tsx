@@ -99,7 +99,7 @@ const PostImageContainer = styled.View`
 	background-color: ${colors.main};
 `;
 export const PostImageSwiper = styled(Swiper)<{height?: number}>`
-	height: ${props => props.height ?? Dimensions.get('window').width}px;
+	height: ${heightPercentage(240)}px;
 `;
 export const Dot = styled.View`
 	background-color: #b1b6cc80;
@@ -109,7 +109,7 @@ export const Dot = styled.View`
 	margin: 4px;
 `;
 export const ActiveDot = styled.View`
-	background-color: ${colors.backgroundWhite};
+	background-color: ${colors.PointYellow};
 	width: 8px;
 	height: 8px;
 	border-radius: 4px;

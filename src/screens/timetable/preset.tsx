@@ -87,10 +87,10 @@ export default function Preset({navigation}: any) {
 						height={heightPercentage(150)}></SVGCalendarRecommend>
 				</SvgContainer>
 				<WhiteContainer>
-					<HStack>
+					<HStack gap={widthPercentage(4)}>
 						<SVGFlag />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-							{cityViewList[cityIndex].title}
+							{region.map((item, idx) => item + (idx != region.length - 1 ? ',' : ''))}
 						</PretendardSemiBoldText>
 					</HStack>
 					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>

@@ -1,16 +1,6 @@
 import moment from 'moment';
-import {useEffect, useRef, useState} from 'react';
-import {
-	Image,
-	Linking,
-	Modal,
-	NativeScrollEvent,
-	NativeSyntheticEvent,
-	Platform,
-	Pressable,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import {JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -22,21 +12,17 @@ import {
 	MainContainer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
-	TagContainer,
 	VStack,
 } from '../../utill/layout/layout';
-import {DashLine, DashLineContainer, PresetButton} from './preset';
-import {SVGPlus, SvgApple, SvgPlace} from '../../utill/svg/svg';
+import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
 import {WhiteContainer} from '../enroll-info/final-check';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import InfoView from '../../utill/component/timetable/info-view';
-import CustomButton from '../../utill/component/custom-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {ButtonContainer, SVGContainer} from '../enroll-info/select-multi';
 import {usePosition} from '../../utill/hooks/usePosition';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
@@ -94,53 +80,77 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			}
 		}
 	};
+	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
+	const polylines:
+		| string
+		| number
+		| boolean
+		| JSX.Element[]
+		| ReactElement<any, string | JSXElementConstructor<any>>
+		| null
+		| undefined = [];
+	let positions: {latitude: number; longitude: number}[] = [];
 	const mapRef = useRef<MapView>(null);
-
-	const polylineCoordinates = timetable[select]
-		.map((item, value) => {
-			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
-				return {latitude: item.lat, longitude: item.lng};
-			}
-			return null;
-		})
-		.filter(items => items !== null);
-	let count = 0;
-	const markers = timetable[select]
-		.map((value, idx) => {
-			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+	timetable.forEach((value, index) => {
+		const polylineCoordinates = value
+			.map((item, value) => {
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					return {latitude: item.lat, longitude: item.lng};
+				}
+				return null;
+			})
+			.filter(items => items !== null);
+		value.map(
+			vvalue =>
+				index == select &&
+				positions.push({
+					latitude: vvalue.lat,
+					longitude: vvalue.lng,
+				}),
+		);
+		let count = 0;
+		markers.push(
+			value.map((item, idx) => {
 				count += 1;
-				return (
-					<Marker
-						key={`marker_${idx}`}
-						coordinate={{latitude: value.lat, longitude: value.lng}}
-						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
-						anchor={{x: 0.5, y: 0.5}}
-						style={{zIndex: 4}}>
-						<MarkerContainer key={idx}>
-							<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
-								{count}
-							</PretendardSemiBoldText>
-						</MarkerContainer>
-					</Marker>
-				);
-			}
-			return null;
-		})
-		.filter(marker => marker !== null);
-	const polylines = timetable[select].map((val, ind) => (
-		<Polyline
-			key={`polyline_${ind}`}
-			coordinates={polylineCoordinates}
-			strokeColor={colors.PointYellow}
-			strokeWidth={2} // You can change the width of the line here
-		/>
-	));
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					return (
+						<Marker
+							key={`marker_${idx}`}
+							coordinate={{latitude: item.lat, longitude: item.lng}}
+							title={item.name}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							anchor={{x: 0.5, y: 0.5}}
+							style={{zIndex: 4}}>
+							{index == select ? (
+								<MarkerContainer key={idx}>
+									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+										{count}
+									</PretendardSemiBoldText>
+								</MarkerContainer>
+							) : (
+								<Circle color={colors.Gray5} key={idx} />
+							)}
+						</Marker>
+					);
+				} else {
+					return null;
+				}
+			}),
+		);
+		polylines.push(
+			<Polyline
+				key={`polyline_${index}`}
+				coordinates={polylineCoordinates}
+				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
+				strokeWidth={2} // You can change the width of the line here
+			/>,
+		);
+	});
 
-	const minLatitude = Math.min(...polylineCoordinates.map(marker => marker.latitude));
-	const maxLatitude = Math.max(...polylineCoordinates.map(marker => marker.latitude));
-	const minLongitude = Math.min(...polylineCoordinates.map(marker => marker.longitude));
-	const maxLongitude = Math.max(...polylineCoordinates.map(marker => marker.longitude));
+	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
+	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
+	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
+	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
 
 	// 경계 상자의 중심 좌표 계산
 	const centerLatitude = (maxLatitude + minLatitude) / 2;
@@ -177,7 +187,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		// 		}),
 		// 	);
 		// }
-		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
 	const goRemove = () => {
 		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
@@ -272,7 +281,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const CancelModify = () => {
 		setModify(false);
 	};
-	if (polylineCoordinates.length == 0) {
+	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
 	return (
@@ -327,28 +336,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							)}
 						</FlexWrap>
 					</DayContainer>
-					{/* <HStack justifyContent='space-between'>
-						<WhiteContainer width={widthPercentage(160)}>
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
-									여행지
-								</PretendardSemiBoldText>
-								<SVGContainer color={colors.PointYellow}>
-									<SVGPlus color={colors.Primary} />
-								</SVGContainer>
-							</HStack>
-						</WhiteContainer>
-						<WhiteContainer width={widthPercentage(160)}>
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
-									여행지
-								</PretendardSemiBoldText>
-								<SVGContainer color={colors.PointYellow}>
-									<SVGPlus color={colors.Primary} />
-								</SVGContainer>
-							</HStack>
-						</WhiteContainer>
-					</HStack> */}
 					<DayScrollView modify={modify} ref={scrollRef} onMomentumScrollEnd={changeViewState}>
 						{timetable.map(
 							(value, index) =>
@@ -380,7 +367,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																idx == value.length - 1 ? 'end' : 'center'
 															}></DashLine>
 													</DashLineContainer>
-													<InsideGrayContainer>
+													<InsideGrayContainer
+														onPress={() => {
+															moveRegion(idx);
+														}}>
 														<HStack justifyContent='space-between'>
 															<VStack>
 																<PretendardVariableText
@@ -470,7 +460,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 															idx={index}
 															modify={false}
 															CancelModify={CancelModify}
-															//modify TODO 바꾸기
 														/>
 													</InsideGrayContainer>
 												</HStack>
@@ -479,57 +468,15 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									</WhiteContainer>
 								),
 						)}
-						{/* {timetable[select].map((value, index) => {
-							if (!excludeNames.includes(value.name)) {
-								return (
-									<DaysContainer key={index}>
-										<DayElementContainer>
-											<PlaceContainer
-												onPress={() => {
-													moveRegion(index);
-												}}>
-												<VStack>
-													<PlaceText>{categoryTitle[value.category]}</PlaceText>
-													<DayTimeText>
-														{Math.floor((value.y * 30 + 360) / 60)}:
-														{String((value.y * 30 + 360) % 60).padStart(2, '0')}~
-														{Math.floor(((value.y + value.takenTime / 30) * 30 + 360) / 60)}
-														:
-														{String(
-															((value.y + value.takenTime / 30) * 30 + 360) % 60,
-														).padStart(2, '0')}
-													</DayTimeText>
-												</VStack>
-												<PlaceText>{value.name}</PlaceText>
-											</PlaceContainer>
-										</DayElementContainer>
-										<DayElementContainer>
-											{value.id != noMove[noMove.length - 1].id && (
-												<MoveContainer
-													onPress={() => {
-														goNavigation(index);
-													}}>
-													<PlaceText>이동</PlaceText>
-													<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
-												</MoveContainer>
-											)}
-										</DayElementContainer>
-									</DaysContainer>
-								);
-							} else {
-								return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
-							}
-						})} */}
 					</DayScrollView>
-					{saveView && (
-						<AbsoluteButton onPress={goSave}>
-							<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
-								저장
-							</PretendardSemiBoldText>
-						</AbsoluteButton>
-					)}
-					{/* {modify && <CustomButton label='저장' onPress={() => {}}></CustomButton>} */}
 				</BackgroundGray>
+				{saveView && (
+					<AbsoluteButton onPress={goSave}>
+						<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
+							저장
+						</PretendardSemiBoldText>
+					</AbsoluteButton>
+				)}
 				<Modal
 					visible={visible}
 					animationType={'fade'}
@@ -653,24 +600,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 						</InfoModalContainer>
 					</ModalContainer>
 				</Modal>
-				{/* <UseDatePicker
-					title={flag.current == 0 ? '시작 시간' : '종료 시간'}
-					goConfirm={onConfirm}
-					minuteData={flag.current == 0 ? startTime.current.minute / 30 : endTime.current.minute / 30}
-					ampmData={
-						flag.current == 0 ? (startTime.current.hours < 12 ? 0 : 1) : endTime.current.hours < 12 ? 0 : 1
-					}
-					hourData={
-						flag.current == 0
-							? startTime.current.hours < 12
-								? startTime.current.hours
-								: startTime.current.hours - 12
-							: endTime.current.hours < 12
-							? endTime.current.hours
-							: endTime.current.hours - 12
-					}
-					visible={visible}
-					setVisible={setVisible}></UseDatePicker> */}
 			</VStack>
 		</MainAllContainer>
 	);
@@ -709,29 +638,10 @@ const InfoModalContainer = styled.View`
 	border-top-left-radius: 16px;
 	padding: ${heightPercentage(23.22)}px ${widthPercentage(24)}px;
 `;
-const ModalElementContainer = styled.TouchableOpacity`
-	width: 100%;
-	align-items: center;
-	border-bottom-width: 1px;
-	border-bottom-color: ${colors.regionNormal};
-	flex-direction: row;
-	padding: 3%;
-`;
-const ModalIconContainer = styled.View`
-	width: 20%;
-	align-items: center;
-	justify-content: center;
-`;
 const ModalContainer = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.4);
 `;
-const ModalText = styled.Text`
-	font-size: 18px;
-	font-weight: 500;
-	color: black;
-`;
-const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
 export const DayContainer = styled.ScrollView``;
 const PlaceText = styled.Text`
 	font-size: 16px;
@@ -759,10 +669,6 @@ export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};
 `;
-const DaysContainer = styled.View`
-	padding: 2%;
-`;
-
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
@@ -770,22 +676,6 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 const DayScrollView = styled.ScrollView<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
 	height: ${props => (props.modify ? heightPercentage(600) : heightPercentage(300))}px;
-`;
-
-const MoveContainer = styled.TouchableOpacity`
-	width: 100%;
-	padding: 5%;
-	align-items: center;
-	justify-content: space-around;
-	flex-direction: row;
-`;
-const PlaceContainer = styled(MoveContainer)`
-	flex-direction: row;
-	justify-content: space-between;
-`;
-const DayTimeText = styled.Text`
-	font-size: 14px;
-	color: ${colors.selectButton};
 `;
 export const MarkerText = styled.Text`
 	position: absolute;
@@ -805,7 +695,7 @@ const BackgroundGray = styled.View`
 	top: -10px;
 	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
 `;
-const InsideGrayContainer = styled.View<{backgroundColor?: string}>`
+const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	width: ${widthPercentage(282)}px;
 	height: ${heightPercentage(66)}px;
 	border-radius: 8px;

@@ -1,6 +1,6 @@
 import {ScrollView} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getRegionInfo, travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 import CustomButton from '../../utill/component/custom-button';
 import {BackgroundGray, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
@@ -61,9 +61,14 @@ export default function SelectCity({navigation}: any) {
 	};
 
 	const goNext = () => {
-		region.length != 0
-			? navigation.navigate('SelectDay')
-			: dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
+		if (region.length == 0) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
+		} else {
+			navigation.navigate('SelectDay');
+			dispatch(
+				getRegionInfo({region: cityViewList[cityIndex].title + (region[0] != '전체' ? ' ' + region[0] : '')}),
+			);
+		}
 	};
 
 	return (
@@ -155,6 +160,10 @@ export default function SelectCity({navigation}: any) {
 		</BackgroundGray>
 	);
 }
+const TestImage = styled.Image`
+	width: ${widthPercentage(100)}px;
+	height: ${heightPercentage(100)}px;
+`;
 const FlexContainer = styled.View`
 	flex: 1;
 	justify-content: center;

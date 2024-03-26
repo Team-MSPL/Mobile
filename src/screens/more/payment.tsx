@@ -1,4 +1,4 @@
-import {Platform, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Platform, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
 import {
@@ -74,6 +74,15 @@ export default function Payment({navigation}: any) {
 			unsubscribeEarned();
 		};
 	}, [watchAD]);
+	const [adload, setAdload] = useState(false);
+	const tick = setTimeout(() => {
+		setAdload(true);
+		clearTimeout(tick);
+	}, 5000);
+	useEffect(() => {
+		tick;
+	}, []);
+
 	const openAd = () => {
 		if (rewardedRef.current !== null) {
 			rewardedRef?.current?.loaded
@@ -107,10 +116,15 @@ export default function Payment({navigation}: any) {
 							1일 최대 2회 수령 가능{`\n`}오늘 남은 횟수 {2 - watchAD}회
 						</PretendardVariableText>
 					</VStack>
-					<TouchContainer onPress={openAd} disabled={watchAD > 1}>
+					<TouchContainer onPress={openAd} disabled={watchAD > 1 || !adload} opacity={adload ? 1 : 0.7}>
 						<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 							광고시청
 						</PretendardSemiBoldText>
+						{!adload && (
+							<ActivityIndicatorContainer>
+								<ActivityIndicator color={colors.PointYellow} size={'large'} />
+							</ActivityIndicatorContainer>
+						)}
 					</TouchContainer>
 				</HStack>
 			</PaymentContainer>
@@ -155,7 +169,7 @@ const PaymentContainer = styled.View`
 	padding-left: ${widthPercentage(10)}px;
 	margin-top: ${heightPercentage(24)}px;
 `;
-const TouchContainer = styled.TouchableOpacity`
+const TouchContainer = styled.TouchableOpacity<{opacity?: number}>`
 	width: ${widthPercentage(80)}px;
 	height: ${heightPercentage(92)}px;
 	background-color: ${colors.Primary};
@@ -163,4 +177,8 @@ const TouchContainer = styled.TouchableOpacity`
 	justify-content: center;
 	border-top-right-radius: 8px;
 	border-bottom-right-radius: 8px;
+	opacity: ${props => props.opacity ?? 1};
+`;
+const ActivityIndicatorContainer = styled.View`
+	position: absolute;
 `;

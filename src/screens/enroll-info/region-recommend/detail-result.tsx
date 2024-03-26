@@ -19,6 +19,9 @@ export default function DetailResult({navigation, route}: any) {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = () => {
 		let copy = [...regionTendency];
+		let copy0 = [...regionTendency[0]];
+		copy0.push(0);
+		copy[0] = copy0;
 		let copy2 = [...regionTendency[2]];
 		if (copy2[4] == 1) {
 			copy2.push(1);

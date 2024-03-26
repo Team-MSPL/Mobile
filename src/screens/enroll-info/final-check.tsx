@@ -44,6 +44,8 @@ export default function FinalCheck({navigation}: any) {
 		season,
 		bandwidth,
 		freeTicket,
+		regionInfo,
+		travelName,
 	} = useAppSelector(state => state.travelSlice);
 	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
@@ -117,6 +119,16 @@ export default function FinalCheck({navigation}: any) {
 		try {
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
+			if (travelName == '신나는 여행') {
+				let changeName =
+					tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
+					(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
+						? ' '
+						: ' 함께하는 ') +
+					seasonList[season.findIndex(item => item == 1)].title +
+					'여행';
+				dispatch(travelSliceActions.enrollTravelName(changeName));
+			}
 			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
 			if (
 				(cityViewList[cityIndex].id >= 9 && region[0] == '전체') ||
@@ -231,15 +243,20 @@ export default function FinalCheck({navigation}: any) {
 				<MainContainer showsVerticalScrollIndicator={false}>
 					{/* 스테퍼 넣기 */}
 					<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
+						<RegionImage source={{uri: regionInfo.photo}} />
 						<VStack>
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
 								{day[0].format('YY-MM-DD') + ' - ' + day[nDay].format('YY-MM-DD')}
 							</PretendardVariableText>
 							<HStack gap={widthPercentage(5)}>
-								<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Gray5}>
+								<PretendardSemiBoldText
+									size={20}
+									lineHeight={27}
+									color={colors.Gray5}
+									width={widthPercentage(150)}>
 									{cityViewList[cityIndex].title + region}
+									<SVGFlag style={{marginLeft: widthPercentage(8)}} />
 								</PretendardSemiBoldText>
-								<SVGFlag />
 							</HStack>
 						</VStack>
 						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
@@ -478,6 +495,11 @@ export default function FinalCheck({navigation}: any) {
 		</>
 	);
 }
+const RegionImage = styled.Image`
+	width: ${widthPercentage(50)}px;
+	height: ${heightPercentage(50)}px;
+	border-radius: 12px;
+`;
 const SvgContainer = styled.View`
 	width: ${widthPercentage(40)}px;
 	height: ${widthPercentage(40)}px;

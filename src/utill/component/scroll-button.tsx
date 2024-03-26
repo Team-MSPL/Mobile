@@ -1,11 +1,12 @@
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {HStack, PretendardVariableText, devicesHeight, devicesWidth} from '../layout/layout';
+import {HStack, PretendardVariableText, devicesWidth} from '../layout/layout';
 import {useEffect} from 'react';
 import {colors} from '../colors';
 import {useAppDispatch} from '../../redux';
 import {communitySliceActions} from '../../redux/community/community.slice';
 import {SVGPencil} from '../svg/svg';
+import {heightPercentage, widthPercentage} from '../layout/responsive-size';
 
 export default function ScrollButton({viewState, navigation}: {viewState: boolean; navigation: any}) {
 	const IconContainer = styled(Icon)``;
@@ -29,17 +30,17 @@ export default function ScrollButton({viewState, navigation}: {viewState: boolea
 						글쓰기
 					</PretendardVariableText>
 				)}
-				<SVGPencil color={colors.Primary} width={devicesWidth * (viewState ? 0.08 : 0.05)} />
+				<SVGPencil color={colors.Primary} width={widthPercentage(viewState ? 30 : 30)} />
 			</HStack>
 		</CommunityButton>
 	);
 }
 const CommunityButton = styled.TouchableOpacity`
-	padding: ${devicesWidth * 0.03}px;
+	padding: ${widthPercentage(10)}px ${widthPercentage(15)}px;
 	border-radius: 99px;
 	position: absolute;
-	bottom: ${devicesHeight * 0.03}px;
-	right: ${devicesWidth * 0.05}px;
+	bottom: ${heightPercentage(25)}px;
+	right: ${widthPercentage(20)}px;
 	background-color: ${colors.Gray5};
 	elevation: 4;
 `;

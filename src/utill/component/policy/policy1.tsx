@@ -99,5 +99,5 @@ export const PolicySubText = styled(PretendardVariable)`
 	color: ${colors.Gray4};
 	line-height: ${heightPercentage(21)}px;
 	margin-bottom: 10px;
-	text-align: center;
+	text-align: left;
 `;

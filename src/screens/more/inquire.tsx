@@ -80,6 +80,7 @@ export default function Inquire({navigation}: any) {
 					height={heightPercentage(52)}
 					width={widthPercentage(327)}
 					disabled={text.length == 0}
+					marginBottom={10}
 					backgroundColor={colors.Primary}
 					textColor={colors.Black}></PrimaryButton>
 			</ButtonContainer>
@@ -89,6 +90,7 @@ export default function Inquire({navigation}: any) {
 const CouponContainer = styled(BackgroundGray).attrs({as: Pressable})`
 	flex: 1;
 	gap: ${heightPercentage(15)}px;
+	padding-top: ${heightPercentage(10)}px;
 `;
 const CouponInput = styled.TextInput`
 	width: ${widthPercentage(326)}px;

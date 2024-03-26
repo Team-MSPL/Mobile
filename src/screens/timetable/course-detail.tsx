@@ -39,6 +39,8 @@ import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice'
 import {ButtonContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
 import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/community-post';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 export default function CourseDetail({navigation, route}: any) {
 	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
@@ -163,17 +165,27 @@ export default function CourseDetail({navigation, route}: any) {
 			getDetail();
 		}, []),
 	);
-	useEffect(() => {
-		route.params.value.name == '소백산국립공원(경북)' &&
+	const toDayNoShow = async () => {
+		await AsyncStorage.setItem('sobaecksan', moment().format('DD').toString());
+	};
+	const checkSobaecksan = async () => {
+		const checkFlag = await AsyncStorage.getItem('sobaecksan');
+		checkFlag != moment().format('DD').toString() &&
+			route.params.value.name == '소백산국립공원(경북)' &&
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '소백산',
 					modalSubTitle: '소백산은 탐방 코스를 추천받을수도있어요!',
 					modalFunction: goHiking,
 					modalTopText: '추천받기',
-					modalBottomText: '둘러보기',
+					modalBottomText: '오늘보지않기',
+					modalBottomFunctionUse: true,
+					modalBottomFunction: toDayNoShow,
 				}),
 			);
+	};
+	useEffect(() => {
+		checkSobaecksan();
 	}, []);
 	const tabBarRef = useRef();
 	const [tabView, setTabView] = useState(0);
@@ -263,6 +275,7 @@ export default function CourseDetail({navigation, route}: any) {
 		dispatch(hikingRecommendSliceActions.reset());
 		navigation.navigate('HikingSelectPlay');
 	};
+	const [moreStatus, setMoreStatus] = useState(false);
 	if (courseDetail?.name)
 		return (
 			<>
@@ -319,7 +332,7 @@ export default function CourseDetail({navigation, route}: any) {
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
 						<ScrollView>
-							{route.params.value.name == '소백산국립공원(경북)' && (
+							{/* {route.params.value.name == '소백산국립공원(경북)' && (
 								<PrimaryButton
 									marginBottom={heightPercentage(10)}
 									width={widthPercentage(200)}
@@ -328,7 +341,7 @@ export default function CourseDetail({navigation, route}: any) {
 									onPress={goHiking}
 									backgroundColor={colors.Primary}
 									textColor={colors.Gray5}></PrimaryButton>
-							)}
+							)} */}
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
 									{courseDetail.name}
@@ -350,14 +363,19 @@ export default function CourseDetail({navigation, route}: any) {
 								{courseDetail?.infoTitle}
 							</PretendardVariableText>
 							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-							<PretendardVariableText
-								width={widthPercentage(327)}
-								size={14}
-								lineHeight={21}
-								color={colors.Gray4}
-								numberOfLines={2}>
-								{courseDetail?.infoContent}
-							</PretendardVariableText>
+							<MoreTouchable
+								onPress={() => {
+									setMoreStatus(!moreStatus);
+								}}>
+								<PretendardVariableText
+									width={widthPercentage(327)}
+									size={14}
+									lineHeight={21}
+									color={colors.Gray4}
+									numberOfLines={moreStatus ? 2 : undefined}>
+									{courseDetail?.infoContent}
+								</PretendardVariableText>
+							</MoreTouchable>
 							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 							{detailList.map(
 								(detail, detailIndex) =>
@@ -514,8 +532,14 @@ export default function CourseDetail({navigation, route}: any) {
 						</ScrollView>
 						<ButtonContainer>
 							<CustomButton
-								label='이 지역의 여행코스 추천받기'
-								onPress={goIncludeRecommend}></CustomButton>
+								label={
+									route.params.value.name == '소백산국립공원(경북)'
+										? '탐방 코스 추천받기'
+										: '이 지역의 여행코스 추천받기'
+								}
+								onPress={
+									route.params.value.name == '소백산국립공원(경북)' ? goHiking : goIncludeRecommend
+								}></CustomButton>
 						</ButtonContainer>
 					</RecommendBorderContainer>
 					{/* <TitleInfoContainer>
@@ -636,6 +660,10 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
 }
+
+const MoreTouchable = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+`;
 export const ReviewImage = styled.Image<{width: number}>`
 	width: ${props => props.width}px;
 	height: ${heightPercentage(120)}px;

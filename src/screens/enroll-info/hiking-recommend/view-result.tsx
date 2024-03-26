@@ -25,7 +25,6 @@ export default function HikingViewResult({navigation}: any) {
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {hikingList} = useAppSelector(state => state.hikingSlice);
 	const difficultyKorean = ['하', '중', '중상', '상', '고급'];
-	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
 		navigation.setOptions({
 			headerLeft: () => (
@@ -33,8 +32,7 @@ export default function HikingViewResult({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '취소시 지역 추천이 종료됩니다.',
-								modalSubTitle: '그래도 나가시겠습니까?',
+								modalTitle: '홈으로 이동하시겠습니까?',
 								modalFunction: () => {
 									navigation.popToTop();
 								},

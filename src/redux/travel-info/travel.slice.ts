@@ -72,6 +72,7 @@ const initialState: LiteState = {
 	moveTimeErrorIndex: 0,
 	shareLoginFlag: false,
 	shareViewWithStartFlag: false,
+	regionInfo: {name: '', photo: ''},
 };
 
 export const axiosGoogle = axios.create({
@@ -335,6 +336,20 @@ export const updateShareUserList = createAsyncThunk(
 		}
 	},
 );
+
+// 지역 사진 가져오는거
+export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: any, {rejectWithValue}) => {
+	try {
+		console.log(data);
+		const response = await axiosAuth.get(`/place/regionInfo?region=${data.region}`, data);
+		//console.log(a);
+		//제로리절트 처리하기
+		return response.data;
+	} catch (error: any) {
+		console.log(error);
+		throw rejectWithValue(error.code);
+	}
+});
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -676,6 +691,10 @@ export const travelSlice = createSlice({
 			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
 		});
+		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
+			state.regionInfo.name = payload.name;
+			state.regionInfo.photo = payload.photo;
+		});
 	},
 });
 
@@ -724,6 +743,11 @@ interface LiteState {
 	moveTimeErrorIndex: number;
 	shareLoginFlag: boolean;
 	shareViewWithStartFlag: boolean;
+	regionInfo: regionInfoType;
+}
+interface regionInfoType {
+	name: string;
+	photo: string;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];

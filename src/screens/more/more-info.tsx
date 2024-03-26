@@ -7,7 +7,7 @@ import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {BackgroundGray, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
 import {useState} from 'react';
 import ViewPager from '../../utill/view-pager';
@@ -134,10 +134,17 @@ export default function MoreInfo({navigation}: any) {
 							{userName}
 						</PretendardSemiBoldText>
 					</HStack>
-					<SVGNoteList
-						onPress={goNoteList}
-						width={widthPercentage(33)}
-						height={widthPercentage(33)}></SVGNoteList>
+					<NoteListContainer>
+						<NoteCount>
+							<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+								0
+							</PretendardSemiBoldText>
+						</NoteCount>
+						<SVGNoteList
+							onPress={goNoteList}
+							width={widthPercentage(33)}
+							height={widthPercentage(33)}></SVGNoteList>
+					</NoteListContainer>
 				</HStack>
 				<UserManage />
 				<HStack justifyContent='flex-end'>
@@ -254,9 +261,29 @@ export default function MoreInfo({navigation}: any) {
 		</ScrollView>
 	);
 }
+const NoteListContainer = styled.View`
+	width: ${widthPercentage(50)}px;
+	height: ${widthPercentage(50)}px;
+	align-items: center;
+	justify-content: center;
+	right: 3px;
+	top: 3px;
+`;
+const NoteCount = styled.View`
+	width: ${widthPercentage(11)}px;
+	height: ${widthPercentage(15)}px;
+	background-color: ${colors.Gray5};
+	border-radius: 3px;
+	position: absolute;
+	z-index: 2;
+	right: 2px;
+	top: 0;
+	align-items: center;
+	justify-content: center;
+`;
 const Test = styled.View`
-	width: ${widthPercentage(327)}px;
-	height: ${heightPercentage(10)}px;
+	width: 100%;
+	height: ${heightPercentage(15)}px;
 	background-color: ${colors.backgroundGray};
 `;
 const ProfileImage = styled.Image`

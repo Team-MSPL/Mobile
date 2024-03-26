@@ -1,23 +1,17 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getRegionInfo, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import {getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
-import {
-	HStack,
-	PretendardBoldText,
-	PretendardSemiBoldText,
-	PretendardVariable,
-	PretendardVariableText,
-} from '../../utill/layout/layout';
+import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
@@ -26,9 +20,10 @@ import {cityViewList} from '../enroll-info/select-city';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
-import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 
 export default function Main({navigation}: any) {
+	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -53,10 +48,10 @@ export default function Main({navigation}: any) {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle];
+		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle.split(' ')[1]];
 		let cityDistance = metropolitanCheckList.includes(e.subTitle)
 			? 0
-			: cityViewList[e.id].sub.findIndex(item => item.subTitle == e.subTitle);
+			: cityViewList[e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
@@ -103,6 +98,26 @@ export default function Main({navigation}: any) {
 			setMainScreens(data);
 		} catch (err) {}
 	};
+	useFocusEffect(
+		useCallback(() => {
+			recursionCall();
+		}, []),
+	);
+	const countRef = useRef(0);
+	const recursionCall = () => {
+		const tick = setTimeout(async () => {
+			countRef.current += 1;
+			let randomKey = Math.floor(Math.random() * regionList.length);
+			let searchRegion = regionList[randomKey].subTitle;
+			await dispatch(getHomeRegionInfo({region: searchRegion.trimStart()}));
+			recursionCall();
+		}, 5000);
+		if (countRef.current < 5) {
+			tick;
+		} else {
+			clearTimeout(tick);
+		}
+	};
 	useLayoutEffect(() => {
 		getMainScreen();
 	}, []);
@@ -120,6 +135,7 @@ export default function Main({navigation}: any) {
 		}
 		checkEvent();
 	}, [signUpReward]);
+
 	useBackHandler({type: 'exit'});
 	const buttonList: ButtonListType[] = [
 		{
@@ -191,7 +207,7 @@ export default function Main({navigation}: any) {
 	};
 	return (
 		<HomeContainer showsVerticalScrollIndicator={false}>
-			<BackgroundImage source={require('../../../public/images/home-image.png')}>
+			<BackgroundImage source={{uri: homeRegionImage.photo}}>
 				<BrighnessBox>
 					<TicketTouchable onPress={goTokenLog}>
 						<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
@@ -200,7 +216,10 @@ export default function Main({navigation}: any) {
 					</TicketTouchable>
 					<HomeTextContainer
 						onPress={() => {
-							selectPopularity({id: randomRegion.id, subTitle: randomRegion.subTitle});
+							selectPopularity({
+								id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
+								subTitle: regionList.find(item => item.subTitle == homeRegionImage.name).subTitle,
+							});
 						}}>
 						<PretendardSemiBoldText
 							size={23}
@@ -210,7 +229,7 @@ export default function Main({navigation}: any) {
 							}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
 						<HStack>
 							<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
-								{randomRegion.subTitle + ' '}
+								{homeRegionImage.name + ' '}
 							</PretendardBoldText>
 							<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
 								여행은 어때요?
@@ -298,9 +317,10 @@ const RecommendContainer = styled.Pressable`
 	background-color: ${colors.Gray1};
 	border-radius: 12px;
 	top: ${heightPercentage(18)}px;
-	margin: 0px 0px ${heightPercentage(9)}px 0px;
+	margin: 0px 0px ${heightPercentage(9)}px -${widthPercentage(24)}px;
 	flex-direction: row;
 	overflow: hidden;
+	align-self: center;
 `;
 
 const RecommendTextContainer = styled.View`
@@ -397,9 +417,9 @@ const regionList = [
 	{id: 5, subTitle: '광주'},
 	{id: 6, subTitle: '대전'},
 	{id: 7, subTitle: '울산'},
-	{id: 10, subTitle: '강릉시'},
-	{id: 10, subTitle: '속초시'},
-	{id: 15, subTitle: '경주시'},
-	{id: 15, subTitle: '포항시'},
-	{id: 14, subTitle: '여수시'},
+	{id: 10, subTitle: '강원 강릉시'},
+	{id: 10, subTitle: '강원 속초시'},
+	{id: 15, subTitle: '경북 경주시'},
+	{id: 15, subTitle: '경북 포항시'},
+	{id: 14, subTitle: '전남 여수시'},
 ];

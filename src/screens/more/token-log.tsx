@@ -1,11 +1,12 @@
 import {useLayoutEffect, useRef, useState} from 'react';
-import {useAppDispatch} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {TokenLogType, getTokenLog} from '../../redux/user/user.slice';
 import styled from 'styled-components/native';
 import {
 	BackgroundGray,
 	HStack,
+	PretendardBoldText,
 	PretendardSemiBoldText,
 	PretendardVariableText,
 	TagContainer,
@@ -15,9 +16,12 @@ import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {FlatList} from 'react-native';
 import {WhiteContainer} from '../enroll-info/final-check';
+import PrimaryButton from '../../utill/component/primary-button';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function TokenLog({navigation}: any) {
 	const dispatch = useAppDispatch();
+	const {functionToken} = useAppSelector(state => state.userSlice);
 	const [logList, setLogList] = useState<TokenLogType[]>([]);
 	const getTokenList = async () => {
 		try {
@@ -30,6 +34,9 @@ export default function TokenLog({navigation}: any) {
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
+	};
+	const goPayment = () => {
+		navigation.navigate('Payment');
 	};
 	useLayoutEffect(() => {
 		getTokenList();
@@ -82,6 +89,20 @@ export default function TokenLog({navigation}: any) {
 	};
 	return (
 		<BackgroundGray>
+			<WhiteContainer>
+				<HStack justifyContent='space-between' width={widthPercentage(307)}>
+					<PretendardBoldText size={15} lineHeight={20} color={colors.Black}>
+						이용권 {functionToken}개
+					</PretendardBoldText>
+					<PrimaryButton
+						label='이용권 구매'
+						width={widthPercentage(88)}
+						height={heightPercentage(32)}
+						backgroundColor={colors.Primary}
+						textColor={colors.Black}
+						onPress={goPayment}></PrimaryButton>
+				</HStack>
+			</WhiteContainer>
 			{logList.length == 0 ? (
 				<>
 					<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>

@@ -213,14 +213,12 @@ const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
 export const PictureElementContainer = styled.Pressable`
-	width: ${widthPercentage(150)}px;
-	height: ${widthPercentage(150)}px;
+	width: ${widthPercentage(125)}px;
+	height: ${widthPercentage(125)}px;
 	border-radius: 10px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
 	align-items: center;
 	justify-content: center;
-	margin: 10px 10px 0px 0px;
+	margin: 10px ${widthPercentage(20)}px 0px 0px;
 `;
 const PictureText = styled.Text`
 	margin: 10px 0px 0px 0px;

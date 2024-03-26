@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {Platform, ScrollView} from 'react-native';
+import {NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView} from 'react-native';
 import {BackgroundGray, FlexWrap, HStack, PretendardSemiBoldText, TagContainer} from '../../utill/layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {colors} from '../../utill/colors';
@@ -75,7 +75,7 @@ export default function PresetDetail({navigation, route}: any) {
 		for (let i = 0; i < idx; i++) {
 			totalScroll += presetDatas[route.params.index][i].length;
 		}
-		scrollRef.current.scrollTo({y: totalScroll * 48 + idx * 17 + idx * widthPercentage(10), animate: true});
+		//scrollRef.current.scrollTo({y: totalScroll * 48 + idx * 17 + idx * widthPercentage(10), animate: true});
 		setSelect(idx);
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -151,6 +151,42 @@ export default function PresetDetail({navigation, route}: any) {
 
 	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
+	const presetScrollHeight = presetDatas[route.params.index].map(
+		(item, idx) => item.length * 48 + idx * 17 + idx * widthPercentage(10),
+	);
+	const binarySearch = (e: {data: number[]; target: number}) => {
+		let start = 0;
+		let end = e.data.length - 1;
+		let middle = Math.floor(e.data.length / 2);
+		while (start <= end) {
+			middle = Math.floor(start + (end - start) / 2);
+			if (e.target > e.data[middle]) {
+				start = middle + 1;
+			} else if (e.target < e.data[middle]) {
+				end = middle - 1;
+			} else {
+				return e.data[middle];
+			}
+		}
+	};
+	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const scrollY = e.nativeEvent.contentOffset.y;
+
+		// 스크롤뷰의 컨텐츠 높이를 가져옵니다.
+		const contentHeight = e.nativeEvent.contentSize.height;
+
+		// 스크롤뷰의 높이를 가져옵니다.
+		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
+
+		//console.log(scrollY, contentHeight, scrollViewHeight, presetScrollHeight);
+		console.log(binarySearch({data: presetScrollHeight, target: scrollY}));
+		// if (scrollY + scrollViewHeight >= contentHeight - 20) {
+		// 	// 스크롤이 거의 끝에 다다랐을 때 원하는 작업을 수행합니다.
+		// 	return false;
+		// } else {
+		// 	return true;
+		// }
+	};
 	return (
 		<>
 			<BackgroundGray>
@@ -180,7 +216,7 @@ export default function PresetDetail({navigation, route}: any) {
 						{markers}
 						{polylines}
 					</MapView>
-					{/* <ScrollView horizontal>
+					<ScrollView horizontal>
 						<FlexWrap gap={10}>
 							{presetDatas[route.params.index].map((item, idx) => (
 								<DayTouchablOpacity
@@ -198,9 +234,14 @@ export default function PresetDetail({navigation, route}: any) {
 								</DayTouchablOpacity>
 							))}
 						</FlexWrap>
-					</ScrollView> */}
+					</ScrollView>
 				</TopFixContainer>
-				<ScrollView showsVerticalScrollIndicator={false} ref={scrollRef}>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					ref={scrollRef}
+					onScroll={e => {
+						//scrollhandle(e);
+					}}>
 					{presetDatas[route.params.index].map((item, index) => (
 						<WhiteContainer key={index}>
 							<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray5}>
@@ -233,12 +274,12 @@ export default function PresetDetail({navigation, route}: any) {
 											size={16}
 											lineHeight={19}
 											color={value.category == 5 ? colors.PointYellow : colors.Gray5}>
-											{value.name}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-											{Math.floor(value.takenTime / 60) != 0 &&
-												Math.floor(value.takenTime / 60) + '시간'}
-											{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+											{value.name + ' '}
+											<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
+												{Math.floor(value.takenTime / 60) != 0 &&
+													Math.floor(value.takenTime / 60) + '시간'}
+												{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+											</PretendardSemiBoldText>
 										</PretendardSemiBoldText>
 									</HStack>
 								))}

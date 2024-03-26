@@ -10,7 +10,13 @@ import {colors} from '../../utill/colors';
 import CommunityMain from '../../utill/component/community/community-main';
 import ScrollButton from '../../utill/component/scroll-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {HStack, HeaderContianer, HeaderText, PretendardVariableText} from '../../utill/layout/layout';
+import {
+	HStack,
+	HeaderContianer,
+	HeaderText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 import {Google_Ads_Banner_Android} from '@env';
@@ -24,11 +30,11 @@ export default function CommunityMainScreen({navigation}: any) {
 	const {socialloginProvider, blockUserList} = useAppSelector(state => state.userSlice);
 	const [totalPages, setTotalPages] = useState(1);
 	const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-	const [sortOption, setSortOption] = useState(0);
+	const [sortOption, setSortOption] = useState(1);
 	const [sortOptions, setSortOptions] = useState([
-		{label: '최신 순', value: 1},
-		{label: '좋아요 순 ', value: 2},
-		{label: '댓글 순', value: 3},
+		{label: '최신순', value: 1},
+		{label: '좋아요순 ', value: 2},
+		{label: '댓글순', value: 3},
 	]);
 	const [sortOnOff, setSortOnOff] = useState(false);
 	const [currentPostList, setCurrentPostList] = useState<postListType[]>(postList);
@@ -73,16 +79,16 @@ export default function CommunityMainScreen({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(communitySliceActions.resetPostList());
+			console.log(sortOption);
 			const response = await dispatch(
-				getPostList({page: currentPage, sort: sortOption + 1, blockList: blockUserList}),
+				getPostList({page: currentPage, sort: sortOption, blockList: blockUserList}),
 			);
-			console.log('DB로부터 게시글들을 가져오는데 성공했습니다.', response.payload);
-			setCurrentPostList([...response.payload]);
-			if (response.payload.length < 20) {
-				// payload에 실제로 게시글 데이터가 담겨 있다고 가정
-				setTotalPages(currentPage); // 현재 페이지가 마지막 페이지임을 설정
-				console.log('현재가 마지막 페이지임');
-			}
+			// console.log('DB로부터 게시글들을 가져오는데 성공했습니다.', response.payload);
+			// setCurrentPostList([...response.payload]);
+			// if (response.payload.length < 20) {
+			// 	setTotalPages(currentPage); // 현재 페이지가 마지막 페이지임을 설정
+			// 	console.log('현재가 마지막 페이지임');
+			// }
 		} catch (error) {
 			console.log('DB로부터 게시글들을 읽어오는 중에 오류가 발생했습니다:', error);
 		} finally {
@@ -119,24 +125,24 @@ export default function CommunityMainScreen({navigation}: any) {
 					setSortOnOff(!sortOnOff);
 				}}>
 				<HStack justifyContent='space-around'>
-					<PretendardVariableText size={12} lineHeight={14.32} color={colors.PointYellow}>
-						{sortOptions[sortOption].label}
-					</PretendardVariableText>
+					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
+						{sortOptions[sortOption - 1].label}
+					</PretendardSemiBoldText>
 					<SVGRightAdd width={10} height={10} color='black' rotation={180} />
 				</HStack>
 			</SortButton>
 			{sortOnOff &&
 				sortOptions.map(
 					(item, idx) =>
-						idx != sortOption && (
+						idx + 1 != sortOption && (
 							<SelectSort
 								key={idx}
 								onPress={() => {
-									changeSortOption(idx);
+									changeSortOption(idx + 1);
 								}}>
-								<PretendardVariableText size={12} lineHeight={14.32} color={colors.PointYellow}>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
 									{sortOptions[idx].label}
-								</PretendardVariableText>
+								</PretendardSemiBoldText>
 							</SelectSort>
 						),
 				)}
@@ -153,6 +159,7 @@ const SelectSort = styled.Pressable`
 	padding: 0px ${widthPercentage(10)}px;
 	justify-content: center;
 	margin-right: ${widthPercentage(15)}px;
+	border-radius: 6px;
 `;
 const CommunityMainContainer = styled.SafeAreaView`
 	height: 100%;

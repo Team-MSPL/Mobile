@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, TouchableOpacity} from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
@@ -11,11 +11,12 @@ import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
-import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
+import {SVGCamera, SVGRightAdd, SvgCancel, SvgRight} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
+import {PretendardVariableText} from '../../utill/layout/layout';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -128,14 +129,13 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<PrimaryButton
-					label='작성'
-					backgroundColor={colors.Primary}
-					textColor={colors.Black}
-					width={widthPercentage(60)}
-					height={heightPercentage(28)}
+				<TouchableOpacity
 					disabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}
-					onPress={handlePostSubmit}></PrimaryButton>
+					onPress={handlePostSubmit}>
+					<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+						등록
+					</PretendardVariableText>
+				</TouchableOpacity>
 			),
 		});
 	}, [postData.postTitle, postData.postContent]);
@@ -175,22 +175,20 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 										</CancelContainer>
 										<PictureElement source={{uri: uri}} />
 										<BarContainer>
-											{index != 0 && (
-												<MoveButton
-													onPress={() => {
-														moveImage({index: index, direction: false});
-													}}>
-													<ImageInputButtonText>왼</ImageInputButtonText>
-												</MoveButton>
-											)}
-											{index != postData.postImage.length - 1 && (
-												<MoveButton
-													onPress={() => {
-														moveImage({index: index, direction: true});
-													}}>
-													<ImageInputButtonText>오</ImageInputButtonText>
-												</MoveButton>
-											)}
+											<MoveButton
+												disabled={index == 0}
+												onPress={() => {
+													moveImage({index: index, direction: false});
+												}}>
+												{index != 0 && <SvgRight transform={180} />}
+											</MoveButton>
+											<MoveButton
+												disabled={index == postData.postImage.length - 1}
+												onPress={() => {
+													moveImage({index: index, direction: true});
+												}}>
+												{index != postData.postImage.length - 1 && <SvgRight />}
+											</MoveButton>
 										</BarContainer>
 									</PictureElementContainer>
 								);
@@ -240,10 +238,12 @@ const BarContainer = styled.View`
 	bottom: 0px;
 	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-around;
+	background-color: rgba(0, 0, 0, 0.2);
 `;
 const MoveButton = styled.TouchableOpacity`
 	width: 50%;
+	align-items: center;
 `;
 const Container = styled.View`
 	flex: 1;
@@ -275,6 +275,7 @@ const ContentInput = styled.TextInput`
 export const ImageScrollViewContainer = styled.ScrollView`
 	background-color: ${colors.backgroundGray};
 	gap: ${widthPercentage(20)}px;
+	margin-bottom: ${heightPercentage(30)}px;
 `;
 const ImageInputButtonText = styled.Text`
 	font-size: 16px;

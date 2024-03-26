@@ -80,7 +80,7 @@ export const getPostList = createAsyncThunk('/getPostList', async (data: postLis
 		const block = data.blockList.map(item => `&blockedUserIDs=${item}`);
 		const response = await axiosAuth.get(
 			`/post/postList?page=${data.page}&sort=${data.sort}${
-				data.search != undefined && `&search=${data.search}`
+				data.search != undefined ? `&search=${data.search}` : ''
 			}${block.join('')}`,
 		);
 		return response.data;
