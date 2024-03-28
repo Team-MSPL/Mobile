@@ -180,14 +180,16 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 												onPress={() => {
 													moveImage({index: index, direction: false});
 												}}>
-												{index != 0 && <SvgRight transform={180} />}
+												{index != 0 && <SvgRight color={colors.Black} transform={180} />}
 											</MoveButton>
 											<MoveButton
 												disabled={index == postData.postImage.length - 1}
 												onPress={() => {
 													moveImage({index: index, direction: true});
 												}}>
-												{index != postData.postImage.length - 1 && <SvgRight />}
+												{index != postData.postImage.length - 1 && (
+													<SvgRight color={colors.Black} />
+												)}
 											</MoveButton>
 										</BarContainer>
 									</PictureElementContainer>

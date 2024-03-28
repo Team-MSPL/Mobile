@@ -119,7 +119,7 @@ export default function FinalCheck({navigation}: any) {
 		try {
 			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
-			if (travelName == '신나는 여행') {
+			if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
 				let changeName =
 					tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
 					(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
@@ -241,7 +241,6 @@ export default function FinalCheck({navigation}: any) {
 		<>
 			<BackgroundGray>
 				<MainContainer showsVerticalScrollIndicator={false}>
-					{/* 스테퍼 넣기 */}
 					<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
 						<RegionImage source={{uri: regionInfo.photo}} />
 						<VStack>

@@ -208,7 +208,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		return true;
 	};
 
-	const [saveView, setSaveView] = useState(false);
+	const [saveView, setSaveView] = useState(true);
 	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		const state = usePosition(e);
 		state != saveView && setSaveView(state);
@@ -278,6 +278,21 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			}
 		}
 	};
+	let totalHeight = 0;
+	const presetScrollHeight = timetable.map((item, idx) => {
+		totalHeight += item.length * 76 + idx * 17 + idx * widthPercentage(10);
+		return totalHeight;
+	});
+	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const scrollY = e.nativeEvent.contentOffset.y;
+		// 스크롤뷰의 높이를 가져옵니다.
+		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
+		console.log(scrollY, scrollViewHeight, presetScrollHeight, e.nativeEvent.contentSize.height);
+		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
+		if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
+		}
+	};
 	const CancelModify = () => {
 		setModify(false);
 	};
@@ -336,11 +351,16 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							)}
 						</FlexWrap>
 					</DayContainer>
-					<DayScrollView modify={modify} ref={scrollRef} onMomentumScrollEnd={changeViewState}>
+					<DayScrollView
+						modify={modify}
+						ref={scrollRef}
+						onScroll={e => {
+							scrollhandle(e);
+						}}
+						onMomentumScrollEnd={changeViewState}>
 						{timetable.map(
 							(value, index) =>
-								value.length != 0 &&
-								select == index && (
+								value.length != 0 && (
 									<WhiteContainer width={widthPercentage(327)} key={index}>
 										<PretendardSemiBoldText
 											marginBottom={heightPercentage(10)}

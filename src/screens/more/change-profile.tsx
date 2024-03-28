@@ -7,7 +7,14 @@ import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {BackgroundGray, Center, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {
+	BackgroundGray,
+	Center,
+	ClearTouchableOpacity,
+	HStack,
+	InputWrap,
+	PretendardSemiBoldText,
+} from '../../utill/layout/layout';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
 import {FilterList} from '../../utill/filter';
@@ -127,14 +134,24 @@ export default function ChangeProfile({navigation}: any) {
 				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
 					닉네임
 				</PretendardSemiBoldText>
-				<CustomTextInput
-					text={nickname}
-					placeholderTextColor={colors.Gray2}
-					placeholder='ex)홍길동 최대 8자이내 '
-					value={nickname}
-					onChangeText={(value: string) => changeNickname(value)}
-					maxLength={8}
-				/>
+				<InputAllContainter>
+					<CustomTextInput
+						text={nickname}
+						placeholderTextColor={colors.Gray2}
+						placeholder='ex)홍길동 최대 8자이내 '
+						value={nickname}
+						onChangeText={(value: string) => changeNickname(value)}
+						maxLength={8}
+					/>
+					{nickname && (
+						<ClearTouchableOpacity
+							onPress={() => {
+								changeNickname('');
+							}}>
+							<SvgCancel width='20' height='20' color='black' />
+						</ClearTouchableOpacity>
+					)}
+				</InputAllContainter>
 			</InputProfileContainer>
 			<ButtonContainer>
 				<CustomButton
@@ -146,7 +163,12 @@ export default function ChangeProfile({navigation}: any) {
 		</ProfileContainer>
 	);
 }
-
+const InputAllContainter = styled(HStack)`
+	border-radius: 12px;
+	background-color: ${colors.backgroundWhite};
+	height: ${heightPercentage(52)}px;
+	padding: 0px 0px 0px ${widthPercentage(10)}px;
+`;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(125)}px;
@@ -163,7 +185,7 @@ const ProfileContainer = styled(BackgroundGray).attrs({as: Pressable})`
 `;
 
 const CustomTextInput = styled.TextInput<{text: string}>`
-	width: ${widthPercentage(327)}px;
+	width: 80%;
 	height: ${heightPercentage(52)}px;
 	align-items: center;
 	font-size: ${fontPercentage(14)}px;

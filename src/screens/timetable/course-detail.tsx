@@ -332,7 +332,7 @@ export default function CourseDetail({navigation, route}: any) {
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
 						<ScrollView>
-							{/* {route.params.value.name == '소백산국립공원(경북)' && (
+							{route.params.value.name == '소백산국립공원(경북)' && (
 								<PrimaryButton
 									marginBottom={heightPercentage(10)}
 									width={widthPercentage(200)}
@@ -341,7 +341,7 @@ export default function CourseDetail({navigation, route}: any) {
 									onPress={goHiking}
 									backgroundColor={colors.Primary}
 									textColor={colors.Gray5}></PrimaryButton>
-							)} */}
+							)}
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
 									{courseDetail.name}
@@ -532,14 +532,8 @@ export default function CourseDetail({navigation, route}: any) {
 						</ScrollView>
 						<ButtonContainer>
 							<CustomButton
-								label={
-									route.params.value.name == '소백산국립공원(경북)'
-										? '탐방 코스 추천받기'
-										: '이 지역의 여행코스 추천받기'
-								}
-								onPress={
-									route.params.value.name == '소백산국립공원(경북)' ? goHiking : goIncludeRecommend
-								}></CustomButton>
+								label={'이 지역의 여행코스 추천받기'}
+								onPress={goIncludeRecommend}></CustomButton>
 						</ButtonContainer>
 					</RecommendBorderContainer>
 					{/* <TitleInfoContainer>

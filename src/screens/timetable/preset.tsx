@@ -1,5 +1,5 @@
-import {useEffect} from 'react';
-import {Image, TouchableOpacity, Platform, ScrollView} from 'react-native';
+import {useEffect, useState} from 'react';
+import {Image, TouchableOpacity, ScrollView, Pressable} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -12,13 +12,12 @@ import {
 	TagContainer,
 	PretendardVariableText,
 } from '../../utill/layout/layout';
-import {SVGCalendarRecommend, SVGFlag, SvgPlace} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGFlag} from '../../utill/svg/svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {WhiteContainer} from '../enroll-info/final-check';
-import {cityViewList} from '../enroll-info/select-city';
 import PrimaryButton from '../../utill/component/primary-button';
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName, cityIndex, region} =
@@ -71,6 +70,7 @@ export default function Preset({navigation}: any) {
 	useEffect(() => {
 		saveCache();
 	}, []);
+	const [regionText, setRegionText] = useState(false);
 	return (
 		<BackgroundGray>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -89,12 +89,20 @@ export default function Preset({navigation}: any) {
 					/>
 				</SvgContainer>
 				<WhiteContainer>
-					<HStack gap={widthPercentage(4)}>
+					<RegionTextContainer
+						gap={widthPercentage(4)}
+						onPress={() => {
+							setRegionText(!regionText);
+						}}>
 						<SVGFlag />
-						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+						<PretendardSemiBoldText
+							size={12}
+							lineHeight={14}
+							color={colors.Gray5}
+							numberOfLines={regionText ? 2 : undefined}>
 							{region.map((item, idx) => item + (idx != region.length - 1 ? ',' : ''))}
 						</PretendardSemiBoldText>
-					</HStack>
+					</RegionTextContainer>
 					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
 						{presetTendencyList[0].tendencyNameList.map((item, idx) => {
 							return (
@@ -146,14 +154,7 @@ export default function Preset({navigation}: any) {
 								</FlexWrap>
 								{item.map((value, index) =>
 									value.map((target, targetIndex) => {
-										if (
-											targetIndex == 0
-											// (index == 0 && targetIndex == 0) ||
-											// index % value.length == targetIndex ||
-											// (target.category == 4 && targetIndex != 0) ||
-											// target.category == 5 ||
-											// (index == item.length - 1 && targetIndex == value.length - 1)
-										) {
+										if (targetIndex == 0) {
 											return (
 												<HStack gap={widthPercentage(10)} key={targetIndex}>
 													<DashLineContainer>
@@ -170,12 +171,6 @@ export default function Preset({navigation}: any) {
 														)}
 														<DashLine
 															status={
-																// index == 0 && targetIndex == 0
-																// 	? 'start'
-																// 	: index == item.length - 1 &&
-																// 	  targetIndex == value.length - 1
-																// 	? 'end'
-																// 	: 'center'
 																index == 0 && targetIndex == 0
 																	? 'start'
 																	: index == item.length - 1
@@ -226,6 +221,7 @@ export default function Preset({navigation}: any) {
 		</BackgroundGray>
 	);
 }
+const RegionTextContainer = styled(HStack).attrs({as: Pressable})``;
 export const DashLineContainer = styled.View<{justifyContent?: string}>`
 	width: ${widthPercentage(20)}px;
 	min-height: ${heightPercentage(46)}px;

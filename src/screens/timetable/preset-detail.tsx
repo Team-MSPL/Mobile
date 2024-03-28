@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView} from 'react-native';
+import {NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, TouchableOpacity} from 'react-native';
 import {BackgroundGray, FlexWrap, HStack, PretendardSemiBoldText, TagContainer} from '../../utill/layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {colors} from '../../utill/colors';
@@ -151,41 +151,22 @@ export default function PresetDetail({navigation, route}: any) {
 
 	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
-	const presetScrollHeight = presetDatas[route.params.index].map(
-		(item, idx) => item.length * 48 + idx * 17 + idx * widthPercentage(10),
-	);
-	const binarySearch = (e: {data: number[]; target: number}) => {
-		let start = 0;
-		let end = e.data.length - 1;
-		let middle = Math.floor(e.data.length / 2);
-		while (start <= end) {
-			middle = Math.floor(start + (end - start) / 2);
-			if (e.target > e.data[middle]) {
-				start = middle + 1;
-			} else if (e.target < e.data[middle]) {
-				end = middle - 1;
-			} else {
-				return e.data[middle];
-			}
-		}
-	};
+	let totalHeight = 0;
+	const presetScrollHeight = presetDatas[route.params.index].map((item, idx) => {
+		totalHeight += item.length * 48 + idx * 17 + idx * widthPercentage(10);
+		return totalHeight;
+	});
 	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 		const scrollY = e.nativeEvent.contentOffset.y;
-
-		// 스크롤뷰의 컨텐츠 높이를 가져옵니다.
-		const contentHeight = e.nativeEvent.contentSize.height;
-
 		// 스크롤뷰의 높이를 가져옵니다.
 		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
-
-		//console.log(scrollY, contentHeight, scrollViewHeight, presetScrollHeight);
-		console.log(binarySearch({data: presetScrollHeight, target: scrollY}));
-		// if (scrollY + scrollViewHeight >= contentHeight - 20) {
-		// 	// 스크롤이 거의 끝에 다다랐을 때 원하는 작업을 수행합니다.
-		// 	return false;
-		// } else {
-		// 	return true;
-		// }
+		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
+		if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
+		}
+	};
+	const moveRegion = async (index: number, e: number) => {
+		navigation.navigate('CourseDetail', {value: presetDatas[route.params.index][index][e]});
 	};
 	return (
 		<>
@@ -240,7 +221,7 @@ export default function PresetDetail({navigation, route}: any) {
 					showsVerticalScrollIndicator={false}
 					ref={scrollRef}
 					onScroll={e => {
-						//scrollhandle(e);
+						scrollhandle(e);
 					}}>
 					{presetDatas[route.params.index].map((item, index) => (
 						<WhiteContainer key={index}>
@@ -252,36 +233,46 @@ export default function PresetDetail({navigation, route}: any) {
 									여행지
 								</PretendardSemiBoldText>
 								{item.map((value, idx) => (
-									<HStack gap={widthPercentage(10)} key={idx}>
-										<DashLineContainer>
-											{value.category == 4 ? (
-												<Triangle />
-											) : (
-												<Circle
-													color={value.category == 5 ? colors.PointYellow : colors.Gray5}
-												/>
-											)}
-											{item.length != 1 && (
-												<DashLine
-													dash={false}
-													status={
-														idx == 0 ? 'start' : idx == item.length - 1 ? 'end' : 'center'
-													}
-												/>
-											)}
-										</DashLineContainer>
-										<PretendardSemiBoldText
-											size={16}
-											lineHeight={19}
-											color={value.category == 5 ? colors.PointYellow : colors.Gray5}>
-											{value.name + ' '}
-											<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-												{Math.floor(value.takenTime / 60) != 0 &&
-													Math.floor(value.takenTime / 60) + '시간'}
-												{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+									<TouchableOpacity
+										onPress={() => {
+											moveRegion(index, idx);
+										}}
+										key={idx}>
+										<HStack gap={widthPercentage(10)}>
+											<DashLineContainer>
+												{value.category == 4 ? (
+													<Triangle />
+												) : (
+													<Circle
+														color={value.category == 5 ? colors.PointYellow : colors.Gray5}
+													/>
+												)}
+												{item.length != 1 && (
+													<DashLine
+														dash={false}
+														status={
+															idx == 0
+																? 'start'
+																: idx == item.length - 1
+																? 'end'
+																: 'center'
+														}
+													/>
+												)}
+											</DashLineContainer>
+											<PretendardSemiBoldText
+												size={15}
+												lineHeight={19}
+												color={value.category == 5 ? colors.PointYellow : colors.Gray5}>
+												{value.name + ' '}
+												<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
+													{Math.floor(value.takenTime / 60) != 0 &&
+														Math.floor(value.takenTime / 60) + '시간'}
+													{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+												</PretendardSemiBoldText>
 											</PretendardSemiBoldText>
-										</PretendardSemiBoldText>
-									</HStack>
+										</HStack>
+									</TouchableOpacity>
 								))}
 							</InsideGray>
 						</WhiteContainer>
