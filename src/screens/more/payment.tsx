@@ -74,20 +74,36 @@ export default function Payment({navigation}: any) {
 			unsubscribeEarned();
 		};
 	}, [watchAD]);
-	const [adload, setAdload] = useState(false);
-	const tick = setTimeout(() => {
-		setAdload(true);
-		clearTimeout(tick);
-	}, 5000);
-	useEffect(() => {
-		tick;
-	}, []);
+	const [adload, setAdload] = useState(true);
+	let adCount = useRef(0);
+	const tick = () => {
+		const timer = setTimeout(() => {
+			if (adCount.current > 3) {
+				Toast.show({
+					type: 'error',
+					text1: '준비된 광고가 없습니다. 잠시 후 다시 시도해주세요',
+					position: 'bottom',
+				});
+				setAdload(true);
+				adCount.current = 0;
+				clearTimeout(timer);
+			} else if (rewardedRef?.current?.loaded) {
+				setAdload(true);
+				adCount.current = 0;
+				clearTimeout(timer);
+				rewardedRef.current.show();
+			} else {
+				adCount.current += 1;
+				clearTimeout(timer);
+				tick();
+			}
+		}, 2000);
+	};
 
 	const openAd = () => {
 		if (rewardedRef.current !== null) {
-			rewardedRef?.current?.loaded
-				? rewardedRef.current.show()
-				: Toast.show({type: 'error', text1: '광고 준비중이니 잠시만 기다려 주세요', position: 'bottom'});
+			rewardedRef?.current?.loaded ? rewardedRef.current.show() : (setAdload(false), tick());
+			//Toast.show({type: 'error', text1: '광고 준비중이니 잠시만 기다려 주세요', position: 'bottom'});
 		}
 	};
 	const itemSkus: any = Platform.select({
@@ -100,8 +116,8 @@ export default function Payment({navigation}: any) {
 				다님 이용권 구매
 			</PretendardVariableText>
 			<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
-				코인을 구매하고 다님의 다양한 기능을 즐겨보세요!{`\n`}여행지역 추천 또는 여행 코스 추천 ai를 사용하실 수
-				있어요.
+				이용권을 구매하거나 광고를 시청하여 다님의 다양한 기능을 즐겨보세요.{`\n`}여행 지역 추천 AI 또는 여행
+				일정 추천 AI를 사용하실 수 있어요!
 			</PretendardVariableText>
 			<PaymentContainer>
 				<HStack justifyContent='space-between'>
@@ -109,7 +125,7 @@ export default function Payment({navigation}: any) {
 						<HStack>
 							<SVGCoin />
 							<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
-								코인 1개
+								이용권 1개-광고 보상
 							</PretendardSemiBoldText>
 						</HStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.backgroundWhite}>
@@ -135,7 +151,7 @@ export default function Payment({navigation}: any) {
 							<HStack>
 								<SVGCoin />
 								<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
-									{item.title} 코인
+									이용권 {item.title}개
 								</PretendardSemiBoldText>
 							</HStack>
 							<PretendardBoldText size={12} lineHeight={18} color={colors.Primary}>

@@ -227,7 +227,7 @@ const CalendarContainer = styled.View`
 `;
 const DayBackground = styled(BackgroundGray).attrs({as: Pressable})``;
 const SelectAbsolute = styled.View`
-	z-index: 2;
+	z-index: 3;
 	position: absolute;
 	bottom: -${heightPercentage(122)}px;
 `;

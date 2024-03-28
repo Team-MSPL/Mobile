@@ -247,7 +247,7 @@ export default function Main({navigation}: any) {
 				<HStack gap={5}>
 					<SVGGood />
 					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
-						다님에게 추천받기
+						다님 AI에게 추천받기
 					</PretendardSemiBoldText>
 				</HStack>
 				{buttonList.map(item => (
@@ -325,7 +325,7 @@ const RecommendContainer = styled.Pressable`
 
 const RecommendTextContainer = styled.View`
 	width: 50%;
-	top: ${heightPercentage(48)}px;
+	justify-content: center;
 	left: ${widthPercentage(21)}px;
 `;
 const HomeContainer = styled.ScrollView`
@@ -348,7 +348,7 @@ const BackgroundImage = styled.ImageBackground`
 `;
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
-	top: ${heightPercentage(59)}px;
+	top: ${heightPercentage(39)}px;
 	left: ${widthPercentage(295)}px;
 	width: ${widthPercentage(63)}px;
 	height: ${heightPercentage(31)}px;

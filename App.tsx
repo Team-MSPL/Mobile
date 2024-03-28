@@ -192,6 +192,7 @@ function App(): JSX.Element {
 
 	const getFcmToken = async () => {
 		const fcmToken = await messaging().getToken();
+		console.log(fcmToken);
 		dispatch(userSliceActions.setFcmToken({fcmToken: fcmToken}));
 		return fcmToken;
 		//console.log('[FCM Token] ', fcmToken);

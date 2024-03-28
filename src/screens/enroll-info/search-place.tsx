@@ -237,7 +237,7 @@ export default function SearchPlace({navigation, route}: any) {
 						width={widthPercentage(327)}
 						height={heightPercentage(60)}
 						onPress={addPlace}
-						backgroundColor='rgba(195,245,80,0.3)'
+						backgroundColor={colors.Primary}
 						textColor={colors.Gray5}></PrimaryButton>
 				</BottomContainer>
 			) : (

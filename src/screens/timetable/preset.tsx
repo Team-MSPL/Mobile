@@ -83,8 +83,10 @@ export default function Preset({navigation}: any) {
 				/>
 				<SvgContainer>
 					<SVGCalendarRecommend
+						style={{zIndex: 0}}
 						width={widthPercentage(200)}
-						height={heightPercentage(150)}></SVGCalendarRecommend>
+						height={heightPercentage(150)}
+					/>
 				</SvgContainer>
 				<WhiteContainer>
 					<HStack gap={widthPercentage(4)}>
@@ -130,7 +132,7 @@ export default function Preset({navigation}: any) {
 												height={heightPercentage(28)}
 												key={index}>
 												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-													{item}
+													{item + ' '}
 												</PretendardSemiBoldText>
 												<PretendardSemiBoldText
 													size={14}

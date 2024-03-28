@@ -71,7 +71,7 @@ const InputAllContainter = styled(InputWrap)`
 	border-color: ${colors.backgroundWhite};
 	background-color: ${colors.backgroundWhite};
 	height: ${heightPercentage(52)}px;
-	padding: 0px ${widthPercentage(20)}px;
+	padding: 0px 0px 0px ${widthPercentage(10)}px;
 `;
 
 const TravelTitleTextInput = styled.TextInput`

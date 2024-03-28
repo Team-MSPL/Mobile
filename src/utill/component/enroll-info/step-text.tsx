@@ -33,7 +33,11 @@ export default function StepText({
 			<PretendardSemiBoldText size={mainTextSize ?? 23} lineHeight={31} color={mainTextColor ?? colors.Black}>
 				{mainText}
 			</PretendardSemiBoldText>
-			<PretendardSemiBoldText size={subTextSize ?? 12} lineHeight={18} color={subTextColor ?? colors.Gray2}>
+			<PretendardSemiBoldText
+				size={subTextSize ?? 12}
+				lineHeight={18}
+				color={subTextColor ?? colors.Gray2}
+				style={{zIndex: 99}}>
 				{subText ?? ''}
 			</PretendardSemiBoldText>
 			<PretendardSemiBoldText
