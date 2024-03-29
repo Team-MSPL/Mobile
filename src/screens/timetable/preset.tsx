@@ -70,7 +70,6 @@ export default function Preset({navigation}: any) {
 	useEffect(() => {
 		saveCache();
 	}, []);
-	const [regionText, setRegionText] = useState(false);
 	return (
 		<BackgroundGray>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -89,18 +88,11 @@ export default function Preset({navigation}: any) {
 					/>
 				</SvgContainer>
 				<WhiteContainer>
-					<RegionTextContainer
-						gap={widthPercentage(4)}
-						onPress={() => {
-							setRegionText(!regionText);
-						}}>
+					<RegionTextContainer gap={widthPercentage(4)}>
 						<SVGFlag />
-						<PretendardSemiBoldText
-							size={12}
-							lineHeight={14}
-							color={colors.Gray5}
-							numberOfLines={regionText ? 2 : undefined}>
-							{region.map((item, idx) => item + (idx != region.length - 1 ? ',' : ''))}
+						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+							{region[0]}
+							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
 						</PretendardSemiBoldText>
 					</RegionTextContainer>
 					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>

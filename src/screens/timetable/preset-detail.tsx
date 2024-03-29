@@ -93,13 +93,11 @@ export default function PresetDetail({navigation, route}: any) {
 			latitude: vvalue.lat,
 			longitude: vvalue.lng,
 		}));
-		value.map(
-			vvalue =>
-				index == select &&
-				positions.push({
-					latitude: vvalue.lat,
-					longitude: vvalue.lng,
-				}),
+		value.map(vvalue =>
+			positions.push({
+				latitude: vvalue.lat,
+				longitude: vvalue.lng,
+			}),
 		),
 			markers.push(
 				value.map((vvalue, iindex) => {

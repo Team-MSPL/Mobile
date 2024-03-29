@@ -494,7 +494,7 @@ export default function FinalCheck({navigation}: any) {
 		</>
 	);
 }
-const RegionImage = styled.Image`
+export const RegionImage = styled.Image`
 	width: ${widthPercentage(50)}px;
 	height: ${heightPercentage(50)}px;
 	border-radius: 12px;

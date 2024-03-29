@@ -209,7 +209,7 @@ export const RecommendBorderContainer = styled.View<{height?: number; top?: numb
 	height: ${props => props.height + 'px' ?? null};
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: ${heightPercentage(38)}px 0px ${heightPercentage(100)}px ${widthPercentage(24)}px;
+	padding: ${heightPercentage(38)}px ${widthPercentage(24)}px ${heightPercentage(100)}px ${widthPercentage(24)}px;
 	margin-top: -30px;
 `;
 const RecommendMainContainer = styled.TouchableOpacity`

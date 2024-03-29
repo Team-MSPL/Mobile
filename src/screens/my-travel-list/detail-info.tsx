@@ -1,12 +1,14 @@
-import {useCallback, useEffect, useState} from 'react';
+import {JSXElementConstructor, ReactElement, useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	deleteTravelCourse,
 	getOneTravelCourse,
+	getRegionInfo,
 	reCourseName,
 	travelSliceActions,
 } from '../../redux/travel-info/travel.slice';
-import {TouchableOpacity} from 'react-native';
+import {Platform, Touchable, TouchableOpacity} from 'react-native';
+import MapView, {Marker, Polyline} from 'react-native-maps';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
@@ -16,12 +18,8 @@ import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
 	BackgroundGray,
-	Center,
-	Divider,
 	HStack,
 	HeaderContianer,
-	HeaderText,
-	MainContainer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
 	VStack,
@@ -30,19 +28,23 @@ import {
 import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGMaps, SVGTravlePencil, SvgMilestone, SvgReview} from '../../utill/svg/svg';
+import {SVGMaps, SVGPencil, SVGTravlePencil, SvgShare} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import Toast from 'react-native-toast-message';
-import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
-import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ScrollView} from 'react-native';
+import {AbsoluteTopBar} from '../timetable/map-info';
+import {RegionImage} from '../enroll-info/final-check';
+import {MarkerContainer} from '../timetable/preset-detail';
+import {Circle} from '../timetable/preset';
+import PrimaryButton from '../../utill/component/primary-button';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
+	const {travelId, nDay, day, travelName, reviewCheck, region, regionInfo, timetable} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const Icons = styled(Icon)``;
 	const goMyTravelDetail = async () => {
@@ -60,9 +62,94 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
+	const polylines:
+		| string
+		| number
+		| boolean
+		| JSX.Element[]
+		| ReactElement<any, string | JSXElementConstructor<any>>
+		| null
+		| undefined = [];
+	let positions: {latitude: number; longitude: number}[] = [];
+	timetable.forEach((value, index) => {
+		const polylineCoordinates = value
+			.map((item, value) => {
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					return {latitude: item.lat, longitude: item.lng};
+				}
+				return null;
+			})
+			.filter(items => items !== null);
+		value.map(vvalue =>
+			positions.push({
+				latitude: vvalue.lat,
+				longitude: vvalue.lng,
+			}),
+		);
+		let count = 0;
+		markers.push(
+			value.map((item, idx) => {
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					count += 1;
+					return (
+						<Marker
+							key={`marker_${idx}`}
+							coordinate={{latitude: item.lat, longitude: item.lng}}
+							title={item.name}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							anchor={{x: 0.5, y: 0.5}}
+							style={{zIndex: 4}}>
+							{index == 0 ? (
+								<MarkerContainer key={idx}>
+									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+										{count}
+									</PretendardSemiBoldText>
+								</MarkerContainer>
+							) : (
+								<Circle color={colors.Gray5} key={idx} />
+							)}
+						</Marker>
+					);
+				} else {
+					return null;
+				}
+			}),
+		);
+		polylines.push(
+			<Polyline
+				key={`polyline_${index}`}
+				coordinates={polylineCoordinates}
+				strokeColor={index == 0 ? colors.PointYellow : colors.Gray5}
+				strokeWidth={2} // You can change the width of the line here
+			/>,
+		);
+	});
+
+	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
+	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
+	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
+	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
+
+	// 경계 상자의 중심 좌표 계산
+	const centerLatitude = (maxLatitude + minLatitude) / 2;
+	const centerLongitude = (maxLongitude + minLongitude) / 2;
+
+	// 경계 상자의 너비와 높이 계산
+	const deltaLatitude = maxLatitude - minLatitude;
+	const deltaLongitude = maxLongitude - minLongitude;
+
+	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
+	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const removeCheck = () => {
 		dispatch(
-			modalSliceActions.setOpenModal({modalTitle: '삭제하시겠습니까?', modalFunction: goRemove, modalLeft: true}),
+			modalSliceActions.setOpenModal({
+				modalTitle: '이 여행을 삭제할까요?',
+				modalSubTitle: '여행을 삭제하면 되돌릴 수 없습니다.',
+				modalFunction: goRemove,
+				modalTopText: '삭제할래요',
+				modalLeft: true,
+			}),
 		);
 	};
 	const {firebaseImageRemove} = useFirebaseStorage();
@@ -96,8 +183,9 @@ export default function DetailInfo({navigation}: any) {
 			setText(travelName);
 		}
 	}; //여행 리뷰 별점 저장하기
-	const goTimetable = () => {
+	const goTimetable = async () => {
 		dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'modify'}));
+		dispatch(getRegionInfo({region: region[0]}));
 		navigation.navigate('Timetable');
 		if (editing) {
 			setEditing(false);
@@ -121,38 +209,32 @@ export default function DetailInfo({navigation}: any) {
 			);
 		}
 	};
+	const [modify, setModify] = useState(false);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderContianer>
-					<TouchableOpacity
-						style={{marginRight: 5}}
-						onPress={() => {
-							editing
-								? dispatch(
-										modalSliceActions.setOpenModal({
-											modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
-											modalLeft: true,
-											modalFunction: goKakaoShare,
-											modalTopText: '나가기',
-											modalBottomText: '수정계속하기',
-										}),
-								  )
-								: goKakaoShare();
-						}}>
-						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-							공유
-						</PretendardVariableText>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={removeCheck}>
-						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-							삭제
-						</PretendardVariableText>
-					</TouchableOpacity>
+					{!modify && (
+						<>
+							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+									삭제
+								</PretendardVariableText>
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={() => {
+									setModify(true);
+								}}>
+								<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+									편집
+								</PretendardVariableText>
+							</TouchableOpacity>
+						</>
+					)}
 				</HeaderContianer>
 			),
 		});
-	}, []);
+	}, [modify]);
 	useFocusEffect(
 		useCallback(() => {
 			goMyTravelDetail();
@@ -185,38 +267,86 @@ export default function DetailInfo({navigation}: any) {
 	};
 	return (
 		<Scroll>
-			<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>
-				다님과 함께한
-			</PretendardVariableText>
-			{!editing ? (
-				<TravleHStack>
-					<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
-						{travelName}
-					</PretendardVariableText>
-					<ReName
-						onPress={() => {
-							setEditing(true);
-						}}>
-						<Icons name={'form'} size={20} color={'grey'} />
-					</ReName>
-				</TravleHStack>
-			) : (
-				<RenameContainer>
-					<CustomTextInput
-						text={text}
-						placeholderTextColor={'grey'}
-						style={{color: 'black', fontSize: 20}}
-						autoFocus={true}
-						value={text}
-						onChangeText={(value: string) => setText(value)}
-						maxLength={20}></CustomTextInput>
-					<ReName onPress={checkChange}>
-						<Icons name={'save'} size={30} color={'black'} />
-					</ReName>
-				</RenameContainer>
-			)}
-			<DayText>{moment(day[0]).format('YYYY년-MM월-DD일') + '~' + moment(day[nDay]).format('MM월-DD일')}</DayText>
-			<CourseAndReview>
+			<AbsoluteTopBar opacityState={false}>
+				<HStack gap={10} marginVertical={heightPercentage(10)} width={widthPercentage(375)}>
+					<RegionImage
+						source={{
+							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
+						}}
+					/>
+					<HStack justifyContent='space-between' width={widthPercentage(290)}>
+						<VStack>
+							<HStack>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
+									{region[0]}
+									{region.length >= 2 ? ` +${region.length - 1}` : ''}
+								</PretendardVariableText>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+									{' '}
+									| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
+								</PretendardVariableText>
+							</HStack>
+							<HStack gap={4}>
+								{!editing ? (
+									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+										{travelName}
+									</PretendardSemiBoldText>
+								) : (
+									<CustomTextInput
+										text={text}
+										placeholderTextColor={'grey'}
+										style={{color: 'black', fontSize: heightPercentage(18)}}
+										autoFocus={true}
+										value={text}
+										onChangeText={(value: string) => setText(value)}
+										maxLength={20}></CustomTextInput>
+								)}
+								{modify && !editing && (
+									<TouchableOpacity
+										onPress={() => {
+											setEditing(true);
+										}}>
+										<SVGPencil color={colors.PointYellow} />
+									</TouchableOpacity>
+								)}
+							</HStack>
+						</VStack>
+						{!modify && (
+							<TouchableOpacity onPress={goKakaoShare}>
+								<SvgShare />
+							</TouchableOpacity>
+						)}
+					</HStack>
+				</HStack>
+			</AbsoluteTopBar>
+			<MapContainer>
+				<MapView
+					//provider={PROVIDER_GOOGLE}
+					showsMyLocationButton={true}
+					style={{width: '100%', height: 350}}
+					showsUserLocation={true}
+					region={{
+						latitude: centerLatitude,
+						longitude: centerLongitude,
+						latitudeDelta: deltaLatitude + deltaLatitude,
+						longitudeDelta: deltaLongitude + deltaLongitude,
+					}}>
+					{markers}
+					{polylines}
+				</MapView>
+				{!modify && (
+					<AbsoluteButton>
+						<PrimaryButton
+							label='여행 일정 확인하기'
+							onPress={goTimetable}
+							backgroundColor={colors.PointYellow}
+							textColor={colors.backgroundWhite}
+							width={widthPercentage(150)}
+							height={heightPercentage(50)}></PrimaryButton>
+					</AbsoluteButton>
+				)}
+			</MapContainer>
+			{/* <CourseAndReview>
 				<HandleButtonContainer
 					backgroundColor={colors.Primary}
 					onPress={() => {
@@ -236,9 +366,6 @@ export default function DetailInfo({navigation}: any) {
 					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.Gray5}>
 						여행 코스 확인
 					</PretendardSemiBoldText>
-					{/* <IconContainer>
-						<SvgMilestone color='white' />
-					</IconContainer> */}
 				</HandleButtonContainer>
 				<HandleButtonContainer
 					backgroundColor='#5350FF'
@@ -255,36 +382,34 @@ export default function DetailInfo({navigation}: any) {
 							  )
 							: goReviewAndRating();
 					}}>
-					{/* <VStack>
-						<ReviewTitleText>리뷰 작성</ReviewTitleText>
-						<ReviewSubTitleText>다른 여행자들에게 도움이 되는 리뷰를 작성해주세요</ReviewSubTitleText>
-					</VStack>
-					<IconContainer>
-						<SvgReview color={colors.selectButton} />
-					</IconContainer> */}
 					<SVGTravlePencil />
 					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.backgroundWhite}>
 						리뷰 작성
 					</PretendardSemiBoldText>
 				</HandleButtonContainer>
-			</CourseAndReview>
-			<InputDiary navigation={navigation} />
+			</CourseAndReview> */}
+			<InputDiary
+				navigation={navigation}
+				modify={modify}
+				setModify={setModify}
+				text={text}
+				setEditing={setEditing}
+			/>
 		</Scroll>
 	);
 }
-const Scroll = styled(BackgroundGray).attrs({as: ScrollView})``;
-
-const HandleButtonContainer = styled.TouchableOpacity<{backgroundColor: string}>`
-	width: ${widthPercentage(151)}px;
-	height: ${heightPercentage(105)}px;
-	background-color: ${props => props.backgroundColor};
-	border-radius: 12px;
+const AbsoluteButton = styled.View`
+	position: absolute;
+	z-index: 5;
+	bottom: ${heightPercentage(50)}px;
+`;
+const MapContainer = styled.View`
+	width: 100%;
+	height: ${heightPercentage(350)}px;
 	align-items: center;
-	justify-content: center;
 `;
-const InfoDivider = styled(Divider)`
-	background-color: ${colors.regionNormal};
-`;
+const Scroll = styled.ScrollView``;
+
 const ReName = styled.TouchableOpacity`
 	padding: 5px;
 `;
@@ -299,13 +424,6 @@ const TravleHStack = styled(HStack)`
 	align-items: center;
 	margin: 0px 0px 5px 0px;
 `;
-const TravelNameText = styled.Text`
-	width: 90%;
-	font-size: ${devicesWidth * 0.08}px;
-	color: ${colors.selectButton};
-	margin: ${devicesWidth * 0.01}px;
-`;
-
 export const IconContainer = styled.View`
 	width: 100%;
 	align-items: flex-end;
@@ -332,16 +450,6 @@ export const CourseTitleText = styled.Text`
 export const CourseSubTitleText = styled.Text`
 	font-size: 15px;
 	color: white;
-`;
-
-const ReviewContainer = styled(CourseContainer)`
-	background: ${colors.reviewBackground};
-`;
-const ReviewTitleText = styled(CourseTitleText)`
-	color: ${colors.selectButton};
-`;
-const ReviewSubTitleText = styled(CourseSubTitleText)`
-	color: ${colors.selectButton};
 `;
 export const HeaderHStack = styled(HStack)`
 	justify-content: space-between;

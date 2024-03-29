@@ -29,13 +29,9 @@ export const getPlaceRecommendInMainScreen = createAsyncThunk(
 	},
 );
 // 지역 사진 가져오는거
-export const getHomeRegionInfo = createAsyncThunk('/place/regionInfo', async (data: any, {rejectWithValue}) => {
+export const getHomeRegionInfo = createAsyncThunk('/place/regionHomeInfo', async (data: any, {rejectWithValue}) => {
 	try {
-		console.log(data);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${data.region}`, data);
-		//console.log(a);
-		//제로리절트 처리하기
-		console.log(response.data);
 		return response.data;
 	} catch (error: any) {
 		console.log(error);

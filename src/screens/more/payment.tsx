@@ -125,7 +125,7 @@ export default function Payment({navigation}: any) {
 						<HStack>
 							<SVGCoin />
 							<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
-								이용권 1개-광고 보상
+								이용권 1개 - 광고 보상
 							</PretendardSemiBoldText>
 						</HStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.backgroundWhite}>

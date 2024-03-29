@@ -106,8 +106,8 @@ export default function CourseDetail({navigation, route}: any) {
 					address: data?.formatted_address,
 					information: data?.formatted_phone_number,
 					infoTitle: null,
-					infoContent: data?.editorial_summary.overview ?? null,
-					photo: data.photos.map((item, idx) => item.photo_reference),
+					infoContent: data?.editorial_summary?.overview ?? null,
+					photo: data?.photos.map((item, idx) => item.photo_reference),
 				});
 			}
 			//setCourseDetail(a);
@@ -299,7 +299,7 @@ export default function CourseDetail({navigation, route}: any) {
 										source={{
 											uri:
 												courseDetail.status == 'google'
-													? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
+													? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${uri}&key=${GOOGLE_API_KEY}`
 													: uri,
 										}}
 										style={{width: widthPercentage(374), height: heightPercentage(240)}}
@@ -331,7 +331,7 @@ export default function CourseDetail({navigation, route}: any) {
 						// </ImageScroll>
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
-						<ScrollView>
+						<ScrollView showsVerticalScrollIndicator={false}>
 							{route.params.value.name == '소백산국립공원(경북)' && (
 								<PrimaryButton
 									marginBottom={heightPercentage(10)}
@@ -359,24 +359,33 @@ export default function CourseDetail({navigation, route}: any) {
 									</HStack>
 								)}
 							</HStack>
-							<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
-								{courseDetail?.infoTitle}
-							</PretendardVariableText>
 							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-							<MoreTouchable
-								onPress={() => {
-									setMoreStatus(!moreStatus);
-								}}>
-								<PretendardVariableText
-									width={widthPercentage(327)}
-									size={14}
-									lineHeight={21}
-									color={colors.Gray4}
-									numberOfLines={moreStatus ? 2 : undefined}>
-									{courseDetail?.infoContent}
-								</PretendardVariableText>
-							</MoreTouchable>
-							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							{courseDetail?.infoTitle && (
+								<>
+									<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+										{courseDetail?.infoTitle}
+									</PretendardVariableText>
+									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+								</>
+							)}
+							{courseDetail?.infoContent && (
+								<>
+									<MoreTouchable
+										onPress={() => {
+											setMoreStatus(!moreStatus);
+										}}>
+										<PretendardVariableText
+											width={widthPercentage(327)}
+											size={14}
+											lineHeight={21}
+											color={colors.Gray4}
+											numberOfLines={moreStatus ? 2 : undefined}>
+											{courseDetail?.infoContent}
+										</PretendardVariableText>
+									</MoreTouchable>
+									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+								</>
+							)}
 							{detailList.map(
 								(detail, detailIndex) =>
 									detail.title != null && (
@@ -477,7 +486,7 @@ export default function CourseDetail({navigation, route}: any) {
 											</Pressable>
 										)}
 									</HStack>
-									{item.reviewPhotoList?.length != 0 && (
+									{item.reviewPhotoList?.length != null && item.reviewPhotoList?.length != 0 && (
 										<ReviewImageScroll horizontal={true} showsHorizontalScrollIndicator={false}>
 											{item.reviewPhotoList?.map((value, idx) => (
 												<ReviewImage

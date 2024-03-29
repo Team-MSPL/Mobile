@@ -12,8 +12,6 @@ import {
 	PretendardSemiBoldText,
 	PretendardVariableText,
 } from '../../utill/layout/layout';
-import Clipboard from '@react-native-clipboard/clipboard';
-import Toast from 'react-native-toast-message';
 import {widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGDanimLogo} from '../../utill/svg/svg';
 export default function NoteList({navigation}: any) {
@@ -30,14 +28,6 @@ export default function NoteList({navigation}: any) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
-	const handleCopyClipBoard = (e: string) => {
-		try {
-			Clipboard.setString(e);
-			Toast.show({type: 'success', text1: '복사가 완료되었습니다.', position: 'bottom'});
-		} catch (err) {
-			console.log('qwe', err);
 		}
 	};
 	useEffect(() => {
@@ -62,15 +52,14 @@ export default function NoteList({navigation}: any) {
 									다님
 								</PretendardSemiBoldText>
 							</HStack>
-							<PretendardVariableText size={14} lineHeight={21} color={colors.Black} textAlign='left'>
+							<PretendardVariableText
+								selectable
+								size={14}
+								lineHeight={21}
+								color={colors.Black}
+								textAlign='left'>
 								{item}
 							</PretendardVariableText>
-							{/* <ClopTouchable
-								onPress={() => {
-									handleCopyClipBoard(item);
-								}}>
-								<Icon name='copy1' size={25} color={'black'}></Icon>
-							</ClopTouchable> */}
 						</ElementContainer>
 					))}
 				</ElementScrollView>
@@ -86,9 +75,4 @@ const ElementContainer = styled.View`
 `;
 const ElementScrollView = styled.ScrollView`
 	width: 100%;
-`;
-const ClopTouchable = styled.TouchableOpacity`
-	width: 20%;
-	align-items: center;
-	justify-content: center;
 `;

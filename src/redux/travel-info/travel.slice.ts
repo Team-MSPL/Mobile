@@ -340,7 +340,6 @@ export const updateShareUserList = createAsyncThunk(
 // 지역 사진 가져오는거
 export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: any, {rejectWithValue}) => {
 	try {
-		console.log(data);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${data.region}`, data);
 		//console.log(a);
 		//제로리절트 처리하기
@@ -692,6 +691,7 @@ export const travelSlice = createSlice({
 			//state.myTravelList = payload;
 		});
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
+			console.log('왜 여기옴 ㅋㅋㅋ');
 			state.regionInfo.name = payload.name;
 			state.regionInfo.photo = payload.photo;
 		});

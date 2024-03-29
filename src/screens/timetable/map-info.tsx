@@ -12,11 +12,12 @@ import {
 	MainContainer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
+	TagContainer,
 	VStack,
 } from '../../utill/layout/layout';
 import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
-import {WhiteContainer} from '../enroll-info/final-check';
+import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import InfoView from '../../utill/component/timetable/info-view';
@@ -24,9 +25,12 @@ import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
+import {TagShopText} from '../home/main';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -37,15 +41,17 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		index: 0,
 		idx: 0,
 	});
-	const [selectPinIndex, setSecletPinIndex] = useState(-1);
 	const scrollRef = useRef();
+	const changeTouch = (idx: number) => {
+		//setSelect(idx);
+		let totalScroll = 0;
+		for (let i = 0; i < idx; i++) {
+			totalScroll += timetable[i].length;
+		}
+		scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
+	};
 	const change = (idx: number) => {
 		setSelect(idx);
-		// let totalScroll = 0;
-		// for (let i = 0; i < idx; i++) {
-		// 	totalScroll += timetable[i].length;
-		// }
-		// scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
@@ -100,13 +106,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				return null;
 			})
 			.filter(items => items !== null);
-		value.map(
-			vvalue =>
-				index == select &&
-				positions.push({
-					latitude: vvalue.lat,
-					longitude: vvalue.lng,
-				}),
+		value.map(vvalue =>
+			positions.push({
+				latitude: vvalue.lat,
+				longitude: vvalue.lng,
+			}),
 		);
 		let count = 0;
 		markers.push(
@@ -289,7 +293,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
 		console.log(scrollY, scrollViewHeight, presetScrollHeight, e.nativeEvent.contentSize.height);
 		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
-		if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+		if (scrollY + scrollViewHeight + (scrollY + scrollViewHeight) * 0.1 > e.nativeEvent.contentSize.height) {
+			change(presetScrollHeight.length - 1);
+		} else if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
 			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
 		}
 	};
@@ -301,6 +307,50 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	}
 	return (
 		<MainAllContainer>
+			{!modify && (
+				<AbsoluteTopBar opacityState={modify}>
+					<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
+						<RegionImage
+							source={{
+								uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
+							}}
+						/>
+						<VStack>
+							<HStack>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
+									{region[0]}
+									{region.length >= 2 ? ` +${region.length - 1}` : ''}
+								</PretendardVariableText>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+									{' '}
+									| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
+								</PretendardVariableText>
+							</HStack>
+							<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+								{travelName}
+							</PretendardSemiBoldText>
+						</VStack>
+						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
+							<TagContainer backgroundColor={colors.backgroundWhite}>
+								<TagShopText color={colors.Gray2} size={12}>
+									#
+								</TagShopText>
+								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+									{!transit ? '자동차·렌트카' : '대중교통'}
+								</PretendardSemiBoldText>
+							</TagContainer>
+							<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
+								<TagShopText color={colors.Gray2} size={12}>
+									#
+								</TagShopText>
+								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+									{bandwidth ? '여유있는 일정' : '알찬 일정'}
+								</PretendardSemiBoldText>
+							</TagContainer>
+						</VStack>
+					</HStack>
+				</AbsoluteTopBar>
+			)}
 			<VStack>
 				{!modify &&
 					timetable.map(
@@ -334,7 +384,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 											key={idx}
 											select={idx === select}
 											onPress={() => {
-												change(idx);
+												changeTouch(idx);
 											}}>
 											<PretendardSemiBoldText
 												size={14}
@@ -397,13 +447,13 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																	size={12}
 																	lineHeight={18}
 																	color={colors.Gray2}>
-																	{categoryTitle[item.category]}
+																	{categoryTitle[item.category]}{' '}
 																	{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
 																	{String(((item.y ?? 0) * 30 + 360) % 60).padStart(
 																		2,
 																		'0',
-																	)}
-																	~
+																	)}{' '}
+																	~{' '}
 																	{Math.floor(
 																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
 																			360) /
@@ -723,4 +773,14 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	justify-content: center;
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
+`;
+
+export const AbsoluteTopBar = styled.View<{opacityState: boolean}>`
+	width: 100%;
+	height: ${heightPercentage(71)}px;
+	position: ${props => (props.opacityState ? 'relative' : 'absolute')};
+	top: 0;
+	z-index: 100;
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 0px ${widthPercentage(12)}px;
 `;

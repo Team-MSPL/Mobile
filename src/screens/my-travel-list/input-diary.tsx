@@ -4,12 +4,18 @@ import {BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {updateDiary} from '../../redux/travel-info/travel.slice';
+import {reCourseName, updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SVGPencil, SvgCancel, SvgPicture} from '../../utill/svg/svg';
-import {PretendardVariableText, VStack} from '../../utill/layout/layout';
+import {
+	BackgroundGray,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
 import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
@@ -18,7 +24,9 @@ import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import ImageView from 'react-native-image-viewing';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-export default function InputDiary({navigation}: any) {
+import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
+import {ButtonContainer} from '../enroll-info/select-multi';
+export default function InputDiary({navigation, modify, setModify, text, setEditing}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -55,11 +63,16 @@ export default function InputDiary({navigation}: any) {
 
 		return () => backHandler.remove();
 	}, [saveCheck]);
+	const handleBuntton = () => {
+		modify ? setModify(false) : goSaveDiary();
+	};
 	const {uploadImage} = useFirebaseStorage();
 	let diaryImageRef = useRef<string[]>([]);
 	const goSaveDiary = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			const textData = {updateTravelName: text, travelId: travelId};
+			await dispatch(reCourseName(textData));
 			diaryImageRef.current = [];
 			const ImageFunction = pictureValue.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: travelId, category: 'diary'})) ?? '';
@@ -103,45 +116,66 @@ export default function InputDiary({navigation}: any) {
 		setImageIndex(e);
 	};
 	return (
-		<>
-			<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
-				여행 일기
-			</PretendardVariableText>
+		<RecommendBorderContainer>
+			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+				사진첩
+			</PretendardSemiBoldText>
 			<PictureCotainer>
 				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
-					<PictureElementContainer onPress={handelGetImage}>
-						<PictuerVstack>
-							<SvgPicture color={colors.selectButton} />
-							<PictureText>사진 추가</PictureText>
-						</PictuerVstack>
-					</PictureElementContainer>
+					{modify ? (
+						<PictureColorContainer onPress={handelGetImage} noBorder={false}>
+							<HStack gap={3}>
+								<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+									사진 추가
+								</PretendardVariableText>
+								<SvgPicture color={colors.PointYellow} width={widthPercentage(14)} />
+							</HStack>
+						</PictureColorContainer>
+					) : pictureValue.length == 0 ? (
+						<NullContainer></NullContainer>
+					) : null}
 					{pictureValue.map((item, idx) => (
-						<PictureElementContainer
+						<PictureColorContainer
+							noBorder={true}
 							key={idx}
 							onPress={() => {
 								viewingImgae(idx);
 							}}>
-							<CancelContainer
-								onPress={() => {
-									deletePicture(idx);
-								}}>
-								<SvgCancel color='white' width={13} height={13}></SvgCancel>
-							</CancelContainer>
-							<PictureElement source={{uri: item}}></PictureElement>
-						</PictureElementContainer>
+							{modify && (
+								<CancelContainer
+									onPress={() => {
+										deletePicture(idx);
+									}}>
+									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+								</CancelContainer>
+							)}
+							<PictureElement
+								width={widthPercentage(150)}
+								height={widthPercentage(150)}
+								resizeMode='contain'
+								source={{uri: item}}></PictureElement>
+						</PictureColorContainer>
 					))}
 				</PictureScroll>
 			</PictureCotainer>
-			<PretendardVariableText size={16} lineHeight={19.09} color={colors.Black}>
+			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
 				일기
-			</PretendardVariableText>
-			<DiaryTextInput
-				value={diaryValue}
-				multiline={true}
-				placeholderTextColor={'grey'}
-				style={{color: 'black'}}
-				placeholder='여행 일기로 추억을 기록해보세요'
-				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
+			</PretendardSemiBoldText>
+			{!modify ? (
+				<InsideGray>
+					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+						{diaryValue}
+					</PretendardVariableText>
+				</InsideGray>
+			) : (
+				<DiaryTextInput
+					value={diaryValue}
+					multiline={true}
+					placeholderTextColor={'grey'}
+					style={{color: 'black'}}
+					placeholder='여행 일기로 추억을 기록해보세요'
+					onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
+			)}
 			<ImageView
 				images={pictureValue.map((item, idx) => ({
 					uri: item,
@@ -160,24 +194,37 @@ export default function InputDiary({navigation}: any) {
 					);
 				}}
 			/>
-			<TestButton onPress={goSaveDiary}>
-				<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
-					{diary == '' ? '일기 & 사진 저장' : '일기 & 사진 수정'}
-				</PretendardVariableText>
-			</TestButton>
-		</>
+			<CustomButton
+				onPress={handleBuntton}
+				label={modify ? '수정 완료' : '리뷰 저장'}
+				marginTop={heightPercentage(30)}></CustomButton>
+		</RecommendBorderContainer>
 	);
 }
-
-const TestButton = styled.TouchableOpacity`
-	width: ${widthPercentage(120)}px;
-	height: ${heightPercentage(40)}px;
+const NullContainer = styled.View`
+	width: ${widthPercentage(150)}px;
+	height: ${widthPercentage(150)}px;
 	border-radius: 12px;
-	background-color: ${colors.Primary};
+	background-color: ${colors.backgroundGray};
+`;
+const InsideGray = styled.View`
+	width: 100%;
+	border-radius: 8px;
+	background-color: ${colors.backgroundGray};
+	padding: ${heightPercentage(13)}px ${widthPercentage(15)}px;
+	min-height: ${heightPercentage(120)}px;
+	margin: 10px 0px 0px 0px;
+`;
+const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
+	width: ${widthPercentage(150)}px;
+	height: ${widthPercentage(150)}px;
+	border-radius: 12px;
 	align-items: center;
+	border-width: ${props => (props.noBorder ? 0 : 1)}px;
+	border-color: ${colors.PointYellow};
 	justify-content: center;
-	align-self: center;
-	margin-top: ${widthPercentage(10)}px;
+	background-color: rgba(83, 80, 255, 0.08);
+	margin-right: ${widthPercentage(12)}px;
 `;
 export const CancelContainer = styled.TouchableOpacity`
 	border-radius: 99px;
@@ -187,11 +234,6 @@ export const CancelContainer = styled.TouchableOpacity`
 	top: -10px;
 	background-color: black;
 	z-index: 3;
-`;
-const DiaryText = styled.Text`
-	font-size: 17px;
-	font-weight: bold;
-	color: black;
 `;
 export const DiaryTextInput = styled.TextInput`
 	width: 100%;
@@ -220,17 +262,7 @@ export const PictureElementContainer = styled.Pressable`
 	justify-content: center;
 	margin: 10px ${widthPercentage(20)}px 0px 0px;
 `;
-const PictureText = styled.Text`
-	margin: 10px 0px 0px 0px;
-	font-size: 15px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-const PictuerVstack = styled(VStack)`
-	align-items: center;
-	justify-content: center;
-`;
-export const PictureElement = styled.Image`
+export const PictureElement = styled.Image<{width?: number; height?: number}>`
 	width: 135px;
 	height: 180px;
 	border-radius: 10px;
