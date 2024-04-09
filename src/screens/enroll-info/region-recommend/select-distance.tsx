@@ -118,12 +118,12 @@ export default function SelectDistance({navigation}: any) {
 		await openSettings();
 	};
 	const goReverseGeocoding = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			requestPermission().then(result => {
-				if (result === 'granted') {
-					Geolocation.getCurrentPosition(
-						async position => {
+		dispatch(LoadingSliceActions.onLoading());
+		await requestPermission().then(async result => {
+			if (result === 'granted') {
+				Geolocation.getCurrentPosition(
+					async position => {
+						try {
 							const {latitude, longitude} = position.coords;
 							const latlng = latitude + ',' + longitude;
 							const result = await dispatch(reverseGeocoding({latlng: latlng})).unwrap();
@@ -133,31 +133,29 @@ export default function SelectDistance({navigation}: any) {
 								name: result.results[0].formatted_address,
 							};
 							setGeoInfo(latlngData);
+						} catch {
+						} finally {
 							dispatch(LoadingSliceActions.offLoading());
-						},
-						error => {
-							// See error code charts below.
-							dispatch(LoadingSliceActions.offLoading());
-							console.log(error.code, error.message);
-						},
-						{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-					);
-				} else {
-					dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '권한 설정',
-							modalSubTitle: '현재 권한이 거부된 상태입니다.\n위치 정보 권한을 설정하러 가시겠습니까?',
-							modalLeft: true,
-							modalFunction: goPermission,
-						}),
-					);
-				}
-			});
-		} catch (err) {
-			console.log('에러요', err);
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
+						}
+					},
+					error => {
+						// See error code charts below.
+						console.log(error.code, error.message);
+					},
+					{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+				);
+			} else {
+				dispatch(LoadingSliceActions.offLoading());
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '권한 설정',
+						modalSubTitle: '현재 권한이 거부된 상태입니다.\n위치 정보 권한을 설정하러 가시겠습니까?',
+						modalLeft: true,
+						modalFunction: goPermission,
+					}),
+				);
+			}
+		});
 	};
 	return (
 		<BackgroundGray>

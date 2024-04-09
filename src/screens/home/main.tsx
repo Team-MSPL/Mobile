@@ -33,6 +33,7 @@ export default function Main({navigation}: any) {
 	const regionRecommend = () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		dispatch(regionRecommendSliceActions.reset());
+		dispatch(travelSliceActions.reset());
 		navigation.navigate('RegionSelectWho');
 	};
 	const goEnroll = () => {

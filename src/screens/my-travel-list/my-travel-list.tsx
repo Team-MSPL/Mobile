@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useRef} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
@@ -11,21 +11,14 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {
-	Center,
-	HStack,
-	MainContainer,
-	PretendardBoldText,
-	PretendardVariableText,
-	VStack,
-} from '../../utill/layout/layout';
-import {SvgRight, SVGRightAdd} from '../../utill/svg/svg';
-import {DayViewContainer} from '../enroll-info/select-multi';
+import {Center, PretendardSemiBoldText, PretendardVariableText, TagContainer, VStack} from '../../utill/layout/layout';
+import {SVGFlag, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
+import {ButtonContainer, DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
-import {widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import PrimaryButton from '../../utill/component/primary-button';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
-	const {socialloginProvider, userName} = useAppSelector(state => state.userSlice);
 
 	const dispatch = useAppDispatch();
 	const goMyTravelDetail = async (e: any) => {
@@ -51,10 +44,6 @@ export default function MyTravelList({navigation}: any) {
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
-	};
-	const goLogin = () => {
-		dispatch(userSliceActions.reset());
-		navigation.replace('LoginScreen');
 	};
 	const getTravelList = async () => {
 		try {
@@ -108,133 +97,96 @@ export default function MyTravelList({navigation}: any) {
 		let data = {result: result, endFlag: endFlag};
 		return data;
 	};
+	const monthRef = useRef(moment().add(1, 'month').format('MM'));
 	const renderItem = (item: any) => {
+		let after = monthRef.current;
+		monthRef.current = moment(item.item.day[0]).format('MM');
 		return (
-			<MyTravelContainer
-				onPress={() => {
-					goMyTravelDetail(item.item);
-				}}>
-				<VStack>
-					<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-						{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
-							'~' +
-							moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
-					</PretendardVariableText>
-					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-						{item.item.travelName}
-					</PretendardVariableText>
-					<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-						{dDayCalculate({startDay: item.item.day[0], endDay: item.item.day[item.item.nDay - 1]}).result}
-					</PretendardVariableText>
-				</VStack>
-				<SVGRightAdd color={colors.PointYellow} />
-			</MyTravelContainer>
+			<>
+				{monthRef.current != after && (
+					<DivideDayContainer>
+						<PretendardVariableText
+							size={12}
+							lineHeight={18}
+							color={colors.Gray2}
+							marginTop={heightPercentage(30)}>
+							{moment(item.item.day[item.item.nDay - 1]).format('YYYY년 MM월')}
+						</PretendardVariableText>
+					</DivideDayContainer>
+				)}
+				<MyTravelContainer
+					onPress={() => {
+						goMyTravelDetail(item.item);
+					}}>
+					<VStack>
+						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+							{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
+								'~' +
+								moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
+						</PretendardVariableText>
+						<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+							{item.item.travelName}
+						</PretendardVariableText>
+						<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+							{
+								dDayCalculate({startDay: item.item.day[0], endDay: item.item.day[item.item.nDay - 1]})
+									.result
+							}
+						</PretendardVariableText>
+						<TagContainer
+							backgroundColor={colors.backgroundGray}
+							height={heightPercentage(30)}
+							width={widthPercentage(99)}>
+							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+								{item.item.region[0]}
+							</PretendardVariableText>
+							<SVGFlag color={colors.Primary} />
+						</TagContainer>
+					</VStack>
+				</MyTravelContainer>
+			</>
 		);
 	};
 	return (
 		<TravelContainer>
-			<TopContainer>
-				<NewTravelContainer>
-					<HStack>
-						<PretendardBoldText size={21} lineHeight={26} color={colors.PointYellow}>
-							{userName}
-						</PretendardBoldText>
-						<SubTitleBlackText>님, 다님과 떠나볼까요?</SubTitleBlackText>
-					</HStack>
-					<NewTravelHStack>
-						<MainText>
-							새로운
-							{'\n'}여행 일정 만들기
-						</MainText>
-						<NewTravelButton onPress={goEnroll}>
-							<PretendardBoldText size={21} lineHeight={26} color={colors.Primary}>
-								출발
-							</PretendardBoldText>
-							<ButtonRight>
-								<SvgRight color={colors.Gray5} />
-							</ButtonRight>
-						</NewTravelButton>
-					</NewTravelHStack>
-				</NewTravelContainer>
-				<NewTravelContainer>
-					<SubTitleBlackText>잠시 머물렀던 그곳</SubTitleBlackText>
-					<MainText>내 여행 기록</MainText>
-				</NewTravelContainer>
-			</TopContainer>
-			{myTravelList.length == 0 ? (
-				<NewTravelContainer>
+			<TravleListContainer>
+				{myTravelList.length == 0 ? (
 					<Center>
-						<TouchableOpacity onPress={goEnroll}>
-							<MainText>아직 만들어진 여행이 없어요!</MainText>
-						</TouchableOpacity>
+						<PretendardSemiBoldText size={16} lineHeight={22} color={colors.Gray2}>
+							아직 만들어진 여행이 없어요:(
+						</PretendardSemiBoldText>
 					</Center>
-				</NewTravelContainer>
-			) : (
-				<FlatList
-					data={myTravelList}
-					renderItem={renderItem}
-					initialNumToRender={20}
-					showsVerticalScrollIndicator={false}
-					keyExtractor={item => item._id}
-					nestedScrollEnabled></FlatList>
-			)}
+				) : (
+					<FlatList
+						data={myTravelList}
+						renderItem={renderItem}
+						initialNumToRender={20}
+						showsVerticalScrollIndicator={false}
+						keyExtractor={item => item._id}
+						nestedScrollEnabled></FlatList>
+				)}
+			</TravleListContainer>
+			<PrimaryButton
+				backgroundColor={colors.Gray5}
+				label='새로운 여행 떠나기'
+				onPress={goEnroll}
+				textColor={colors.Primary}
+				width={widthPercentage(327)}
+				height={heightPercentage(60)}
+				marginBottom={10}></PrimaryButton>
 		</TravelContainer>
 	);
 }
-const TopContainer = styled.View`
-	height: 50%;
+const TravleListContainer = styled.View`
+	height: 85%;
+`;
+const DivideDayContainer = styled.View`
+	padding: 0px 15px;
 `;
 const TravelContainer = styled.View`
 	background-color: ${colors.main};
 	padding: 0px 24px 0px 24px;
 	height: 100%;
-`;
-const NewTravelContainer = styled.View`
-	width: 100%;
-	padding: 10px;
-	margin: 10px 0px 50px 0px;
-`;
-const NewTravelHStack = styled(HStack)`
-	justify-content: space-between;
-	margin: 10px 0px 0px 0px;
-`;
-const MainText = styled.Text`
-	font-size: 22px;
-	font-weight: bold;
-	color: black;
-`;
-const NewTravelButton = styled.TouchableOpacity`
-	width: 40%;
-	height: 48px;
-	padding: 10px;
-	border-radius: 30px;
-	background-color: ${colors.Gray5};
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding-left: ${widthPercentage(20)}px;
-	padding-right: ${widthPercentage(10)}px;
-`;
-const ButtonText = styled(MainText)`
-	color: white;
-	margin: 0px 0px 0px 10px;
-`;
-const ButtonRight = styled.View`
-	width: 36px;
-	height: 36px;
-	border-radius: 99px;
-	background-color: white;
-	justify-content: center;
-	align-items: center;
-`;
-const SubTitleColorText = styled(MainText)`
-	font-size: 17px;
-	color: ${colors.selectButton};
-`;
-const SubTitleBlackText = styled(MainText)`
-	font-size: 17px;
-	color: black;
-	font-weight: 500;
 `;
 export const DayText = styled.Text`
 	font-size: 17px;
@@ -246,8 +198,4 @@ const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-`;
-const TravelTitleText = styled(SubTitleColorText)`
-	font-size: 22px;
-	font-weight: 900;
 `;

@@ -178,10 +178,12 @@ export default function Timetable({navigation, route}: any) {
 								modalSubTitle: modifyCheck
 									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
 									: '홈으로 이동하시겠습니까?',
-								modalFunction: goHome,
+								modalFunction: () => {},
+								modalBottomFunctionUse: true,
+								modalBottomFunction: goHome,
 								modalLeft: true,
-								modalTopText: '그냥 나가기',
-								modalBottomText: '저장하러 가기',
+								modalTopText: '저장하러 가기',
+								modalBottomText: '그냥 나가기',
 							}),
 					  );
 

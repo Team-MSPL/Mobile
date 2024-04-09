@@ -53,8 +53,16 @@ export default function SelectPopularity({navigation}: any) {
 						가장 유명한
 					</PretendardSemiBoldText>
 				</SpaceHstack>
+				<PretendardSemiBoldText
+					size={11}
+					lineHeight={18}
+					color={colors.Gray2}
+					style={{zIndex: 99, marginTop: 20}}>
+					가장 이색적인 : 경남 함안군 등 37개 지역 {`\n`}상당히 이색적인 : 경북 청송군 등 53개 지역 {`\n`}
+					균형잡힌 : 강원 화천시 등 32개 지역 {`\n`}상당히 유명한 : 강원 강릉시 등 30개 지역 {`\n`}가장 유명한
+					: 서울, 제주 등 10개 지역
+				</PretendardSemiBoldText>
 			</BarContainer>
-
 			<ButtonContainer>
 				<CustomButton label='다음' onPress={goNext} marginBottom={12}></CustomButton>
 			</ButtonContainer>

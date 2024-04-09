@@ -3,6 +3,8 @@ import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppSelector} from '../../redux';
 import {Linking} from 'react-native';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {PretendardVariableText} from '../../utill/layout/layout';
 
 export default function NeedVersionUpdate() {
 	const {updateStoreUrl} = useAppSelector(state => state.settingSlice);
@@ -12,8 +14,10 @@ export default function NeedVersionUpdate() {
 	return (
 		<Container>
 			<ViewContaniner>
-				<Guide>새로운 여행을 위해 업데이트가 필요해요!</Guide>
-				<CustomButton label={'업데이트'} onPress={checkNetwork} width={50} />
+				<PretendardVariableText size={18} lineHeight={22} color={colors.Black}>
+					새로운 여행을 위해 업데이트가 필요해요!
+				</PretendardVariableText>
+				<CustomButton label={'업데이트'} onPress={checkNetwork} width={widthPercentage(200)} />
 			</ViewContaniner>
 		</Container>
 	);
@@ -25,20 +29,16 @@ const Container = styled.View`
 	justify-content: center;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(250, 250, 255, 0.9);
-`;
-const Guide = styled.Text`
-	font-size: 16px;
-	text-align: center;
-	line-height: 24.5px;
-	font-weight: 500;
-	color: black;
+	background-color: rgba(0, 0, 0, 0.2);
 `;
 const ViewContaniner = styled.Pressable`
 	background-color: white;
-	width: 80%;
-	border-radius: 5px;
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(200)}px;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 12px;
 	border-width: 1px;
 	padding: 20px;
-	border-color: ${colors.selectButton};
+	border-color: ${colors.backgroundWhite};
 `;

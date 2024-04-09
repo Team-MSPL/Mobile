@@ -26,6 +26,8 @@ import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {TagShopText} from '../home/main';
+import {SVGContainer} from '../enroll-info/select-multi';
+import {SVGPlus} from '../../utill/svg/svg';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo} = useAppSelector(
@@ -307,50 +309,48 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	}
 	return (
 		<MainAllContainer>
-			{!modify && (
-				<AbsoluteTopBar opacityState={modify}>
-					<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
-						<RegionImage
-							source={{
-								uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
-							}}
-						/>
-						<VStack>
-							<HStack>
-								<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-									{region[0]}
-									{region.length >= 2 ? ` +${region.length - 1}` : ''}
-								</PretendardVariableText>
-								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-									{' '}
-									| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
-								</PretendardVariableText>
-							</HStack>
-							<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
-								{travelName}
+			<AbsoluteTopBar opacityState={modify}>
+				<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
+					<RegionImage
+						source={{
+							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
+						}}
+					/>
+					<VStack>
+						<HStack>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
+								{region[0]}
+								{region.length >= 2 ? ` +${region.length - 1}` : ''}
+							</PretendardVariableText>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{' '}
+								| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
+							</PretendardVariableText>
+						</HStack>
+						<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+							{travelName}
+						</PretendardSemiBoldText>
+					</VStack>
+					<VStack gap={heightPercentage(3)} alignItems='flex-end'>
+						<TagContainer backgroundColor={colors.backgroundWhite}>
+							<TagShopText color={colors.Gray2} size={12}>
+								#
+							</TagShopText>
+							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+								{!transit ? '자동차·렌트카' : '대중교통'}
 							</PretendardSemiBoldText>
-						</VStack>
-						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
-							<TagContainer backgroundColor={colors.backgroundWhite}>
-								<TagShopText color={colors.Gray2} size={12}>
-									#
-								</TagShopText>
-								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-									{!transit ? '자동차·렌트카' : '대중교통'}
-								</PretendardSemiBoldText>
-							</TagContainer>
-							<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-								<TagShopText color={colors.Gray2} size={12}>
-									#
-								</TagShopText>
-								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-									{bandwidth ? '여유있는 일정' : '알찬 일정'}
-								</PretendardSemiBoldText>
-							</TagContainer>
-						</VStack>
-					</HStack>
-				</AbsoluteTopBar>
-			)}
+						</TagContainer>
+						<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
+							<TagShopText color={colors.Gray2} size={12}>
+								#
+							</TagShopText>
+							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+								{bandwidth ? '여유있는 일정' : '알찬 일정'}
+							</PretendardSemiBoldText>
+						</TagContainer>
+					</VStack>
+				</HStack>
+			</AbsoluteTopBar>
 			<VStack>
 				{!modify &&
 					timetable.map(
@@ -366,8 +366,8 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									region={{
 										latitude: centerLatitude,
 										longitude: centerLongitude,
-										latitudeDelta: deltaLatitude + deltaLatitude,
-										longitudeDelta: deltaLongitude + deltaLongitude,
+										latitudeDelta: deltaLatitude + deltaLatitude + 0.02,
+										longitudeDelta: deltaLongitude + deltaLongitude + 0.02,
 									}}>
 									{markers}
 									{polylines}
@@ -401,6 +401,28 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							)}
 						</FlexWrap>
 					</DayContainer>
+					<HStack justifyContent='space-between'>
+						<WhiteContainer width={widthPercentage(160)}>
+							<HStack justifyContent='space-between' width={widthPercentage(140)}>
+								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+									여행지
+								</PretendardSemiBoldText>
+								<SVGContainer color={colors.PointYellow}>
+									<SVGPlus color={colors.Primary} />
+								</SVGContainer>
+							</HStack>
+						</WhiteContainer>
+						<WhiteContainer width={widthPercentage(160)}>
+							<HStack justifyContent='space-between' width={widthPercentage(140)}>
+								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+									숙소
+								</PretendardSemiBoldText>
+								<SVGContainer color={colors.PointYellow}>
+									<SVGPlus color={colors.Primary} />
+								</SVGContainer>
+							</HStack>
+						</WhiteContainer>
+					</HStack>
 					<DayScrollView
 						modify={modify}
 						ref={scrollRef}
@@ -745,7 +767,7 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 
 const DayScrollView = styled.ScrollView<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modify ? heightPercentage(600) : heightPercentage(300))}px;
+	height: ${props => (props.modify ? heightPercentage(500) : heightPercentage(300))}px;
 `;
 export const MarkerText = styled.Text`
 	position: absolute;
@@ -762,7 +784,6 @@ const BackgroundGray = styled.View`
 	border-top-right-radius: 10px;
 	border-top-left-radius: 10px;
 	background-color: ${colors.backgroundGray};
-	top: -10px;
 	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
 `;
 const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`

@@ -136,7 +136,6 @@ export default function SearchPlace({navigation, route}: any) {
 						language: 'ko',
 						components: 'country:kr',
 					}}
-					// renderRightButton={clearButton}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{
 						container: {alignItems: 'center'},
@@ -149,7 +148,6 @@ export default function SearchPlace({navigation, route}: any) {
 						},
 						listView: {width: widthPercentage(327)},
 						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
-						// listView: {position: 'relative'},
 						description: {color: 'black'},
 					}}
 					fetchDetails={true}

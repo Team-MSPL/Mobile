@@ -254,7 +254,7 @@ export default function FinalCheck({navigation}: any) {
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
 									{cityViewList[cityIndex].title + region}
-									<SVGFlag style={{marginLeft: widthPercentage(8)}} />
+									<SVGFlag style={{marginLeft: widthPercentage(8)}} color='#DDF2FE' />
 								</PretendardSemiBoldText>
 							</HStack>
 						</VStack>

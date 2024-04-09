@@ -8,7 +8,7 @@ import {reCourseName, updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGPencil, SvgCancel, SvgPicture} from '../../utill/svg/svg';
+import {SVGPencil, SVGPlus, SvgCancel, SvgPicture} from '../../utill/svg/svg';
 import {
 	BackgroundGray,
 	HStack,
@@ -46,12 +46,14 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					modalSliceActions.setOpenModal({
 						modalTitle: '저장이 필요합니다. ',
 						modalSubTitle: '변경사항이 저장되지않았습니다. 나가시겠습니까?',
-						modalTopText: '나가기',
-						modalBottomText: '수정계속하기',
+						modalTopText: '수정계속하기',
+						modalBottomText: '나가기',
 						modalLeft: true,
-						modalFunction: () => {
+						modalBottomFunctionUse: true,
+						modalBottomFunction: () => {
 							navigation.goBack();
 						},
+						modalFunction: () => {},
 					}),
 				);
 
@@ -132,7 +134,17 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 							</HStack>
 						</PictureColorContainer>
 					) : pictureValue.length == 0 ? (
-						<NullContainer></NullContainer>
+						<NullContainer
+							onPress={() => {
+								setModify(true);
+							}}>
+							<PlusCircle>
+								<SVGPlus color='black' />
+							</PlusCircle>
+							{/* <PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+								사진 추가
+							</PretendardVariableText> */}
+						</NullContainer>
 					) : null}
 					{pictureValue.map((item, idx) => (
 						<PictureColorContainer
@@ -162,9 +174,13 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 				일기
 			</PretendardSemiBoldText>
 			{!modify ? (
-				<InsideGray>
+				<InsideGray
+					status={diaryValue == ''}
+					onPress={() => {
+						setModify(true);
+					}}>
 					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-						{diaryValue}
+						{diaryValue == '' ? '일기 작성하기' : diaryValue}
 					</PretendardVariableText>
 				</InsideGray>
 			) : (
@@ -201,19 +217,31 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 		</RecommendBorderContainer>
 	);
 }
-const NullContainer = styled.View`
+const NullContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(150)}px;
 	height: ${widthPercentage(150)}px;
 	border-radius: 12px;
 	background-color: ${colors.backgroundGray};
+	align-items: center;
+	justify-content: center;
 `;
-const InsideGray = styled.View`
+const InsideGray = styled.TouchableOpacity<{status: boolean}>`
 	width: 100%;
 	border-radius: 8px;
 	background-color: ${colors.backgroundGray};
 	padding: ${heightPercentage(13)}px ${widthPercentage(15)}px;
 	min-height: ${heightPercentage(120)}px;
 	margin: 10px 0px 0px 0px;
+	align-items: ${props => (props.status ? 'center' : null)};
+	justify-content: ${props => (props.status ? 'center' : null)};
+`;
+const PlusCircle = styled.View`
+	width: ${widthPercentage(30)}px;
+	height: ${widthPercentage(30)}px;
+	border-radius: 99px;
+	border-width: 1px;
+	align-items: center;
+	justify-content: center;
 `;
 const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
 	width: ${widthPercentage(150)}px;

@@ -11,7 +11,7 @@ export default function CustomButton({marginTop, marginBottom, label, onPress, i
 			disabled={isDisabled ?? false}
 			isDisabledOpacity={isDisabled ?? false}
 			onPress={onPress}
-			width={width ?? 60}>
+			width={width}>
 			<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 				{label}
 			</PretendardSemiBoldText>
@@ -31,11 +31,11 @@ type CustomButtonProps = {
 const ButtonContainer = styled.TouchableOpacity<{
 	marginBottom: number;
 	marginTop: number;
-	width: number;
+	width?: number;
 	isDisabledOpacity: boolean;
 }>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
-	width: ${widthPercentage(327)}px;
+	width: ${props => props.width ?? widthPercentage(327)}px;
 	align-self: center;
 	align-items: center;
 	height: ${heightPercentage(60)}px;

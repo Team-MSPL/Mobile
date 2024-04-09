@@ -89,7 +89,7 @@ export default function Preset({navigation}: any) {
 				</SvgContainer>
 				<WhiteContainer>
 					<RegionTextContainer gap={widthPercentage(4)}>
-						<SVGFlag />
+						<SVGFlag color='#DDF2FE' />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
 							{region[0]}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}

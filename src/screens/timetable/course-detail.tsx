@@ -275,7 +275,7 @@ export default function CourseDetail({navigation, route}: any) {
 		dispatch(hikingRecommendSliceActions.reset());
 		navigation.navigate('HikingSelectPlay');
 	};
-	const [moreStatus, setMoreStatus] = useState(false);
+	const [moreStatus, setMoreStatus] = useState(true);
 	if (courseDetail?.name)
 		return (
 			<>
@@ -285,7 +285,7 @@ export default function CourseDetail({navigation, route}: any) {
 							dot={<Dot />}
 							activeDot={<ActiveDot />}
 							paginationStyle={{
-								marginBottom: 24,
+								marginBottom: 10,
 							}}
 							loop={false}>
 							{courseDetail.photo.map((uri, index) => (
@@ -308,27 +308,6 @@ export default function CourseDetail({navigation, route}: any) {
 								</Pressable>
 							))}
 						</PostImageSwiper>
-						// <ImageScroll horizontal={true}>
-						// 	{courseDetail.photo.map((value, index) => (
-						// 		<Pressable
-						// 			onPress={() => {
-						// 				setImageIndex(index);
-						// 				setVisible(true);
-						// 			}}
-						// 			key={index}>
-						// 			<Image
-						// 				source={{
-						// 					uri:
-						// 						courseDetail.status == 'google'
-						// 							? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${value}&key=${GOOGLE_API_KEY}`
-						// 							: value,
-						// 				}}
-						// 				style={{width: widthPercentage(374), height: heightPercentage(240)}}
-						// 				alt='Place Image'
-						// 			/>
-						// 		</Pressable>
-						// 	))}
-						// </ImageScroll>
 					)}
 					<RecommendBorderContainer height={heightPercentage(480)}>
 						<ScrollView showsVerticalScrollIndicator={false}>
@@ -432,14 +411,16 @@ export default function CourseDetail({navigation, route}: any) {
 								</>
 							)}
 							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-							<HStack gap={widthPercentage(10)}>
-								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
-									리뷰
-								</PretendardSemiBoldText>
-								<HStack width={widthPercentage(290)} justifyContent='space-between'>
+							<HStack width={widthPercentage(327)} justifyContent='space-between'>
+								<HStack gap={widthPercentage(10)}>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+										리뷰
+									</PretendardSemiBoldText>
 									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
 										{courseDetail.review.length}
 									</PretendardSemiBoldText>
+								</HStack>
+								<HStack justifyContent='space-between'>
 									{courseDetail.status == 'firebase' && (
 										<ReviewButton onPress={goReviewEnroll}>
 											<SVGReviewPencil />
@@ -453,6 +434,13 @@ export default function CourseDetail({navigation, route}: any) {
 									)}
 								</HStack>
 							</HStack>
+							{courseDetail.review.length == 0 && (
+								<ReviewNonContainer onPress={goReviewEnroll}>
+									<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
+										첫 번째 리뷰를 작성해 보세요!
+									</PretendardVariableText>
+								</ReviewNonContainer>
+							)}
 							{courseDetail.review.map((item, idx) => (
 								<ReviewContainer key={idx}>
 									<HStack justifyContent='space-between'>
@@ -510,114 +498,15 @@ export default function CourseDetail({navigation, route}: any) {
 									)}
 								</ReviewContainer>
 							))}
-							{/* {courseDetail?.review.length != 0 ? (
-								courseDetail.review.map((item, idx) => (
-									<OpenContainer key={idx}>
-										<OpenVStack>
-											<ReviewTitleText>{item.name}</ReviewTitleText>
-											<ReviewElementText>{item.content}</ReviewElementText>
-										</OpenVStack>
-										{item.rating && (
-											<ReviewRating>
-												<SvgStart color={colors.selectButton} width={18} height={18} />
-												<ReviewText>{item.rating}</ReviewText>
-											</ReviewRating>
-										)}
-										{item.reviewUserToken == userIdToken && (
-											<DeleteContainer
-												onPress={() => {
-													checkDelete(item);
-												}}>
-												<Icons size={20} name='delete' color={'black'}></Icons>
-											</DeleteContainer>
-										)}
-									</OpenContainer>
-								))
-							) : (
-								<ReviewCenter>
-									<ReviewElementText>리뷰가 없습니다!</ReviewElementText>
-								</ReviewCenter>
-							)} */}
 						</ScrollView>
-						<ButtonContainer>
-							<CustomButton
-								label={'이 지역의 여행코스 추천받기'}
-								onPress={goIncludeRecommend}></CustomButton>
-						</ButtonContainer>
+						{route.params.value.mainFlag && (
+							<ButtonContainer>
+								<CustomButton
+									label={'이 지역의 여행코스 추천받기'}
+									onPress={goIncludeRecommend}></CustomButton>
+							</ButtonContainer>
+						)}
 					</RecommendBorderContainer>
-					{/* <TitleInfoContainer>
-						<DetailInfoContainer>
-							<TitleText>{courseDetail.name}</TitleText>
-							{courseDetail.rating && (
-								<RatingContainer>
-									<RatingHStack>
-										<SvgStart color={colors.selectButton} width={20} height={20} />
-										<RatingText>{courseDetail.rating}</RatingText>
-									</RatingHStack>
-									<RatinInfoText>* 구글 검색 기준</RatinInfoText>
-								</RatingContainer>
-							)}
-						</DetailInfoContainer>
-					</TitleInfoContainer> */}
-					{/* <HStack>
-						{tabList.map((list, listIndex) => (
-							<TabTouchableOpacity
-								key={listIndex}
-								color={listIndex == tabView ? colors.selectButton : colors.regionNormal}
-								onPress={list.function}>
-								<TabText color={listIndex == tabView ? colors.selectButton : 'black'}>
-									{list.title}
-								</TabText>
-							</TabTouchableOpacity>
-						))}
-					</HStack> */}
-					{/* <TabScrollView
-						horizontal={true}
-						nestedScrollEnabled={true}
-						pagingEnabled
-						snapToInterval={devicesWidth}
-						scrollEventThrottle={180}
-						decelerationRate={'fast'}
-						ref={tabBarRef}
-						disableIntervalMomentum={true}
-						onScroll={e => {
-							changeTab(e);
-						}}
-						showsHorizontalScrollIndicator={false}>
-						<HStack>
-							<ReviewContainer showsVerticalScrollIndicator={false} onScroll={e => checkGoState(e)}>
-								{courseDetail?.review.length != 0 ? (
-									courseDetail.review.map((item, idx) => (
-										<OpenContainer key={idx}>
-											<OpenVStack>
-												<ReviewTitleText>{item.name}</ReviewTitleText>
-												<ReviewElementText>{item.content}</ReviewElementText>
-											</OpenVStack>
-											{item.rating && (
-												<ReviewRating>
-													<SvgStart color={colors.selectButton} width={18} height={18} />
-													<ReviewText>{item.rating}</ReviewText>
-												</ReviewRating>
-											)}
-											{item.reviewUserToken == userIdToken && (
-												<DeleteContainer
-													onPress={() => {
-														checkDelete(item);
-													}}>
-													<Icons size={20} name='delete' color={'black'}></Icons>
-												</DeleteContainer>
-											)}
-										</OpenContainer>
-									))
-								) : (
-									<ReviewCenter>
-										<ReviewElementText>리뷰가 없습니다!</ReviewElementText>
-									</ReviewCenter>
-								)}
-							</ReviewContainer>
-						</HStack>
-
-					</TabScrollView> */}
 					{courseDetail?.photo && (
 						<ImageView
 							images={courseDetail?.photo.map((value, index) => ({
@@ -642,23 +531,6 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
-
-				{/* {tabView == 0 && route.params.value.mainFlag && (
-					<GoRecommendButton onPress={goIncludeRecommend} state={goState}>
-						<ButtonHStack>
-							<ButtonText>{goState ? '추가' : '이 관광지를 추가하여 코스 추천받기'}</ButtonText>
-							<SvgRight color={colors.selectButton} />
-						</ButtonHStack>
-					</GoRecommendButton>
-				)}
-				{tabView == 1 && courseDetail.status == 'firebase' && (
-					<GoRecommendButton onPress={goReviewEnroll} state={reviewState}>
-						<ButtonHStack>
-							<ButtonText>{reviewState ? '작성' : '리뷰 작성하러가기'}</ButtonText>
-							<SvgRight color={colors.selectButton} />
-						</ButtonHStack>
-					</GoRecommendButton>
-				)} */}
 			</>
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
@@ -711,9 +583,6 @@ export const ImageViewFooterComponent = styled.View`
 	height: 50px;
 	align-items: center;
 `;
-const ImageScroll = styled.ScrollView`
-	height: 35%;
-`;
 export const LogoContainer = styled.View`
 	width: ${widthPercentage(30)}px;
 `;
@@ -728,4 +597,10 @@ const ReviewElementText = styled.Text`
 `;
 export const ImageText = styled(ReviewElementText)`
 	color: white;
+`;
+const ReviewNonContainer = styled.Pressable`
+	width: ${widthPercentage(327)}px;
+	align-items: center;
+	justify-content: center;
+	height: ${heightPercentage(100)}px;
 `;

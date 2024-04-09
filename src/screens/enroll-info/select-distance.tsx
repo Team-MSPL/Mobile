@@ -1,24 +1,17 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import Slider from '@react-native-community/slider';
-import {
-	BackgroundGray,
-	Center,
-	HStack,
-	PretendardSemiBold,
-	PretendardSemiBoldText,
-	devicesWidth,
-} from '../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {ButtonContainer, MarginContainder} from './select-multi';
-import MapView, {Circle, Marker, Polyline} from 'react-native-maps';
+import {ButtonContainer} from './select-multi';
+import MapView, {Circle} from 'react-native-maps';
 import {cityViewList} from './select-city';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import Stepper from '../../utill/component/enroll-info/stepper';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
