@@ -270,12 +270,12 @@ const ElementContainer = styled.View<{color: string}>`
 const SearchContainer = styled.View<{height: number}>`
 	height: ${props => props.height}px;
 `;
-const BottomContainer = styled.View<{height: number}>`
+export const BottomContainer = styled.View<{height: number; gap?: number}>`
 	width: ${widthPercentage(375)}px;
 	height: ${props => props.height}px;
 	background-color: ${colors.backgroundWhite};
 	padding: ${heightPercentage(14)}px ${widthPercentage(24)}px;
-	gap: ${heightPercentage(15)}px;
+	gap: ${props => props.gap ?? heightPercentage(15)}px;
 `;
 export const DefalutLogoContainer = styled.View`
 	width: 100px;

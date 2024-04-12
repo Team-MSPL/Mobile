@@ -4,32 +4,31 @@ import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-nativ
 import {Alert, TouchableOpacity, View} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
-import {recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {TimetableType, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import moment from 'moment';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Center, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
 import {
-	CourseAndReview,
-	CourseContainer,
-	CourseTitleText,
-	CourseSubTitleText,
-	IconContainer,
-} from '../my-travel-list/detail-info';
-import {SvgCoffee, SvgHome} from '../../utill/svg/svg';
-import {TimeContainer, TimeItemContainer, TimeStepText, TimeItemText, DayPressable} from '../enroll-info/select-day';
+	VStack,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	BackgroundGray,
+} from '../../utill/layout/layout';
+import {DayPressable, SelectContainer} from '../enroll-info/select-day';
 
-import Icon from 'react-native-vector-icons/AntDesign';
-
-import Icons from 'react-native-vector-icons/MaterialIcons';
-import CustomButton from '../../utill/component/custom-button';
 import {useDistance} from '../../utill/hooks/useDistance';
-import {SearchClearButton, SearchClearContainer} from '../enroll-info/search-place';
+import {BottomContainer, SearchClearButton, SearchClearContainer} from '../enroll-info/search-place';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ButtonContainer, DeleteContainer} from '../enroll-info/select-multi';
+import PrimaryButton from '../../utill/component/primary-button';
+import UseDatePicker from '../../utill/hooks/useDatePicker';
+import {InfoModalContainer, TimePickerContainer} from './map-info';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: ''});
+	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: '', formatted_address: ''});
 	const newY = useRef(0);
 
 	const goRecommend = (category: string) => {
@@ -133,39 +132,147 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			);
 		}
 	};
-	const addTimetable = () => {
+	const [qw, seA] = useState(0);
+	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
+		if (timeView.value == 'left') {
+			viewRef.current.y =
+				(parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0) - 6) * 2 + parseInt(timeData.minute) / 30;
+		} else {
+			viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
+			viewRef.current.endMinute = parseInt(timeData.minute);
+		}
+		seA(qw + 1);
+		return true;
+	};
+	const viewRef = useRef({
+		...timetable[0][0],
+		endHours: Math.floor((((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) / 60),
+		endMinute: (((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) % 60,
+		index: 0,
+		idx: 0,
+	});
+	const [timeView, setTimeView] = useState({status: false, value: ''});
+	const goModify = () => {
+		const newY = viewRef.current.y;
+		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
+		console.log(newY, newEnd);
+		if (newEnd >= 49) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
+		} else {
+			let copy = [...timetable[viewRef.current.index]];
+			let changeCopy = [...timetable];
+			let changeFlag = null;
+			console.log(copy);
+			//부터 가능
+			for (let i = 0; i < copy.length; i++) {
+				if (
+					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+							newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+					copy[i].id != viewRef.current.id
+				) {
+					changeFlag = copy[i];
+					break;
+				}
+			}
+			let changeInputIndex = copy.findIndex(item => item.y >= newY);
+			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+			if (changeFlag) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+					}),
+				);
+			} else {
+				let copyValue = {
+					...changeCopy[viewRef.current.index][viewRef.current.idx],
+					y: newY,
+					x: viewRef.current.index,
+					takenTime: (newEnd - newY) * 30,
+				};
+				let deleteCopy = [...timetable[viewRef.current.index]];
+				deleteCopy.splice(viewRef.current.idx, 1);
+				changeCopy[viewRef.current.index] = deleteCopy;
+				let addCopy = [...changeCopy[viewRef.current.index]];
+				addCopy.splice(changeInputIndex, 0, copyValue);
+				changeCopy[viewRef.current.index] = addCopy;
+				dispatch(travelSliceActions.changeTimetable(changeCopy));
+				navigation.goBack();
+			}
+		}
+	};
+	const addAccommodation = () => {
+		let checkTimetalbe = [...timetable[route.params.x]];
 		const updateItem = {
-			...getInfo,
-			category: 5,
-			concept: [0],
-			partner: [0],
-			play: [0],
-			popular: 0,
-			season: [0],
-			tour: [0],
-			x: route.params.x,
-			y: route.params.y[0],
-			id: shortId.generate(),
-			takenTime: route.params.y.length * 30,
+			...checkTimetalbe[checkTimetalbe.length - 1],
+			lat: getInfo.lat,
+			lng: getInfo.lng,
+			name: getInfo.name,
 		};
 		let copy = [...timetable];
-		let xArrayCopy = [...copy[route.params.x]];
-		xArrayCopy.splice(newY.current, 0, updateItem);
-		copy[route.params.x] = xArrayCopy;
+		copy[route.params.x] = checkTimetalbe;
+		if (checkTimetalbe[checkTimetalbe.length - 1].name == '숙소 추천') {
+			checkTimetalbe.splice(checkTimetalbe.length - 1, 1, updateItem);
+			let updateitems = {
+				...updateItem,
+				x: copy[route.params.x + 1][0].x,
+				y: copy[route.params.x + 1][0].y,
+				takenTime: copy[route.params.x + 1][0].takenTime,
+			};
+			let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
+			itemCopy[0] = updateitems;
+			copy[route.params.x + 1] = itemCopy;
+		} else {
+			checkTimetalbe.push(updateItem);
+		}
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.goBack();
 	};
-	const DeleteIconContainer = styled(Icon)`
-		background-color: ${colors.selectButton};
-		border-radius: 5px;
-		padding: 0.6%;
-		margin: 0px 0px 0px 10px;
-	`;
-	const DeleteIconContainers = styled(Icons)`
-		border-radius: 5px;
-		padding: 0.6%;
-		margin: 0px 0px 0px 10px;
-	`;
+	const addTimetable = () => {
+		const newCurrentY = viewRef.current.y;
+		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
+		// console.log(newEnd, newCurrentY);
+		let changeFlag = null;
+		let checkTimetalbe = [...timetable[route.params.x]];
+		//부터 가능
+		for (let i = 0; i < checkTimetalbe.length; i++) {
+			console.log(newEnd, newCurrentY, checkTimetalbe[i]?.y);
+			if (
+				(newCurrentY <= checkTimetalbe[i]?.y && newEnd > checkTimetalbe[i]?.y) ||
+				(newCurrentY <= checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1 &&
+					newEnd > checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1)
+			) {
+				changeFlag = checkTimetalbe[i];
+				break;
+			}
+		}
+		console.log(changeFlag);
+		if (changeFlag) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`}));
+		} else {
+			const updateItem = {
+				...getInfo,
+				category: 5,
+				concept: [0],
+				partner: [0],
+				play: [0],
+				popular: 0,
+				season: [0],
+				tour: [0],
+				x: route.params.x,
+				y: newCurrentY,
+				id: shortId.generate(),
+				takenTime: (newEnd - newCurrentY) * 30,
+			};
+			newY.current = timetable[route.params.x].findIndex(item => item?.y > newCurrentY);
+			let copy = [...timetable];
+			let xArrayCopy = [...copy[route.params.x]];
+			xArrayCopy.splice(newY.current, 0, updateItem);
+			copy[route.params.x] = xArrayCopy;
+			dispatch(travelSliceActions.changeTimetable(copy));
+			navigation.goBack();
+		}
+	};
 	useEffect(() => {
 		newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
 		if (newY.current == -1) {
@@ -194,14 +301,47 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		</SearchClearContainer>
 	);
 	return (
-		<MainContainer>
-			<DayContainer>
+		<BackgroundGray paddingHorizental={0}>
+			{/* <DayContainer>
 				<DayText>
 					{moment(day[route.params.x]).format('YYYY-MM-DD')},{weekdays[moment(day[route.params.x]).day()]}요일
 				</DayText>
-			</DayContainer>
-
-			<TimeContainer>
+			</DayContainer> */}
+			<GooglePlacesAutocomplete
+				placeholder='장소를 검색해보세요!'
+				placeholderTextColor={'grey'}
+				query={{
+					key: GOOGLE_API_KEY,
+					language: 'ko',
+					components: 'country:kr',
+				}}
+				ref={autocompleteRef}
+				textInputProps={{placeholderTextColor: 'grey'}}
+				styles={{
+					container: {alignItems: 'center'},
+					textInputContainer: {
+						width: widthPercentage(327),
+						height: heightPercentage(52),
+						borderRadius: 8,
+						backgroundColor: colors.backgroundWhite,
+						alignItems: 'center',
+					},
+					listView: {width: widthPercentage(327)},
+					textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+					description: {color: 'black'},
+				}}
+				fetchDetails={true}
+				onPress={async (data, details) => {
+					setGetInfo({
+						lat: details?.geometry.location.lat ?? 0,
+						lng: details?.geometry.location.lng ?? 0,
+						name: details?.name ?? '검색불가',
+						formatted_address: details?.formatted_address.replace('대한민국 ', '') ?? '',
+					});
+				}}
+				onFail={error => console.log(error)}
+				onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+			{/* <TimeContainer>
 				{[...Array(2)].map((item, idx) => (
 					<TimeItemContainer key={idx}>
 						<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
@@ -217,9 +357,163 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						</HStack>
 					</TimeItemContainer>
 				))}
-			</TimeContainer>
+			</TimeContainer> */}
+			{getInfo.name ? (
+				<BottomContainer
+					height={route.params.status == 'travle' ? heightPercentage(342) : heightPercentage(150)}
+					gap={heightPercentage(0)}>
+					<ElementContainer color={colors.backgroundGray}>
+						<VStack width={widthPercentage(243)}>
+							<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+								{getInfo.name}
+							</PretendardSemiBoldText>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{getInfo.formatted_address}
+							</PretendardVariableText>
+						</VStack>
+						<DeleteContainer
+							onPress={() => {
+								setGetInfo({lat: 0, lng: 0, name: '', formatted_address: ''});
+								clearInput();
+							}}>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+								취소
+							</PretendardSemiBoldText>
+						</DeleteContainer>
+					</ElementContainer>
+					{route.params.status == 'travle' && (
+						<>
+							<HStack justifyContent='space-between'>
+								<SelectContainer
+									backgroundColor={colors.backgroundGray}
+									onPress={() => {
+										setTimeView({status: !timeView.status, value: 'left'});
+									}}>
+									<HStack justifyContent='space-between'>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12 ? 'AM' : 'PM'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											:
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{String(((viewRef.current.y ?? 0) * 30 + 360) % 60).padStart(2, '0')}
+										</PretendardSemiBoldText>
+									</HStack>
+								</SelectContainer>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									~
+								</PretendardSemiBoldText>
+								<SelectContainer
+									backgroundColor={colors.backgroundGray}
+									onPress={() => {
+										setTimeView({status: !timeView.status, value: 'right'});
+									}}>
+									<HStack justifyContent='space-between'>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{viewRef.current.endHours < 12 ? 'AM' : 'PM'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{viewRef.current.endHours}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											:
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{String(viewRef.current.endMinute).padStart(2, '0')}
+										</PretendardSemiBoldText>
+									</HStack>
+								</SelectContainer>
+							</HStack>
+							<TimePickerContainer alignSelf={timeView.value == 'right' ? 'flex-end' : 'flex-start'}>
+								<UseDatePicker
+									goConfirm={goConfirm}
+									minuteData={
+										timeView.value == 'right'
+											? viewRef.current.endMinute / 30
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) % 60) / 30
+									}
+									ampmData={
+										timeView.value == 'right'
+											? Math.floor(
+													(((viewRef.current.y ?? 0) + viewRef.current.takenTime / 30) * 30 +
+														360) /
+														60,
+											  ) < 12
+												? 0
+												: 1
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+											? 0
+											: 1
+									}
+									hourData={
+										timeView.value == 'right'
+											? viewRef.current.endHours < 12
+												? viewRef.current.endHours
+												: viewRef.current.endHours - 12
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+											? Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) - 12
+									}
+									visible={timeView.status}
+									setVisible={() => {}}></UseDatePicker>
+							</TimePickerContainer>
+						</>
+					)}
+					{/* {route.params.id == 0 && (
+						<HStack justifyContent='space-around'>
+							<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={24}>
+								머무를 시간
+							</PretendardSemiBoldText>
+							<HStack justifyContent='space-around' width={widthPercentage(182)}>
+								<SVGContainer
+									disabled={timeValue < 1}
+									onPress={() => {
+										setTimeValue(timeValue - 1);
+									}}
+									color={colors.Gray1}>
+									<SVGMinus color={colors.Gray2} />
+								</SVGContainer>
+								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+									{timeValue + 1}시간
+								</PretendardSemiBoldText>
+								<SVGContainer
+									disabled={timeValue > 1}
+									onPress={() => {
+										setTimeValue(timeValue + 1);
+									}}
+									color={colors.Gray1}>
+									<SVGPlus color={colors.Gray2} />
+								</SVGContainer>
+							</HStack>
+						</HStack>
+					)} */}
 
-			<SearchContainer>
+					<PrimaryButton
+						label={route.params.status == 'travle' ? '여행지 추가' : '숙소 추가'}
+						width={widthPercentage(327)}
+						height={heightPercentage(60)}
+						onPress={route.params.status == 'travle' ? addTimetable : addAccommodation}
+						backgroundColor={colors.Primary}
+						textColor={colors.Gray5}></PrimaryButton>
+				</BottomContainer>
+			) : (
+				<ButtonContainer>
+					<PrimaryButton
+						disabled={!getInfo.name}
+						label={route.params.status == 'travle' ? '여행지 추가' : '숙소 추가'}
+						alignSelf='center'
+						width={widthPercentage(327)}
+						height={heightPercentage(60)}
+						onPress={() => {}}
+						backgroundColor={colors.Gray1}
+						textColor={colors.Gray4}></PrimaryButton>
+				</ButtonContainer>
+			)}
+			{/* <SearchContainer>
 				{getInfo.name ? (
 					<AddHStack>
 						<AddText>{getInfo.name}</AddText>
@@ -252,7 +546,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							listView: {height: 300},
 							description: {color: 'black'},
 						}}
-						renderRightButton={clearButton}
+						renderLeftButton={clearButton}
 						fetchDetails={true}
 						onPress={async (data, details) => {
 							setGetInfo({
@@ -264,8 +558,8 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						onFail={error => console.log(error)}
 						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 				)}
-			</SearchContainer>
-			<CourseAndReview>
+			</SearchContainer> */}
+			{/* <CourseAndReview>
 				<RecommendContainer color='#ffccb6' onPress={() => goRecommend('CE7')}>
 					<CourseTitleText>카페 추천</CourseTitleText>
 					<IconContainer>
@@ -293,53 +587,21 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						<DeleteIconContainers name={'restaurant'} size={devicesWidth * 0.09} color={'white'} />
 					</IconContainer>
 				</RecommendContainer>
-			</CourseAndReview>
-			<CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} />
-		</MainContainer>
+			</CourseAndReview> */}
+			{/* <CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} /> */}
+		</BackgroundGray>
 	);
 }
-
-const DayContainer = styled.View`
-	width: 100%;
-	height: 48px;
-	border-radius: 10px;
-	background-color: ${colors.selectButton};
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-	margin: 0px 0px 10px 0px;
-`;
-const DayText = styled.Text`
-	font-size: 22px;
-	font-weight: bold;
-	color: white;
-`;
-const RecommendContainer = styled(CourseContainer)<{color: string}>`
-	width: 30%;
+const ElementContainer = styled.View<{color: string}>`
+	border-radius: 8px;
 	background-color: ${props => props.color};
-	height: 100px;
-`;
-
-const MainContainer = styled.View`
-	flex: 1;
-	background-color: ${colors.main};
-	padding: 10px;
-`;
-const DayElementContainer = styled(DayPressable).attrs({as: View})`
-	width: 100%;
-`;
-const SearchContainer = styled.View`
-	width: 100%;
-	margin: 5% 0% 5% 0%;
-	height: 100px;
-`;
-
-const AddText = styled.Text`
-	font-size: 20px;
-	gont-weight: bold;
-	color: ${colors.selectButton};
-`;
-const AddHStack = styled(HStack)`
 	align-items: center;
-	justify-content: center;
+	justify-content: space-between;
+	padding: ${widthPercentage(5)}px ${widthPercentage(8)}px;
+	gap: ${widthPercentage(4)}px;
+	flex-direction: row;
+	margin-right: ${widthPercentage(5)}px;
+	margin-bottom: ${widthPercentage(5)}px;
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(64)}px;
 `;

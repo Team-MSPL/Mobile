@@ -330,7 +330,7 @@ const RecommendTextContainer = styled.View`
 	left: ${widthPercentage(21)}px;
 `;
 const HomeContainer = styled.ScrollView`
-	background-color: ${colors.Black};
+	background-color: ${colors.backgroundWhite};
 	width: 100%;
 `;
 const HomeBottomContainer = styled.View`
@@ -338,10 +338,12 @@ const HomeBottomContainer = styled.View`
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
 	padding: ${widthPercentage(35)}px 0px 0px ${widthPercentage(24)}px;
+	top: -${heightPercentage(20)}px;
 `;
 const BrighnessBox = styled.View`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.3);
+	top: -${heightPercentage(20)}px;
 `;
 const BackgroundImage = styled.ImageBackground`
 	width: 100%;

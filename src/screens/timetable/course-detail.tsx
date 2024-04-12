@@ -309,7 +309,9 @@ export default function CourseDetail({navigation, route}: any) {
 							))}
 						</PostImageSwiper>
 					)}
-					<RecommendBorderContainer height={heightPercentage(480)}>
+					<RecommendBorderContainer
+						height={heightPercentage(480)}
+						paddingBottom={route.params.value.mainFlag}>
 						<ScrollView showsVerticalScrollIndicator={false}>
 							{route.params.value.name == '소백산국립공원(경북)' && (
 								<PrimaryButton
@@ -502,7 +504,7 @@ export default function CourseDetail({navigation, route}: any) {
 						{route.params.value.mainFlag && (
 							<ButtonContainer>
 								<CustomButton
-									label={'이 지역의 여행코스 추천받기'}
+									label={'이 지역의 여행 일정 추천 받기'}
 									onPress={goIncludeRecommend}></CustomButton>
 							</ButtonContainer>
 						)}

@@ -12,7 +12,7 @@ import {
 	TagContainer,
 	PretendardVariableText,
 } from '../../utill/layout/layout';
-import {SVGCalendarRecommend, SVGFlag} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGFlag, SVGRightAdd} from '../../utill/svg/svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -27,6 +27,7 @@ export default function Preset({navigation}: any) {
 	const goDetail = (e: number) => {
 		navigation.navigate('PresetDetail', {index: e});
 	};
+	const [tendencyViewIndex, setTendencyViewIndex] = useState<boolean[]>(Array(presetDatas.length).fill(true));
 	useEffect(() => {
 		navigation.setOptions({
 			headerLeft: () => (
@@ -78,7 +79,7 @@ export default function Preset({navigation}: any) {
 					styleTextColor={colors.Gray4}
 					styleText='일정 추천'
 					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
-					subText='순위가 낮은 일정은 간단한 동선을 우선시했어요!'
+					subText='점수가 낮은 일정은 간단한 동선을 우선시했어요!'
 				/>
 				<SvgContainer>
 					<SVGCalendarRecommend
@@ -124,26 +125,57 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								<FlexWrap gap={widthPercentage(10)} marginBottom={10}>
-									{presetTendencyList[idx].tendencyNameList.map((item, index) => {
-										return (
-											<TagContainer
-												backgroundColor={colors.backgroundGray}
-												height={heightPercentage(28)}
-												key={index}>
-												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-													{item + ' '}
-												</PretendardSemiBoldText>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={17}
-													color={colors.PointYellow}>
-													{presetTendencyList[idx].tendencyPointList[index]}점
-												</PretendardSemiBoldText>
-											</TagContainer>
-										);
-									})}
-								</FlexWrap>
+								<HStack>
+									<FlexWrap
+										width={widthPercentage(280)}
+										gap={widthPercentage(10)}
+										marginBottom={10}
+										onPress={() => {
+											let copy = {...tendencyViewIndex};
+											copy[idx] = !copy[idx];
+											setTendencyViewIndex(copy);
+										}}>
+										{presetTendencyList[idx].tendencyNameList
+											.slice(
+												0,
+												tendencyViewIndex[idx]
+													? 5
+													: presetTendencyList[idx].tendencyNameList.length,
+											)
+											.map((item, index) => {
+												return (
+													<TagContainer
+														backgroundColor={colors.backgroundGray}
+														height={heightPercentage(28)}
+														key={index}>
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={17}
+															color={colors.Gray4}>
+															{item + ' '}
+														</PretendardSemiBoldText>
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={17}
+															color={colors.PointYellow}>
+															{presetTendencyList[idx].tendencyPointList[index]}점
+														</PretendardSemiBoldText>
+													</TagContainer>
+												);
+											})}
+									</FlexWrap>
+									{presetTendencyList[idx].tendencyNameList.length > 5 && (
+										<TouchableOpacity
+											style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
+											onPress={() => {
+												let copy = {...tendencyViewIndex};
+												copy[idx] = !copy[idx];
+												setTendencyViewIndex(copy);
+											}}>
+											<SVGRightAdd color='black' rotation={tendencyViewIndex[idx] ? 90 : 270} />
+										</TouchableOpacity>
+									)}
+								</HStack>
 								{item.map((value, index) =>
 									value.map((target, targetIndex) => {
 										if (targetIndex == 0) {

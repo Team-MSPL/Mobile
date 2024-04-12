@@ -13,6 +13,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
+	deleteTravelCourse,
 	getDrivingDuration,
 	saveTravel,
 	travelSliceActions,
@@ -288,6 +289,34 @@ export default function Timetable({navigation, route}: any) {
 			);
 		}
 	};
+	const removeCheck = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '이 여행을 삭제할까요?',
+				modalSubTitle: '여행을 삭제하면 되돌릴 수 없습니다.',
+				modalFunction: goRemove,
+				modalTopText: '삭제할래요',
+				modalLeft: true,
+			}),
+		);
+	};
+	const goRemove = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
+			await dispatch(deleteTravelCourse({travelId: travelId}));
+			navigation.goBack();
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 삭제가 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
+				}),
+			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	const [modify, setModify] = useState(false);
 	useEffect(() => {
 		shareLoginFlag && isLogin && addSharedList();
@@ -356,14 +385,29 @@ export default function Timetable({navigation, route}: any) {
 									)}
 								</>
 							) : (
-								<TouchableOpacity
-									onPress={() => {
-										setModify(!modify);
-									}}>
-									<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-										{modify ? '취소' : '편집'}
-									</PretendardVariableText>
-								</TouchableOpacity>
+								shareViewWithStartFlag && (
+									<>
+										<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+											<PretendardVariableText
+												size={16}
+												lineHeight={24}
+												color={colors.PointYellow}>
+												삭제
+											</PretendardVariableText>
+										</TouchableOpacity>
+										<TouchableOpacity
+											onPress={() => {
+												setModify(!modify);
+											}}>
+											<PretendardVariableText
+												size={16}
+												lineHeight={24}
+												color={colors.PointYellow}>
+												{modify ? '취소' : '편집'}
+											</PretendardVariableText>
+										</TouchableOpacity>
+									</>
+								)
 							)}
 						</>
 					)}

@@ -14,6 +14,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {SVGCamera, SVGPencil, SVGRightAdd, SvgRight} from '../../utill/svg/svg';
 
 export default function PresetDetail({navigation, route}: any) {
 	const {presetTendencyList, presetDatas, day, nDay} = useAppSelector(state => state.travelSlice);
@@ -166,22 +167,44 @@ export default function PresetDetail({navigation, route}: any) {
 	const moveRegion = async (index: number, e: number) => {
 		navigation.navigate('CourseDetail', {value: presetDatas[route.params.index][index][e]});
 	};
+	const [tendencyView, setTendencyView] = useState(true);
 	return (
 		<>
 			<BackgroundGray>
 				<TopFixContainer>
-					<FlexWrap gap={widthPercentage(3)}>
-						{presetTendencyList[route.params.index].tendencyNameList.map((item, idx) => (
-							<TagContainer key={idx} height={28} backgroundColor={colors.backgroundWhite}>
-								<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray4}>
-									{item}
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={14} lineHeight={16} color={colors.PointYellow}>
-									{presetTendencyList[route.params.index].tendencyPointList[idx]}점
-								</PretendardSemiBoldText>
-							</TagContainer>
-						))}
-					</FlexWrap>
+					<HStack>
+						<FlexWrap
+							width={widthPercentage(300)}
+							gap={widthPercentage(3)}
+							onPress={() => {
+								setTendencyView(!tendencyView);
+							}}>
+							{presetTendencyList[route.params.index].tendencyNameList
+								.slice(
+									0,
+									tendencyView ? 5 : presetTendencyList[route.params.index].tendencyNameList.length,
+								)
+								.map((item, idx) => (
+									<TagContainer key={idx} height={28} backgroundColor={colors.backgroundWhite}>
+										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray4}>
+											{item}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.PointYellow}>
+											{presetTendencyList[route.params.index].tendencyPointList[idx]}점
+										</PretendardSemiBoldText>
+									</TagContainer>
+								))}
+						</FlexWrap>
+						{presetTendencyList[route.params.index].tendencyNameList.length > 5 && (
+							<TouchableOpacity
+								style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
+								onPress={() => {
+									setTendencyView(!tendencyView);
+								}}>
+								<SVGRightAdd color='black' rotation={tendencyView ? 90 : 270} />
+							</TouchableOpacity>
+						)}
+					</HStack>
 					<MapView
 						style={{width: '100%', height: heightPercentage(248), marginBottom: heightPercentage(13)}}
 						showsMyLocationButton={true}

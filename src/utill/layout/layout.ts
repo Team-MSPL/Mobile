@@ -29,12 +29,13 @@ export const VStack = styled.View<{width?: number; gap?: number; alignItems?: st
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
 `;
-export const FlexWrap = styled.View<{gap?: number; marginBottom?: number}>`
+export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; width?: number}>`
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
+	width: ${props => props.width ?? null}px;
 `;
 
 export const Divider = styled.View<{width?: number; color?: string; height: number}>`

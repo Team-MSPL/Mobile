@@ -340,7 +340,14 @@ export const updateShareUserList = createAsyncThunk(
 // 지역 사진 가져오는거
 export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: any, {rejectWithValue}) => {
 	try {
-		const response = await axiosAuth.get(`/place/regionInfo?region=${data.region}`, data);
+		let regionName;
+		if (data.region.split(' ')[1] == '전체') {
+			regionName = data.region.split(' ')[0];
+		} else {
+			regionName = data.region;
+		}
+
+		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
 		//console.log(a);
 		//제로리절트 처리하기
 		return response.data;

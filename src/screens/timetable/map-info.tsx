@@ -249,6 +249,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			console.log(copy);
 			//부터 가능
 			for (let i = 0; i < copy.length; i++) {
+				console.log(newEnd, newY, copy[i]?.y);
 				if (
 					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
 						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
@@ -293,7 +294,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		const scrollY = e.nativeEvent.contentOffset.y;
 		// 스크롤뷰의 높이를 가져옵니다.
 		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
-		console.log(scrollY, scrollViewHeight, presetScrollHeight, e.nativeEvent.contentSize.height);
 		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
 		if (scrollY + scrollViewHeight + (scrollY + scrollViewHeight) * 0.1 > e.nativeEvent.contentSize.height) {
 			change(presetScrollHeight.length - 1);
@@ -303,6 +303,32 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	};
 	const CancelModify = () => {
 		setModify(false);
+	};
+	const checkAccommodation = () => {
+		if (select == timetable.length - 1) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '마지막 날입니다',
+					modalSubTitle: '마지막 날은 숙소를 추가할 수 없습니다.',
+				}),
+			);
+		} else if (
+			timetable[select][timetable[select].length - 1].category == 4 &&
+			timetable[select][timetable[select].length - 1].name != '숙소 추천'
+		) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '숙소가 있습니다.',
+					modalSubTitle: '숙소를 제거한 후 시도해주세요',
+				}),
+			);
+		} else {
+			navigation.navigate('TimetableAddPlace', {
+				x: select,
+				y: [],
+				status: 'accommodation',
+			});
+		}
 	};
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
@@ -407,7 +433,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
 									여행지
 								</PretendardSemiBoldText>
-								<SVGContainer color={colors.PointYellow}>
+								<SVGContainer
+									color={colors.PointYellow}
+									onPress={() => {
+										navigation.navigate('TimetableAddPlace', {x: select, y: [], status: 'travle'});
+									}}>
 									<SVGPlus color={colors.Primary} />
 								</SVGContainer>
 							</HStack>
@@ -417,7 +447,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
 									숙소
 								</PretendardSemiBoldText>
-								<SVGContainer color={colors.PointYellow}>
+								<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
 									<SVGPlus color={colors.Primary} />
 								</SVGContainer>
 							</HStack>
@@ -480,13 +510,31 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
 																			360) /
 																			60,
+																	) < 25 &&
+																		Math.floor(
+																			(((item.y ?? 0) + item.takenTime / 30) *
+																				30 +
+																				360) /
+																				60,
+																		) +
+																			':' +
+																			String(
+																				(((item.y ?? 0) + item.takenTime / 30) *
+																					30 +
+																					360) %
+																					60,
+																			).padStart(2, '0')}
+																	{/* {Math.floor(
+																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
+																			360) /
+																			60,
 																	)}
 																	:
 																	{String(
 																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
 																			360) %
 																			60,
-																	).padStart(2, '0')}
+																	).padStart(2, '0')} */}
 																</PretendardVariableText>
 																<PretendardSemiBoldText
 																	size={14}
@@ -715,11 +763,11 @@ const ButtonsContainer = styled.TouchableOpacity<{backgroundColor: string}>`
 	align-items: center;
 	justify-content: center;
 `;
-const TimePickerContainer = styled.View<{alignSelf: string}>`
+export const TimePickerContainer = styled.View<{alignSelf: string}>`
 	align-self: ${props => props.alignSelf};
 	height: ${heightPercentage(140)}px;
 `;
-const InfoModalContainer = styled.View`
+export const InfoModalContainer = styled.View`
 	flex: 0.5;
 	position: absolute;
 	bottom: 0px;
@@ -767,7 +815,7 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 
 const DayScrollView = styled.ScrollView<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modify ? heightPercentage(500) : heightPercentage(300))}px;
+	height: ${props => (props.modify ? heightPercentage(500) : heightPercentage(230))}px;
 `;
 export const MarkerText = styled.Text`
 	position: absolute;

@@ -253,6 +253,7 @@ const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
 	justify-content: center;
 	background-color: rgba(83, 80, 255, 0.08);
 	margin-right: ${widthPercentage(12)}px;
+	margin-top: ${heightPercentage(12)}px;
 `;
 export const CancelContainer = styled.TouchableOpacity`
 	border-radius: 99px;

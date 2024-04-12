@@ -214,7 +214,7 @@ export default function DetailInfo({navigation}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderContianer>
-					{!modify && (
+					{!modify ? (
 						<>
 							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
 								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
@@ -230,6 +230,16 @@ export default function DetailInfo({navigation}: any) {
 								</PretendardVariableText>
 							</TouchableOpacity>
 						</>
+					) : (
+						<TouchableOpacity
+							onPress={() => {
+								setModify(false);
+							}}
+							style={{marginRight: 10}}>
+							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+								완료
+							</PretendardVariableText>
+						</TouchableOpacity>
 					)}
 				</HeaderContianer>
 			),

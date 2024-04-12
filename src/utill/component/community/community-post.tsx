@@ -109,7 +109,7 @@ export const Dot = styled.View`
 	margin: 4px;
 `;
 export const ActiveDot = styled.View`
-	background-color: ${colors.PointYellow};
+	background-color: ${colors.backgroundWhite};
 	width: 8px;
 	height: 8px;
 	border-radius: 4px;
