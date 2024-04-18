@@ -152,6 +152,7 @@ export default function DetailResult({navigation, route}: any) {
 						))}
 					</RecommendAllContainer>
 				</RecommendBorderContainer>
+				<MarginBottom></MarginBottom>
 			</MainContainer>
 			<ButtonContainer>
 				<CustomButton label='이 지역의 여행코스 추천받기' onPress={goEnrollInfo}></CustomButton>
@@ -203,6 +204,9 @@ const TagContainer = styled.View`
 const MainContainer = styled.ScrollView`
 	width: 100%;
 	background-color: ${colors.backgroundWhite};
+`;
+const MarginBottom = styled.View`
+	height: ${heightPercentage(100)}px;
 `;
 export const RecommendBorderContainer = styled.View<{height?: number; top?: number; paddingBottom?: boolean}>`
 	width: 100%;

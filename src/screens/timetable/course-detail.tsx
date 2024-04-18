@@ -309,205 +309,188 @@ export default function CourseDetail({navigation, route}: any) {
 							))}
 						</PostImageSwiper>
 					)}
-					<RecommendBorderContainer
-						height={heightPercentage(480)}
-						paddingBottom={route.params.value.mainFlag}>
-						<ScrollView showsVerticalScrollIndicator={false}>
-							{route.params.value.name == '소백산국립공원(경북)' && (
-								<PrimaryButton
-									marginBottom={heightPercentage(10)}
-									width={widthPercentage(200)}
-									height={heightPercentage(37)}
-									label='탐방 코스 추천받기'
-									onPress={goHiking}
-									backgroundColor={colors.Primary}
-									textColor={colors.Gray5}></PrimaryButton>
+					<RecommendBorderContainer paddingBottom={route.params.value.mainFlag}>
+						{route.params.value.name == '소백산국립공원(경북)' && (
+							<PrimaryButton
+								marginBottom={heightPercentage(10)}
+								width={widthPercentage(200)}
+								height={heightPercentage(37)}
+								label='탐방 코스 추천받기'
+								onPress={goHiking}
+								backgroundColor={colors.Primary}
+								textColor={colors.Gray5}></PrimaryButton>
+						)}
+						<HStack justifyContent='space-between'>
+							<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
+								{courseDetail.name}
+							</PretendardSemiBoldText>
+							{courseDetail.rating && (
+								<HStack>
+									<PretendardSemiBoldText size={18} lineHeight={27} color={colors.PointGreen1}>
+										{courseDetail.rating}
+									</PretendardSemiBoldText>
+									<SvgStart
+										color={colors.selectButton}
+										width={widthPercentage(19)}
+										height={heightPercentage(18)}
+									/>
+								</HStack>
 							)}
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
-									{courseDetail.name}
-								</PretendardSemiBoldText>
-								{courseDetail.rating && (
-									<HStack>
-										<PretendardSemiBoldText size={18} lineHeight={27} color={colors.PointGreen1}>
-											{courseDetail.rating}
-										</PretendardSemiBoldText>
-										<SvgStart
-											color={colors.selectButton}
-											width={widthPercentage(19)}
-											height={heightPercentage(18)}
-										/>
-									</HStack>
-								)}
-							</HStack>
-							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-							{courseDetail?.infoTitle && (
-								<>
-									<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
-										{courseDetail?.infoTitle}
+						</HStack>
+						<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+						{courseDetail?.infoTitle && (
+							<>
+								<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+									{courseDetail?.infoTitle}
+								</PretendardVariableText>
+								<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							</>
+						)}
+						{courseDetail?.infoContent && (
+							<>
+								<MoreTouchable
+									onPress={() => {
+										setMoreStatus(!moreStatus);
+									}}>
+									<PretendardVariableText
+										width={widthPercentage(327)}
+										size={14}
+										lineHeight={21}
+										color={colors.Gray4}
+										numberOfLines={moreStatus ? 2 : undefined}>
+										{courseDetail?.infoContent}
 									</PretendardVariableText>
-									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-								</>
-							)}
-							{courseDetail?.infoContent && (
-								<>
-									<MoreTouchable
+								</MoreTouchable>
+								<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+							</>
+						)}
+						{detailList.map(
+							(detail, detailIndex) =>
+								detail.title != null && (
+									<InfoContainer
+										key={detailIndex}
+										disabled={detailIndex != 1}
 										onPress={() => {
-											setMoreStatus(!moreStatus);
+											handleCopyClipBoard(detail.title ?? '');
 										}}>
-										<PretendardVariableText
-											width={widthPercentage(327)}
-											size={14}
-											lineHeight={21}
-											color={colors.Gray4}
-											numberOfLines={moreStatus ? 2 : undefined}>
-											{courseDetail?.infoContent}
-										</PretendardVariableText>
-									</MoreTouchable>
-									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-								</>
-							)}
-							{detailList.map(
-								(detail, detailIndex) =>
-									detail.title != null && (
-										<InfoContainer
-											key={detailIndex}
-											disabled={detailIndex != 1}
-											onPress={() => {
-												handleCopyClipBoard(detail.title ?? '');
-											}}>
-											<HStack>
-												<LogoContainer>{detail.logo}</LogoContainer>
-												<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-													{detail.title}
-												</PretendardVariableText>
-											</HStack>
-										</InfoContainer>
-									),
-							)}
-							{courseDetail?.openInfo && (
-								<>
-									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-									<InfoContainer disabled={true}>
 										<HStack>
-											<LogoContainer>
-												<SvgCalendar
-													width={widthPercentage(12)}
-													height={widthPercentage(12)}
-													color={colors.Gray2}
-												/>
-											</LogoContainer>
-											<OpenVStack>
-												{courseDetail?.openInfo.map((item, itemIndex) => (
-													<PretendardVariableText
-														size={14}
-														lineHeight={21}
-														color={colors.Gray5}
-														key={itemIndex}>
-														{item}
-													</PretendardVariableText>
-												))}
-											</OpenVStack>
+											<LogoContainer>{detail.logo}</LogoContainer>
+											<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+												{detail.title}
+											</PretendardVariableText>
 										</HStack>
 									</InfoContainer>
-								</>
-							)}
-							<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-							<HStack width={widthPercentage(327)} justifyContent='space-between'>
-								<HStack gap={widthPercentage(10)}>
-									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
-										리뷰
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
-										{courseDetail.review.length}
-									</PretendardSemiBoldText>
-								</HStack>
-								<HStack justifyContent='space-between'>
-									{courseDetail.status == 'firebase' && (
-										<ReviewButton onPress={goReviewEnroll}>
-											<SVGReviewPencil />
-											<PretendardVariableText
-												size={13}
-												lineHeight={20.8}
-												color={colors.PointYellow}>
-												리뷰 쓰기
-											</PretendardVariableText>
-										</ReviewButton>
-									)}
-								</HStack>
+								),
+						)}
+						{courseDetail?.openInfo && (
+							<>
+								<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+								<InfoContainer disabled={true}>
+									<HStack>
+										<LogoContainer>
+											<SvgCalendar
+												width={widthPercentage(12)}
+												height={widthPercentage(12)}
+												color={colors.Gray2}
+											/>
+										</LogoContainer>
+										<OpenVStack>
+											{courseDetail?.openInfo.map((item, itemIndex) => (
+												<PretendardVariableText
+													size={14}
+													lineHeight={21}
+													color={colors.Gray5}
+													key={itemIndex}>
+													{item}
+												</PretendardVariableText>
+											))}
+										</OpenVStack>
+									</HStack>
+								</InfoContainer>
+							</>
+						)}
+						<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+						<HStack width={widthPercentage(327)} justifyContent='space-between'>
+							<HStack gap={widthPercentage(10)}>
+								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+									리뷰
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
+									{courseDetail.review.length}
+								</PretendardSemiBoldText>
 							</HStack>
-							{courseDetail.review.length == 0 && (
-								<ReviewNonContainer onPress={goReviewEnroll}>
-									<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
-										첫 번째 리뷰를 작성해 보세요!
-									</PretendardVariableText>
-								</ReviewNonContainer>
-							)}
-							{courseDetail.review.map((item, idx) => (
-								<ReviewContainer key={idx}>
-									<HStack justifyContent='space-between'>
-										<HStack>
-											<ReviewerProfileImage
-												source={{uri: item.reviewerProfileImage}}></ReviewerProfileImage>
+							<HStack justifyContent='space-between'>
+								{courseDetail.status == 'firebase' && (
+									<ReviewButton onPress={goReviewEnroll}>
+										<SVGReviewPencil />
+										<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
+											리뷰 쓰기
+										</PretendardVariableText>
+									</ReviewButton>
+								)}
+							</HStack>
+						</HStack>
+						{courseDetail.review.length == 0 && (
+							<ReviewNonContainer onPress={goReviewEnroll}>
+								<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
+									첫 번째 리뷰를 작성해 보세요!
+								</PretendardVariableText>
+							</ReviewNonContainer>
+						)}
+						{courseDetail.review.map((item, idx) => (
+							<ReviewContainer key={idx}>
+								<HStack justifyContent='space-between'>
+									<HStack>
+										<ReviewerProfileImage
+											source={{uri: item.reviewerProfileImage}}></ReviewerProfileImage>
 
-											<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray5}>
-												{item.name}
-											</PretendardSemiBoldText>
-										</HStack>
-										{item.rating && (
+										<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray5}>
+											{item.name}
+										</PretendardSemiBoldText>
+									</HStack>
+									{item.rating && (
+										<PretendardSemiBoldText size={14} lineHeight={21} color={colors.PointGreen1}>
+											{item.rating}
+										</PretendardSemiBoldText>
+									)}
+									{item.reviewUserToken == userIdToken && (
+										<Pressable
+											onPress={() => {
+												deleteReview(item);
+											}}>
 											<PretendardSemiBoldText
 												size={14}
 												lineHeight={21}
 												color={colors.PointGreen1}>
-												{item.rating}
+												삭제
 											</PretendardSemiBoldText>
-										)}
-										{item.reviewUserToken == userIdToken && (
-											<Pressable
-												onPress={() => {
-													deleteReview(item);
-												}}>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={21}
-													color={colors.PointGreen1}>
-													삭제
-												</PretendardSemiBoldText>
-											</Pressable>
-										)}
-									</HStack>
-									{item.reviewPhotoList?.length != null && item.reviewPhotoList?.length != 0 && (
-										<ReviewImageScroll horizontal={true} showsHorizontalScrollIndicator={false}>
-											{item.reviewPhotoList?.map((value, idx) => (
-												<ReviewImage
-													source={{uri: value}}
-													key={idx}
-													width={
-														item.reviewPhotoList?.length == 1
-															? 327
-															: item.reviewPhotoList?.length == 2
-															? 159.5
-															: 141
-													}></ReviewImage>
-											))}
-										</ReviewImageScroll>
+										</Pressable>
 									)}
-									<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-										{item.content}
-									</PretendardVariableText>
-									{idx != courseDetail.review.length - 1 && (
-										<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
-									)}
-								</ReviewContainer>
-							))}
-						</ScrollView>
-						{route.params.value.mainFlag && (
-							<ButtonContainer>
-								<CustomButton
-									label={'이 지역의 여행 일정 추천 받기'}
-									onPress={goIncludeRecommend}></CustomButton>
-							</ButtonContainer>
-						)}
+								</HStack>
+								{item.reviewPhotoList?.length != null && item.reviewPhotoList?.length != 0 && (
+									<ReviewImageScroll horizontal={true} showsHorizontalScrollIndicator={false}>
+										{item.reviewPhotoList?.map((value, idx) => (
+											<ReviewImage
+												source={{uri: value}}
+												key={idx}
+												width={
+													item.reviewPhotoList?.length == 1
+														? 327
+														: item.reviewPhotoList?.length == 2
+														? 159.5
+														: 141
+												}></ReviewImage>
+										))}
+									</ReviewImageScroll>
+								)}
+								<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+									{item.content}
+								</PretendardVariableText>
+								{idx != courseDetail.review.length - 1 && (
+									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
+								)}
+							</ReviewContainer>
+						))}
 					</RecommendBorderContainer>
 					{courseDetail?.photo && (
 						<ImageView
@@ -533,6 +516,13 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
+				{route.params.value.mainFlag && (
+					<ButtonContainer>
+						<CustomButton
+							label={'이 지역의 여행 일정 추천 받기'}
+							onPress={goIncludeRecommend}></CustomButton>
+					</ButtonContainer>
+				)}
 			</>
 		);
 	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
@@ -576,7 +566,7 @@ const NullContainer = styled(Center)`
 	flex: 1;
 `;
 
-const DetailContainer = styled.View`
+const DetailContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	flex: 1;
 `;

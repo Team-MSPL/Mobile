@@ -216,7 +216,7 @@ export default function DetailInfo({navigation}: any) {
 				<HeaderContianer>
 					{!modify ? (
 						<>
-							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+							<TouchableOpacity onPress={removeCheck} style={{marginRight: 15}}>
 								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
 									삭제
 								</PretendardVariableText>
@@ -234,8 +234,7 @@ export default function DetailInfo({navigation}: any) {
 						<TouchableOpacity
 							onPress={() => {
 								setModify(false);
-							}}
-							style={{marginRight: 10}}>
+							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								완료
 							</PretendardVariableText>

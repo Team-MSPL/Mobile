@@ -103,8 +103,9 @@ export default function FinalCheck({navigation}: any) {
 			if (navigation.isFocused() && loading) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: 'ai가 돌아가고 있습니다 조금만 기다려주세요',
+						modalTitle: 'AI가 실행 중입니다. 잠시만 기다려주세요.',
 						modalFunction: () => {},
+						modalSingleUse: true,
 					}),
 				);
 				return true;

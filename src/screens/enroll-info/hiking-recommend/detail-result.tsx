@@ -104,9 +104,8 @@ export default function HikingDetailResult({navigation, route}: any) {
 		{
 			title:
 				'예상 소요 시간 ' +
-				(route.params.item?.takenTime > 60 && Math.floor(route.params.item?.takenTime / 60) + '시간') +
-				(route.params.item?.takenTime % 60) +
-				' 분',
+				(route.params.item?.takenTime >= 60 ? Math.floor(route.params.item?.takenTime / 60) + '시간' : '') +
+				(route.params.item?.takenTime % 60 == 0 ? '' : (route.params.item?.takenTime % 60) + ' 분'),
 			logo: <SvgInfos width={widthPercentage(20)} height={widthPercentage(20)} color={colors.Gray2} />,
 		},
 	];

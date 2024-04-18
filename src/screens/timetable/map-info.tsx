@@ -377,7 +377,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					</VStack>
 				</HStack>
 			</AbsoluteTopBar>
-			<VStack>
+			<VStack flex={1}>
 				{!modify &&
 					timetable.map(
 						(item, idx) =>
@@ -387,7 +387,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									ref={mapRef}
 									//provider={PROVIDER_GOOGLE}
 									showsMyLocationButton={true}
-									style={{width: '100%', height: 300}}
+									style={{width: '100%', flex: 0.45}}
 									showsUserLocation={true}
 									region={{
 										latitude: centerLatitude,
@@ -400,9 +400,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</MapView>
 							),
 					)}
-				<BackgroundGray>
+				<BackgroundGray modify={modify}>
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap gap={10}>
+						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
 							{timetable.map(
 								(item, idx) =>
 									item.length != 0 && (
@@ -537,6 +537,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																	).padStart(2, '0')} */}
 																</PretendardVariableText>
 																<PretendardSemiBoldText
+																	maxWidth={widthPercentage(200)}
 																	size={14}
 																	lineHeight={18.9}
 																	color={colors.Gray5}>
@@ -752,7 +753,7 @@ const AbsoluteButton = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 	position: absolute;
-	bottom: ${heightPercentage(50)}px;
+	bottom: ${heightPercentage(30)}px;
 	align-self: center;
 `;
 const ButtonsContainer = styled.TouchableOpacity<{backgroundColor: string}>`
@@ -827,12 +828,13 @@ export const MarkerText = styled.Text`
 	bottom: 10px;
 `;
 
-const BackgroundGray = styled.View`
+const BackgroundGray = styled.View<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
 	border-top-right-radius: 10px;
 	border-top-left-radius: 10px;
 	background-color: ${colors.backgroundGray};
 	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
+	flex: ${props => (props.modify ? 1 : 0.55)};
 `;
 const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	width: ${widthPercentage(282)}px;

@@ -16,6 +16,7 @@ export default function BaseModal() {
 		modalTopText,
 		modalBottomText,
 		modalBottomFunctionUse,
+		modalSingleUse,
 		modalBottomFunction,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
@@ -35,7 +36,7 @@ export default function BaseModal() {
 			{modalOpen && (
 				<Container>
 					<ModalContainer onPress={close}>
-						<ViewContaniner>
+						<ViewContaniner modalSingleUse={modalSingleUse}>
 							<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Gray5}>
 								{modalTitle}
 							</PretendardSemiBoldText>
@@ -56,13 +57,15 @@ export default function BaseModal() {
 									width={widthPercentage(327)}
 									height={heightPercentage(50)}
 									label={modalTopText}></PrimaryButton>
-								<PrimaryButton
-									backgroundColor={colors.Gray1}
-									textColor={colors.Gray4}
-									onPress={modalBottomFunctionUse ? handleLeftFunction : close}
-									width={widthPercentage(327)}
-									height={heightPercentage(50)}
-									label={modalBottomText}></PrimaryButton>
+								{!modalSingleUse && (
+									<PrimaryButton
+										backgroundColor={colors.Gray1}
+										textColor={colors.Gray4}
+										onPress={modalBottomFunctionUse ? handleLeftFunction : close}
+										width={widthPercentage(327)}
+										height={heightPercentage(50)}
+										label={modalBottomText}></PrimaryButton>
+								)}
 							</ButtonContainer>
 						</ViewContaniner>
 					</ModalContainer>
@@ -93,10 +96,10 @@ const ModalContainer = styled.Pressable`
 	background-color: rgba(0, 0, 0, 0.3);
 `;
 
-const ViewContaniner = styled.Pressable`
+const ViewContaniner = styled.Pressable<{modalSingleUse: boolean}>`
 	background-color: white;
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(269)}px;
+	height: ${props => (props.modalSingleUse ? heightPercentage(219) : heightPercentage(269))}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	align-items: center;

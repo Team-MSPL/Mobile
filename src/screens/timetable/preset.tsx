@@ -204,6 +204,7 @@ export default function Preset({navigation}: any) {
 														/>
 													</DashLineContainer>
 													<PretendardVariableText
+														maxWidth={widthPercentage(200)}
 														size={16}
 														lineHeight={19}
 														color={

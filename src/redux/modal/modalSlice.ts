@@ -10,6 +10,7 @@ const initialState: LiteState = {
 	modalBottomText: '취소',
 	modalBottomFunctionUse: false,
 	modalBottomFunction: () => {},
+	modalSingleUse: false,
 };
 
 export const modalSlice = createSlice({
@@ -26,6 +27,7 @@ export const modalSlice = createSlice({
 			state.modalBottomText = payload.modalBottomText ?? '취소';
 			state.modalBottomFunctionUse = payload.modalBottomFunctionUse ?? false;
 			state.modalBottomFunction = payload.modalBottomFunction ?? (() => {});
+			state.modalSingleUse = payload.modalSingleUse ?? false;
 		},
 		setCloseModal: state => {
 			state.modalOpen = false;
@@ -50,4 +52,5 @@ interface LiteState {
 	modalBottomText: string;
 	modalBottomFunctionUse: boolean;
 	modalBottomFunction: () => void | Promise<void>;
+	modalSingleUse: boolean;
 }

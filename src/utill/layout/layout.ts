@@ -21,13 +21,14 @@ export const HStack = styled.View<{
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
 `;
-export const VStack = styled.View<{width?: number; gap?: number; alignItems?: string}>`
+export const VStack = styled.View<{width?: number; gap?: number; alignItems?: string; flex?: number}>`
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: column;
 	justify-content: center;
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
+	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
 `;
 export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; width?: number}>`
 	display: flex;
@@ -116,6 +117,7 @@ export const PretendardVariableText = styled.Text<{
 	width?: number;
 	textAlign?: string;
 	marginTop?: number;
+	maxWidth?: number;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -125,6 +127,7 @@ export const PretendardVariableText = styled.Text<{
 	width: ${props => props.width + 'px' ?? 'auto'};
 	text-align: ${props => props.textAlign ?? 'auto'};
 	margin-top: ${props => props.marginTop ?? 0}px;
+	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 `;
 export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number}>`
 	font-family: Pretendard-Bold;
@@ -140,6 +143,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	width?: number;
 	textDecoration?: string;
 	marginBottom?: number;
+	maxWidth?: number;
 }>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
@@ -149,6 +153,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	font-weight: 600;
 	text-decoration: ${props => props.textDecoration ?? null};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 `;
 
 export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`

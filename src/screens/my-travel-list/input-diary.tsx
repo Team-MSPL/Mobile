@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {BackHandler} from 'react-native';
+import {BackHandler, TextInput} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -8,24 +8,14 @@ import {reCourseName, updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGPencil, SVGPlus, SvgCancel, SvgPicture} from '../../utill/svg/svg';
-import {
-	BackgroundGray,
-	HStack,
-	PretendardSemiBoldText,
-	PretendardVariableText,
-	VStack,
-} from '../../utill/layout/layout';
+import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
+import {HStack, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {usePhoto} from '../../utill/hooks/usePhoto';
-import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
-import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
-import {storage, firebase} from '../../../config';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import ImageView from 'react-native-image-viewing';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
-import {ButtonContainer} from '../enroll-info/select-multi';
 export default function InputDiary({navigation, modify, setModify, text, setEditing}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -117,6 +107,11 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 		setVisible(true);
 		setImageIndex(e);
 	};
+	const changeModify = () => {
+		setModify(true);
+		handelGetImage();
+	};
+	const diaryRef = useRef<React.RefObject<TextInput>>();
 	return (
 		<RecommendBorderContainer>
 			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
@@ -124,28 +119,14 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			</PretendardSemiBoldText>
 			<PictureCotainer>
 				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
-					{modify ? (
-						<PictureColorContainer onPress={handelGetImage} noBorder={false}>
-							<HStack gap={3}>
-								<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-									사진 추가
-								</PretendardVariableText>
-								<SvgPicture color={colors.PointYellow} width={widthPercentage(14)} />
-							</HStack>
-						</PictureColorContainer>
-					) : pictureValue.length == 0 ? (
-						<NullContainer
-							onPress={() => {
-								setModify(true);
-							}}>
-							<PlusCircle>
-								<SVGPlus color='black' />
-							</PlusCircle>
-							{/* <PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+					<PictureColorContainer onPress={modify ? handelGetImage : changeModify} noBorder={false}>
+						<HStack gap={3}>
+							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 								사진 추가
-							</PretendardVariableText> */}
-						</NullContainer>
-					) : null}
+							</PretendardVariableText>
+							<SvgPicture color={colors.PointYellow} width={widthPercentage(14)} />
+						</HStack>
+					</PictureColorContainer>
 					{pictureValue.map((item, idx) => (
 						<PictureColorContainer
 							noBorder={true}
@@ -173,25 +154,49 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
 				일기
 			</PretendardSemiBoldText>
-			{!modify ? (
+			<DiaryTextInput
+				value={diaryValue}
+				multiline={true}
+				onPressIn={() => {
+					!modify && setModify(true);
+				}}
+				placeholderTextColor={colors.Gray5}
+				style={{
+					color: 'black',
+					fontSize: fontPercentage(14),
+					fontFamily: 'PretendardVariable',
+					lineHeight: fontPercentage(21),
+				}}
+				placeholder='여행 일기로 추억을 기록해보세요'
+				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
+			{/* {!modify ? (
 				<InsideGray
 					status={diaryValue == ''}
 					onPress={() => {
 						setModify(true);
+						diaryRef.current?.focus();
 					}}>
 					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-						{diaryValue == '' ? '일기 작성하기' : diaryValue}
+						{diaryValue == '' ? '여행 일기로 추억을 기록해보세요' : diaryValue}
 					</PretendardVariableText>
 				</InsideGray>
 			) : (
 				<DiaryTextInput
 					value={diaryValue}
 					multiline={true}
-					placeholderTextColor={'grey'}
-					style={{color: 'black'}}
+					onPressIn={() => {
+						modify && setModify(true);
+					}}
+					placeholderTextColor={colors.Gray5}
+					style={{
+						color: 'black',
+						fontSize: fontPercentage(14),
+						fontFamily: 'PretendardVariable',
+						lineHeight: fontPercentage(21),
+					}}
 					placeholder='여행 일기로 추억을 기록해보세요'
 					onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
-			)}
+			)} */}
 			<ImageView
 				images={pictureValue.map((item, idx) => ({
 					uri: item,
@@ -213,6 +218,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			<CustomButton
 				onPress={handleBuntton}
 				label={modify ? '수정 완료' : '리뷰 저장'}
+				marginBottom={heightPercentage(15)}
 				marginTop={heightPercentage(30)}></CustomButton>
 		</RecommendBorderContainer>
 	);
@@ -227,13 +233,12 @@ const NullContainer = styled.TouchableOpacity`
 `;
 const InsideGray = styled.TouchableOpacity<{status: boolean}>`
 	width: 100%;
-	border-radius: 8px;
-	background-color: ${colors.backgroundGray};
-	padding: ${heightPercentage(13)}px ${widthPercentage(15)}px;
-	min-height: ${heightPercentage(120)}px;
+	height: ${heightPercentage(120)}px;
+	background-color: ${colors.Gray1};
+	border-radius: 10px;
 	margin: 10px 0px 0px 0px;
-	align-items: ${props => (props.status ? 'center' : null)};
-	justify-content: ${props => (props.status ? 'center' : null)};
+	text-align-vertical: top;
+	padding: 9px 10px 10px 10px;
 `;
 const PlusCircle = styled.View`
 	width: ${widthPercentage(30)}px;

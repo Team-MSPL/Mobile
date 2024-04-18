@@ -17,6 +17,8 @@ import {ButtonContainer, DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
+import CustomButton from '../../utill/component/custom-button';
+import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
 
@@ -61,6 +63,23 @@ export default function MyTravelList({navigation}: any) {
 			getTravelList();
 		}, []),
 	);
+	const checkGoEnroll = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '생각 중인 여행 지역이 있으신가요?',
+				modalFunction: regionRecommend,
+				modalBottomFunctionUse: true,
+				modalBottomFunction: goEnroll,
+				modalTopText: '아니요, 여행 지역부터 추천해주세요.',
+				modalBottomText: '네, 여행 일정을 추천받을래요.',
+			}),
+		);
+	};
+	const regionRecommend = () => {
+		dispatch(regionRecommendSliceActions.reset());
+		dispatch(travelSliceActions.reset());
+		navigation.navigate('RegionSelectWho');
+	};
 	const goEnroll = () => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
@@ -166,14 +185,11 @@ export default function MyTravelList({navigation}: any) {
 						nestedScrollEnabled></FlatList>
 				)}
 			</TravleListContainer>
-			<PrimaryButton
-				backgroundColor={colors.Gray5}
+			<CustomButton
 				label='새로운 여행 떠나기'
-				onPress={goEnroll}
-				textColor={colors.Primary}
+				onPress={checkGoEnroll}
 				width={widthPercentage(327)}
-				height={heightPercentage(60)}
-				marginBottom={10}></PrimaryButton>
+				marginBottom={12}></CustomButton>
 		</TravelContainer>
 	);
 }

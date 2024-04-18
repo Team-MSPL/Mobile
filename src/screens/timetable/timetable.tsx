@@ -391,7 +391,7 @@ export default function Timetable({navigation, route}: any) {
 											<PretendardVariableText
 												size={16}
 												lineHeight={24}
-												color={colors.PointYellow}>
+												color={colors.PointGreen1}>
 												삭제
 											</PretendardVariableText>
 										</TouchableOpacity>
