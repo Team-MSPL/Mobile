@@ -21,6 +21,7 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native';
 
 export default function Main({navigation}: any) {
 	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
@@ -207,87 +208,92 @@ export default function Main({navigation}: any) {
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
 	return (
-		<HomeContainer showsVerticalScrollIndicator={false}>
-			<BackgroundImage source={{uri: homeRegionImage.photo}}>
-				<BrighnessBox>
-					<TicketTouchable onPress={goTokenLog}>
-						<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-							이용권
-						</PretendardSemiBoldText>
-					</TicketTouchable>
-					<HomeTextContainer
-						onPress={() => {
-							selectPopularity({
-								id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
-								subTitle: regionList.find(item => item.subTitle == homeRegionImage.name).subTitle,
-							});
-						}}>
-						<PretendardSemiBoldText
-							size={23}
-							lineHeight={34.5}
-							color={
-								colors.backgroundWhite
-							}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
-						<HStack>
-							<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
-								{homeRegionImage.name + ' '}
-							</PretendardBoldText>
-							<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
-								여행은 어때요?
+		<SafeAreaView>
+			<HomeContainer showsVerticalScrollIndicator={false}>
+				<BackgroundImage source={{uri: homeRegionImage.photo}}>
+					<BrighnessBox>
+						<TicketTouchable onPress={goTokenLog}>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+								이용권
 							</PretendardSemiBoldText>
-							<SVGRightAdd
-								color='white'
-								width={heightPercentage(24)}
-								height={heightPercentage(24)}
-								style={{marginLeft: 10}}></SVGRightAdd>
-						</HStack>
-					</HomeTextContainer>
-				</BrighnessBox>
-			</BackgroundImage>
-			<HomeBottomContainer>
-				<HStack gap={5}>
-					<SVGGood />
-					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
-						다님 AI에게 추천받기
-					</PretendardSemiBoldText>
-				</HStack>
-				{buttonList.map(item => (
-					<RecommendContainer onPress={item.onPress} key={item.id}>
-						<RecommendTextContainer>
-							<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
-								{item.text}
-								<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
-									추천
+						</TicketTouchable>
+						<HomeTextContainer
+							onPress={() => {
+								selectPopularity({
+									id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
+									subTitle: regionList.find(item => item.subTitle == homeRegionImage.name).subTitle,
+								});
+							}}>
+							<PretendardSemiBoldText
+								size={23}
+								lineHeight={34.5}
+								color={
+									colors.backgroundWhite
+								}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
+							<HStack>
+								<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
+									{homeRegionImage.name + ' '}
+								</PretendardBoldText>
+								<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
+									여행은 어때요?
 								</PretendardSemiBoldText>
-							</PretendardSemiBoldText>
-						</RecommendTextContainer>
-						{item.image}
-					</RecommendContainer>
-				))}
-				<CollectionContainer>
-					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
-						다님이 추천하는 여행지
-					</PretendardSemiBoldText>
-					<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						{mainScreens.map((item, idx) => (
-							<CollectionTouchableOpacity
-								key={idx}
-								onPress={() => {
-									goCourseDetaile(item);
-								}}>
-								<ImageContainer>
-									<CollectionRecommendContentItemImage
-										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-									<PretendardSemiBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
-										{item.name}
+								<SVGRightAdd
+									color='white'
+									width={heightPercentage(24)}
+									height={heightPercentage(24)}
+									style={{marginLeft: 10}}></SVGRightAdd>
+							</HStack>
+						</HomeTextContainer>
+					</BrighnessBox>
+				</BackgroundImage>
+				<HomeBottomContainer>
+					<HStack gap={5}>
+						<SVGGood />
+						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+							다님 AI에게 추천받기
+						</PretendardSemiBoldText>
+					</HStack>
+					{buttonList.map(item => (
+						<RecommendContainer onPress={item.onPress} key={item.id}>
+							<RecommendTextContainer>
+								<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
+									{item.text}
+									<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
+										추천
 									</PretendardSemiBoldText>
-								</ImageContainer>
-							</CollectionTouchableOpacity>
-						))}
-					</CollectionContentContainer>
-				</CollectionContainer>
-			</HomeBottomContainer>
-		</HomeContainer>
+								</PretendardSemiBoldText>
+							</RecommendTextContainer>
+							{item.image}
+						</RecommendContainer>
+					))}
+					<CollectionContainer>
+						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+							다님이 추천하는 여행지
+						</PretendardSemiBoldText>
+						<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+							{mainScreens.map((item, idx) => (
+								<CollectionTouchableOpacity
+									key={idx}
+									onPress={() => {
+										goCourseDetaile(item);
+									}}>
+									<ImageContainer>
+										<CollectionRecommendContentItemImage
+											source={{uri: item.photo}}></CollectionRecommendContentItemImage>
+										<PretendardSemiBoldText
+											size={20}
+											lineHeight={26}
+											color={colors.backgroundWhite}>
+											{item.name}
+										</PretendardSemiBoldText>
+									</ImageContainer>
+								</CollectionTouchableOpacity>
+							))}
+						</CollectionContentContainer>
+					</CollectionContainer>
+				</HomeBottomContainer>
+			</HomeContainer>
+		</SafeAreaView>
 	);
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];

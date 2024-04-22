@@ -135,8 +135,9 @@ export const SvgShare = styled(Share)<{color?: string}>`
 export const SVGHelp = styled(Help)<{color?: string}>`
 	color: color;
 `;
-export const SVGRightAdd = styled(RightAdd)<{color?: string}>`
+export const SVGRightAdd = styled(RightAdd)<{color?: string; transform?: number}>`
 	color: color;
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string; transform?: boolean}>`
 	color: color;

@@ -99,6 +99,17 @@ export const BackgroundGray = styled.View<{paddingHorizental?: number; gap?: num
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
 `;
+export const BackgroundGrayScrollView = styled.ScrollView<{
+	paddingHorizental?: number;
+	gap?: number;
+	marginTop?: number;
+}>`
+	flex: 1;
+	background-color: ${colors.backgroundGray};
+	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
+		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
+	gap: ${props => props.gap ?? 0}px;
+`;
 
 export const PretendardVariable = styled.Text`
 	font-family: PretendardVariable;

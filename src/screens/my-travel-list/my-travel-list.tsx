@@ -71,7 +71,7 @@ export default function MyTravelList({navigation}: any) {
 				modalBottomFunctionUse: true,
 				modalBottomFunction: goEnroll,
 				modalTopText: '아니요, 여행 지역부터 추천해주세요.',
-				modalBottomText: '네, 여행 일정을 추천받을래요.',
+				modalBottomText: '네, 바로 여행 일정을 추천받을래요.',
 			}),
 		);
 	};

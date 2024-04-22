@@ -213,9 +213,10 @@ export default function SearchPlace({navigation, route}: any) {
 									onPress={() => {
 										setTimeValue(timeValue - 1);
 									}}
-									color={colors.Gray1}>
-									<SVGMinus color={colors.Gray2} />
+									color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
+									{timeValue >= 1 && <SVGMinus color={colors.Gray2} />}
 								</SVGContainer>
+
 								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
 									{timeValue + 1}시간
 								</PretendardSemiBoldText>
@@ -224,8 +225,8 @@ export default function SearchPlace({navigation, route}: any) {
 									onPress={() => {
 										setTimeValue(timeValue + 1);
 									}}
-									color={colors.Gray1}>
-									<SVGPlus color={colors.Gray2} />
+									color={timeValue > 1 ? colors.backgroundWhite : colors.Gray1}>
+									{timeValue <= 1 && <SVGPlus color={colors.Gray2} />}
 								</SVGContainer>
 							</HStack>
 						</HStack>

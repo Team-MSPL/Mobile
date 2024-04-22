@@ -6,9 +6,9 @@ import Policy2 from '../../utill/component/policy/policy2';
 import Policy3 from '../../utill/component/policy/policy3';
 import Policy4 from '../../utill/component/policy/policy4';
 import Policy5 from '../../utill/component/policy/policy5';
-import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {BackgroundGray, BackgroundGrayScrollView, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGRightAdd, SvgRight} from '../../utill/svg/svg';
+import {SVGRightAdd} from '../../utill/svg/svg';
 export default function PolicyMain() {
 	const [view, setView] = useState(0);
 	const PolicyComponent = policyList[view]?.component;
@@ -16,7 +16,7 @@ export default function PolicyMain() {
 		setView(view == e ? -1 : e);
 	};
 	return (
-		<BackgroundGray>
+		<BackgroundGrayScrollView>
 			{policyList.map((item, value) => (
 				<Fragment key={value}>
 					<PolicyTouchableOpacity
@@ -24,15 +24,19 @@ export default function PolicyMain() {
 						onPress={() => {
 							handleViewVisible(value);
 						}}>
-						<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+						<PretendardSemiBoldText
+							size={14}
+							lineHeight={21}
+							color={colors.Black}
+							width={widthPercentage(300)}>
 							{item.title}
 						</PretendardSemiBoldText>
-						<SVGRightAdd rotation={value == view ? 90 : 180} color='black' />
+						<SVGRightAdd transform={value == view ? 270 : 90} color='black' />
 					</PolicyTouchableOpacity>
 					{value == view && <PolicyComponent />}
 				</Fragment>
 			))}
-		</BackgroundGray>
+		</BackgroundGrayScrollView>
 	);
 }
 const policyList = [

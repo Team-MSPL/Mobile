@@ -150,7 +150,7 @@ export default function Join1({navigation, route}: any) {
 const ButtonContainer = styled.View`
 	width: ${widthPercentage(375)}px;
 	position: absolute;
-	bottom: ${heightPercentage(0)}px;
+	bottom: ${heightPercentage(20)}px;
 	align-items: center;
 `;
 const PlusTouchableOpacity = styled.TouchableOpacity`
