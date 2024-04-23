@@ -346,7 +346,7 @@ export default function DetailInfo({navigation}: any) {
 				{!modify && (
 					<AbsoluteButton>
 						<PrimaryButton
-							label='여행 일정 확인하기'
+							label='여행 코스 확인하기'
 							onPress={goTimetable}
 							backgroundColor={colors.PointYellow}
 							textColor={colors.backgroundWhite}

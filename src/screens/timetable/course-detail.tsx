@@ -519,7 +519,7 @@ export default function CourseDetail({navigation, route}: any) {
 				{route.params.value.mainFlag && (
 					<ButtonContainer>
 						<CustomButton
-							label={'이 지역의 여행 일정 추천 받기'}
+							label={'이 지역의 여행 코스 추천 받기'}
 							onPress={goIncludeRecommend}></CustomButton>
 					</ButtonContainer>
 				)}

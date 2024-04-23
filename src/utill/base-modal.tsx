@@ -37,7 +37,7 @@ export default function BaseModal() {
 				<Container>
 					<ModalContainer onPress={close}>
 						<ViewContaniner modalSingleUse={modalSingleUse}>
-							<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Gray5}>
+							<PretendardSemiBoldText textAlign='center' size={20} lineHeight={27} color={colors.Gray5}>
 								{modalTitle}
 							</PretendardSemiBoldText>
 							{modalSubTitle && (

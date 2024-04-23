@@ -150,7 +150,7 @@ export default function Main({navigation}: any) {
 			id: 2,
 			onPress: goEnroll,
 			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
-			text: '여행 일정 ',
+			text: '여행 코스 ',
 		},
 	];
 	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];

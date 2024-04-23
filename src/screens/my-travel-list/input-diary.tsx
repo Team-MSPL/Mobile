@@ -16,6 +16,8 @@ import ImageView from 'react-native-image-viewing';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
+import moment from 'moment';
+import {savePost, updatePost} from '../../redux/community/community.slice';
 export default function InputDiary({navigation, modify, setModify, text, setEditing}: any) {
 	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
@@ -73,7 +75,19 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			await Promise.all(ImageFunction);
 			const data = {travelId: travelId, diary: diaryValue, picture: diaryImageRef.current};
 			await dispatch(updateDiary(data));
-			navigation.goBack();
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '저장되었습니다\n내용을 커뮤니티에도 올리시겠습니까?',
+					modalSubTitle: '*제목은 여행 제목으로 설정됩니다',
+					modalFunction: handlePostSubmit,
+					modalBottomFunctionUse: true,
+					modalBottomFunction: () => {
+						navigation.goBack();
+					},
+					modalTopText: '네, 올리겠습니다',
+					modalBottomText: '아니요, 리뷰만 남기겠습니다',
+				}),
+			);
 		} catch (err) {
 			console.log(err);
 			dispatch(
@@ -82,6 +96,46 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					modalSubTitle: '잠시후 다시 시도해주세요',
 				}),
 			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const handlePostSubmit = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				postTitle: text,
+				postContent: diaryValue,
+				postImage: [],
+				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
+			};
+			let postId = await dispatch(savePost(data)).unwrap();
+			diaryImageRef.current = [];
+			const ImageFunction = pictureValue.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
+				diaryImageRef.current.push(data);
+			});
+			await Promise.all(ImageFunction);
+			const uploadData = {
+				postTitle: text,
+				postContent: diaryValue,
+				postImage: diaryImageRef.current,
+				postId: postId.postId,
+			};
+			await dispatch(updatePost(uploadData));
+
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '등록',
+					modalSubTitle: '게시글이 등록되었습니다.',
+					modalFunction: () => {
+						navigation.goBack();
+					},
+					modalSingleUse: true,
+				}),
+			);
+		} catch (error) {
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -145,7 +199,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 							<PictureElement
 								width={widthPercentage(150)}
 								height={widthPercentage(150)}
-								resizeMode='contain'
+								resizeMode='cover'
 								source={{uri: item}}></PictureElement>
 						</PictureColorContainer>
 					))}

@@ -418,10 +418,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												color={select == idx ? colors.Gray5 : colors.Gray3}>
 												{'DAY' + (idx + 1)}
 											</PretendardSemiBoldText>
-											{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-										<DaySubTitle select={idx === select}>
-											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-										</DaySubTitle> */}
 										</DayTouchablOpacity>
 									),
 							)}
@@ -524,17 +520,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																					360) %
 																					60,
 																			).padStart(2, '0')}
-																	{/* {Math.floor(
-																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
-																			360) /
-																			60,
-																	)}
-																	:
-																	{String(
-																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
-																			360) %
-																			60,
-																	).padStart(2, '0')} */}
 																</PretendardVariableText>
 																<PretendardSemiBoldText
 																	maxWidth={widthPercentage(200)}
@@ -667,9 +652,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											{viewRef.current.endHours}
-											{/* {viewRef.current.endHours < 12
-												? viewRef.current.endHours
-												: viewRef.current.endHours - 12} */}
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											:

@@ -155,6 +155,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	textDecoration?: string;
 	marginBottom?: number;
 	maxWidth?: number;
+	textAlign?: string;
 }>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
@@ -163,6 +164,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	width: ${props => props.width + 'px' ?? 'auto'};
 	font-weight: 600;
 	text-decoration: ${props => props.textDecoration ?? null};
+	text-align: ${props => props.textAlign ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 `;

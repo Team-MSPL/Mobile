@@ -338,7 +338,7 @@ export default function Timetable({navigation, route}: any) {
 					modalTitle: '공유자',
 					modalSubTitle: `${
 						userId == '' ? '로그인 후 ' : ''
-					}공유 받은 여행 일정을 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
+					}공유 받은 여행 코스를 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
 					modalLeft: true,
 					modalRightText: '추가할래요',
 					modalLeftText: '보기만할래요',

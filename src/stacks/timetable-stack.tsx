@@ -93,7 +93,7 @@ export default function TimetableStack() {
 				name='Timetable'
 				component={Timetable}
 				options={{
-					title: '여행 일정',
+					title: '여행 코스',
 				}}
 			/>
 			<Stack.Screen

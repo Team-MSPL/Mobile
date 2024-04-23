@@ -138,56 +138,54 @@ export default function SelectDay({navigation}: any) {
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='언제 떠나시나요?'
 				subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
-			<VStack>
-				<TimeContainer>
-					{DaySelectInfoList.map((item, idx) => (
-						<TimeItemContainer key={idx}>
-							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
-								{item.step}
+			<TimeContainer>
+				{DaySelectInfoList.map((item, idx) => (
+					<TimeItemContainer key={idx}>
+						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
+							{item.step}
+						</PretendardSemiBoldText>
+						<SelectContainer backgroundColor={colors.backgroundGray}>
+							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+								{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
 							</PretendardSemiBoldText>
-							<SelectContainer backgroundColor={colors.backgroundGray}>
+						</SelectContainer>
+						<SelectContainer
+							onPress={() => {
+								onPressTime(idx);
+							}}>
+							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
+									{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
 								</PretendardSemiBoldText>
-							</SelectContainer>
-							<SelectContainer
-								onPress={() => {
-									onPressTime(idx);
-								}}>
-								<HStack justifyContent='space-between'>
-									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-										{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-										{String(timeLimitArray[idx]).padStart(2, '0')}
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-										:
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-										{String(minuteLimitArray[idx]).padStart(2, '0')}
-									</PretendardSemiBoldText>
-								</HStack>
-							</SelectContainer>
-							{dateFlag.current == idx && (
-								<SelectAbsolute>
-									<UseDatePicker
-										goConfirm={goConfirm}
-										minuteData={minuteLimitArray[dateFlag.current] / 30}
-										ampmData={timeLimitArray[dateFlag.current] < 12 ? 0 : 1}
-										hourData={
-											timeLimitArray[dateFlag.current] < 12
-												? timeLimitArray[dateFlag.current]
-												: timeLimitArray[dateFlag.current] - 12
-										}
-										visible={visible}
-										setVisible={setVisible}></UseDatePicker>
-								</SelectAbsolute>
-							)}
-						</TimeItemContainer>
-					))}
-				</TimeContainer>
-			</VStack>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									{String(timeLimitArray[idx]).padStart(2, '0')}
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									:
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									{String(minuteLimitArray[idx]).padStart(2, '0')}
+								</PretendardSemiBoldText>
+							</HStack>
+						</SelectContainer>
+						{dateFlag.current == idx && (
+							<SelectAbsolute>
+								<UseDatePicker
+									goConfirm={goConfirm}
+									minuteData={minuteLimitArray[dateFlag.current] / 30}
+									ampmData={timeLimitArray[dateFlag.current] < 12 ? 0 : 1}
+									hourData={
+										timeLimitArray[dateFlag.current] < 12
+											? timeLimitArray[dateFlag.current]
+											: timeLimitArray[dateFlag.current] - 12
+									}
+									visible={visible}
+									setVisible={setVisible}></UseDatePicker>
+							</SelectAbsolute>
+						)}
+					</TimeItemContainer>
+				))}
+			</TimeContainer>
 			<CalendarContainer>
 				<CalendarPicker
 					weekdays={weekdays}
@@ -203,8 +201,8 @@ export default function SelectDay({navigation}: any) {
 					selectedDayColor={colors.Primary}
 					selectedStartDate={freeTicket ? selectStartDate.toDate() : undefined}
 					selectedEndDate={freeTicket && selectEndDate != null ? selectEndDate.toDate() : undefined}
-					previousTitle='이전 달'
-					nextTitle='다음 달'
+					previousTitle='이전'
+					nextTitle='다음'
 					previousTitleStyle={{color: 'black'}}
 					nextTitleStyle={{color: 'black'}}
 					allowBackwardRangeSelect={true}
@@ -222,7 +220,6 @@ export default function SelectDay({navigation}: any) {
 	);
 }
 const CalendarContainer = styled.View`
-	flex: 1;
 	justify-content: center;
 `;
 const DayBackground = styled(BackgroundGray).attrs({as: Pressable})``;
