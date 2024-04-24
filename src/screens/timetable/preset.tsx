@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Image, TouchableOpacity, ScrollView, Pressable} from 'react-native';
+import {Image, TouchableOpacity, ScrollView, Pressable, Modal} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -19,6 +19,8 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {WhiteContainer} from '../enroll-info/final-check';
 import PrimaryButton from '../../utill/component/primary-button';
+import {useViewPager} from '../../utill/hooks/useViewPager';
+import ViewPager from '../../utill/view-pager';
 export default function Preset({navigation}: any) {
 	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName, cityIndex, region} =
 		useAppSelector(state => state.travelSlice);
@@ -66,7 +68,10 @@ export default function Preset({navigation}: any) {
 		];
 		AsyncStorage.multiSet(cacheValues);
 	};
-
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'presetViewPager'});
+	useEffect(() => {
+		getMainViewPager();
+	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
 		saveCache();
@@ -243,6 +248,13 @@ export default function Preset({navigation}: any) {
 						),
 				)}
 			</ScrollView>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerState}
+				onRequestClose={deleteMainViewPager}>
+				<ViewPager sliceNumber={2} handleFunction={deleteMainViewPager} />
+			</Modal>
 		</BackgroundGray>
 	);
 }

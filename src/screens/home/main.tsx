@@ -21,8 +21,9 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native';
-
+import {Modal, SafeAreaView} from 'react-native';
+import ViewPager from '../../utill/view-pager';
+import {useViewPager} from '../../utill/hooks/useViewPager';
 export default function Main({navigation}: any) {
 	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
@@ -129,6 +130,7 @@ export default function Main({navigation}: any) {
 
 	useEffect(() => {
 		pushPermission();
+		getMainViewPager();
 		checkCache();
 		if (signUpReward) {
 			navigation.navigate('HomeModal', {status: '회원가입'});
@@ -176,6 +178,7 @@ export default function Main({navigation}: any) {
 		);
 		navigation.navigate('Preset');
 	};
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'mainViewPager'});
 	const checkCache = async () => {
 		let [preset, presetTendency, day, nDay, transit, tendency, travelName] = await AsyncStorage.multiGet([
 			'preset',
@@ -293,6 +296,13 @@ export default function Main({navigation}: any) {
 					</CollectionContainer>
 				</HomeBottomContainer>
 			</HomeContainer>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerState}
+				onRequestClose={deleteMainViewPager}>
+				<ViewPager sliceNumber={1} handleFunction={deleteMainViewPager} />
+			</Modal>
 		</SafeAreaView>
 	);
 }

@@ -7,7 +7,7 @@ import {
 	reCourseName,
 	travelSliceActions,
 } from '../../redux/travel-info/travel.slice';
-import {Platform, Touchable, TouchableOpacity} from 'react-native';
+import {Modal, Platform, Touchable, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -41,6 +41,8 @@ import {RegionImage} from '../enroll-info/final-check';
 import {MarkerContainer} from '../timetable/preset-detail';
 import {Circle} from '../timetable/preset';
 import PrimaryButton from '../../utill/component/primary-button';
+import ViewPager from '../../utill/view-pager';
+import {useViewPager} from '../../utill/hooks/useViewPager';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, reviewCheck, region, regionInfo, timetable} = useAppSelector(
 		state => state.travelSlice,
@@ -244,6 +246,9 @@ export default function DetailInfo({navigation}: any) {
 			),
 		});
 	}, [modify]);
+	useEffect(() => {
+		getMainViewPager();
+	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			goMyTravelDetail();
@@ -274,6 +279,8 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'afterTravelViewPager'});
+
 	return (
 		<Scroll>
 			<AbsoluteTopBar opacityState={false}>
@@ -404,6 +411,13 @@ export default function DetailInfo({navigation}: any) {
 				text={text}
 				setEditing={setEditing}
 			/>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerState}
+				onRequestClose={deleteMainViewPager}>
+				<ViewPager sliceNumber={4} handleFunction={deleteMainViewPager} />
+			</Modal>
 		</Scroll>
 	);
 }
@@ -419,20 +433,6 @@ const MapContainer = styled.View`
 `;
 const Scroll = styled.ScrollView``;
 
-const ReName = styled.TouchableOpacity`
-	padding: 5px;
-`;
-const RenameContainer = styled(HStack)`
-	border-bottom-width: 1px;
-	align-items: center;
-	width: 70%;
-	margin: 0px 0px 5px 0px;
-`;
-const TravleHStack = styled(HStack)`
-	width: 100%;
-	align-items: center;
-	margin: 0px 0px 5px 0px;
-`;
 export const IconContainer = styled.View`
 	width: 100%;
 	align-items: flex-end;

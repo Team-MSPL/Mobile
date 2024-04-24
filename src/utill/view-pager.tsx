@@ -3,21 +3,34 @@ import {devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
-export default function ViewPager({handleFunction, timetable}: {handleFunction: any; timetable?: boolean}) {
+export default function ViewPager({
+	handleFunction,
+	timetable,
+	sliceNumber,
+}: {
+	handleFunction: any;
+	timetable?: boolean;
+	sliceNumber?: number;
+}) {
 	const [viewIndex, setViewIndex] = useState(0);
 	const [viewList, setViewList] = useState([
-		{imagePath: require('../../public/viewPager/home.png')},
-		{imagePath: require('../../public/viewPager/travelList.png')},
-		{imagePath: require('../../public/viewPager/timetable1.png')},
-		{imagePath: require('../../public/viewPager/timetable2.png')},
+		{imagePath: require('../../public/viewPager/main.png')},
+		{imagePath: require('../../public/viewPager/preset.png')},
+		{imagePath: require('../../public/viewPager/timetable.png')},
+		{imagePath: require('../../public/viewPager/afterTravel.png')},
 	]);
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
 	useEffect(() => {
+		console.log(sliceNumber);
 		if (timetable ?? false) {
 			let copy = [...viewList];
 			setViewList(copy.slice(2, 4));
+		} else if (sliceNumber ?? false) {
+			console.log('qwe');
+			let copy = [...viewList];
+			setViewList(copy.slice(sliceNumber - 1, sliceNumber));
 		}
 	}, []);
 	return (
@@ -52,7 +65,7 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 					</CancelContainer>
 				</HStack>
 			) : (
-				<CustomButton label={'시작하기'} onPress={handleFunction}></CustomButton>
+				<CustomButton label={'시작하기'} onPress={handleFunction} marginBottom={10}></CustomButton>
 			)}
 		</MainContainer>
 	);
@@ -97,5 +110,5 @@ const ImageAllContainer = styled.View`
 `;
 const ImageContainer = styled.Image`
 	width: 100%;
-	height: 100%;
+	height: 95%;
 `;
