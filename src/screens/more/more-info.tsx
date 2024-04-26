@@ -108,7 +108,7 @@ export default function MoreInfo({navigation}: any) {
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
-		// {title: '사용 가이드', function: goViewPager},
+		{title: '사용 가이드', function: goViewPager},
 	];
 	return (
 		<ScrollView>
@@ -119,7 +119,7 @@ export default function MoreInfo({navigation}: any) {
 					transparent={true}
 					visible={viewPagerView}
 					onRequestClose={() => setViewPagerView(false)}>
-					<ViewPager handleFunction={goBack} />
+					<ViewPager handleFunction={goBack} scrollState={true} />
 				</Modal>
 				<HStack justifyContent='space-between'>
 					<HStack gap={widthPercentage(5)}>

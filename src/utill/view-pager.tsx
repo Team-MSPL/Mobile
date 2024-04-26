@@ -3,14 +3,17 @@ import {devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
+import {heightPercentage, widthPercentage} from './layout/responsive-size';
 export default function ViewPager({
 	handleFunction,
 	timetable,
 	sliceNumber,
+	scrollState,
 }: {
 	handleFunction: any;
 	timetable?: boolean;
 	sliceNumber?: number;
+	scrollState?: boolean;
 }) {
 	const [viewIndex, setViewIndex] = useState(0);
 	const [viewList, setViewList] = useState([
@@ -48,8 +51,8 @@ export default function ViewPager({
 				horizontal={true}
 				showsHorizontalScrollIndicator={false}>
 				{viewList.map((item, idx) => (
-					<ImageAllContainer key={idx}>
-						<ImageContainer source={item.imagePath}></ImageContainer>
+					<ImageAllContainer key={idx} scrollState={scrollState ?? false}>
+						<ImageContainer resizeMode='stretch' source={item.imagePath}></ImageContainer>
 					</ImageAllContainer>
 				))}
 			</Carousel>
@@ -61,11 +64,14 @@ export default function ViewPager({
 						))}
 					</DotHStack>
 					<CancelContainer onPress={handleFunction}>
-						<SkipText>건너뛰기</SkipText>
+						<SkipText>닫기</SkipText>
 					</CancelContainer>
 				</HStack>
 			) : (
-				<CustomButton label={'시작하기'} onPress={handleFunction} marginBottom={10}></CustomButton>
+				<CustomButton
+					label={scrollState ? '닫기' : '시작하기'}
+					onPress={handleFunction}
+					marginBottom={10}></CustomButton>
 			)}
 		</MainContainer>
 	);
@@ -102,13 +108,14 @@ const CancelContainer = styled.TouchableOpacity`
 const MainContainer = styled.SafeAreaView`
 	flex: 1;
 	align-items: center;
-	background-color: rgba(122, 122, 122, 1);
+	background-color: rgba(102, 102, 102, 1);
 `;
-const ImageAllContainer = styled.View`
-	width: ${devicesWidth * 0.8}px;
-	margin: 0px ${devicesWidth * 0.1}px;
+const ImageAllContainer = styled.View<{scrollState: boolean}>`
+	width: ${devicesWidth}px;
+	align-items: center;
+	margin-bottom: ${heightPercentage(10)}px;
 `;
 const ImageContainer = styled.Image`
-	width: 100%;
-	height: 95%;
+	width: ${widthPercentage(327)}px;
+	height: 100%;
 `;
