@@ -339,6 +339,21 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
+	{
+		/* <DraggableGrid
+					numColumns={1}
+					renderItem={renderItem}
+					data={qwe}
+					itemHeight={100}
+					onDragStart={() => {
+						console.log('qwe');
+						setZ(false);
+					}}
+					onDragRelease={data => {
+						console.log(data);
+						setZ(true);
+					}}></DraggableGrid> */
+	}
 	return (
 		<MainAllContainer>
 			<AbsoluteTopBar opacityState={modify}>

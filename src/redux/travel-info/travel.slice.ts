@@ -499,7 +499,13 @@ export const travelSlice = createSlice({
 						if (idx == 0) {
 							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
 						} else if (copy[idx - 1].at(-1)?.category == 4) {
-							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
+							copy[idx].push({
+								...copy[idx - 1].at(-1),
+								y: 0,
+								takenTime: 150,
+								x: idx,
+								key: shortId.generate(),
+							});
 						}
 					}
 					if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
@@ -513,6 +519,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 						lunch = true;
 						time += 3;
@@ -528,12 +535,13 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 						dinner = true;
 						time += 3;
 					}
 					if (value.category != 4) {
-						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
+						copy[idx].push({...value, x: idx, y: time, id: shortId.generate(), key: shortId.generate()});
 						time += value.takenTime / 30;
 						let bandwidthTime = state.bandwidth ? 1 : 0;
 						index != item.length - 1 &&
@@ -551,6 +559,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 					} else if (value.category == 4 && index == item.length - 1) {
 						//copy[idx].pop();
@@ -564,6 +573,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 					}
 				});
@@ -802,6 +812,7 @@ export interface TimetableType {
 	concept: number[];
 	tour: number[];
 	regionIndex: number;
+	key: string;
 }
 
 export interface CourseDetailType {
