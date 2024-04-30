@@ -68,7 +68,7 @@ export default function TimetableStack() {
 				name='SelectDistance'
 				component={SelectDistance}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
@@ -149,42 +149,42 @@ export default function TimetableStack() {
 				name='RecommendSelectWho'
 				component={RecommendSelectWho}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen
 				name='RecommendSelectMove'
 				component={RecommendSelectMove}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen
 				name='RecommendSelectBusy'
 				component={RecommendSelectBusy}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen
 				name='RecommendSelectConcept'
 				component={RecommendSelectConcept}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen
 				name='RecommendSelectPlay'
 				component={RecommendSelectPlay}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen
 				name='RecommendSelectTour'
 				component={RecommendSelectTour}
 				options={{
-					title: '여행일정추천',
+					title: '여행 코스 추천',
 				}}
 			/>
 			<Stack.Screen

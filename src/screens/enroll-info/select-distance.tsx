@@ -91,7 +91,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 				/>
 			</DistanceCenter>
 			<ButtonContainer>
-				<CustomButton label='맞춤형 여행일정을 확인해볼게요!' onPress={goNext}></CustomButton>
+				<CustomButton label='맞춤형 여행 코스를 확인해볼게요!' onPress={goNext}></CustomButton>
 			</ButtonContainer>
 		</BackgroundGray>
 	);

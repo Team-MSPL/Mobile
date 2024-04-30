@@ -144,7 +144,7 @@ export default function Preset({navigation}: any) {
 											.slice(
 												0,
 												tendencyViewIndex[idx]
-													? 5
+													? 4
 													: presetTendencyList[idx].tendencyNameList.length,
 											)
 											.map((item, index) => {
@@ -169,7 +169,7 @@ export default function Preset({navigation}: any) {
 												);
 											})}
 									</FlexWrap>
-									{presetTendencyList[idx].tendencyNameList.length > 5 && (
+									{presetTendencyList[idx].tendencyNameList.length > 4 && (
 										<TouchableOpacity
 											style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
 											onPress={() => {

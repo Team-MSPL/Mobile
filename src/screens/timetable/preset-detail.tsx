@@ -182,7 +182,7 @@ export default function PresetDetail({navigation, route}: any) {
 							{presetTendencyList[route.params.index].tendencyNameList
 								.slice(
 									0,
-									tendencyView ? 5 : presetTendencyList[route.params.index].tendencyNameList.length,
+									tendencyView ? 4 : presetTendencyList[route.params.index].tendencyNameList.length,
 								)
 								.map((item, idx) => (
 									<TagContainer key={idx} height={28} backgroundColor={colors.backgroundWhite}>
@@ -195,7 +195,7 @@ export default function PresetDetail({navigation, route}: any) {
 									</TagContainer>
 								))}
 						</FlexWrap>
-						{presetTendencyList[route.params.index].tendencyNameList.length > 5 && (
+						{presetTendencyList[route.params.index].tendencyNameList.length > 4 && (
 							<TouchableOpacity
 								style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
 								onPress={() => {
@@ -302,7 +302,7 @@ export default function PresetDetail({navigation, route}: any) {
 				<MarginContainer />
 			</BackgroundGray>
 			<ButtonContainer>
-				<CustomButton label='이 일정으로 할래요!' onPress={checkNext}></CustomButton>
+				<CustomButton label='이 코스로 할래요!' onPress={checkNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

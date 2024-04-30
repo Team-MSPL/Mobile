@@ -30,11 +30,16 @@ import {SVGContainer} from '../enroll-info/select-multi';
 import {SVGPlus} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
+import {
+	NestableScrollContainer,
+	NestableDraggableFlatList,
+	ScaleDecorator,
+	RenderItemParams,
+} from 'react-native-draggable-flatlist';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo, shareViewWithStartFlag} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -73,21 +78,31 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
-		let navigationIndex = e + 1;
-		let transitCondition = transit == 1 ? 'public' : 'car';
-		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
-		const url = `nmap://route/${transitCondition}?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
-		const supported = await Linking.canOpenURL(url);
-		if (supported) {
-			await Linking.openURL(url);
-		} else {
-			if (Platform.OS === 'android') {
-				const GOOGLE_PLAY_STORE_LINK = 'market://details?id=com.nhn.android.nmap';
-				await Linking.openURL(GOOGLE_PLAY_STORE_LINK);
+		try {
+			let navigationIndex = e - 1;
+			let transitCondition = transit == 1 ? 'public' : 'car';
+			if (excludeNames.includes(timetable[select][e - 1].name)) navigationIndex -= 1;
+			const url = `nmap://route/${transitCondition}?slat=${timetable[select][navigationIndex].lat}&slng=${timetable[select][navigationIndex].lng}&sname=${timetable[select][navigationIndex].name}&dlat=${timetable[select][e].lat}&dlng=${timetable[select][e].lng}&dname=${timetable[select][e].name}&appname=다님`;
+			const supported = await Linking.canOpenURL(url);
+			if (supported) {
+				await Linking.openURL(url);
 			} else {
-				const APPLE_APP_STORE_LINK = 'http://itunes.apple.com/app/id311867728?mt=8';
-				await Linking.openURL(APPLE_APP_STORE_LINK);
+				if (Platform.OS === 'android') {
+					const GOOGLE_PLAY_STORE_LINK = 'market://details?id=com.nhn.android.nmap';
+					await Linking.openURL(GOOGLE_PLAY_STORE_LINK);
+				} else {
+					const APPLE_APP_STORE_LINK = 'http://itunes.apple.com/app/id311867728?mt=8';
+					await Linking.openURL(APPLE_APP_STORE_LINK);
+				}
 			}
+		} catch (e) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '길찾기를 진행할 관광지가 없습니다.',
+					modalSubTitle: '추천 관광지를 받은 후 다시 시도해주세요',
+					modalSingleUse: true,
+				}),
+			);
 		}
 	};
 	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
@@ -333,26 +348,83 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		}
 	};
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'timetableViewPager'});
+	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
+		let idx = getIndex() ?? 0;
+		return (
+			<ScaleDecorator>
+				{!excludeNames.includes(item.name) ? (
+					<HStack gap={widthPercentage(10)}>
+						<InsideGrayContainer
+							onLongPress={() => {
+								changeLocationRef.current.before = idx;
+								drag();
+							}}
+							onPress={() => {
+								moveRegion(idx);
+							}}>
+							<HStack justifyContent='space-between'>
+								<VStack>
+									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+										{categoryTitle[item.category]} {Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+										{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
+										{Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) < 25 &&
+											Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) +
+												':' +
+												String(
+													(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) % 60,
+												).padStart(2, '0')}
+									</PretendardVariableText>
+									<PretendardSemiBoldText
+										maxWidth={widthPercentage(200)}
+										size={14}
+										lineHeight={18.9}
+										color={colors.Gray5}>
+										{item.name}
+									</PretendardSemiBoldText>
+								</VStack>
+								<Pressable
+									onPress={() => {
+										openModal(item.x, idx);
+									}}>
+									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.PointYellow}>
+										편집
+									</PretendardSemiBoldText>
+								</Pressable>
+							</HStack>
+						</InsideGrayContainer>
+					</HStack>
+				) : (
+					<HStack>
+						<InsideGrayContainer backgroundColor={colors.backgroundWhite}>
+							<InfoView
+								navigation={navigation}
+								test={item}
+								index={idx}
+								idx={item.x}
+								modify={false}
+								CancelModify={CancelModify}
+								drag={drag}
+							/>
+						</InsideGrayContainer>
+					</HStack>
+				)}
+			</ScaleDecorator>
+		);
+	};
+	const changeLocation = (data: any) => {
+		let copy = [...timetable];
+		timetable[data[0].x].map((item, index) => {
+			data[index] = {...data[index], y: item.y, takenTime: item.takenTime};
+		});
+		copy[data[0].x] = data;
+		dispatch(travelSliceActions.changeTimetable(copy));
+	};
+	const changeLocationRef = useRef({before: 0, after: 1});
 	useEffect(() => {
-		getMainViewPager();
-	}, []);
+		shareViewWithStartFlag && getMainViewPager();
+	}, [shareViewWithStartFlag]);
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
-	}
-	{
-		/* <DraggableGrid
-					numColumns={1}
-					renderItem={renderItem}
-					data={qwe}
-					itemHeight={100}
-					onDragStart={() => {
-						console.log('qwe');
-						setZ(false);
-					}}
-					onDragRelease={data => {
-						console.log(data);
-						setZ(true);
-					}}></DraggableGrid> */
 	}
 	return (
 		<MainAllContainer>
@@ -477,10 +549,13 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					<DayScrollView
 						modify={modify}
 						ref={scrollRef}
-						onScroll={e => {
-							scrollhandle(e);
-						}}
-						onMomentumScrollEnd={changeViewState}>
+						// onScroll={e => {
+						// 	console.log('a');
+						// 	scrollhandle(e);
+						// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
+						onMomentumScrollEnd={e => {
+							changeViewState(e), scrollhandle(e);
+						}}>
 						{timetable.map(
 							(value, index) =>
 								value.length != 0 && (
@@ -493,95 +568,84 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 											{moment(day[index]).format('YY.MM.DD')} (
 											{weekdays[moment(day[index]).day()]})
 										</PretendardSemiBoldText>
-										{value.map((item, idx) =>
-											!excludeNames.includes(item.name) ? (
-												<HStack gap={widthPercentage(10)} key={idx}>
-													<DashLineContainer justifyContent='start'>
-														<MarkerContainer>
-															<PretendardSemiBoldText
-																size={13}
-																lineHeight={19}
-																color={colors.backgroundWhite}>
-																{idx + 1}
-															</PretendardSemiBoldText>
-														</MarkerContainer>
-														<DashLine
-															status={
-																idx == value.length - 1 ? 'end' : 'center'
-															}></DashLine>
-													</DashLineContainer>
-													<InsideGrayContainer
-														onPress={() => {
-															moveRegion(idx);
-														}}>
-														<HStack justifyContent='space-between'>
-															<VStack>
-																<PretendardVariableText
-																	size={12}
-																	lineHeight={18}
-																	color={colors.Gray2}>
-																	{categoryTitle[item.category]}{' '}
-																	{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
-																	{String(((item.y ?? 0) * 30 + 360) % 60).padStart(
-																		2,
-																		'0',
-																	)}{' '}
-																	~{' '}
-																	{Math.floor(
-																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
-																			360) /
-																			60,
-																	) < 25 &&
-																		Math.floor(
+										{modify ? (
+											<NestableDraggableFlatList
+												onPlaceholderIndexChange={qwe =>
+													(changeLocationRef.current.after = qwe)
+												}
+												containerStyle={{height: heightPercentage(76) * value.length}}
+												data={value}
+												onDragEnd={({data}) => changeLocation(data)}
+												keyExtractor={item => item.id}
+												renderItem={renderItem}
+											/>
+										) : (
+											value.map((item, idx) =>
+												!excludeNames.includes(item.name) ? (
+													<HStack gap={widthPercentage(10)} key={idx}>
+														<DashLineContainer justifyContent='start'>
+															<MarkerContainer>
+																<PretendardSemiBoldText
+																	size={13}
+																	lineHeight={19}
+																	color={colors.backgroundWhite}>
+																	{idx + 1}
+																</PretendardSemiBoldText>
+															</MarkerContainer>
+															<DashLine
+																status={
+																	idx == value.length - 1 ? 'end' : 'center'
+																}></DashLine>
+														</DashLineContainer>
+														<InsideGrayContainer
+															onPress={() => {
+																moveRegion(idx);
+															}}>
+															<HStack justifyContent='space-between'>
+																<VStack>
+																	<PretendardVariableText
+																		size={12}
+																		lineHeight={18}
+																		color={colors.Gray2}>
+																		{categoryTitle[item.category]}{' '}
+																		{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+																		{String(
+																			((item.y ?? 0) * 30 + 360) % 60,
+																		).padStart(2, '0')}{' '}
+																		~{' '}
+																		{Math.floor(
 																			(((item.y ?? 0) + item.takenTime / 30) *
 																				30 +
 																				360) /
 																				60,
-																		) +
-																			':' +
-																			String(
+																		) < 25 &&
+																			Math.floor(
 																				(((item.y ?? 0) + item.takenTime / 30) *
 																					30 +
-																					360) %
+																					360) /
 																					60,
-																			).padStart(2, '0')}
-																	{/* {Math.floor(
-																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
-																			360) /
-																			60,
-																	)}
-																	:
-																	{String(
-																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
-																			360) %
-																			60,
-																	).padStart(2, '0')} */}
-																</PretendardVariableText>
-																<PretendardSemiBoldText
-																	maxWidth={widthPercentage(200)}
-																	size={14}
-																	lineHeight={18.9}
-																	color={colors.Gray5}>
-																	{item.name}
-																</PretendardSemiBoldText>
-															</VStack>
-															{modify ? (
-																<Pressable
-																	onPress={() => {
-																		openModal(index, idx);
-																	}}>
+																			) +
+																				':' +
+																				String(
+																					(((item.y ?? 0) +
+																						item.takenTime / 30) *
+																						30 +
+																						360) %
+																						60,
+																				).padStart(2, '0')}
+																	</PretendardVariableText>
 																	<PretendardSemiBoldText
+																		maxWidth={widthPercentage(200)}
 																		size={14}
 																		lineHeight={18.9}
-																		color={colors.PointYellow}>
-																		편집
+																		color={colors.Gray5}>
+																		{item.name}
 																	</PretendardSemiBoldText>
-																</Pressable>
-															) : (
-																idx != 0 && (
+																</VStack>
+																{idx != 0 && (
 																	<PrimaryButton
 																		onPress={() => {
-																			goNavigation(index);
+																			goNavigation(idx);
 																		}}
 																		label='길찾기'
 																		textSize={12}
@@ -590,42 +654,42 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																		height={heightPercentage(22)}
 																		backgroundColor={colors.Primary}
 																		textColor={colors.Gray5}></PrimaryButton>
-																)
-															)}
-														</HStack>
-													</InsideGrayContainer>
-												</HStack>
-											) : (
-												<HStack key={idx}>
-													<DashLineContainer justifyContent='start'>
-														<MarkerContainer
-															backgroundColor={
-																item.category == 4 ? colors.PointGreen1 : undefined
-															}>
-															<PretendardSemiBoldText
-																size={13}
-																lineHeight={19}
-																color={colors.backgroundWhite}>
-																{idx + 1}
-															</PretendardSemiBoldText>
-														</MarkerContainer>
-														<DashLine
-															status={
-																idx == value.length - 1 ? 'end' : 'center'
-															}></DashLine>
-													</DashLineContainer>
-													<InsideGrayContainer backgroundColor={colors.backgroundWhite}>
-														<InfoView
-															navigation={navigation}
-															test={item}
-															index={idx}
-															idx={index}
-															modify={false}
-															CancelModify={CancelModify}
-														/>
-													</InsideGrayContainer>
-												</HStack>
-											),
+																)}
+															</HStack>
+														</InsideGrayContainer>
+													</HStack>
+												) : (
+													<HStack key={idx}>
+														<DashLineContainer justifyContent='start'>
+															<MarkerContainer
+																backgroundColor={
+																	item.category == 4 ? colors.PointGreen1 : undefined
+																}>
+																<PretendardSemiBoldText
+																	size={13}
+																	lineHeight={19}
+																	color={colors.backgroundWhite}>
+																	{idx + 1}
+																</PretendardSemiBoldText>
+															</MarkerContainer>
+															<DashLine
+																status={
+																	idx == value.length - 1 ? 'end' : 'center'
+																}></DashLine>
+														</DashLineContainer>
+														<InsideGrayContainer backgroundColor={colors.backgroundWhite}>
+															<InfoView
+																navigation={navigation}
+																test={item}
+																index={idx}
+																idx={index}
+																modify={false}
+																CancelModify={CancelModify}
+															/>
+														</InsideGrayContainer>
+													</HStack>
+												),
+											)
 										)}
 									</WhiteContainer>
 								),
@@ -842,7 +906,7 @@ const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
 
-const DayScrollView = styled.ScrollView<{modify: boolean}>`
+const DayScrollView = styled(NestableScrollContainer)<{modify: boolean}>`
 	width: ${widthPercentage(375)}px;
 	height: ${props => (props.modify ? heightPercentage(500) : heightPercentage(230))}px;
 `;

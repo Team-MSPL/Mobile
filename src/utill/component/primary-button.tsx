@@ -16,12 +16,14 @@ export default function PrimaryButton({
 	marginTop,
 	textSize,
 	lineHeight,
+	onLongPress,
 }: PrimarybuttonType) {
 	return (
 		<PrimaryButtonContainer
 			alignSelf={alignSelf ?? 'null'}
 			width={width}
 			height={height}
+			onLongPress={onLongPress ?? undefined}
 			onPress={onPress}
 			backgroundColor={backgroundColor}
 			marginBottom={marginBottom ?? 0}
@@ -73,4 +75,5 @@ interface PrimarybuttonType {
 	textSize?: number;
 	lineHeight?: number;
 	marginTop?: number;
+	onLongPress?: () => void;
 }

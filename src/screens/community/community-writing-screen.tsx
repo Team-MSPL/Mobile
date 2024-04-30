@@ -279,7 +279,3 @@ export const ImageScrollViewContainer = styled.ScrollView`
 	gap: ${widthPercentage(20)}px;
 	margin-bottom: ${heightPercentage(30)}px;
 `;
-const ImageInputButtonText = styled.Text`
-	font-size: 16px;
-	color: ${colors.selectButton};
-`;

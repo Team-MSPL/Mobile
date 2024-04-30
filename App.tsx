@@ -38,6 +38,7 @@ import Event from './src/utill/component/event/event';
 import moment from 'moment';
 import {eventSliceActions, getEventList} from './src/redux/event/event.slice';
 import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -236,33 +237,35 @@ function App(): JSX.Element {
 	};
 
 	return (
-		<SafeAreaProvider>
-			<StatusBar
-				animated={true}
-				barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-				backgroundColor={backgroundStyle.backgroundColor}
-			/>
-			<NavigationContainer linking={linking}>
-				{
-					// isFirstLaunch == 'true' ? (
-					// 	<ViewPager handleFunction={handleFirstLaunch} />
-					//
-					<StackNavigator />
-					// isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
-					// hasPermission || noPermission ? (
+		<GestureHandlerRootView style={{flex: 1}}>
+			<SafeAreaProvider>
+				<StatusBar
+					animated={true}
+					barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+					backgroundColor={backgroundStyle.backgroundColor}
+				/>
+				<NavigationContainer linking={linking}>
+					{
+						// isFirstLaunch == 'true' ? (
+						// 	<ViewPager handleFunction={handleFirstLaunch} />
+						//
+						<StackNavigator />
+						// isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
+						// hasPermission || noPermission ? (
 
-					// ) : (
-					// 	<NeedPermissions />
-					// )
-				}
-				{needVersionUpdate && <NeedVersionUpdate />}
-				{eventState && <Event />}
-				{!(networkConn && serverConn) && <Connection />}
-				{<BaseModal />}
-				{Boolean(isLoading) && <Loading />}
-				<Toast />
-			</NavigationContainer>
-		</SafeAreaProvider>
+						// ) : (
+						// 	<NeedPermissions />
+						// )
+					}
+					{needVersionUpdate && <NeedVersionUpdate />}
+					{eventState && <Event />}
+					{!(networkConn && serverConn) && <Connection />}
+					{<BaseModal />}
+					{Boolean(isLoading) && <Loading />}
+					<Toast />
+				</NavigationContainer>
+			</SafeAreaProvider>
+		</GestureHandlerRootView>
 	);
 }
 const codePushOptions = {

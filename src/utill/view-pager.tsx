@@ -95,7 +95,7 @@ const HStack = styled.View`
 const Dot = styled.View<{size: number}>`
 	width: ${props => props.size}px;
 	height: 10px;
-	background-color: ${props => (props.size == 20 ? colors.selectButton : 'white')};
+	background-color: ${props => (props.size == 20 ? colors.Primary : 'white')};
 	border-radius: 99px;
 	margin: 5px;
 `;

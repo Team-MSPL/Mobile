@@ -25,6 +25,7 @@ const InfoView = ({
 	setModifyRef,
 	setStop,
 	CancelModify,
+	drag,
 }: any) => {
 	const {timetable, editMode, makeMode, nDay} = useAppSelector(state => state.travelSlice);
 	const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -340,6 +341,7 @@ const InfoView = ({
 							idx: idx,
 					  });
 			}}
+			onLongPress={drag}
 			marginBottom={heightPercentage(10)}
 			width={widthPercentage(282)}
 			height={heightPercentage(42)}></PrimaryButton>

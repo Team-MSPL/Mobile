@@ -88,6 +88,7 @@ export default function CourseDetail({navigation, route}: any) {
 					photo: data.photo,
 				});
 			} else {
+				console.log(data.reviews);
 				setCourseDetail({
 					status: 'google',
 					name: data.name,
@@ -99,7 +100,7 @@ export default function CourseDetail({navigation, route}: any) {
 						reviewUserToken: null,
 						reviewPhotoList: null,
 						reviewId: null,
-						reviewerProfileImage: null,
+						reviewerProfileImage: item?.profile_photo_url ?? null,
 					})),
 					expense: null,
 					rating: data?.rating,
@@ -330,7 +331,7 @@ export default function CourseDetail({navigation, route}: any) {
 										{courseDetail.rating}
 									</PretendardSemiBoldText>
 									<SvgStart
-										color={colors.selectButton}
+										color={colors.PointGreen1}
 										width={widthPercentage(19)}
 										height={heightPercentage(18)}
 									/>
@@ -440,19 +441,25 @@ export default function CourseDetail({navigation, route}: any) {
 						{courseDetail.review.map((item, idx) => (
 							<ReviewContainer key={idx}>
 								<HStack justifyContent='space-between'>
-									<HStack>
+									<HStack gap={widthPercentage(3)}>
 										<ReviewerProfileImage
 											source={{uri: item.reviewerProfileImage}}></ReviewerProfileImage>
 
 										<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray5}>
 											{item.name}
 										</PretendardSemiBoldText>
+										{item.rating && (
+											<HStack>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={21}
+													color={colors.PointGreen1}>
+													{item.rating.toFixed(1)}
+												</PretendardSemiBoldText>
+												<SvgStart width={widthPercentage(13)} color={colors.PointGreen1} />
+											</HStack>
+										)}
 									</HStack>
-									{item.rating && (
-										<PretendardSemiBoldText size={14} lineHeight={21} color={colors.PointGreen1}>
-											{item.rating}
-										</PretendardSemiBoldText>
-									)}
 									{item.reviewUserToken == userIdToken && (
 										<Pressable
 											onPress={() => {
@@ -549,7 +556,6 @@ export const ReviewContainer = styled.View`
 export const ReviewerProfileImage = styled.Image`
 	width: ${widthPercentage(28)}px;
 	height: ${widthPercentage(28)}px;
-	background-color: ${colors.Primary};
 	border-radius: 4px;
 `;
 export const ReviewButton = styled.Pressable`

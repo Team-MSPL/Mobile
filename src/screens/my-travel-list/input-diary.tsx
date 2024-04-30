@@ -77,7 +77,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			await dispatch(updateDiary(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '저장되었습니다\n내용을 커뮤니티에도 올리시겠습니까?',
+					modalTitle: '작성하신 내용을 커뮤니티에도 올리시겠습니까?',
 					modalSubTitle: '*제목은 여행 제목으로 설정됩니다',
 					modalFunction: handlePostSubmit,
 					modalBottomFunctionUse: true,

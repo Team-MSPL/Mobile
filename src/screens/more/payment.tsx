@@ -117,7 +117,7 @@ export default function Payment({navigation}: any) {
 			</PretendardVariableText>
 			<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
 				이용권을 구매하거나 광고를 시청하여 다님의 다양한 기능을 즐겨보세요.{`\n`}여행 지역 추천 AI 또는 여행
-				일정 추천 AI를 사용하실 수 있어요!
+				코스 추천 AI를 사용하실 수 있어요!
 			</PretendardVariableText>
 			<PaymentContainer>
 				<HStack justifyContent='space-between'>

@@ -528,10 +528,6 @@ const CommentMenu = styled.TouchableOpacity`
 	justify-content: center;
 	flex: 1;
 `;
-const CommentMenuIcon = styled(FeatherIcon)`
-	font-size: 20px;
-	color: ${colors.selectButton};
-`;
 const CommentContent = styled.Text`
 	font-size: 16px;
 	margin-bottom: 8px;
