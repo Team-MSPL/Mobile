@@ -450,6 +450,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						multiline={true}
 						onChangeText={text => setCommentContent(text)}
 						placeholder='댓글을 입력하세요...'
+						blurOnSubmit={true}
 					/>
 					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
 						<SVGPencil color='#70768E' />

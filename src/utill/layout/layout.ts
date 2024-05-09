@@ -30,10 +30,11 @@ export const VStack = styled.View<{width?: number; gap?: number; alignItems?: st
 	gap: ${props => props.gap ?? 0}px;
 	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
 `;
-export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; width?: number}>`
+export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; margintop?: number; width?: number}>`
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	margin-top: ${props => props.marginBottom ?? 15}px;
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
 	width: ${props => props.width ?? null}px;

@@ -71,6 +71,7 @@ export default function Inquire({navigation}: any) {
 				value={text}
 				placeholder='문의 사항을 적어주세요.'
 				placeholderTextColor={colors.Gray2}
+				blurOnSubmit={true}
 				onChangeText={(value: string) => changeText(value)}></CouponInput>
 			<ButtonContainer>
 				<PrimaryButton

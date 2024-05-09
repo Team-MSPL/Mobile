@@ -13,11 +13,11 @@ import {ButtonContainer} from '../enroll-info/select-multi';
 import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SVGCamera, SVGPencil, SVGRightAdd, SvgRight} from '../../utill/svg/svg';
 
 export default function PresetDetail({navigation, route}: any) {
-	const {presetTendencyList, presetDatas, day, nDay} = useAppSelector(state => state.travelSlice);
+	const {presetTendencyList, presetDatas, day, nDay, aiID} = useAppSelector(state => state.travelSlice);
 	const [select, setSelect] = useState(0);
 	const dispatch = useAppDispatch();
 	let markerCount = 0;
@@ -40,22 +40,28 @@ export default function PresetDetail({navigation, route}: any) {
 			'transit',
 			'tendency',
 			'travelName',
+			'region',
 		]);
 	};
 	const goNext = () => {
 		// console.log(presetDatas[select]);
-		removeCache();
-		let copy = [...presetDatas[select]];
-		if (presetDatas[select].length != nDay + 1) {
-			const check = nDay + 1 - presetDatas[select].length;
+		try {
+			removeCache();
+			dispatch(deleteAI({aiId: aiID}));
+			let copy = [...presetDatas[select]];
+			if (presetDatas[select].length != nDay + 1) {
+				const check = nDay + 1 - presetDatas[select].length;
 
-			for (let i = 0; i < check; i++) {
-				copy.push([]);
+				for (let i = 0; i < check; i++) {
+					copy.push([]);
+				}
 			}
+			dispatch(travelSliceActions.enrollTimetable(copy));
+			// navigation.popToTop();
+			navigation.navigate('Timetable');
+		} catch (err) {
+			console.log(err, '에러');
 		}
-		dispatch(travelSliceActions.enrollTimetable(copy));
-		// navigation.popToTop();
-		navigation.navigate('Timetable');
 	};
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const mapRef = useRef<MapView>(null);

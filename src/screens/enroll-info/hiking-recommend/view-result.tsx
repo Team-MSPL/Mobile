@@ -58,9 +58,9 @@ export default function HikingViewResult({navigation}: any) {
 					marginLeft={widthPercentage(24)}
 					mainTextSize={23}
 					styleTextColor={colors.Gray4}
-					styleText='지역 추천'
+					styleText='탐방 코스 추천'
 					mainText={`${userName} 님, \n이런 탐방코스는 어떠신가요?`}
-					subText='여행 성향을 기반으로 추천된 여행지에요!'
+					subText='성향을 기반으로 추천된 텀벙 코스에요!'
 				/>
 				<SvgContainer>
 					<SVGRegionRecommend

@@ -297,7 +297,7 @@ const NoProfileContainer = styled.View`
 	border-radius: 99px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${colors.selectButton};
+	background-color: ${colors.Primary};
 `;
 const SettingContainer = styled.View`
 	width: 100%;

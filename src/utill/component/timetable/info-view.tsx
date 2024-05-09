@@ -341,7 +341,7 @@ const InfoView = ({
 							idx: idx,
 					  });
 			}}
-			onLongPress={drag}
+			// onLongPress={drag}
 			marginBottom={heightPercentage(10)}
 			width={widthPercentage(282)}
 			height={heightPercentage(42)}></PrimaryButton>

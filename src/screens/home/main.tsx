@@ -164,7 +164,9 @@ export default function Main({navigation}: any) {
 		transit: any;
 		tendency: any;
 		travelName: any;
+		region: any;
 	}) => {
+		console.log(data.region.split(','));
 		dispatch(
 			travelSliceActions.setCache({
 				presetDatas: JSON.parse(data.preset),
@@ -174,13 +176,14 @@ export default function Main({navigation}: any) {
 				transit: Number(data.transit),
 				tendency: JSON.parse(data.tendency),
 				travelName: data.travelName,
+				region: data.region.split(','),
 			}),
 		);
 		navigation.navigate('Preset');
 	};
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'mainViewPager'});
 	const checkCache = async () => {
-		let [preset, presetTendency, day, nDay, transit, tendency, travelName] = await AsyncStorage.multiGet([
+		let [preset, presetTendency, day, nDay, transit, tendency, travelName, region] = await AsyncStorage.multiGet([
 			'preset',
 			'presetTendency',
 			'day',
@@ -188,6 +191,7 @@ export default function Main({navigation}: any) {
 			'transit',
 			'tendency',
 			'travelName',
+			'region',
 		]);
 		if (preset[1] != null) {
 			dispatch(
@@ -203,6 +207,7 @@ export default function Main({navigation}: any) {
 							transit: transit[1],
 							tendency: tendency[1],
 							travelName: travelName[1],
+							region: region[1],
 						}),
 					modalLeft: true,
 				}),

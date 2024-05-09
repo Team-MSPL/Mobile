@@ -21,9 +21,23 @@ import {WhiteContainer} from '../enroll-info/final-check';
 import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
+import {saveAI} from '../../redux/travel-info/travel.slice';
 export default function Preset({navigation}: any) {
-	const {nDay, presetDatas, tendency, presetTendencyList, day, transit, travelName, cityIndex, region} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		enoughPlace,
+		timeLimitArray,
+		nDay,
+		presetDatas,
+		tendency,
+		presetTendencyList,
+		day,
+		transit,
+		travelName,
+		cityIndex,
+		region,
+		aiFlag,
+		aiID,
+	} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const goDetail = (e: number) => {
@@ -57,16 +71,34 @@ export default function Preset({navigation}: any) {
 		});
 	}, []);
 	const saveCache = async () => {
-		const cacheValues: [string, string][] = [
-			['preset', JSON.stringify(presetDatas)],
-			['presetTendency', JSON.stringify(presetTendencyList)],
-			['day', JSON.stringify(day)],
-			['nDay', nDay.toString()],
-			['transit', transit.toString()],
-			['tendency', JSON.stringify(tendency)],
-			['travelName', travelName.toString()],
-		];
-		AsyncStorage.multiSet(cacheValues);
+		try {
+			let data = {
+				region: region,
+				day: day.slice(0, nDay + 1),
+				nDay: nDay + 1,
+				transit: transit,
+				timeLimitArray: timeLimitArray,
+				tendency: tendency,
+				preset: presetDatas,
+				enoughPlace: enoughPlace,
+				bestPointList: presetTendencyList,
+				travelName: travelName,
+			};
+			await dispatch(saveAI(data)).unwrap();
+			const cacheValues: [string, string][] = [
+				['preset', JSON.stringify(presetDatas)],
+				['presetTendency', JSON.stringify(presetTendencyList)],
+				['day', JSON.stringify(day.slice(0, nDay + 1))],
+				['nDay', nDay.toString()],
+				['transit', transit.toString()],
+				['tendency', JSON.stringify(tendency)],
+				['travelName', travelName.toString()],
+				['region', region.toString()],
+			];
+			AsyncStorage.multiSet(cacheValues);
+		} catch (err) {
+			console.log(err, '에러');
+		}
 	};
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'presetViewPager'});
 	useEffect(() => {
@@ -74,8 +106,8 @@ export default function Preset({navigation}: any) {
 	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		saveCache();
-	}, []);
+		!aiFlag && saveCache();
+	}, [aiFlag]);
 	return (
 		<BackgroundGray>
 			<ScrollView showsVerticalScrollIndicator={false}>

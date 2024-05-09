@@ -256,17 +256,13 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		setVisible(false);
 		const newY = viewRef.current.y;
 		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
-		console.log(newY, newEnd);
 		if (newEnd >= 49) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
 		} else {
-			let copy = [...timetable[viewRef.current.index]];
+			let copy = [...timetable[changeDay]];
 			let changeCopy = [...timetable];
 			let changeFlag = null;
-			console.log(copy);
-			//부터 가능
 			for (let i = 0; i < copy.length; i++) {
-				console.log(newEnd, newY, copy[i]?.y);
 				if (
 					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
 						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
@@ -295,12 +291,56 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				let deleteCopy = [...timetable[viewRef.current.index]];
 				deleteCopy.splice(viewRef.current.idx, 1);
 				changeCopy[viewRef.current.index] = deleteCopy;
-				let addCopy = [...changeCopy[viewRef.current.index]];
+				let addCopy = [...changeCopy[changeDay]];
 				addCopy.splice(changeInputIndex, 0, copyValue);
-				changeCopy[viewRef.current.index] = addCopy;
+				changeCopy[changeDay] = addCopy;
 				dispatch(travelSliceActions.changeTimetable(changeCopy));
 			}
 		}
+		// setVisible(false);
+		// const newY = viewRef.current.y;
+		// const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
+		// if (newEnd >= 49) {
+		// 	dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
+		// } else {
+		// 	let copy = [...timetable[viewRef.current.index]];
+		// 	let changeCopy = [...timetable];
+		// 	let changeFlag = null;
+		// 	for (let i = 0; i < copy.length; i++) {
+		// 		if (
+		// 			((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+		// 				(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+		// 					newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+		// 			copy[i].id != viewRef.current.id
+		// 		) {
+		// 			changeFlag = copy[i];
+		// 			break;
+		// 		}
+		// 	}
+		// 	let changeInputIndex = copy.findIndex(item => item.y >= newY);
+		// 	changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+		// 	if (changeFlag) {
+		// 		dispatch(
+		// 			modalSliceActions.setOpenModal({
+		// 				modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+		// 			}),
+		// 		);
+		// 	} else {
+		// 		let copyValue = {
+		// 			...changeCopy[viewRef.current.index][viewRef.current.idx],
+		// 			y: newY,
+		// 			x: viewRef.current.index,
+		// 			takenTime: (newEnd - newY) * 30,
+		// 		};
+		// 		let deleteCopy = [...timetable[viewRef.current.index]];
+		// 		deleteCopy.splice(viewRef.current.idx, 1);
+		// 		changeCopy[viewRef.current.index] = deleteCopy;
+		// 		let addCopy = [...changeCopy[viewRef.current.index]];
+		// 		addCopy.splice(changeInputIndex, 0, copyValue);
+		// 		changeCopy[viewRef.current.index] = addCopy;
+		// 		dispatch(travelSliceActions.changeTimetable(changeCopy));
+		// 	}
+		// }
 	};
 	let totalHeight = 0;
 	const presetScrollHeight = timetable.map((item, idx) => {
@@ -419,6 +459,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		copy[data[0].x] = data;
 		dispatch(travelSliceActions.changeTimetable(copy));
 	};
+	const [changeDay, setChangeDay] = useState(0);
 	const changeLocationRef = useRef({before: 0, after: 1});
 	useEffect(() => {
 		shareViewWithStartFlag && getMainViewPager();
@@ -546,29 +587,29 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							</HStack>
 						</WhiteContainer>
 					</HStack>
-					<DayScrollView
-						modify={modify}
-						ref={scrollRef}
-						// onScroll={e => {
-						// 	console.log('a');
-						// 	scrollhandle(e);
-						// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
-						onMomentumScrollEnd={e => {
-							changeViewState(e), scrollhandle(e);
-						}}>
-						{timetable.map(
-							(value, index) =>
-								value.length != 0 && (
-									<WhiteContainer width={widthPercentage(327)} key={index}>
-										<PretendardSemiBoldText
-											marginBottom={heightPercentage(10)}
-											size={14}
-											lineHeight={16.71}
-											color={colors.Gray5}>
-											{moment(day[index]).format('YY.MM.DD')} (
-											{weekdays[moment(day[index]).day()]})
-										</PretendardSemiBoldText>
-										{modify ? (
+					{modify ? (
+						<DayScrollView
+							ref={scrollRef}
+							// onScroll={e => {
+							// 	console.log('a');
+							// 	scrollhandle(e);
+							// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
+							onMomentumScrollEnd={e => {
+								changeViewState(e), scrollhandle(e);
+							}}>
+							{timetable.map(
+								(value, index) =>
+									value.length != 0 && (
+										<WhiteContainer width={widthPercentage(327)} key={index}>
+											<PretendardSemiBoldText
+												marginBottom={heightPercentage(10)}
+												size={14}
+												lineHeight={16.71}
+												color={colors.Gray5}>
+												{moment(day[index]).format('YY.MM.DD')} (
+												{weekdays[moment(day[index]).day()]})
+											</PretendardSemiBoldText>
+
 											<NestableDraggableFlatList
 												onPlaceholderIndexChange={qwe =>
 													(changeLocationRef.current.after = qwe)
@@ -579,8 +620,32 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												keyExtractor={item => item.id}
 												renderItem={renderItem}
 											/>
-										) : (
-											value.map((item, idx) =>
+										</WhiteContainer>
+									),
+							)}
+						</DayScrollView>
+					) : (
+						<DayScrollViews
+							ref={scrollRef}
+							onScroll={e => {
+								scrollhandle(e);
+							}}
+							onMomentumScrollEnd={e => {
+								changeViewState(e);
+							}}>
+							{timetable.map(
+								(value, index) =>
+									value.length != 0 && (
+										<WhiteContainer width={widthPercentage(327)} key={index}>
+											<PretendardSemiBoldText
+												marginBottom={heightPercentage(10)}
+												size={14}
+												lineHeight={16.71}
+												color={colors.Gray5}>
+												{moment(day[index]).format('YY.MM.DD')} (
+												{weekdays[moment(day[index]).day()]})
+											</PretendardSemiBoldText>
+											{value.map((item, idx) =>
 												!excludeNames.includes(item.name) ? (
 													<HStack gap={widthPercentage(10)} key={idx}>
 														<DashLineContainer justifyContent='start'>
@@ -689,12 +754,12 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 														</InsideGrayContainer>
 													</HStack>
 												),
-											)
-										)}
-									</WhiteContainer>
-								),
-						)}
-					</DayScrollView>
+											)}
+										</WhiteContainer>
+									),
+							)}
+						</DayScrollViews>
+					)}
 				</BackgroundGray>
 				{saveView && (
 					<AbsoluteButton onPress={goSave}>
@@ -719,7 +784,31 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									{categoryTitle[viewRef.current.category]}
 								</PretendardVariableText>
 							</HStack>
-							<HStack justifyContent='space-between'>
+							<FlexWrap gap={10} margintop={15}>
+								{timetable.map(
+									(item, idx) =>
+										item.length != 0 && (
+											<ChangeDayContainer
+												key={idx}
+												select={idx === changeDay}
+												onPress={() => {
+													setChangeDay(idx);
+												}}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={19}
+													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
+													{moment(day[idx]).format('MM월DD일')}
+												</PretendardSemiBoldText>
+												{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
+										<DaySubTitle select={idx === select}>
+											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+										</DaySubTitle> */}
+											</ChangeDayContainer>
+										),
+								)}
+							</FlexWrap>
+							<HStack justifyContent='space-between' marginVertical={5}>
 								<SelectContainer
 									onPress={() => {
 										setTimeView({status: !timeView.status, value: 'left'});
@@ -837,6 +926,15 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		</MainAllContainer>
 	);
 }
+const ChangeDayContainer = styled.TouchableOpacity<{select: boolean}>`
+	padding: ${heightPercentage(5)}px ${widthPercentage(10)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 99px;
+	border-width: ${props => (props.select ? '0px' : '1px')};
+	border-color: ${colors.Gray3};
+	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
+`;
 const AbsoluteButton = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(60)}px;
@@ -866,7 +964,7 @@ export const InfoModalContainer = styled.View`
 	bottom: 0px;
 	background-color: ${colors.backgroundGray};
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(309)}px;
+	height: ${heightPercentage(409)}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	padding: ${heightPercentage(23.22)}px ${widthPercentage(24)}px;
@@ -905,10 +1003,13 @@ export const DayElementContainer = styled.View`
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
-
-const DayScrollView = styled(NestableScrollContainer)<{modify: boolean}>`
+const DayScrollViews = styled.ScrollView`
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modify ? heightPercentage(500) : heightPercentage(230))}px;
+	height: ${heightPercentage(230)}px;
+`;
+const DayScrollView = styled(NestableScrollContainer)`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(500)}px;
 `;
 export const MarkerText = styled.Text`
 	position: absolute;

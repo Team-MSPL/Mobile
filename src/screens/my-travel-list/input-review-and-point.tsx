@@ -11,7 +11,7 @@ import {colors} from '../../utill/colors';
 import styled from 'styled-components/native';
 import {DiaryTextInput} from './input-diary';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
-import {ScrollView} from 'react-native';
+import {Keyboard, ScrollView} from 'react-native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function InputReviewAndPoint({navigation}: any) {
 	const {travelId, tendency} = useAppSelector(state => state.travelSlice);
@@ -97,7 +97,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 						<SvgStart
 							width={20}
 							height={20}
-							color={idx <= pointValue ? colors.selectButton : colors.emptyStart}
+							color={idx <= pointValue ? colors.Primary : colors.emptyStart}
 						/>
 					</RatingElement>
 				))}
@@ -131,7 +131,7 @@ export default function InputReviewAndPoint({navigation}: any) {
 											height={20}
 											color={
 												inex <= tedencyPointList[index][iindex]
-													? colors.selectButton
+													? colors.Primary
 													: colors.emptyStart
 											}
 										/>

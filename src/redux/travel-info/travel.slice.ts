@@ -73,6 +73,10 @@ const initialState: LiteState = {
 	shareLoginFlag: false,
 	shareViewWithStartFlag: false,
 	regionInfo: {name: '', photo: ''},
+	enoughPlace: false,
+	aiID: '',
+	aiList: [],
+	aiFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -250,6 +254,16 @@ export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: an
 		throw rejectWithValue(error.code);
 	}
 });
+//ai 임시 결과 목록 가져오기
+export const getAiList = createAsyncThunk('/place/placeInfo', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/ai/aiList`);
+		console.log(response.data);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 
 //카카오 식당,카페 등 추천 장소 얻는 거
 export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
@@ -278,6 +292,27 @@ export const reCourseName = createAsyncThunk(
 	},
 );
 
+//ai 결과 임시 저장하기
+export const saveAI = createAsyncThunk('/ai/saveAI', async (data: saveAiType, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/ai/saveAI`, data);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//ai 결과 임시 삭제하기
+export const deleteAI = createAsyncThunk('/ai/deleteAI', async (data: {aiId: string}, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.delete(`/ai/deleteAI`, {data});
+		console.log(response.data, data);
+		return response.data;
+	} catch (error: any) {
+		console.log(error);
+		throw rejectWithValue(error.code);
+	}
+});
 //관광지 리뷰 등록
 export const savePlaceReview = createAsyncThunk(
 	'/place/savePlaceReview',
@@ -460,6 +495,7 @@ export const travelSlice = createSlice({
 			state.presetDatas = payload;
 		},
 		setCache: (state, {payload}) => {
+			console.log(payload?.aiID ?? '');
 			state.presetDatas = payload.presetDatas;
 			state.presetTendencyList = payload.presetTendency;
 			state.makeMode = 'recommend';
@@ -470,6 +506,10 @@ export const travelSlice = createSlice({
 			state.transit = payload.transit;
 			state.tendency = payload.tendency;
 			state.travelName = payload.travelName;
+			state.region = payload.region;
+			state.aiID = payload?.aiID ?? '';
+			state.aiFlag = true;
+			state.shareViewWithStartFlag = true;
 		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = payload;
@@ -680,6 +720,7 @@ export const travelSlice = createSlice({
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
 			state.presetTendencyList = payload.data.bestPointList;
 			state.presetDatas = payload.data.resultData;
+			state.enoughPlace = payload.data.enoughPlace;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
 			state.myTravelList = payload;
@@ -707,10 +748,19 @@ export const travelSlice = createSlice({
 			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
 		});
+		builder.addCase(saveAI.fulfilled, (state, {payload}) => {
+			console.log('저장이요', payload);
+			state.aiID = payload.aiId;
+			//state.myTravelList = payload;
+		});
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
 			console.log('왜 여기옴 ㅋㅋㅋ');
 			state.regionInfo.name = payload.name;
 			state.regionInfo.photo = payload.photo;
+		});
+		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
+			console.log('왜 여기옴 ㅋㅋㅋ');
+			state.aiList = payload.data;
 		});
 	},
 });
@@ -761,6 +811,22 @@ interface LiteState {
 	shareLoginFlag: boolean;
 	shareViewWithStartFlag: boolean;
 	regionInfo: regionInfoType;
+	enoughPlace: boolean;
+	aiID: string;
+	aiList: aiListType[];
+	aiFlag: boolean;
+}
+interface aiListType {
+	_id: string;
+	bestPointList: [[Object], [Object], [Object], [Object], [Object], [Object], [Object]];
+	day: string[];
+	nDay: number;
+	preset: TimetableType[][][];
+	region: string[];
+	tendency: number[][];
+	timeLimitArray: number[];
+	transit: number;
+	userId: string;
 }
 interface regionInfoType {
 	name: string;
@@ -873,6 +939,18 @@ export interface RecommendList {
 	y: number;
 }
 
+interface saveAiType {
+	region: string[];
+	day: string[];
+	nDay: number;
+	transit: number;
+	timeLimitArray: number[];
+	tendency: number[][];
+	preset: TimetableType[][][];
+	enoughPlace: boolean;
+	bestPointList: presetTendencyListType[];
+	travelName: string;
+}
 interface travelAiType {
 	regionList: string[];
 	accomodationList: PlaceType[];

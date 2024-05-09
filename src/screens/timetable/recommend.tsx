@@ -215,10 +215,6 @@ export default function Recommend({navigation, route}: any) {
 				{markers}
 				{polylines}
 			</MapView>
-			{/* <KakaoMapInfoView>
-				<SVGHelp color={colors.selectButton} width={15} height={15} />
-				<KakaoMapInfoText>앞, 뒤 관광지를 바탕으로한 카카오맵 추천 순서입니다.</KakaoMapInfoText>
-			</KakaoMapInfoView> */}
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
@@ -309,10 +305,6 @@ const ImageContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-const DistanceText = styled.Text<{color: string}>`
-	font-size: ${devicesWidth * 0.03}px;
-	color: ${props => props.color};
-`;
 const RecommendContainer = styled.View`
 	flex: 1;
 	background-color: ${colors.main};
@@ -343,21 +335,4 @@ const ListHStack = styled(HStack)<{color: string}>`
 const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
 	width: 65%;
 	padding: 3px;
-`;
-const CategoryText = styled(RecommendElementText)`
-	font-size: 14px;
-	font-weight: 500;
-`;
-const KakaoMapInfoView = styled.View`
-	flex-direction: row;
-	width: 100%;
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-`;
-const KakaoMapInfoText = styled.Text`
-	font-size: 13px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0px 0px 0px 5px;
 `;

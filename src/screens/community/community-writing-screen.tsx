@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {SafeAreaView, TouchableOpacity} from 'react-native';
+import {Keyboard, SafeAreaView, TouchableOpacity} from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
@@ -69,10 +69,11 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 				};
 				let postId = await dispatch(savePost(data)).unwrap();
-				diaryImageRef.current = [];
+				diaryImageRef.current = Array(postData.postImage.length).fill('');
 				const ImageFunction = postData.postImage.map(async (item, idx) => {
 					let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
-					diaryImageRef.current.push(data);
+					diaryImageRef.current[idx] = data;
+					console.log('데타', data);
 				});
 				await Promise.all(ImageFunction);
 				const uploadData = {
@@ -83,10 +84,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				};
 				await dispatch(updatePost(uploadData));
 			} else {
-				diaryImageRef.current = [];
+				diaryImageRef.current = Array(postData.postImage.length).fill('');
 				const ImageFunction = postData.postImage.map(async (item, idx) => {
 					let data = (await uploadImage({item: item, idx: idx, id: postData._id, category: 'post'})) ?? '';
-					diaryImageRef.current.push(data);
+					diaryImageRef.current[idx] = data;
 				});
 				await Promise.all(ImageFunction);
 				const data = {
@@ -138,7 +139,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				</TouchableOpacity>
 			),
 		});
-	}, [postData.postTitle, postData.postContent]);
+	}, [postData.postTitle, postData.postContent, postData.postImage]);
+	const asd = () => {
+		console.log('qwe');
+	};
 	return (
 		<SafeAreaView style={{flex: 1}}>
 			<Container>
@@ -149,6 +153,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						value={postData.postTitle}
 						onChangeText={changeTitle}
 						multiline={true}
+						blurOnSubmit={true}
 					/>
 					<ContentInput
 						placeholder={`내용을 입력하세요\n 부적절하거나 불쾌감을 줄 수 있는 컨텐츠는 제재를 받을 수 있습니다.`}
@@ -156,6 +161,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						value={postData.postContent}
 						onChangeText={changeContent}
 						multiline={true}
+						blurOnSubmit={true}
 					/>
 					{postData.postImage.length > 0 && (
 						<ImageScrollViewContainer horizontal={true}>

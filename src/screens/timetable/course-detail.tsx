@@ -88,7 +88,6 @@ export default function CourseDetail({navigation, route}: any) {
 					photo: data.photo,
 				});
 			} else {
-				console.log(data.reviews);
 				setCourseDetail({
 					status: 'google',
 					name: data.name,

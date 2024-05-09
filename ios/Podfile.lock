@@ -1432,35 +1432,10 @@ PODS:
     - TOCropViewController
   - RNPermissions (3.10.0):
     - React-Core
-  - RNReanimated (3.4.2):
-    - DoubleConversion
-    - FBLazyVector
-    - glog
-    - hermes-engine
-    - RCT-Folly
-    - RCTRequired
-    - RCTTypeSafety
-    - React-callinvoker
+  - RNReanimated (3.9.0):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
-    - React-Core/DevSupport
-    - React-Core/RCTWebSocket
-    - React-CoreModules
-    - React-cxxreact
-    - React-hermes
-    - React-jsi
-    - React-jsiexecutor
-    - React-jsinspector
-    - React-RCTActionSheet
-    - React-RCTAnimation
-    - React-RCTAppDelegate
-    - React-RCTBlob
-    - React-RCTImage
-    - React-RCTLinking
-    - React-RCTNetwork
-    - React-RCTSettings
-    - React-RCTText
     - ReactCommon/turbomodule/core
-    - Yoga
   - RNScreens (3.24.0):
     - React-Core
     - React-RCTImage
@@ -1874,7 +1849,7 @@ SPEC CHECKSUMS:
   RNIap: 99a559a3642155b47aa0622f9693632010a0b4f7
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
   RNPermissions: c89a21801693a728fec0adbfe8084381bb73e7ec
-  RNReanimated: 726395a2fa2f04cea340274ba57a4e659bc0d9c1
+  RNReanimated: 65ea8b9347cf9d2f16402355aae86e35d6905385
   RNScreens: b21dc57dfa2b710c30ec600786a3fc223b1b92e7
   RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
   RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9

@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {BackHandler, TextInput} from 'react-native';
+import {BackHandler, Keyboard, TextInput} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -67,10 +67,10 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			dispatch(LoadingSliceActions.onLoading());
 			const textData = {updateTravelName: text, travelId: travelId};
 			await dispatch(reCourseName(textData));
-			diaryImageRef.current = [];
+			diaryImageRef.current = Array(pictureValue.length).fill('');
 			const ImageFunction = pictureValue.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: travelId, category: 'diary'})) ?? '';
-				diaryImageRef.current.push(data);
+				diaryImageRef.current[idx] = data;
 			});
 			await Promise.all(ImageFunction);
 			const data = {travelId: travelId, diary: diaryValue, picture: diaryImageRef.current};
@@ -110,10 +110,10 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 			};
 			let postId = await dispatch(savePost(data)).unwrap();
-			diaryImageRef.current = [];
+			diaryImageRef.current = Array(pictureValue.length).fill('');
 			const ImageFunction = pictureValue.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
-				diaryImageRef.current.push(data);
+				diaryImageRef.current[idx] = data;
 			});
 			await Promise.all(ImageFunction);
 			const uploadData = {
@@ -222,6 +222,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					lineHeight: fontPercentage(21),
 				}}
 				placeholder='여행 일기로 추억을 기록해보세요'
+				blurOnSubmit={true}
 				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
 			{/* {!modify ? (
 				<InsideGray

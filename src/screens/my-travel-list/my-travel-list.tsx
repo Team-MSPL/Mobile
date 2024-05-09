@@ -1,7 +1,13 @@
 import {useCallback, useRef} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	deleteAI,
+	getAiList,
+	getMyTravelList,
+	getOneTravelCourse,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import 'moment/locale/ko';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -20,7 +26,7 @@ import PrimaryButton from '../../utill/component/primary-button';
 import CustomButton from '../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 export default function MyTravelList({navigation}: any) {
-	const {myTravelList, selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 
 	const dispatch = useAppDispatch();
 	const goMyTravelDetail = async (e: any) => {
@@ -51,6 +57,7 @@ export default function MyTravelList({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const data = await dispatch(getMyTravelList()).unwrap();
+			await dispatch(getAiList());
 		} catch (err) {
 			dispatch(travelSliceActions.setMyTravelList([]));
 		} finally {
@@ -63,7 +70,7 @@ export default function MyTravelList({navigation}: any) {
 			getTravelList();
 		}, []),
 	);
-	const checkGoEnroll = () => {
+	const checkGoEnroll = async () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '생각 중인 여행 지역이 있으신가요?',
@@ -116,12 +123,73 @@ export default function MyTravelList({navigation}: any) {
 		let data = {result: result, endFlag: endFlag};
 		return data;
 	};
+	const goPreset = (data: any) => {
+		dispatch(
+			travelSliceActions.setCache({
+				presetDatas: data.preset,
+				presetTendency: data.bestPointList,
+				day: data.day,
+				nDay: data.nDay - 1,
+				transit: data.transit,
+				tendency: data.tendency,
+				travelName: data.travelName ?? '임시여행',
+				aiID: data._id,
+				region: data.region,
+			}),
+		);
+		navigation.navigate('Preset');
+	};
 	const monthRef = useRef(moment().add(1, 'month').format('MM'));
 	const renderItem = (item: any) => {
 		let after = monthRef.current;
 		monthRef.current = moment(item.item.day[0]).format('MM');
 		return (
 			<>
+				{item.index == 0 && aiList.length != 0 && (
+					<>
+						<DivideDayContainer>
+							<PretendardVariableText
+								size={12}
+								lineHeight={18}
+								color={colors.Gray2}
+								marginTop={heightPercentage(30)}>
+								코스 미확정
+							</PretendardVariableText>
+						</DivideDayContainer>
+						{aiList.map((data, idx) => (
+							<MyTravelContainer
+								key={idx}
+								onPress={() => {
+									goPreset(data);
+								}}>
+								<VStack>
+									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+										{moment(data.day[0]).format('YYYY년-MM월-DD일') +
+											'~' +
+											moment(data.day[data.nDay - 1]).format('MM월-DD일')}
+									</PretendardVariableText>
+									<PretendardVariableText
+										size={14}
+										lineHeight={21}
+										color={colors.Gray5}
+										marginTop={2}>
+										여행 코스를 선택하고{`\n`}편집하여 여행 계획을 완성해보세요!
+									</PretendardVariableText>
+
+									<TagContainer
+										backgroundColor={colors.backgroundGray}
+										height={heightPercentage(30)}
+										width={widthPercentage(105)}>
+										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+											{data.region[0]}
+										</PretendardVariableText>
+										<SVGFlag width={10} color={colors.Primary} />
+									</TagContainer>
+								</VStack>
+							</MyTravelContainer>
+						))}
+					</>
+				)}
 				{monthRef.current != after && (
 					<DivideDayContainer>
 						<PretendardVariableText
@@ -155,11 +223,11 @@ export default function MyTravelList({navigation}: any) {
 						<TagContainer
 							backgroundColor={colors.backgroundGray}
 							height={heightPercentage(30)}
-							width={widthPercentage(99)}>
+							width={widthPercentage(105)}>
 							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 								{item.item.region[0]}
 							</PretendardVariableText>
-							<SVGFlag color={colors.Primary} />
+							<SVGFlag width={10} color={colors.Primary} />
 						</TagContainer>
 					</VStack>
 				</MyTravelContainer>

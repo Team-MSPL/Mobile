@@ -55,10 +55,10 @@ export function CourseReview({navigation, route}: any) {
 			const randomId = shortId.generate();
 			// id 체크해서 변경 후에 파이어베이스 업로드 확인하기
 			console.log(randomId);
-			diaryImageRef.current = [];
+			diaryImageRef.current = Array(reviewImage.length).fill('');
 			const ImageFunction = reviewImage.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: randomId, category: 'review'})) ?? '';
-				diaryImageRef.current.push(data);
+				diaryImageRef.current[idx] = data;
 			});
 			await Promise.all(ImageFunction);
 			let data = {
@@ -99,6 +99,7 @@ export function CourseReview({navigation, route}: any) {
 			<ReviewPressable showsVerticalScrollIndicator={false}>
 				<ReviewInput
 					onChangeText={e => changeText(e)}
+					blurOnSubmit={true}
 					placeholder='방문했던 곳에 대해 이야기해주세요.'
 					multiline={true}
 					placeholderTextColor={colors.Gray2}

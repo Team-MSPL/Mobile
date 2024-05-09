@@ -385,29 +385,21 @@ export default function Timetable({navigation, route}: any) {
 									)}
 								</>
 							) : (
-								shareViewWithStartFlag && (
-									<>
-										<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
-											<PretendardVariableText
-												size={16}
-												lineHeight={24}
-												color={colors.PointGreen1}>
-												삭제
-											</PretendardVariableText>
-										</TouchableOpacity>
-										<TouchableOpacity
-											onPress={() => {
-												setModify(!modify);
-											}}>
-											<PretendardVariableText
-												size={16}
-												lineHeight={24}
-												color={colors.PointYellow}>
-												{modify ? '취소' : '편집'}
-											</PretendardVariableText>
-										</TouchableOpacity>
-									</>
-								)
+								<>
+									<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+										<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+											삭제
+										</PretendardVariableText>
+									</TouchableOpacity>
+									<TouchableOpacity
+										onPress={() => {
+											setModify(!modify);
+										}}>
+										<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+											{modify ? '취소' : '편집'}
+										</PretendardVariableText>
+									</TouchableOpacity>
+								</>
 							)}
 						</>
 					)}

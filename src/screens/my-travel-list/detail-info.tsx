@@ -7,7 +7,7 @@ import {
 	reCourseName,
 	travelSliceActions,
 } from '../../redux/travel-info/travel.slice';
-import {Modal, Platform, Touchable, TouchableOpacity} from 'react-native';
+import {Keyboard, Modal, Platform, Touchable, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
