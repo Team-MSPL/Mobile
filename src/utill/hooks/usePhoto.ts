@@ -29,7 +29,7 @@ export const usePhoto = () => {
 			maxFiles: 5,
 			mediaType: 'photo',
 			croppingQuality: 0.6,
-			compressImageQuality: 0.3,
+			compressImageQuality: 0.25,
 			cropping: true,
 			//includeBase64: true,
 		})

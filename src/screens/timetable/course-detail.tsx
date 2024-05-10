@@ -112,7 +112,7 @@ export default function CourseDetail({navigation, route}: any) {
 			}
 			//setCourseDetail(a);
 		} catch (err) {
-			console.log('이유', err);
+			console.log('이유q', err);
 			// dispatch(
 			// 	modalSliceActions.setOpenModal({
 			// 		modalTitle: '여행 정보가 없습니다',

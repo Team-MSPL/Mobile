@@ -27,7 +27,7 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 export default function Main({navigation}: any) {
 	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
-	const {selectStartDate, shareLoginFlag} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);

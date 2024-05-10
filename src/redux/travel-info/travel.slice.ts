@@ -256,10 +256,10 @@ export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: an
 	}
 });
 //ai 임시 결과 목록 가져오기
-export const getAiList = createAsyncThunk('/place/placeInfo', async (_, {rejectWithValue}) => {
+export const getAiList = createAsyncThunk('/ai/aiList', async (_, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(`/ai/aiList`);
-		console.log(response.data);
+		console.log('에에ㅔ', response.data);
 		return response;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -761,7 +761,7 @@ export const travelSlice = createSlice({
 			state.regionInfo.photo = payload.photo;
 		});
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
-			console.log('왜 여기옴 ㅋㅋㅋ');
+			console.log('왜 여기옴 ㅋㅋddㅋ', payload.data);
 			state.aiList = payload.data;
 		});
 	},

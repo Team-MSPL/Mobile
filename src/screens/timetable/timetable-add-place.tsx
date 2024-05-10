@@ -137,9 +137,49 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		if (timeView.value == 'left') {
 			viewRef.current.y =
 				(parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0) - 6) * 2 + parseInt(timeData.minute) / 30;
+			switch (viewRef.current.y) {
+				case 34:
+					viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
+					viewRef.current.endMinute = 30;
+					break;
+				case 35:
+					viewRef.current.y = viewRef.current.y - 1;
+					viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
+					viewRef.current.endMinute = 30;
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '23시 30분 이후는 선택이 불가능합니다.',
+							modalSubTitle: '23시로 자동조정됩니다.',
+							modalSingleUse: true,
+						}),
+					);
+					setTimeView({status: false, value: 'left'});
+					break;
+				default:
+					viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0) + 1;
+					viewRef.current.endMinute = parseInt(timeData.minute);
+			}
 		} else {
 			viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
 			viewRef.current.endMinute = parseInt(timeData.minute);
+			console.log(viewRef.current.endHours);
+			if (viewRef.current.endHours == 0) {
+				if (viewRef.current.endMinute == 0) {
+					viewRef.current.endMinute = 30;
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '0시 30분 이후부터 선택이 가능합니다.',
+							modalSubTitle: '0시 30분으로 자동조정됩니다.',
+							modalSingleUse: true,
+						}),
+					);
+
+					setTimeView({status: false, value: 'right'});
+				}
+				viewRef.current.y = -12;
+			} else if (viewRef.current.y >= (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30) {
+				viewRef.current.y = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30 - 2;
+			}
 		}
 		seA(qw + 1);
 		return true;
@@ -231,10 +271,8 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	const addTimetable = () => {
 		const newCurrentY = viewRef.current.y;
 		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
-		// console.log(newEnd, newCurrentY);
 		let changeFlag = null;
 		let checkTimetalbe = [...timetable[route.params.x]];
-		//부터 가능
 		for (let i = 0; i < checkTimetalbe.length; i++) {
 			console.log(newEnd, newCurrentY, checkTimetalbe[i]?.y);
 			if (

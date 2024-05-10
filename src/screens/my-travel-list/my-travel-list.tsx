@@ -56,8 +56,8 @@ export default function MyTravelList({navigation}: any) {
 	const getTravelList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = await dispatch(getMyTravelList()).unwrap();
 			await dispatch(getAiList());
+			const data = await dispatch(getMyTravelList()).unwrap();
 		} catch (err) {
 			dispatch(travelSliceActions.setMyTravelList([]));
 		} finally {
@@ -156,7 +156,7 @@ export default function MyTravelList({navigation}: any) {
 								코스 미확정
 							</PretendardVariableText>
 						</DivideDayContainer>
-						{aiList.map((data, idx) => (
+						{aiList?.map((data, idx) => (
 							<MyTravelContainer
 								key={idx}
 								onPress={() => {

@@ -60,6 +60,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	// * 게시글 등록
 	const handlePostSubmit = async () => {
 		try {
+			Keyboard.dismiss();
 			dispatch(LoadingSliceActions.onLoading());
 			if (route.params.isNewPost) {
 				const data = {
