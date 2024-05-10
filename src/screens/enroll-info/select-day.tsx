@@ -18,8 +18,16 @@ import {ButtonContainer} from './select-multi';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
-	const {Place, timeLimitArray, minuteLimitArray, accommodations, selectStartDate, selectEndDate, freeTicket} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		Place,
+		timeLimitArray,
+		minuteLimitArray,
+		accommodations,
+		selectStartDate,
+		selectEndDate,
+		freeTicket,
+		selectedDateFlag,
+	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -199,8 +207,10 @@ export default function SelectDay({navigation}: any) {
 					selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
 					selectedRangeEndStyle={{backgroundColor: colors.Primary}}
 					selectedDayColor={colors.Primary}
-					selectedStartDate={freeTicket ? selectStartDate.toDate() : undefined}
-					selectedEndDate={freeTicket && selectEndDate != null ? selectEndDate.toDate() : undefined}
+					selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
+					selectedEndDate={
+						(selectedDateFlag || freeTicket) && selectEndDate != null ? selectEndDate.toDate() : undefined
+					}
 					previousTitle='이전'
 					nextTitle='다음'
 					previousTitleStyle={{color: 'black'}}

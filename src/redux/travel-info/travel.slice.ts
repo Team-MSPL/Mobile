@@ -77,6 +77,7 @@ const initialState: LiteState = {
 	aiID: '',
 	aiList: [],
 	aiFlag: false,
+	selecedtDateFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -477,6 +478,7 @@ export const travelSlice = createSlice({
 		},
 		enrollSelectStartDate: (state, {payload}) => {
 			state.selectStartDate = payload;
+			state.selectedDateFlag = true;
 		},
 		enrollSelectEndDate: (state, {payload}) => {
 			state.selectEndDate = payload;
@@ -815,6 +817,7 @@ interface LiteState {
 	aiID: string;
 	aiList: aiListType[];
 	aiFlag: boolean;
+	selectedDateFlag: boolean;
 }
 interface aiListType {
 	_id: string;
