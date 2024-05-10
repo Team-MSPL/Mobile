@@ -164,9 +164,9 @@ export default function MyTravelList({navigation}: any) {
 								}}>
 								<VStack>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-										{moment(data.day[0]).format('YYYY년-MM월-DD일') +
-											'~' +
-											moment(data.day[data.nDay - 1]).format('MM월-DD일')}
+										{moment(data.day[0]).format('YYYY년 MM월 DD일') +
+											' ~ ' +
+											moment(data.day[data.nDay - 1]).format('MM월 DD일')}
 									</PretendardVariableText>
 									<PretendardVariableText
 										size={14}
@@ -183,7 +183,7 @@ export default function MyTravelList({navigation}: any) {
 										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 											{data.region[0]}
 										</PretendardVariableText>
-										<SVGFlag width={10} color={colors.Primary} />
+										<SVGFlag width={12} color={colors.Primary} />
 									</TagContainer>
 								</VStack>
 							</MyTravelContainer>
@@ -207,9 +207,9 @@ export default function MyTravelList({navigation}: any) {
 					}}>
 					<VStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-							{moment(item.item.day[0]).format('YYYY년-MM월-DD일') +
-								'~' +
-								moment(item.item.day[item.item.nDay - 1]).format('MM월-DD일')}
+							{moment(item.item.day[0]).format('YYYY년 MM월 DD일') +
+								' ~ ' +
+								moment(item.item.day[item.item.nDay - 1]).format('MM월 DD일')}
 						</PretendardVariableText>
 						<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
 							{item.item.travelName}
@@ -227,7 +227,7 @@ export default function MyTravelList({navigation}: any) {
 							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 								{item.item.region[0]}
 							</PretendardVariableText>
-							<SVGFlag width={10} color={colors.Primary} />
+							<SVGFlag width={12} color={colors.Primary} />
 						</TagContainer>
 					</VStack>
 				</MyTravelContainer>

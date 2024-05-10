@@ -21,7 +21,7 @@ import {WhiteContainer} from '../enroll-info/final-check';
 import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
-import {saveAI} from '../../redux/travel-info/travel.slice';
+import {deleteAI, saveAI} from '../../redux/travel-info/travel.slice';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -43,6 +43,34 @@ export default function Preset({navigation}: any) {
 	const goDetail = (e: number) => {
 		navigation.navigate('PresetDetail', {index: e});
 	};
+	const checkDelete = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '이 여행 코스들을 삭제할까요?',
+				modalSubTitle: '여행 코스를 삭제하면 되돌릴 수 없습니다.',
+				modalFunction: handleDeleteAi,
+				modalLeft: true,
+				modalTopText: '삭제할래요',
+				modalBottomText: '취소',
+			}),
+		);
+	};
+	const handleDeleteAi = async () => {
+		try {
+			await dispatch(deleteAI({aiId: aiID}));
+			navigation.goBack();
+		} catch (e) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '네트워크 연결이 불안정합니다.',
+					modalSubTitle: '확인 후 다시 시도해주세요.',
+					modalFunction: () => {},
+					modalLeft: true,
+					modalSingleUse: true,
+				}),
+			);
+		}
+	};
 	const [tendencyViewIndex, setTendencyViewIndex] = useState<boolean[]>(Array(presetDatas.length).fill(true));
 	useEffect(() => {
 		navigation.setOptions({
@@ -51,7 +79,7 @@ export default function Preset({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로 이동시 지역추천이 종료됩니다.',
+								modalTitle: '홈으로 이동시 코스 추천이 종료됩니다.',
 								modalSubTitle: '그래도 나가시겠습니까?\n변경 사항이 있다면 저장하기 버튼을 눌러주세요.',
 								modalFunction: () => {
 									navigation.popToTop();
@@ -68,8 +96,16 @@ export default function Preset({navigation}: any) {
 					/>
 				</TouchableOpacity>
 			),
+			headerRight: () =>
+				aiFlag && (
+					<TouchableOpacity onPress={checkDelete} style={{justifyContent: 'center'}}>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+							삭제
+						</PretendardVariableText>
+					</TouchableOpacity>
+				),
 		});
-	}, []);
+	}, [aiFlag]);
 	const saveCache = async () => {
 		try {
 			let data = {
