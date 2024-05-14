@@ -435,17 +435,15 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					</HStack>
 				) : (
 					<HStack>
-						<InsideGrayContainer backgroundColor={colors.backgroundWhite}>
-							<InfoView
-								navigation={navigation}
-								test={item}
-								index={idx}
-								idx={item.x}
-								modify={false}
-								CancelModify={CancelModify}
-								drag={drag}
-							/>
-						</InsideGrayContainer>
+						<InfoView
+							navigation={navigation}
+							test={item}
+							index={idx}
+							idx={item.x}
+							modify={false}
+							CancelModify={CancelModify}
+							drag={drag}
+						/>
 					</HStack>
 				)}
 			</ScaleDecorator>
@@ -600,8 +598,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							{timetable.map(
 								(value, index) =>
 									value.length != 0 && (
-										<WhiteContainer width={widthPercentage(327)} key={index}>
+										<WhiteContainer width={widthPercentage(327)} key={index} alignItems='center'>
 											<PretendardSemiBoldText
+												style={{alignSelf: 'flex-start'}}
 												marginBottom={heightPercentage(10)}
 												size={14}
 												lineHeight={16.71}

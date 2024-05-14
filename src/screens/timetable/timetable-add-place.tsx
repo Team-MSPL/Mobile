@@ -303,9 +303,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				takenTime: (newEnd - newCurrentY) * 30,
 			};
 			newY.current = timetable[route.params.x].findIndex(item => item?.y > newCurrentY);
+			console.log(newCurrentY, newY.current);
 			let copy = [...timetable];
 			let xArrayCopy = [...copy[route.params.x]];
-			xArrayCopy.splice(newY.current, 0, updateItem);
+			xArrayCopy.splice((newY.current = -1 ? timetable[route.params.x].length : newY.current), 0, updateItem);
 			copy[route.params.x] = xArrayCopy;
 			dispatch(travelSliceActions.changeTimetable(copy));
 			navigation.goBack();

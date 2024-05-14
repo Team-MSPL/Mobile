@@ -508,11 +508,11 @@ const SvgContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-export const WhiteContainer = styled.View<{width?: number; justifyContent?: string}>`
+export const WhiteContainer = styled.View<{width?: number; justifyContent?: string; alignItems?: string}>`
 	width: ${props => props.width + 'px' ?? '100%'};
 	background-color: ${colors.backgroundWhite};
 	border-radius: 8px;
-	align-items: flex-start;
+	align-items: ${props => props.alignItems ?? 'flex-start'};
 	justify-content: ${props => props.justifyContent ?? 'center'};
 	padding: ${heightPercentage(8)}px ${widthPercentage(10)}px;
 	gap: ${widthPercentage(3)}px;
