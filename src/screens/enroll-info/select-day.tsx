@@ -8,7 +8,7 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Pressable} from 'react-native';
+import {Platform, Pressable} from 'react-native';
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -146,9 +146,9 @@ export default function SelectDay({navigation}: any) {
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='언제 떠나시나요?'
 				subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
-			<TimeContainer>
+			<TimeContainer zIndexs={Platform.OS == 'ios' ? true : false}>
 				{DaySelectInfoList.map((item, idx) => (
-					<TimeItemContainer key={idx}>
+					<TimeItemContainer key={idx} zIndexs={Platform.OS == 'ios' ? true : false}>
 						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
 							{item.step}
 						</PretendardSemiBoldText>
@@ -247,13 +247,15 @@ export const SelectContainer = styled.Pressable<{backgroundColor?: string}>`
 	justify-content: center;
 	margin-bottom: ${heightPercentage(6)}px;
 `;
-export const TimeContainer = styled.View`
+export const TimeContainer = styled.View<{zIndexs?: boolean}>`
 	flex-direction: row;
 	margin-top: ${heightPercentage(10)}px;
+	${props => props.zIndexs && 'z-index:4'};
 `;
-export const TimeItemContainer = styled.View`
+export const TimeItemContainer = styled.View<{zIndexs?: boolean}>`
 	width: 50%;
 	gap: ${heightPercentage(5)}px;
+	${props => props.zIndexs && 'z-index:4'};
 `;
 export const TimeItemText = styled.Text`
 	font-size: 15px;

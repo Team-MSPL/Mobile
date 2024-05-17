@@ -387,7 +387,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			});
 		}
 	};
-	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'timetableViewPager'});
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({
+		title: modify ? 'modifyViewPager' : 'timetableViewPager',
+	});
 	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
 		let idx = getIndex() ?? 0;
 		return (
@@ -460,8 +462,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const [changeDay, setChangeDay] = useState(0);
 	const changeLocationRef = useRef({before: 0, after: 1});
 	useEffect(() => {
+		console.log('옴', shareViewWithStartFlag);
 		shareViewWithStartFlag && getMainViewPager();
-	}, [shareViewWithStartFlag]);
+	}, [shareViewWithStartFlag, modify]);
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
@@ -920,7 +923,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={3} handleFunction={deleteMainViewPager} />
+				<ViewPager sliceNumber={modify ? 4 : 3} handleFunction={deleteMainViewPager} />
 			</Modal>
 		</MainAllContainer>
 	);

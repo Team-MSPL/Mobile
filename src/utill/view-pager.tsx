@@ -21,6 +21,7 @@ export default function ViewPager({
 		{imagePath: require('../../public/viewPager/preset.png')},
 		{imagePath: require('../../public/viewPager/timetable.png')},
 		{imagePath: require('../../public/viewPager/afterTravel.png')},
+		{imagePath: require('../../public/viewPager/modify.png')},
 	]);
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
