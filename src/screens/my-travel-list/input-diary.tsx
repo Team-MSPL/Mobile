@@ -4,7 +4,7 @@ import {BackHandler, Keyboard, TextInput} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {reCourseName, updateDiary} from '../../redux/travel-info/travel.slice';
+import {reCourseName, travelSliceActions, updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
@@ -28,7 +28,8 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 	const [pictureValue, setpictureValue] = useState<string[]>(picture);
 	const changeDiary = (e: string) => {
 		!saveCheck && setSaveCheck(true);
-		setDiaryValue(e);
+		dispatch(travelSliceActions.enrollReviewDiary(e));
+		// setDiaryValue(e);
 	};
 
 	useEffect(() => {
@@ -39,13 +40,13 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 						modalTitle: '저장이 필요합니다. ',
 						modalSubTitle: '변경사항이 저장되지않았습니다. 나가시겠습니까?',
 						modalTopText: '수정계속하기',
-						modalBottomText: '나가기',
+						modalBottomText: '그냥 나가기',
 						modalLeft: true,
 						modalBottomFunctionUse: true,
 						modalBottomFunction: () => {
 							navigation.goBack();
 						},
-						modalFunction: () => {},
+						modalFunction: goSaveDiary,
 					}),
 				);
 
@@ -56,7 +57,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
 		return () => backHandler.remove();
-	}, [saveCheck]);
+	}, [saveCheck, text, picture, diary]);
 	const handleBuntton = () => {
 		modify ? setModify(false) : goSaveDiary();
 	};
@@ -67,13 +68,13 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			dispatch(LoadingSliceActions.onLoading());
 			const textData = {updateTravelName: text, travelId: travelId};
 			await dispatch(reCourseName(textData));
-			diaryImageRef.current = Array(pictureValue.length).fill('');
-			const ImageFunction = pictureValue.map(async (item, idx) => {
+			diaryImageRef.current = Array(picture.length).fill('');
+			const ImageFunction = picture.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: travelId, category: 'diary'})) ?? '';
 				diaryImageRef.current[idx] = data;
 			});
 			await Promise.all(ImageFunction);
-			const data = {travelId: travelId, diary: diaryValue, picture: diaryImageRef.current};
+			const data = {travelId: travelId, diary: diary, picture: diaryImageRef.current};
 			await dispatch(updateDiary(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -105,20 +106,20 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 			dispatch(LoadingSliceActions.onLoading());
 			const data = {
 				postTitle: text,
-				postContent: diaryValue,
+				postContent: diary,
 				postImage: [],
 				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
 			};
 			let postId = await dispatch(savePost(data)).unwrap();
-			diaryImageRef.current = Array(pictureValue.length).fill('');
-			const ImageFunction = pictureValue.map(async (item, idx) => {
+			diaryImageRef.current = Array(picture.length).fill('');
+			const ImageFunction = picture.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
 				diaryImageRef.current[idx] = data;
 			});
 			await Promise.all(ImageFunction);
 			const uploadData = {
 				postTitle: text,
-				postContent: diaryValue,
+				postContent: diary,
 				postImage: diaryImageRef.current,
 				postId: postId.postId,
 			};
@@ -141,19 +142,23 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 		}
 	};
 
+	const changeImage = (e: any) => {
+		dispatch(travelSliceActions.enrollReviewImage(e));
+	};
 	const {handleImagePickerLaunch} = usePhoto();
 	const handelGetImage = async () => {
 		handleImagePickerLaunch({
-			photoData: pictureValue,
-			changeFunction: setpictureValue,
+			photoData: picture,
+			changeFunction: changeImage,
 			saveCheck: saveCheck,
 			setSaveCheck: setSaveCheck,
 		});
 	};
 	const deletePicture = (e: number) => {
-		let copy = [...pictureValue];
+		let copy = [...picture];
 		copy.splice(e, 1);
-		setpictureValue(copy);
+		dispatch(travelSliceActions.enrollReviewImage(copy));
+		// setpictureValue(copy);
 	};
 	const [visible, setVisible] = useState(false);
 	const [imageIndex, setImageIndex] = useState(0);
@@ -181,7 +186,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 							<SvgPicture color={colors.PointYellow} width={widthPercentage(14)} />
 						</HStack>
 					</PictureColorContainer>
-					{pictureValue.map((item, idx) => (
+					{picture.map((item, idx) => (
 						<PictureColorContainer
 							noBorder={true}
 							key={idx}
@@ -209,7 +214,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 				일기
 			</PretendardSemiBoldText>
 			<DiaryTextInput
-				value={diaryValue}
+				value={diary}
 				multiline={true}
 				onPressIn={() => {
 					!modify && setModify(true);
@@ -253,7 +258,7 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
 			)} */}
 			<ImageView
-				images={pictureValue.map((item, idx) => ({
+				images={picture.map((item, idx) => ({
 					uri: item,
 				}))}
 				onImageIndexChange={item => console.log(item)}
@@ -270,11 +275,11 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					);
 				}}
 			/>
-			<CustomButton
+			{/* <CustomButton
 				onPress={handleBuntton}
 				label={modify ? '수정 완료' : '리뷰 저장'}
 				marginBottom={heightPercentage(15)}
-				marginTop={heightPercentage(30)}></CustomButton>
+				marginTop={heightPercentage(30)}></CustomButton> */}
 		</RecommendBorderContainer>
 	);
 }
@@ -352,7 +357,7 @@ export const PictureElementContainer = styled.Pressable`
 	margin: 10px ${widthPercentage(20)}px 0px 0px;
 `;
 export const PictureElement = styled.Image<{width?: number; height?: number}>`
-	width: 135px;
-	height: 180px;
+	width: ${props => props.width ?? 135}px;
+	height: ${props => props.height ?? 180}px;
 	border-radius: 10px;
 `;

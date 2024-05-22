@@ -13,6 +13,7 @@ import PushNotify from '../screens/more/push-notify';
 import UserManage from '../screens/more/user-manage';
 import Notice from '../screens/more/notice';
 import NoticeDetail from '../screens/more/notice-detail';
+import Festival from '../screens/more/festival';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -107,6 +108,13 @@ export default function MoreStack() {
 				component={NoticeDetail}
 				options={{
 					title: '공지 사항',
+				}}
+			/>
+			<Stack.Screen
+				name='Festival'
+				component={Festival}
+				options={{
+					title: '중앙대 축제',
 				}}
 			/>
 		</Fragment>

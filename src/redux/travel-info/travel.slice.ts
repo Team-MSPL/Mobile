@@ -517,6 +517,12 @@ export const travelSlice = createSlice({
 			state.timetable = payload;
 			//state.tableShowFlag = true;
 		},
+		enrollReviewImage: (state, {payload}) => {
+			state.picture = payload;
+		},
+		enrollReviewDiary: (state, {payload}) => {
+			state.diary = payload;
+		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			console.log('내ㅔ', state.moveTimeList);
@@ -741,11 +747,10 @@ export const travelSlice = createSlice({
 			state.travelName = payload.travelName;
 			//state.myTravelList = payload;
 		});
-		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
-			state.diary = payload.diary;
-			state.picture = payload.picture;
-			//state.myTravelList = payload;
-		});
+		// builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
+		// 	state.diary = payload.diary;
+		// 	state.picture = payload.picture;
+		// });
 		builder.addCase(saveTravel.fulfilled, (state, {payload}) => {
 			state.travelId = payload.travelId;
 			//state.myTravelList = payload;

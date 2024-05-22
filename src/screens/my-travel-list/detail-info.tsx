@@ -1,4 +1,4 @@
-import {JSXElementConstructor, ReactElement, useCallback, useEffect, useState} from 'react';
+import {JSXElementConstructor, ReactElement, useCallback, useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
 	deleteTravelCourse,
@@ -6,6 +6,7 @@ import {
 	getRegionInfo,
 	reCourseName,
 	travelSliceActions,
+	updateDiary,
 } from '../../redux/travel-info/travel.slice';
 import {Keyboard, Modal, Platform, Touchable, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
@@ -38,15 +39,17 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {ScrollView} from 'react-native';
 import {AbsoluteTopBar} from '../timetable/map-info';
 import {RegionImage} from '../enroll-info/final-check';
-import {MarkerContainer} from '../timetable/preset-detail';
+import {MarginContainer, MarkerContainer} from '../timetable/preset-detail';
 import {Circle} from '../timetable/preset';
 import PrimaryButton from '../../utill/component/primary-button';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
+import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
+import CustomButton from '../../utill/component/custom-button';
+import {savePost, updatePost} from '../../redux/community/community.slice';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, reviewCheck, region, regionInfo, timetable} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {travelId, nDay, day, travelName, reviewCheck, region, regionInfo, timetable, picture, diary} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const Icons = styled(Icon)``;
 	const goMyTravelDetail = async () => {
@@ -153,6 +156,89 @@ export default function DetailInfo({navigation}: any) {
 				modalLeft: true,
 			}),
 		);
+	};
+	const handleBuntton = () => {
+		modify ? setModify(false) : goSaveDiary();
+	};
+	const {uploadImage} = useFirebaseStorage();
+	let diaryImageRef = useRef<string[]>([]);
+	const goSaveDiary = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const textData = {updateTravelName: text, travelId: travelId};
+			await dispatch(reCourseName(textData));
+			diaryImageRef.current = Array(picture.length).fill('');
+			const ImageFunction = picture.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: travelId, category: 'diary'})) ?? '';
+				diaryImageRef.current[idx] = data;
+			});
+			await Promise.all(ImageFunction);
+			const data = {travelId: travelId, diary: diary, picture: diaryImageRef.current};
+			await dispatch(updateDiary(data));
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '작성하신 내용을 커뮤니티에도 올리시겠습니까?',
+					modalSubTitle: '*제목은 여행 제목으로 설정됩니다',
+					modalFunction: handlePostSubmit,
+					modalBottomFunctionUse: true,
+					modalBottomFunction: () => {
+						navigation.goBack();
+					},
+					modalTopText: '네, 올리겠습니다',
+					modalBottomText: '아니요, 리뷰만 남기겠습니다',
+				}),
+			);
+		} catch (err) {
+			console.log(err);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '다이어리 저장이 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
+				}),
+			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const handlePostSubmit = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				postTitle: text,
+				postContent: diary,
+				postImage: [],
+				postedAt: moment(Date()).format('yyyy/MM/DD HH:mm:ss'),
+			};
+			let postId = await dispatch(savePost(data)).unwrap();
+			diaryImageRef.current = Array(picture.length).fill('');
+			const ImageFunction = picture.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
+				diaryImageRef.current[idx] = data;
+			});
+			await Promise.all(ImageFunction);
+			const uploadData = {
+				postTitle: text,
+				postContent: diary,
+				postImage: diaryImageRef.current,
+				postId: postId.postId,
+			};
+			await dispatch(updatePost(uploadData));
+
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '등록',
+					modalSubTitle: '게시글이 등록되었습니다.',
+					modalFunction: () => {
+						navigation.goBack();
+					},
+					modalSingleUse: true,
+				}),
+			);
+		} catch (error) {
+			modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'});
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
 	};
 	const {firebaseImageRemove} = useFirebaseStorage();
 	const goRemove = async () => {
@@ -282,87 +368,91 @@ export default function DetailInfo({navigation}: any) {
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'afterTravelViewPager'});
 
 	return (
-		<Scroll>
-			<AbsoluteTopBar opacityState={false}>
-				<HStack gap={10} marginVertical={heightPercentage(10)} width={widthPercentage(375)}>
-					<RegionImage
-						source={{
-							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
-						}}
-					/>
-					<HStack justifyContent='space-between' width={widthPercentage(290)}>
-						<VStack>
-							<HStack>
-								<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-									{region[0]}
-									{region.length >= 2 ? ` +${region.length - 1}` : ''}
-								</PretendardVariableText>
-								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-									{' '}
-									| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
-								</PretendardVariableText>
-							</HStack>
-							<HStack gap={4}>
-								{!editing ? (
-									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
-										{travelName}
-									</PretendardSemiBoldText>
-								) : (
-									<CustomTextInput
-										text={text}
-										placeholderTextColor={'grey'}
-										style={{color: 'black', fontSize: heightPercentage(18)}}
-										autoFocus={true}
-										value={text}
-										onChangeText={(value: string) => setText(value)}
-										maxLength={20}></CustomTextInput>
-								)}
-								{modify && !editing && (
-									<TouchableOpacity
-										onPress={() => {
-											setEditing(true);
-										}}>
-										<SVGPencil color={colors.PointYellow} />
-									</TouchableOpacity>
-								)}
-							</HStack>
-						</VStack>
-						{!modify && (
-							<TouchableOpacity onPress={goKakaoShare}>
-								<SvgShare />
-							</TouchableOpacity>
-						)}
+		<>
+			<Scroll>
+				<AbsoluteTopBar opacityState={false}>
+					<HStack gap={10} marginVertical={heightPercentage(10)} width={widthPercentage(375)}>
+						<RegionImage
+							source={{
+								uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
+							}}
+						/>
+						<HStack justifyContent='space-between' width={widthPercentage(290)}>
+							<VStack>
+								<HStack>
+									<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
+										{region[0]}
+										{region.length >= 2 ? ` +${region.length - 1}` : ''}
+									</PretendardVariableText>
+									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+										{' '}
+										|{' '}
+										{moment(day[0]).format('YY.MM.DD') +
+											' - ' +
+											moment(day[nDay]).format('YY.MM.DD')}
+									</PretendardVariableText>
+								</HStack>
+								<HStack gap={4}>
+									{!editing ? (
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+											{travelName}
+										</PretendardSemiBoldText>
+									) : (
+										<CustomTextInput
+											text={text}
+											placeholderTextColor={'grey'}
+											style={{color: 'black', fontSize: heightPercentage(18)}}
+											autoFocus={true}
+											value={text}
+											onChangeText={(value: string) => setText(value)}
+											maxLength={20}></CustomTextInput>
+									)}
+									{modify && !editing && (
+										<TouchableOpacity
+											onPress={() => {
+												setEditing(true);
+											}}>
+											<SVGPencil color={colors.PointYellow} />
+										</TouchableOpacity>
+									)}
+								</HStack>
+							</VStack>
+							{!modify && (
+								<TouchableOpacity onPress={goKakaoShare}>
+									<SvgShare />
+								</TouchableOpacity>
+							)}
+						</HStack>
 					</HStack>
-				</HStack>
-			</AbsoluteTopBar>
-			<MapContainer>
-				<MapView
-					//provider={PROVIDER_GOOGLE}
-					showsMyLocationButton={true}
-					style={{width: '100%', height: 350}}
-					showsUserLocation={true}
-					region={{
-						latitude: centerLatitude,
-						longitude: centerLongitude,
-						latitudeDelta: deltaLatitude + deltaLatitude,
-						longitudeDelta: deltaLongitude + deltaLongitude,
-					}}>
-					{markers}
-					{polylines}
-				</MapView>
-				{!modify && (
-					<AbsoluteButton>
-						<PrimaryButton
-							label='여행 코스 확인하기'
-							onPress={goTimetable}
-							backgroundColor={colors.PointYellow}
-							textColor={colors.backgroundWhite}
-							width={widthPercentage(150)}
-							height={heightPercentage(50)}></PrimaryButton>
-					</AbsoluteButton>
-				)}
-			</MapContainer>
-			{/* <CourseAndReview>
+				</AbsoluteTopBar>
+				<MapContainer>
+					<MapView
+						//provider={PROVIDER_GOOGLE}
+						showsMyLocationButton={true}
+						style={{width: '100%', height: 350}}
+						showsUserLocation={true}
+						region={{
+							latitude: centerLatitude,
+							longitude: centerLongitude,
+							latitudeDelta: deltaLatitude + deltaLatitude,
+							longitudeDelta: deltaLongitude + deltaLongitude,
+						}}>
+						{markers}
+						{polylines}
+					</MapView>
+					{!modify && (
+						<AbsoluteButton>
+							<PrimaryButton
+								label='여행 코스 확인하기'
+								onPress={goTimetable}
+								backgroundColor={colors.PointYellow}
+								textColor={colors.backgroundWhite}
+								width={widthPercentage(150)}
+								height={heightPercentage(50)}></PrimaryButton>
+						</AbsoluteButton>
+					)}
+				</MapContainer>
+				{/* <CourseAndReview>
 				<HandleButtonContainer
 					backgroundColor={colors.Primary}
 					onPress={() => {
@@ -404,23 +494,36 @@ export default function DetailInfo({navigation}: any) {
 					</PretendardSemiBoldText>
 				</HandleButtonContainer>
 			</CourseAndReview> */}
-			<InputDiary
-				navigation={navigation}
-				modify={modify}
-				setModify={setModify}
-				text={text}
-				setEditing={setEditing}
-			/>
-			<Modal
-				animationType={'fade'}
-				transparent={true}
-				visible={viewPagerState}
-				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={4} handleFunction={deleteMainViewPager} />
-			</Modal>
-		</Scroll>
+				<InputDiary
+					navigation={navigation}
+					modify={modify}
+					setModify={setModify}
+					text={text}
+					setEditing={setEditing}
+				/>
+				<Modal
+					animationType={'fade'}
+					transparent={true}
+					visible={viewPagerState}
+					onRequestClose={deleteMainViewPager}>
+					<ViewPager sliceNumber={4} handleFunction={deleteMainViewPager} />
+				</Modal>
+				<ButtonMarginBottom></ButtonMarginBottom>
+			</Scroll>
+			<ButtonContainer>
+				<CustomButton
+					onPress={handleBuntton}
+					label={modify ? '수정 완료' : '리뷰 저장'}
+					marginBottom={heightPercentage(15)}
+					marginTop={heightPercentage(30)}></CustomButton>
+			</ButtonContainer>
+		</>
 	);
 }
+const ButtonMarginBottom = styled.View`
+	height: ${heightPercentage(115)}px;
+	background-color: ${colors.backgroundWhite};
+`;
 const AbsoluteButton = styled.View`
 	position: absolute;
 	z-index: 5;
