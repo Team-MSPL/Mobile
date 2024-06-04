@@ -112,7 +112,7 @@ const Ball = styled.View<{index: boolean}>`
 	width: ${devicesWidth * 0.02}px;
 	height: ${devicesWidth * 0.02}px;
 	border-radius: 99px;
-	background-color: ${props => (props.index ? colors.selectButton : 'white')};
+	background-color: ${props => (props.index ? colors.PointYellow : 'white')};
 	margin: 0px 1px;
 	border-width: 1px;
 	border-color: grey;

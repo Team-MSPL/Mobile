@@ -2,9 +2,25 @@ import {GOOGLE_API_KEY} from '@env';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {axiosGoogle} from './travel.slice';
 import axiosAuth from '../api/api';
-import {regionTendencyList} from '../../screens/enroll-info/region-recommend/select-tendency';
+export const regionTendencyList = [
+	{
+		list: ['혼자여행', '커플 여행', '우정 여행', '가족 여행', '효도 여행', '어린 자녀와'],
+	},
+	{
+		list: ['힐링', '에너제틱', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+	},
+	{
+		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '역사여행'],
+	},
+	{
+		list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통한옥'],
+	},
+	{
+		list: ['봄', '여름', '가을', '겨울'],
+	},
+];
 const initialState: LiteState = {
-	tendency: regionTendencyList.map(item => {
+	regionTendency: regionTendencyList.map(item => {
 		return Array(item.list.length).fill(0);
 	}), //성향
 	distance: 0,
@@ -19,8 +35,8 @@ export const regionRecommendSlice = createSlice({
 	name: 'loading',
 	initialState,
 	reducers: {
-		enrollTendency: (state, {payload}) => {
-			state.tendency = payload;
+		enrollRegionTendency: (state, {payload}) => {
+			state.regionTendency = payload;
 		},
 		enrollDistanceAndLatLng: (state, {payload}) => {
 			state.distance = payload.distance;
@@ -40,7 +56,8 @@ export const regionRecommendSlice = createSlice({
 	extraReducers: builder => {
 		builder.addCase(regionSearch.fulfilled, (state, {payload}) => {
 			console.log(payload);
-			state.recommendList = payload;
+			let sort = payload.sort((a, b) => a.takenDay - b.takenDay);
+			state.recommendList = sort;
 			//state.myTravelList = payload;
 		});
 	},
@@ -92,7 +109,7 @@ export const regionRecommendSliceActions = regionRecommendSlice.actions;
 export default regionRecommendSlice.reducer;
 
 interface LiteState {
-	tendency: number[][];
+	regionTendency: number[][];
 	distance: number;
 	popularity: number[];
 	lat: number;

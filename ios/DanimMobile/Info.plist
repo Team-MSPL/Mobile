@@ -20,8 +20,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-		<key>CodePushDeploymentKey</key>
-	<string>${CODEPUSH_KEY}</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -55,6 +53,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CodePushDeploymentKey</key>
+	<string>${CODEPUSH_KEY}</string>
 	<key>GMSApiKey</key>
 	<string>70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com</string>
 	<key>KAKAO_APP_KEY</key>
@@ -121,22 +121,16 @@
 	<string>다님은 광고 최적화와 사용자 경험 개선을 위해 데이터 추적이 필요합니다.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>AntDesign.ttf</string>
-		<string>Entypo.ttf</string>
-		<string>EvilIcons.ttf</string>
-		<string>Feather.ttf</string>
-		<string>FontAwesome.ttf</string>
-		<string>FontAwesome5_Brands.ttf</string>
-		<string>FontAwesome5_Regular.ttf</string>
-		<string>FontAwesome5_Solid.ttf</string>
-		<string>Foundation.ttf</string>
-		<string>Ionicons.ttf</string>
-		<string>MaterialCommunityIcons.ttf</string>
-		<string>MaterialIcons.ttf</string>
-		<string>Octicons.ttf</string>
-		<string>SimpleLineIcons.ttf</string>
-		<string>Zocial.ttf</string>
-		<string>Fontisto.ttf</string>
+		<string>PretendardVariable.ttf</string>
+		<string>Pretendard-Black.ttf</string>
+		<string>Pretendard-Bold.ttf</string>
+		<string>Pretendard-ExtraBold.ttf</string>
+		<string>Pretendard-ExtraLight.ttf</string>
+		<string>Pretendard-Light.ttf</string>
+		<string>Pretendard-Medium.ttf</string>
+		<string>Pretendard-Regular.ttf</string>
+		<string>Pretendard-SemiBold.ttf</string>
+		<string>Pretendard-Thin.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

@@ -5,7 +5,6 @@ import InputDiary from '../screens/my-travel-list/input-diary';
 import InputReviewAndPoint from '../screens/my-travel-list/input-review-and-point';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
 import {colors} from '../utill/colors';
-import {SvgShare} from '../utill/svg/svg';
 const Stack = createNativeStackNavigator();
 export default function MyTravelListStack() {
 	return (

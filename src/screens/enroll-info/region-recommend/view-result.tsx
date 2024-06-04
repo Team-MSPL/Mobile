@@ -1,35 +1,32 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {BackHandler, Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {MainContainer} from '../../../utill/layout/layout';
+import {
+	BackgroundGray,
+	HStack,
+	MainContainer,
+	PretendardSemiBold,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
-import {SvgLoginLogo, SvgRight} from '../../../utill/svg/svg';
+import {SVGRegionRecommend, SvgLoginLogo} from '../../../utill/svg/svg';
+import {ScrollView} from 'react-native';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {TagElement} from '../../home/main';
+import {useBackHandler} from '../../../utill/hooks/useBackhandler';
+import {GraientBackground} from '../hiking-recommend/view-result';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
+	const {userName} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
+
+	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '취소시 지역 추천이 종료됩니다.',
-						modalSubTitle: '그래도 나가시겠습니까?',
-						modalLeft: true,
-						modalFunction: () => {
-							navigation.popToTop();
-						},
-					}),
-				);
-				return true;
-			}
-		};
-
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
 		navigation.setOptions({
 			headerLeft: () => (
 				<TouchableOpacity
@@ -47,75 +44,153 @@ export default function ViewResult({navigation}: any) {
 					}}
 					style={{justifyContent: 'center'}}>
 					<Image
+						resizeMode='contain'
 						source={require('../../../../public/images/danim_logo_row.png')}
 						style={{height: 30, aspectRatio: 2.054}}
 					/>
 				</TouchableOpacity>
 			),
 		});
-		return () => backHandler.remove();
 	}, []);
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
-		<MainContainer>
-			<StepText mainText='지역 추천' subText='당신의 성향을 기반으로, 여행 지역을 찾아왔어요' />
-			<RecommendAllContainer>
-				{recommendList.map((item, idx) => (
-					<RecommendContainer
-						key={idx}
-						onPress={() => {
-							navigation.navigate('DetailResult', {item: item});
-							//goEnrollInfo(item.name);
-						}}>
-						{item.photo != '' ? (
-							<RecommendImage source={{uri: item.photo}}></RecommendImage>
-						) : (
-							<LogoCOntainer>
-								<SvgLoginLogo color={'white'} width={40} />
-							</LogoCOntainer>
-						)}
-						<RecommendElement>
-							<TitleText>{item.name}</TitleText>
-							<TendencyTextContainer>
-								<TendencyText>
-									{item.tendency.map((value, index) => (
-										<Fragment key={index}>#{value}</Fragment>
-									))}
-								</TendencyText>
-							</TendencyTextContainer>
-							<RightLogoContainer>
-								<LogoCircle>
-									<SvgRight color={'black'} width={15} />
-								</LogoCircle>
-							</RightLogoContainer>
-						</RecommendElement>
-						<TakenDayContainer>
-							<TakenText>
-								{item.takenDay == 0
-									? '당일치기추천'
-									: item.takenDay + '박 ' + (item.takenDay + 1) + '일 추천'}{' '}
-							</TakenText>
-						</TakenDayContainer>
-					</RecommendContainer>
-				))}
-			</RecommendAllContainer>
-		</MainContainer>
+		<BackgroundGray paddingHorizental={0}>
+			<ScrollView showsVerticalScrollIndicator={false}>
+				<StepText
+					marginLeft={widthPercentage(24)}
+					mainTextSize={23}
+					styleTextColor={colors.Gray4}
+					styleText='지역 추천'
+					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
+					subText='여행 성향을 기반으로 추천된 여행지에요!'
+				/>
+				<SvgContainer>
+					<SVGRegionRecommend
+						transform={true}
+						width={widthPercentage(200)}
+						height={heightPercentage(150)}></SVGRegionRecommend>
+				</SvgContainer>
+				<RecommendBorderContainer>
+					{recommendList.map((item, idx) => (
+						<Fragment key={idx}>
+							{(item.takenDay != recommendList[idx - 1]?.takenDay ?? 0) && (
+								<DayRecommendContainer>
+									<HStack>
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.PointGreen1}>
+											{item.takenDay == 0
+												? '당일치기'
+												: item.takenDay + '박 ' + (item.takenDay + 1) + '일 '}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Black}>
+											추천
+										</PretendardSemiBoldText>
+									</HStack>
+								</DayRecommendContainer>
+							)}
+							<RecommendContainer
+								onPress={() => {
+									navigation.navigate('DetailResult', {item: item});
+								}}>
+								<ImageContainer>
+									{item.photo != '' ? (
+										<RecommendImage source={{uri: item.photo}}></RecommendImage>
+									) : (
+										<LogoCOntainer>
+											<SvgLoginLogo color={'white'} width={40} />
+										</LogoCOntainer>
+									)}
+									<GraientBackground>
+										<RegionText>{item.name}</RegionText>
+										<TagContainer>
+											{item.tendency.slice(0, 5).map((value, index) => (
+												<Fragment key={index}>
+													<TagElement opacityStatus={true}>
+														<HStack>
+															<PretendardVariableText
+																size={12}
+																lineHeight={14}
+																color={colors.Primary}>
+																{'# '}
+															</PretendardVariableText>
+															<PretendardVariableText
+																size={10}
+																lineHeight={12}
+																color={colors.backgroundWhite}>
+																{value}
+															</PretendardVariableText>
+														</HStack>
+													</TagElement>
+													{index == 1 && item.tendency.length > 5 && (
+														<PretendardSemiBoldText
+															size={15}
+															lineHeight={21}
+															color={colors.Primary}>
+															+{item.tendency.length - 5}
+														</PretendardSemiBoldText>
+													)}
+												</Fragment>
+											))}
+										</TagContainer>
+									</GraientBackground>
+								</ImageContainer>
+							</RecommendContainer>
+						</Fragment>
+					))}
+				</RecommendBorderContainer>
+			</ScrollView>
+		</BackgroundGray>
 	);
 }
-const TakenText = styled.Text`
-	font-size: 17px;
-	font-weight: bold;
-	color: white;
-`;
-const TakenDayContainer = styled.View`
+const SvgContainer = styled.View`
+	z-index: 0;
 	position: absolute;
-	top: 0px;
-	left: 0px;
-	background-color: ${colors.selectButton};
-	width: 40%;
-	padding: 5px;
-	border-top-left-radius: 10px;
-	border-bottom-right-radius: 10px;
+	width: ${widthPercentage(329.19)}px;
+	height: ${heightPercentage(204.14)}px;
+	align-items: center;
+	justify-content: center;
+	left: ${widthPercentage(182)}px;
+	top: ${heightPercentage(51)}px;
+`;
+const RecommendBorderContainer = styled.View`
+	border-radius: 30px 30px 0px 0px;
+	background-color: ${colors.backgroundWhite};
+	padding: 0px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
+	margin-top: ${heightPercentage(52)}px;
+`;
+const DayRecommendContainer = styled.View`
+	width: ${widthPercentage(112)}px;
+	height: ${heightPercentage(35)}px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.Gray1};
+	border-radius: 12px 12px 0px 0px;
+	margin-bottom: ${widthPercentage(12)}px;
+	margin-top: ${widthPercentage(22)}px;
+	top: -${heightPercentage(2.5)}px;
+`;
+const ImageContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(200)}px;
+	margin-top: ${widthPercentage(12)}px;
+`;
+const RegionText = styled(PretendardSemiBold)`
+	position: absolute;
+	font-size: ${fontPercentage(20)}px;
+	font-weight: 600;
+	line-height: ${heightPercentage(27)}px;
+	color: ${colors.backgroundWhite};
+	bottom: ${heightPercentage(10)}px;
+	left: ${widthPercentage(10)}px;
+`;
+const TagContainer = styled.View`
+	position: absolute;
+	width: 60%;
+	height: ${widthPercentage(200)}px;
+	flex-direction: row;
+	flex-wrap: wrap-reverse;
+	right: ${widthPercentage(17.8)}px;
+	bottom: ${heightPercentage(19)}px;
+	justify-content: flex-end;
 `;
 const LogoCOntainer = styled.View`
 	width: 100%;
@@ -125,23 +200,15 @@ const LogoCOntainer = styled.View`
 	justify-content: center;
 	background-color: ${colors.regionNormal};
 `;
-const RecommendAllContainer = styled.View`
-	width: 100%;
-	border-radius: 10px;
-	align-items: center;
-	justify-content: center;
-	margin: 0px 0px 30px 0px;
-`;
 export const RecommendContainer = styled.TouchableOpacity`
-	width: 90%;
-	border-radius: 10px;
-	align-items: center;
-	justify-content: center;
-	margin: 10px 0px 10px 0px;
+	width: ${widthPercentage(327)}px;
+	border-radius: 12px;
+	margin: 0px 0px ${widthPercentage(5)}px 0px;
+	top: -${heightPercentage(17.5)}px;
 `;
 const RecommendImage = styled.Image`
 	width: 100%;
-	height: 200px;
+	height: 100%;
 	border-radius: 10px;
 `;
 export const RecommendElement = styled.View`
@@ -154,31 +221,4 @@ export const RecommendElement = styled.View`
 	bottom: 0px;
 	align-items: center;
 	padding: 10px;
-`;
-const TendencyTextContainer = styled.View`
-	width: 50%;
-	flex-direction: row;
-`;
-const RightLogoContainer = styled.View`
-	width: 20%;
-	align-items: center;
-	justify-content: center;
-`;
-const TitleText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: white;
-	width: 30%;
-`;
-const TendencyText = styled.Text`
-	font-weight: bold;
-	color: white;
-	font-size: 9px;
-`;
-const LogoCircle = styled.View`
-	border-radius: 99px;
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-	background-color: white;
 `;

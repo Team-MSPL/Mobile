@@ -1,15 +1,25 @@
 import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
-import {MainContainer, VStack, HStack, devicesWidth} from '../../utill/layout/layout';
+import {
+	MainContainer,
+	VStack,
+	HStack,
+	devicesWidth,
+	FlexWrap,
+	BackgroundGray,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {Pressable} from 'react-native';
-import {SvgCancel, SvgPlace, SvgHome} from '../../utill/svg/svg';
+import {SVGPlus} from '../../utill/svg/svg';
+import Stepper from '../../utill/component/enroll-info/stepper';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
-export default function SelectMulti({viewComponent, navigation, goNextStep}: any) {
+export default function SelectMulti({navigation}: any) {
 	const [accommodation, setAccommodation] = useState(false);
 	const [essential, setEssential] = useState(false);
 	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
@@ -20,13 +30,9 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 		console.log(navigation);
 		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
 	};
-	const MultiViewList = [
-		{title: '여행지 추가하기', logo: '2', function: goSearchPlace},
-		{title: '숙소 추가하기', logo: '1', function: goSearchPlace},
-	];
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const goNext = () => {
-		navigation.navigate('SelectDistance');
+		navigation.navigate('RecommendSelectWho');
 	};
 
 	const openAccommodation = () => {
@@ -47,80 +53,150 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 	return (
 		<>
 			<MainContainer>
-				<StepText mainText='미리 정한 장소가 있나요?' subText='정해놓은 장소는 먼저 추가할 수 있어요.' />
-				<VStack>
-					{[...Array(nDay + 1)].map((item, idx) => {
-						const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
+				<BackgroundGray>
+					<Stepper total={11} now={3}></Stepper>
+					<StepText
+						styleText='1.여행 계획을 알려주세요.'
+						mainText='미리 정해놓은 장소가 있나요?'
+						subText='숙소는 최대 1개, 여행지는 최대 3개 추가할 수 있어요.'></StepText>
+					<VStack>
+						{[...Array(nDay + 1)].map((item, idx) => {
+							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
-						return (
-							<DayViewContainer key={idx}>
-								<HStack>
-									<DayText>{'Day ' + (idx + 1)}</DayText>
-									<DayInfoText>
-										{day[idx].format('YYYY-MM-DD') + ',' + weekdays[day[idx].days()] + '요일'}
-									</DayInfoText>
-								</HStack>
-								<HStack>
-									{MultiViewList.map(
-										(value, index) =>
-											!(idx == nDay && index == 1) && (
-												<ElementContainer
-													key={index}
-													onPress={() => {
-														value.function({idx: idx, index: index});
-													}}>
-													<HStack>
-														{index == 0 ? (
-															<SvgPlace color='white' />
-														) : (
-															<SvgHome color='white' />
-														)}
-														<ElementText>
-															{accommodations[idx + 1]?.name && index == 1
-																? '숙소 변경하기'
-																: value.title}
-														</ElementText>
-													</HStack>
-												</ElementContainer>
-											),
-									)}
-								</HStack>
-								{accommodations[idx + 1].name && (
+							return (
+								<DayViewContainer key={idx}>
+									<HStack>
+										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.PointYellow}>
+											{'DAY' + (idx + 1)}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray5}>
+											{'   '}
+											{day[idx].format('YY.MM.DD') + ' (' + weekdays[day[idx].days()] + ')'}
+										</PretendardSemiBoldText>
+									</HStack>
 									<MultiAllContainer>
-										<MultiText>숙소</MultiText>
-										<MultiContainer>
-											<SvgHome color={colors.selectButton} />
-											<MultiElementText>{accommodations[idx + 1].name}</MultiElementText>
-											<Pressable
+										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
+											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
+												여행지
+											</PretendardSemiBoldText>
+											<SVGContainer
+												disabled={filteredPlaces.length >= 3}
 												onPress={() => {
-													deleteAccommodation(idx + 1);
-												}}>
-												<SvgCancel color={colors.selectButton} />
-											</Pressable>
-										</MultiContainer>
+													goSearchPlace({idx: idx, index: 0});
+												}}
+												color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PointYellow}>
+												<SVGPlus
+													color={filteredPlaces.length >= 3 ? colors.Gray2 : colors.Primary}
+												/>
+											</SVGContainer>
+										</ElementContainer>
+										{filteredPlaces.length != 0 && (
+											<FlexWrap gap={10}>
+												{filteredPlaces.map((data, index) => (
+													<ElementContainer color={colors.backgroundGray} key={index}>
+														<VStack width={widthPercentage(243)}>
+															<HStack gap={3}>
+																<PretendardSemiBoldText
+																	size={16}
+																	lineHeight={21.6}
+																	width={widthPercentage(200)}
+																	color={colors.Gray5}>
+																	{data.name}
+																</PretendardSemiBoldText>
+																<PretendardSemiBoldText
+																	size={12}
+																	lineHeight={16.2}
+																	color={colors.PointYellow}>
+																	{data.takenTime / 60}시간
+																</PretendardSemiBoldText>
+															</HStack>
+															<PretendardVariableText
+																color={colors.Gray2}
+																size={12}
+																lineHeight={18}>
+																{data.formatted_address}
+															</PretendardVariableText>
+														</VStack>
+														<DeleteContainer
+															onPress={() => {
+																deleteEssential(data);
+															}}>
+															<PretendardSemiBoldText
+																size={12}
+																lineHeight={18}
+																color={colors.Gray5}>
+																취소
+															</PretendardSemiBoldText>
+														</DeleteContainer>
+													</ElementContainer>
+												))}
+											</FlexWrap>
+										)}
 									</MultiAllContainer>
-								)}
-								{filteredPlaces.length != 0 && (
-									<MultiAllContainer>
-										<MultiText>여행지</MultiText>
-										{filteredPlaces.map((data, index) => (
-											<MultiContainer key={index}>
-												<SvgPlace color={colors.selectButton} />
-												<MultiElementText>{data.name}</MultiElementText>
-												<Pressable
+									{idx != nDay && (
+										<MultiAllContainer marginBottom={15}>
+											<ElementContainer
+												color={colors.backgroundGray}
+												height={heightPercentage(43)}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={16.7}
+													color={colors.Gray2}>
+													숙소
+												</PretendardSemiBoldText>
+												<SVGContainer
+													disabled={accommodations[idx + 1].name != ''}
 													onPress={() => {
-														deleteEssential(data);
-													}}>
-													<SvgCancel color={colors.selectButton} />
-												</Pressable>
-											</MultiContainer>
-										))}
-									</MultiAllContainer>
-								)}
-							</DayViewContainer>
-						);
-					})}
-				</VStack>
+														goSearchPlace({idx: idx, index: 1});
+													}}
+													color={
+														accommodations[idx + 1].name ? colors.Gray1 : colors.PointYellow
+													}>
+													<SVGPlus
+														color={
+															accommodations[idx + 1].name ? colors.Gray2 : colors.Primary
+														}
+													/>
+												</SVGContainer>
+											</ElementContainer>
+											{accommodations[idx + 1].name && (
+												<ElementContainer color={colors.backgroundGray} marginBottom={20}>
+													<VStack width={widthPercentage(243)}>
+														<PretendardSemiBoldText
+															size={16}
+															lineHeight={21.6}
+															width={widthPercentage(200)}
+															color={colors.Gray5}>
+															{accommodations[idx + 1].name}
+														</PretendardSemiBoldText>
+														<PretendardVariableText
+															color={colors.Gray2}
+															size={12}
+															lineHeight={18}>
+															{accommodations[idx + 1].formatted_address}
+														</PretendardVariableText>
+													</VStack>
+
+													<DeleteContainer
+														onPress={() => {
+															deleteAccommodation(idx + 1);
+														}}>
+														<PretendardSemiBoldText
+															size={12}
+															lineHeight={18}
+															color={colors.Gray5}>
+															취소
+														</PretendardSemiBoldText>
+													</DeleteContainer>
+												</ElementContainer>
+											)}
+										</MultiAllContainer>
+									)}
+								</DayViewContainer>
+							);
+						})}
+					</VStack>
+				</BackgroundGray>
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>
@@ -130,8 +206,8 @@ export default function SelectMulti({viewComponent, navigation, goNextStep}: any
 						accommodations.find(value => value.name != '') || essentialPlaces.length != 0
 							? '다음'
 							: '건너뛰기'
-					} (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
-					onPress={goNextStep}></CustomButton>
+					}`}
+					onPress={goNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
@@ -141,67 +217,52 @@ export const MarginContainder = styled.View`
 `;
 
 export const DayViewContainer = styled.View`
-	width: 100%;
-	border-radius: 20px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
+	width: ${widthPercentage(327)}px;
+	align-self: center;
+	border-radius: 12px;
+	background-color: ${colors.backgroundWhite};
 	padding: 15px;
-	margin: 5px 0px 5px 0px;
+	gap: ${widthPercentage(8)}px;
 `;
 
-const DayText = styled.Text`
-	font-size: 18px;
-	font-weight: 500;
-	color: ${colors.selectButton};
-	margin: 0px 10px 0px 0px;
-`;
-const DayInfoText = styled.Text`
-	font-size: 18px;
-	font-weight: 500;
-	color: black;
-`;
-const ElementContainer = styled.TouchableOpacity`
-	width: 50%;
-	border-radius: 10px;
-	background-color: ${colors.selectButton};
+export const SVGContainer = styled.TouchableOpacity<{color: string}>`
+	width: ${widthPercentage(20)}px;
+	height: ${widthPercentage(20)}px;
+	background-color: ${props => props.color};
+	border-radius: 99px;
 	align-items: center;
-	padding: 10px;
-	margin: 10px 4px 10px 0px;
+	justify-content: center;
 `;
-const ElementText = styled.Text`
-	color: white;
-	font-size: 15px;
-	font-weight: bold;
-`;
-const MultiAllContainer = styled.View`
-	width: 100%;
-	margin: 5px 0px 5px 0px;
-`;
-const MultiText = styled.Text`
-	font-size: 15px;
-	font-weight: 500;
-	color: black;
-`;
-const MultiContainer = styled.View`
-	border-width: 2px;
-	border-radius: 10px;
-	border-color: ${colors.selectButton};
-	width: 60%;
-	padding: 10px;
+export const ElementContainer = styled.View<{color: string; height?: number; marginBottom?: number}>`
+	border-radius: 8px;
+	background-color: ${props => props.color};
+	align-items: center;
 	justify-content: space-between;
-	align-items: center;
+	padding: 0px ${widthPercentage(8)}px;
+	gap: ${widthPercentage(4)}px;
 	flex-direction: row;
-	margin: 3px 0px 3px 0px;
-	flex-wrap: wrap;
+	margin-right: ${widthPercentage(5)}px;
+	margin-bottom: ${props => props.marginBottom ?? widthPercentage(5)}px;
+	width: ${widthPercentage(300)}px;
+	height: ${props => props.height + 'px' ?? 'auto'};
 `;
-const MultiElementText = styled.Text`
-	font-size: 15px;
-	font-weight: 500;
-	color: ${colors.selectButton};
+const MultiAllContainer = styled.View<{marginBottom?: number}>`
+	width: ${widthPercentage(300)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundGray};
+	gap: ${widthPercentage(3)}px;
 `;
 export const ButtonContainer = styled.View`
 	width: ${devicesWidth}px;
 	background-color: rgba(250, 250, 255, 0.8);
 	position: absolute;
-	bottom: 0;
+	bottom: 10px;
+`;
+export const DeleteContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(41)}px;
+	height: ${heightPercentage(22)}px;
+	border-radius: 99px;
+	background-color: ${colors.Primary};
+	align-items: center;
+	justify-content: center;
 `;

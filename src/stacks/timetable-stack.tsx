@@ -5,7 +5,6 @@ import SelectCity from '../screens/enroll-info/select-city';
 import SelectDay from '../screens/enroll-info/select-day';
 import SelectMulti from '../screens/enroll-info/select-multi';
 import SelectDistance from '../screens/enroll-info/select-distance';
-import SelectTendency from '../screens/enroll-info/select-tendency';
 import FinalCheck from '../screens/enroll-info/final-check';
 import Preset from '../screens/timetable/preset';
 import Timetable from '../screens/timetable/timetable';
@@ -14,22 +13,20 @@ import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 import Recommend from '../screens/timetable/recommend';
 import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
-import EnrollInfo from '../screens/enroll-info/enroll-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
-import {View, Image} from 'react-native';
 import {colors} from '../utill/colors';
 import {CourseReview} from '../utill/component/timetable/course-review';
+import RecommendSelectWho from '../screens/enroll-info/select-who';
+import RecommendSelectMove from '../screens/enroll-info/select-move';
+import RecommendSelectBusy from '../screens/enroll-info/select-busy';
+import RecommendSelectConcept from '../screens/enroll-info/select-concept';
+import RecommendSelectPlay from '../screens/enroll-info/select-play';
+import RecommendSelectTour from '../screens/enroll-info/select-tour';
+import PresetDetail from '../screens/timetable/preset-detail';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
 		<Fragment>
-			<Stack.Screen
-				name='EnrollInfo'
-				component={EnrollInfo}
-				options={{
-					title: '새 여행',
-				}}
-			/>
 			<Stack.Screen
 				name='SelectCity'
 				component={SelectCity}
@@ -71,16 +68,7 @@ export default function TimetableStack() {
 				name='SelectDistance'
 				component={SelectDistance}
 				options={{
-					title: '새 여행 (4/5)',
-					headerStyle: {backgroundColor: colors.main},
-					headerShadowVisible: false,
-				}}
-			/>
-			<Stack.Screen
-				name='SelectTendency'
-				component={SelectTendency}
-				options={{
-					title: '새 여행 (5/5)',
+					title: '여행 코스 추천',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
@@ -105,7 +93,7 @@ export default function TimetableStack() {
 				name='Timetable'
 				component={Timetable}
 				options={{
-					title: '여행 스케줄',
+					title: '여행 코스',
 				}}
 			/>
 			<Stack.Screen
@@ -155,6 +143,55 @@ export default function TimetableStack() {
 				component={CourseReview}
 				options={{
 					title: '리뷰작성',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectWho'
+				component={RecommendSelectWho}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectMove'
+				component={RecommendSelectMove}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectBusy'
+				component={RecommendSelectBusy}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectConcept'
+				component={RecommendSelectConcept}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectPlay'
+				component={RecommendSelectPlay}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendSelectTour'
+				component={RecommendSelectTour}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+			<Stack.Screen
+				name='PresetDetail'
+				component={PresetDetail}
+				options={{
+					title: '일정 자세히 보기',
 				}}
 			/>
 		</Fragment>

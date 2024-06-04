@@ -3,21 +3,38 @@ import {devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
-export default function ViewPager({handleFunction, timetable}: {handleFunction: any; timetable?: boolean}) {
+import {heightPercentage, widthPercentage} from './layout/responsive-size';
+export default function ViewPager({
+	handleFunction,
+	timetable,
+	sliceNumber,
+	scrollState,
+}: {
+	handleFunction: any;
+	timetable?: boolean;
+	sliceNumber?: number;
+	scrollState?: boolean;
+}) {
 	const [viewIndex, setViewIndex] = useState(0);
 	const [viewList, setViewList] = useState([
-		{imagePath: require('../../public/viewPager/home.png')},
-		{imagePath: require('../../public/viewPager/travelList.png')},
-		{imagePath: require('../../public/viewPager/timetable1.png')},
-		{imagePath: require('../../public/viewPager/timetable2.png')},
+		{imagePath: require('../../public/viewPager/main.png')},
+		{imagePath: require('../../public/viewPager/preset.png')},
+		{imagePath: require('../../public/viewPager/timetable.png')},
+		{imagePath: require('../../public/viewPager/afterTravel.png')},
+		{imagePath: require('../../public/viewPager/modify.png')},
 	]);
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
 	useEffect(() => {
+		console.log(sliceNumber);
 		if (timetable ?? false) {
 			let copy = [...viewList];
 			setViewList(copy.slice(2, 4));
+		} else if (sliceNumber ?? false) {
+			console.log('qwe');
+			let copy = [...viewList];
+			setViewList(copy.slice(sliceNumber - 1, sliceNumber));
 		}
 	}, []);
 	return (
@@ -35,8 +52,8 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 				horizontal={true}
 				showsHorizontalScrollIndicator={false}>
 				{viewList.map((item, idx) => (
-					<ImageAllContainer key={idx}>
-						<ImageContainer source={item.imagePath}></ImageContainer>
+					<ImageAllContainer key={idx} scrollState={scrollState ?? false}>
+						<ImageContainer resizeMode='stretch' source={item.imagePath}></ImageContainer>
 					</ImageAllContainer>
 				))}
 			</Carousel>
@@ -48,11 +65,14 @@ export default function ViewPager({handleFunction, timetable}: {handleFunction: 
 						))}
 					</DotHStack>
 					<CancelContainer onPress={handleFunction}>
-						<SkipText>건너뛰기</SkipText>
+						<SkipText>닫기</SkipText>
 					</CancelContainer>
 				</HStack>
 			) : (
-				<CustomButton label={'시작하기'} onPress={handleFunction}></CustomButton>
+				<CustomButton
+					label={scrollState ? '닫기' : '시작하기'}
+					onPress={handleFunction}
+					marginBottom={10}></CustomButton>
 			)}
 		</MainContainer>
 	);
@@ -76,7 +96,7 @@ const HStack = styled.View`
 const Dot = styled.View<{size: number}>`
 	width: ${props => props.size}px;
 	height: 10px;
-	background-color: ${props => (props.size == 20 ? colors.selectButton : 'white')};
+	background-color: ${props => (props.size == 20 ? colors.Primary : 'white')};
 	border-radius: 99px;
 	margin: 5px;
 `;
@@ -89,13 +109,14 @@ const CancelContainer = styled.TouchableOpacity`
 const MainContainer = styled.SafeAreaView`
 	flex: 1;
 	align-items: center;
-	background-color: rgba(122, 122, 122, 1);
+	background-color: rgba(102, 102, 102, 1);
 `;
-const ImageAllContainer = styled.View`
-	width: ${devicesWidth * 0.8}px;
-	margin: 0px ${devicesWidth * 0.1}px;
+const ImageAllContainer = styled.View<{scrollState: boolean}>`
+	width: ${devicesWidth}px;
+	align-items: center;
+	margin-bottom: ${heightPercentage(10)}px;
 `;
 const ImageContainer = styled.Image`
-	width: 100%;
+	width: ${widthPercentage(327)}px;
 	height: 100%;
 `;

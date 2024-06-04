@@ -1,17 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {
-	Dimensions,
-	FlatList,
-	Keyboard,
-	NativeModules,
-	Platform,
-	RefreshControl,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import {FlatList, Keyboard, NativeModules, Platform, RefreshControl, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
@@ -39,6 +29,8 @@ import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {SVGMoreHorizontal, SVGPencil} from '../../utill/svg/svg';
 const {StatusBarManager} = NativeModules;
 
 export default function CommunityReadingScreen({navigation, route}: any) {
@@ -60,7 +52,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 
 	const [commentContent, setCommentContent] = useState<string>('');
 	const [isCommentButtonDisabled, setCommentButtonDisabled] = useState<boolean>(true);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const {userId, userName, userProfileImage, socialloginProvider, blockUserList} = useAppSelector(
 		state => state.userSlice,
@@ -181,7 +172,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							actionSheetType.current = '게시글';
 							showCommunityReadingOptionActionSheet();
 						}}>
-						<MenuIcon name='more-horizontal'></MenuIcon>
+						<SVGMoreHorizontal />
 					</TouchableOpacity>
 				</View>
 			),
@@ -211,10 +202,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const fetchPostData = async () => {
 		try {
 			await dispatch(getOnePost({postId: route.params.postId}));
-			setIsLoading(false);
 			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
-			setIsLoading(false);
 			console.log('DB로부터 데이터를 가져오는 중에 오류가 발생했습니다:', error);
 		}
 	};
@@ -300,7 +289,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							setCommentData(data.item);
 							actionSheetType.current = '댓글';
 						}}>
-						<CommentMenuIcon name='more-horizontal' />
+						<SVGMoreHorizontal />
 					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
 				<CommentContent>{data.item.commentContent}</CommentContent>
@@ -441,7 +430,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					ListHeaderComponent={
 						<FlatListHeaderContainer>
 							<CommunityPost></CommunityPost>
-							<Divider></Divider>
 							<LiKeCommentBar></LiKeCommentBar>
 						</FlatListHeaderContainer>
 					}
@@ -462,9 +450,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						multiline={true}
 						onChangeText={text => setCommentContent(text)}
 						placeholder='댓글을 입력하세요...'
+						blurOnSubmit={true}
 					/>
 					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
-						<CommentSubmitButtonIcon name='send' isDisabled={isCommentButtonDisabled} />
+						<SVGPencil color='#70768E' />
 					</ClearContainer>
 				</CommentTextInputContainer>
 			</CommentInputContainer>
@@ -540,10 +529,6 @@ const CommentMenu = styled.TouchableOpacity`
 	justify-content: center;
 	flex: 1;
 `;
-const CommentMenuIcon = styled(FeatherIcon)`
-	font-size: 20px;
-	color: ${colors.selectButton};
-`;
 const CommentContent = styled.Text`
 	font-size: 16px;
 	margin-bottom: 8px;
@@ -563,22 +548,17 @@ const CommentInputContainer = styled.KeyboardAvoidingView`
 `;
 // 밝은 회색(#f0f0f0)인 영역
 const CommentTextInputContainer = styled(InputWrap)`
-	background-color: #f0f0f0;
-	border-radius: 16px;
-	width: 100%;
-	height: 50px;
-	padding-horizontal: 16px;
+	background-color: ${colors.Gray1};
+	padding: 0px ${widthPercentage(10)}px;
+	border-radius: 12px;
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(52)}px;
 	align-items: center;
 	border-width: 0px;
 `;
 // 실제 글이 입력될 영역
 const CommentTextInput = styled.TextInput`
 	width: 90%;
-`;
-// 댓글 등록 버튼
-const CommentSubmitButtonIcon = styled(FeatherIcon)<{isDisabled: boolean}>`
-	color: ${props => (props.isDisabled ? '#ccc' : colors.border)};
-	font-size: 24px;
 `;
 
 const CommentDivider = styled.View`

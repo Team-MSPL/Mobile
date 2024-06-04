@@ -2,12 +2,13 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {useEffect, useRef, useState} from 'react';
 import {clickLike, unclickLike} from '../../../redux/community/community.slice';
-import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import {colors} from '../../colors';
+import {HStack, PretendardVariableText} from '../../layout/layout';
+import {SVGHeart, SVGMessageSquare} from '../../svg/svg';
+import {widthPercentage} from '../../layout/responsive-size';
 
 export default function LiKeCommentBar() {
-	const {socialloginProvider, userId} = useAppSelector(state => state.userSlice);
+	const {userId} = useAppSelector(state => state.userSlice);
 	const {postData} = useAppSelector(state => state.communitySlice);
 	const [isLiked, setIsLiked] = useState<boolean>(false);
 	const [totalLike, setTotalLike] = useState(postData.liker.length);
@@ -32,49 +33,29 @@ export default function LiKeCommentBar() {
 	}, []);
 	return (
 		<>
-			<PostLikeCommentNumContainer>
+			<HStack gap={widthPercentage(10)} justifyContent='flex-end'>
+				<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+					{postData.postedAt.slice(0, 10)}
+				</PretendardVariableText>
 				<LikeButton onPress={handleLikePress}>
-					<HeartIcon name={isLiked ? 'heart' : 'hearto'} selected={isLiked}></HeartIcon>
-					<LikeCommentText>{isLiked ? '좋아요 취소' : '좋아요'}</LikeCommentText>
+					<SVGHeart color={isLiked ? 'red' : colors.backgroundWhite} />
+					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+						{totalLike}
+					</PretendardVariableText>
 				</LikeButton>
-				<CommentIcon name='message-circle' />
-				<LikeCommentText>{postData.comment.length}</LikeCommentText>
-			</PostLikeCommentNumContainer>
-			<LikeCommentText>{totalLike}명이 좋아합니다</LikeCommentText>
+				<HStack gap={widthPercentage(3)}>
+					<SVGMessageSquare />
+					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
+						{postData.comment.length}
+					</PretendardVariableText>
+				</HStack>
+			</HStack>
 		</>
 	);
 }
 
-const PostLikeCommentNumContainer = styled.View`
-	align-items: center;
-	flex-direction: row;
-	padding-vertical: 8px;
-	background-color: ${colors.main};
-`;
 const LikeButton = styled.TouchableOpacity`
 	align-items: center;
 	flex-direction: row;
-`;
-const HeartIcon = styled(AntDesignIcon)<{selected: boolean}>`
-	color: ${props => (props.selected ? 'red' : 'black')};
-	font-size: 24px;
-	margin-right: 4px;
-`;
-const LikeCommentText = styled.Text`
-	font-size: 14px;
-	color: black;
-	margin-right: 12px;
-`;
-const CommentIcon = styled(FeatherIcon)`
-	color: black;
-	font-size: 24px;
-	margin-right: 4px;
-`;
-
-const CommentItemContainer = styled.View`
-	width: 100%;
-	align-self: center;
-	margin-vertical: 8px;
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
+	gap: ${widthPercentage(3)}px;
 `;

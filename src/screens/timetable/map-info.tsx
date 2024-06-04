@@ -1,22 +1,64 @@
 import moment from 'moment';
-import {useEffect, useRef, useState} from 'react';
-import {Image, Linking, Platform, TouchableOpacity, View} from 'react-native';
+import {JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
-import {MainContainer, VStack} from '../../utill/layout/layout';
-import {PresetButton} from './preset';
-import {SvgApple, SvgPlace} from '../../utill/svg/svg';
+import {
+	FlexWrap,
+	HStack,
+	MainContainer,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	TagContainer,
+	VStack,
+} from '../../utill/layout/layout';
+import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
+import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
+import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import PrimaryButton from '../../utill/component/primary-button';
+import InfoView from '../../utill/component/timetable/info-view';
+import UseDatePicker from '../../utill/hooks/useDatePicker';
+import {SelectContainer} from '../enroll-info/select-day';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {usePosition} from '../../utill/hooks/usePosition';
+import {TagShopText} from '../home/main';
+import {SVGContainer} from '../enroll-info/select-multi';
+import {SVGPlus} from '../../utill/svg/svg';
+import {useViewPager} from '../../utill/hooks/useViewPager';
+import ViewPager from '../../utill/view-pager';
+import {
+	NestableScrollContainer,
+	NestableDraggableFlatList,
+	ScaleDecorator,
+	RenderItemParams,
+} from 'react-native-draggable-flatlist';
 
-export default function MapInfo({navigation, route}: any) {
-	const {timetable, day, transit} = useAppSelector(state => state.travelSlice);
+export default function MapInfo({navigation, modify, setModify, goSave}: any) {
+	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo, shareViewWithStartFlag} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
-	const viewRef = useRef(0);
-	const [selectPinIndex, setSecletPinIndex] = useState(-1);
+	const viewRef = useRef({
+		...timetable[0][0],
+		endHours: Math.floor((((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) / 60),
+		endMinute: (((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) % 60,
+		index: 0,
+		idx: 0,
+	});
+	const scrollRef = useRef();
+	const changeTouch = (idx: number) => {
+		//setSelect(idx);
+		let totalScroll = 0;
+		for (let i = 0; i < idx; i++) {
+			totalScroll += timetable[i].length;
+		}
+		scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
+	};
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
@@ -36,68 +78,102 @@ export default function MapInfo({navigation, route}: any) {
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
-		let navigationIndex = e + 1;
-		let transitCondition = transit == 1 ? 'public' : 'car';
-		if (excludeNames.includes(timetable[select][e + 1].name)) navigationIndex += 1;
-		const url = `nmap://route/${transitCondition}?slat=${timetable[select][e].lat}&slng=${timetable[select][e].lng}&sname=${timetable[select][e].name}&dlat=${timetable[select][navigationIndex].lat}&dlng=${timetable[select][navigationIndex].lng}&dname=${timetable[select][navigationIndex].name}&appname=다님`;
-		const supported = await Linking.canOpenURL(url);
-		if (supported) {
-			await Linking.openURL(url);
-		} else {
-			if (Platform.OS === 'android') {
-				const GOOGLE_PLAY_STORE_LINK = 'market://details?id=com.nhn.android.nmap';
-				await Linking.openURL(GOOGLE_PLAY_STORE_LINK);
+		try {
+			let navigationIndex = e - 1;
+			let transitCondition = transit == 1 ? 'public' : 'car';
+			if (excludeNames.includes(timetable[select][e - 1].name)) navigationIndex -= 1;
+			const url = `nmap://route/${transitCondition}?slat=${timetable[select][navigationIndex].lat}&slng=${timetable[select][navigationIndex].lng}&sname=${timetable[select][navigationIndex].name}&dlat=${timetable[select][e].lat}&dlng=${timetable[select][e].lng}&dname=${timetable[select][e].name}&appname=다님`;
+			const supported = await Linking.canOpenURL(url);
+			if (supported) {
+				await Linking.openURL(url);
 			} else {
-				const APPLE_APP_STORE_LINK = 'http://itunes.apple.com/app/id311867728?mt=8';
-				await Linking.openURL(APPLE_APP_STORE_LINK);
+				if (Platform.OS === 'android') {
+					const GOOGLE_PLAY_STORE_LINK = 'market://details?id=com.nhn.android.nmap';
+					await Linking.openURL(GOOGLE_PLAY_STORE_LINK);
+				} else {
+					const APPLE_APP_STORE_LINK = 'http://itunes.apple.com/app/id311867728?mt=8';
+					await Linking.openURL(APPLE_APP_STORE_LINK);
+				}
 			}
+		} catch (e) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '길찾기를 진행할 관광지가 없습니다.',
+					modalSubTitle: '추천 관광지를 받은 후 다시 시도해주세요',
+					modalSingleUse: true,
+				}),
+			);
 		}
 	};
+	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
+	const polylines:
+		| string
+		| number
+		| boolean
+		| JSX.Element[]
+		| ReactElement<any, string | JSXElementConstructor<any>>
+		| null
+		| undefined = [];
+	let positions: {latitude: number; longitude: number}[] = [];
 	const mapRef = useRef<MapView>(null);
-
-	const polylineCoordinates = timetable[select]
-		.map((item, value) => {
-			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
-				return {latitude: item.lat, longitude: item.lng};
-			}
-			return null;
-		})
-		.filter(items => items !== null);
-	let count = 0;
-	const markers = timetable[select]
-		.map((value, idx) => {
-			if (value.name != '점심 추천' && value.name != '저녁 추천' && value.name !== '숙소 추천') {
+	timetable.forEach((value, index) => {
+		const polylineCoordinates = value
+			.map((item, value) => {
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					return {latitude: item.lat, longitude: item.lng};
+				}
+				return null;
+			})
+			.filter(items => items !== null);
+		value.map(vvalue =>
+			positions.push({
+				latitude: vvalue.lat,
+				longitude: vvalue.lng,
+			}),
+		);
+		let count = 0;
+		markers.push(
+			value.map((item, idx) => {
 				count += 1;
-				return (
-					<Marker
-						key={`marker_${idx}`}
-						coordinate={{latitude: value.lat, longitude: value.lng}}
-						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
-						anchor={{x: 0.5, y: 0.9}}
-						pinColor={idx == selectPinIndex ? 'yellow' : 'red'}
-						style={{width: 50, height: 50}}>
-						<MarkerText>{count}</MarkerText>
-						<SvgPlace color={'#F08676'} width={50} height={50} />
-					</Marker>
-				);
-			}
-			return null;
-		})
-		.filter(marker => marker !== null);
-	const polylines = timetable[select].map((val, ind) => (
-		<Polyline
-			key={`polyline_${ind}`}
-			coordinates={polylineCoordinates}
-			strokeColor={'red'}
-			strokeWidth={5} // You can change the width of the line here
-		/>
-	));
+				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
+					return (
+						<Marker
+							key={`marker_${idx}`}
+							coordinate={{latitude: item.lat, longitude: item.lng}}
+							title={item.name}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							anchor={{x: 0.5, y: 0.5}}
+							style={{zIndex: 4}}>
+							{index == select ? (
+								<MarkerContainer key={idx}>
+									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+										{count}
+									</PretendardSemiBoldText>
+								</MarkerContainer>
+							) : (
+								<Circle color={colors.Gray5} key={idx} />
+							)}
+						</Marker>
+					);
+				} else {
+					return null;
+				}
+			}),
+		);
+		polylines.push(
+			<Polyline
+				key={`polyline_${index}`}
+				coordinates={polylineCoordinates}
+				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
+				strokeWidth={2} // You can change the width of the line here
+			/>,
+		);
+	});
 
-	const minLatitude = Math.min(...polylineCoordinates.map(marker => marker.latitude));
-	const maxLatitude = Math.max(...polylineCoordinates.map(marker => marker.latitude));
-	const minLongitude = Math.min(...polylineCoordinates.map(marker => marker.longitude));
-	const maxLongitude = Math.max(...polylineCoordinates.map(marker => marker.longitude));
+	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
+	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
+	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
+	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
 
 	// 경계 상자의 중심 좌표 계산
 	const centerLatitude = (maxLatitude + minLatitude) / 2;
@@ -134,110 +210,772 @@ export default function MapInfo({navigation, route}: any) {
 		// 		}),
 		// 	);
 		// }
-		console.log('예에에에에ㅔ', polylineCoordinates.length);
 	}, []);
+	const goRemove = () => {
+		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
+		dispatch(travelSliceActions.changeTimetable(a));
+	};
 	const goBack = () => {
 		navigation.goBack();
 	};
+	const [qw, seA] = useState(0);
+	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
+		if (timeView.value == 'left') {
+			viewRef.current.y =
+				(parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0) - 6) * 2 + parseInt(timeData.minute) / 30;
+		} else {
+			viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
+			viewRef.current.endMinute = parseInt(timeData.minute);
+		}
+		seA(qw + 1);
+		return true;
+	};
+
+	const [saveView, setSaveView] = useState(true);
+	const changeViewState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const state = usePosition(e);
+		state != saveView && setSaveView(state);
+	};
+	const openModal = (index, idx) => {
+		viewRef.current = {
+			...timetable[index][idx],
+			endHours: Math.floor(
+				(((timetable[index][idx].y ?? 0) + timetable[index][idx].takenTime / 30) * 30 + 360) / 60,
+			),
+			endMinute: (((timetable[index][idx].y ?? 0) + timetable[index][idx].takenTime / 30) * 30 + 360) % 60,
+			index: index,
+			idx: idx,
+		};
+		timeView.status && setTimeView({status: false, value: ''});
+		setVisible(true);
+	};
+	const [timeView, setTimeView] = useState({status: false, value: ''});
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
-	if (polylineCoordinates.length == 0) {
+	const goModify = () => {
+		setVisible(false);
+		const newY = viewRef.current.y;
+		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
+		if (newEnd >= 49) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
+		} else {
+			let copy = [...timetable[changeDay]];
+			let changeCopy = [...timetable];
+			let changeFlag = null;
+			for (let i = 0; i < copy.length; i++) {
+				if (
+					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+							newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+					copy[i].id != viewRef.current.id
+				) {
+					changeFlag = copy[i];
+					break;
+				}
+			}
+			let changeInputIndex = copy.findIndex(item => item.y >= newY);
+			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+			if (changeFlag) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+					}),
+				);
+			} else {
+				let copyValue = {
+					...changeCopy[viewRef.current.index][viewRef.current.idx],
+					y: newY,
+					x: viewRef.current.index,
+					takenTime: (newEnd - newY) * 30,
+				};
+				let deleteCopy = [...timetable[viewRef.current.index]];
+				deleteCopy.splice(viewRef.current.idx, 1);
+				changeCopy[viewRef.current.index] = deleteCopy;
+				let addCopy = [...changeCopy[changeDay]];
+				addCopy.splice(changeInputIndex, 0, copyValue);
+				changeCopy[changeDay] = addCopy;
+				dispatch(travelSliceActions.changeTimetable(changeCopy));
+			}
+		}
+		// setVisible(false);
+		// const newY = viewRef.current.y;
+		// const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
+		// if (newEnd >= 49) {
+		// 	dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
+		// } else {
+		// 	let copy = [...timetable[viewRef.current.index]];
+		// 	let changeCopy = [...timetable];
+		// 	let changeFlag = null;
+		// 	for (let i = 0; i < copy.length; i++) {
+		// 		if (
+		// 			((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+		// 				(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+		// 					newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+		// 			copy[i].id != viewRef.current.id
+		// 		) {
+		// 			changeFlag = copy[i];
+		// 			break;
+		// 		}
+		// 	}
+		// 	let changeInputIndex = copy.findIndex(item => item.y >= newY);
+		// 	changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
+		// 	if (changeFlag) {
+		// 		dispatch(
+		// 			modalSliceActions.setOpenModal({
+		// 				modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
+		// 			}),
+		// 		);
+		// 	} else {
+		// 		let copyValue = {
+		// 			...changeCopy[viewRef.current.index][viewRef.current.idx],
+		// 			y: newY,
+		// 			x: viewRef.current.index,
+		// 			takenTime: (newEnd - newY) * 30,
+		// 		};
+		// 		let deleteCopy = [...timetable[viewRef.current.index]];
+		// 		deleteCopy.splice(viewRef.current.idx, 1);
+		// 		changeCopy[viewRef.current.index] = deleteCopy;
+		// 		let addCopy = [...changeCopy[viewRef.current.index]];
+		// 		addCopy.splice(changeInputIndex, 0, copyValue);
+		// 		changeCopy[viewRef.current.index] = addCopy;
+		// 		dispatch(travelSliceActions.changeTimetable(changeCopy));
+		// 	}
+		// }
+	};
+	let totalHeight = 0;
+	const presetScrollHeight = timetable.map((item, idx) => {
+		totalHeight += item.length * 76 + idx * 17 + idx * widthPercentage(10);
+		return totalHeight;
+	});
+	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const scrollY = e.nativeEvent.contentOffset.y;
+		// 스크롤뷰의 높이를 가져옵니다.
+		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
+		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
+		if (scrollY + scrollViewHeight + (scrollY + scrollViewHeight) * 0.1 > e.nativeEvent.contentSize.height) {
+			change(presetScrollHeight.length - 1);
+		} else if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
+		}
+	};
+	const CancelModify = () => {
+		setModify(false);
+	};
+	const checkAccommodation = () => {
+		if (select == timetable.length - 1) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '마지막 날입니다',
+					modalSubTitle: '마지막 날은 숙소를 추가할 수 없습니다.',
+				}),
+			);
+		} else if (
+			timetable[select][timetable[select].length - 1].category == 4 &&
+			timetable[select][timetable[select].length - 1].name != '숙소 추천'
+		) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '숙소가 있습니다.',
+					modalSubTitle: '숙소를 제거한 후 시도해주세요',
+				}),
+			);
+		} else {
+			navigation.navigate('TimetableAddPlace', {
+				x: select,
+				y: [],
+				status: 'accommodation',
+			});
+		}
+	};
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({
+		title: modify ? 'modifyViewPager' : 'timetableViewPager',
+	});
+	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
+		let idx = getIndex() ?? 0;
+		return (
+			<ScaleDecorator>
+				{!excludeNames.includes(item.name) ? (
+					<HStack gap={widthPercentage(10)}>
+						<InsideGrayContainer
+							onLongPress={() => {
+								changeLocationRef.current.before = idx;
+								drag();
+							}}
+							onPress={() => {
+								moveRegion(idx);
+							}}>
+							<HStack justifyContent='space-between'>
+								<VStack>
+									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+										{categoryTitle[item.category]} {Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+										{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
+										{Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) < 25 &&
+											Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) +
+												':' +
+												String(
+													(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) % 60,
+												).padStart(2, '0')}
+									</PretendardVariableText>
+									<PretendardSemiBoldText
+										maxWidth={widthPercentage(200)}
+										size={14}
+										lineHeight={18.9}
+										color={colors.Gray5}>
+										{item.name}
+									</PretendardSemiBoldText>
+								</VStack>
+								<Pressable
+									onPress={() => {
+										openModal(item.x, idx);
+									}}>
+									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.PointYellow}>
+										편집
+									</PretendardSemiBoldText>
+								</Pressable>
+							</HStack>
+						</InsideGrayContainer>
+					</HStack>
+				) : (
+					<HStack>
+						<InfoView
+							navigation={navigation}
+							test={item}
+							index={idx}
+							idx={item.x}
+							modify={false}
+							CancelModify={CancelModify}
+							drag={drag}
+						/>
+					</HStack>
+				)}
+			</ScaleDecorator>
+		);
+	};
+	const changeLocation = (data: any) => {
+		let copy = [...timetable];
+		timetable[data[0].x].map((item, index) => {
+			data[index] = {...data[index], y: item.y, takenTime: item.takenTime};
+		});
+		copy[data[0].x] = data;
+		dispatch(travelSliceActions.changeTimetable(copy));
+	};
+	const [changeDay, setChangeDay] = useState(0);
+	const changeLocationRef = useRef({before: 0, after: 1});
+	useEffect(() => {
+		console.log('옴', shareViewWithStartFlag);
+		shareViewWithStartFlag && getMainViewPager();
+	}, [shareViewWithStartFlag, modify]);
+	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
 	return (
 		<MainAllContainer>
-			<VStack>
-				{timetable.map(
-					(item, idx) =>
-						select == idx && (
-							<MapView
-								key={idx}
-								ref={mapRef}
-								//provider={PROVIDER_GOOGLE}
-								showsMyLocationButton={true}
-								style={{width: '100%', height: 300}}
-								showsUserLocation={true}
-								region={{
-									latitude: centerLatitude,
-									longitude: centerLongitude,
-									latitudeDelta: deltaLatitude + deltaLatitude,
-									longitudeDelta: deltaLongitude + deltaLongitude,
-								}}>
-								{markers}
-								{polylines}
-							</MapView>
-						),
-				)}
-
-				<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-					{timetable.map(
+			<AbsoluteTopBar opacityState={modify}>
+				<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
+					<RegionImage
+						source={{
+							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
+						}}
+					/>
+					<VStack>
+						<HStack>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
+								{region[0]}
+								{region.length >= 2 ? ` +${region.length - 1}` : ''}
+							</PretendardVariableText>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{' '}
+								| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
+							</PretendardVariableText>
+						</HStack>
+						<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+							{travelName}
+						</PretendardSemiBoldText>
+					</VStack>
+					<VStack gap={heightPercentage(3)} alignItems='flex-end'>
+						<TagContainer backgroundColor={colors.backgroundWhite}>
+							<TagShopText color={colors.Gray2} size={12}>
+								#
+							</TagShopText>
+							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+								{!transit ? '자동차·렌트카' : '대중교통'}
+							</PretendardSemiBoldText>
+						</TagContainer>
+						<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
+							<TagShopText color={colors.Gray2} size={12}>
+								#
+							</TagShopText>
+							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
+								{bandwidth ? '여유있는 일정' : '알찬 일정'}
+							</PretendardSemiBoldText>
+						</TagContainer>
+					</VStack>
+				</HStack>
+			</AbsoluteTopBar>
+			<VStack flex={1}>
+				{!modify &&
+					timetable.map(
 						(item, idx) =>
-							item.length != 0 && (
-								<DayButton
+							select == idx && (
+								<MapView
 									key={idx}
-									select={idx === select}
-									onPress={() => {
-										console.log(deltaLatitude, deltaLongitude), change(idx);
+									ref={mapRef}
+									//provider={PROVIDER_GOOGLE}
+									showsMyLocationButton={true}
+									style={{width: '100%', flex: 0.45}}
+									showsUserLocation={true}
+									region={{
+										latitude: centerLatitude,
+										longitude: centerLongitude,
+										latitudeDelta: deltaLatitude + deltaLatitude + 0.02,
+										longitudeDelta: deltaLongitude + deltaLongitude + 0.02,
 									}}>
-									<DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-									<DaySubTitle select={idx === select}>
-										{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-									</DaySubTitle>
-								</DayButton>
+									{markers}
+									{polylines}
+								</MapView>
 							),
 					)}
-				</DayContainer>
-				<DayScrollView>
-					{timetable[select].map((value, index) => {
-						if (!excludeNames.includes(value.name)) {
-							return (
-								<DaysContainer key={index}>
-									<DayElementContainer>
-										<PlaceContainer
+				<BackgroundGray modify={modify}>
+					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
+							{timetable.map(
+								(item, idx) =>
+									item.length != 0 && (
+										<DayTouchablOpacity
+											key={idx}
+											select={idx === select}
 											onPress={() => {
-												moveRegion(index);
+												changeTouch(idx);
 											}}>
-											<VStack>
-												<PlaceText>{categoryTitle[value.category]}</PlaceText>
-												<DayTimeText>
-													{Math.floor((value.y * 30 + 360) / 60)}:
-													{String((value.y * 30 + 360) % 60).padStart(2, '0')}~
-													{Math.floor(((value.y + value.takenTime / 30) * 30 + 360) / 60)}:
-													{String(
-														((value.y + value.takenTime / 30) * 30 + 360) % 60,
-													).padStart(2, '0')}
-												</DayTimeText>
-											</VStack>
-											<PlaceText>{value.name}</PlaceText>
-										</PlaceContainer>
-									</DayElementContainer>
-									<DayElementContainer>
-										{value.id != noMove[noMove.length - 1].id && (
-											<MoveContainer
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={19}
+												color={select == idx ? colors.Gray5 : colors.Gray3}>
+												{'DAY' + (idx + 1)}
+											</PretendardSemiBoldText>
+											{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
+										<DaySubTitle select={idx === select}>
+											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+										</DaySubTitle> */}
+										</DayTouchablOpacity>
+									),
+							)}
+						</FlexWrap>
+					</DayContainer>
+					<HStack justifyContent='space-between'>
+						<WhiteContainer width={widthPercentage(160)}>
+							<HStack justifyContent='space-between' width={widthPercentage(140)}>
+								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+									여행지
+								</PretendardSemiBoldText>
+								<SVGContainer
+									color={colors.PointYellow}
+									onPress={() => {
+										navigation.navigate('TimetableAddPlace', {x: select, y: [], status: 'travle'});
+									}}>
+									<SVGPlus color={colors.Primary} />
+								</SVGContainer>
+							</HStack>
+						</WhiteContainer>
+						<WhiteContainer width={widthPercentage(160)}>
+							<HStack justifyContent='space-between' width={widthPercentage(140)}>
+								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+									숙소
+								</PretendardSemiBoldText>
+								<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
+									<SVGPlus color={colors.Primary} />
+								</SVGContainer>
+							</HStack>
+						</WhiteContainer>
+					</HStack>
+					{modify ? (
+						<DayScrollView
+							ref={scrollRef}
+							// onScroll={e => {
+							// 	console.log('a');
+							// 	scrollhandle(e);
+							// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
+							onMomentumScrollEnd={e => {
+								changeViewState(e), scrollhandle(e);
+							}}>
+							{timetable.map(
+								(value, index) =>
+									value.length != 0 && (
+										<WhiteContainer width={widthPercentage(327)} key={index} alignItems='center'>
+											<PretendardSemiBoldText
+												style={{alignSelf: 'flex-start'}}
+												marginBottom={heightPercentage(10)}
+												size={14}
+												lineHeight={16.71}
+												color={colors.Gray5}>
+												{moment(day[index]).format('YY.MM.DD')} (
+												{weekdays[moment(day[index]).day()]})
+											</PretendardSemiBoldText>
+
+											<NestableDraggableFlatList
+												onPlaceholderIndexChange={qwe =>
+													(changeLocationRef.current.after = qwe)
+												}
+												containerStyle={{height: heightPercentage(76) * value.length}}
+												data={value}
+												onDragEnd={({data}) => changeLocation(data)}
+												keyExtractor={item => item.id}
+												renderItem={renderItem}
+											/>
+										</WhiteContainer>
+									),
+							)}
+						</DayScrollView>
+					) : (
+						<DayScrollViews
+							ref={scrollRef}
+							onScroll={e => {
+								scrollhandle(e);
+							}}
+							onMomentumScrollEnd={e => {
+								changeViewState(e);
+							}}>
+							{timetable.map(
+								(value, index) =>
+									value.length != 0 && (
+										<WhiteContainer width={widthPercentage(327)} key={index}>
+											<PretendardSemiBoldText
+												marginBottom={heightPercentage(10)}
+												size={14}
+												lineHeight={16.71}
+												color={colors.Gray5}>
+												{moment(day[index]).format('YY.MM.DD')} (
+												{weekdays[moment(day[index]).day()]})
+											</PretendardSemiBoldText>
+											{value.map((item, idx) =>
+												!excludeNames.includes(item.name) ? (
+													<HStack gap={widthPercentage(10)} key={idx}>
+														<DashLineContainer justifyContent='start'>
+															<MarkerContainer>
+																<PretendardSemiBoldText
+																	size={13}
+																	lineHeight={19}
+																	color={colors.backgroundWhite}>
+																	{idx + 1}
+																</PretendardSemiBoldText>
+															</MarkerContainer>
+															<DashLine
+																status={
+																	idx == value.length - 1 ? 'end' : 'center'
+																}></DashLine>
+														</DashLineContainer>
+														<InsideGrayContainer
+															onPress={() => {
+																moveRegion(idx);
+															}}>
+															<HStack justifyContent='space-between'>
+																<VStack>
+																	<PretendardVariableText
+																		size={12}
+																		lineHeight={18}
+																		color={colors.Gray2}>
+																		{categoryTitle[item.category]}{' '}
+																		{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+																		{String(
+																			((item.y ?? 0) * 30 + 360) % 60,
+																		).padStart(2, '0')}{' '}
+																		~{' '}
+																		{Math.floor(
+																			(((item.y ?? 0) + item.takenTime / 30) *
+																				30 +
+																				360) /
+																				60,
+																		) < 25 &&
+																			Math.floor(
+																				(((item.y ?? 0) + item.takenTime / 30) *
+																					30 +
+																					360) /
+																					60,
+																			) +
+																				':' +
+																				String(
+																					(((item.y ?? 0) +
+																						item.takenTime / 30) *
+																						30 +
+																						360) %
+																						60,
+																				).padStart(2, '0')}
+																	</PretendardVariableText>
+																	<PretendardSemiBoldText
+																		maxWidth={widthPercentage(200)}
+																		size={14}
+																		lineHeight={18.9}
+																		color={colors.Gray5}>
+																		{item.name}
+																	</PretendardSemiBoldText>
+																</VStack>
+																{idx != 0 && (
+																	<PrimaryButton
+																		onPress={() => {
+																			goNavigation(idx);
+																		}}
+																		label='길찾기'
+																		textSize={12}
+																		lineHeight={18}
+																		width={widthPercentage(52)}
+																		height={heightPercentage(22)}
+																		backgroundColor={colors.Primary}
+																		textColor={colors.Gray5}></PrimaryButton>
+																)}
+															</HStack>
+														</InsideGrayContainer>
+													</HStack>
+												) : (
+													<HStack key={idx}>
+														<DashLineContainer justifyContent='start'>
+															<MarkerContainer
+																backgroundColor={
+																	item.category == 4 ? colors.PointGreen1 : undefined
+																}>
+																<PretendardSemiBoldText
+																	size={13}
+																	lineHeight={19}
+																	color={colors.backgroundWhite}>
+																	{idx + 1}
+																</PretendardSemiBoldText>
+															</MarkerContainer>
+															<DashLine
+																status={
+																	idx == value.length - 1 ? 'end' : 'center'
+																}></DashLine>
+														</DashLineContainer>
+														<InsideGrayContainer backgroundColor={colors.backgroundWhite}>
+															<InfoView
+																navigation={navigation}
+																test={item}
+																index={idx}
+																idx={index}
+																modify={false}
+																CancelModify={CancelModify}
+															/>
+														</InsideGrayContainer>
+													</HStack>
+												),
+											)}
+										</WhiteContainer>
+									),
+							)}
+						</DayScrollViews>
+					)}
+				</BackgroundGray>
+				{saveView && (
+					<AbsoluteButton onPress={goSave}>
+						<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
+							저장
+						</PretendardSemiBoldText>
+					</AbsoluteButton>
+				)}
+				<Modal
+					visible={visible}
+					animationType={'fade'}
+					transparent={true}
+					statusBarTranslucent={true}
+					onRequestClose={() => setVisible(false)}>
+					<ModalContainer onPress={() => setVisible(false)}>
+						<InfoModalContainer>
+							<HStack gap={widthPercentage(10)}>
+								<PretendardSemiBoldText size={17.78} lineHeight={24} color={colors.Gray5}>
+									{viewRef.current.name}
+								</PretendardSemiBoldText>
+								<PretendardVariableText size={13.33} lineHeight={20} color={colors.Gray2}>
+									{categoryTitle[viewRef.current.category]}
+								</PretendardVariableText>
+							</HStack>
+							<FlexWrap gap={10} margintop={15}>
+								{timetable.map(
+									(item, idx) =>
+										item.length != 0 && (
+											<ChangeDayContainer
+												key={idx}
+												select={idx === changeDay}
 												onPress={() => {
-													goNavigation(index);
+													setChangeDay(idx);
 												}}>
-												<PlaceText>이동</PlaceText>
-												<DayTimeText>* 네이버 길찾기로 연결됩니다</DayTimeText>
-											</MoveContainer>
-										)}
-									</DayElementContainer>
-								</DaysContainer>
-							);
-						} else {
-							return null; // '저녁 추천'이나 '점심 추천'인 경우 아무 것도 렌더링하지 않음
-						}
-					})}
-				</DayScrollView>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={19}
+													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
+													{moment(day[idx]).format('MM월DD일')}
+												</PretendardSemiBoldText>
+												{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
+										<DaySubTitle select={idx === select}>
+											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
+										</DaySubTitle> */}
+											</ChangeDayContainer>
+										),
+								)}
+							</FlexWrap>
+							<HStack justifyContent='space-between' marginVertical={5}>
+								<SelectContainer
+									onPress={() => {
+										setTimeView({status: !timeView.status, value: 'left'});
+									}}>
+									<HStack justifyContent='space-between'>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12 ? 'AM' : 'PM'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											:
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{String(((viewRef.current.y ?? 0) * 30 + 360) % 60).padStart(2, '0')}
+										</PretendardSemiBoldText>
+									</HStack>
+								</SelectContainer>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									~
+								</PretendardSemiBoldText>
+								<SelectContainer
+									onPress={() => {
+										setTimeView({status: !timeView.status, value: 'right'});
+									}}>
+									<HStack justifyContent='space-between'>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{viewRef.current.endHours < 12 ? 'AM' : 'PM'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{viewRef.current.endHours}
+											{/* {viewRef.current.endHours < 12
+												? viewRef.current.endHours
+												: viewRef.current.endHours - 12} */}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											:
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+											{String(viewRef.current.endMinute).padStart(2, '0')}
+										</PretendardSemiBoldText>
+									</HStack>
+								</SelectContainer>
+							</HStack>
+							<TimePickerContainer alignSelf={timeView.value == 'right' ? 'flex-end' : 'flex-start'}>
+								<UseDatePicker
+									goConfirm={goConfirm}
+									minuteData={
+										timeView.value == 'right'
+											? viewRef.current.endMinute / 30
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) % 60) / 30
+									}
+									ampmData={
+										timeView.value == 'right'
+											? Math.floor(
+													(((viewRef.current.y ?? 0) + viewRef.current.takenTime / 30) * 30 +
+														360) /
+														60,
+											  ) < 12
+												? 0
+												: 1
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+											? 0
+											: 1
+									}
+									hourData={
+										timeView.value == 'right'
+											? viewRef.current.endHours < 12
+												? viewRef.current.endHours
+												: viewRef.current.endHours - 12
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+											? Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)
+											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) - 12
+									}
+									visible={timeView.status}
+									setVisible={setVisible}></UseDatePicker>
+							</TimePickerContainer>
+							<HStack justifyContent='space-between'>
+								<ButtonsContainer
+									backgroundColor={colors.Gray1}
+									onPress={() => {
+										setVisible(false);
+										dispatch(
+											modalSliceActions.setOpenModal({
+												modalTitle: `'${viewRef.current.name}' 일정을 삭제할까요?`,
+												modalSubTitle: '추천받은 일정을 삭제하면 되돌릴 수 없어요.',
+												modalFunction: goRemove,
+												modalBottomText: '취소',
+												modalTopText: '삭제할래요',
+											}),
+										);
+									}}>
+									<PretendardVariableText size={16} lineHeight={19} color={colors.PointGreen1}>
+										삭제
+									</PretendardVariableText>
+								</ButtonsContainer>
+								<ButtonsContainer backgroundColor='#D5FF734D' onPress={goModify}>
+									<PretendardVariableText size={16} lineHeight={19} color={colors.Gray5}>
+										저장
+									</PretendardVariableText>
+								</ButtonsContainer>
+							</HStack>
+						</InfoModalContainer>
+					</ModalContainer>
+				</Modal>
 			</VStack>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={viewPagerState}
+				onRequestClose={deleteMainViewPager}>
+				<ViewPager sliceNumber={modify ? 4 : 3} handleFunction={deleteMainViewPager} />
+			</Modal>
 		</MainAllContainer>
 	);
 }
-
-const mapColor = ['black', 'blue', 'red', 'orange', 'pink'];
-export const DayContainer = styled.ScrollView`
-	height: 80px;
+const ChangeDayContainer = styled.TouchableOpacity<{select: boolean}>`
+	padding: ${heightPercentage(5)}px ${widthPercentage(10)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 99px;
+	border-width: ${props => (props.select ? '0px' : '1px')};
+	border-color: ${colors.Gray3};
+	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
 `;
+const AbsoluteButton = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(60)}px;
+	border-radius: 8px;
+	background-color: ${colors.Gray5};
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	bottom: ${heightPercentage(30)}px;
+	align-self: center;
+`;
+const ButtonsContainer = styled.TouchableOpacity<{backgroundColor: string}>`
+	width: ${widthPercentage(160)}px;
+	height: ${heightPercentage(50)}px;
+	border-radius: 8px;
+	background-color: ${props => props.backgroundColor};
+	align-items: center;
+	justify-content: center;
+`;
+export const TimePickerContainer = styled.View<{alignSelf: string}>`
+	align-self: ${props => props.alignSelf};
+	height: ${heightPercentage(140)}px;
+`;
+export const InfoModalContainer = styled.View`
+	flex: 0.5;
+	position: absolute;
+	bottom: 0px;
+	background-color: ${colors.backgroundGray};
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(409)}px;
+	border-top-right-radius: 16px;
+	border-top-left-radius: 16px;
+	padding: ${heightPercentage(23.22)}px ${widthPercentage(24)}px;
+`;
+const ModalContainer = styled.Pressable`
+	flex: 1;
+	background-color: rgba(0, 0, 0, 0.4);
+`;
+export const DayContainer = styled.ScrollView``;
 const PlaceText = styled.Text`
 	font-size: 16px;
 	font-weight: bold;
@@ -264,32 +1002,16 @@ export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};
 `;
-const DaysContainer = styled.View`
-	padding: 2%;
-`;
-
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
-
-const DayScrollView = styled.ScrollView`
-	height: 40%;
+const DayScrollViews = styled.ScrollView`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(230)}px;
 `;
-
-const MoveContainer = styled.TouchableOpacity`
-	width: 100%;
-	padding: 5%;
-	align-items: center;
-	justify-content: space-around;
-	flex-direction: row;
-`;
-const PlaceContainer = styled(MoveContainer)`
-	flex-direction: row;
-	justify-content: space-between;
-`;
-const DayTimeText = styled.Text`
-	font-size: 14px;
-	color: ${colors.selectButton};
+const DayScrollView = styled(NestableScrollContainer)`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(500)}px;
 `;
 export const MarkerText = styled.Text`
 	position: absolute;
@@ -299,4 +1021,32 @@ export const MarkerText = styled.Text`
 	z-index: 1;
 	left: 20px;
 	bottom: 10px;
+`;
+
+const BackgroundGray = styled.View<{modify: boolean}>`
+	width: ${widthPercentage(375)}px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	background-color: ${colors.backgroundGray};
+	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
+	flex: ${props => (props.modify ? 1 : 0.55)};
+`;
+const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
+	width: ${widthPercentage(282)}px;
+	height: ${heightPercentage(66)}px;
+	border-radius: 8px;
+	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
+	justify-content: center;
+	padding-horizontal: ${widthPercentage(10)}px;
+	margin-bottom: ${heightPercentage(10)}px;
+`;
+
+export const AbsoluteTopBar = styled.View<{opacityState: boolean}>`
+	width: 100%;
+	height: ${heightPercentage(71)}px;
+	position: ${props => (props.opacityState ? 'relative' : 'absolute')};
+	top: 0;
+	z-index: 100;
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 0px ${widthPercentage(12)}px;
 `;

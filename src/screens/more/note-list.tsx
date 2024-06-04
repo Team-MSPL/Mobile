@@ -5,10 +5,15 @@ import {getNoteList} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
-import Clipboard from '@react-native-clipboard/clipboard';
-import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/AntDesign';
+import {
+	BackgroundGray,
+	Center,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
+import {widthPercentage} from '../../utill/layout/responsive-size';
+import {SVGDanimLogo} from '../../utill/svg/svg';
 export default function NoteList({navigation}: any) {
 	const dispatch = useAppDispatch();
 
@@ -25,66 +30,49 @@ export default function NoteList({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const handleCopyClipBoard = (e: string) => {
-		try {
-			Clipboard.setString(e);
-			Toast.show({type: 'success', text1: '복사가 완료되었습니다.', position: 'bottom'});
-		} catch (err) {
-			console.log('qwe', err);
-		}
-	};
 	useEffect(() => {
 		getNoteListData();
 	}, []);
 	if (isLoading) return <></>;
 	return (
-		<MainContainer>
+		<BackgroundGray>
 			{noteList.length == 0 ? (
-				<ElementText>쪽지가 없습니다!</ElementText>
+				<Center>
+					<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>
+						쪽지가 없습니다
+					</PretendardVariableText>
+				</Center>
 			) : (
 				<ElementScrollView>
 					{noteList.map((item, idx) => (
 						<ElementContainer key={idx}>
-							<ElementText>{item}</ElementText>
-							<ClopTouchable
-								onPress={() => {
-									handleCopyClipBoard(item);
-								}}>
-								<Icon name='copy1' size={25} color={'black'}></Icon>
-							</ClopTouchable>
+							<HStack marginHorizon={-widthPercentage(30)} gap={widthPercentage(10)}>
+								<SVGDanimLogo />
+								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+									다님
+								</PretendardSemiBoldText>
+							</HStack>
+							<PretendardVariableText
+								selectable
+								size={14}
+								lineHeight={21}
+								color={colors.Black}
+								textAlign='left'>
+								{item}
+							</PretendardVariableText>
 						</ElementContainer>
 					))}
 				</ElementScrollView>
 			)}
-		</MainContainer>
+		</BackgroundGray>
 	);
 }
-
-const ElementText = styled.Text`
-	font-size: 20px;
-	font-weight: 500;
-	color: black;
-	width: 80%;
-`;
-const MainContainer = styled.View`
-	flex: 1;
-	align-items: center;
-	justify-content: center;
-	padding: 10px;
-	background-color: ${colors.main};
-`;
-const ElementContainer = styled(HStack)`
+const ElementContainer = styled.View`
 	width: 100%;
 	border-bottom-width: 1px;
-	justify-content: space-between;
-	padding: 10px;
-	border-bottom-color: ${colors.regionNormal};
+	padding: ${widthPercentage(10)}px ${widthPercentage(30)}px;
+	border-bottom-color: ${colors.Gray1};
 `;
 const ElementScrollView = styled.ScrollView`
 	width: 100%;
-`;
-const ClopTouchable = styled.TouchableOpacity`
-	width: 20%;
-	align-items: center;
-	justify-content: center;
 `;

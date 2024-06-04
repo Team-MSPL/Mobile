@@ -16,6 +16,9 @@ import MyTravelListStack from './my-travel-list-stack';
 import RegionRecommendStack from './region-recommend-stack';
 import TimetableStack from './timetable-stack';
 import {colors} from '../utill/colors';
+import HomeModal from '../screens/login/home-modal';
+import HikingStack from './hiking-stack';
+import {widthPercentage} from '../utill/layout/responsive-size';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -33,6 +36,7 @@ export default function StackNavigator() {
 			})}>
 			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
+			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
 
 			{TimetableStack()}
 			{CommunityStack()}
@@ -40,6 +44,7 @@ export default function StackNavigator() {
 			{MyTravelListStack()}
 			{MoreStack()}
 			{JoinStack()}
+			{HikingStack()}
 			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />
@@ -76,14 +81,16 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
 						</View>
 					),
 					title: '홈',
-					headerShown: true,
+					headerShown: false,
 					headerStyle: {backgroundColor: colors.main},
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
 				}}
 			/>
@@ -92,8 +99,9 @@ function TabBar() {
 				component={MyTravelList}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', paddingLeft: 24}}>
+						<View style={{justifyContent: 'center', marginLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -102,6 +110,7 @@ function TabBar() {
 					title: '내 여행',
 					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
 				}}
 			/>
@@ -112,6 +121,7 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -120,6 +130,7 @@ function TabBar() {
 					title: '커뮤니티',
 					headerShown: true,
 					headerStyle: {backgroundColor: colors.main},
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
 				}}
 			/>
@@ -130,6 +141,7 @@ function TabBar() {
 					headerLeft: () => (
 						<View style={{justifyContent: 'center', paddingLeft: 24}}>
 							<Image
+								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
 								style={{height: 36, aspectRatio: 2.054}}
 							/>
@@ -138,6 +150,7 @@ function TabBar() {
 					title: '내 정보',
 					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => <SvgProfile color={color} />,
 				}}
 			/>

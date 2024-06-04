@@ -35,6 +35,8 @@
       android:allowBackup="true"
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true">
+      <meta-data  android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_launcher" />
       <meta-data
     android:name="com.google.android.geo.API_KEY"
     android:value="AIzaSyA_nsvAajvyiWj-FeJO6u1-yZYsOBkoPOk" />

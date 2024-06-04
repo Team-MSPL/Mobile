@@ -5,6 +5,7 @@ import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {networkCheck} from '../../redux/network/networkSlice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function Connection() {
 	const dispatch = useAppDispatch();
@@ -27,7 +28,7 @@ export default function Connection() {
 		<Container>
 			<ViewContaniner>
 				<Guide>네트워크 연결이 불안정합니다{'\n'}확인 후 다시 시도해주세요.</Guide>
-				<CustomButton label={'새로고침'} onPress={checkNetwork} width={50} />
+				<CustomButton label={'새로고침'} onPress={checkNetwork} width={widthPercentage(200)} />
 			</ViewContaniner>
 		</Container>
 	);
@@ -50,9 +51,12 @@ const Guide = styled.Text`
 `;
 const ViewContaniner = styled.Pressable`
 	background-color: white;
-	width: 80%;
-	border-radius: 5px;
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(200)}px;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 12px;
 	border-width: 1px;
 	padding: 20px;
-	border-color: ${colors.selectButton};
+	border-color: ${colors.Primary};
 `;

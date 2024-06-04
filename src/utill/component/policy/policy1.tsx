@@ -1,21 +1,23 @@
 import styled from 'styled-components/native';
+import {PretendardBoldText, PretendardSemiBold, PretendardVariable} from '../../layout/layout';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {colors} from '../../colors';
 export default function Policy1() {
 	return (
 		<>
-			<TextContainer>
-				<TitleText>제1장 총칙</TitleText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제1조(목적)</MainText>
-				<SubText>
+			<PolicyTextContainer>
+				<PretendardBoldText size={14} lineHeight={21} color={colors.Black}>
+					제1조(목적)
+				</PretendardBoldText>
+				<PolicySubText>
 					이 약관은 주식회사 나그네들 (이하 “회사”라고 한다)가 온라인으로 제공하는 여행정보 콘텐츠(이하
 					"콘텐츠"라고 한다) 및 제반 서비스의 이용과 관련하여 회사와 이용자와의 권리, 의무 및 책임사항 등을
 					규정함을 목적으로 합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제2조(정의)</MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제2조(정의)</PolicyMainText>
+				<PolicySubText>
 					이 약관에서 사용하는 용어의 정의는 다음과 같습니다.{'\n '}
 					1. "회사"라 함은 "콘텐츠" 산업과 관련된 경제활동을 영위하는 자로서 콘텐츠 및 제반서비스를 제공하는
 					자를 말합니다.{'\n '}
@@ -32,31 +34,31 @@ export default function Policy1() {
 					또는 숫자의 조합을 말합니다.{'\n '}
 					7. "비밀번호(PASSWORD)"라 함은 "회원"이 부여받은 "아이디"와 일치되는 "회원"임을 확인하고 비밀보호를
 					위해 "회원" 자신이 정한 문자 또는 숫자의 조합을 말합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제3조(신원정보 등의 제공) </MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제3조(신원정보 등의 제공) </PolicyMainText>
+				<PolicySubText>
 					"회사"는 이 약관의 내용, 상호, 대표자 성명, 영업소 소재지 주소(소비자의 불만을 처리할 수 있는 곳의
 					주소를 포함), 전화번호, 모사전송번호, 전자우편주소, 사업자등록번호, 통신판매업 신고번호 및
 					개인정보관리책임자 등을 이용자가 쉽게 알 수 있도록 온라인 서비스초기화면에 게시합니다. 다만, 약관은
 					이용자가 연결화면을 통하여 볼 수 있도록 할 수 있습니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제4조(약관의 게시 등) </MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제4조(약관의 게시 등) </PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 이 약관을 "회원"이 그 전부를 인쇄할 수 있고 거래과정에서 해당 약관의 내용을 확인할 수
 					있도록 기술적 조치를 취합니다.{'\n '}② "회사"는 "이용자"가 "회사"와 이 약관의 내용에 관하여 질의 및
 					응답할 수 있도록 기술적 장치를 설치합니다.{'\n '}③ "회사"는 "이용자"가 약관에 동의하기에 앞서 약관에
 					정하여져 있는 내용 중 청약철회, 환불조건 등과 같은 중요한 내용을 이용자가 쉽게 이해할 수 있도록
 					별도의 연결화면 또는 팝업화면 등을 제공하여 "이용자"의 확인을 구합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제5조(약관의 개정 등) </MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제5조(약관의 개정 등) </PolicyMainText>
+				<PolicySubText>
 					{' '}
 					① "회사"는 온라인 디지털콘텐츠산업 발전법, 전자상거래 등에서의 소비자보호에 관한 법률, 약관의 규제에
 					관한 법률 등 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.{'\n '}② "회사"가 약관을
@@ -65,31 +67,26 @@ export default function Policy1() {
 					{'\n '}③ "회사"가 약관을 개정할 경우에는 개정약관 공지 후 개정약관의 적용에 대한 "이용자"의 동의
 					여부를 확인합니다. "이용자"가 개정약관의 적용에 동의하지 않는 경우 "회사" 또는 "이용자"는 콘텐츠
 					이용계약을 해지할 수 있습니다. 이때, "회사"는 계약해지로 인하여 "이용자"가 입은 손해를 배상합니다.
-				</SubText>
-			</TextContainer>
-			<TextContainer>
-				<MainText>제6조(약관의 해석) </MainText>
-				<SubText>
+				</PolicySubText>
+			</PolicyTextContainer>
+			<PolicyTextContainer>
+				<PolicyMainText>제6조(약관의 해석) </PolicyMainText>
+				<PolicySubText>
 					이 약관에서 정하지 아니한 사항과 이 약관의 해석에 관하여는 온라인 디지털콘텐츠산업 발전법,
 					전자상거래 등에서의 소비자보호에 관한 법률, 약관의 규제에 관한 법률, 문화체육관광부장관이 정하는
 					디지털콘텐츠이용자보호지침, 기타 관계법령 또는 상관례에 따릅니다.
-				</SubText>
-			</TextContainer>
+				</PolicySubText>
+			</PolicyTextContainer>
 		</>
 	);
 }
 
-const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
-`;
-export const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
+export const PolicyTextContainer = styled.View`
+	margin-bottom: ${heightPercentage(30)}px;
+	gap: ${heightPercentage(10)}px;
 `;
 
-const MainText = styled.Text`
+export const PolicyMainText = styled.Text`
 	margin-bottom: 20px;
 	font-size: 15px;
 	line-height: 20px;
@@ -97,9 +94,10 @@ const MainText = styled.Text`
 	font-weight: bold;
 `;
 
-export const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
+export const PolicySubText = styled(PretendardVariable)`
+	font-size: ${fontPercentage(14)}px;
+	color: ${colors.Gray4};
+	line-height: ${heightPercentage(21)}px;
 	margin-bottom: 10px;
+	text-align: left;
 `;

@@ -1,6 +1,6 @@
 import {useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {Alert, Linking, TouchableOpacity, ScrollView, Platform} from 'react-native';
+import {Alert, Linking, TouchableOpacity, ScrollView, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
@@ -9,12 +9,22 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack, MainText, VStack, devicesWidth} from '../../utill/layout/layout';
+import {
+	HStack,
+	MainText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+	devicesWidth,
+} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {SVGHelp, SvgPlace} from '../../utill/svg/svg';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 import {MarkerText} from './map-info';
+import PrimaryButton from '../../utill/component/primary-button';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {MarkerContainer} from './preset-detail';
 export default function Recommend({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -45,9 +55,14 @@ export default function Recommend({navigation, route}: any) {
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
 						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
-						anchor={{x: 0.5, y: 0.9}}>
-						<MarkerText>{count}</MarkerText>
-						<SvgPlace color={route.params.index == index ? 'yellow' : 'red'} width={50} height={50} />
+						anchor={{x: 0.5, y: 0.5}}>
+						<MarkerContainer
+							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
+							key={index}>
+							<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+								{index + 1}
+							</PretendardSemiBoldText>
+						</MarkerContainer>
 					</Marker>
 				);
 			}
@@ -59,8 +74,8 @@ export default function Recommend({navigation, route}: any) {
 		<Polyline
 			key={`polyline_${ind}`}
 			coordinates={polylineCoordinates}
-			strokeColor={'red'}
-			strokeWidth={5} // You can change the width of the line here
+			strokeColor={colors.Gray5}
+			strokeWidth={2} // You can change the width of the line here
 		/>
 	));
 
@@ -106,7 +121,6 @@ export default function Recommend({navigation, route}: any) {
 			modalSliceActions.setOpenModal({
 				modalTitle: '바로 추가됩니다!',
 				modalFunction: addRecommend,
-				modalLeft: true,
 			}),
 		);
 	};
@@ -201,24 +215,42 @@ export default function Recommend({navigation, route}: any) {
 				{markers}
 				{polylines}
 			</MapView>
-			<KakaoMapInfoView>
-				<SVGHelp color={colors.selectButton} width={15} height={15} />
-				<KakaoMapInfoText>앞, 뒤 관광지를 바탕으로한 카카오맵 추천 순서입니다.</KakaoMapInfoText>
-			</KakaoMapInfoView>
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
-						<ListHStack color={idx == select ? colors.selectButton : 'white'} key={idx}>
+						<ListHStack color={idx == select ? colors.Blue4 : colors.backgroundWhite} key={idx}>
+							<ImageContainer>
+								{route.params.name == '식당 추천' ? (
+									<Image
+										source={require('../../../public/images/food.png')}
+										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
+								) : route.params.name == '숙소 추천' ? (
+									<Image
+										source={require('../../../public/images/accommodation.png')}
+										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
+								) : (
+									<Image
+										source={require('../../../public/images/coffee.png')}
+										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
+								)}
+								{/* <Image
+									source={require(route.params.name == '식당 추천'
+										? '../../../public/images/food.png'
+										: route.params.name == '숙소 추천'
+										? '../../../public/images/accommodation.png'
+										: '../../../public/images/coffee.png')}
+									style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image> */}
+							</ImageContainer>
 							<ListVStack
 								onPress={() => {
 									changeRecommend(idx);
 								}}>
 								<RecommendView>
-									<RecommendElementText color={idx == select ? 'white' : 'black'}>
+									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.Gray5}>
 										{item.place_name}
-									</RecommendElementText>
+									</PretendardSemiBoldText>
 								</RecommendView>
-								<DistanceText color={idx == select ? 'black' : colors.selectButton}>
+								<PretendardVariableText size={11} lineHeight={16.5} color={colors.PointYellow}>
 									{'* ' +
 										route.params.status.name +
 										' 기준 ' +
@@ -229,19 +261,30 @@ export default function Recommend({navigation, route}: any) {
 											}) * 1000,
 										) +
 										'm'}
-								</DistanceText>
-								<CategoryText color={idx == select ? 'white' : 'black'}>
+								</PretendardVariableText>
+								<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
 									{item.category_name.slice(6, item.category_name.length)}
-								</CategoryText>
+								</PretendardVariableText>
 							</ListVStack>
-							<RecommendInfoTouchableOpacity
+							<PrimaryButton
+								label='자세히보기'
+								textSize={12}
+								lineHeight={18}
+								width={widthPercentage(75)}
+								height={heightPercentage(30)}
+								backgroundColor={colors.Primary}
+								textColor={colors.Gray5}
+								onPress={() => {
+									Linking.openURL(item.place_url);
+								}}></PrimaryButton>
+							{/* <RecommendInfoTouchableOpacity
 								onPress={() => {
 									Linking.openURL(item.place_url);
 								}}>
 								<RecommendElementText color={idx == select ? 'white' : 'black'}>
 									정보보기
 								</RecommendElementText>
-							</RecommendInfoTouchableOpacity>
+							</RecommendInfoTouchableOpacity> */}
 						</ListHStack>
 					))
 				) : (
@@ -251,14 +294,16 @@ export default function Recommend({navigation, route}: any) {
 				<MarginContainder />
 			</RecommendScrollView>
 			<ButtonContainer>
-				<CustomButton label='선택완료' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
+				<CustomButton label='추가하기' isDisabled={select == -1} onPress={checkMessage}></CustomButton>
 			</ButtonContainer>
 		</RecommendContainer>
 	);
 }
-const DistanceText = styled.Text<{color: string}>`
-	font-size: ${devicesWidth * 0.03}px;
-	color: ${props => props.color};
+const ImageContainer = styled.View`
+	width: ${widthPercentage(71)}px;
+	height: ${widthPercentage(71)}px;
+	align-items: center;
+	justify-content: center;
 `;
 const RecommendContainer = styled.View`
 	flex: 1;
@@ -282,30 +327,12 @@ const RecommendScrollView = styled.ScrollView`
 	padding: 10px;
 `;
 const ListHStack = styled(HStack)<{color: string}>`
-	justify-content: space-between;
-	flex-wrap: wrap;
+	justify-content: space-around;
 	background-color: ${props => props.color};
 	border-bottom-width: 1px;
-	border-color: black;
+	border-color: ${colors.Gray2};
 `;
 const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
-	width: 80%;
+	width: 65%;
 	padding: 3px;
-`;
-const CategoryText = styled(RecommendElementText)`
-	font-size: 14px;
-	font-weight: 500;
-`;
-const KakaoMapInfoView = styled.View`
-	flex-direction: row;
-	width: 100%;
-	padding: 10px;
-	align-items: center;
-	justify-content: center;
-`;
-const KakaoMapInfoText = styled.Text`
-	font-size: 13px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0px 0px 0px 5px;
 `;

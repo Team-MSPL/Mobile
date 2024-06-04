@@ -1,5 +1,12 @@
 import {AppState, Platform} from 'react-native';
-import {PERMISSIONS, checkMultiple, Permission, requestMultiple, request} from 'react-native-permissions';
+import {
+	PERMISSIONS,
+	checkMultiple,
+	Permission,
+	requestMultiple,
+	request,
+	requestNotifications,
+} from 'react-native-permissions';
 import {useAppDispatch} from '../../redux';
 import {setNopermission, setPermission} from '../../redux/setting/settingSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +16,7 @@ const usePermission = () => {
 	// OS별 필수 권한
 	const androidPermissions = [
 		PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, //33버전 이후부터는 얘만
+		PERMISSIONS.ANDROID.RECEIVE_WAP_PUSH,
 		PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
 		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
 		PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
@@ -22,8 +30,8 @@ const usePermission = () => {
 	const needPermission =
 		Platform.OS === 'android'
 			? androidSDKVersion >= 33
-				? androidPermissions.splice(0, 2)
-				: androidPermissions.splice(1, 3)
+				? androidPermissions.splice(0, 3)
+				: androidPermissions.splice(1, 4)
 			: iosPermissions;
 
 	// 앱 실행했을 때 혹은 로그아웃 이후 권한 체크
@@ -49,6 +57,7 @@ const usePermission = () => {
 						.catch(error => console.log(error));
 				}
 			});
+			await requestNotifications(['alert', 'sound']);
 			// await requestMultiple(needPermission);
 			checkResult = props || (await checkMultiple(needPermission));
 			for (let permission in checkResult) {

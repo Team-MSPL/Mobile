@@ -13,6 +13,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
+	deleteTravelCourse,
 	getDrivingDuration,
 	saveTravel,
 	travelSliceActions,
@@ -23,7 +24,7 @@ import {colors} from '../../utill/colors';
 import Background from '../../utill/component/timetable/background';
 import DayView from '../../utill/component/timetable/day-view';
 import InfoView from '../../utill/component/timetable/info-view';
-import {HeaderContianer, HeaderText} from '../../utill/layout/layout';
+import {HeaderContianer, HeaderText, PretendardVariableText} from '../../utill/layout/layout';
 import {SvgMapIcon} from '../../utill/svg/svg';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {usePosition} from '../../utill/hooks/usePosition';
@@ -119,9 +120,6 @@ export default function Timetable({navigation, route}: any) {
 	const goMapInfo = () => {
 		setMapORtable(!mapORtable);
 	};
-	const goReview = () => {
-		navigation.navigate('InputReviewAndPoint');
-	};
 	const handleModify = () => {
 		// let copy = [...timetable[modifyState.day]];
 		// copy[modifyState.index] = {
@@ -149,9 +147,9 @@ export default function Timetable({navigation, route}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: `${userName}님`,
-					modalSubTitle: `다님이 추천하는 여행 코스는 어떠셨나요?? \n리뷰를 남겨주시면 다님에 큰 도움이 됩니다!`,
+					modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
 					modalLeft: true,
-					modalFunction: goReview,
+					modalFunction: goKakaoShare,
 				}),
 			);
 			clearTimeout(timeRef.current);
@@ -179,10 +177,14 @@ export default function Timetable({navigation, route}: any) {
 							modalSliceActions.setOpenModal({
 								modalTitle: '홈으로',
 								modalSubTitle: modifyCheck
-									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
 									: '홈으로 이동하시겠습니까?',
-								modalFunction: goHome,
+								modalFunction: () => {},
+								modalBottomFunctionUse: true,
+								modalBottomFunction: goHome,
 								modalLeft: true,
+								modalTopText: '저장하러 가기',
+								modalBottomText: '그냥 나가기',
 							}),
 					  );
 
@@ -270,6 +272,10 @@ export default function Timetable({navigation, route}: any) {
 			}
 		}
 	};
+	const [modifyView, setModifyView] = useState(true);
+	const noModifyView = () => {
+		setModifyView(false);
+	};
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
 		try {
@@ -283,6 +289,35 @@ export default function Timetable({navigation, route}: any) {
 			);
 		}
 	};
+	const removeCheck = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '이 여행을 삭제할까요?',
+				modalSubTitle: '여행을 삭제하면 되돌릴 수 없습니다.',
+				modalFunction: goRemove,
+				modalTopText: '삭제할래요',
+				modalLeft: true,
+			}),
+		);
+	};
+	const goRemove = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
+			await dispatch(deleteTravelCourse({travelId: travelId}));
+			navigation.goBack();
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '여행 삭제가 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
+				}),
+			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const [modify, setModify] = useState(false);
 	useEffect(() => {
 		shareLoginFlag && isLogin && addSharedList();
 	}, [isLogin]);
@@ -293,7 +328,7 @@ export default function Timetable({navigation, route}: any) {
 		makeMode == 'recommend' && getDuration();
 	}, []);
 	useEffect(() => {
-		makeMode == 'recommend' && setViewPagerView(true);
+		// makeMode == 'recommend' && setViewPagerView(true);
 	}, []);
 	useEffect(() => {
 		makeMode == 'share' &&
@@ -303,17 +338,19 @@ export default function Timetable({navigation, route}: any) {
 					modalTitle: '공유자',
 					modalSubTitle: `${
 						userId == '' ? '로그인 후 ' : ''
-					}공유 받은 여행 일정을 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
+					}공유 받은 여행 코스를 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
 					modalLeft: true,
 					modalRightText: '추가할래요',
 					modalLeftText: '보기만할래요',
 					modalFunction: addSharedList,
+					modalLeftFunctionUse: true,
+					modalLeftFunction: noModifyView,
 				}),
 			);
 	}, [makeMode]);
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackVisible: makeMode == 'recommend' ? false : true,
+			headerBackVisible: false,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
 			headerRight: () => (
 				<HeaderContianer>
@@ -336,53 +373,67 @@ export default function Timetable({navigation, route}: any) {
 						</TouchableOpacity>
 					) : (
 						<>
-							{makeMode != 'share' && mapORtable ? (
+							{mapORtable ? (
 								<>
-									{shareViewWithStartFlag && (
-										<TouchableOpacity onPress={goKakaoShare}>
-											<HeaderText>공유</HeaderText>
+									{/* <TouchableOpacity onPress={goViewPager}>
+										<HeaderText>설명</HeaderText>
+									</TouchableOpacity> */}
+									{modifyView && (
+										<TouchableOpacity onPress={goSave}>
+											<HeaderText>저장</HeaderText>
 										</TouchableOpacity>
 									)}
-									<TouchableOpacity onPress={goViewPager}>
-										<HeaderText>설명</HeaderText>
-									</TouchableOpacity>
 								</>
 							) : (
-								<TouchableOpacity onPress={goMapInfo}>
-									<HeaderText>수정</HeaderText>
-								</TouchableOpacity>
-							)}
-							{modifyCheck && (
-								<TouchableOpacity onPress={goSave}>
-									<HeaderText>저장</HeaderText>
-								</TouchableOpacity>
+								<>
+									<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+										<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+											삭제
+										</PretendardVariableText>
+									</TouchableOpacity>
+									<TouchableOpacity
+										onPress={() => {
+											setModify(!modify);
+										}}>
+										<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+											{modify ? '취소' : '편집'}
+										</PretendardVariableText>
+									</TouchableOpacity>
+								</>
 							)}
 						</>
 					)}
 				</HeaderContianer>
 			),
 			headerLeft: () =>
-				makeMode == 'recommend' && (
-					<TouchableOpacity
-						style={{justifyContent: 'center'}}
-						onPress={() => {
-							dispatch(
-								modalSliceActions.setOpenModal({
-									modalTitle: '홈으로',
-									modalSubTitle: modifyCheck
-										? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
-										: '홈으로 이동하시겠습니까?',
-									modalLeft: true,
-									modalFunction: goHome,
-								}),
-							);
-						}}>
-						<Image
-							source={require('../../../public/images/danim_logo_row.png')}
-							style={{height: 36, aspectRatio: 2.054}}
-						/>
+				shareViewWithStartFlag && (
+					<TouchableOpacity onPress={goKakaoShare}>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							공유
+						</PretendardVariableText>
 					</TouchableOpacity>
 				),
+			// makeMode == 'recommend' && (
+			// 	<TouchableOpacity
+			// 		style={{justifyContent: 'center'}}
+			// 		onPress={() => {
+			// 			dispatch(
+			// 				modalSliceActions.setOpenModal({
+			// 					modalTitle: '홈으로',
+			// 					modalSubTitle: modifyCheck
+			// 						? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?\n\n*저장은 화면 우측 상단 저장 버튼을 눌러주세요!'
+			// 						: '홈으로 이동하시겠습니까?',
+			// 					modalLeft: true,
+			// 					modalFunction: goHome,
+			// 				}),
+			// 			);
+			// 		}}>
+			// 		<Image
+			// 			source={require('../../../public/images/danim_logo_row.png')}
+			// 			style={{height: 36, aspectRatio: 2.054}}
+			// 		/>
+			// 	</TouchableOpacity>
+			// ),
 		});
 	}, [
 		editMode,
@@ -395,6 +446,9 @@ export default function Timetable({navigation, route}: any) {
 		modifyCheck,
 		modifyState,
 		shareViewWithStartFlag,
+		shareLoginFlag,
+		modifyView,
+		modify,
 	]);
 	const goScrollRef = useRef({now: 0, content: 0, layout: 0, wantGoing: 0});
 	const goScroll = async (value: {data: number; up: boolean}) => {
@@ -486,7 +540,7 @@ export default function Timetable({navigation, route}: any) {
 			</Modal>
 		</TimeTableContainer>
 	) : (
-		<MapInfo navigation={navigation}></MapInfo>
+		<MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>
 	);
 }
 

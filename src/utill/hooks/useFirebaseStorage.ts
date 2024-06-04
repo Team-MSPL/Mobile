@@ -10,12 +10,17 @@ const useFirebaseStorage = () => {
 				.child(`${e.id}/${e.category == 'profile' ? '' : idx}${e.category}.png`)
 				.delete();
 		});
-		await Promise.all(removeData);
+		try {
+			await Promise.all(removeData);
+		} catch (error: any) {
+			throw error;
+		}
 	};
 
 	const uploadImage = async (e: {item: string; idx: number; id: string; category: string}) => {
 		const response = await useUriToBlob(e.item);
 		var ref = firebase.storage().ref(e.category).child(`${e.id}/${e.idx}${e.category}.png`).put(response);
+		console.log('여기는용?', e.idx);
 		try {
 			await ref;
 			let copy = await getImage({index: e.idx, id: e.id, category: e.category});
@@ -25,6 +30,7 @@ const useFirebaseStorage = () => {
 		}
 	};
 	const getImage = async (data: {index: number; id: string; category: string}) => {
+		console.log('순서입니다.', data.index);
 		const storage = getStorage();
 		const reference = ref(storage, `${data.category}/${data.id}/${data.index}${data.category}.png`);
 		let downloadUrl = '';

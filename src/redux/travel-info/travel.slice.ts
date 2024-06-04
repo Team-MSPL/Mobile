@@ -3,8 +3,23 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
-import {tendencyList} from '../../screens/enroll-info/select-tendency';
 import axiosAuth from '../api/api';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+// const {tendencyList} = useTendencyHandler();
+const tendencyList = [
+	{
+		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
+	},
+	{
+		list: ['힐링', '액티비티', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+	},
+	{
+		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '유적지', '박물관', '공원', '사찰', '성지'],
+	},
+	{
+		list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+	},
+];
 const initialState: LiteState = {
 	region: [], //선택한 지역들 리스트 ex) 김해시,창원시
 	cityIndex: 0, //지역이름 ex)경남
@@ -57,6 +72,12 @@ const initialState: LiteState = {
 	moveTimeErrorIndex: 0,
 	shareLoginFlag: false,
 	shareViewWithStartFlag: false,
+	regionInfo: {name: '', photo: ''},
+	enoughPlace: false,
+	aiID: '',
+	aiList: [],
+	aiFlag: false,
+	selecedtDateFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -234,15 +255,23 @@ export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: an
 		throw rejectWithValue(error.code);
 	}
 });
+//ai 임시 결과 목록 가져오기
+export const getAiList = createAsyncThunk('/ai/aiList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/ai/aiList`);
+		console.log('에에ㅔ', response.data);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 
 //카카오 식당,카페 등 추천 장소 얻는 거
 export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosKakao.get(
-			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=distance`,
+			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=accuracy`,
 		);
-		console.log(response.data.documents);
-		// console.log(response.data.documents);
 
 		//제로리절트 처리하기
 		return response.data.documents;
@@ -264,31 +293,43 @@ export const reCourseName = createAsyncThunk(
 	},
 );
 
-//투어 api 정보가져오기
-export const getTourTest = createAsyncThunk('/getTourTest', async (data: any, {rejectWithValue}) => {
+//ai 결과 임시 저장하기
+export const saveAI = createAsyncThunk('/ai/saveAI', async (data: saveAiType, {rejectWithValue}) => {
 	try {
-		const response = await axiosTour.get(
-			`/locationBasedList1?MobileOS=${data.platform}&MobileApp=다님&mapX=${data.lng}&mapY=${data.lat}&radius=20000&numOfRows=1&_type=json&serviceKey=${Tour_API_KEY}`,
-		);
-		let params = response.data.response.body.items.item[0];
-		const responseData = await axiosTour.get(
-			`/detailInfo1?MobileOS=${data.platform}&MobileApp=다님&contentId=${params.contentid}&contentTypeId=${params.contenttypeid}&_type=json&serviceKey=${Tour_API_KEY}`,
-		);
-		//console.log('하위요', responseData.data.response.body.items.item);
-		return responseData.data.response.body.items.item;
+		const response = await axiosAuth.post(`/ai/saveAI`, data);
+		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
 	}
 });
 
+//ai 결과 임시 삭제하기
+export const deleteAI = createAsyncThunk('/ai/deleteAI', async (data: {aiId: string}, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.delete(`/ai/deleteAI`, {data});
+		console.log(response.data, data);
+		return response.data;
+	} catch (error: any) {
+		console.log(error);
+		throw rejectWithValue(error.code);
+	}
+});
 //관광지 리뷰 등록
 export const savePlaceReview = createAsyncThunk(
 	'/place/savePlaceReview',
 	async (
-		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		data: {
+			region: any;
+			name: any;
+			reviewContent: string;
+			reviewUserToken: string;
+			reviewPhotoList: string[];
+			reviewId: string;
+		},
 		{rejectWithValue},
 	) => {
 		try {
+			console.log(data);
 			const response = await axiosAuth.patch(`/place/savePlaceReview`, data);
 			return response.data;
 		} catch (error: any) {
@@ -300,7 +341,14 @@ export const savePlaceReview = createAsyncThunk(
 export const deletePlaceReview = createAsyncThunk(
 	'/place/deletePlaceReview',
 	async (
-		data: {region: any; name: any; reviewContent: string; reviewUserToken: string; reviewPhotoList: never[]},
+		data: {
+			region: any;
+			name: any;
+			reviewContent: string;
+			reviewUserToken: string;
+			reviewPhotoList: never[];
+			reviewId: string;
+		},
 		{rejectWithValue},
 	) => {
 		try {
@@ -324,6 +372,26 @@ export const updateShareUserList = createAsyncThunk(
 		}
 	},
 );
+
+// 지역 사진 가져오는거
+export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: any, {rejectWithValue}) => {
+	try {
+		let regionName;
+		if (data.region.split(' ')[1] == '전체') {
+			regionName = data.region.split(' ')[0];
+		} else {
+			regionName = data.region;
+		}
+
+		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
+		//console.log(a);
+		//제로리절트 처리하기
+		return response.data;
+	} catch (error: any) {
+		console.log(error);
+		throw rejectWithValue(error.code);
+	}
+});
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -392,6 +460,7 @@ export const travelSlice = createSlice({
 			state.editMode = '';
 			state.season = payload.season;
 			state.freeTicket = false;
+			state.shareViewWithStartFlag = true;
 		},
 		setPopuarityClickStart: (state, {payload}) => {
 			Object.assign(state, initialState);
@@ -409,6 +478,7 @@ export const travelSlice = createSlice({
 		},
 		enrollSelectStartDate: (state, {payload}) => {
 			state.selectStartDate = payload;
+			state.selectedDateFlag = true;
 		},
 		enrollSelectEndDate: (state, {payload}) => {
 			state.selectEndDate = payload;
@@ -427,6 +497,7 @@ export const travelSlice = createSlice({
 			state.presetDatas = payload;
 		},
 		setCache: (state, {payload}) => {
+			console.log(payload?.aiID ?? '');
 			state.presetDatas = payload.presetDatas;
 			state.presetTendencyList = payload.presetTendency;
 			state.makeMode = 'recommend';
@@ -437,10 +508,20 @@ export const travelSlice = createSlice({
 			state.transit = payload.transit;
 			state.tendency = payload.tendency;
 			state.travelName = payload.travelName;
+			state.region = payload.region;
+			state.aiID = payload?.aiID ?? '';
+			state.aiFlag = true;
+			state.shareViewWithStartFlag = true;
 		},
 		enrollTimetable: (state, {payload}) => {
 			state.timetable = payload;
 			//state.tableShowFlag = true;
+		},
+		enrollReviewImage: (state, {payload}) => {
+			state.picture = payload;
+		},
+		enrollReviewDiary: (state, {payload}) => {
+			state.diary = payload;
 		},
 		drawTimetable: state => {
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
@@ -466,7 +547,13 @@ export const travelSlice = createSlice({
 						if (idx == 0) {
 							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
 						} else if (copy[idx - 1].at(-1)?.category == 4) {
-							copy[idx].push({...copy[idx - 1].at(-1), y: 0, takenTime: 150, x: idx});
+							copy[idx].push({
+								...copy[idx - 1].at(-1),
+								y: 0,
+								takenTime: 150,
+								x: idx,
+								key: shortId.generate(),
+							});
 						}
 					}
 					if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
@@ -480,6 +567,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 						lunch = true;
 						time += 3;
@@ -495,12 +583,13 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 						dinner = true;
 						time += 3;
 					}
 					if (value.category != 4) {
-						copy[idx].push({...value, x: idx, y: time, id: shortId.generate()});
+						copy[idx].push({...value, x: idx, y: time, id: shortId.generate(), key: shortId.generate()});
 						time += value.takenTime / 30;
 						let bandwidthTime = state.bandwidth ? 1 : 0;
 						index != item.length - 1 &&
@@ -518,6 +607,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 					} else if (value.category == 4 && index == item.length - 1) {
 						//copy[idx].pop();
@@ -531,6 +621,7 @@ export const travelSlice = createSlice({
 							lat: value.lat,
 							lng: value.lng,
 							photo: '',
+							key: shortId.generate(),
 						});
 					}
 				});
@@ -582,6 +673,7 @@ export const travelSlice = createSlice({
 			state.tendency = payload.tendency;
 			state.freeTicket = true;
 			state.cityDistance = payload.cityDistance;
+			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -636,6 +728,7 @@ export const travelSlice = createSlice({
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
 			state.presetTendencyList = payload.data.bestPointList;
 			state.presetDatas = payload.data.resultData;
+			state.enoughPlace = payload.data.enoughPlace;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
 			state.myTravelList = payload;
@@ -654,14 +747,27 @@ export const travelSlice = createSlice({
 			state.travelName = payload.travelName;
 			//state.myTravelList = payload;
 		});
-		builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
-			state.diary = payload.diary;
-			state.picture = payload.picture;
-			//state.myTravelList = payload;
-		});
+		// builder.addCase(updateDiary.fulfilled, (state, {payload}) => {
+		// 	state.diary = payload.diary;
+		// 	state.picture = payload.picture;
+		// });
 		builder.addCase(saveTravel.fulfilled, (state, {payload}) => {
 			state.travelId = payload.travelId;
 			//state.myTravelList = payload;
+		});
+		builder.addCase(saveAI.fulfilled, (state, {payload}) => {
+			console.log('저장이요', payload);
+			state.aiID = payload.aiId;
+			//state.myTravelList = payload;
+		});
+		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
+			console.log('왜 여기옴 ㅋㅋㅋ');
+			state.regionInfo.name = payload.name;
+			state.regionInfo.photo = payload.photo;
+		});
+		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
+			console.log('왜 여기옴 ㅋㅋddㅋ', payload.data);
+			state.aiList = payload.data;
 		});
 	},
 });
@@ -711,6 +817,28 @@ interface LiteState {
 	moveTimeErrorIndex: number;
 	shareLoginFlag: boolean;
 	shareViewWithStartFlag: boolean;
+	regionInfo: regionInfoType;
+	enoughPlace: boolean;
+	aiID: string;
+	aiList: aiListType[];
+	aiFlag: boolean;
+	selectedDateFlag: boolean;
+}
+interface aiListType {
+	_id: string;
+	bestPointList: [[Object], [Object], [Object], [Object], [Object], [Object], [Object]];
+	day: string[];
+	nDay: number;
+	preset: TimetableType[][][];
+	region: string[];
+	tendency: number[][];
+	timeLimitArray: number[];
+	transit: number;
+	userId: string;
+}
+interface regionInfoType {
+	name: string;
+	photo: string;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];
@@ -738,6 +866,10 @@ export interface EssentialPlaceType {
 	takenTime: number;
 	id: string;
 	photo: string;
+	cityDistance?: [number];
+	cityIndex?: number;
+	region?: [string];
+	formatted_address: string | undefined;
 }
 export interface TimetableType {
 	category: number;
@@ -754,6 +886,7 @@ export interface TimetableType {
 	concept: number[];
 	tour: number[];
 	regionIndex: number;
+	key: string;
 }
 
 export interface CourseDetailType {
@@ -814,6 +947,18 @@ export interface RecommendList {
 	y: number;
 }
 
+interface saveAiType {
+	region: string[];
+	day: string[];
+	nDay: number;
+	transit: number;
+	timeLimitArray: number[];
+	tendency: number[][];
+	preset: TimetableType[][][];
+	enoughPlace: boolean;
+	bestPointList: presetTendencyListType[];
+	travelName: string;
+}
 interface travelAiType {
 	regionList: string[];
 	accomodationList: PlaceType[];
@@ -875,5 +1020,7 @@ interface InfoReviewType {
 	content: string;
 	rating: number | null;
 	reviewUserToken: string | null;
-	reviewPhotoList: string | null;
+	reviewPhotoList: string[] | null;
+	reviewId: string | null;
+	reviewerProfileImage: string;
 }

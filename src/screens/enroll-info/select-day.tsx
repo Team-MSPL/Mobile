@@ -3,30 +3,30 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {VStack, HStack, MainContainer} from '../../utill/layout/layout';
+import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Modal, View} from 'react-native';
+import {Platform, Pressable} from 'react-native';
 
-import Icon from 'react-native-vector-icons/AntDesign';
-
-import {ButtonContainer, MarginContainder} from './select-multi';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-export default function SelectDay({setViewComponent, viewComponent, goNextStep}: any) {
-	const IconElement = styled(Icon)``;
+import Stepper from '../../utill/component/enroll-info/stepper';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {ButtonContainer} from './select-multi';
+export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
 	const {
 		Place,
 		timeLimitArray,
 		minuteLimitArray,
-		regionRecommendFlag,
 		accommodations,
 		selectStartDate,
 		selectEndDate,
+		freeTicket,
+		selectedDateFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 
@@ -34,8 +34,12 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
 	const onPressTime = (e: number) => {
-		dateFlag.current = e;
-		setVisible(true);
+		if (visible) {
+			setVisible(false);
+		} else {
+			dateFlag.current = e;
+			setVisible(true);
+		}
 	};
 	useLayoutEffect(() => {
 		goNext();
@@ -88,11 +92,12 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 		);
 	};
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
-		console.log(timeData);
 		if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '첫날 시작은 06시 이후부터 가능합니다.'}));
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '출발 시간을 06시 이전으로 설정하실 수 없습니다.'}));
+			return false;
 		} else if (dateFlag.current == 1 && timeData.ampm == '오전') {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '13시 이전은 불가능합니다.'}));
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '도착 시간을 13시 이전으로 설정하실 수 없습니다.'}));
+			return false;
 		} else {
 			let timeCopy = [...timeLimitArray];
 			let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
@@ -100,17 +105,19 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 			let minuteCopy = [...minuteLimitArray];
 			minuteCopy[dateFlag.current] = parseInt(timeData.minute);
 			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-			setVisible(false);
+			return true;
+			// setVisible(false);
 		}
 	};
+	const [selectDateFlag, setSelectDateFlag] = useState(false);
 	const onDateChange = (date: any, type: string) => {
-		if (calendarView.when == 0) {
+		!selectDateFlag && setSelectDateFlag(true);
+		if (type == 'END_DATE') {
+			dispatch(travelSliceActions.enrollSelectEndDate(date));
+		} else {
 			selectEndDate && selectEndDate.diff(date) <= 0 && dispatch(travelSliceActions.enrollSelectEndDate(date));
 			dispatch(travelSliceActions.enrollSelectStartDate(date));
-		} else {
-			dispatch(travelSliceActions.enrollSelectEndDate(date));
 		}
-		setCalendarView({...calendarView, visible: false});
 	};
 
 	const calculateDateDifference = () => {
@@ -123,195 +130,138 @@ export default function SelectDay({setViewComponent, viewComponent, goNextStep}:
 		}
 		return 0;
 	};
-	const calendarContainerRef = useRef<View>(null);
-	const nDays = calculateDateDifference();
 	const DaySelectInfoList = [
-		{step: 'Start', title: '여행 시작', day: selectStartDate},
-		{step: 'End', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
+		{step: '출발', title: '여행 시작', day: selectStartDate},
+		{step: '도착', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
-	const [calendarView, setCalendarView] = useState({visible: false, x: 0, y: 0, when: 0});
 
-	const customDate = [
-		{
-			date: calendarView.when == 1 ? DaySelectInfoList[1].day.clone() : selectStartDate.clone(),
-			style: {backgroundColor: colors.regionNormal},
-			allowDisabled: true,
-		},
-	];
 	return (
-		<>
-			<MainContainer showsVerticalScrollIndicator={false}>
-				<StepText mainText='언제 여행을 계획하고 계신가요?' subText='여행 일정을 알려주세요.' />
-				<VStack>
-					<TimeContainer>
-						{[...Array(2)].map((item, idx) => (
-							<Fragment key={idx}>
-								<TimeItemContainer>
-									<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-									<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-									<TiemSelectContainer>
-										<DayPressable
-											ref={calendarContainerRef}
-											onPress={() => {
-												calendarContainerRef.current?.measure(
-													(x, y, width, height, pageX, pageY) => {
-														console.log(pageX, pageY);
-														setCalendarView({
-															visible: true,
-															x: pageX,
-															y: pageY,
-															when: idx,
-														});
-													},
-												);
-											}}>
-											<TimeItemText>
-												{DaySelectInfoList[idx].day.format('YYYY-MM-DD')}
-											</TimeItemText>
-											<IconElement name={'down'} size={16} color='black' />
-										</DayPressable>
-										<TimePressable
-											onPress={() => {
-												onPressTime(idx);
-											}}>
-											<TimeItemText>
-												{String(timeLimitArray[idx]).padStart(2, '0') +
-													':' +
-													String(minuteLimitArray[idx]).padStart(2, '0')}
-											</TimeItemText>
-
-											<IconElement name={'down'} size={16} color='black' />
-										</TimePressable>
-									</TiemSelectContainer>
-								</TimeItemContainer>
-							</Fragment>
-						))}
-					</TimeContainer>
-					<PreviewContainer>
-						<PreviewText>이번 여행은,</PreviewText>
-						<PreviewText>
-							<PreviewBoldText>
-								{nDays == 0 ? '당일치기' : nDays + '박' + Number(nDays + 1) + '일'}
-							</PreviewBoldText>
-							{nDays == 0 ? ' ' : '동안 '}여행할 거에요 ✈
-						</PreviewText>
-						<PreviewText>
-							<PreviewBoldText>
-								{weekdays[selectStartDate.day()] +
-									'요일 ' +
-									String(timeLimitArray[0]).padStart(2, '0') +
-									'시 ' +
-									String(minuteLimitArray[0]).padStart(2, '0') +
-									'분'}
-							</PreviewBoldText>
-							에 출발하고 👉
-						</PreviewText>
-						<PreviewText>
-							<PreviewBoldText>
-								{selectEndDate == null
-									? weekdays[selectStartDate.day()]
-									: weekdays[selectEndDate.day()]}
-								{'요일 ' +
-									String(timeLimitArray[1]).padStart(2, '0') +
-									'시 ' +
-									String(minuteLimitArray[1]).padStart(2, '0') +
-									'분'}
-							</PreviewBoldText>
-							에 돌아와요 👈
-						</PreviewText>
-					</PreviewContainer>
-				</VStack>
-				<Modal
-					animationType='fade'
-					transparent={true}
-					visible={calendarView.visible}
-					onRequestClose={() => {
-						setCalendarView({...calendarView, visible: false});
-					}}>
-					<ModalContainer
-						onPress={() => {
-							setCalendarView({...calendarView, visible: false});
-						}}>
-						<CalendarContainer x={calendarView.x} y={calendarView.y} when={calendarView.when}>
-							<CalendarPicker
-								todayBackgroundColor='white'
-								customDatesStyles={customDate}
-								weekdays={weekdays}
-								months={months}
-								minDate={calendarView.when == 1 ? selectStartDate.toDate() : new Date()}
-								startFromMonday={false}
-								onDateChange={onDateChange}
-								showDayStragglers={false}
-								previousTitle='이전 달'
-								nextTitle='다음 달'
-								previousTitleStyle={{color: 'black'}}
-								nextTitleStyle={{color: 'black'}}
-								allowBackwardRangeSelect={true}
-								selectYearTitle='년도 선택'
-							/>
-						</CalendarContainer>
-					</ModalContainer>
-				</Modal>
-				<MarginContainder />
-			</MainContainer>
-			<UseDatePicker
-				title={dateFlag.current == 0 ? '시작 시간' : '종료 시간'}
-				goConfirm={goConfirm}
-				minuteData={minuteLimitArray[dateFlag.current] / 30 + 1}
-				ampmData={timeLimitArray[dateFlag.current] < 12 ? 1 : 2}
-				hourData={
-					(timeLimitArray[dateFlag.current] < 12
-						? timeLimitArray[dateFlag.current]
-						: timeLimitArray[dateFlag.current] - 12) + 1
-				}
-				visible={visible}
-				setVisible={setVisible}></UseDatePicker>
-
+		<DayBackground
+			onPress={() => {
+				setVisible(false);
+			}}>
+			<Stepper total={11} now={3}></Stepper>
+			<StepText
+				marginTop={heightPercentage(10)}
+				styleText='1.여행 계획을 알려주세요.'
+				mainText='언제 떠나시나요?'
+				subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
+			<TimeContainer zIndexs={Platform.OS == 'ios' ? true : false}>
+				{DaySelectInfoList.map((item, idx) => (
+					<TimeItemContainer key={idx} zIndexs={Platform.OS == 'ios' ? true : false}>
+						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
+							{item.step}
+						</PretendardSemiBoldText>
+						<SelectContainer backgroundColor={colors.backgroundGray}>
+							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+								{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
+							</PretendardSemiBoldText>
+						</SelectContainer>
+						<SelectContainer
+							onPress={() => {
+								onPressTime(idx);
+							}}>
+							<HStack justifyContent='space-between'>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									{String(timeLimitArray[idx]).padStart(2, '0')}
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									:
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+									{String(minuteLimitArray[idx]).padStart(2, '0')}
+								</PretendardSemiBoldText>
+							</HStack>
+						</SelectContainer>
+						{dateFlag.current == idx && (
+							<SelectAbsolute>
+								<UseDatePicker
+									goConfirm={goConfirm}
+									minuteData={minuteLimitArray[dateFlag.current] / 30}
+									ampmData={timeLimitArray[dateFlag.current] < 12 ? 0 : 1}
+									hourData={
+										timeLimitArray[dateFlag.current] < 12
+											? timeLimitArray[dateFlag.current]
+											: timeLimitArray[dateFlag.current] - 12
+									}
+									visible={visible}
+									setVisible={setVisible}></UseDatePicker>
+							</SelectAbsolute>
+						)}
+					</TimeItemContainer>
+				))}
+			</TimeContainer>
+			<CalendarContainer>
+				<CalendarPicker
+					weekdays={weekdays}
+					months={months}
+					minDate={new Date()}
+					startFromMonday={false}
+					onDateChange={onDateChange}
+					showDayStragglers={false}
+					allowRangeSelection={true}
+					selectedRangeStartStyle={{backgroundColor: colors.Primary}}
+					selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
+					selectedRangeEndStyle={{backgroundColor: colors.Primary}}
+					selectedDayColor={colors.Primary}
+					selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
+					selectedEndDate={
+						(selectedDateFlag || freeTicket) && selectEndDate != null ? selectEndDate.toDate() : undefined
+					}
+					previousTitle='이전'
+					nextTitle='다음'
+					previousTitleStyle={{color: 'black'}}
+					nextTitleStyle={{color: 'black'}}
+					allowBackwardRangeSelect={true}
+					selectYearTitle='년도 선택'
+				/>
+			</CalendarContainer>
 			<ButtonContainer>
 				<CustomButton
-					label={`다음 (${viewComponent + 1}/${regionRecommendFlag ? 3 : 5})`}
-					onPress={goNextStep}></CustomButton>
+					label={`다음`}
+					onPress={() => {
+						navigation.navigate('SelectMulti');
+					}}></CustomButton>
 			</ButtonContainer>
-		</>
+		</DayBackground>
 	);
 }
-const TiemSelectContainer = styled(HStack)`
-	width: 100%;
-	justify-content: space-around;
+const CalendarContainer = styled.View`
+	justify-content: center;
 `;
-const ModalContainer = styled.Pressable`
-	flex-directrion: row;
-	flex: 1;
+const DayBackground = styled(BackgroundGray).attrs({as: Pressable})``;
+const SelectAbsolute = styled.View`
+	z-index: 3;
+	position: absolute;
+	bottom: -${heightPercentage(122)}px;
 `;
-const CalendarContainer = styled.View<{x: number; y: number; when: number}>`
-	background-color: ${colors.main};
-	border-width: 1px;
-	border-radius: 10px;
-	padding: 10px 0px 10px 0px;
-	top: ${props => props.y + 40}px;
+export const SelectContainer = styled.Pressable<{backgroundColor?: string}>`
+	width: ${widthPercentage(157)}px;
+	height: ${heightPercentage(40)}px;
+	background-color: ${props => props.backgroundColor ?? colors.backgroundWhite};
+	border-radius: 12px;
+	padding: 0px ${widthPercentage(16)}px;
+	justify-content: center;
+	margin-bottom: ${heightPercentage(6)}px;
 `;
-export const TimeContainer = styled.View`
-	width: 100%;
-	margin: 0px 0px 0px 0px;
+export const TimeContainer = styled.View<{zIndexs?: boolean}>`
+	flex-direction: row;
+	margin-top: ${heightPercentage(10)}px;
+	${props => props.zIndexs && 'z-index:4'};
 `;
-export const TimeItemContainer = styled.View`
-	width: 100%;
-	margin: 0px 0px 10px 0px;
+export const TimeItemContainer = styled.View<{zIndexs?: boolean}>`
+	width: 50%;
+	gap: ${heightPercentage(5)}px;
+	${props => props.zIndexs && 'z-index:4'};
 `;
 export const TimeItemText = styled.Text`
 	font-size: 15px;
 	color: black;
 	font-weight: bold;
 	margin: 0px 12px 0px 0px;
-`;
-const TimePressable = styled.Pressable`
-	align-items: center;
-	justify-content: center;
-	height: 40px;
-	margin: 5px 0px 0px 0px;
-	flex-direction: row;
-	border-bottom-color: ${colors.regionNormal};
-	border-bottom-width: 1px;
 `;
 export const DayPressable = styled.Pressable`
 	align-items: center;
@@ -322,24 +272,8 @@ export const DayPressable = styled.Pressable`
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};
 `;
-export const TimeStepText = styled.Text`
-	color: ${colors.selectButton};
-	font-size: 16px;
-	font-weight: bold;
-`;
-
-const PreviewText = styled.Text`
-	font-size: 23px;
-	font-weight: 400;
-	color: black;
-`;
-const PreviewBoldText = styled.Text`
-	font-size: 23px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
-
-const PreviewContainer = styled.View`
-	width: 100%;
-	margin: 50px 0px 50px 0px;
+export const TimeStepText = styled(PretendardVariable)`
+	color: ${colors.PointYellow};
+	font-size: ${fontPercentage(12)}px;
+	margin-left: ${widthPercentage(10)}px;
 `;
