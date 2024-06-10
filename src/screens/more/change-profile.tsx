@@ -126,7 +126,7 @@ export default function ChangeProfile({navigation}: any) {
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
 					<ImageBottom>
-						<SVGCamera color='white' />
+						<SVGCamera width={widthPercentage(18)} height={widthPercentage(18)} color='white' />
 					</ImageBottom>
 				</TouchableOpacity>
 			</ImageContainer>
@@ -148,7 +148,7 @@ export default function ChangeProfile({navigation}: any) {
 							onPress={() => {
 								changeNickname('');
 							}}>
-							<SvgCancel width='20' height='20' color='black' />
+							<SvgCancel width={widthPercentage(20)} height={widthPercentage(20)} color='black' />
 						</ClearTouchableOpacity>
 					)}
 				</InputAllContainter>

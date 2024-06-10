@@ -16,7 +16,7 @@ import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
 import {useShopping} from '../../utill/hooks/useShopping';
 import {colors} from '../../utill/colors';
-import {SVGCoin, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCoin} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useFocusEffect} from '@react-navigation/native';
@@ -123,7 +123,7 @@ export default function Payment({navigation}: any) {
 				<HStack justifyContent='space-between'>
 					<VStack>
 						<HStack>
-							<SVGCoin />
+							<SVGCoin width={widthPercentage(22)} height={widthPercentage(22)} />
 							<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
 								이용권 1개 - 광고 보상
 							</PretendardSemiBoldText>
@@ -149,7 +149,7 @@ export default function Payment({navigation}: any) {
 					<HStack justifyContent='space-between'>
 						<VStack>
 							<HStack>
-								<SVGCoin />
+								<SVGCoin width={widthPercentage(22)} height={widthPercentage(22)} />
 								<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
 									이용권 {item.title}개
 								</PretendardSemiBoldText>

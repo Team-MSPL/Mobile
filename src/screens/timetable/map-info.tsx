@@ -18,7 +18,7 @@ import {
 import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
 import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import InfoView from '../../utill/component/timetable/info-view';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
@@ -494,7 +494,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					</VStack>
 					<VStack gap={heightPercentage(3)} alignItems='flex-end'>
 						<TagContainer backgroundColor={colors.backgroundWhite}>
-							<TagShopText color={colors.Gray2} size={12}>
+							<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 								#
 							</TagShopText>
 							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
@@ -502,7 +502,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							</PretendardSemiBoldText>
 						</TagContainer>
 						<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-							<TagShopText color={colors.Gray2} size={12}>
+							<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 								#
 							</TagShopText>
 							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
@@ -573,7 +573,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									onPress={() => {
 										navigation.navigate('TimetableAddPlace', {x: select, y: [], status: 'travle'});
 									}}>
-									<SVGPlus color={colors.Primary} />
+									<SVGPlus
+										width={widthPercentage(16)}
+										height={widthPercentage(16)}
+										color={colors.Primary}
+									/>
 								</SVGContainer>
 							</HStack>
 						</WhiteContainer>
@@ -583,7 +587,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									숙소
 								</PretendardSemiBoldText>
 								<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
-									<SVGPlus color={colors.Primary} />
+									<SVGPlus
+										width={widthPercentage(16)}
+										height={widthPercentage(16)}
+										color={colors.Primary}
+									/>
 								</SVGContainer>
 							</HStack>
 						</WhiteContainer>
@@ -923,7 +931,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={modify ? 4 : 3} handleFunction={deleteMainViewPager} />
+				<ViewPager sliceNumber={modify ? 5 : 3} handleFunction={deleteMainViewPager} />
 			</Modal>
 		</MainAllContainer>
 	);

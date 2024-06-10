@@ -128,7 +128,12 @@ export default function CommunityMainScreen({navigation}: any) {
 					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
 						{sortOptions[sortOption - 1].label}
 					</PretendardSemiBoldText>
-					<SVGRightAdd width={10} height={10} color='black' rotation={180} />
+					<SVGRightAdd
+						width={widthPercentage(10)}
+						height={widthPercentage(10)}
+						color='black'
+						rotation={180}
+					/>
 				</HStack>
 			</SortButton>
 			{sortOnOff &&

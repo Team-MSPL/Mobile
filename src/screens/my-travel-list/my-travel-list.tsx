@@ -18,7 +18,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Center, PretendardSemiBoldText, PretendardVariableText, TagContainer, VStack} from '../../utill/layout/layout';
-import {SVGFlag, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGFlag} from '../../utill/svg/svg';
 import {ButtonContainer, DayViewContainer} from '../enroll-info/select-multi';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -183,7 +183,11 @@ export default function MyTravelList({navigation}: any) {
 										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 											{data.region[0]}
 										</PretendardVariableText>
-										<SVGFlag width={12} color={colors.Primary} />
+										<SVGFlag
+											width={widthPercentage(12)}
+											height={widthPercentage(15)}
+											color={colors.Primary}
+										/>
 									</TagContainer>
 								</VStack>
 							</MyTravelContainer>
@@ -227,7 +231,7 @@ export default function MyTravelList({navigation}: any) {
 							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 								{item.item.region[0]}
 							</PretendardVariableText>
-							<SVGFlag width={12} color={colors.Primary} />
+							<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color={colors.Primary} />
 						</TagContainer>
 					</VStack>
 				</MyTravelContainer>

@@ -26,7 +26,7 @@ import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer} fr
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarginContainer} from '../timetable/preset-detail';
 export default function FinalCheck({navigation}: any) {
 	const {tendencyList} = useTendencyHandler();
@@ -232,10 +232,10 @@ export default function FinalCheck({navigation}: any) {
 	};
 	const schedule = ['출발일', '종료일'];
 	const seasonList = [
-		{title: '봄', svg: <SVGSpring />},
-		{title: '여름', svg: <SVGSummer />},
-		{title: '가을', svg: <SVGFall />},
-		{title: '겨울', svg: <SVGWinter />},
+		{title: '봄', svg: <SVGSpring width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '여름', svg: <SVGSummer width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '가을', svg: <SVGFall width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '겨울', svg: <SVGWinter width={widthPercentage(24)} height={widthPercentage(27)} />},
 	];
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
@@ -255,13 +255,18 @@ export default function FinalCheck({navigation}: any) {
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
 									{cityViewList[cityIndex].title + region}
-									<SVGFlag style={{marginLeft: widthPercentage(8)}} color='#DDF2FE' />
+									<SVGFlag
+										width={widthPercentage(20)}
+										height={widthPercentage(20)}
+										style={{marginLeft: widthPercentage(8)}}
+										color='#DDF2FE'
+									/>
 								</PretendardSemiBoldText>
 							</HStack>
 						</VStack>
 						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
 							<TagContainer backgroundColor={colors.backgroundWhite}>
-								<TagShopText color={colors.Gray2} size={12}>
+								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 									#
 								</TagShopText>
 								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
@@ -269,7 +274,7 @@ export default function FinalCheck({navigation}: any) {
 								</PretendardSemiBoldText>
 							</TagContainer>
 							<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-								<TagShopText color={colors.Gray2} size={12}>
+								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 									#
 								</TagShopText>
 								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>

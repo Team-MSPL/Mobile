@@ -31,7 +31,12 @@ export default function PolicyMain() {
 							width={widthPercentage(300)}>
 							{item.title}
 						</PretendardSemiBoldText>
-						<SVGRightAdd transform={value == view ? 270 : 90} color='black' />
+						<SVGRightAdd
+							width={widthPercentage(20)}
+							height={widthPercentage(20)}
+							transform={value == view ? 270 : 90}
+							color='black'
+						/>
 					</PolicyTouchableOpacity>
 					{value == view && <PolicyComponent />}
 				</Fragment>

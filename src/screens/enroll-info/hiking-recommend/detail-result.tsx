@@ -249,7 +249,7 @@ export default function HikingDetailResult({navigation, route}: any) {
 							</PretendardSemiBoldText>
 
 							<ReviewButton onPress={goReviewEnroll}>
-								<SVGReviewPencil />
+								<SVGReviewPencil width={widthPercentage(12)} height={widthPercentage(12)} />
 								<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
 									리뷰 쓰기
 								</PretendardVariableText>

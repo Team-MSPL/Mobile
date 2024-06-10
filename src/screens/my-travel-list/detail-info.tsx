@@ -412,14 +412,18 @@ export default function DetailInfo({navigation}: any) {
 											onPress={() => {
 												setEditing(true);
 											}}>
-											<SVGPencil color={colors.PointYellow} />
+											<SVGPencil
+												width={widthPercentage(16)}
+												height={widthPercentage(16)}
+												color={colors.PointYellow}
+											/>
 										</TouchableOpacity>
 									)}
 								</HStack>
 							</VStack>
 							{!modify && (
 								<TouchableOpacity onPress={goKakaoShare}>
-									<SvgShare />
+									<SvgShare width={widthPercentage(38)} height={widthPercentage(38)} />
 								</TouchableOpacity>
 							)}
 						</HStack>
@@ -429,7 +433,7 @@ export default function DetailInfo({navigation}: any) {
 					<MapView
 						//provider={PROVIDER_GOOGLE}
 						showsMyLocationButton={true}
-						style={{width: '100%', height: 350}}
+						style={{width: '100%', height: heightPercentage(350)}}
 						showsUserLocation={true}
 						region={{
 							latitude: centerLatitude,

@@ -19,7 +19,6 @@ import {
 } from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
-import {SVGHelp, SvgPlace} from '../../utill/svg/svg';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 import {MarkerText} from './map-info';
 import PrimaryButton from '../../utill/component/primary-button';
@@ -205,7 +204,7 @@ export default function Recommend({navigation, route}: any) {
 		<RecommendContainer>
 			<MapView
 				ref={mapRef}
-				style={{width: '100%', height: 300}}
+				style={{width: '100%', height: heightPercentage(350)}}
 				region={{
 					latitude: route.params.status.lat,
 					longitude: route.params.status.lng,

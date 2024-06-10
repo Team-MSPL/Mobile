@@ -214,7 +214,13 @@ export default function SearchPlace({navigation, route}: any) {
 										setTimeValue(timeValue - 1);
 									}}
 									color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue >= 1 && <SVGMinus color={colors.Gray2} />}
+									{timeValue >= 1 && (
+										<SVGMinus
+											width={widthPercentage(14)}
+											height={widthPercentage(4)}
+											color={colors.Gray2}
+										/>
+									)}
 								</SVGContainer>
 
 								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
@@ -226,7 +232,13 @@ export default function SearchPlace({navigation, route}: any) {
 										setTimeValue(timeValue + 1);
 									}}
 									color={timeValue > 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue <= 1 && <SVGPlus color={colors.Gray2} />}
+									{timeValue <= 1 && (
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Gray2}
+										/>
+									)}
 								</SVGContainer>
 							</HStack>
 						</HStack>

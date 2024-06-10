@@ -23,7 +23,7 @@ import {
 	devicesWidth,
 } from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgRight, SvgStart} from '../../utill/svg/svg';
+import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import {ButtonHStack, GoRecommendButton, RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
@@ -422,7 +422,7 @@ export default function CourseDetail({navigation, route}: any) {
 							<HStack justifyContent='space-between'>
 								{courseDetail.status == 'firebase' && (
 									<ReviewButton onPress={goReviewEnroll}>
-										<SVGReviewPencil />
+										<SVGReviewPencil width={widthPercentage(12)} height={widthPercentage(12)} />
 										<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
 											리뷰 쓰기
 										</PretendardVariableText>

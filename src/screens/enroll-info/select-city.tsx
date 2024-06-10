@@ -87,7 +87,11 @@ export default function SelectCity({navigation}: any) {
 									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.backgroundWhite}>
 										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
 									</PretendardSemiBoldText>
-									<SvgCancel color={colors.Primary} />
+									<SvgCancel
+										width={widthPercentage(13)}
+										height={widthPercentage(13)}
+										color={colors.Primary}
+									/>
 								</RegionElementContainer>
 							);
 						})}

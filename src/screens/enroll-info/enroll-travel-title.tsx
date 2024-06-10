@@ -50,7 +50,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 								onPress={() => {
 									changeTextValue('');
 								}}>
-								<SvgCancel width='20' height='20' color='black' />
+								<SvgCancel width={widthPercentage(20)} height={widthPercentage(20)} color='black' />
 							</ClearTouchableOpacity>
 						)}
 					</InputAllContainter>

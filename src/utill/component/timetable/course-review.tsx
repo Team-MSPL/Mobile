@@ -114,7 +114,10 @@ export function CourseReview({navigation, route}: any) {
 									onPress={() => {
 										deletePicture(index);
 									}}>
-									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+									<SvgCancel
+										color='white'
+										width={widthPercentage(13)}
+										height={widthPercentage(13)}></SvgCancel>
 								</CancelContainer>
 								<PictureElement source={{uri: uri}} />
 							</PictureElementContainer>

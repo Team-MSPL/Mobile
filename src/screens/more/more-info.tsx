@@ -125,7 +125,11 @@ export default function MoreInfo({navigation}: any) {
 					<HStack gap={widthPercentage(5)}>
 						{userProfileImage == '' ? (
 							<NoProfileContainer>
-								<SvgLoginLogo color={'white'} width={75} height={75} />
+								<SvgLoginLogo
+									color={'white'}
+									width={widthPercentage(75)}
+									height={widthPercentage(75)}
+								/>
 							</NoProfileContainer>
 						) : (
 							<ProfileImage source={{uri: userProfileImage}}></ProfileImage>

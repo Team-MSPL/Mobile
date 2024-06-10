@@ -3,15 +3,12 @@ import Home from '../../../public/home.svg';
 import Place from '../../../public/place.svg';
 import Cancel from '../../../public/cancel.svg';
 import Check from '../../../public/check.svg';
-import Map from '../../../public/map.svg';
 import Right from '../../../public/right.svg';
 import AirPlain from '../../../public/airplain.svg';
 import Calendar from '../../../public/calendar.svg';
 import Community from '../../../public/community.svg';
 import Profile from '../../../public/profile.svg';
 import Picture from '../../../public/picture.svg';
-import MileStone from '../../../public/milestone.svg';
-import Review from '../../../public/review.svg';
 import Start from '../../../public/start.svg';
 import Coffee from '../../../public/coffee.svg';
 import MapIcon from '../../../public/map-view.svg';
@@ -68,9 +65,6 @@ export const SvgCancel = styled(Cancel)<{color: string}>`
 export const SvgCheck = styled(Check)<{color: string}>`
 	color: color;
 `;
-export const SvgMap = styled(Map)<{color?: string}>`
-	color: color;
-`;
 export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
 	color: color;
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
@@ -90,22 +84,10 @@ export const SvgProfile = styled(Profile)<{color?: string}>`
 export const SvgPicture = styled(Picture)<{color?: string}>`
 	color: color;
 `;
-export const SvgMilestone = styled(MileStone)<{color?: string}>`
-	color: color;
-`;
-export const SvgReview = styled(Review)<{color?: string}>`
-	color: color;
-`;
 export const SvgStart = styled(Start)<{color?: string}>`
 	color: color;
 `;
-export const SvgCoffee = styled(Coffee)<{color?: string}>`
-	color: color;
-`;
 export const SvgMapIcon = styled(MapIcon)<{color?: string}>`
-	color: color;
-`;
-export const SvgDanimText = styled(DanimText)<{color?: string}>`
 	color: color;
 `;
 export const SvgLoginLogo = styled(LoginLogo)<{color?: string}>`
@@ -130,9 +112,6 @@ export const SvgInfos = styled(Infos)<{color?: string}>`
 	color: color;
 `;
 export const SvgShare = styled(Share)<{color?: string}>`
-	color: color;
-`;
-export const SVGHelp = styled(Help)<{color?: string}>`
 	color: color;
 `;
 export const SVGRightAdd = styled(RightAdd)<{color?: string; transform?: number}>`

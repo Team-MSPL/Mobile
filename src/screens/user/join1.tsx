@@ -12,7 +12,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {ClearTouchableOpacity, MainContainer, PretendardVariable} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import {SvgCancel, SvgCheck, SvgRight} from '../../utill/svg/svg';
+import {SvgCancel, SvgCheck} from '../../utill/svg/svg';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
@@ -129,7 +129,10 @@ export default function Join1({navigation, route}: any) {
 					{checkList.map((item, idx) => (
 						<CheckContainer key={idx}>
 							<CheckTouchableOpacity onPress={item.checkFunction}>
-								<SvgCheck color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}></SvgCheck>
+								<SvgCheck
+									width={widthPercentage(18)}
+									height={widthPercentage(14)}
+									color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}></SvgCheck>
 								<CheckBoxText>{item.title}</CheckBoxText>
 							</CheckTouchableOpacity>
 							{idx != 0 && (

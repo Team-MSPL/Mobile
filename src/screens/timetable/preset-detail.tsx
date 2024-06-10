@@ -14,7 +14,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {SVGCamera, SVGPencil, SVGRightAdd, SvgRight} from '../../utill/svg/svg';
+import {SVGRightAdd} from '../../utill/svg/svg';
 
 export default function PresetDetail({navigation, route}: any) {
 	const {presetTendencyList, presetDatas, day, nDay, aiID} = useAppSelector(state => state.travelSlice);
@@ -207,7 +207,12 @@ export default function PresetDetail({navigation, route}: any) {
 								onPress={() => {
 									setTendencyView(!tendencyView);
 								}}>
-								<SVGRightAdd color='black' rotation={tendencyView ? 90 : 270} />
+								<SVGRightAdd
+									width={widthPercentage(20)}
+									height={widthPercentage(20)}
+									color='black'
+									rotation={tendencyView ? 90 : 270}
+								/>
 							</TouchableOpacity>
 						)}
 					</HStack>

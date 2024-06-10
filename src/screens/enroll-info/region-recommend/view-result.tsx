@@ -96,7 +96,7 @@ export default function ViewResult({navigation}: any) {
 										<RecommendImage source={{uri: item.photo}}></RecommendImage>
 									) : (
 										<LogoCOntainer>
-											<SvgLoginLogo color={'white'} width={40} />
+											<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
 										</LogoCOntainer>
 									)}
 									<GraientBackground>

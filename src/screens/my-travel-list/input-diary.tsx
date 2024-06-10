@@ -198,7 +198,10 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 									onPress={() => {
 										deletePicture(idx);
 									}}>
-									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+									<SvgCancel
+										color='white'
+										width={widthPercentage(13)}
+										height={widthPercentage(13)}></SvgCancel>
 								</CancelContainer>
 							)}
 							<PictureElement

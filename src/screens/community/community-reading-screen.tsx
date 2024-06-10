@@ -113,8 +113,8 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '신고완료',
-					modalSubTitle:
-						'신고가 접수되었습니다.\n검토까지는 최대24시간 소요됩니다.\n\n⦁신고사유에 맞지 않는 신고일 경우,\n해당 신고는 처리되지않습니다.\n\n⦁누적 신고횟수가 3회 이상인 유저는 글 작성을 할 수 없게됩니다.',
+					modalSingleUse: true,
+					modalSubTitle: '신고가 접수되었습니다.\n⦁부적절한 신고일 경우 처리되지않습니다.',
 				}),
 			);
 			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
@@ -141,6 +141,24 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 		} catch (error) {
 			console.log('댓글 신고 접수 중에 오류가 발생했습니다:', error);
 		}
+	};
+	const checkReport = (reason: string, commentId?: string | undefined) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: reason,
+				modalSubTitle: `신고하시겠습니까?`,
+				modalFunction: commentId
+					? () => {
+							handleCommentReport(reason, commentId);
+					  }
+					: () => {
+							handlePostReport(reason);
+					  },
+				modalTopText: '신고',
+				modalBottomText: '취소',
+				modalBottomFunciton: () => {},
+			}),
+		);
 	};
 
 	// ---------------- useEffect 모음(시작) -------------------
@@ -172,7 +190,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							actionSheetType.current = '게시글';
 							showCommunityReadingOptionActionSheet();
 						}}>
-						<SVGMoreHorizontal />
+						<SVGMoreHorizontal width={widthPercentage(24)} height={widthPercentage(24)} />
 					</TouchableOpacity>
 				</View>
 			),
@@ -289,7 +307,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							setCommentData(data.item);
 							actionSheetType.current = '댓글';
 						}}>
-						<SVGMoreHorizontal />
+						<SVGMoreHorizontal width={widthPercentage(24)} height={widthPercentage(24)} />
 					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
 				<CommentContent>{data.item.commentContent}</CommentContent>
@@ -347,21 +365,21 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			'취소',
 		],
 		reportPost: [
-			() => handlePostReport('무분별한 도배'),
-			() => handlePostReport('정당/정치인 비하 및 선거운동'),
-			() => handlePostReport('욕설/비하'),
-			() => handlePostReport('상업적 광고 및 판매'),
-			() => handlePostReport('음란물/불건전한 만남 및 대화'),
-			() => handlePostReport('유출/사칭/사기'),
+			() => checkReport('무분별한 도배'),
+			() => checkReport('정당/정치인 비하 및 선거운동'),
+			() => checkReport('욕설/비하'),
+			() => checkReport('상업적 광고 및 판매'),
+			() => checkReport('음란물/불건전한 만남 및 대화'),
+			() => checkReport('유출/사칭/사기'),
 			doNothing,
 		],
 		reportComment: [
-			() => handleCommentReport('무분별한 도배', commentData._id),
-			() => handleCommentReport('정당/정치인 비하 및 선거운동', commentData._id),
-			() => handleCommentReport('욕설/비하', commentData._id),
-			() => handleCommentReport('상업적 광고 및 판매', commentData._id),
-			() => handleCommentReport('음란물/불건전한 만남 및 대화', commentData._id),
-			() => handleCommentReport('유출/사칭/사기', commentData._id),
+			() => checkReport('무분별한 도배', commentData._id),
+			() => checkReport('정당/정치인 비하 및 선거운동', commentData._id),
+			() => checkReport('욕설/비하', commentData._id),
+			() => checkReport('상업적 광고 및 판매', commentData._id),
+			() => checkReport('음란물/불건전한 만남 및 대화', commentData._id),
+			() => checkReport('유출/사칭/사기', commentData._id),
 			doNothing,
 		],
 	};
@@ -453,7 +471,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						blurOnSubmit={true}
 					/>
 					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
-						<SVGPencil color='#70768E' />
+						<SVGPencil width={widthPercentage(16)} height={widthPercentage(16)} color='#70768E' />
 					</ClearContainer>
 				</CommentTextInputContainer>
 			</CommentInputContainer>

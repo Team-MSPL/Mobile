@@ -145,13 +145,19 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: regionRecommend,
-			image: <SVGRegionRecommend></SVGRegionRecommend>,
+			image: (
+				<SVGRegionRecommend width={widthPercentage(200)} height={heightPercentage(150)}></SVGRegionRecommend>
+			),
 			text: '여행 지역 ',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
+			image: (
+				<SVGCalendarRecommend
+					width={widthPercentage(200)}
+					height={heightPercentage(150)}></SVGCalendarRecommend>
+			),
 			text: '여행 코스 ',
 		},
 	];
@@ -256,7 +262,7 @@ export default function Main({navigation}: any) {
 				</BackgroundImage>
 				<HomeBottomContainer>
 					<HStack gap={5}>
-						<SVGGood />
+						<SVGGood width={widthPercentage(25)} height={widthPercentage(25)} />
 						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
 							다님 AI에게 추천받기
 						</PretendardSemiBoldText>

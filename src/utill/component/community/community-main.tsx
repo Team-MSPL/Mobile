@@ -133,19 +133,23 @@ function CommunityMain({
 							{data.item.postedAt.slice(0, 10)}
 						</PretendardVariableText>
 						<HStack gap={2}>
-							<SVGEmptyHeart />
+							<SVGEmptyHeart width={widthPercentage(12)} height={widthPercentage(12)} />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.likerLength}
 							</PretendardVariableText>
 						</HStack>
 						<HStack gap={2}>
-							<SVGMessageSquare />
+							<SVGMessageSquare width={widthPercentage(14)} height={widthPercentage(14)} />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.commentLength}
 							</PretendardVariableText>
 							{data.item.ImageLength != 0 && (
 								<>
-									<SVGCamera color={colors.Gray3} />
+									<SVGCamera
+										width={widthPercentage(14)}
+										height={widthPercentage(14)}
+										color={colors.Gray3}
+									/>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 										{data.item.ImageLength}
 									</PretendardVariableText>

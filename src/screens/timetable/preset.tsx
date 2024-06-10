@@ -163,7 +163,7 @@ export default function Preset({navigation}: any) {
 				</SvgContainer>
 				<WhiteContainer>
 					<RegionTextContainer gap={widthPercentage(4)}>
-						<SVGFlag color='#DDF2FE' />
+						<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color='#DDF2FE' />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
 							{region[0]}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
@@ -245,7 +245,12 @@ export default function Preset({navigation}: any) {
 												copy[idx] = !copy[idx];
 												setTendencyViewIndex(copy);
 											}}>
-											<SVGRightAdd color='black' rotation={tendencyViewIndex[idx] ? 90 : 270} />
+											<SVGRightAdd
+												width={widthPercentage(20)}
+												height={widthPercentage(20)}
+												color='black'
+												rotation={tendencyViewIndex[idx] ? 90 : 270}
+											/>
 										</TouchableOpacity>
 									)}
 								</HStack>

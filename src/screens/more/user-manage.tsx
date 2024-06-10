@@ -49,7 +49,7 @@ export default function UserManage() {
 						{cryptoItem}
 					</PretendardSemiBoldText>
 				</ClipBox>
-				<SVGCopy />
+				<SVGCopy width={widthPercentage(16)} height={widthPercentage(17)} />
 			</ClipCopy>
 		</HStack>
 	);

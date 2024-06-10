@@ -87,7 +87,7 @@ export default function DetailResult({navigation, route}: any) {
 						<TitleImage source={{uri: route.params.item.photo}}></TitleImage>
 					) : (
 						<LogoCOntainer>
-							<SvgLoginLogo color={'white'} width={40} />
+							<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
 						</LogoCOntainer>
 					)}
 				</RecommendMainContainer>
@@ -118,11 +118,11 @@ export default function DetailResult({navigation, route}: any) {
 					<StepText
 						mainText='인기 관광지 Top 5'
 						subText='해당 지역의 인기 관광지를 확인하세요'
-						mainTextSize={fontPercentage(18)}
-						subTextSize={fontPercentage(12)}
+						mainTextSize={18}
+						subTextSize={12}
 						marginLeft={0}
 						marginTop={0}
-						marginBottom={heightPercentage(14)}
+						marginBottom={14}
 					/>
 					<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						{route.params.item.topPopularPlaceList.map((item, idx) => (
@@ -140,7 +140,7 @@ export default function DetailResult({navigation, route}: any) {
 									<RecommendImage source={{uri: item.photo}}></RecommendImage>
 								) : (
 									<LogoCOntainer>
-										<SvgLoginLogo color={'white'} width={20} />
+										<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
 									</LogoCOntainer>
 								)}
 								<PopularityInfoTitleTextContainer>

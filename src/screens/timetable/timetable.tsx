@@ -7,6 +7,8 @@ import {
 	Modal,
 	BackHandler,
 	Image,
+	View,
+	Platform,
 } from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -33,6 +35,7 @@ import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
 import Toast from 'react-native-toast-message';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -182,9 +185,8 @@ export default function Timetable({navigation, route}: any) {
 								modalFunction: () => {},
 								modalBottomFunctionUse: true,
 								modalBottomFunction: goHome,
-								modalLeft: true,
-								modalTopText: '저장하러 가기',
-								modalBottomText: '그냥 나가기',
+								modalTopText: modifyCheck ? '저장하러 가기' : '둘러보기',
+								modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
 							}),
 					  );
 
@@ -405,14 +407,46 @@ export default function Timetable({navigation, route}: any) {
 					)}
 				</HeaderContianer>
 			),
-			headerLeft: () =>
-				shareViewWithStartFlag && (
-					<TouchableOpacity onPress={goKakaoShare}>
-						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-							공유
-						</PretendardVariableText>
-					</TouchableOpacity>
-				),
+			headerLeft: () => (
+				<>
+					{Platform.OS != 'android' && (
+						<TouchableOpacity
+							onPress={() => {
+								dispatch(
+									modalSliceActions.setOpenModal({
+										modalTitle: '홈으로',
+										modalSubTitle: modifyCheck
+											? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
+											: '홈으로 이동하시겠습니까?',
+										modalFunction: () => {},
+										modalBottomFunctionUse: true,
+										modalBottomFunction: goHome,
+										modalTopText: modifyCheck ? '저장하러 가기' : '둘러보기',
+										modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+									}),
+								);
+							}}
+							style={{
+								justifyContent: 'center',
+								marginLeft: widthPercentage(4),
+								marginRight: widthPercentage(4),
+							}}>
+							<Image
+								resizeMode='contain'
+								source={require('../../../public/images/danim_logo_row.png')}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
+							/>
+						</TouchableOpacity>
+					)}
+					{shareViewWithStartFlag && (
+						<TouchableOpacity onPress={goKakaoShare}>
+							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+								공유
+							</PretendardVariableText>
+						</TouchableOpacity>
+					)}
+				</>
+			),
 			// makeMode == 'recommend' && (
 			// 	<TouchableOpacity
 			// 		style={{justifyContent: 'center'}}
@@ -502,7 +536,7 @@ export default function Timetable({navigation, route}: any) {
 			<DayView setViewDayIndex={setViewDayIndex} viewDayIndex={viewDayIndex} navigation={navigation} />
 			{!modifyState.state && mapViewState && (
 				<MapContainer onPress={goMapInfo} right={WINDOW_WIDTH * 0.1} bottom={WINDOW_HEIGHT * 0.05}>
-					<SvgMapIcon width={30} height={30} color={'white'} />
+					<SvgMapIcon width={widthPercentage(30)} height={widthPercentage(30)} color={'white'} />
 					<MapText>지도</MapText>
 				</MapContainer>
 			)}

@@ -46,7 +46,7 @@ export default function HomeModal({navigation, route}: {navigation: any; route: 
 
 const ButtonContainer = styled.View`
 	position: absolute;
-	bottom: 0px;
+	bottom: ${heightPercentage(10)}px;
 	width: ${widthPercentage(375)}px;
 	align-items: center;
 	justify-content: center;

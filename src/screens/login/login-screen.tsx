@@ -15,7 +15,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {colors} from '../../utill/colors';
 import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
-import {SvgApple, SvgDanimText, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {SvgApple, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {networkCheck} from '../../redux/network/networkSlice';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 interface tokenType {
@@ -225,9 +225,24 @@ export default function LoginScreen({navigation}: any) {
 	};
 
 	const platforms = [
-		{title: 'Google', color: 'white', image: <SvgGoogle />, onPress: googleLogin},
-		{title: 'Kakao', color: colors.reviewBackground, image: <SvgKakao />, onPress: kakaoLogin},
-		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
+		{
+			title: 'Google',
+			color: 'white',
+			image: <SvgGoogle width={widthPercentage(24)} height={widthPercentage(24)} />,
+			onPress: googleLogin,
+		},
+		{
+			title: 'Kakao',
+			color: colors.reviewBackground,
+			image: <SvgKakao width={widthPercentage(18)} height={widthPercentage(18)} />,
+			onPress: kakaoLogin,
+		},
+		{
+			title: 'Apple',
+			color: 'black',
+			image: <SvgApple width={widthPercentage(24)} height={widthPercentage(24)} />,
+			onPress: appleLogin,
+		},
 	];
 
 	return (

@@ -55,7 +55,7 @@ export default function CommunityPost() {
 									onSelect(index);
 								}}
 								key={index}>
-								<PostImage source={{uri: uri}} />
+								<PostImage resizeMode='contain' source={{uri: uri}} />
 							</PostImageWrapper>
 						))}
 					</PostImageSwiper>
@@ -119,9 +119,11 @@ export const ActiveDot = styled.View`
 const PostImageWrapper = styled.Pressable`
 	width: 100%;
 	aspect-ratio: 1;
+	align-items: center;
 `;
 const PostImage = styled.Image`
 	width: 100%;
+	height: ${heightPercentage(300)}px;
 	aspect-ratio: 1;
 `;
 

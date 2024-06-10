@@ -17,6 +17,6 @@ export function heightPercentage(height: number) {
 	return responsiveScreenHeight(percentage);
 }
 export function fontPercentage(size: number) {
-	const percentage = size * 0.14; // TODO 변경하기
+	const percentage = size * (responsiveScreenHeight(100) / responsiveScreenWidth(100)) * 0.07; // TODO 변경하기
 	return responsiveScreenFontSize(percentage);
 }

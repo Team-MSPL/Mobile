@@ -11,7 +11,7 @@ import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
-import {SVGCamera, SVGRightAdd, SvgCancel, SvgRight} from '../../utill/svg/svg';
+import {SVGCamera, SvgCancel, SvgRight} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -178,7 +178,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 											onPress={() => {
 												deletePicture(index);
 											}}>
-											<SvgCancel color='white' width={13} height={13}></SvgCancel>
+											<SvgCancel
+												color='white'
+												width={widthPercentage(15)}
+												height={widthPercentage(15)}></SvgCancel>
 										</CancelContainer>
 										<PictureElement source={{uri: uri}} />
 										<BarContainer>
@@ -187,7 +190,14 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 												onPress={() => {
 													moveImage({index: index, direction: false});
 												}}>
-												{index != 0 && <SvgRight color={colors.Black} transform={180} />}
+												{index != 0 && (
+													<SvgRight
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={colors.Black}
+														transform={180}
+													/>
+												)}
 											</MoveButton>
 											<MoveButton
 												disabled={index == postData.postImage.length - 1}
@@ -195,7 +205,11 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 													moveImage({index: index, direction: true});
 												}}>
 												{index != postData.postImage.length - 1 && (
-													<SvgRight color={colors.Black} />
+													<SvgRight
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={colors.Black}
+													/>
 												)}
 											</MoveButton>
 										</BarContainer>

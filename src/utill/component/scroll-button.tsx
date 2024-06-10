@@ -30,7 +30,11 @@ export default function ScrollButton({viewState, navigation}: {viewState: boolea
 						글쓰기
 					</PretendardVariableText>
 				)}
-				<SVGPencil color={colors.Primary} width={widthPercentage(viewState ? 30 : 30)} />
+				<SVGPencil
+					color={colors.Primary}
+					width={widthPercentage(viewState ? 30 : 30)}
+					height={widthPercentage(20)}
+				/>
 			</HStack>
 		</CommunityButton>
 	);
