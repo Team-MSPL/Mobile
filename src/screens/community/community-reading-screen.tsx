@@ -3,7 +3,6 @@ import moment from 'moment';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, Keyboard, NativeModules, Platform, RefreshControl, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -21,11 +20,15 @@ import {
 	saveCommentType,
 } from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
-import {MenuIcon} from './community-main-screen';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
+import {
+	ClearTouchableOpacity,
+	InputWrap,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
@@ -299,7 +302,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				<CommentWriterInfoNMenuContainer>
 					<CommentWriterInfoContainer>
 						<CommentWriterImage source={{uri: data.item.commentWriterProfile}} />
-						<CommentWriterText>{data.item.commentWriter}</CommentWriterText>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Black}>
+							{data.item.commentWriter}
+						</PretendardSemiBoldText>
 					</CommentWriterInfoContainer>
 					{/* 더보기 버튼 */}
 					<CommentMenu
@@ -310,8 +315,14 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						<SVGMoreHorizontal width={widthPercentage(24)} height={widthPercentage(24)} />
 					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
-				<CommentContent>{data.item.commentContent}</CommentContent>
-				<CommentInfoText>{data.item.commentedAt.slice(0, 10)}</CommentInfoText>
+
+				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+					{data.item.commentContent}
+				</PretendardSemiBoldText>
+
+				<PretendardVariableText size={12} lineHeight={18} color={colors.Black}>
+					{data.item.commentedAt.slice(0, 10)}
+				</PretendardVariableText>
 			</CommentItemContainer>
 		);
 	};
@@ -494,29 +505,16 @@ const PostContentCommentContainer = styled.View`
 	justify-content: center;
 `;
 const FlatListHeaderContainer = styled.View`
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
-`;
-const Divider = styled.View`
-	border-bottom-color: #ccc;
-	border-bottom-width: 1px;
-`;
-
-// 사진 눌렀을 때 사진 보이는 화면
-export const PostImageView = styled.SafeAreaView`
-	align-items: center;
-`;
-export const PostImageIndicatorText = styled.Text`
-	font-size: 16px;
-	color: white;
+	padding-vertical: ${heightPercentage(12)}px;
+	padding-horizontal: ${widthPercentage(24)}px;
 `;
 
 const CommentItemContainer = styled.View`
 	width: 100%;
 	align-self: center;
-	margin-vertical: 8px;
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
+	margin-vertical: ${widthPercentage(2)}px;
+	padding-vertical: ${widthPercentage(6)}px;
+	padding-horizontal: ${heightPercentage(24)}px;
 	background-color: ${colors.main};
 `;
 
@@ -524,7 +522,7 @@ const CommentItemContainer = styled.View`
 const CommentWriterInfoNMenuContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: 12px;
+	margin-bottom: ${heightPercentage(12)}px;
 `;
 const CommentWriterInfoContainer = styled.View`
 	flex-direction: row;
@@ -532,29 +530,15 @@ const CommentWriterInfoContainer = styled.View`
 	flex: 9;
 `;
 const CommentWriterImage = styled.Image`
-	height: 36px;
-	width: 36px;
+	height: ${widthPercentage(36)}px;
+	width: ${widthPercentage(36)}px;
 	border-radius: 18px;
 	margin-right: 12px;
-`;
-const CommentWriterText = styled.Text`
-	font-size: 12px;
-	font-weight: bold;
-	color: black;
 `;
 const CommentMenu = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-`;
-const CommentContent = styled.Text`
-	font-size: 16px;
-	margin-bottom: 8px;
-	color: black;
-`;
-const CommentInfoText = styled.Text`
-	font-size: 10px;
-	color: black;
 `;
 
 // 댓글 입력을 위해 전체 화면을 9:1로 나눈 곳 중 1인 영역

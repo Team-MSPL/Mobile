@@ -164,10 +164,6 @@ export default function SelectCity({navigation}: any) {
 		</BackgroundGray>
 	);
 }
-const TestImage = styled.Image`
-	width: ${widthPercentage(100)}px;
-	height: ${heightPercentage(100)}px;
-`;
 const FlexContainer = styled.View`
 	flex: 1;
 	justify-content: center;

@@ -15,7 +15,7 @@ import {
 	TagContainer,
 	VStack,
 } from '../../utill/layout/layout';
-import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
+import {Circle, DashLine, DashLineContainer} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
 import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -553,10 +553,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												color={select == idx ? colors.Gray5 : colors.Gray3}>
 												{'DAY' + (idx + 1)}
 											</PretendardSemiBoldText>
-											{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-										<DaySubTitle select={idx === select}>
-											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-										</DaySubTitle> */}
 										</DayTouchablOpacity>
 									),
 							)}
@@ -810,10 +806,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
 													{moment(day[idx]).format('MM월DD일')}
 												</PretendardSemiBoldText>
-												{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-										<DaySubTitle select={idx === select}>
-											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-										</DaySubTitle> */}
 											</ChangeDayContainer>
 										),
 								)}
@@ -989,23 +981,7 @@ const PlaceText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-export const DayButton = styled(PresetButton)`
-	width: 130px;
-	height: 60px;
-	border-radius: 15px;
-	padding: 10px;
-	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
-	align-items: center;
-	justify-content: center;
-`;
 
-export const DayTitle = styled(PlaceText)<{select: boolean}>`
-	color: ${props => (props.select ? 'white' : colors.selectButton)};
-`;
-export const DaySubTitle = styled(DayTitle)`
-	font-weight: 500;
-	font-size: 12px;
-`;
 export const DayElementContainer = styled.View`
 	border-bottom-width: 1px;
 	border-bottom-color: ${colors.regionNormal};

@@ -386,9 +386,3 @@ const SvgContainer = styled.View`
 	left: ${widthPercentage(122)}px;
 	top: ${heightPercentage(51)}px;
 `;
-export const PresetButton = styled.TouchableOpacity<{select: boolean}>`
-	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
-	border-radius: 20px;
-	padding: 10px;
-	margin: 10px 5px 0px 5px;
-`;

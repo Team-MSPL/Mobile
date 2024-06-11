@@ -209,10 +209,6 @@ const CommentNumText = styled.Text`
 	font-size: 12px;
 	color: green;
 `;
-export const MenuIcon = styled(FeatherIcon)`
-	font-size: 24px;
-	color: ${colors.selectButton};
-`;
 const PostItemContainer = styled.View`
 	gap: ${widthPercentage(5)}px;
 	padding: ${heightPercentage(10)}px ${widthPercentage(24)}px;

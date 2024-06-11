@@ -380,23 +380,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				}}
 				onFail={error => console.log(error)}
 				onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
-			{/* <TimeContainer>
-				{[...Array(2)].map((item, idx) => (
-					<TimeItemContainer key={idx}>
-						<TimeStepText>{DaySelectInfoList[idx].step}</TimeStepText>
-						<TimeItemText>{DaySelectInfoList[idx].title}</TimeItemText>
-						<HStack>
-							<DayElementContainer>
-								<TimeItemText>
-									{DaySelectInfoList[idx].time < 12 ? '오전' : '오후'}
-									{Math.floor((DaySelectInfoList[idx].time * 30 + 360) / 60)}:
-									{String((DaySelectInfoList[idx].time * 30 + 360) % 60).padStart(2, '0')}
-								</TimeItemText>
-							</DayElementContainer>
-						</HStack>
-					</TimeItemContainer>
-				))}
-			</TimeContainer> */}
 			{getInfo.name ? (
 				<BottomContainer
 					height={route.params.status == 'travle' ? heightPercentage(342) : heightPercentage(150)}
@@ -552,82 +535,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						textColor={colors.Gray4}></PrimaryButton>
 				</ButtonContainer>
 			)}
-			{/* <SearchContainer>
-				{getInfo.name ? (
-					<AddHStack>
-						<AddText>{getInfo.name}</AddText>
-						<TouchableOpacity
-							onPress={() => {
-								setGetInfo({lat: 0, lng: 0, name: ''});
-							}}>
-							<DeleteIconContainer name={'delete'} size={20} color={'white'} />
-						</TouchableOpacity>
-					</AddHStack>
-				) : (
-					<GooglePlacesAutocomplete
-						placeholder='장소를 검색해보세요!'
-						placeholderTextColor={'grey'}
-						query={{
-							key: GOOGLE_API_KEY,
-							language: 'ko',
-							components: 'country:kr',
-						}}
-						ref={autocompleteRef}
-						textInputProps={{placeholderTextColor: 'grey'}}
-						styles={{
-							textInputContainer: {
-								borderWidth: 1,
-								borderColor: colors.selectButton,
-								borderRadius: 10,
-								backgroundColor: colors.main,
-							},
-							textInput: {margin: 1, color: 'black', backgroundColor: colors.main},
-							listView: {height: 300},
-							description: {color: 'black'},
-						}}
-						renderLeftButton={clearButton}
-						fetchDetails={true}
-						onPress={async (data, details) => {
-							setGetInfo({
-								lat: details?.geometry.location.lat ?? 0,
-								lng: details?.geometry.location.lng ?? 0,
-								name: details?.name ?? '검색불가',
-							});
-						}}
-						onFail={error => console.log(error)}
-						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
-				)}
-			</SearchContainer> */}
-			{/* <CourseAndReview>
-				<RecommendContainer color='#ffccb6' onPress={() => goRecommend('CE7')}>
-					<CourseTitleText>카페 추천</CourseTitleText>
-					<IconContainer>
-						<SvgCoffee width={devicesWidth * 0.09} height={devicesWidth * 0.09} color='white' />
-					</IconContainer>
-				</RecommendContainer>
-				<RecommendContainer
-					color='#cbaacb'
-					onPress={() => {
-						goRecommend('AD5');
-					}}>
-					<CourseTitleText>숙소 추천</CourseTitleText>
-
-					<IconContainer>
-						<SvgHome width={devicesWidth * 0.09} height={devicesWidth * 0.09} color='white' />
-					</IconContainer>
-				</RecommendContainer>
-				<RecommendContainer
-					color='#abdee6'
-					onPress={() => {
-						goRecommend('FD6');
-					}}>
-					<CourseTitleText>식당 추천</CourseTitleText>
-					<IconContainer>
-						<DeleteIconContainers name={'restaurant'} size={devicesWidth * 0.09} color={'white'} />
-					</IconContainer>
-				</RecommendContainer>
-			</CourseAndReview> */}
-			{/* <CustomButton label='추가하기' isDisabled={!getInfo.name} onPress={addTimetable} /> */}
 		</BackgroundGray>
 	);
 }

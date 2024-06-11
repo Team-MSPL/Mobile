@@ -70,12 +70,6 @@ export const Center = styled.View`
 export const HeaderContianer = styled(HStack)`
 	justify-content: space-between;
 `;
-export const HeaderText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0px 5px;
-`;
 export const InputWrap = styled.View`
 	flex-direction: row;
 	align-self: center;

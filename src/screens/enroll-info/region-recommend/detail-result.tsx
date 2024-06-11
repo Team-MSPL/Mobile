@@ -249,18 +249,3 @@ const PopularityContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(152)}px;
 	height: ${heightPercentage(196)}px;
 `;
-export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
-	width: ${props => (props.state ? '20%' : '85%')};
-	align-self: ${props => (props.state ? 'flex-end' : 'center')};
-	right: 20px;
-	border-radius: 20px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
-	padding: 15px;
-	position: absolute;
-	bottom: 20px;
-	background-color: ${colors.main};
-`;
-export const ButtonHStack = styled(HStack)`
-	justify-content: space-between;
-`;

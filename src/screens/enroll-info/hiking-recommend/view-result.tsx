@@ -17,7 +17,6 @@ import {SVGRegionRecommend, SvgLoginLogo} from '../../../utill/svg/svg';
 import {ScrollView} from 'react-native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {TagElement} from '../../home/main';
-import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 import {RecommendContainer} from '../region-recommend/view-result';
 export default function HikingViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();

@@ -218,19 +218,6 @@ export default function FinalCheck({navigation}: any) {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
-	const goReset = () => {
-		navigation.navigate('SelectCity');
-		dispatch(travelSliceActions.reset());
-	};
-	const removeTendency = ({index, idx}: {index: number; idx: number}) => {
-		console.log(tendency[index][idx]);
-		let copy = [...tendency];
-		let seCopy = [...tendency[index]];
-		seCopy[idx] = 0;
-		copy[index] = seCopy;
-		dispatch(travelSliceActions.enrollTendency(copy));
-	};
-	const schedule = ['출발일', '종료일'];
 	const seasonList = [
 		{title: '봄', svg: <SVGSpring width={widthPercentage(24)} height={widthPercentage(27)} />},
 		{title: '여름', svg: <SVGSummer width={widthPercentage(24)} height={widthPercentage(27)} />},

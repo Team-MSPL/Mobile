@@ -131,7 +131,3 @@ const PostImage = styled.Image`
 export const PostImageView = styled.SafeAreaView`
 	align-items: center;
 `;
-export const PostImageIndicatorText = styled.Text`
-	font-size: 16px;
-	color: white;
-`;

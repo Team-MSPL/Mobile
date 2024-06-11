@@ -1,13 +1,7 @@
 import {useCallback, useRef} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {
-	deleteAI,
-	getAiList,
-	getMyTravelList,
-	getOneTravelCourse,
-	travelSliceActions,
-} from '../../redux/travel-info/travel.slice';
+import {getAiList, getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import 'moment/locale/ko';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -19,10 +13,8 @@ import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {Center, PretendardSemiBoldText, PretendardVariableText, TagContainer, VStack} from '../../utill/layout/layout';
 import {SVGFlag} from '../../utill/svg/svg';
-import {ButtonContainer, DayViewContainer} from '../enroll-info/select-multi';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {DayViewContainer} from '../enroll-info/select-multi';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import PrimaryButton from '../../utill/component/primary-button';
 import CustomButton from '../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 export default function MyTravelList({navigation}: any) {
@@ -275,10 +267,6 @@ const TravelContainer = styled.View`
 	background-color: ${colors.main};
 	padding: 0px 24px 0px 24px;
 	height: 100%;
-`;
-export const DayText = styled.Text`
-	font-size: 17px;
-	color: ${colors.selectButton};
 `;
 
 const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})`

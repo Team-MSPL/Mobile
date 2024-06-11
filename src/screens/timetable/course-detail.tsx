@@ -26,7 +26,7 @@ import {colors} from '../../utill/colors';
 import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
-import {ButtonHStack, GoRecommendButton, RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
+import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
 import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
 import Icon from 'react-native-vector-icons/AntDesign';

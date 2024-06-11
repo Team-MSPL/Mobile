@@ -27,7 +27,7 @@ const ButtonContainer = styled.TouchableOpacity`
 	height: 45px;
 	padding: 0px 10px 0px 10px;
 	justify-content: center;
-	background-color: ${colors.selectButton};
+	background-color: ${colors.Primary};
 	border-radius: 25px;
 	margin: 5px 10px 5px 10px;
 `;

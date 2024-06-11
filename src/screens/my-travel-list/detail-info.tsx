@@ -26,7 +26,6 @@ import {
 	VStack,
 	devicesWidth,
 } from '../../utill/layout/layout';
-import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {SVGMaps, SVGPencil, SVGTravlePencil, SvgShare} from '../../utill/svg/svg';

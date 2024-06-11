@@ -141,34 +141,6 @@ export default function InputReviewAndPoint({navigation}: any) {
 						),
 				),
 			)}
-			{/* {detailView &&
-				tendency.map((value, index) =>
-					value.map(
-						(vvalue, iindex) =>
-							vvalue == 1 && (
-								<HStack key={iindex}>
-									<ElementText>{reviewTendencyList[index].list[iindex]}</ElementText>
-									{[...Array(5)].map((_, inex) => (
-										<RatingElement
-											key={inex}
-											onPress={() => {
-												changeTendencyPoint({index: index, iindex: iindex, inex: inex});
-											}}>
-											<SvgStart
-												width={30}
-												height={30}
-												color={
-													inex <= tedencyPointList[index][iindex]
-														? colors.selectButton
-														: colors.emptyStart
-												}
-											/>
-										</RatingElement>
-									))}
-								</HStack>
-							),
-					),
-				)} */}
 			<TestButton onPress={goSaveReviewAndPoint}>
 				<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
 					저장하기

@@ -132,7 +132,7 @@ export default function Join1({navigation, route}: any) {
 								<SvgCheck
 									width={widthPercentage(18)}
 									height={widthPercentage(14)}
-									color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}></SvgCheck>
+									color={check[idx - 1] || allCheck ? colors.Primary : 'grey'}></SvgCheck>
 								<CheckBoxText>{item.title}</CheckBoxText>
 							</CheckTouchableOpacity>
 							{idx != 0 && (

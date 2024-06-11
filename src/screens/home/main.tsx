@@ -24,6 +24,7 @@ import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {Modal, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
+import NeedPermissions from '../../utill/need-permissions';
 export default function Main({navigation}: any) {
 	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);

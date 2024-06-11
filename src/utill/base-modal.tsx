@@ -105,5 +105,5 @@ const ViewContaniner = styled.Pressable<{modalSingleUse: boolean}>`
 	align-items: center;
 	justify-content: center;
 	padding: ${widthPercentage(24)}px;
-	border-color: ${colors.selectButton};
+	border-color: ${colors.Primary};
 `;

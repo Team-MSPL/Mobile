@@ -211,14 +211,3 @@ const RecommendImage = styled.Image`
 	height: 100%;
 	border-radius: 10px;
 `;
-export const RecommendElement = styled.View`
-	width: 100%;
-	background-color: ${colors.selectButton};
-	flex-direction: row;
-	border-bottom-right-radius: 10px;
-	border-bottom-left-radius: 10px;
-	position: absolute;
-	bottom: 0px;
-	align-items: center;
-	padding: 10px;
-`;
