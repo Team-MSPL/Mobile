@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {devicesHeight, devicesWidth} from './layout/layout';
+import {PretendardBoldText, devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
@@ -65,7 +65,9 @@ export default function ViewPager({
 						))}
 					</DotHStack>
 					<CancelContainer onPress={handleFunction}>
-						<SkipText>닫기</SkipText>
+						<PretendardBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+							닫기
+						</PretendardBoldText>
 					</CancelContainer>
 				</HStack>
 			) : (
@@ -79,11 +81,6 @@ export default function ViewPager({
 }
 const DotHStack = styled.View`
 	flex-direction: row;
-`;
-const SkipText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: white;
 `;
 const Carousel = styled.ScrollView``;
 const HStack = styled.View`

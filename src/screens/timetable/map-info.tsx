@@ -65,16 +65,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
 		navigation.navigate('CourseDetail', {value: timetable[select][e]});
-		// setSecletPinIndex(e);
-		// mapRef.current?.animateCamera(
-		// 	{
-		// 		center: {
-		// 			latitude: timetable[select][e].lat,
-		// 			longitude: timetable[select][e].lng,
-		// 		},
-		// 	},
-		// 	{duration: 1000},
-		// );
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
@@ -189,10 +179,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
-		// if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
-		// 	setSelect(route.params.mapIndex);
-		// 	setVisible(false);
-		// } else {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
@@ -201,22 +187,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				break;
 			}
 		}
-		//}
-		// if (polylineCoordinates.length == 0) {
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '보여질 정보가 없습니다.',
-		// 			modalFunction: goBack,
-		// 		}),
-		// 	);
-		// }
 	}, []);
 	const goRemove = () => {
 		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
 		dispatch(travelSliceActions.changeTimetable(a));
-	};
-	const goBack = () => {
-		navigation.goBack();
 	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
@@ -297,50 +271,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				dispatch(travelSliceActions.changeTimetable(changeCopy));
 			}
 		}
-		// setVisible(false);
-		// const newY = viewRef.current.y;
-		// const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
-		// if (newEnd >= 49) {
-		// 	dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
-		// } else {
-		// 	let copy = [...timetable[viewRef.current.index]];
-		// 	let changeCopy = [...timetable];
-		// 	let changeFlag = null;
-		// 	for (let i = 0; i < copy.length; i++) {
-		// 		if (
-		// 			((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
-		// 				(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
-		// 					newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
-		// 			copy[i].id != viewRef.current.id
-		// 		) {
-		// 			changeFlag = copy[i];
-		// 			break;
-		// 		}
-		// 	}
-		// 	let changeInputIndex = copy.findIndex(item => item.y >= newY);
-		// 	changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
-		// 	if (changeFlag) {
-		// 		dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
-		// 			}),
-		// 		);
-		// 	} else {
-		// 		let copyValue = {
-		// 			...changeCopy[viewRef.current.index][viewRef.current.idx],
-		// 			y: newY,
-		// 			x: viewRef.current.index,
-		// 			takenTime: (newEnd - newY) * 30,
-		// 		};
-		// 		let deleteCopy = [...timetable[viewRef.current.index]];
-		// 		deleteCopy.splice(viewRef.current.idx, 1);
-		// 		changeCopy[viewRef.current.index] = deleteCopy;
-		// 		let addCopy = [...changeCopy[viewRef.current.index]];
-		// 		addCopy.splice(changeInputIndex, 0, copyValue);
-		// 		changeCopy[viewRef.current.index] = addCopy;
-		// 		dispatch(travelSliceActions.changeTimetable(changeCopy));
-		// 	}
-		// }
 	};
 	let totalHeight = 0;
 	const presetScrollHeight = timetable.map((item, idx) => {
@@ -976,16 +906,6 @@ const ModalContainer = styled.Pressable`
 	background-color: rgba(0, 0, 0, 0.4);
 `;
 export const DayContainer = styled.ScrollView``;
-const PlaceText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: black;
-`;
-
-export const DayElementContainer = styled.View`
-	border-bottom-width: 1px;
-	border-bottom-color: ${colors.regionNormal};
-`;
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
@@ -996,15 +916,6 @@ const DayScrollViews = styled.ScrollView`
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(500)}px;
-`;
-export const MarkerText = styled.Text`
-	position: absolute;
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-	z-index: 1;
-	left: 20px;
-	bottom: 10px;
 `;
 
 const BackgroundGray = styled.View<{modify: boolean}>`

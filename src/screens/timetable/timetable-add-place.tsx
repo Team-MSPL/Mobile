@@ -15,16 +15,17 @@ import {
 	PretendardSemiBoldText,
 	PretendardVariableText,
 	BackgroundGray,
+	PretendardBoldText,
 } from '../../utill/layout/layout';
 import {DayPressable, SelectContainer} from '../enroll-info/select-day';
 
 import {useDistance} from '../../utill/hooks/useDistance';
-import {BottomContainer, SearchClearButton, SearchClearContainer} from '../enroll-info/search-place';
+import {BottomContainer, SearchClearContainer} from '../enroll-info/search-place';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer, DeleteContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
-import {InfoModalContainer, TimePickerContainer} from './map-info';
+import {TimePickerContainer} from './map-info';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -335,7 +336,9 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	const clearButton = () => (
 		<SearchClearContainer>
 			<TouchableOpacity onPress={clearInput}>
-				<SearchClearButton>취소</SearchClearButton>
+				<PretendardBoldText size={17} lineHeight={21} color={colors.PointYellow}>
+					취소
+				</PretendardBoldText>
 			</TouchableOpacity>
 		</SearchClearContainer>
 	);

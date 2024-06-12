@@ -186,7 +186,7 @@ export default function MyTravelList({navigation}: any) {
 						))}
 					</>
 				)}
-				{monthRef.current != after && (
+				{(monthRef.current != after || item.index == 0) && (
 					<DivideDayContainer>
 						<PretendardVariableText
 							size={12}

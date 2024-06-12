@@ -113,7 +113,6 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 				} else if (timetable[e.idx][e.index + 1].name.includes('추천')) {
 					status = timetable[e.idx][e.index - 1];
 				}
-				//status = timetable[e.idx][e.index - 1];
 			}
 			if (goCheck) {
 				const startNumber = e.value.y; // 시작 숫자
@@ -144,7 +143,6 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 				);
 			}
 		}
-		// }
 	};
 
 	const pan = useRef(new Animated.ValueXY()).current;

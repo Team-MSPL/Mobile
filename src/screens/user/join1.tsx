@@ -9,7 +9,12 @@ import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import {ClearTouchableOpacity, MainContainer, PretendardVariable} from '../../utill/layout/layout';
+import {
+	ClearTouchableOpacity,
+	MainContainer,
+	PretendardVariable,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel, SvgCheck} from '../../utill/svg/svg';
@@ -133,11 +138,15 @@ export default function Join1({navigation, route}: any) {
 									width={widthPercentage(18)}
 									height={widthPercentage(14)}
 									color={check[idx - 1] || allCheck ? colors.Primary : 'grey'}></SvgCheck>
-								<CheckBoxText>{item.title}</CheckBoxText>
+								<PretendardVariableText size={14} lineHeight={17.47} color={colors.Gray4}>
+									{item.title}
+								</PretendardVariableText>
 							</CheckTouchableOpacity>
 							{idx != 0 && (
 								<PlusTouchableOpacity onPress={item.detaileFunction}>
-									<CheckBoxText>(약관보기)</CheckBoxText>
+									<PretendardVariableText size={14} lineHeight={17.47} color={colors.Gray4}>
+										(약관보기)
+									</PretendardVariableText>
 								</PlusTouchableOpacity>
 							)}
 						</CheckContainer>
@@ -163,19 +172,12 @@ const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
 	flex: 1;
 	padding: 0px ${widthPercentage(25)}px;
 `;
-const CheckBoxText = styled.Text`
-	margin-left: ${widthPercentage(5)}px;
-	font-size: ${fontPercentage(14)}px;
-	color: ${colors.Gray4};
-	font-weight: 500;
-	line-weight: ${fontPercentage(17.47)}px;
-`;
-
 const CheckTouchableOpacity = styled.TouchableOpacity`
 	width: 80%;
 	flex-direction: row;
 	margin: 0px 0px 0px 5px;
 	align-items: center;
+	gap: ${widthPercentage(5)}px;
 `;
 const InputProfileContainer = styled.View`
 	display: flex;

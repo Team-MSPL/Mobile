@@ -1,27 +1,45 @@
-import {ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {MainViewContainer} from './policy-main';
+import {PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {colors} from '../../utill/colors';
+import {heightPercentage} from '../../utill/layout/responsive-size';
 export default function Terms() {
 	return (
 		<MainViewContainer>
 			<TextContainer>
-				<TitleText>개인정보 처리방침</TitleText>
+				<PretendardBoldText size={20} lineHeight={24} color={colors.Black}>
+					개인정보 처리방침
+				</PretendardBoldText>
 			</TextContainer>
 			<TextContainer>
-				<SubText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					나그네들 ('https://danim.me'이하 '다님')은(는) 「개인정보 보호법」 제30조에 따라 정보주체의
 					개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이
 					개인정보 처리방침을 수립·공개합니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제1조(개인정보의 처리 목적)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제1조(개인정보의 처리 목적)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					나그네들 ('https://danim.me'이하 '다님')은(는) 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고
 					있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며 이용 목적이 변경되는 경우에는 「개인정보
 					보호법」 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
-				</SubText>
-				<SubText>
+				</PretendardVariableText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					{' '}
 					1. 홈페이지 회원가입 및 관리 회원 가입의사 확인, 회원제 서비스 제공에 따른 본인 식별·인증, 회원자격
 					유지·관리, 각종 고지·통지 목적으로 개인정보를 처리합니다.{'\n '}
@@ -29,11 +47,17 @@ export default function Terms() {
 					목적으로 개인정보를 처리합니다.{'\n '}
 					3. 마케팅 및 광고에의 활용 이벤트 및 광고성 정보 제공 및 참여기회 제공 , 접속빈도 파악 또는 회원의
 					서비스 이용에 대한 통계 등을 목적으로 개인정보를 처리합니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제2조(개인정보의 처리 및 보유 기간)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제2조(개인정보의 처리 및 보유 기간)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 나그네들 은(는) 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에
 					동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다. {'\n '}② 각각의 개인정보 처리 및
 					보유 기간은 다음과 같습니다. {'\n '}
@@ -41,18 +65,30 @@ export default function Terms() {
 					동의일로부터 3년까지 위 이용목적을 위하여 보유.이용됩니다. {'\n '}
 					보유근거 : 서비스 제공을 위한 인증 관련법령 : {'\n '}1{')'}대금결제 및 재화 등의 공급에 관한 기록 :
 					5년 {'\n '}2{')'} 신용정보의 수집/처리 및 이용 등에 관한 기록
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제3조(처리하는 개인정보의 항목)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제3조(처리하는 개인정보의 항목)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 나그네들 은(는) 다음의 개인정보 항목을 처리하고 있습니다. {'\n '}1 홈페이지 회원가입 및 관리
 					필수항목 : 이름, 로그인ID 선택항목 : 접속 로그, 서비스 이용 기록
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제4조(개인정보의 파기절차 및 파기방법)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제4조(개인정보의 파기절차 및 파기방법)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 나그네들 은(는) 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는
 					지체없이 해당 개인정보를 파기합니다.{'\n '}② 정보주체로부터 동의받은 개인정보 보유기간이 경과하거나
 					처리목적이 달성되었음에도 불구하고 다른 법령에 따라 개인정보를 계속 보존하여야 하는 경우에는, 해당
@@ -64,11 +100,17 @@ export default function Terms() {
 					보호책임자의 승인을 받아 개인정보를 파기합니다. {'\n '}
 					2. 파기방법 종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각을 통하여 파기합니다. 전자적 파일
 					형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용합니다
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제5조(개인정보의 안전성 확보조치에 관한 사항)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제5조(개인정보의 안전성 확보조치에 관한 사항)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					나그네들 은(는) 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다.
 					{'\n '}
 					1. 개인정보에 대한 접근 제한 개인정보를 처리하는 데이터베이스시스템에 대한 접근권한의
@@ -81,11 +123,17 @@ export default function Terms() {
 					{'\n '}
 					3. 비인가자에 대한 출입 통제 개인정보를 보관하고 있는 물리적 보관 장소를 별도로 두고 이에 대해
 					출입통제 절차를 수립, 운영하고 있습니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제6조(개인정보를 자동으로 수집하는 장치의 설치 운영 및 그 거부에 관한 사항)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제6조(개인정보를 자동으로 수집하는 장치의 설치 운영 및 그 거부에 관한 사항)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 나그네들 은(는) 이용자에게 개별적인 맞춤서비스를 제공하기 위해 이용정보를 저장하고 수시로 불러오는
 					‘쿠키(cookie)’를 사용합니다.{'\n '}② 쿠키는 웹사이트를 운영하는데 이용되는 서버(http)가 이용자의
 					컴퓨터 브라우저에게 보내는 소량의 정보이며 이용자들의 PC 컴퓨터내의 하드디스크에 저장되기도 합니다.
@@ -95,11 +143,17 @@ export default function Terms() {
 					나. 쿠키의 설치•운영 및 거부 : 웹브라우저 상단의 도구{'>'}인터넷 옵션{'>'}개인정보 메뉴의 옵션
 					설정을 통해 쿠키 저장을 거부 할 수 있습니다. 다. 쿠키 저장을 거부할 경우 맞춤형 서비스 이용에
 					어려움이 발생할 수 있습니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제7조(행태정보의 수집 이용 제공 및 거부 등에 관한 사항)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제7조(행태정보의 수집 이용 제공 및 거부 등에 관한 사항)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 개인정보처리자은(는) 서비스 이용과정에서 정보주체에게 최적화된 맞춤형 서비스 및 혜택, 온라인
 					맞춤형 광고 등을 제공하기 위하여 행태정보를 수집·이용하고 있습니다.{'\n '}② 개인정보처리자은(는)
 					다음과 같이 행태정보를 수집합니다.{'\n '}
@@ -141,11 +195,17 @@ export default function Terms() {
 					사항과 거부권 행사, 피해 신고 접수 등을 문의할 수 있습니다.{'\n '}‣ 개인정보 보호 담당부서{'\n '}
 					담당자 : 이태운{'\n '}
 					연락처 : 010, tulee4734,
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제7조(추가적인 이용 제공 판단기준)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제7조(추가적인 이용 제공 판단기준)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					나그네들 은(는) ｢개인정보 보호법｣ 제15조제3항 및 제17조제4항에 따라 ｢개인정보 보호법 시행령｣
 					제14조의2에 따른 사항을 고려하여 정보주체의 동의 없이 개인정보를 추가적으로 이용·제공할 수 있습니다.
 					이에 따라 나그네들 가(이) 정보주체의 동의 없이 추가적인 이용·제공을 하기 위해서 다음과 같은 사항을
@@ -154,11 +214,17 @@ export default function Terms() {
 					예측 가능성이 있는지 여부{'\n '}▶ 개인정보의 추가적인 이용·제공이 정보주체의 이익을 부당하게
 					침해하는지 여부{'\n '}▶ 가명처리 또는 암호화 등 안전성 확보에 필요한 조치를 하였는지 여부{'\n '}※
 					추가적인 이용·제공 시 고려사항에 대한 판단기준은 사업자/단체 스스로 자율적으로 판단하여 작성·공개함
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제8조(개인정보 보호책임자에 관한 사항)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제8조(개인정보 보호책임자에 관한 사항)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					① 나그네들 은(는) 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의
 					불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.{'\n '}▶
 					개인정보 보호책임자{'\n '}
@@ -169,11 +235,17 @@ export default function Terms() {
 					정보주체께서는 나그네들 의 서비스(또는 사업)을 이용하시면서 발생한 모든 개인정보 보호 관련 문의,
 					불만처리, 피해구제 등에 관한 사항을 개인정보 보호책임자로 문의하실 수 있습니다. 나그네들 은(는)
 					정보주체의 문의에 대해 지체 없이 답변 및 처리해드릴 것입니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제9조(정보주체의 권익침해에 대한 구제방법)</MainText>
-				<SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제9조(정보주체의 권익침해에 대한 구제방법)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
 					정보주체는 개인정보침해로 인한 구제를 받기 위하여 개인정보분쟁조정위원회, 한국인터넷진흥원
 					개인정보침해신고센터 등에 분쟁해결이나 상담 등을 신청할 수 있습니다. 이 밖에 기타 개인정보침해의
 					신고, 상담에 대하여는 아래의 기관에 문의하시기 바랍니다.{'\n '}
@@ -185,11 +257,19 @@ export default function Terms() {
 					등)의 규정에 의한 요구에 대 하여 공공기관의 장이 행한 처분 또는 부작위로 인하여 권리 또는 이익의
 					침해를 받은 자는 행정심판법이 정하는 바에 따라 행정심판을 청구할 수 있습니다.{'\n '}※ 행정심판에
 					대해 자세한 사항은 중앙행정심판위원회(www.simpan.go.kr) 홈페이지를 참고하시기 바랍니다.
-				</SubText>
+				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
-				<MainText>제10조(개인 정보 처리방침 변경)</MainText>
-				<SubText> ① 이 개인정보처리방침은 2023년 1월 1부터 적용됩니다.</SubText>
+				<PretendardBoldText size={15} lineHeight={20} color={colors.Black} marginBottom={heightPercentage(20)}>
+					제10조(개인 정보 처리방침 변경)
+				</PretendardBoldText>
+				<PretendardVariableText
+					size={13}
+					lineHeight={17}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
+					① 이 개인정보처리방침은 2023년 1월 1부터 적용됩니다.
+				</PretendardVariableText>
 			</TextContainer>
 		</MainViewContainer>
 	);
@@ -198,24 +278,4 @@ export default function Terms() {
 const TextContainer = styled.View`
 	margin-bottom: 30px;
 	padding-horizontal: 10px;
-`;
-const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
-`;
-
-const MainText = styled.Text`
-	margin-bottom: 20px;
-	font-size: 15px;
-	line-height: 20px;
-	color: black;
-	font-weight: bold;
-`;
-
-const SubText = styled.Text`
-	font-size: 13px;
-	color: black;
-	line-height: 20px;
-	margin-bottom: 10px;
 `;

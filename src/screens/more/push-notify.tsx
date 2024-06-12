@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {openSettings, checkNotifications} from 'react-native-permissions';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';

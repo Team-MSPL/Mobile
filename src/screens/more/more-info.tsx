@@ -3,15 +3,14 @@ import {Modal, Platform, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
+import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {BackgroundGray, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
 import {useState} from 'react';
 import ViewPager from '../../utill/view-pager';
-import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import UserManage from './user-manage';
 import PrimaryButton from '../../utill/component/primary-button';
@@ -19,9 +18,7 @@ import {WhiteContainer} from '../enroll-info/final-check';
 import Coupon from './coupon';
 import PushNotify from './push-notify';
 export default function MoreInfo({navigation}: any) {
-	const {userName, socialloginProvider, functionToken, userId, userProfileImage} = useAppSelector(
-		state => state.userSlice,
-	);
+	const {userName, socialloginProvider, functionToken, userProfileImage} = useAppSelector(state => state.userSlice);
 	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
 	const dispatch = useAppDispatch();
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
@@ -37,37 +34,6 @@ export default function MoreInfo({navigation}: any) {
 				modalTitle: '로그아웃에 성공했습니다.',
 			}),
 		);
-	};
-	const {firebaseImageRemove} = useFirebaseStorage();
-	const goWithdraw = async () => {
-		try {
-			await firebaseImageRemove({pictureList: ['profile'], id: userId, category: 'profile'});
-		} catch (err) {
-			console.log('이유', err);
-		}
-		try {
-			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
-			const data = {userId: userId, signUpFirebase: !signUpFirebase};
-			await dispatch(userWithdraw(data));
-			await AsyncStorage.getAllKeys().then(allKeys => {
-				const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
-				AsyncStorage.multiRemove(removeList);
-			});
-			dispatch(userSliceActions.reset());
-			navigation.replace('LoginScreen');
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '회원탈퇴가 완료됐습니다.',
-				}),
-			);
-		} catch (err) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '회원 탈퇴가 실패했습니다',
-					modalSubTitle: '잠시후 다시 시도해주세요',
-				}),
-			);
-		}
 	};
 	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler({type: 'exit'});
@@ -236,17 +202,7 @@ export default function MoreInfo({navigation}: any) {
 						<SettingElement
 							bottomShow={false}
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '계정 삭제 하시겠습니까?',
-										modalSubTitle: `탈퇴하면 더 이상 다님의 여행 추천 서비스를 받을 수 없고\n여행기록도 사라지게 되어요.`,
-										modalTopText: '다님과 게속 여행하기',
-										modalBottomText: '아쉽지만 계정 삭제',
-										modalBottomFunction: goWithdraw,
-										modalBottomFunctionUse: true,
-										modalLeft: true,
-									}),
-								);
+								navigation.navigate('Withdraw');
 							}}>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
 								계정 삭제

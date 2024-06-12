@@ -20,7 +20,6 @@ import {
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
-import {MarkerText} from './map-info';
 import PrimaryButton from '../../utill/component/primary-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarkerContainer} from './preset-detail';
@@ -316,11 +315,6 @@ const RecommendInfoTouchableOpacity = styled.TouchableOpacity`
 	margin: 5px 0px 0px 0px;
 	padding: 1%;
 	width: 20%;
-`;
-const RecommendElementText = styled.Text<{color: string}>`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${props => props.color};
 `;
 const RecommendScrollView = styled.ScrollView`
 	padding: 10px;

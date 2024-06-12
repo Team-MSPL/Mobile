@@ -3,22 +3,20 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {getOneTravelCourse, reviewAndPoint} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {useFocusEffect} from '@react-navigation/native';
-import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {MainContainer, MainText, HStack, BackgroundGray, PretendardVariableText} from '../../utill/layout/layout';
+import {HStack, BackgroundGray, PretendardVariableText} from '../../utill/layout/layout';
 import {SvgStart} from '../../utill/svg/svg';
 import {colors} from '../../utill/colors';
 import styled from 'styled-components/native';
 import {DiaryTextInput} from './input-diary';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
-import {Keyboard, ScrollView} from 'react-native';
+import {ScrollView} from 'react-native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function InputReviewAndPoint({navigation}: any) {
 	const {travelId, tendency} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [reviewValue, setReviewValue] = useState('');
 	const [pointValue, setPointValue] = useState(5);
-	const [detailView, setDetailView] = useState(false);
 	const [tedencyPointList, setTedencyPointList] = useState<number[][]>(
 		tendency.map(innerArray => innerArray.map(() => 4)),
 	);
@@ -73,9 +71,6 @@ export default function InputReviewAndPoint({navigation}: any) {
 		copy[e.index][e.iindex] = e.inex;
 		setTedencyPointList(copy);
 	};
-	const changeDetailView = () => {
-		setDetailView(!detailView);
-	};
 	useFocusEffect(
 		useCallback(() => {
 			goMyTravelDetail();
@@ -86,7 +81,6 @@ export default function InputReviewAndPoint({navigation}: any) {
 			<PretendardVariableText size={20} lineHeight={27} color={colors.Black}>
 				어떤 점이 좋았나요?
 			</PretendardVariableText>
-			{/* <ElementText>이 여행 코스는 어떠셨나요?</ElementText> */}
 			<ReviewContainer>
 				{[...Array(5)].map((item, idx) => (
 					<RatingElement
@@ -102,16 +96,12 @@ export default function InputReviewAndPoint({navigation}: any) {
 					</RatingElement>
 				))}
 			</ReviewContainer>
-			{/* <ElementText>어떤 점이 좋았나요?</ElementText> */}
 			<RatingReview
 				placeholder='좋았던 점을 남겨주세요'
 				placeholderTextColor={'grey'}
 				style={{color: 'black'}}
 				value={reviewValue}
 				onChangeText={(value: string) => changeReview(value)}></RatingReview>
-			{/* <DetailRating onPress={changeDetailView}>
-				<ElementText>상세 리뷰 {!detailView ? '열기' : '닫기'}</ElementText>
-			</DetailRating> */}
 			{tendency.map((value, index) =>
 				value.map(
 					(vvalue, iindex) =>
@@ -146,7 +136,6 @@ export default function InputReviewAndPoint({navigation}: any) {
 					저장하기
 				</PretendardVariableText>
 			</TestButton>
-			{/* <CustomButton label='리뷰 저장하기' onPress={goSaveReviewAndPoint} /> */}
 		</Scroll>
 	);
 }
@@ -162,26 +151,11 @@ const TestButton = styled.TouchableOpacity`
 	margin-top: ${widthPercentage(10)}px;
 `;
 const Scroll = styled(BackgroundGray).attrs({as: ScrollView})``;
-const DetailRating = styled.TouchableOpacity`
-	width: 100%;
-	justify-content: center;
-	flex-direction: row;
-`;
-
-const ReviewAndPointContainer = styled(MainContainer)`
-	flex: 1;
-`;
 const RatingReview = styled(DiaryTextInput)`
 	height: ${heightPercentage(225)}px;
 `;
 const RatingElement = styled.TouchableOpacity`
 	margin: 0px 10px 0px 10px;
-`;
-const ElementText = styled.Text`
-	font-size: 20px;
-	font-weight: 500;
-	color: black;
-	margin: 10px 0px;
 `;
 const ReviewContainer = styled(HStack)`
 	justify-content: center;

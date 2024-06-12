@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView} from 'react-native';
+import {Image, Pressable} from 'react-native';
 import {
 	getPlaceInfo,
 	courseInfoType,
@@ -17,10 +17,9 @@ import {
 	Divider,
 	HStack,
 	MainText,
+	PretendardSemiBold,
 	PretendardSemiBoldText,
 	PretendardVariableText,
-	VStack,
-	devicesWidth,
 } from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
 import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
@@ -29,10 +28,8 @@ import Toast from 'react-native-toast-message';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
 import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
-import Icon from 'react-native-vector-icons/AntDesign';
 import {useFocusEffect} from '@react-navigation/native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {WhiteContainer} from '../enroll-info/final-check';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import CustomButton from '../../utill/component/custom-button';
 import {hikingRecommendSliceActions} from '../../redux/travel-info/hiking.slice';
@@ -42,7 +39,6 @@ import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/c
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 export default function CourseDetail({navigation, route}: any) {
-	const Icons = styled(Icon)``;
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
@@ -113,11 +109,6 @@ export default function CourseDetail({navigation, route}: any) {
 			//setCourseDetail(a);
 		} catch (err) {
 			console.log('이유q', err);
-			// dispatch(
-			// 	modalSliceActions.setOpenModal({
-			// 		modalTitle: '여행 정보가 없습니다',
-			// 	}),
-			// );
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -187,16 +178,6 @@ export default function CourseDetail({navigation, route}: any) {
 	useEffect(() => {
 		checkSobaecksan();
 	}, []);
-	const tabBarRef = useRef();
-	const [tabView, setTabView] = useState(0);
-	const changeTab = (e: any) => {
-		Math.round(e.nativeEvent.contentOffset.x / devicesWidth) != tabView &&
-			setTabView(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
-	};
-	const tabList = [
-		{title: '상세 정보', function: () => tabBarRef.current.scrollTo({x: 0, y: 0, animated: true})},
-		{title: '리뷰', function: () => tabBarRef.current.scrollToEnd({animated: true})},
-	];
 	const detailList = [
 		{
 			title: courseDetail?.address,
@@ -217,15 +198,6 @@ export default function CourseDetail({navigation, route}: any) {
 			Toast.show({type: 'success', text1: '복사가 완료되었습니다.', position: 'bottom'});
 		} catch (err) {
 			console.log('qwe', err);
-		}
-	};
-	const [goState, setGoState] = useState(false);
-	const [reviewState, setReviewState] = useState(false);
-	const checkGoState = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-		if (tabView == 0) {
-			e.nativeEvent.contentOffset.y > 30 ? setGoState(true) : setGoState(false);
-		} else {
-			e.nativeEvent.contentOffset.y > 30 ? setReviewState(true) : setReviewState(false);
 		}
 	};
 	const goIncludeRecommend = () => {
@@ -462,7 +434,7 @@ export default function CourseDetail({navigation, route}: any) {
 									{item.reviewUserToken == userIdToken && (
 										<Pressable
 											onPress={() => {
-												deleteReview(item);
+												checkDelete(item);
 											}}>
 											<PretendardSemiBoldText
 												size={14}
@@ -513,9 +485,9 @@ export default function CourseDetail({navigation, route}: any) {
 							FooterComponent={index => {
 								return (
 									<ImageViewFooterComponent>
-										<ImageText>
+										<PretendardSemiBoldText size={15} lineHeight={18} color={colors.Black}>
 											{index.imageIndex + 1}/{courseDetail.photo.length}
-										</ImageText>
+										</PretendardSemiBoldText>
 									</ImageViewFooterComponent>
 								);
 							}}
@@ -587,13 +559,11 @@ export const LogoContainer = styled.View`
 const OpenVStack = styled.View`
 	width: 80%;
 `;
-const ReviewElementText = styled.Text`
-	font-size: 16px;
+export const ImageText = styled(PretendardSemiBold)`
+	color: ${colors.backgroundWhite};
+	font-size: ${fontPercentage(16)}px;
+	line-height: ${fontPercentage(21)}px;
 	font-weight: 600;
-	color: black;
-`;
-export const ImageText = styled(ReviewElementText)`
-	color: white;
 `;
 const ReviewNonContainer = styled.Pressable`
 	width: ${widthPercentage(327)}px;

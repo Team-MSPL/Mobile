@@ -55,17 +55,8 @@ export default function UserManage() {
 	);
 }
 
-const ProviderText = styled.Text`
-	font-size: 20px;
-	font-weight: 400;
-	color: black;
-`;
 const ClipBox = styled.View`
 	width: 50%;
-`;
-export const ClipText = styled(ProviderText)`
-	width: 60%;
-	font-size: 18px;
 `;
 
 export const ClipCopy = styled.TouchableOpacity`

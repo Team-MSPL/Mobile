@@ -6,6 +6,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {networkCheck} from '../../redux/network/networkSlice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {PretendardVariableText} from '../../utill/layout/layout';
 
 export default function Connection() {
 	const dispatch = useAppDispatch();
@@ -27,7 +28,9 @@ export default function Connection() {
 	return (
 		<Container>
 			<ViewContaniner>
-				<Guide>네트워크 연결이 불안정합니다{'\n'}확인 후 다시 시도해주세요.</Guide>
+				<PretendardVariableText size={16} lineHeight={24.5} color={colors.Black}>
+					네트워크 연결이 불안정합니다{'\n'}확인 후 다시 시도해주세요.
+				</PretendardVariableText>
 				<CustomButton label={'새로고침'} onPress={checkNetwork} width={widthPercentage(200)} />
 			</ViewContaniner>
 		</Container>
@@ -41,13 +44,6 @@ const Container = styled.View`
 	width: 100%;
 	height: 100%;
 	background-color: rgba(250, 250, 255, 0.9);
-`;
-const Guide = styled.Text`
-	font-size: 16px;
-	text-align: center;
-	line-height: 24.5px;
-	font-weight: 500;
-	color: black;
 `;
 const ViewContaniner = styled.Pressable`
 	background-color: white;

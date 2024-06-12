@@ -1,11 +1,14 @@
 import styled from 'styled-components/native';
 import {colors} from '../colors';
-import {fontPercentage, heightPercentage, widthPercentage} from '../layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../layout/responsive-size';
+import {PretendardSemiBoldText} from '../layout/layout';
 
 export default function TendencyButton({onPress, label, bgColor, divide, marginBottom}: CustomButtonProps) {
 	return (
 		<ButtonContainer select={bgColor} onPress={onPress} divide={divide ?? false} marginBottom={marginBottom}>
-			<ButtonText select={bgColor}>{label}</ButtonText>
+			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
+				{label}
+			</PretendardSemiBoldText>
 		</ButtonContainer>
 	);
 }
@@ -28,10 +31,4 @@ const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolea
 	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
 	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};
 	margin-bottom: ${props => props.marginBottom ?? heightPercentage(10)}px;
-`;
-const ButtonText = styled.Text<{select: boolean}>`
-	color: ${props => (props.select ? colors.Gray5 : colors.Gray4)};
-	font-size: ${fontPercentage(16)}px;
-	font-weight: 600;
-	line-height: ${fontPercentage(19.09)}px;
 `;

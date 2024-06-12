@@ -300,11 +300,6 @@ export const DefalutLogoContainer = styled.View`
 `;
 const SearchPlaceContainer = styled(BackgroundGray).attrs({as: Pressable})``;
 
-export const SearchClearButton = styled.Text`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${colors.PointYellow};
-`;
 export const SearchClearContainer = styled.View`
 	align-items: center;
 	justify-content: center;

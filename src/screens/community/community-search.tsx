@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {HStack} from '../../utill/layout/layout';
+import {HStack, PretendardBoldText} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useEffect, useRef, useState} from 'react';
@@ -57,14 +57,18 @@ export default function CommunitySearch({navigation}: any) {
 			</SearchHstack>
 			{show && searchList.length == 0 && (
 				<TextContainer>
-					<SearchText>검색 결과가 없습니다</SearchText>
+					<PretendardBoldText size={25} lineHeight={35} color={colors.Gray4}>
+						검색 결과가 없습니다
+					</PretendardBoldText>
 				</TextContainer>
 			)}
 			{show ? (
 				<CommunityMain navigation={navigation} searchState={true} searchValue={searchValue}></CommunityMain>
 			) : (
 				<TextContainer>
-					<SearchText>제목, 내용을 검색해보세요</SearchText>
+					<PretendardBoldText size={25} lineHeight={35} color={colors.Gray4}>
+						제목, 내용을 검색해보세요
+					</PretendardBoldText>
 				</TextContainer>
 			)}
 		</MainContainer>
@@ -74,11 +78,6 @@ const TextContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-`;
-const SearchText = styled.Text`
-	font-size: 25px;
-	font-weight: bold;
-	color: grey;
 `;
 const MainContainer = styled.SafeAreaView`
 	flex: 1;

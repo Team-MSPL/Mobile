@@ -24,13 +24,11 @@ const initialUserState: UserState = {
 //회원탈퇴
 export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
-	async (data: {userId: string; signUpFirebase: boolean}, {rejectWithValue}) => {
+	async (data: {userId: string; signUpFirebase: boolean; withdrawReasonList: string[]}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.delete('/user/withdraw', {data});
-			console.log('잘왓다');
 			return response.data;
 		} catch (err: any) {
-			console.log('안왔다', err);
 			throw rejectWithValue(err.response.data);
 		}
 	},

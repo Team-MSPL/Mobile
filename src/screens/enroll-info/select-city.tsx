@@ -88,8 +88,8 @@ export default function SelectCity({navigation}: any) {
 										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
 									</PretendardSemiBoldText>
 									<SvgCancel
-										width={widthPercentage(13)}
-										height={widthPercentage(13)}
+										width={widthPercentage(12)}
+										height={widthPercentage(12)}
 										color={colors.Primary}
 									/>
 								</RegionElementContainer>

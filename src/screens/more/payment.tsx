@@ -1,4 +1,4 @@
-import {ActivityIndicator, Platform, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Platform} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
 import {
@@ -10,7 +10,7 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
@@ -22,7 +22,7 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {useFocusEffect} from '@react-navigation/native';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
-	const {purchaseItems, requestItemPurchase} = useShopping();
+	const {requestItemPurchase} = useShopping();
 	const [watchAD, setWatchAD] = useState(0);
 	useShopping();
 	const dispatch = useAppDispatch();

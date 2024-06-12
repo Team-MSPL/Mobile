@@ -11,7 +11,7 @@ import {useState} from 'react';
 import {ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {ButtonContainer} from '../select-multi';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();

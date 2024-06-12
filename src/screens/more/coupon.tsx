@@ -8,7 +8,6 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import PrimaryButton from '../../utill/component/primary-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {colors} from '../../utill/colors';
-import {Keyboard} from 'react-native';
 
 export default function Coupon({navigation}: any) {
 	const [text, setText] = useState('');

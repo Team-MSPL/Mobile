@@ -14,11 +14,6 @@ import PrimaryButton from '../../utill/component/primary-button';
 export default function Inquire({navigation}: any) {
 	const [text, setText] = useState('');
 	const changeText = (e: string) => {
-		// if (e == '여행의 설렘' || e == '여행의설렘') {
-		// 	navigation.navigate('Festival');
-		// } else {
-		// 	setText(e);
-		// }
 		setText(e);
 	};
 	const {userName} = useAppSelector(state => state.userSlice);

@@ -13,7 +13,7 @@ import PushNotify from '../screens/more/push-notify';
 import UserManage from '../screens/more/user-manage';
 import Notice from '../screens/more/notice';
 import NoticeDetail from '../screens/more/notice-detail';
-import Festival from '../screens/more/festival';
+import Withdraw from '../screens/more/withdraw';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -111,10 +111,10 @@ export default function MoreStack() {
 				}}
 			/>
 			<Stack.Screen
-				name='Festival'
-				component={Festival}
+				name='Withdraw'
+				component={Withdraw}
 				options={{
-					title: '중앙대 축제',
+					title: '계정 삭제',
 				}}
 			/>
 		</Fragment>

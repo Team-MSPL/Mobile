@@ -103,17 +103,17 @@ export const PostImageSwiper = styled(Swiper)<{height?: number}>`
 `;
 export const Dot = styled.View`
 	background-color: #b1b6cc80;
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
+	width: ${widthPercentage(8)}px;
+	height: ${widthPercentage(8)}px;
+	border-radius: 99px;
+	margin: ${widthPercentage(4)}px;
 `;
 export const ActiveDot = styled.View`
 	background-color: ${colors.backgroundWhite};
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
+	width: ${widthPercentage(8)}px;
+	height: ${widthPercentage(8)}px;
+	border-radius: 99px;
+	margin: ${widthPercentage(4)}px;
 `;
 // 사진을 누를 수 있게 하기 위한 componenet
 const PostImageWrapper = styled.Pressable`

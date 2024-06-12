@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {PretendardBoldText, PretendardSemiBold, PretendardVariable} from '../../layout/layout';
+import {PretendardBold, PretendardBoldText, PretendardSemiBold, PretendardVariable} from '../../layout/layout';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {colors} from '../../colors';
 export default function Policy1() {
@@ -86,11 +86,11 @@ export const PolicyTextContainer = styled.View`
 	gap: ${heightPercentage(10)}px;
 `;
 
-export const PolicyMainText = styled.Text`
-	margin-bottom: 20px;
-	font-size: 15px;
-	line-height: 20px;
-	color: black;
+export const PolicyMainText = styled(PretendardBold)`
+	margin-bottom: ${heightPercentage(20)}px;
+	font-size: ${fontPercentage(15)}px;
+	line-height: ${fontPercentage(20)}px;
+	color: ${colors.Black};
 	font-weight: bold;
 `;
 

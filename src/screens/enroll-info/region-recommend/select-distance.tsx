@@ -4,7 +4,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
 import {Platform, PermissionsAndroid} from 'react-native';
-import {Center, BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';

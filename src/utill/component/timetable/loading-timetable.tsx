@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {colors} from '../../colors';
-import {MainText} from '../../layout/layout';
+import {MainText, PretendardBoldText} from '../../layout/layout';
 import LoadingLottie from '../../loading-lottie';
 import {useAppSelector} from '../../../redux';
 
@@ -34,9 +34,13 @@ export default function LoadingTimetable({navigation}: any) {
 			<BarContainer>
 				<BarContinueContainer size={view}></BarContinueContainer>
 			</BarContainer>
-			<LimitText>
-				다님만의 ai를 바탕으로 <NicknameText>{userName}</NicknameText>님께 {'\n'}꼭 맞는 여행지를 생성중이에요!
-			</LimitText>
+			<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
+				다님만의 ai를 바탕으로{' '}
+				<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
+					{userName}
+				</PretendardBoldText>
+				님께 {'\n'}꼭 맞는 여행지를 생성중이에요!
+			</PretendardBoldText>
 			<MainText>{viewList[view]}</MainText>
 		</LoadingTimetableContainer>
 	);
@@ -46,14 +50,6 @@ const LoadingTimetableContainer = styled.View`
 	align-items: center;
 	background-color: ${colors.main};
 	flex: 1;
-`;
-const LimitText = styled.Text`
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-`;
-const NicknameText = styled(LimitText)`
-	color: ${colors.Primary};
 `;
 const BarContainer = styled.View`
 	width: 80%;

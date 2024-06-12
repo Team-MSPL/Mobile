@@ -42,6 +42,6 @@ const ButtonContainer = styled.TouchableOpacity<{
 	justify-content: center;
 	border-radius: 17px;
 	background-color: ${colors.Gray5};
-	margin-top: ${props => props.marginTop}px;
-	margin-bottom: ${props => props.marginBottom}px;
+	margin-top: ${props => heightPercentage(props.marginTop)}px;
+	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
 `;

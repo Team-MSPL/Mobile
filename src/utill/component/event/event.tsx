@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {colors} from '../../colors';
-import {HStack, devicesWidth} from '../../layout/layout';
+import {HStack, PretendardVariableText, devicesWidth} from '../../layout/layout';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
@@ -51,10 +51,14 @@ export default function Event() {
 				</IndexHStack>
 				<EventHStack>
 					<TextPressable onPress={closeModalOneDay}>
-						<Guide>오늘 그만 보기</Guide>
+						<PretendardVariableText size={15} lineHeight={21.6} color={colors.Black}>
+							오늘 그만 보기
+						</PretendardVariableText>
 					</TextPressable>
 					<TextPressable onPress={closeModal}>
-						<Guide>닫기</Guide>
+						<PretendardVariableText size={15} lineHeight={21.6} color={colors.Black}>
+							닫기
+						</PretendardVariableText>
 					</TextPressable>
 				</EventHStack>
 			</ViewContaniner>
@@ -80,13 +84,6 @@ const Container = styled.View`
 	width: 100%;
 	height: 100%;
 	background-color: rgba(128, 128, 128, 0.9);
-`;
-const Guide = styled.Text`
-	font-size: 16px;
-	text-align: center;
-	line-height: 24.5px;
-	font-weight: 500;
-	color: black;
 `;
 const EventImage = styled.Image`
 	width: ${devicesWidth * 0.95}px;
