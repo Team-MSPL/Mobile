@@ -82,7 +82,6 @@ export default function InputDiary({navigation, modify, setModify, text}: any) {
 				}),
 			);
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '다이어리 저장이 실패했습니다',

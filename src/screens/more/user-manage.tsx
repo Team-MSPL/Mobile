@@ -17,7 +17,6 @@ export default function UserManage() {
 		try {
 			const secret_key = CRYPTO_KEY;
 			if (!secret_key) {
-				console.log('No Secret Key.');
 				return null;
 			}
 			const encrypted = CryptoJS.AES.encrypt(userIdToken, secret_key).toString();

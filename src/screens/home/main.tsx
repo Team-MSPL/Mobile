@@ -172,7 +172,6 @@ export default function Main({navigation}: any) {
 		travelName: any;
 		region: any;
 	}) => {
-		console.log(data.region.split(','));
 		dispatch(
 			travelSliceActions.setCache({
 				presetDatas: JSON.parse(data.preset),

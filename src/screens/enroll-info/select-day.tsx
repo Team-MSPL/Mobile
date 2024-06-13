@@ -122,7 +122,6 @@ export default function SelectDay({navigation}: any) {
 
 	const calculateDateDifference = () => {
 		if (selectStartDate && selectEndDate) {
-			console.log(selectEndDate.diff(selectStartDate));
 			const diffInMilliseconds = selectEndDate.diff(selectStartDate);
 			const duration = moment.duration(diffInMilliseconds);
 			const days = duration.asDays();

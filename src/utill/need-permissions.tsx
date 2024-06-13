@@ -72,7 +72,6 @@ export default function NeedPermissions() {
 			const res = await requestMultiple(deniedList);
 			const checkResult = await checkPermissions(res);
 			const status = checkResult.hasBlocked ? 'blocked' : checkResult.deniedList.length ? 'denied' : 'granted';
-			console.log(status);
 			showDialogModal(status, checkResult.deniedList);
 		} catch (e) {
 			dispatch(

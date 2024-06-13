@@ -183,7 +183,6 @@ export default function DetailInfo({navigation}: any) {
 				}),
 			);
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '다이어리 저장이 실패했습니다',
@@ -270,7 +269,6 @@ export default function DetailInfo({navigation}: any) {
 			}
 			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
@@ -331,6 +329,7 @@ export default function DetailInfo({navigation}: any) {
 				<AbsoluteTopBar opacityState={false}>
 					<HStack gap={10} marginVertical={heightPercentage(10)} width={widthPercentage(375)}>
 						<RegionImage
+							resizeMode='contain'
 							source={{
 								uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
 							}}
@@ -381,7 +380,7 @@ export default function DetailInfo({navigation}: any) {
 							</VStack>
 							{!modify && (
 								<TouchableOpacity onPress={goKakaoShare}>
-									<SvgShare width={widthPercentage(38)} height={widthPercentage(38)} />
+									<SvgShare width={heightPercentage(38)} height={heightPercentage(38)} />
 								</TouchableOpacity>
 							)}
 						</HStack>

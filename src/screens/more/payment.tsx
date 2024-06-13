@@ -62,7 +62,6 @@ export default function Payment({navigation}: any) {
 			rewarded.removeAllListeners();
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
-			console.log('dddddd', watchAD, watchAD + 1);
 			dispatch(setWatchADTime({watchADTime: watchAD + 1}));
 			navigation.goBack();
 		});

@@ -4,6 +4,7 @@ import {colors} from '../../colors';
 import {MainText, PretendardBoldText} from '../../layout/layout';
 import LoadingLottie from '../../loading-lottie';
 import {useAppSelector} from '../../../redux';
+import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 
 export default function LoadingTimetable({navigation}: any) {
 	const [view, setView] = useState(0);
@@ -53,14 +54,14 @@ const LoadingTimetableContainer = styled.View`
 `;
 const BarContainer = styled.View`
 	width: 80%;
-	height: 10px;
+	height: ${heightPercentage(10)}px;
 	border-radius: 10px;
 	background-color: ${colors.normalButton};
-	margin: 10px 0px 10px 0px;
+	margin: ${widthPercentage(10)}px 0px ${widthPercentage(10)}px 0px;
 `;
 const BarContinueContainer = styled.View<{size: number}>`
 	width: ${props => props.size * 25 + 25}%;
-	height: 10px;
+	height: ${heightPercentage(10)}px;
 	border-radius: 10px;
 	background-color: ${colors.Primary};
 `;

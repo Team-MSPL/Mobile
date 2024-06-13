@@ -114,7 +114,6 @@ export default function Recommend({navigation, route}: any) {
 		);
 	};
 	const checkMessage = () => {
-		//	console.log(departure);
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '바로 추가됩니다!',
@@ -192,7 +191,6 @@ export default function Recommend({navigation, route}: any) {
 
 	useLayoutEffect(() => {
 		getRecommendList();
-		console.log(route.params.status);
 	}, []);
 
 	const mapRef = useRef<MapView>(null);
@@ -231,13 +229,6 @@ export default function Recommend({navigation, route}: any) {
 										source={require('../../../public/images/coffee.png')}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								)}
-								{/* <Image
-									source={require(route.params.name == '식당 추천'
-										? '../../../public/images/food.png'
-										: route.params.name == '숙소 추천'
-										? '../../../public/images/accommodation.png'
-										: '../../../public/images/coffee.png')}
-									style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image> */}
 							</ImageContainer>
 							<ListVStack
 								onPress={() => {
@@ -275,14 +266,6 @@ export default function Recommend({navigation, route}: any) {
 								onPress={() => {
 									Linking.openURL(item.place_url);
 								}}></PrimaryButton>
-							{/* <RecommendInfoTouchableOpacity
-								onPress={() => {
-									Linking.openURL(item.place_url);
-								}}>
-								<RecommendElementText color={idx == select ? 'white' : 'black'}>
-									정보보기
-								</RecommendElementText>
-							</RecommendInfoTouchableOpacity> */}
 						</ListHStack>
 					))
 				) : (
@@ -308,16 +291,16 @@ const RecommendContainer = styled.View`
 	background-color: ${colors.main};
 `;
 const RecommendView = styled.View`
-	margin: 5px 0px 0px 0px;
+	margin: ${widthPercentage(5)}px 0px 0px 0px;
 	padding: 1%;
 `;
 const RecommendInfoTouchableOpacity = styled.TouchableOpacity`
-	margin: 5px 0px 0px 0px;
+	margin: ${widthPercentage(5)}px 0px 0px 0px;
 	padding: 1%;
 	width: 20%;
 `;
 const RecommendScrollView = styled.ScrollView`
-	padding: 10px;
+	padding: ${widthPercentage(10)}px;
 `;
 const ListHStack = styled(HStack)<{color: string}>`
 	justify-content: space-around;
@@ -327,5 +310,5 @@ const ListHStack = styled(HStack)<{color: string}>`
 `;
 const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
 	width: 65%;
-	padding: 3px;
+	padding: ${widthPercentage(3)}px;
 `;

@@ -71,7 +71,7 @@ export default function MoreStack() {
 				name='NoteList'
 				component={NoteList}
 				options={{
-					title: '문의 하기',
+					title: '쪽지함',
 				}}
 			/>
 			<Stack.Screen

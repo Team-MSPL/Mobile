@@ -142,7 +142,6 @@ export default function FinalCheck({navigation}: any) {
 			}
 			let copy = [...tendency];
 			copy.push(season);
-			// console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
 			const result = await dispatch(
 				getTravelAi({
 					regionList: a,
@@ -178,7 +177,6 @@ export default function FinalCheck({navigation}: any) {
 				);
 			}
 		} catch (error) {
-			console.log(error, 'qwe');
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '네트워크 연결이 불안정합니다',

@@ -43,7 +43,7 @@ export default function HikingViewResult({navigation}: any) {
 					<Image
 						resizeMode='contain'
 						source={require('../../../../public/images/danim_logo_row.png')}
-						style={{height: 30, aspectRatio: 2.054}}
+						style={{height: heightPercentage(36), aspectRatio: 2.054}}
 					/>
 				</TouchableOpacity>
 			),

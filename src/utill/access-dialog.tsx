@@ -3,6 +3,7 @@ import Modal from 'react-native-modal';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import {PretendardBoldText, PretendardVariableText} from './layout/layout';
+import {widthPercentage} from './layout/responsive-size';
 
 /**
  * 필수 접근 권한 거절 시 보여질 모달
@@ -60,14 +61,14 @@ const ModalView = styled.View`
 	background-color: ${colors.main};
 `;
 const Section = styled.View`
-	padding: 20px;
+	padding: ${widthPercentage(20)}px;
 `;
 const BtnSection = styled(Section)`
 	flex-direction: row;
 	justify-content: flex-end;
 `;
 const Btn = styled.TouchableOpacity`
-	margin-left: 40px;
+	margin-left: ${widthPercentage(40)}px;
 `;
 interface AccessDialogProps {
 	type: 'denied' | 'blocked';

@@ -1,12 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
-import {Alert, TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
-import {TimetableType, recommendApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
-import moment from 'moment';
-import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {
@@ -17,122 +15,20 @@ import {
 	BackgroundGray,
 	PretendardBoldText,
 } from '../../utill/layout/layout';
-import {DayPressable, SelectContainer} from '../enroll-info/select-day';
+import {SelectContainer} from '../enroll-info/select-day';
 
-import {useDistance} from '../../utill/hooks/useDistance';
 import {BottomContainer, SearchClearContainer} from '../enroll-info/search-place';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer, DeleteContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {TimePickerContainer} from './map-info';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: '', formatted_address: ''});
 	const newY = useRef(0);
-
-	const goRecommend = (category: string) => {
-		let lat = 0;
-		let lng = 0;
-		let radius = 2000;
-		let goCheck = true;
-		let status = timetable[route.params.x][timetable[route.params.x].length - 1];
-		switch (newY.current) {
-			case timetable[route.params.x].length:
-				if (timetable[route.params.x][timetable[route.params.x].length - 1].name.includes('추천')) {
-					goCheck = false;
-				} else {
-					lat = timetable[route.params.x][timetable[route.params.x].length - 1].lat;
-					lng = timetable[route.params.x][timetable[route.params.x].length - 1].lng;
-					status = timetable[route.params.x][timetable[route.params.x].length - 1];
-				}
-				break;
-			case 0:
-				if (timetable[route.params.x][0].name.includes('추천')) {
-					goCheck = false;
-				} else {
-					lat = timetable[route.params.x][0].lat;
-					lng = timetable[route.params.x][0].lng;
-					status = timetable[route.params.x][0];
-				}
-				break;
-			case -1:
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '참고할 관광지가 없어서 보여줄 수 없습니다!',
-						modalSubTitle: '동일한 날짜에 아무것도 없으면 추천을 해줄 수 없습니다.',
-					}),
-				);
-				return 0;
-			default:
-				let departure = {
-					lat: timetable[route.params.x][newY.current - 1].lat,
-					lng: timetable[route.params.x][newY.current - 1].lng,
-				};
-				let arrival = {
-					lat: timetable[route.params.x][newY.current].lat,
-					lng: timetable[route.params.x][newY.current].lng,
-				};
-				if (
-					timetable[route.params.x][newY.current - 1].name.includes('추천') &&
-					timetable[route.params.x][newY.current].name.includes('추천')
-				) {
-					goCheck = false;
-				} else if (timetable[route.params.x][newY.current - 1].name.includes('추천')) {
-					departure = {
-						lat: timetable[route.params.x][newY.current].lat,
-						lng: timetable[route.params.x][newY.current].lng,
-					};
-					arrival = {
-						lat: timetable[route.params.x][newY.current].lat,
-						lng: timetable[route.params.x][newY.current].lng,
-					};
-					status = timetable[route.params.x][newY.current];
-				} else {
-					departure = {
-						lat: timetable[route.params.x][newY.current - 1].lat,
-						lng: timetable[route.params.x][newY.current - 1].lng,
-					};
-					arrival = {
-						lat: timetable[route.params.x][newY.current - 1].lat,
-						lng: timetable[route.params.x][newY.current - 1].lng,
-					};
-					status = timetable[route.params.x][newY.current - 1];
-				}
-
-				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival})); // 두 지점 간의 거리 (단위: km)
-				lat =
-					(timetable[route.params.x][newY.current - 1].lat + timetable[route.params.x][newY.current].lat) / 2;
-				lng =
-					(timetable[route.params.x][newY.current - 1].lng + timetable[route.params.x][newY.current].lng) / 2;
-				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
-				// status = timetable[route.params.x][newY.current - 1];
-				break;
-		}
-		if (goCheck) {
-			const categoryIndex = category == 'AD5' ? 4 : category == 'FD6' ? 1 : 3;
-			navigation.navigate('Recommend', {
-				name: '',
-				x: route.params.x,
-				index: newY.current,
-				y: route.params.y,
-				category: categoryIndex,
-				lat: lat,
-				lng: lng,
-				apiCategory: category,
-				radius: radius,
-				status: status,
-			});
-		} else {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '참고할 관광지가 없어서 보여줄 수 없습니다!',
-					modalSubTitle: '동일한 날짜에 아무것도 없으면 추천을 해줄 수 없습니다.',
-				}),
-			);
-		}
-	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
 		if (timeView.value == 'left') {
@@ -163,7 +59,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		} else {
 			viewRef.current.endHours = parseInt(timeData.hour) + (timeData.ampm == '오후' ? 12 : 0);
 			viewRef.current.endMinute = parseInt(timeData.minute);
-			console.log(viewRef.current.endHours);
 			if (viewRef.current.endHours == 0) {
 				if (viewRef.current.endMinute == 0) {
 					viewRef.current.endMinute = 30;
@@ -193,55 +88,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		idx: 0,
 	});
 	const [timeView, setTimeView] = useState({status: false, value: ''});
-	const goModify = () => {
-		const newY = viewRef.current.y;
-		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
-		console.log(newY, newEnd);
-		if (newEnd >= 49) {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
-		} else {
-			let copy = [...timetable[viewRef.current.index]];
-			let changeCopy = [...timetable];
-			let changeFlag = null;
-			console.log(copy);
-			//부터 가능
-			for (let i = 0; i < copy.length; i++) {
-				if (
-					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
-						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
-							newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
-					copy[i].id != viewRef.current.id
-				) {
-					changeFlag = copy[i];
-					break;
-				}
-			}
-			let changeInputIndex = copy.findIndex(item => item.y >= newY);
-			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
-			if (changeFlag) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
-					}),
-				);
-			} else {
-				let copyValue = {
-					...changeCopy[viewRef.current.index][viewRef.current.idx],
-					y: newY,
-					x: viewRef.current.index,
-					takenTime: (newEnd - newY) * 30,
-				};
-				let deleteCopy = [...timetable[viewRef.current.index]];
-				deleteCopy.splice(viewRef.current.idx, 1);
-				changeCopy[viewRef.current.index] = deleteCopy;
-				let addCopy = [...changeCopy[viewRef.current.index]];
-				addCopy.splice(changeInputIndex, 0, copyValue);
-				changeCopy[viewRef.current.index] = addCopy;
-				dispatch(travelSliceActions.changeTimetable(changeCopy));
-				navigation.goBack();
-			}
-		}
-	};
 	const addAccommodation = () => {
 		let checkTimetalbe = [...timetable[route.params.x]];
 		const updateItem = {
@@ -275,7 +121,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		let changeFlag = null;
 		let checkTimetalbe = [...timetable[route.params.x]];
 		for (let i = 0; i < checkTimetalbe.length; i++) {
-			console.log(newEnd, newCurrentY, checkTimetalbe[i]?.y);
 			if (
 				(newCurrentY <= checkTimetalbe[i]?.y && newEnd > checkTimetalbe[i]?.y) ||
 				(newCurrentY <= checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1 &&
@@ -285,7 +130,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				break;
 			}
 		}
-		console.log(changeFlag);
 		if (changeFlag) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`}));
 		} else {
@@ -304,7 +148,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				takenTime: (newEnd - newCurrentY) * 30,
 			};
 			newY.current = timetable[route.params.x].findIndex(item => item?.y > newCurrentY);
-			console.log(newCurrentY, newY.current);
 			let copy = [...timetable];
 			let xArrayCopy = [...copy[route.params.x]];
 			xArrayCopy.splice((newY.current = -1 ? timetable[route.params.x].length : newY.current), 0, updateItem);
@@ -323,11 +166,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			}
 		}
 	}, []);
-	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const DaySelectInfoList = [
-		{step: 'Start', title: '시작 시간', time: route.params.y[0]},
-		{step: 'End', title: '종료 시간', time: route.params.y[route.params.y.length - 1] + 1},
-	];
 
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	const clearInput = () => {
@@ -344,11 +182,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	);
 	return (
 		<BackgroundGray paddingHorizental={0}>
-			{/* <DayContainer>
-				<DayText>
-					{moment(day[route.params.x]).format('YYYY-MM-DD')},{weekdays[moment(day[route.params.x]).day()]}요일
-				</DayText>
-			</DayContainer> */}
 			<GooglePlacesAutocomplete
 				placeholder='장소를 검색해보세요!'
 				placeholderTextColor={'grey'}
@@ -488,34 +321,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							</TimePickerContainer>
 						</>
 					)}
-					{/* {route.params.id == 0 && (
-						<HStack justifyContent='space-around'>
-							<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={24}>
-								머무를 시간
-							</PretendardSemiBoldText>
-							<HStack justifyContent='space-around' width={widthPercentage(182)}>
-								<SVGContainer
-									disabled={timeValue < 1}
-									onPress={() => {
-										setTimeValue(timeValue - 1);
-									}}
-									color={colors.Gray1}>
-									<SVGMinus color={colors.Gray2} />
-								</SVGContainer>
-								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
-									{timeValue + 1}시간
-								</PretendardSemiBoldText>
-								<SVGContainer
-									disabled={timeValue > 1}
-									onPress={() => {
-										setTimeValue(timeValue + 1);
-									}}
-									color={colors.Gray1}>
-									<SVGPlus color={colors.Gray2} />
-								</SVGContainer>
-							</HStack>
-						</HStack>
-					)} */}
 
 					<PrimaryButton
 						label={route.params.status == 'travle' ? '여행지 추가' : '숙소 추가'}

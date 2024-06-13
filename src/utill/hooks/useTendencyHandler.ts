@@ -12,7 +12,6 @@ export const useTendencyHandler = () => {
 		let copy2 = [...(region ? regionTendency[index] : tendency[index])];
 		copy2[item] = copy2[item] == 1 ? 0 : 1;
 		copy[index] = copy2;
-		console.log(copy);
 		dispatch(
 			region ? regionRecommendSliceActions.enrollRegionTendency(copy) : travelSliceActions.enrollTendency(copy),
 		);

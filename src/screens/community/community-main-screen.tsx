@@ -62,7 +62,6 @@ export default function CommunityMainScreen({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			dispatch(communitySliceActions.resetPostList());
-			console.log(sortOption);
 			const response = await dispatch(
 				getPostList({page: currentPage, sort: sortOption, blockList: blockUserList}),
 			);
@@ -98,7 +97,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						width={widthPercentage(10)}
 						height={widthPercentage(10)}
 						color='black'
-						rotation={180}
+						transform={180}
 					/>
 				</HStack>
 			</SortButton>

@@ -16,7 +16,7 @@ const initialState: SettingState = {
 		name: '경북 경주시',
 	},
 };
-
+//메인화면 관광지 추천 리스트 가져오는거
 export const getPlaceRecommendInMainScreen = createAsyncThunk(
 	'/placeRecommendInMainScreen',
 	async (_, {rejectWithValue}) => {
@@ -34,7 +34,6 @@ export const getHomeRegionInfo = createAsyncThunk('/place/regionHomeInfo', async
 		const response = await axiosAuth.get(`/place/regionInfo?region=${data.region}`, data);
 		return response.data;
 	} catch (error: any) {
-		console.log(error);
 		throw rejectWithValue(error.code);
 	}
 });

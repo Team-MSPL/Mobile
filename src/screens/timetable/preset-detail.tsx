@@ -44,7 +44,6 @@ export default function PresetDetail({navigation, route}: any) {
 		]);
 	};
 	const goNext = () => {
-		// console.log(presetDatas[select]);
 		try {
 			removeCache();
 			dispatch(deleteAI({aiId: aiID}));
@@ -211,7 +210,7 @@ export default function PresetDetail({navigation, route}: any) {
 									width={widthPercentage(20)}
 									height={widthPercentage(20)}
 									color='black'
-									rotation={tendencyView ? 90 : 270}
+									transform={tendencyView ? 90 : 270}
 								/>
 							</TouchableOpacity>
 						)}

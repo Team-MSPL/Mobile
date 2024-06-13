@@ -392,7 +392,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const [changeDay, setChangeDay] = useState(0);
 	const changeLocationRef = useRef({before: 0, after: 1});
 	useEffect(() => {
-		console.log('옴', shareViewWithStartFlag);
 		shareViewWithStartFlag && getMainViewPager();
 	}, [shareViewWithStartFlag, modify]);
 	if (positions.length == 0) {
@@ -525,10 +524,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					{modify ? (
 						<DayScrollView
 							ref={scrollRef}
-							// onScroll={e => {
-							// 	console.log('a');
-							// 	scrollhandle(e);
-							// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
 							onMomentumScrollEnd={e => {
 								changeViewState(e), scrollhandle(e);
 							}}>

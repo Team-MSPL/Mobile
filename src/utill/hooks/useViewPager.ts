@@ -4,7 +4,6 @@ import {useState} from 'react';
 export const useViewPager = ({title}: {title: string}) => {
 	const [viewPagerState, setViewPagerState] = useState(false);
 	const getMainViewPager = async () => {
-		console.log('dha', title);
 		let data = await AsyncStorage.getItem(`${title}`);
 		setViewPagerState(data == 'true' ? false : true);
 	};

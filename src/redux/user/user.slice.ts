@@ -1,8 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axiosAuth from '../api/api';
-
-const name = 'user';
 
 const initialUserState: UserState = {
 	userId: '',
@@ -181,15 +178,6 @@ const userSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder.addCase(userWithdraw.fulfilled, state => {
-			// /AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
-			// console.log('왔는딩?');
-			// state.functionToken = 0;
-			// console.log('허허허?');
-			// state.isLogin = false;
-			// state.socialloginProvider = null;
-			// state.userId = '';
-			// state.userName = '';
-			//userSlice.actions.reset();
 			return {...initialUserState};
 		});
 		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {

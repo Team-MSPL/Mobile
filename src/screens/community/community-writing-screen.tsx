@@ -74,7 +74,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				const ImageFunction = postData.postImage.map(async (item, idx) => {
 					let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
 					diaryImageRef.current[idx] = data;
-					console.log('데타', data);
 				});
 				await Promise.all(ImageFunction);
 				const uploadData = {
@@ -141,9 +140,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			),
 		});
 	}, [postData.postTitle, postData.postContent, postData.postImage]);
-	const asd = () => {
-		console.log('qwe');
-	};
 	return (
 		<SafeAreaView style={{flex: 1}}>
 			<Container>

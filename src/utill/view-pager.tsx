@@ -27,12 +27,10 @@ export default function ViewPager({
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
 	useEffect(() => {
-		console.log(sliceNumber);
 		if (timetable ?? false) {
 			let copy = [...viewList];
 			setViewList(copy.slice(2, 4));
 		} else if (sliceNumber ?? false) {
-			console.log('qwe');
 			let copy = [...viewList];
 			setViewList(copy.slice(sliceNumber - 1, sliceNumber));
 		}
@@ -91,17 +89,17 @@ const HStack = styled.View`
 	justify-content: center;
 `;
 const Dot = styled.View<{size: number}>`
-	width: ${props => props.size}px;
-	height: 10px;
+	width: ${props => widthPercentage(props.size)}px;
+	height: ${heightPercentage(10)}px;
 	background-color: ${props => (props.size == 20 ? colors.Primary : 'white')};
 	border-radius: 99px;
-	margin: 5px;
+	margin: ${widthPercentage(5)}px;
 `;
 const CancelContainer = styled.TouchableOpacity`
 	justify-content: center;
 	align-items: center;
 	position: absolute;
-	right: 20px;
+	right: ${widthPercentage(20)}px;
 `;
 const MainContainer = styled.SafeAreaView`
 	flex: 1;

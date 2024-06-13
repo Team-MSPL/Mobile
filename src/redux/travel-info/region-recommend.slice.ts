@@ -55,7 +55,6 @@ export const regionRecommendSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder.addCase(regionSearch.fulfilled, (state, {payload}) => {
-			console.log(payload);
 			let sort = payload.sort((a, b) => a.takenDay - b.takenDay);
 			state.recommendList = sort;
 			//state.myTravelList = payload;
@@ -65,26 +64,18 @@ export const regionRecommendSlice = createSlice({
 //여행 지역 추천 알고리즘
 export const regionSearch = createAsyncThunk('/regionSearch', async (data: any, {rejectWithValue}) => {
 	try {
-		console.log('왔엉');
 		const response = await axiosAuth.post(`/regionSearch/run`, data);
-
-		console.log(response.data);
 		return response.data;
 	} catch (error: any) {
-		console.log(error, 'qwe');
 		throw rejectWithValue(error.code);
 	}
 });
 //이름으로 좌표 얻는거
 export const geocoding = createAsyncThunk('/googleDetailApi', async (data: any, {rejectWithValue}) => {
 	try {
-		console.log(data.region);
 		const response = await axiosGoogle.get(
 			`/geocode/json?address=${encodeURIComponent(data.region)}&language=ko&key=${GOOGLE_API_KEY}`,
 		);
-
-		//제로리절트 처리하기
-		console.log(response.data);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -97,8 +88,6 @@ export const reverseGeocoding = createAsyncThunk('/googleDetailApi', async (data
 		const response = await axiosGoogle.get(
 			`/geocode/json?address=${data.latlng}&language=ko&key=${GOOGLE_API_KEY}`,
 		);
-		//제로리절트 처리하기
-		console.log(response.data);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);

@@ -92,7 +92,7 @@ export default function Preset({navigation}: any) {
 					<Image
 						resizeMode='contain'
 						source={require('../../../public/images/danim_logo_row.png')}
-						style={{height: 30, aspectRatio: 2.054}}
+						style={{height: heightPercentage(36), aspectRatio: 2.054}}
 					/>
 				</TouchableOpacity>
 			),
@@ -249,7 +249,7 @@ export default function Preset({navigation}: any) {
 												width={widthPercentage(20)}
 												height={widthPercentage(20)}
 												color='black'
-												rotation={tendencyViewIndex[idx] ? 90 : 270}
+												transform={tendencyViewIndex[idx] ? 90 : 270}
 											/>
 										</TouchableOpacity>
 									)}

@@ -50,8 +50,6 @@ export const communitySlice = createSlice({
 			state.searchList = copy;
 		});
 		builder.addCase(getOnePost.fulfilled, (state, {payload}) => {
-			//console.log('게시글 하나 가져오기', payload);
-			console.log('안녕', payload);
 			state.postData = payload;
 		});
 	},
@@ -69,7 +67,6 @@ export const getSearchPostList = createAsyncThunk(
 			);
 			return response.data;
 		} catch (error) {
-			console.log(error);
 			throw rejectWithValue(error);
 		}
 	},
@@ -85,7 +82,6 @@ export const getPostList = createAsyncThunk('/getPostList', async (data: postLis
 		);
 		return response.data;
 	} catch (error) {
-		console.log(error);
 		throw rejectWithValue(error);
 	}
 });

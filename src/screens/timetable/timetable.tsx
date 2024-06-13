@@ -24,7 +24,6 @@ export default function Timetable({navigation, route}: any) {
 		timetable,
 		day,
 		makeMode,
-		editMode,
 		region,
 		nDay,
 		transit,
@@ -238,7 +237,6 @@ export default function Timetable({navigation, route}: any) {
 		try {
 			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
@@ -367,7 +365,6 @@ export default function Timetable({navigation, route}: any) {
 			),
 		});
 	}, [
-		editMode,
 		timetable,
 		addList,
 		makeMode,

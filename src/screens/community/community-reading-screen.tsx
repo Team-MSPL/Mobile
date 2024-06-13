@@ -120,7 +120,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 					modalSubTitle: '신고가 접수되었습니다.\n⦁부적절한 신고일 경우 처리되지않습니다.',
 				}),
 			);
-			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
 		}
@@ -170,7 +169,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	useFocusEffect(
 		useCallback(() => {
 			fetchPostData();
-			console.log('CommunityReadingScreen 갱신됨');
 		}, []),
 	);
 
@@ -223,7 +221,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const fetchPostData = async () => {
 		try {
 			await dispatch(getOnePost({postId: route.params.postId}));
-			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
 			console.log('DB로부터 데이터를 가져오는 중에 오류가 발생했습니다:', error);
 		}

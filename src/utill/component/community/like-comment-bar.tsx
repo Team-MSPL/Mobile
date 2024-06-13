@@ -21,7 +21,6 @@ export default function LiKeCommentBar() {
 			} else {
 				dispatch(clickLike({postId: postData._id}));
 				setTotalLike(totalLike + 1);
-				console.log('좋아요를 했습니다.');
 			}
 			setIsLiked(!isLiked);
 		} catch (error) {

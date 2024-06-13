@@ -1,16 +1,15 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 const initialState: LiteState = {
-	// modalLeft: () => {},
 	modalBottom: false, //모달 왼쪽 버튼이 있을지없을지 보통은 '취소' 버튼임
 	modalOpen: false, // 모달 오픈할지 안할지
 	modalTitle: '', // 모달의 title
 	modalSubTitle: '', //  title 밑에 있는 작은 글씨
-	modalFunction: () => {}, //모달 오른쪽 버튼을 눌렀을때 실행될 함수.
-	modalTopText: '확인',
-	modalBottomText: '취소',
-	modalBottomFunctionUse: false,
-	modalBottomFunction: () => {},
-	modalSingleUse: false,
+	modalFunction: () => {}, //모달 윗쪽 버튼을 눌렀을때 실행될 함수.
+	modalTopText: '확인', //모달 윗쪽 텍스트
+	modalBottomText: '취소', //모달 아래쪽 텍스트
+	modalBottomFunctionUse: false, //모달 아래쪽 버튼을 눌렀을때 함수가 실행할건지
+	modalBottomFunction: () => {}, //모달 아래쪽 버튼 눌렀을때 실행될 함수
+	modalSingleUse: false, // 모달 아래쪽 없애고 하나만 쓰는거
 };
 
 export const modalSlice = createSlice({
@@ -32,7 +31,6 @@ export const modalSlice = createSlice({
 		setCloseModal: state => {
 			state.modalOpen = false;
 			state.modalBottom = false;
-			// state.modalLeft = () => {};
 			state.modalSubTitle = '';
 			state.modalBottomFunctionUse = false;
 		},
@@ -44,7 +42,6 @@ export default modalSlice.reducer;
 interface LiteState {
 	modalOpen: boolean;
 	modalBottom: boolean;
-	//modalLeft: () => void | Promise<void>;
 	modalTitle: string;
 	modalSubTitle: string;
 	modalFunction: () => void | Promise<void>;
