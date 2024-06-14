@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function RecommendSelectMove({navigation}: any) {
 	const {transit} = useAppSelector(state => state.travelSlice);

@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {communitySliceActions, getPostList, postListType} from '../../redux/community/community.slice';
+import {communitySliceActions, getPostList} from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
 import CommunityMain from '../../utill/component/community/community-main';
 import ScrollButton from '../../utill/component/scroll-button';
@@ -17,16 +16,14 @@ import {SVGRightAdd} from '../../utill/svg/svg';
 export default function CommunityMainScreen({navigation}: any) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
-	const {postList} = useAppSelector(state => state.communitySlice); // slice에 있는 변수를 가져옴.
 	const {blockUserList} = useAppSelector(state => state.userSlice);
 	const [sortOption, setSortOption] = useState(1);
-	const [sortOptions, setSortOptions] = useState([
+	const sortOptions = [
 		{label: '최신순', value: 1},
 		{label: '좋아요순 ', value: 2},
 		{label: '댓글순', value: 3},
-	]);
+	];
 	const [sortOnOff, setSortOnOff] = useState(false);
-	const [currentPostList, setCurrentPostList] = useState<postListType[]>(postList);
 
 	const changeSortOption = (e: number) => {
 		setSortOption(e);
@@ -46,7 +43,6 @@ export default function CommunityMainScreen({navigation}: any) {
 						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 							검색
 						</PretendardVariableText>
-						{/* <IconContainer color={'black'} name='search1' size={24}></IconContainer> */}
 					</SearchTouchableOpacity>
 				</HeaderContianer>
 			),
@@ -97,7 +93,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						width={widthPercentage(10)}
 						height={widthPercentage(10)}
 						color='black'
-						transform={180}
+						transform={sortOnOff ? 270 : 90}
 					/>
 				</HStack>
 			</SortButton>

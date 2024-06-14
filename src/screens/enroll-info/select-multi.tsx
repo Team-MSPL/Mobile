@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SVGPlus} from '../../utill/svg/svg';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function SelectMulti({navigation}: any) {
 	const [accommodation, setAccommodation] = useState(false);

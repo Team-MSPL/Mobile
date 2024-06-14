@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 import {MainViewContainer} from './policy-main';
 import {PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {heightPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function Terms() {
 	return (
 		<MainViewContainer>
@@ -194,7 +194,7 @@ export default function Terms() {
 					52 | 개인정보 처리방침 작성지침 일반{'\n '}⑧ 정보주체는 아래의 연락처로 행태정보와 관련하여 궁금한
 					사항과 거부권 행사, 피해 신고 접수 등을 문의할 수 있습니다.{'\n '}‣ 개인정보 보호 담당부서{'\n '}
 					담당자 : 이태운{'\n '}
-					연락처 : 010, tulee4734,
+					연락처 : 01032223474, tulee3474@naver.com,
 				</PretendardVariableText>
 			</TextContainer>
 			<TextContainer>
@@ -276,6 +276,6 @@ export default function Terms() {
 }
 
 const TextContainer = styled.View`
-	margin-bottom: 30px;
-	padding-horizontal: 10px;
+	margin-bottom: ${widthPercentage(30)}px;
+	padding-horizontal: ${widthPercentage(10)}px;
 `;

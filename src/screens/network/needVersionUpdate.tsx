@@ -39,6 +39,6 @@ const ViewContaniner = styled.Pressable`
 	justify-content: space-between;
 	border-radius: 12px;
 	border-width: 1px;
-	padding: 20px;
+	padding: ${widthPercentage(20)}px;
 	border-color: ${colors.backgroundWhite};
 `;

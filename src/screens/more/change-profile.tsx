@@ -25,7 +25,6 @@ export default function ChangeProfile({navigation}: any) {
 	const uploadImage = async (e: string) => {
 		const response = await useUriToBlob(e);
 		var ref = firebase.storage().ref('profile').child(`${userId}/profile.png`).put(response);
-		//var ref = firebase.storage().ref('test').child(`test/photo1.png`).delete();
 		try {
 			await ref;
 			let copy = await getImage();

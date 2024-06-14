@@ -56,7 +56,7 @@ const BarContainer = styled.View`
 	width: 80%;
 	height: ${heightPercentage(10)}px;
 	border-radius: 10px;
-	background-color: ${colors.normalButton};
+	background-color: ${colors.emptyStart};
 	margin: ${widthPercentage(10)}px 0px ${widthPercentage(10)}px 0px;
 `;
 const BarContinueContainer = styled.View<{size: number}>`

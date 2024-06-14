@@ -12,9 +12,9 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 import {ButtonContainer} from './select-multi';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 export default function SelectCity({navigation}: any) {
-	const {region, regionRecommendFlag, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
+	const {region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {

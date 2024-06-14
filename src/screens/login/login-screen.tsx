@@ -13,7 +13,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {colors} from '../../utill/colors';
-import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {HStack, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {SvgApple, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 interface tokenType {

@@ -9,7 +9,6 @@ import {PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
 export default function BaseModal() {
 	const {
 		modalOpen,
-		modalBottom,
 		modalTitle,
 		modalSubTitle,
 		modalFunction,
