@@ -56,7 +56,6 @@ export default function PresetDetail({navigation, route}: any) {
 				}
 			}
 			dispatch(travelSliceActions.enrollTimetable(copy));
-			// navigation.popToTop();
 			navigation.navigate('Timetable');
 		} catch (err) {
 			console.log(err, '에러');
@@ -81,7 +80,6 @@ export default function PresetDetail({navigation, route}: any) {
 		for (let i = 0; i < idx; i++) {
 			totalScroll += presetDatas[route.params.index][i].length;
 		}
-		//scrollRef.current.scrollTo({y: totalScroll * 48 + idx * 17 + idx * widthPercentage(10), animate: true});
 		setSelect(idx);
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -125,7 +123,6 @@ export default function PresetDetail({navigation, route}: any) {
 							) : (
 								<Circle color={colors.Gray5} key={iindex} />
 							)}
-							{/* <SvgPlace color={mapColor[index]} width={50} height={50} /> */}
 						</Marker>
 					);
 				}),

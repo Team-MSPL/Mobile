@@ -33,7 +33,6 @@ export default function Preset({navigation}: any) {
 		day,
 		transit,
 		travelName,
-		cityIndex,
 		region,
 		aiFlag,
 		aiID,

@@ -1,6 +1,6 @@
 import {useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {Alert, Linking, TouchableOpacity, ScrollView, Platform, Image} from 'react-native';
+import {Linking, TouchableOpacity, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
@@ -9,14 +9,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {
-	HStack,
-	MainText,
-	PretendardSemiBoldText,
-	PretendardVariableText,
-	VStack,
-	devicesWidth,
-} from '../../utill/layout/layout';
+import {HStack, PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
@@ -27,12 +20,10 @@ export default function Recommend({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
-	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 	const [recommendList, setRcommendList] = useState<RecommendList[]>();
 	const departure = useRef<DistanceType>({lat: 0, lng: 0});
-	const whereIndex = useRef(0);
 	const polylineCoordinates = recommendItem
 		.map((item, value) => {
 			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
@@ -98,9 +89,6 @@ export default function Recommend({navigation, route}: any) {
 				copy[route.params.index] = updateItem;
 			}
 		}
-		// select == -1 && route.params.category != 1
-		// 	? copy.splice(route.params.index, 0, updateItem)
-		// 	: (copy[route.params.index] = updateItem);
 		setRecommendItem(copy);
 		setSelect(idx);
 		mapRef.current?.animateCamera(

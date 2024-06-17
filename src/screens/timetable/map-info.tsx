@@ -12,12 +12,11 @@ import {
 	MainContainer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
-	TagContainer,
 	VStack,
 } from '../../utill/layout/layout';
 import {Circle, DashLine, DashLineContainer} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
-import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
+import {WhiteContainer} from '../enroll-info/final-check';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import InfoView from '../../utill/component/timetable/info-view';
@@ -25,7 +24,6 @@ import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
-import {TagShopText} from '../home/main';
 import {SVGContainer} from '../enroll-info/select-multi';
 import {SVGPlus} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
@@ -36,10 +34,10 @@ import {
 	ScaleDecorator,
 	RenderItemParams,
 } from 'react-native-draggable-flatlist';
+import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-top-bar-component';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo, shareViewWithStartFlag} =
-		useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit, shareViewWithStartFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -57,7 +55,14 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		for (let i = 0; i < idx; i++) {
 			totalScroll += timetable[i].length;
 		}
-		scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
+		scrollRef.current.scrollTo({
+			y:
+				totalScroll * heightPercentage(76) +
+				totalScroll * widthPercentage(3) +
+				idx * fontPercentage(16.71) +
+				idx * heightPercentage(36),
+			animate: true,
+		});
 	};
 	const change = (idx: number) => {
 		setSelect(idx);
@@ -274,7 +279,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	};
 	let totalHeight = 0;
 	const presetScrollHeight = timetable.map((item, idx) => {
-		totalHeight += item.length * 76 + idx * 17 + idx * widthPercentage(10);
+		totalHeight +=
+			item.length * heightPercentage(76) +
+			item.length * widthPercentage(3) +
+			idx * fontPercentage(16.71) +
+			idx * heightPercentage(36);
 		return totalHeight;
 	});
 	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -374,7 +383,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							idx={item.x}
 							modify={false}
 							CancelModify={CancelModify}
-							drag={drag}
 						/>
 					</HStack>
 				)}
@@ -399,48 +407,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	}
 	return (
 		<MainAllContainer>
-			<AbsoluteTopBar opacityState={modify}>
-				<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
-					<RegionImage
-						source={{
-							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
-						}}
-					/>
-					<VStack>
-						<HStack>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-								{region[0]}
-								{region.length >= 2 ? ` +${region.length - 1}` : ''}
-							</PretendardVariableText>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-								{' '}
-								| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
-							</PretendardVariableText>
-						</HStack>
-						<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
-							{travelName}
-						</PretendardSemiBoldText>
-					</VStack>
-					<VStack gap={heightPercentage(3)} alignItems='flex-end'>
-						<TagContainer backgroundColor={colors.backgroundWhite}>
-							<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
-								#
-							</TagShopText>
-							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-								{!transit ? '자동차·렌트카' : '대중교통'}
-							</PretendardSemiBoldText>
-						</TagContainer>
-						<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-							<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
-								#
-							</TagShopText>
-							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-								{bandwidth ? '여유있는 일정' : '알찬 일정'}
-							</PretendardSemiBoldText>
-						</TagContainer>
-					</VStack>
-				</HStack>
-			</AbsoluteTopBar>
+			<AbsoluteTopBarComponent modify={modify}></AbsoluteTopBarComponent>
 			<VStack flex={1}>
 				{!modify &&
 					timetable.map(
@@ -449,7 +416,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								<MapView
 									key={idx}
 									ref={mapRef}
-									//provider={PROVIDER_GOOGLE}
 									showsMyLocationButton={true}
 									style={{width: '100%', flex: 0.45}}
 									showsUserLocation={true}
@@ -545,7 +511,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												onPlaceholderIndexChange={qwe =>
 													(changeLocationRef.current.after = qwe)
 												}
-												containerStyle={{height: heightPercentage(76) * value.length}}
+												containerStyle={{
+													height:
+														heightPercentage(76) * value.length +
+														widthPercentage(3) * value.length,
+												}}
 												data={value}
 												onDragEnd={({data}) => changeLocation(data)}
 												keyExtractor={item => item.id}
@@ -768,9 +738,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											{viewRef.current.endHours}
-											{/* {viewRef.current.endHours < 12
-												? viewRef.current.endHours
-												: viewRef.current.endHours - 12} */}
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											:
@@ -929,14 +896,4 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	justify-content: center;
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
-`;
-
-export const AbsoluteTopBar = styled.View<{opacityState: boolean}>`
-	width: 100%;
-	height: ${heightPercentage(71)}px;
-	position: ${props => (props.opacityState ? 'relative' : 'absolute')};
-	top: 0;
-	z-index: 100;
-	background-color: rgba(255, 255, 255, 0.9);
-	padding: 0px ${widthPercentage(12)}px;
 `;

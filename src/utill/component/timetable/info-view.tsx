@@ -1,5 +1,4 @@
-import {memo, useRef} from 'react';
-import {Animated} from 'react-native';
+import {memo} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {colors} from '../../colors';
@@ -144,13 +143,6 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 			}
 		}
 	};
-
-	const pan = useRef(new Animated.ValueXY()).current;
-
-	const locationRef = useRef({x: 0, y: 0});
-	pan.addListener(async e => {
-		locationRef.current = {x: e.x, y: e.y};
-	});
 	return (
 		<PrimaryButton
 			label={test.name}
@@ -170,7 +162,6 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 							idx: idx,
 					  });
 			}}
-			// onLongPress={drag}
 			marginBottom={heightPercentage(10)}
 			width={widthPercentage(282)}
 			height={heightPercentage(42)}></PrimaryButton>

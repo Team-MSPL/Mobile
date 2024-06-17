@@ -31,7 +31,7 @@ import InputDiary from './input-diary';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {AbsoluteTopBar} from '../timetable/map-info';
+
 import {RegionImage} from '../enroll-info/final-check';
 import {MarkerContainer} from '../timetable/preset-detail';
 import {Circle} from '../timetable/preset';
@@ -41,6 +41,7 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 import {ButtonContainer} from '../enroll-info/select-multi';
 import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
+import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary} = useAppSelector(
 		state => state.travelSlice,
