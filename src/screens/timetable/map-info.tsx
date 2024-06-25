@@ -136,7 +136,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							key={`marker_${idx}`}
 							coordinate={{latitude: item.lat, longitude: item.lng}}
 							title={item.name}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == select ? (
@@ -160,7 +160,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				key={`polyline_${index}`}
 				coordinates={polylineCoordinates}
 				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
-				strokeWidth={2} // You can change the width of the line here
+				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 			/>,
 		);
 	});

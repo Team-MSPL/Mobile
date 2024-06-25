@@ -258,7 +258,7 @@ export default function FinalCheck({navigation}: any) {
 									{!transit ? '자동차·렌트카' : '대중교통'}
 								</PretendardSemiBoldText>
 							</TagContainer>
-							<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
+							<TagContainer backgroundColor={colors.backgroundWhite}>
 								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 									#
 								</TagShopText>

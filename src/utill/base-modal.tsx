@@ -5,6 +5,8 @@ import {colors} from './colors';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
 import PrimaryButton from './component/primary-button';
 import {PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
+import {useEffect, useRef} from 'react';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 export default function BaseModal() {
 	const {
@@ -16,6 +18,8 @@ export default function BaseModal() {
 		modalBottomText,
 		modalBottomFunctionUse,
 		modalSingleUse,
+		modalConfetti,
+		modalConfettiFlag,
 		modalBottomFunction,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
@@ -30,10 +34,23 @@ export default function BaseModal() {
 		close();
 		modalBottomFunction();
 	};
+	const confettiRef = useRef();
+	useEffect(() => {
+		if (modalConfetti && !modalConfettiFlag) {
+			confettiRef.current.start();
+			dispatch(modalSliceActions.setConfettiFlag());
+		}
+		// ref={confettiRef} confettiCount={50} timeout={0.1} duration={1300}
+	}, [modalConfetti, modalConfettiFlag]);
 	return (
 		<>
 			{modalOpen && (
 				<Container>
+					<ConfettiCannon
+						ref={confettiRef}
+						autoStart={false}
+						count={200}
+						origin={{x: -10, y: 0}}></ConfettiCannon>
 					<ModalContainer onPress={close}>
 						<ViewContaniner modalSingleUse={modalSingleUse}>
 							<PretendardSemiBoldText textAlign='center' size={20} lineHeight={27} color={colors.Gray5}>

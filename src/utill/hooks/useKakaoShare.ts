@@ -9,7 +9,7 @@ const useKakaoShare = () => {
 			const response = await KakaoShareLink.sendFeed({
 				content: {
 					title: e.travelName,
-					imageUrl: 'https://danim.me/square_logo.png',
+					imageUrl: e?.photo ?? 'https://danim.me/square_logo.png',
 					link: {
 						webUrl: 'http://danim.me',
 						mobileWebUrl: 'http://danim.me',
@@ -49,4 +49,5 @@ interface KakaoType {
 	travelId: string;
 	startDay: Moment;
 	endDay: Moment;
+	photo: string;
 }

@@ -31,6 +31,7 @@ export default function SelectSeason({navigation}: any) {
 						bgColor={regionTendency[4][idx] == 1}
 						label={item}
 						key={idx}
+						imageUrl={regionTendencyList[4]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

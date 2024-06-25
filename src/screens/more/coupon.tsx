@@ -61,7 +61,7 @@ export default function Coupon({navigation}: any) {
 				<PrimaryButton
 					label='확인'
 					width={widthPercentage(45)}
-					height={heightPercentage(32)}
+					height={heightPercentage(40)}
 					onPress={checkCoupon}
 					backgroundColor={colors.Primary}
 					textColor={colors.Black}></PrimaryButton>

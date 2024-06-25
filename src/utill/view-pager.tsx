@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
+import {Platform} from 'react-native';
 export default function ViewPager({
 	handleFunction,
 	timetable,
@@ -112,6 +113,6 @@ const ImageAllContainer = styled.View<{scrollState: boolean}>`
 	margin-bottom: ${heightPercentage(10)}px;
 `;
 const ImageContainer = styled.Image`
-	width: ${widthPercentage(327)}px;
+	width: ${widthPercentage(Platform.isPad ? 280 : 327)}px;
 	height: 100%;
 `;

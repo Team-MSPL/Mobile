@@ -1,6 +1,6 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity, Dimensions, View} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {
 	BackgroundGray,
@@ -24,6 +24,7 @@ export default function ViewResult({navigation}: any) {
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
+	const windowWidth = Dimensions.get('window').width;
 
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
@@ -103,7 +104,13 @@ export default function ViewResult({navigation}: any) {
 										<RegionText>{item.name}</RegionText>
 										<TagContainer>
 											{item.tendency.slice(0, 5).map((value, index) => (
-												<Fragment key={index}>
+												<View
+													key={index}
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														justifyContent: 'center',
+													}}>
 													<TagElement opacityStatus={true}>
 														<HStack>
 															<PretendardVariableText
@@ -113,22 +120,23 @@ export default function ViewResult({navigation}: any) {
 																{'# '}
 															</PretendardVariableText>
 															<PretendardVariableText
-																size={10}
-																lineHeight={12}
+																size={12}
+																lineHeight={14}
 																color={colors.backgroundWhite}>
 																{value}
 															</PretendardVariableText>
 														</HStack>
 													</TagElement>
-													{index == 1 && item.tendency.length > 5 && (
-														<PretendardSemiBoldText
-															size={15}
-															lineHeight={21}
-															color={colors.Primary}>
-															+{item.tendency.length - 5}
-														</PretendardSemiBoldText>
-													)}
-												</Fragment>
+													{index == (windowWidth > 800 ? 2 : 1) &&
+														item.tendency.length > 5 && (
+															<PretendardSemiBoldText
+																size={15}
+																lineHeight={21}
+																color={colors.Primary}>
+																+{item.tendency.length - 5}
+															</PretendardSemiBoldText>
+														)}
+												</View>
 											))}
 										</TagContainer>
 									</GraientBackground>
@@ -175,9 +183,9 @@ const ImageContainer = styled.View`
 `;
 const RegionText = styled(PretendardSemiBold)`
 	position: absolute;
-	font-size: ${fontPercentage(20)}px;
+	font-size: ${fontPercentage(22)}px;
 	font-weight: 600;
-	line-height: ${heightPercentage(27)}px;
+	line-height: ${fontPercentage(27)}px;
 	color: ${colors.backgroundWhite};
 	bottom: ${heightPercentage(10)}px;
 	left: ${widthPercentage(10)}px;

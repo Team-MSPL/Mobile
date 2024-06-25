@@ -33,6 +33,7 @@ export default function RecommendSelectConcept({navigation}: any) {
 						label={item}
 						key={idx}
 						divide={true}
+						imageUrl={tendencyList[1]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

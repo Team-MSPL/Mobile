@@ -111,7 +111,7 @@ export default function PresetDetail({navigation, route}: any) {
 							key={`marker_${index}_${iindex}`}
 							style={{zIndex: 4}}
 							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 							anchor={{x: 0.5, y: 0.5}}
 							title={vvalue.name}>
 							{index == select ? (
@@ -133,7 +133,7 @@ export default function PresetDetail({navigation, route}: any) {
 				key={`polyline_${index}`}
 				coordinates={polylineCoordinates}
 				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
-				strokeWidth={2} // You can change the width of the line here
+				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 			/>,
 		);
 	});
@@ -329,8 +329,8 @@ export const DayTouchablOpacity = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
 `;
 export const MarkerContainer = styled.View<{backgroundColor?: string}>`
-	width: ${widthPercentage(24)}px;
-	height: ${widthPercentage(24)}px;
+	width: ${widthPercentage(Platform.isPad ? 20 : 24)}px;
+	height: ${widthPercentage(Platform.isPad ? 20 : 24)}px;
 	border-radius: 6px;
 	align-items: center;
 	justify-content: center;

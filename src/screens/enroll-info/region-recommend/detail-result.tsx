@@ -13,6 +13,7 @@ import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {ButtonContainer} from '../select-multi';
+import {Platform} from 'react-native';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -246,6 +247,6 @@ const PopularityContainer = styled.TouchableOpacity`
 	margin: 0px ${widthPercentage(12)}px 0px 0px;
 	display: inline-block;
 	flex-direction: row;
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 `;

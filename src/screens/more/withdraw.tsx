@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {useState} from 'react';
-import {Keyboard, Pressable, ScrollView} from 'react-native';
+import {Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {userSliceActions, userWithdraw} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -26,7 +26,7 @@ export default function Withdraw({navigation}: any) {
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '계정 삭제 하시겠습니까?',
-				modalSubTitle: `탈퇴하면 더 이상 다님의 여행 추천 서비스를 받을 수 없고\n여행기록도 사라지게 되어요.`,
+				modalSubTitle: `탈퇴하면 더 이상 다님의 여행 추천 서비스를\n 받을 수 없고 여행기록도 사라지게 되어요.`,
 				modalTopText: '다님과 계속 여행하기',
 				modalBottomText: '아쉽지만 계정 삭제',
 				modalBottomFunction: goWithdraw,
@@ -53,6 +53,7 @@ export default function Withdraw({navigation}: any) {
 		}
 		try {
 			const reason = select.filter((item, idx) => item.selected).map((value, index) => value.title);
+			reason.push(text);
 			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
 			const data = {userId: userId, signUpFirebase: !signUpFirebase, withdrawReasonList: reason};
 			await dispatch(userWithdraw(data));
@@ -61,7 +62,7 @@ export default function Withdraw({navigation}: any) {
 				AsyncStorage.multiRemove(removeList);
 			});
 			dispatch(userSliceActions.reset());
-			navigation.replace('LoginScreen');
+			navigation.reset({index: 0, routes: [{name: 'LoginScreen'}]});
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '회원탈퇴가 완료됐습니다.',
@@ -81,48 +82,50 @@ export default function Withdraw({navigation}: any) {
 			onPress={() => {
 				Keyboard.dismiss();
 			}}>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<StepText
-					marginTop={heightPercentage(10)}
-					styleText='계정 삭제 사유가 궁금해요'
-					mainText='무엇이 불편하셨나요?'></StepText>
-				<SelectButtonsContainer>
-					{select.map((item, idx) => (
-						<TendencyButton
-							bgColor={item.selected}
-							label={item.title}
-							key={idx}
-							divide={true}
-							onPress={() => {
-								let copy = [...select];
-								copy[idx].selected = !copy[idx].selected;
-								setSelect(copy);
-							}}></TendencyButton>
-					))}
-				</SelectButtonsContainer>
-				<PretendardSemiBoldText
-					size={12}
-					lineHeight={21}
-					color={colors.Gray3}
-					marginTop={heightPercentage(20)}
-					marginBottom={heightPercentage(10)}>
-					탈퇴 사유를 적어주시면, 다님에게 큰 도움이 될 거에요!
-				</PretendardSemiBoldText>
-				<CouponInput
-					multiline={true}
-					value={text}
-					placeholder='문의 사항을 적어주세요.'
-					placeholderTextColor={colors.Gray2}
-					blurOnSubmit={true}
-					onChangeText={(value: string) => changeText(value)}></CouponInput>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<StepText
+						marginTop={heightPercentage(10)}
+						styleText='계정 삭제 사유가 궁금해요'
+						mainText='무엇이 불편하셨나요?'></StepText>
+					<SelectButtonsContainer>
+						{select.map((item, idx) => (
+							<TendencyButton
+								bgColor={item.selected}
+								label={item.title}
+								key={idx}
+								divide={true}
+								onPress={() => {
+									let copy = [...select];
+									copy[idx].selected = !copy[idx].selected;
+									setSelect(copy);
+								}}></TendencyButton>
+						))}
+					</SelectButtonsContainer>
+					<PretendardSemiBoldText
+						size={12}
+						lineHeight={21}
+						color={colors.Gray3}
+						marginTop={heightPercentage(20)}
+						marginBottom={heightPercentage(10)}>
+						탈퇴 사유를 적어주시면, 다님에게 큰 도움이 될 거에요!
+					</PretendardSemiBoldText>
+					<CouponInput
+						multiline={true}
+						value={text}
+						placeholder='문의 사항을 적어주세요.'
+						placeholderTextColor={colors.Gray2}
+						blurOnSubmit={true}
+						onChangeText={(value: string) => changeText(value)}></CouponInput>
 
-				<CustomButton
-					label={'계정 삭제하기'}
-					onPress={checkHandle}
-					width={widthPercentage(327)}
-					marginTop={20}
-					marginBottom={10}></CustomButton>
-			</ScrollView>
+					<CustomButton
+						label={'계정 삭제하기'}
+						onPress={checkHandle}
+						width={widthPercentage(327)}
+						marginTop={20}
+						marginBottom={10}></CustomButton>
+				</ScrollView>
+			</KeyboardAvoidingView>
 		</CouponContainer>
 	);
 }

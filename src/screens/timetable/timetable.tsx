@@ -36,8 +36,11 @@ export default function Timetable({navigation, route}: any) {
 		moveTimeErrorIndex,
 		shareLoginFlag,
 		shareViewWithStartFlag,
+		regionInfo,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin} = useAppSelector(state => state.userSlice);
+
+	const {modalConfettiFlag} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const [addList, setAddList] = useState<number[]>([]);
 	const [modifyState, setmodifyState] = useState({state: false, day: 0, index: 0, value: {}});
@@ -100,17 +103,22 @@ export default function Timetable({navigation, route}: any) {
 	const goMyTravelList = () => {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
-		timeRef.current = setTimeout(() => {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: `${userName}님`,
-					modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
-					modalLeft: true,
-					modalFunction: goKakaoShare,
-				}),
-			);
-			clearTimeout(timeRef.current);
-		}, 1000);
+		if (!modalConfettiFlag) {
+			timeRef.current = setTimeout(() => {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `${userName}님`,
+						modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
+						modalLeft: true,
+						modalFunction: goKakaoShare,
+						modalTopText: '일행과 일정 공유하기',
+						modalBottomText: '다음에',
+						modalConfetti: true,
+					}),
+				);
+				clearTimeout(timeRef.current);
+			}, 1000);
+		}
 	};
 	const goHome = () => {
 		navigation.popToTop();
@@ -235,7 +243,13 @@ export default function Timetable({navigation, route}: any) {
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
 		try {
-			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
+			await kakaoShare({
+				travelName: travelName,
+				travelId: travelId,
+				startDay: day[0],
+				endDay: day[nDay],
+				photo: regionInfo?.photo,
+			});
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -355,7 +369,7 @@ export default function Timetable({navigation, route}: any) {
 						</TouchableOpacity>
 					)}
 					{shareViewWithStartFlag && (
-						<TouchableOpacity onPress={goKakaoShare}>
+						<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								공유
 							</PretendardVariableText>

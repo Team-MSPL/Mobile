@@ -21,7 +21,7 @@ import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {Modal, SafeAreaView} from 'react-native';
+import {Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 export default function Main({navigation}: any) {
@@ -220,12 +220,16 @@ export default function Main({navigation}: any) {
 		}
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
+	const testRef = useRef();
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						<TicketTouchable onPress={goTokenLog}>
+						<TicketTouchable
+							onPress={() => {
+								testRef.current.startConfetti();
+							}}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
 								이용권
 							</PretendardSemiBoldText>
@@ -319,13 +323,13 @@ export default function Main({navigation}: any) {
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
 export const TagElement = styled.View<{opacityStatus: boolean; height?: number; backgroundColor?: string}>`
-	height: ${props => props.height ?? heightPercentage(22)}px;
+	height: ${props => props.height ?? widthPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
 	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : props.backgroundColor)};
 	border-radius: 4px;
 	padding: 0px ${widthPercentage(6)}px;
-	margin: 2px;
+	margin: ${widthPercentage(2)}px;
 `;
 export const TagShopText = styled(PretendardVariable)<{size?: number; color?: string}>`
 	font-size: ${props => props.size ?? heightPercentage(12)}px;
@@ -401,12 +405,12 @@ const CollectionContentContainer = styled.ScrollView`
 const CollectionTouchableOpacity = styled.Pressable``;
 const CollectionRecommendContentItemImage = styled.Image`
 	position: absolute;
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	border-radius: 12px;
 `;
 const ImageContainer = styled.View`
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin-right: ${widthPercentage(12)}px;
 	padding: ${widthPercentage(12)}px;

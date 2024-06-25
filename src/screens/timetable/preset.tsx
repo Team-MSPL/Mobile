@@ -310,8 +310,8 @@ export default function Preset({navigation}: any) {
 									alignSelf='center'
 									marginBottom={heightPercentage(10)}
 									marginTop={heightPercentage(10)}
-									width={290}
-									height={50}
+									width={widthPercentage(290)}
+									height={heightPercentage(50)}
 									label='일정 자세히 보기'
 									backgroundColor={colors.backgroundGray}
 									textColor={colors.PointYellow}

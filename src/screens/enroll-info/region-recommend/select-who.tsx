@@ -31,6 +31,7 @@ export default function SelectWho({navigation}: any) {
 						bgColor={regionTendency[0][idx] == 1}
 						label={item}
 						key={idx}
+						imageUrl={regionTendencyList[0]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

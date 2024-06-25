@@ -33,6 +33,7 @@ export default function SelectTour({navigation}: any) {
 						label={item}
 						key={idx}
 						divide={true}
+						imageUrl={regionTendencyList[3]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

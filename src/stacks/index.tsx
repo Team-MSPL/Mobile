@@ -34,7 +34,11 @@ export default function StackNavigator() {
 				headerStyle: {backgroundColor: colors.main},
 				headerShadowVisible: false,
 			})}>
-			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
+			<Stack.Screen
+				name='LoginScreen'
+				component={LoginScreen}
+				options={{headerShown: false, gestureEnabled: false}}
+			/>
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
 

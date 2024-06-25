@@ -34,6 +34,7 @@ export default function RecommendSelectPlay({navigation}: any) {
 						label={item}
 						key={idx}
 						divide={true}
+						imageUrl={tendencyList[2]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

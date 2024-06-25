@@ -1,7 +1,13 @@
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getAiList, getMyTravelList, getOneTravelCourse, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	getAiList,
+	getMyTravelList,
+	getOneTravelCourse,
+	getRegionInfo,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import 'moment/locale/ko';
 
 import {useFocusEffect} from '@react-navigation/native';
@@ -25,7 +31,12 @@ export default function MyTravelList({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const whenDday = dDayCalculate({startDay: e.day[0], endDay: e.day[e.nDay - 1]});
-			await dispatch(getOneTravelCourse({travelId: e._id}));
+			const data = await dispatch(getOneTravelCourse({travelId: e._id})).unwrap();
+			dispatch(
+				getRegionInfo({
+					region: data.region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
+				}),
+			);
 			if (!whenDday.endFlag) {
 				dispatch(
 					travelSliceActions.setMakeMode({shareViewWithStartFlag: !whenDday.endFlag, makeMode: 'modify'}),

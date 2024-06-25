@@ -1,3 +1,4 @@
+import {Platform} from 'react-native';
 import {
 	responsiveScreenWidth,
 	responsiveScreenHeight,
@@ -17,6 +18,7 @@ export function heightPercentage(height: number) {
 	return responsiveScreenHeight(percentage);
 }
 export function fontPercentage(size: number) {
-	const percentage = size * (responsiveScreenHeight(100) / responsiveScreenWidth(100)) * 0.07;
+	const percentage =
+		size * (Platform.isPad ? (responsiveScreenHeight(100) / responsiveScreenWidth(100)) * 0.07 : 0.14);
 	return responsiveScreenFontSize(percentage);
 }

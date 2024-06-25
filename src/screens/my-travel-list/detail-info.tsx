@@ -8,7 +8,7 @@ import {
 	travelSliceActions,
 	updateDiary,
 } from '../../redux/travel-info/travel.slice';
-import {Modal, Platform, TouchableOpacity} from 'react-native';
+import {Alert, Modal, Platform, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -97,7 +97,7 @@ export default function DetailInfo({navigation}: any) {
 							key={`marker_${idx}`}
 							coordinate={{latitude: item.lat, longitude: item.lng}}
 							title={item.name}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == 0 ? (
@@ -121,7 +121,7 @@ export default function DetailInfo({navigation}: any) {
 				key={`polyline_${index}`}
 				coordinates={polylineCoordinates}
 				strokeColor={index == 0 ? colors.PointYellow : colors.Gray5}
-				strokeWidth={2} // You can change the width of the line here
+				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 			/>,
 		);
 	});
@@ -268,7 +268,13 @@ export default function DetailInfo({navigation}: any) {
 				setEditing(false);
 				setText(travelName);
 			}
-			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
+			await kakaoShare({
+				travelName: travelName,
+				travelId: travelId,
+				startDay: day[0],
+				endDay: day[nDay],
+				photo: regionInfo?.photo,
+			});
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({

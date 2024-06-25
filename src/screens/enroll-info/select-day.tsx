@@ -198,7 +198,7 @@ export default function SelectDay({navigation}: any) {
 				style={{marginLeft: -widthPercentage(24), width: widthPercentage(375)}}>
 				<CalendarContainer>
 					<CalendarPicker
-						width={widthPercentage(375)}
+						width={widthPercentage(Platform.isPad ? 300 : 375)}
 						weekdays={weekdays}
 						months={months}
 						minDate={new Date()}

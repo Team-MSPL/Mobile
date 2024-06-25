@@ -43,7 +43,7 @@ export default function Recommend({navigation, route}: any) {
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
 							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
@@ -64,7 +64,7 @@ export default function Recommend({navigation, route}: any) {
 			key={`polyline_${ind}`}
 			coordinates={polylineCoordinates}
 			strokeColor={colors.Gray5}
-			strokeWidth={2} // You can change the width of the line here
+			strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 		/>
 	));
 
@@ -176,7 +176,58 @@ export default function Recommend({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-
+	const returnImageIndex = (e: string) => {
+		let numberIndex = 0;
+		switch (e.trim()) {
+			case '한식':
+				numberIndex = 0;
+				break;
+			case '분식':
+				numberIndex = 1;
+				break;
+			case '양식':
+				numberIndex = 2;
+				break;
+			case '일식':
+				numberIndex = 3;
+				break;
+			case '중식':
+				numberIndex = 4;
+				break;
+			default:
+				numberIndex = 5;
+				break;
+		}
+		return numberIndex;
+	};
+	const returnAccomdationImageIndex = (e: string) => {
+		let numberIndex = 0;
+		switch (e.trim()) {
+			case '호텔':
+				numberIndex = 0;
+				break;
+			case '여관' || '모텔' || '펜션':
+				numberIndex = 1;
+				break;
+			default:
+				numberIndex = 2;
+				break;
+		}
+		return numberIndex;
+	};
+	const accommodationImageList = [
+		require('../../../public/images/hotel.png'),
+		require('../../../public/images/motel.png'),
+		require('../../../public/images/defalutAccomodation.png'),
+	];
+	const foodImageList = [
+		require('../../../public/images/koreaFood.png'),
+		require('../../../public/images/snackFood.png'),
+		require('../../../public/images/westernFood.png'),
+		require('../../../public/images/japanFood.png'),
+		require('../../../public/images/chinaFood.png'),
+		require('../../../public/images/defalutFood.png'),
+	];
 	useLayoutEffect(() => {
 		getRecommendList();
 	}, []);
@@ -206,11 +257,15 @@ export default function Recommend({navigation, route}: any) {
 							<ImageContainer>
 								{route.params.name == '식당 추천' ? (
 									<Image
-										source={require('../../../public/images/food.png')}
+										source={foodImageList[returnImageIndex(item.category_name.split('>')[1])]}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								) : route.params.name == '숙소 추천' ? (
 									<Image
-										source={require('../../../public/images/accommodation.png')}
+										source={
+											accommodationImageList[
+												returnAccomdationImageIndex(item.category_name.split('>')[2])
+											]
+										}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								) : (
 									<Image
@@ -240,7 +295,8 @@ export default function Recommend({navigation, route}: any) {
 										'm'}
 								</PretendardVariableText>
 								<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
-									{item.category_name.slice(6, item.category_name.length)}
+									{item.category_name.split('>')[route.params.name == '식당 추천' ? 1 : 2]}
+									{/* {item.category_name.slice(6, item.category_name.length)} */}
 								</PretendardVariableText>
 							</ListVStack>
 							<PrimaryButton

@@ -16,8 +16,16 @@ export default function RecommendSelectBusy({navigation}: any) {
 	};
 
 	const moveList = [
-		{name: '알찬 일정', function: () => dispatch(travelSliceActions.enrollBandwidth(false))},
-		{name: '여유있는 일정', function: () => dispatch(travelSliceActions.enrollBandwidth(true))},
+		{
+			name: '알찬 일정',
+			function: () => dispatch(travelSliceActions.enrollBandwidth(false)),
+			photo: require('../../../public/tendency/busy.png'),
+		},
+		{
+			name: '여유있는 일정',
+			function: () => dispatch(travelSliceActions.enrollBandwidth(true)),
+			photo: require('../../../public/tendency/non-busy.png'),
+		},
 	];
 	return (
 		<BackgroundGray>
@@ -32,6 +40,7 @@ export default function RecommendSelectBusy({navigation}: any) {
 					<TendencyButton
 						bgColor={bandwidth == Boolean(idx)}
 						label={item.name}
+						imageUrl={item.photo}
 						key={idx}
 						onPress={item.function}></TendencyButton>
 				))}

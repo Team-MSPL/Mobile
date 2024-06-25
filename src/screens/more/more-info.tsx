@@ -139,7 +139,7 @@ export default function MoreInfo({navigation}: any) {
 								<PrimaryButton
 									label='이용권 구매'
 									width={widthPercentage(100)}
-									height={heightPercentage(32)}
+									height={heightPercentage(40)}
 									onPress={goPayment}
 									backgroundColor={colors.Primary}
 									textColor={colors.Black}></PrimaryButton>

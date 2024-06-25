@@ -10,6 +10,8 @@ const initialState: LiteState = {
 	modalBottomFunctionUse: false, //모달 아래쪽 버튼을 눌렀을때 함수가 실행할건지
 	modalBottomFunction: () => {}, //모달 아래쪽 버튼 눌렀을때 실행될 함수
 	modalSingleUse: false, // 모달 아래쪽 없애고 하나만 쓰는거
+	modalConfetti: false, //빵빠레
+	modalConfettiFlag: false, //빵빠레 플레그
 };
 
 export const modalSlice = createSlice({
@@ -27,12 +29,16 @@ export const modalSlice = createSlice({
 			state.modalBottomFunctionUse = payload.modalBottomFunctionUse ?? false;
 			state.modalBottomFunction = payload.modalBottomFunction ?? (() => {});
 			state.modalSingleUse = payload.modalSingleUse ?? false;
+			state.modalConfetti = payload.modalConfetti ?? false;
 		},
 		setCloseModal: state => {
 			state.modalOpen = false;
 			state.modalBottom = false;
 			state.modalSubTitle = '';
 			state.modalBottomFunctionUse = false;
+		},
+		setConfettiFlag: state => {
+			state.modalConfettiFlag = true;
 		},
 	},
 });
@@ -50,4 +56,6 @@ interface LiteState {
 	modalBottomFunctionUse: boolean;
 	modalBottomFunction: () => void | Promise<void>;
 	modalSingleUse: boolean;
+	modalConfetti: boolean;
+	modalConfettiFlag: boolean;
 }
