@@ -229,7 +229,7 @@ const TitleImage = styled.Image`
 	resize-mode: cover;
 `;
 const RecommendImage = styled.Image`
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin: 0px 10px 0px 0px;
 	border-radius: 10px;
