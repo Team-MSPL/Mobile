@@ -10,7 +10,12 @@ export default function TendencyButton({onPress, label, bgColor, divide, marginB
 			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
 				{label}
 			</PretendardSemiBoldText>
-			{imageUrl && <Image style={{width: widthPercentage(20)}} resizeMode='contain' source={imageUrl}></Image>}
+			{imageUrl && (
+				<Image
+					style={{width: widthPercentage(20), height: widthPercentage(20)}}
+					resizeMode='contain'
+					source={imageUrl}></Image>
+			)}
 		</ButtonContainer>
 	);
 }
@@ -27,7 +32,7 @@ const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolea
 	width: ${props => (props.divide ? 'null' : widthPercentage(327) + 'px')};
 	align-items: center;
 	height: ${heightPercentage(60)}px;
-	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(33) + 'px' : '0px')};
+	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(13) + 'px' : '0px')};
 	justify-content: center;
 	border-radius: 17px;
 	border-width: ${props => (props.select ? '1px' : '1px')};
