@@ -220,16 +220,12 @@ export default function Main({navigation}: any) {
 		}
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
-	const testRef = useRef();
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						<TicketTouchable
-							onPress={() => {
-								testRef.current.startConfetti();
-							}}>
+						<TicketTouchable onPress={goTokenLog}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
 								이용권
 							</PretendardSemiBoldText>
