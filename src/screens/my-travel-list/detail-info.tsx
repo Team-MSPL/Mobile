@@ -42,6 +42,7 @@ import {ButtonContainer} from '../enroll-info/select-multi';
 import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary} = useAppSelector(
 		state => state.travelSlice,
@@ -275,6 +276,7 @@ export default function DetailInfo({navigation}: any) {
 				endDay: day[nDay],
 				photo: regionInfo?.photo,
 			});
+			await logEvent('share', {course: travelName});
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({

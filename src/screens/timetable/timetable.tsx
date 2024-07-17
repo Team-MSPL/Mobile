@@ -19,6 +19,7 @@ import MapInfo from './map-info';
 import Toast from 'react-native-toast-message';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -122,6 +123,7 @@ export default function Timetable({navigation, route}: any) {
 	};
 	const goHome = () => {
 		navigation.popToTop();
+		navigation.replace('Tab');
 	};
 	const exitApp = () => {
 		BackHandler.exitApp();
@@ -197,6 +199,9 @@ export default function Timetable({navigation, route}: any) {
 					modalFunction: goMyTravelList,
 				}),
 			);
+			await logEvent('edit_course_save', {
+				course: travelName,
+			});
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -250,6 +255,8 @@ export default function Timetable({navigation, route}: any) {
 				endDay: day[nDay],
 				photo: regionInfo?.photo,
 			});
+
+			await logEvent('share', {course: travelName});
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -327,8 +334,12 @@ export default function Timetable({navigation, route}: any) {
 							</PretendardVariableText>
 						</TouchableOpacity>
 						<TouchableOpacity
-							onPress={() => {
+							onPress={async () => {
 								setModify(!modify);
+								!modify &&
+									(await logEvent('edit_course_start', {
+										course: travelName,
+									}));
 							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								{modify ? '취소' : '편집'}

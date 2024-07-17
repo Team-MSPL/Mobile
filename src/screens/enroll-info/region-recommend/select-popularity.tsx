@@ -8,11 +8,17 @@ import styled from 'styled-components/native';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import RangeSlider from 'rn-range-slider';
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('place_step2', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const goNext = async () => {
 		dispatch(
 			regionRecommendSliceActions.enrollPopularity([rangeRef.current.low * 20, rangeRef.current.hight * 20]),

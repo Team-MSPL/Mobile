@@ -13,6 +13,8 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer} from './select-multi';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {useEffect} from 'react';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -70,7 +72,12 @@ export default function SelectCity({navigation}: any) {
 			);
 		}
 	};
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step2', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={2}></Stepper>

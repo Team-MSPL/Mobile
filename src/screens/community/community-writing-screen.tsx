@@ -17,6 +17,7 @@ import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {PretendardVariableText} from '../../utill/layout/layout';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -55,7 +56,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	};
 
 	let diaryImageRef = useRef<string[]>([]);
-
+	useBackHandler({type: 'communityExit'});
 	const {uploadImage} = useFirebaseStorage();
 	// * 게시글 등록
 	const handlePostSubmit = async () => {
@@ -104,9 +105,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					modalTitle: '등록',
 					modalSubTitle: '게시글이 등록되었습니다.',
 					modalFunction: handleRefresh,
-					modalBottomFunctionUse: true,
-					modalBottomFunction: handleRefresh,
-					modalBottomText: '확인',
+					modalSingleUse: true,
 				}),
 			);
 		} catch (error) {
@@ -131,6 +130,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<TouchableOpacity
+					style={{
+						display:
+							postData.postTitle.trim() === '' || postData.postContent.trim() === '' ? 'none' : 'flex',
+					}}
 					disabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}
 					onPress={handlePostSubmit}>
 					<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
@@ -157,6 +160,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						placeholderTextColor={colors.Gray2}
 						value={postData.postContent}
 						onChangeText={changeContent}
+						textAlignVertical='top'
 						multiline={true}
 						blurOnSubmit={true}
 					/>

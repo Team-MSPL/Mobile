@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -13,6 +13,7 @@ import MapView, {Circle} from 'react-native-maps';
 import {cityViewList} from './select-city';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import Stepper from '../../utill/component/enroll-info/stepper';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -30,6 +31,12 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 			  )
 			: (dispatch(travelSliceActions.enrollDistance(range)), navigation.navigate('FinalCheck'));
 	};
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step5', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={11}></Stepper>

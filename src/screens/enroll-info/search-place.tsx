@@ -19,6 +19,7 @@ import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
@@ -102,6 +103,11 @@ export default function SearchPlace({navigation, route}: any) {
 		},
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+	const handleGoogleAnalytics = async () => {
+		await logEvent('select_place', {
+			place: placeState?.name,
+		});
+	};
 	const addPlace = () => {
 		let copy = [...SearchList[route.params.id].variable];
 		route.params.id == 1
@@ -114,6 +120,7 @@ export default function SearchPlace({navigation, route}: any) {
 					takenTime: (timeValue + 1) * 60,
 			  });
 		dispatch(SearchList[route.params.id].function(copy));
+		handleGoogleAnalytics();
 		navigation.goBack();
 	};
 	const clearInput = () => {

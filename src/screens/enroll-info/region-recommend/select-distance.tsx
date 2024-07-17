@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
@@ -21,13 +21,19 @@ import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import PrimaryButton from '../../../utill/component/primary-button';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(10);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('place_step3', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		try {

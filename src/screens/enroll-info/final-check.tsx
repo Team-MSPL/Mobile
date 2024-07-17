@@ -28,6 +28,7 @@ import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarginContainer} from '../timetable/preset-detail';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function FinalCheck({navigation}: any) {
 	const {tendencyList} = useTendencyHandler();
 	const {
@@ -216,6 +217,12 @@ export default function FinalCheck({navigation}: any) {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step6', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const seasonList = [
 		{title: '봄', svg: <SVGSpring width={widthPercentage(24)} height={widthPercentage(27)} />},
 		{title: '여름', svg: <SVGSummer width={widthPercentage(24)} height={widthPercentage(27)} />},

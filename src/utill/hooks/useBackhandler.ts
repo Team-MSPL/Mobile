@@ -13,6 +13,9 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 		navigation.popToTop();
 	};
 	const notFunction = () => {};
+	const goBack = () => {
+		navigation.goBack();
+	};
 	const typeList = {
 		exit: {
 			title: '앱 종료',
@@ -38,6 +41,15 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 			handleFunction: notFunction,
 			modalTopText: '기다릴게요!',
 			modalBottomText: '대기할게요!',
+			modalBottomFunctionUse: false,
+			modalBottomFunction: () => {},
+		},
+		communityExit: {
+			title: '저장되지 않았어요',
+			subTitle: '작성중인 글은 저장되지않습니다\n뒤로가시겠습니까?.',
+			handleFunction: goBack,
+			modalTopText: '뒤로가기',
+			modalBottomText: '머무르기',
 			modalBottomFunctionUse: false,
 			modalBottomFunction: () => {},
 		},
@@ -67,5 +79,5 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 	}, []);
 };
 interface BackHandlerType {
-	type: 'exit' | 'popToTop' | 'stop';
+	type: 'exit' | 'popToTop' | 'stop' | 'communityExit';
 }

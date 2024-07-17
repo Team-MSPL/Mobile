@@ -1,4 +1,4 @@
-import {useRef, useState, useLayoutEffect, Fragment} from 'react';
+import {useRef, useState, useLayoutEffect, Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -15,6 +15,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from './select-multi';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -133,7 +134,12 @@ export default function SelectDay({navigation}: any) {
 		{step: '출발', title: '여행 시작', day: selectStartDate},
 		{step: '도착', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step3', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<DayBackground
 			onPress={() => {

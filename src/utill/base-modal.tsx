@@ -111,11 +111,10 @@ const ModalContainer = styled.Pressable`
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.3);
 `;
-
+//height: ${props => (props.modalSingleUse ? heightPercentage(219) : heightPercentage(269))}px;
 const ViewContaniner = styled.Pressable<{modalSingleUse: boolean}>`
 	background-color: white;
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modalSingleUse ? heightPercentage(219) : heightPercentage(269))}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	align-items: center;

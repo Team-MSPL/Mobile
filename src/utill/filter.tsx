@@ -11,6 +11,7 @@ export const FilterList = [
 	'다님디자이너',
 	'다님ceo',
 	'다님cto',
+	'다님cmo',
 	'커뮤니티관리자',
 	'주식회사나그네들',
 	'시발',

@@ -19,13 +19,25 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/
 import {TagElement} from '../../home/main';
 import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 import {GraientBackground} from '../hiking-recommend/view-result';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
 	const windowWidth = Dimensions.get('window').width;
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('place_complete', {
+			recommand_result1: recommendList[0].name,
+			recommand_result2: recommendList[1].name,
+			recommand_result3: recommendList[2].name,
+			recommand_result4: recommendList[3].name,
+			recommand_result5: recommendList[4].name,
+		});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
 		navigation.setOptions({
@@ -89,8 +101,9 @@ export default function ViewResult({navigation}: any) {
 								</DayRecommendContainer>
 							)}
 							<RecommendContainer
-								onPress={() => {
+								onPress={async () => {
 									navigation.navigate('DetailResult', {item: item});
+									await logEvent('view_place_result', {location: item.name});
 								}}>
 								<ImageContainer>
 									{item.photo != '' ? (

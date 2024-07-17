@@ -19,6 +19,8 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import {SvgCancel, SvgCheck} from '../../utill/svg/svg';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
+import moment from 'moment';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
@@ -42,8 +44,13 @@ export default function Join1({navigation, route}: any) {
 				fcmToken: fcmToken,
 				version: 2,
 			};
-			const result = await dispatch(socialConnect(data));
+			const result = await dispatch(socialConnect(data)).unwrap();
 			dispatch(userSliceActions.setSignUpReward(true));
+			await logEvent('sign_up', {method: route.params.loginProvider, signup_date: moment().format('YYYY-MM-DD')});
+			await setUserId(result.userId);
+			await setUserProperty('user_method', route.params.loginProvider);
+			await setUserProperty('signup_date', moment().format('YYYY-MM-DD'));
+
 			// : (navigation.goBack(), navigation.replace('Tab'));
 		} catch (err) {
 			console.log('왜 이래', err);

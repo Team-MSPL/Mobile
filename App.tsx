@@ -35,6 +35,7 @@ import messaging from '@react-native-firebase/messaging';
 import Event from './src/utill/component/event/event';
 import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
@@ -59,7 +60,7 @@ function App(): JSX.Element {
 			]);
 			const fcmToken = await getFcmToken();
 			if (userToken && userName && loginProvider) {
-				dispatch(
+				const data = await dispatch(
 					socialConnect({
 						userName: userName[1],
 						userProfileImage: userProfileImage[1],
@@ -69,7 +70,10 @@ function App(): JSX.Element {
 						signUpFlag: false,
 						version: 2,
 					}),
-				);
+				).unwrap();
+				await logEvent('login', {});
+				await setUserId(data.userId);
+				await setUserProperty('user_id', data.userId);
 			}
 		} catch (err) {
 			dispatch(

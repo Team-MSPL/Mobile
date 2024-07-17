@@ -14,6 +14,7 @@ import CustomButton from '../../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {ButtonContainer} from '../select-multi';
 import {Platform} from 'react-native';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -65,7 +66,7 @@ export default function DetailResult({navigation, route}: any) {
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const goDetail = (e: {name: string; lat: number; lng: number}) => {
+	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
 			name: e.name,
@@ -75,6 +76,10 @@ export default function DetailResult({navigation, route}: any) {
 			metropolitan: metropolitanStatus,
 		};
 		navigation.navigate('CourseDetail', {value: data});
+		await logEvent('view_place_explore', {
+			location: route.params.item.name,
+			place: e.name,
+		});
 	};
 	const [visible, setVisible] = useState(false);
 	return (

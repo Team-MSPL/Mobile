@@ -1419,7 +1419,7 @@ PODS:
   - RNGoogleSignin (10.0.1):
     - GoogleSignIn (~> 7.0)
     - React-Core
-  - RNIap (12.10.8):
+  - RNIap (12.15.1):
     - React-Core
   - RNImageCropPicker (0.40.0):
     - React-Core
@@ -1846,7 +1846,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: c0d04458598fcb26052494ae23dda8f8f5162b13
   RNGoogleMobileAds: b34663770faa46bab3c718ffbd33151148b6d56f
   RNGoogleSignin: ccaa4a81582cf713eea562c5dd9dc1961a715fd0
-  RNIap: 99a559a3642155b47aa0622f9693632010a0b4f7
+  RNIap: 17583f958d35788a87948e94072ff6edd3580497
   RNImageCropPicker: 486e2f7e2b0461ce24321f751410dce1b3b49e6d
   RNPermissions: c89a21801693a728fec0adbfe8084381bb73e7ec
   RNReanimated: 65ea8b9347cf9d2f16402355aae86e35d6905385

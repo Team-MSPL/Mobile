@@ -23,6 +23,7 @@ import {DayViewContainer} from '../enroll-info/select-multi';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import CustomButton from '../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 
@@ -73,6 +74,12 @@ export default function MyTravelList({navigation}: any) {
 			getTravelList();
 		}, []),
 	);
+	const handleGoogleAnalytics = async () => {
+		await logEvent('view_course_list', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const checkGoEnroll = async () => {
 		dispatch(
 			modalSliceActions.setOpenModal({

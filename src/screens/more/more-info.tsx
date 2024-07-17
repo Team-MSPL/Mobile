@@ -69,12 +69,16 @@ export default function MoreInfo({navigation}: any) {
 	const goNotice = () => {
 		navigation.navigate('Notice');
 	};
+	const goLanguage = () => {
+		navigation.navigate('Language');
+	};
 	const useInfo = [
 		{title: '공지사항', function: goNotice},
 		{title: '문의하기', function: handleInquire},
 		{title: '이용약관', function: goPolicy},
 		{title: '개인정보 처리 방침', function: goTerms},
 		{title: '사용 가이드', function: goViewPager},
+		{title: '언어(language)', function: goLanguage},
 	];
 	return (
 		<ScrollView>

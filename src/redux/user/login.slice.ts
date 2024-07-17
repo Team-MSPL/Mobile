@@ -33,7 +33,7 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			await AsyncStorage.multiSet(loginValues);
 			//axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
 		}
-		return response.status;
+		return response.data;
 	} catch (error) {
 		throw thunkAPI.rejectWithValue(error);
 	}

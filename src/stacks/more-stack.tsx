@@ -14,6 +14,7 @@ import UserManage from '../screens/more/user-manage';
 import Notice from '../screens/more/notice';
 import NoticeDetail from '../screens/more/notice-detail';
 import Withdraw from '../screens/more/withdraw';
+import Language from '../screens/more/language';
 const Stack = createNativeStackNavigator();
 export default function MoreStack() {
 	return (
@@ -115,6 +116,13 @@ export default function MoreStack() {
 				component={Withdraw}
 				options={{
 					title: '계정 삭제',
+				}}
+			/>
+			<Stack.Screen
+				name='Language'
+				component={Language}
+				options={{
+					title: '언어(language)',
 				}}
 			/>
 		</Fragment>

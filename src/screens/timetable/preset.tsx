@@ -22,6 +22,7 @@ import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {deleteAI, saveAI} from '../../redux/travel-info/travel.slice';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -135,6 +136,17 @@ export default function Preset({navigation}: any) {
 			console.log(err, '에러');
 		}
 	};
+	const handleGoogleAnalytics = async () => {
+		let copy = {};
+		presetDatas.map((item, idx) => {
+			const keyName = 'recommand_result' + (idx + 1);
+			copy[keyName] = item[0][0].name;
+		});
+		await logEvent('course_step1', {copy});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'presetViewPager'});
 	useEffect(() => {
 		getMainViewPager();
@@ -315,7 +327,12 @@ export default function Preset({navigation}: any) {
 									label='일정 자세히 보기'
 									backgroundColor={colors.backgroundGray}
 									textColor={colors.PointYellow}
-									onPress={() => goDetail(idx)}></PrimaryButton>
+									onPress={async () => {
+										goDetail(idx);
+										await logEvent('view_course_result_detail', {
+											place: item[0][0].name,
+										});
+									}}></PrimaryButton>
 							</WhiteContainer>
 						),
 				)}

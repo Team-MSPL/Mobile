@@ -8,7 +8,7 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
@@ -24,19 +24,23 @@ import {useFocusEffect} from '@react-navigation/native';
 import {Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
+import {logEvent} from '../../../firebaseAnalytice';
+import {useTranslation} from 'react-i18next';
 export default function Main({navigation}: any) {
-	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
+	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
+	const {t, i18n} = useTranslation();
 
-	const regionRecommend = () => {
+	const regionRecommend = async () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
 		navigation.navigate('RegionSelectWho');
+		await logEvent('place_step1', {});
 	};
 	const goEnroll = () => {
 		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
@@ -227,7 +231,7 @@ export default function Main({navigation}: any) {
 					<BrighnessBox>
 						<TicketTouchable onPress={goTokenLog}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								이용권
+								{t('test')}이용권
 							</PretendardSemiBoldText>
 						</TicketTouchable>
 						<HomeTextContainer

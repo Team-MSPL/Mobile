@@ -20,6 +20,7 @@ import {SVGCoin} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useFocusEffect} from '@react-navigation/native';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
 	const {requestItemPurchase} = useShopping();
@@ -37,7 +38,12 @@ export default function Payment({navigation}: any) {
 		const data = await dispatch(getWatchADTime()).unwrap();
 		setWatchAD(data.watchADTime);
 	};
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('view_voucher_list', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			getWatchData();
