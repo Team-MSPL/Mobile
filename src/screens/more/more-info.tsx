@@ -37,27 +37,12 @@ export default function MoreInfo({navigation}: any) {
 	};
 	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler({type: 'exit'});
-	const changeInfo = () => {
-		navigation.navigate('ChangeProfile');
+	const goNavigation = (route: string) => {
+		navigation.navigate(route);
 	};
 	const goPayment = () => {
 		appsflyerLogEvent({name: 'more_payment_click', value: {id: 'danim'}});
 		navigation.navigate('Payment');
-	};
-	const goTerms = () => {
-		navigation.navigate('Terms');
-	};
-	const goPolicy = () => {
-		navigation.navigate('PolicyMain');
-	};
-	const handleInquire = () => {
-		navigation.navigate('Inquire');
-	};
-	const goNoteList = () => {
-		navigation.navigate('NoteList');
-	};
-	const goTokenLog = () => {
-		navigation.navigate('TokenLog');
 	};
 	const goBack = () => {
 		setViewPagerView(false);
@@ -66,19 +51,39 @@ export default function MoreInfo({navigation}: any) {
 		setViewPagerView(true);
 	};
 	const [viewPagerView, setViewPagerView] = useState(false);
-	const goNotice = () => {
-		navigation.navigate('Notice');
-	};
-	const goLanguage = () => {
-		navigation.navigate('Language');
-	};
+
 	const useInfo = [
-		{title: '공지사항', function: goNotice},
-		{title: '문의하기', function: handleInquire},
-		{title: '이용약관', function: goPolicy},
-		{title: '개인정보 처리 방침', function: goTerms},
+		{
+			title: '공지사항',
+			function: () => {
+				goNavigation('Notice');
+			},
+		},
+		{
+			title: '문의하기',
+			function: () => {
+				goNavigation('Inquire');
+			},
+		},
+		{
+			title: '이용약관',
+			function: () => {
+				goNavigation('PolicyMain');
+			},
+		},
+		{
+			title: '개인정보 처리 방침',
+			function: () => {
+				goNavigation('Terms');
+			},
+		},
 		{title: '사용 가이드', function: goViewPager},
-		{title: '언어(language)', function: goLanguage},
+		{
+			title: '언어(language)',
+			function: () => {
+				goNavigation('Language');
+			},
+		},
 	];
 	return (
 		<ScrollView>
@@ -115,7 +120,9 @@ export default function MoreInfo({navigation}: any) {
 							</PretendardSemiBoldText>
 						</NoteCount>
 						<SVGNoteList
-							onPress={goNoteList}
+							onPress={() => {
+								goNavigation('NoteList');
+							}}
 							width={widthPercentage(33)}
 							height={widthPercentage(33)}></SVGNoteList>
 					</NoteListContainer>
@@ -126,7 +133,9 @@ export default function MoreInfo({navigation}: any) {
 						label='프로필 편집'
 						width={widthPercentage(100)}
 						height={heightPercentage(40)}
-						onPress={changeInfo}
+						onPress={() => {
+							goNavigation('ChangeProfile');
+						}}
 						backgroundColor={colors.Primary}
 						textColor={colors.Black}></PrimaryButton>
 				</HStack>
@@ -135,7 +144,11 @@ export default function MoreInfo({navigation}: any) {
 						계정
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						<SettingElement onPress={goTokenLog} bottomShow={true}>
+						<SettingElement
+							onPress={() => {
+								goNavigation('TokenLog');
+							}}
+							bottomShow={true}>
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 									이용권 갯수{'    '} {functionToken} 개

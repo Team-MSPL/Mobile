@@ -231,7 +231,7 @@ export default function Main({navigation}: any) {
 					<BrighnessBox>
 						<TicketTouchable onPress={goTokenLog}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								{t('test')}이용권
+								{t('ticketLog')}
 							</PretendardSemiBoldText>
 						</TicketTouchable>
 						<HomeTextContainer
