@@ -125,8 +125,12 @@ export default function Main({navigation}: any) {
 			clearTimeout(tick);
 		}
 	};
+	const getFirstRegion = async () => {
+		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
+	};
 	useLayoutEffect(() => {
 		getMainScreen();
+		getFirstRegion();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');
@@ -231,7 +235,7 @@ export default function Main({navigation}: any) {
 					<BrighnessBox>
 						<TicketTouchable onPress={goTokenLog}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								{t('ticketLog')}
+								{t('이용권')}
 							</PretendardSemiBoldText>
 						</TicketTouchable>
 						<HomeTextContainer

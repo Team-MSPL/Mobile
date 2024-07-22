@@ -12,8 +12,8 @@ const initialState: SettingState = {
 	needVersionUpdate: false,
 	updateStoreUrl: '',
 	homeRegionImage: {
-		photo: 'https://storage.googleapis.com/place-photo-bucket/%EC%A0%84%EA%B5%AD%20%EC%97%AC%ED%96%89%20%EC%A7%80%EC%97%AD%20ver2/%EA%B2%BD%EB%B6%81%20%EA%B2%BD%EC%A3%BC%EC%8B%9C.jpg?Expires=2016695378&GoogleAccessId=firebase-adminsdk-9ud51%40danim-3439e.iam.gserviceaccount.com&Signature=UDssfYh7%2BiQHLzDlabvqoGLbHWQ%2Bu1AuaS2Bc5a9%2F%2BuS4RG5gw0Q6eZpiuB3akLfyj66JX%2B5Fd7OQVx%2F7CfGO%2FiitMrfHoMqXOj6HwNJyx%2F854DcvkivfdOrvYP2hO2NHxlAD3y%2B4EWHTA0euZICDqhDxc62%2Bl3lhPKm%2Boj8MG3PUfOmfdOrY2TadIONlm6QcQRzzXqoIcwbHNeNoU6j5m0Hg05NhvBF0XPwn2znsY1RqpSJkyegQRsc6P9osKKKk1Fm7ISdT0wOFuumHt5VZ52lF6VaOaMffSZPmYIqPINqvOO5A3ZYoGsDOoh9nsTVgHPejT9pvxCk8C5J%2FTfIDQ%3D%3D',
-		name: '경북 경주시',
+		photo: '',
+		name: '',
 	},
 	appLanguages: 'ko-KR',
 };
