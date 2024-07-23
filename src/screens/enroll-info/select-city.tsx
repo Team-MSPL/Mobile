@@ -483,7 +483,7 @@ export const cityViewList = [
 			{id: 10, subTitle: '의령군', lat: 35.3924481, lng: 128.2770734},
 			{id: 11, subTitle: '진주시', lat: 35.205153, lng: 128.1297905},
 			{id: 12, subTitle: '창녕군', lat: 35.5083094, lng: 128.4931971},
-			{id: 13, subTitle: '창원군', lat: 35.2028593, lng: 128.6000923},
+			{id: 13, subTitle: '창원시', lat: 35.2028593, lng: 128.6000923},
 			{id: 14, subTitle: '통영시', lat: 34.8544227, lng: 128.433182},
 			{id: 15, subTitle: '하동군', lat: 35.1381776, lng: 127.779014},
 			{id: 16, subTitle: '함안군', lat: 35.2909696, lng: 128.4308338},

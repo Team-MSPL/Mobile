@@ -430,6 +430,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</MapView>
 							),
 					)}
+				{/* <Test></Test> */}
 				<BackgroundGray modify={modify}>
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
@@ -896,4 +897,10 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	justify-content: center;
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
+`;
+const Test = styled.View`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(30)}px;
+	background-color: ${colors.Blue2};
+	border-top-right-radius: 99px;
 `;

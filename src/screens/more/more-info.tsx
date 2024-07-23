@@ -78,12 +78,12 @@ export default function MoreInfo({navigation}: any) {
 			},
 		},
 		{title: '사용 가이드', function: goViewPager},
-		{
-			title: '언어(language)',
-			function: () => {
-				goNavigation('Language');
-			},
-		},
+		// {
+		// 	title: '언어(language)',
+		// 	function: () => {
+		// 		goNavigation('Language');
+		// 	},
+		// },
 	];
 	return (
 		<ScrollView>
