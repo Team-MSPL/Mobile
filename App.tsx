@@ -59,7 +59,7 @@ function App(): JSX.Element {
 				'loginProvider',
 			]);
 			const fcmToken = await getFcmToken();
-			if (userToken && userName && loginProvider) {
+			if (userToken[1] != null && userName[1] != null && loginProvider[1] != null) {
 				const data = await dispatch(
 					socialConnect({
 						userName: userName[1],
@@ -76,9 +76,10 @@ function App(): JSX.Element {
 				await setUserProperty('user_id', data.userId);
 			}
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '네트워크 연결이 불안정합니다',
+					modalTitle: '네트워크 연결이 불안정합니다ㅇㄴ',
 					modalSubTitle: '확인후 다시 시도해주세요',
 				}),
 			);

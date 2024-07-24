@@ -405,11 +405,13 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
+	const [viewMap, setViewMap] = useState(true);
 	return (
 		<MainAllContainer>
 			<AbsoluteTopBarComponent modify={modify}></AbsoluteTopBarComponent>
 			<VStack flex={1}>
 				{!modify &&
+					viewMap &&
 					timetable.map(
 						(item, idx) =>
 							select == idx && (
@@ -430,7 +432,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</MapView>
 							),
 					)}
-				{/* <Test></Test> */}
+				{/* <Test
+					onPress={() => {
+						setViewMap(!viewMap);
+					}}></Test> */}
 				<BackgroundGray modify={modify}>
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
@@ -898,7 +903,7 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
-const Test = styled.View`
+const Test = styled.TouchableOpacity`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(30)}px;
 	background-color: ${colors.Blue2};
