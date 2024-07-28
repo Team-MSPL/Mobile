@@ -107,6 +107,7 @@ export default function LoginScreen({navigation}: any) {
 				});
 			}
 		} catch (error) {
+			console.log(error);
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -132,12 +133,12 @@ export default function LoginScreen({navigation}: any) {
 				);
 				// play services not available or outdated
 			} else {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '네트워크 연결이 불안정합니다',
-						modalSubTitle: '확인후 다시 시도해주세요',
-					}),
-				);
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '네트워크 연결이 불안정합니다ㅋ',
+				// 		modalSubTitle: '확인후 다시 시도해주세요',
+				// 	}),
+				// );
 				// some other error happened
 			}
 		}

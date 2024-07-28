@@ -24,11 +24,11 @@ import {useFocusEffect} from '@react-navigation/native';
 import {Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
-import {logEvent} from '../../../firebaseAnalytice';
+import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
-	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
+	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
@@ -128,12 +128,19 @@ export default function Main({navigation}: any) {
 	const getFirstRegion = async () => {
 		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
 	};
+	const handleGoogleAnalytics = async () => {
+		await logEvent('login', {});
+		await setUserId(userId ?? '');
+		await setUserProperty('user_id', userId ?? '');
+		dispatch(userSliceActions.setAnalyticeFlag(true));
+	};
 	useLayoutEffect(() => {
 		getMainScreen();
 		getFirstRegion();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');
+		!analyticeFlag && handleGoogleAnalytics();
 	}, []);
 
 	useEffect(() => {

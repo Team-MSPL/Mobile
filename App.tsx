@@ -59,7 +59,12 @@ function App(): JSX.Element {
 				'loginProvider',
 			]);
 			const fcmToken = await getFcmToken();
-			if (userToken[1] != null && userName[1] != null && loginProvider[1] != null) {
+			if (
+				userToken[1] != null &&
+				userName[1] != null &&
+				loginProvider[1] != null &&
+				userProfileImage[1] != null
+			) {
 				const data = await dispatch(
 					socialConnect({
 						userName: userName[1],
@@ -71,18 +76,16 @@ function App(): JSX.Element {
 						version: 2,
 					}),
 				).unwrap();
-				await logEvent('login', {});
-				await setUserId(data.userId);
-				await setUserProperty('user_id', data.userId);
 			}
 		} catch (err) {
 			console.log(err);
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '네트워크 연결이 불안정합니다ㅇㄴ',
-					modalSubTitle: '확인후 다시 시도해주세요',
-				}),
-			);
+			// dispatch(
+			// 	modalSliceActions.setOpenModal({
+			// 		modalTitle: '로그인에 실패하였습니다',
+			// 		modalSubTitle: '확인후 다시 시도해주세요',
+			// 		modalSingleUse: true,
+			// 	}),
+			// );
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}

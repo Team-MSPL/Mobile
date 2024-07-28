@@ -16,6 +16,7 @@ const initialUserState: UserState = {
 	fcmToken: '',
 	userIdToken: '',
 	reLogin: false,
+	analyticeFlag: false,
 };
 
 //회원탈퇴
@@ -175,6 +176,9 @@ const userSlice = createSlice({
 		setFcmToken(state, {payload}) {
 			state.fcmToken = payload.fcmToken;
 		},
+		setAnalyticeFlag(state, {payload}) {
+			state.analyticeFlag = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(userWithdraw.fulfilled, state => {
@@ -207,6 +211,7 @@ export interface UserState {
 	fcmToken: string;
 	userIdToken: string;
 	reLogin: boolean;
+	analyticeFlag: boolean;
 }
 
 export interface TokenLogType {
