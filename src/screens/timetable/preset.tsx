@@ -142,7 +142,7 @@ export default function Preset({navigation}: any) {
 			const keyName = 'recommand_result' + (idx + 1);
 			copy[keyName] = item[0][0].name;
 		});
-		await logEvent('course_step1', {copy});
+		await logEvent('course_complete', {copy});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

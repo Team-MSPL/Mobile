@@ -18,7 +18,8 @@ export default function HomeModal({navigation, route}: {navigation: any; route: 
 	const texts = {
 		회원가입: {
 			main: `${userName} 님, 반가워요.\n여행을 준비하러 가볼까요?`,
-			sub: `회원가입 기념으로 사용 가능한\n이용권이 ${functionToken}개 발급되었습니다.\n\n여행지 및 일정 추천을 받아봐요!`,
+			// sub: `회원가입 기념으로 사용 가능한\n이용권이 ${functionToken}개 발급되었습니다.\n\n여행지 및 일정 추천을 받아봐요!`,
+			sub: `여행지 및 일정 추천을 받아볼까요?`,
 		},
 		재가입: {
 			main: `${userName} 님,\n 다시 돌아온 것을 환영해요.\n기다리고 있었어요!`,

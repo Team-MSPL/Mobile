@@ -144,7 +144,7 @@ export default function MoreInfo({navigation}: any) {
 						계정
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						<SettingElement
+						{/* <SettingElement
 							onPress={() => {
 								goNavigation('TokenLog');
 							}}
@@ -161,8 +161,8 @@ export default function MoreInfo({navigation}: any) {
 									backgroundColor={colors.Primary}
 									textColor={colors.Black}></PrimaryButton>
 							</HStack>
-						</SettingElement>
-						{Platform.OS != 'ios' && <Coupon />}
+						</SettingElement> */}
+						{/* {Platform.OS != 'ios' && <Coupon />} */}
 						<HStack width={widthPercentage(303)} justifyContent='space-between'>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 								계정타입

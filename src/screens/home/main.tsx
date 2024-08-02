@@ -240,11 +240,11 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						<TicketTouchable onPress={goTokenLog}>
+						{/* <TicketTouchable onPress={goTokenLog}>
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
 								{t('이용권')}
 							</PretendardSemiBoldText>
-						</TicketTouchable>
+						</TicketTouchable> */}
 						<HomeTextContainer
 							onPress={() => {
 								selectPopularity({
@@ -401,7 +401,7 @@ const TicketTouchable = styled.TouchableOpacity`
 	justify-content: center;
 `;
 const HomeTextContainer = styled.Pressable`
-	top: ${heightPercentage(244)}px;
+	top: ${heightPercentage(275)}px;
 	left: ${widthPercentage(26)}px;
 `;
 

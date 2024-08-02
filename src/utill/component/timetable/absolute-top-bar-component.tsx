@@ -8,10 +8,10 @@ import moment from 'moment';
 import {useAppSelector} from '../../../redux';
 import {colors} from '../../colors';
 
-const AbsoluteTopBarComponent = ({modify}: {modify: boolean}) => {
+const AbsoluteTopBarComponent = ({modify, viewMap}: {modify: boolean; viewMap: boolean}) => {
 	const {day, transit, bandwidth, nDay, region, travelName, regionInfo} = useAppSelector(state => state.travelSlice);
 	return (
-		<AbsoluteTopBars opacityState={modify}>
+		<AbsoluteTopBars opacityState={modify} viewMap={viewMap}>
 			<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
 				<RegionImage
 					source={{
@@ -56,10 +56,10 @@ const AbsoluteTopBarComponent = ({modify}: {modify: boolean}) => {
 	);
 };
 export default memo(AbsoluteTopBarComponent);
-export const AbsoluteTopBars = styled.View<{opacityState: boolean}>`
+export const AbsoluteTopBars = styled.View<{opacityState: boolean; viewMap: boolean}>`
 	width: 100%;
 	height: ${heightPercentage(71)}px;
-	position: ${props => (props.opacityState ? 'relative' : 'absolute')};
+	position: ${props => (props.opacityState || !props.viewMap ? 'relative' : 'absolute')};
 	top: 0;
 	z-index: 100;
 	background-color: rgba(255, 255, 255, 0.9);

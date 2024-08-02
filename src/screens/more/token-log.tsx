@@ -58,19 +58,19 @@ export default function TokenLog({navigation}: any) {
 							</PretendardSemiBoldText>
 						</TagContainer>
 					</HStack>
-					<HStack>
+					{/* <HStack>
 						<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
 							{item.item.tokenLogNumber < 0 ? '소모 이용권' : '획득 이용권'}
 							{'   ' + Math.abs(item.item.tokenLogNumber)}개
 						</PretendardVariableText>
-					</HStack>
+					</HStack> */}
 				</WhiteContainer>
 			</>
 		);
 	};
 	return (
 		<BackgroundGray>
-			<WhiteContainer>
+			{/* <WhiteContainer>
 				<HStack justifyContent='space-between' width={widthPercentage(307)}>
 					<PretendardBoldText size={15} lineHeight={20} color={colors.Black}>
 						이용권 {functionToken}개
@@ -83,7 +83,7 @@ export default function TokenLog({navigation}: any) {
 						textColor={colors.Black}
 						onPress={goPayment}></PrimaryButton>
 				</HStack>
-			</WhiteContainer>
+			</WhiteContainer> */}
 			{logList.length == 0 ? (
 				<>
 					<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>

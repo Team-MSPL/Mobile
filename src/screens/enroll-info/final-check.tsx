@@ -107,45 +107,46 @@ export default function FinalCheck({navigation}: any) {
 		],
 	];
 	const checkToken = () => {
-		if (freeTicket) {
-			goNext();
-		} else {
-			functionToken >= 1
-				? dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: `이용권이 하나가 사용돼요`,
-							modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
-							modalFunction: goNext,
-							modalLeft: true,
-							modalTopText: '사용하기',
-							modalBottomText: '취소',
-						}),
-				  )
-				: dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-							modalFunction: goPayment,
-							modalLeft: true,
-						}),
-				  );
-		}
+		goNext();
+		// if (freeTicket) {
+		// 	goNext();
+		// } else {
+		// 	functionToken >= 1
+		// 		? dispatch(
+		// 				modalSliceActions.setOpenModal({
+		// 					modalTitle: `이용권이 하나가 사용돼요`,
+		// 					modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
+		// 					modalFunction: goNext,
+		// 					modalLeft: true,
+		// 					modalTopText: '사용하기',
+		// 					modalBottomText: '취소',
+		// 				}),
+		// 		  )
+		// 		: dispatch(
+		// 				modalSliceActions.setOpenModal({
+		// 					modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+		// 					modalFunction: goPayment,
+		// 					modalLeft: true,
+		// 				}),
+		// 		  );
+		// }
 	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useFocusEffect(
-		useCallback(() => {
-			if (signUpReward) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-						modalFunction: checkSignUpReward,
-					}),
-				);
-			}
-		}, [signUpReward]),
-	);
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		if (signUpReward) {
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '회원가입 축하드립니다',
+	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+	// 					modalFunction: checkSignUpReward,
+	// 				}),
+	// 			);
+	// 		}
+	// 	}, [signUpReward]),
+	// );
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused() && loading) {
@@ -215,7 +216,7 @@ export default function FinalCheck({navigation}: any) {
 						}),
 					);
 
-				!freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				// !freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({

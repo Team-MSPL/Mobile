@@ -25,7 +25,7 @@ import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {
@@ -406,9 +406,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		return <MainAllContainer></MainAllContainer>;
 	}
 	const [viewMap, setViewMap] = useState(true);
+	const [topbar, setTopBar] = useState(true);
 	return (
 		<MainAllContainer>
-			<AbsoluteTopBarComponent modify={modify}></AbsoluteTopBarComponent>
+			{topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>}
 			<VStack flex={1}>
 				{!modify &&
 					viewMap &&
@@ -419,8 +420,14 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									key={idx}
 									ref={mapRef}
 									showsMyLocationButton={true}
-									style={{width: '100%', flex: 0.45}}
+									style={{width: '100%', flex: 0.42}}
 									showsUserLocation={true}
+									onTouchStart={() => {
+										setTopBar(false);
+									}}
+									onTouchEnd={() => {
+										setTopBar(true);
+									}}
 									region={{
 										latitude: centerLatitude,
 										longitude: centerLongitude,
@@ -432,13 +439,22 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</MapView>
 							),
 					)}
-				{/* <Test
-					onPress={() => {
-						setViewMap(!viewMap);
-					}}></Test> */}
-				<BackgroundGray modify={modify}>
+				{!modify && (
+					<ViewMapTouchable
+						onPress={() => {
+							setViewMap(!viewMap);
+						}}>
+						<SVGRightAdd
+							width={widthPercentage(20)}
+							height={widthPercentage(20)}
+							color='black'
+							transform={!viewMap ? 90 : 270}
+						/>
+					</ViewMapTouchable>
+				)}
+				<BackgroundGray modify={modify} viewMap={viewMap}>
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
+						<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
 							{timetable.map(
 								(item, idx) =>
 									item.length != 0 && (
@@ -539,7 +555,8 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							}}
 							onMomentumScrollEnd={e => {
 								changeViewState(e);
-							}}>
+							}}
+							viewMap={viewMap}>
 							{timetable.map(
 								(value, index) =>
 									value.length != 0 && (
@@ -877,22 +894,22 @@ export const DayContainer = styled.ScrollView``;
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
-const DayScrollViews = styled.ScrollView`
+const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(230)}px;
+	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
 `;
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(500)}px;
 `;
 
-const BackgroundGray = styled.View<{modify: boolean}>`
+const BackgroundGray = styled.View<{modify: boolean; viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
 	border-top-right-radius: 10px;
 	border-top-left-radius: 10px;
 	background-color: ${colors.backgroundGray};
 	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
-	flex: ${props => (props.modify ? 1 : 0.55)};
+	flex: ${props => (props.modify || !props.viewMap ? 1 : 0.55)};
 `;
 const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	width: ${widthPercentage(282)}px;
@@ -903,9 +920,9 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
-const Test = styled.TouchableOpacity`
-	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(30)}px;
-	background-color: ${colors.Blue2};
-	border-top-right-radius: 99px;
+const ViewMapTouchable = styled.TouchableOpacity`
+	flex: 0.03;
+	justify-content: center;
+	align-items: center;
+	padding: ${widthPercentage(3)}px;
 `;

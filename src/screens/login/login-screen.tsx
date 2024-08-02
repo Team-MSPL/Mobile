@@ -16,6 +16,7 @@ import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {SvgApple, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import Carousel from 'react-native-reanimated-carousel';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -231,15 +232,41 @@ export default function LoginScreen({navigation}: any) {
 			onPress: appleLogin,
 		},
 	];
-
+	const textList = [
+		'당신만을 위한 여행 길잡이, 다님',
+		'1분 만에 여행 계획 완성, 다님',
+		'성향에 맞는 여행을 떠나고 싶다면, 다님',
+		'나만의 이색 여행지를 찾고 싶다면, 다님',
+	];
 	return (
 		<BackgroundImage source={require('../../../public/images/login-image.png')}>
 			<SafeAreaView>
 				<LoginSCreenContainer>
 					<SvgLoginLogo color='white' width={widthPercentage(151)} height={heightPercentage(44)} />
-					<PretendardBoldText size={12} lineHeight={18} color={colors.backgroundWhite}>
-						당신을 위한 여행 길잡이,다님
-					</PretendardBoldText>
+					<Carousel
+						loop
+						style={{
+							borderRadius: 10,
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+						width={widthPercentage(375)}
+						height={30}
+						autoPlay={true}
+						data={[1, 2, 3, 4]}
+						scrollAnimationDuration={1000}
+						onSnapToItem={() => {}}
+						autoPlayInterval={4000}
+						renderItem={({index}) => (
+							<PretendardBoldText
+								style={{alignSelf: 'center'}}
+								size={12}
+								lineHeight={18}
+								color={colors.backgroundWhite}>
+								{textList[index]}
+							</PretendardBoldText>
+						)}
+					/>
 				</LoginSCreenContainer>
 				<CircleContainer>
 					{platforms.map((platform, index) => (

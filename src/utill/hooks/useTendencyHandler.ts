@@ -54,7 +54,7 @@ export const useTendencyHandler = () => {
 				require('../../../public/tendency/camera.png'),
 				require('../../../public/tendency/special.png'),
 				require('../../../public/tendency/old-paper.png'),
-				require('../../../public/tendency/facility.png'),
+				require('../../../public/tendency/museum.png'),
 				require('../../../public/tendency/park.png'),
 				require('../../../public/tendency/tempor.png'),
 				require('../../../public/tendency/church.png'),

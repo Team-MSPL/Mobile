@@ -12,7 +12,7 @@ import {
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import {HeaderContianer, PretendardVariableText} from '../../utill/layout/layout';
+import {HeaderContianer, PretendardBold, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
@@ -381,9 +381,9 @@ export default function Timetable({navigation, route}: any) {
 					)}
 					{shareViewWithStartFlag && (
 						<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
-							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							<PretendardBoldText size={18} lineHeight={24} color={colors.PointYellow}>
 								공유
-							</PretendardVariableText>
+							</PretendardBoldText>
 						</TouchableOpacity>
 					)}
 				</>

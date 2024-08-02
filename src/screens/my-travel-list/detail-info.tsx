@@ -389,7 +389,7 @@ export default function DetailInfo({navigation}: any) {
 							</VStack>
 							{!modify && (
 								<TouchableOpacity onPress={goKakaoShare}>
-									<SvgShare width={heightPercentage(38)} height={heightPercentage(38)} />
+									<SvgShare width={heightPercentage(45)} height={heightPercentage(45)} />
 								</TouchableOpacity>
 							)}
 						</HStack>

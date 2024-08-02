@@ -47,6 +47,7 @@ import ReviewPencil from '../../../public/review-pencil.svg';
 import Maps from '../../../public/maps.svg';
 import TravlePencil from '../../../public/travlePenceil.svg';
 import MoreHorizontal from '../../../public/more-horizontal.svg';
+import Search from '../../../public/search.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -191,5 +192,8 @@ export const SVGEmptyHeart = styled(EmptyHeart)<{color?: string}>`
 	color: color;
 `;
 export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
+	color: color;
+`;
+export const SVGSearch = styled(Search)<{color?: string}>`
 	color: color;
 `;

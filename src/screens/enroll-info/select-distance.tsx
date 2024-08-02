@@ -109,7 +109,7 @@ export const MapContainer = styled.View`
 	height: ${heightPercentage(240)}px;
 	align-self: center;
 	justify-content: center;
-	margin-top: ${heightPercentage(37)}px;
+	margin-top: ${heightPercentage(27)}px;
 `;
 export const Qwe = styled.View`
 	width: ${widthPercentage(327)}px;
