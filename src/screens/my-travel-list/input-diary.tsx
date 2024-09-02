@@ -1,9 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {BackHandler, Keyboard, TextInput} from 'react-native';
+import {BackHandler} from 'react-native';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import CustomButton from '../../utill/component/custom-button';
 import {reCourseName, travelSliceActions, updateDiary} from '../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
@@ -18,18 +17,14 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/lay
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
 import moment from 'moment';
 import {savePost, updatePost} from '../../redux/community/community.slice';
-export default function InputDiary({navigation, modify, setModify, text, setEditing}: any) {
-	const {travelId, region, diary, picture, reviewCheck} = useAppSelector(state => state.travelSlice);
-	const {userId} = useAppSelector(state => state.userSlice);
+export default function InputDiary({navigation, modify, setModify, text}: any) {
+	const {travelId, diary, picture} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [saveCheck, setSaveCheck] = useState(false);
-	const [diaryValue, setDiaryValue] = useState(diary);
 
-	const [pictureValue, setpictureValue] = useState<string[]>(picture);
 	const changeDiary = (e: string) => {
 		!saveCheck && setSaveCheck(true);
 		dispatch(travelSliceActions.enrollReviewDiary(e));
-		// setDiaryValue(e);
 	};
 
 	useEffect(() => {
@@ -58,9 +53,6 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 
 		return () => backHandler.remove();
 	}, [saveCheck, text, picture, diary]);
-	const handleBuntton = () => {
-		modify ? setModify(false) : goSaveDiary();
-	};
 	const {uploadImage} = useFirebaseStorage();
 	let diaryImageRef = useRef<string[]>([]);
 	const goSaveDiary = async () => {
@@ -90,7 +82,6 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 				}),
 			);
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '다이어리 저장이 실패했습니다',
@@ -170,7 +161,6 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 		setModify(true);
 		handelGetImage();
 	};
-	const diaryRef = useRef<React.RefObject<TextInput>>();
 	return (
 		<RecommendBorderContainer>
 			<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
@@ -198,7 +188,10 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 									onPress={() => {
 										deletePicture(idx);
 									}}>
-									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+									<SvgCancel
+										color='white'
+										width={widthPercentage(13)}
+										height={widthPercentage(13)}></SvgCancel>
 								</CancelContainer>
 							)}
 							<PictureElement
@@ -229,34 +222,6 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 				placeholder='여행 일기로 추억을 기록해보세요'
 				blurOnSubmit={true}
 				onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
-			{/* {!modify ? (
-				<InsideGray
-					status={diaryValue == ''}
-					onPress={() => {
-						setModify(true);
-						diaryRef.current?.focus();
-					}}>
-					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-						{diaryValue == '' ? '여행 일기로 추억을 기록해보세요' : diaryValue}
-					</PretendardVariableText>
-				</InsideGray>
-			) : (
-				<DiaryTextInput
-					value={diaryValue}
-					multiline={true}
-					onPressIn={() => {
-						modify && setModify(true);
-					}}
-					placeholderTextColor={colors.Gray5}
-					style={{
-						color: 'black',
-						fontSize: fontPercentage(14),
-						fontFamily: 'PretendardVariable',
-						lineHeight: fontPercentage(21),
-					}}
-					placeholder='여행 일기로 추억을 기록해보세요'
-					onChangeText={(value: string) => changeDiary(value)}></DiaryTextInput>
-			)} */}
 			<ImageView
 				images={picture.map((item, idx) => ({
 					uri: item,
@@ -275,39 +240,9 @@ export default function InputDiary({navigation, modify, setModify, text, setEdit
 					);
 				}}
 			/>
-			{/* <CustomButton
-				onPress={handleBuntton}
-				label={modify ? '수정 완료' : '리뷰 저장'}
-				marginBottom={heightPercentage(15)}
-				marginTop={heightPercentage(30)}></CustomButton> */}
 		</RecommendBorderContainer>
 	);
 }
-const NullContainer = styled.TouchableOpacity`
-	width: ${widthPercentage(150)}px;
-	height: ${widthPercentage(150)}px;
-	border-radius: 12px;
-	background-color: ${colors.backgroundGray};
-	align-items: center;
-	justify-content: center;
-`;
-const InsideGray = styled.TouchableOpacity<{status: boolean}>`
-	width: 100%;
-	height: ${heightPercentage(120)}px;
-	background-color: ${colors.Gray1};
-	border-radius: 10px;
-	margin: 10px 0px 0px 0px;
-	text-align-vertical: top;
-	padding: 9px 10px 10px 10px;
-`;
-const PlusCircle = styled.View`
-	width: ${widthPercentage(30)}px;
-	height: ${widthPercentage(30)}px;
-	border-radius: 99px;
-	border-width: 1px;
-	align-items: center;
-	justify-content: center;
-`;
 const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
 	width: ${widthPercentage(150)}px;
 	height: ${widthPercentage(150)}px;

@@ -9,11 +9,18 @@ import {socialConnect} from '../../redux/user/login.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
-import {ClearTouchableOpacity, MainContainer, PretendardVariable} from '../../utill/layout/layout';
+import {
+	ClearTouchableOpacity,
+	MainContainer,
+	PretendardVariable,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import {SvgCancel, SvgCheck, SvgRight} from '../../utill/svg/svg';
+import {SvgCancel, SvgCheck} from '../../utill/svg/svg';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
+import moment from 'moment';
 export default function Join1({navigation, route}: any) {
 	const [allCheck, setAllCheck] = useState(false);
 	const [check, setCheck] = useState([false, false]);
@@ -37,8 +44,13 @@ export default function Join1({navigation, route}: any) {
 				fcmToken: fcmToken,
 				version: 2,
 			};
-			const result = await dispatch(socialConnect(data));
+			const result = await dispatch(socialConnect(data)).unwrap();
 			dispatch(userSliceActions.setSignUpReward(true));
+			await logEvent('sign_up', {method: route.params.loginProvider, signup_date: moment().format('YYYY-MM-DD')});
+			await setUserId(result.userId);
+			await setUserProperty('user_method', route.params.loginProvider);
+			await setUserProperty('signup_date', moment().format('YYYY-MM-DD'));
+
 			// : (navigation.goBack(), navigation.replace('Tab'));
 		} catch (err) {
 			console.log('왜 이래', err);
@@ -129,12 +141,19 @@ export default function Join1({navigation, route}: any) {
 					{checkList.map((item, idx) => (
 						<CheckContainer key={idx}>
 							<CheckTouchableOpacity onPress={item.checkFunction}>
-								<SvgCheck color={check[idx - 1] || allCheck ? colors.selectButton : 'grey'}></SvgCheck>
-								<CheckBoxText>{item.title}</CheckBoxText>
+								<SvgCheck
+									width={widthPercentage(18)}
+									height={widthPercentage(14)}
+									color={check[idx - 1] || allCheck ? colors.Primary : 'grey'}></SvgCheck>
+								<PretendardVariableText size={14} lineHeight={17.47} color={colors.Gray4}>
+									{item.title}
+								</PretendardVariableText>
 							</CheckTouchableOpacity>
 							{idx != 0 && (
 								<PlusTouchableOpacity onPress={item.detaileFunction}>
-									<CheckBoxText>(약관보기)</CheckBoxText>
+									<PretendardVariableText size={14} lineHeight={17.47} color={colors.Gray4}>
+										(약관보기)
+									</PretendardVariableText>
 								</PlusTouchableOpacity>
 							)}
 						</CheckContainer>
@@ -160,19 +179,12 @@ const JoinContainer = styled(MainContainer).attrs({as: Pressable})`
 	flex: 1;
 	padding: 0px ${widthPercentage(25)}px;
 `;
-const CheckBoxText = styled.Text`
-	margin-left: ${widthPercentage(5)}px;
-	font-size: ${fontPercentage(14)}px;
-	color: ${colors.Gray4};
-	font-weight: 500;
-	line-weight: ${fontPercentage(17.47)}px;
-`;
-
 const CheckTouchableOpacity = styled.TouchableOpacity`
 	width: 80%;
 	flex-direction: row;
 	margin: 0px 0px 0px 5px;
 	align-items: center;
+	gap: ${widthPercentage(5)}px;
 `;
 const InputProfileContainer = styled.View`
 	display: flex;

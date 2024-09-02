@@ -19,6 +19,7 @@ import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
@@ -102,6 +103,11 @@ export default function SearchPlace({navigation, route}: any) {
 		},
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+	const handleGoogleAnalytics = async () => {
+		await logEvent('select_place', {
+			place: placeState?.name,
+		});
+	};
 	const addPlace = () => {
 		let copy = [...SearchList[route.params.id].variable];
 		route.params.id == 1
@@ -114,6 +120,7 @@ export default function SearchPlace({navigation, route}: any) {
 					takenTime: (timeValue + 1) * 60,
 			  });
 		dispatch(SearchList[route.params.id].function(copy));
+		handleGoogleAnalytics();
 		navigation.goBack();
 	};
 	const clearInput = () => {
@@ -214,7 +221,13 @@ export default function SearchPlace({navigation, route}: any) {
 										setTimeValue(timeValue - 1);
 									}}
 									color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue >= 1 && <SVGMinus color={colors.Gray2} />}
+									{timeValue >= 1 && (
+										<SVGMinus
+											width={widthPercentage(14)}
+											height={widthPercentage(4)}
+											color={colors.Gray2}
+										/>
+									)}
 								</SVGContainer>
 
 								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
@@ -226,7 +239,13 @@ export default function SearchPlace({navigation, route}: any) {
 										setTimeValue(timeValue + 1);
 									}}
 									color={timeValue > 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue <= 1 && <SVGPlus color={colors.Gray2} />}
+									{timeValue <= 1 && (
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Gray2}
+										/>
+									)}
 								</SVGContainer>
 							</HStack>
 						</HStack>
@@ -288,11 +307,6 @@ export const DefalutLogoContainer = styled.View`
 `;
 const SearchPlaceContainer = styled(BackgroundGray).attrs({as: Pressable})``;
 
-export const SearchClearButton = styled.Text`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-`;
 export const SearchClearContainer = styled.View`
 	align-items: center;
 	justify-content: center;

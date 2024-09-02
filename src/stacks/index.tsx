@@ -18,7 +18,8 @@ import TimetableStack from './timetable-stack';
 import {colors} from '../utill/colors';
 import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
-import {widthPercentage} from '../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout/responsive-size';
+import Search from '../screens/home/search';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -28,15 +29,20 @@ export default function StackNavigator() {
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'SpoqaHanSansNeo-Bold',
-					fontSize: 16,
+					fontSize: fontPercentage(16),
 					fontWeight: '900',
 				},
 				headerStyle: {backgroundColor: colors.main},
 				headerShadowVisible: false,
 			})}>
-			<Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}} />
+			<Stack.Screen
+				name='LoginScreen'
+				component={LoginScreen}
+				options={{headerShown: false, gestureEnabled: false}}
+			/>
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
+			<Stack.Screen name='Search' component={Search} />
 
 			{TimetableStack()}
 			{CommunityStack()}
@@ -61,16 +67,16 @@ function TabBar() {
 			initialRouteName='Home'
 			screenOptions={{
 				tabBarStyle: {
-					minHeight: 60 + insets.bottom,
+					minHeight: heightPercentage(60) + insets.bottom,
 					backgroundColor: colors.main,
 				},
 				tabBarItemStyle: {
-					paddingBottom: 10,
+					paddingBottom: heightPercentage(10),
 				},
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'SpoqaHanSansNeo-Bold',
-					fontSize: 20,
+					fontSize: fontPercentage(20),
 					fontWeight: '900',
 				},
 			}}>
@@ -79,19 +85,25 @@ function TabBar() {
 				component={Main}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', paddingLeft: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
-								style={{height: 36, aspectRatio: 2.054}}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
 					),
 					title: '홈',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
 					headerShown: false,
 					headerStyle: {backgroundColor: colors.main},
+					tabBarLabelPosition: 'below-icon',
 					tabBarActiveTintColor: colors.PointYellow,
-					tabBarIcon: ({color}) => <SvgAirplain color={color} />,
+					tabBarIcon: ({color}) => (
+						<SvgAirplain width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
+					),
 				}}
 			/>
 			<Tab.Screen
@@ -99,19 +111,25 @@ function TabBar() {
 				component={MyTravelList}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', marginLeft: 24}}>
+						<View style={{justifyContent: 'center', marginLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
-								style={{height: 36, aspectRatio: 2.054}}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
 					),
 					title: '내 여행',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
 					headerStyle: {backgroundColor: colors.main},
+					tabBarLabelPosition: 'below-icon',
 					headerShown: true,
 					tabBarActiveTintColor: colors.PointYellow,
-					tabBarIcon: ({color}) => <SvgCalendar color={color} />,
+					tabBarIcon: ({color}) => (
+						<SvgCalendar width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
+					),
 				}}
 			/>
 			<Tab.Screen
@@ -119,19 +137,25 @@ function TabBar() {
 				component={CommunityMainScreen}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', paddingLeft: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
-								style={{height: 36, aspectRatio: 2.054}}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
 					),
 					title: '커뮤니티',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
 					headerShown: true,
+					tabBarLabelPosition: 'below-icon',
 					headerStyle: {backgroundColor: colors.main},
 					tabBarActiveTintColor: colors.PointYellow,
-					tabBarIcon: ({color}) => <SvgCommunity color={color} />,
+					tabBarIcon: ({color}) => (
+						<SvgCommunity width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
+					),
 				}}
 			/>
 			<Tab.Screen
@@ -139,19 +163,25 @@ function TabBar() {
 				component={MoreInfo}
 				options={{
 					headerLeft: () => (
-						<View style={{justifyContent: 'center', paddingLeft: 24}}>
+						<View style={{justifyContent: 'center', paddingLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
 								source={require('../../public/images/danim_logo_row.png')}
-								style={{height: 36, aspectRatio: 2.054}}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
 					),
 					title: '내 정보',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
+					tabBarLabelPosition: 'below-icon',
 					headerStyle: {backgroundColor: colors.main},
 					headerShown: true,
 					tabBarActiveTintColor: colors.PointYellow,
-					tabBarIcon: ({color}) => <SvgProfile color={color} />,
+					tabBarIcon: ({color}) => (
+						<SvgProfile width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
+					),
 				}}
 			/>
 		</Tab.Navigator>

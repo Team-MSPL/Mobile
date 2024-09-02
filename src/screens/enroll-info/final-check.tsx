@@ -1,4 +1,4 @@
-import {Alert, BackHandler} from 'react-native';
+import {Alert, BackHandler, Modal, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
@@ -19,17 +19,21 @@ import {
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGFall, SVGFlag, SVGSpring, SVGSummer, SVGWinter} from '../../utill/svg/svg';
+import {SVGFall, SVGFlag, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
 import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer} from './select-multi';
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarginContainer} from '../timetable/preset-detail';
+import {logEvent} from '../../../firebaseAnalytice';
+import StepText from '../../utill/component/enroll-info/step-text';
+import TendencyButton from '../../utill/component/tendency-button';
+import {SelectButtonsContainer} from './region-recommend/select-who';
 export default function FinalCheck({navigation}: any) {
-	const {tendencyList} = useTendencyHandler();
+	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const {
 		day,
 		region,
@@ -58,46 +62,91 @@ export default function FinalCheck({navigation}: any) {
 	const goNewLogin = () => {
 		navigation.navigate('LoginScreen');
 	};
+	const [tendencyModify, setTendencyModify] = useState({status: false, index: 0});
+	const handleTendencyModify = (index: number) => {
+		setTendencyModify({status: true, index: index});
+	};
+	const handleClose = () => {
+		setTendencyModify({status: false, index: 0});
+	};
+	const [binaryModify, setBinaryModify] = useState({status: false, index: 0});
+	const handleBinaryModify = (index: number) => {
+		setBinaryModify({status: true, index: index});
+	};
+	const handleBinaryClose = () => {
+		setBinaryModify({status: false, index: 0});
+	};
+	const BinaryList = [
+		[
+			{
+				name: '자동차 렌트카',
+				function: () => dispatch(travelSliceActions.enrollTransit(0)),
+				image: (
+					<MoveImage resizeMode='contain' source={require('../../../public/images/test1.png')}></MoveImage>
+				),
+			},
+			{
+				name: '대중교통',
+				function: () => dispatch(travelSliceActions.enrollTransit(1)),
+				image: (
+					<MoveImage resizeMode='contain' source={require('../../../public/images/test2.png')}></MoveImage>
+				),
+			},
+		],
+		[
+			{
+				name: '알찬 일정',
+				function: () => dispatch(travelSliceActions.enrollBandwidth(false)),
+				photo: require('../../../public/tendency/busy.png'),
+			},
+			{
+				name: '여유있는 일정',
+				function: () => dispatch(travelSliceActions.enrollBandwidth(true)),
+				photo: require('../../../public/tendency/non-busy.png'),
+			},
+		],
+	];
 	const checkToken = () => {
-		if (freeTicket) {
-			goNext();
-		} else {
-			functionToken >= 1
-				? dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: `이용권이 하나가 사용돼요`,
-							modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
-							modalFunction: goNext,
-							modalLeft: true,
-							modalTopText: '사용하기',
-							modalBottomText: '취소',
-						}),
-				  )
-				: dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-							modalFunction: goPayment,
-							modalLeft: true,
-						}),
-				  );
-		}
+		goNext();
+		// if (freeTicket) {
+		// 	goNext();
+		// } else {
+		// 	functionToken >= 1
+		// 		? dispatch(
+		// 				modalSliceActions.setOpenModal({
+		// 					modalTitle: `이용권이 하나가 사용돼요`,
+		// 					modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
+		// 					modalFunction: goNext,
+		// 					modalLeft: true,
+		// 					modalTopText: '사용하기',
+		// 					modalBottomText: '취소',
+		// 				}),
+		// 		  )
+		// 		: dispatch(
+		// 				modalSliceActions.setOpenModal({
+		// 					modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+		// 					modalFunction: goPayment,
+		// 					modalLeft: true,
+		// 				}),
+		// 		  );
+		// }
 	};
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useFocusEffect(
-		useCallback(() => {
-			if (signUpReward) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-						modalFunction: checkSignUpReward,
-					}),
-				);
-			}
-		}, [signUpReward]),
-	);
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		if (signUpReward) {
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '회원가입 축하드립니다',
+	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+	// 					modalFunction: checkSignUpReward,
+	// 				}),
+	// 			);
+	// 		}
+	// 	}, [signUpReward]),
+	// );
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused() && loading) {
@@ -142,7 +191,6 @@ export default function FinalCheck({navigation}: any) {
 			}
 			let copy = [...tendency];
 			copy.push(season);
-			// console.log(a, accommodations, copy, essentialPlaces, timeLimitArray, transit, nDay, distance);
 			const result = await dispatch(
 				getTravelAi({
 					regionList: a,
@@ -168,7 +216,7 @@ export default function FinalCheck({navigation}: any) {
 						}),
 					);
 
-				!freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				// !freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -178,7 +226,6 @@ export default function FinalCheck({navigation}: any) {
 				);
 			}
 		} catch (error) {
-			console.log(error, 'qwe');
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '네트워크 연결이 불안정합니다',
@@ -218,25 +265,21 @@ export default function FinalCheck({navigation}: any) {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
-	const goReset = () => {
-		navigation.navigate('SelectCity');
-		dispatch(travelSliceActions.reset());
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step6', {});
 	};
-	const removeTendency = ({index, idx}: {index: number; idx: number}) => {
-		console.log(tendency[index][idx]);
-		let copy = [...tendency];
-		let seCopy = [...tendency[index]];
-		seCopy[idx] = 0;
-		copy[index] = seCopy;
-		dispatch(travelSliceActions.enrollTendency(copy));
-	};
-	const schedule = ['출발일', '종료일'];
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const seasonList = [
-		{title: '봄', svg: <SVGSpring />},
-		{title: '여름', svg: <SVGSummer />},
-		{title: '가을', svg: <SVGFall />},
-		{title: '겨울', svg: <SVGWinter />},
+		{title: '봄', svg: <SVGSpring width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '여름', svg: <SVGSummer width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '가을', svg: <SVGFall width={widthPercentage(24)} height={widthPercentage(27)} />},
+		{title: '겨울', svg: <SVGWinter width={widthPercentage(24)} height={widthPercentage(27)} />},
 	];
+	const handleSelect = (item: number) => {
+		handleButtonClick({index: tendencyModify.index, region: false, item: item});
+	};
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<>
@@ -255,36 +298,52 @@ export default function FinalCheck({navigation}: any) {
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
 									{cityViewList[cityIndex].title + region}
-									<SVGFlag style={{marginLeft: widthPercentage(8)}} color='#DDF2FE' />
+									<SVGFlag
+										width={widthPercentage(20)}
+										height={widthPercentage(20)}
+										style={{marginLeft: widthPercentage(8)}}
+										color='#DDF2FE'
+									/>
 								</PretendardSemiBoldText>
 							</HStack>
 						</VStack>
 						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
-							<TagContainer backgroundColor={colors.backgroundWhite}>
-								<TagShopText color={colors.Gray2} size={12}>
+							<TouchTagContainer
+								onPress={() => {
+									handleBinaryModify(0);
+								}}
+								backgroundColor={colors.backgroundWhite}>
+								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 									#
 								</TagShopText>
 								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
 									{!transit ? '자동차·렌트카' : '대중교통'}
 								</PretendardSemiBoldText>
-							</TagContainer>
-							<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-								<TagShopText color={colors.Gray2} size={12}>
+							</TouchTagContainer>
+							<TouchTagContainer
+								onPress={() => {
+									handleBinaryModify(1);
+								}}
+								backgroundColor={colors.backgroundWhite}>
+								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
 									#
 								</TagShopText>
 								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
 									{bandwidth ? '여유있는 일정' : '알찬 일정'}
 								</PretendardSemiBoldText>
-							</TagContainer>
+							</TouchTagContainer>
 						</VStack>
 					</HStack>
 					<Parent>
 						{tendency[0].find(item => item == 1) && (
-							<WhiteContainer
+							<TouchWhiteContainer
 								justifyContent='flex-start'
 								width={
 									tendency[1].find(item => item == 1) ? widthPercentage(182) : widthPercentage(327)
-								}>
+								}
+								onPress={() => {
+									handleTendencyModify(0);
+								}}>
 								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
 									이런 여행을 할래요
 								</PretendardVariableText>
@@ -307,13 +366,16 @@ export default function FinalCheck({navigation}: any) {
 										</PretendardSemiBoldText>
 									</HStack>
 								</WhoContainer>
-							</WhiteContainer>
+							</TouchWhiteContainer>
 						)}
 						{tendency[1].find(item => item == 1) && (
-							<WhiteContainer
+							<TouchWhiteContainer
 								width={
 									tendency[0].find(item => item == 1) ? widthPercentage(139) : widthPercentage(327)
-								}>
+								}
+								onPress={() => {
+									handleTendencyModify(1);
+								}}>
 								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
 									여행테마
 								</PretendardVariableText>
@@ -329,11 +391,15 @@ export default function FinalCheck({navigation}: any) {
 										) : null;
 									})}
 								</FlexWrap>
-							</WhiteContainer>
+							</TouchWhiteContainer>
 						)}
 					</Parent>
 					{tendency[2].find(item => item == 1) && (
-						<WhiteContainer width={widthPercentage(327)}>
+						<TouchWhiteContainer
+							width={widthPercentage(327)}
+							onPress={() => {
+								handleTendencyModify(2);
+							}}>
 							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
 								이런 걸 하고 싶어요
 							</PretendardVariableText>
@@ -355,10 +421,14 @@ export default function FinalCheck({navigation}: any) {
 									) : null;
 								})}
 							</FlexWrap>
-						</WhiteContainer>
+						</TouchWhiteContainer>
 					)}
 					{tendency[3].find(item => item == 1) && (
-						<WhiteContainer width={widthPercentage(327)}>
+						<TouchWhiteContainer
+							width={widthPercentage(327)}
+							onPress={() => {
+								handleTendencyModify(3);
+							}}>
 							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
 								이런 곳에 가고 싶어요
 							</PretendardVariableText>
@@ -377,7 +447,7 @@ export default function FinalCheck({navigation}: any) {
 									) : null;
 								})}
 							</FlexWrap>
-						</WhiteContainer>
+						</TouchWhiteContainer>
 					)}
 
 					{[...Array(nDay + 1)].map((item, idx) => {
@@ -492,9 +562,103 @@ export default function FinalCheck({navigation}: any) {
 			<ButtonContainer>
 				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
 			</ButtonContainer>
+			<Modal animationType='fade' visible={tendencyModify.status} transparent={true}>
+				<InModalContainer onPress={handleClose}>
+					<InModal>
+						<SvgCancel
+							style={{alignSelf: 'flex-end'}}
+							color={colors.Gray5}
+							width={widthPercentage(18)}
+							height={widthPercentage(18)}
+						/>
+						<StepText
+							mainText={tendencyList[tendencyModify.index].title}
+							subText={
+								tendencyList[tendencyModify.index].multi ? '* 중복 선택 가능' : '*단일선택'
+							}></StepText>
+						<ButtonsContainer>
+							{tendencyList[tendencyModify.index]?.list.map((item, idx) => (
+								<TendencyButton
+									marginBottom={0}
+									bgColor={tendency[tendencyModify.index][idx] == 1}
+									label={item}
+									key={idx}
+									divide={true}
+									imageUrl={tendencyList[tendencyModify.index]?.photo[idx]}
+									onPress={() => {
+										handleSelect(idx);
+									}}></TendencyButton>
+							))}
+						</ButtonsContainer>
+					</InModal>
+				</InModalContainer>
+			</Modal>
+			<Modal animationType='fade' visible={binaryModify.status} transparent={true}>
+				<InModalContainer onPress={handleBinaryClose}>
+					<InModal>
+						<SvgCancel
+							style={{alignSelf: 'flex-end'}}
+							color={colors.Gray5}
+							width={widthPercentage(18)}
+							height={widthPercentage(18)}
+						/>
+						<StepText
+							mainText={binaryModify.index ? '어떻게 이동하시나요?' : '어떤 여행을 원하시나요?'}
+							subText={'* 단일선택'}></StepText>
+						{binaryModify.index == 0 ? (
+							<SelectMoveContainer>
+								{BinaryList[binaryModify.index]?.map((item, idx) => (
+									<SelectButton
+										color={idx == transit ? 'rgba(195,245,80,0.3)' : colors.Gray1}
+										key={idx}
+										onPress={item.function}>
+										{item?.image}
+										<PretendardSemiBoldText size={15} lineHeight={18} color={colors.Gray4}>
+											{item.name}
+										</PretendardSemiBoldText>
+									</SelectButton>
+								))}
+							</SelectMoveContainer>
+						) : (
+							<SelectButtonsContainer>
+								{BinaryList[binaryModify.index].map((item, idx) => (
+									<TendencyButton
+										bgColor={bandwidth == Boolean(idx)}
+										label={item.name}
+										imageUrl={item?.photo}
+										key={idx}
+										onPress={item.function}></TendencyButton>
+								))}
+							</SelectButtonsContainer>
+						)}
+					</InModal>
+				</InModalContainer>
+			</Modal>
 		</>
 	);
 }
+const ButtonsContainer = styled.View`
+	flex: 1;
+	align-content: flex-end;
+	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: ${widthPercentage(10)}px;
+`;
+const InModal = styled.View`
+	width: 100%;
+	height: ${heightPercentage(607)}px;
+	background-color: ${colors.backgroundWhite};
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+	padding: ${heightPercentage(17)}px ${widthPercentage(24)}px;
+`;
+const InModalContainer = styled.Pressable`
+	flex: 1;
+	justify-content: flex-end;
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.6);
+`;
 export const RegionImage = styled.Image`
 	width: ${widthPercentage(50)}px;
 	height: ${heightPercentage(50)}px;
@@ -518,6 +682,7 @@ export const WhiteContainer = styled.View<{width?: number; justifyContent?: stri
 	gap: ${widthPercentage(3)}px;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
+const TouchWhiteContainer = styled(WhiteContainer).attrs({as: TouchableOpacity})``;
 const MultiAllContainer = styled.View`
 	width: ${widthPercentage(300)}px;
 	border-radius: 12px;
@@ -535,4 +700,26 @@ const WhoContainer = styled.View`
 	flex: 1;
 	align-items: center;
 	justify-content: center;
+`;
+const MoveImage = styled.Image`
+	width: ${widthPercentage(60)}px;
+	height: ${heightPercentage(110)}px;
+`;
+
+const TouchTagContainer = styled(TagContainer).attrs({as: TouchableOpacity})``;
+const SelectMoveContainer = styled.View`
+	flex: 1;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-around;
+`;
+const SelectButton = styled.TouchableOpacity<{color: string}>`
+	background-color: ${props => props.color};
+	border-radius: 16px;
+	width: ${widthPercentage(137)}px;
+	height: ${widthPercentage(137)}px;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: ${heightPercentage(5)}px;
+	gap: ${heightPercentage(10)}px;
 `;

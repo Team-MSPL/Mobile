@@ -150,7 +150,6 @@ export const useShopping = () => {
 			await getProducts({skus: itemSkus});
 			Platform.OS == 'android' ? await RNIap.requestPurchase({skus: [sku]}) : await RNIap.requestPurchase({sku});
 		} catch (error) {
-			console.log('request purchase error: ', error);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '취소',

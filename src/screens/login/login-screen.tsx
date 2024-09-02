@@ -5,8 +5,7 @@ import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-sign
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 
 import jwtDecode from 'jwt-decode';
-import {useEffect, useState} from 'react';
-import {Animated} from 'react-native';
+import {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import shortid from 'shortid';
 import styled from 'styled-components/native';
@@ -14,10 +13,10 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {colors} from '../../utill/colors';
-import {HStack, devicesHeight, devicesWidth} from '../../utill/layout/layout';
-import {SvgApple, SvgDanimText, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
-import {networkCheck} from '../../redux/network/networkSlice';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {HStack, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {SvgApple, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import Carousel from 'react-native-reanimated-carousel';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -34,12 +33,10 @@ interface tokenType {
 }
 
 export default function LoginScreen({navigation}: any) {
-	const {shareLoginFlag} = useAppSelector(state => state.travelSlice);
-	const {isLogin, socialloginProvider, fcmToken} = useAppSelector(state => state.userSlice);
+	const {isLogin, fcmToken} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		if (isLogin) {
 			navigation.reset({index: 0, routes: [{name: 'Tab'}]});
-			//navigation.replace('Tab');
 		}
 	}, [isLogin]);
 	// 랜덤으로 문자열 생성
@@ -77,7 +74,6 @@ export default function LoginScreen({navigation}: any) {
 				});
 			}
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 로그인에 실패했습니다.',
@@ -112,6 +108,7 @@ export default function LoginScreen({navigation}: any) {
 				});
 			}
 		} catch (error) {
+			console.log(error);
 			if (error === statusCodes.SIGN_IN_CANCELLED) {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -119,7 +116,6 @@ export default function LoginScreen({navigation}: any) {
 						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
-				console.log('구글 로그인 취소됨', error);
 				// user cancelled the login flow
 			} else if (error === statusCodes.IN_PROGRESS) {
 				dispatch(
@@ -128,7 +124,6 @@ export default function LoginScreen({navigation}: any) {
 						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
-				console.log('구글 로그인 이미 실행 중', error);
 				// operation (e.g. sign in) is in progress already
 			} else if (error === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
 				dispatch(
@@ -137,16 +132,14 @@ export default function LoginScreen({navigation}: any) {
 						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
-				console.log('구글 로그인 서비스 이용 불가 및 만료');
 				// play services not available or outdated
 			} else {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '네트워크 연결이 불안정합니다',
-						modalSubTitle: '확인후 다시 시도해주세요',
-					}),
-				);
-				console.log('구글 로그인 다른 에러 발생', error);
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '네트워크 연결이 불안정합니다ㅋ',
+				// 		modalSubTitle: '확인후 다시 시도해주세요',
+				// 	}),
+				// );
 				// some other error happened
 			}
 		}
@@ -155,10 +148,8 @@ export default function LoginScreen({navigation}: any) {
 	const appleLogin = async () => {
 		try {
 			if (appleAuth.isSupported) {
-				console.log('ios다!!');
 				const appleAuthRequestResponse = await appleAuth.performRequest({
 					requestedOperation: appleAuth.Operation.LOGIN,
-					//requestedScopes: [appleAuth.Scope.FULL_NAME],
 				});
 				// Ensure Apple returned a user identityToken
 				if (!appleAuthRequestResponse.identityToken) {
@@ -184,7 +175,6 @@ export default function LoginScreen({navigation}: any) {
 					});
 				}
 			} else {
-				console.log('안드로이드다!!');
 				// 보안을 위해 state, nonce 랜덤으로 생성
 				const rawNonce = getRandomString(20);
 				const state = getRandomString(20);
@@ -197,9 +187,7 @@ export default function LoginScreen({navigation}: any) {
 					state,
 				});
 				const response = await appleAuthAndroid.signIn();
-				console.log(response);
 				const decodeToken: tokenType = jwtDecode(response.id_token!);
-				console.log('같아라!', decodeToken.sub);
 				const data = {
 					userName: `나그네${shortid.generate()}`,
 					userProfileImage: 'https://danim.me/square_logo.png',
@@ -225,17 +213,60 @@ export default function LoginScreen({navigation}: any) {
 	};
 
 	const platforms = [
-		{title: 'Google', color: 'white', image: <SvgGoogle />, onPress: googleLogin},
-		{title: 'Kakao', color: colors.reviewBackground, image: <SvgKakao />, onPress: kakaoLogin},
-		{title: 'Apple', color: 'black', image: <SvgApple />, onPress: appleLogin},
+		{
+			title: 'Google',
+			color: 'white',
+			image: <SvgGoogle width={widthPercentage(24)} height={widthPercentage(24)} />,
+			onPress: googleLogin,
+		},
+		{
+			title: ' Kakao',
+			color: colors.reviewBackground,
+			image: <SvgKakao width={widthPercentage(18)} height={widthPercentage(18)} />,
+			onPress: kakaoLogin,
+		},
+		{
+			title: 'Apple',
+			color: 'black',
+			image: <SvgApple width={widthPercentage(24)} height={widthPercentage(24)} />,
+			onPress: appleLogin,
+		},
 	];
-
+	const textList = [
+		'당신만을 위한 여행 길잡이, 다님',
+		'1분 만에 여행 계획 완성, 다님',
+		'성향에 맞는 여행을 떠나고 싶다면, 다님',
+		'나만의 이색 여행지를 찾고 싶다면, 다님',
+	];
 	return (
 		<BackgroundImage source={require('../../../public/images/login-image.png')}>
 			<SafeAreaView>
 				<LoginSCreenContainer>
 					<SvgLoginLogo color='white' width={widthPercentage(151)} height={heightPercentage(44)} />
-					<LoginText>당신을 위한 여행 길잡이,다님</LoginText>
+					<Carousel
+						loop
+						style={{
+							borderRadius: 10,
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+						width={widthPercentage(375)}
+						height={30}
+						autoPlay={true}
+						data={[1, 2, 3, 4]}
+						scrollAnimationDuration={1000}
+						onSnapToItem={() => {}}
+						autoPlayInterval={4000}
+						renderItem={({index}) => (
+							<PretendardBoldText
+								style={{alignSelf: 'center'}}
+								size={12}
+								lineHeight={18}
+								color={colors.backgroundWhite}>
+								{textList[index]}
+							</PretendardBoldText>
+						)}
+					/>
 				</LoginSCreenContainer>
 				<CircleContainer>
 					{platforms.map((platform, index) => (
@@ -247,9 +278,12 @@ export default function LoginScreen({navigation}: any) {
 							}}>
 							<LogoHStack>
 								{platform.image}
-								<LogoText color={platform.title == 'Apple' ? 'white' : 'black'}>
+								<PretendardVariableText
+									size={14}
+									lineHeight={21.6}
+									color={platform.title == 'Apple' ? 'white' : 'black'}>
 									{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
-								</LogoText>
+								</PretendardVariableText>
 							</LogoHStack>
 						</LongCircleButton>
 					))}
@@ -269,13 +303,6 @@ const BackgroundImage = styled.ImageBackground`
 	width: 100%;
 	height: 100%;
 `;
-const LoginText = styled.Text`
-	font-size: ${fontPercentage(12)}px;
-	font-weight: 600;
-	color: ${colors.backgroundWhite};
-	line-height: ${heightPercentage(18)}px;
-`;
-
 const CircleContainer = styled.View`
 	width: ${widthPercentage(326)}px;
 	justify-content: center;
@@ -291,10 +318,6 @@ const LongCircleButton = styled.TouchableOpacity<{bgColor: string}>`
 	align-items: center;
 	border-radius: 12px;
 	justify-content: center;
-`;
-const LogoText = styled.Text<{color: string}>`
-	font-size: 15px;
-	color: ${props => props.color};
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

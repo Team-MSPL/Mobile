@@ -1,8 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axiosAuth from '../api/api';
-
-const name = 'user';
 
 const initialUserState: UserState = {
 	userId: '',
@@ -19,18 +16,17 @@ const initialUserState: UserState = {
 	fcmToken: '',
 	userIdToken: '',
 	reLogin: false,
+	analyticeFlag: false,
 };
 
 //회원탈퇴
 export const userWithdraw = createAsyncThunk(
 	'/user/withdraw',
-	async (data: {userId: string; signUpFirebase: boolean}, {rejectWithValue}) => {
+	async (data: {userId: string; signUpFirebase: boolean; withdrawReasonList: string[]}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.delete('/user/withdraw', {data});
-			console.log('잘왓다');
 			return response.data;
 		} catch (err: any) {
-			console.log('안왔다', err);
 			throw rejectWithValue(err.response.data);
 		}
 	},
@@ -180,18 +176,12 @@ const userSlice = createSlice({
 		setFcmToken(state, {payload}) {
 			state.fcmToken = payload.fcmToken;
 		},
+		setAnalyticeFlag(state, {payload}) {
+			state.analyticeFlag = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(userWithdraw.fulfilled, state => {
-			// /AsyncStorage.getAllKeys().then(removeList => AsyncStorage.multiRemove(removeList));
-			// console.log('왔는딩?');
-			// state.functionToken = 0;
-			// console.log('허허허?');
-			// state.isLogin = false;
-			// state.socialloginProvider = null;
-			// state.userId = '';
-			// state.userName = '';
-			//userSlice.actions.reset();
 			return {...initialUserState};
 		});
 		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {
@@ -221,6 +211,7 @@ export interface UserState {
 	fcmToken: string;
 	userIdToken: string;
 	reLogin: boolean;
+	analyticeFlag: boolean;
 }
 
 export interface TokenLogType {

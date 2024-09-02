@@ -7,24 +7,15 @@ import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {
-	BackgroundGray,
-	Center,
-	ClearTouchableOpacity,
-	HStack,
-	InputWrap,
-	PretendardSemiBoldText,
-} from '../../utill/layout/layout';
-import Icon from 'react-native-vector-icons/AntDesign';
+import {BackgroundGray, ClearTouchableOpacity, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGCamera, SvgCancel} from '../../utill/svg/svg';
 import {FilterList} from '../../utill/filter';
-import {getStorage, ref, getDownloadURL, uploadBytes} from 'firebase/storage';
-import {storage, firebase} from '../../../config';
+import {getStorage, ref, getDownloadURL} from 'firebase/storage';
+import {firebase} from '../../../config';
 import {useUriToBlob} from '../../utill/hooks/useUriToBlob';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from '../enroll-info/select-multi';
-// import firebase from '../../../';
 
 export default function ChangeProfile({navigation}: any) {
 	const {userName, userProfileImage, userId} = useAppSelector(state => state.userSlice);
@@ -34,7 +25,6 @@ export default function ChangeProfile({navigation}: any) {
 	const uploadImage = async (e: string) => {
 		const response = await useUriToBlob(e);
 		var ref = firebase.storage().ref('profile').child(`${userId}/profile.png`).put(response);
-		//var ref = firebase.storage().ref('test').child(`test/photo1.png`).delete();
 		try {
 			await ref;
 			let copy = await getImage();
@@ -65,12 +55,8 @@ export default function ChangeProfile({navigation}: any) {
 			cropping: true,
 			includeBase64: true,
 		}).then(response => {
-			//setPostImage(prevImages => [...prevImages, ...selectedImageUris]);
 			uploadImageRef.current = response.path;
 			setImage(`data:${response.mime};base64,${response?.data}`);
-
-			//setImage(response?.sourceURL);
-			//uploadImage(response.path);
 		});
 	};
 	const goChangeProfile = async () => {
@@ -126,7 +112,7 @@ export default function ChangeProfile({navigation}: any) {
 				<TouchableOpacity onPress={handleImagePickerLaunch}>
 					{image && <ImageElement source={{uri: image}} />}
 					<ImageBottom>
-						<SVGCamera color='white' />
+						<SVGCamera width={widthPercentage(18)} height={widthPercentage(18)} color='white' />
 					</ImageBottom>
 				</TouchableOpacity>
 			</ImageContainer>
@@ -148,7 +134,7 @@ export default function ChangeProfile({navigation}: any) {
 							onPress={() => {
 								changeNickname('');
 							}}>
-							<SvgCancel width='20' height='20' color='black' />
+							<SvgCancel width={widthPercentage(20)} height={widthPercentage(20)} color='black' />
 						</ClearTouchableOpacity>
 					)}
 				</InputAllContainter>

@@ -17,7 +17,6 @@ export default function UserManage() {
 		try {
 			const secret_key = CRYPTO_KEY;
 			if (!secret_key) {
-				console.log('No Secret Key.');
 				return null;
 			}
 			const encrypted = CryptoJS.AES.encrypt(userIdToken, secret_key).toString();
@@ -49,23 +48,14 @@ export default function UserManage() {
 						{cryptoItem}
 					</PretendardSemiBoldText>
 				</ClipBox>
-				<SVGCopy />
+				<SVGCopy width={widthPercentage(16)} height={widthPercentage(17)} />
 			</ClipCopy>
 		</HStack>
 	);
 }
 
-const ProviderText = styled.Text`
-	font-size: 20px;
-	font-weight: 400;
-	color: black;
-`;
 const ClipBox = styled.View`
 	width: 50%;
-`;
-export const ClipText = styled(ProviderText)`
-	width: 60%;
-	font-size: 18px;
 `;
 
 export const ClipCopy = styled.TouchableOpacity`

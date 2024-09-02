@@ -8,7 +8,6 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import PrimaryButton from '../../utill/component/primary-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {colors} from '../../utill/colors';
-import {Keyboard} from 'react-native';
 
 export default function Coupon({navigation}: any) {
 	const [text, setText] = useState('');
@@ -62,7 +61,7 @@ export default function Coupon({navigation}: any) {
 				<PrimaryButton
 					label='확인'
 					width={widthPercentage(45)}
-					height={heightPercentage(32)}
+					height={heightPercentage(40)}
 					onPress={checkCoupon}
 					backgroundColor={colors.Primary}
 					textColor={colors.Black}></PrimaryButton>

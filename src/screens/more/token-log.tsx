@@ -1,4 +1,4 @@
-import {useLayoutEffect, useRef, useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {TokenLogType, getTokenLog} from '../../redux/user/user.slice';
@@ -41,26 +41,7 @@ export default function TokenLog({navigation}: any) {
 	useLayoutEffect(() => {
 		getTokenList();
 	}, []);
-	const checkAfter = useRef('');
 	const renderItem = (item: any) => {
-		// if (checkAfter.current == '') {
-		// 	checkAfter.current = item.item.tokenLogDate;
-		// } else {
-		// 	if (moment(item.item.tokenLogDate).isSame(moment(checkAfter.current).format('YYYY-MM-DD'))) {
-		// 		return (
-		// 			<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
-		// 				{moment(item.item.tokenLogDate).format('YYYY년 M월 DD일 HH:mm')}
-		// 			</PretendardVariableText>
-		// 		);
-		// 	} else {
-		// 		return (
-		// 			<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
-		// 				{item.item.tokenLogDate}
-		// 				{/* {moment(item.item.tokenLogDate).from(moment(checkAfter.current).format('YYYY-MM-DD'))} */}
-		// 			</PretendardVariableText>
-		// 		);
-		// 	}
-		// }
 		return (
 			<>
 				<PretendardVariableText size={14} lineHeight={21} color={colors.Gray3}>
@@ -72,24 +53,24 @@ export default function TokenLog({navigation}: any) {
 							사용처 :
 						</PretendardVariableText>
 						<TagContainer backgroundColor={colors.backgroundGray}>
-							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.PointYellow}>
+							<PretendardSemiBoldText size={12} lineHeight={20} color={colors.PointYellow}>
 								{item.item.tokenLogContent}
 							</PretendardSemiBoldText>
 						</TagContainer>
 					</HStack>
-					<HStack>
+					{/* <HStack>
 						<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
 							{item.item.tokenLogNumber < 0 ? '소모 이용권' : '획득 이용권'}
 							{'   ' + Math.abs(item.item.tokenLogNumber)}개
 						</PretendardVariableText>
-					</HStack>
+					</HStack> */}
 				</WhiteContainer>
 			</>
 		);
 	};
 	return (
 		<BackgroundGray>
-			<WhiteContainer>
+			{/* <WhiteContainer>
 				<HStack justifyContent='space-between' width={widthPercentage(307)}>
 					<PretendardBoldText size={15} lineHeight={20} color={colors.Black}>
 						이용권 {functionToken}개
@@ -102,7 +83,7 @@ export default function TokenLog({navigation}: any) {
 						textColor={colors.Black}
 						onPress={goPayment}></PrimaryButton>
 				</HStack>
-			</WhiteContainer>
+			</WhiteContainer> */}
 			{logList.length == 0 ? (
 				<>
 					<PretendardVariableText size={16} lineHeight={24} color={colors.Black}>

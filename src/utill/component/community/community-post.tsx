@@ -35,7 +35,7 @@ export default function CommunityPost() {
 			<PretendardBoldText size={16} lineHeight={19} color={colors.Black}>
 				{postData.postTitle}
 			</PretendardBoldText>
-			<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+			<PretendardVariableText selectable={true} size={14} lineHeight={21} color={colors.Black}>
 				{postData.postContent}
 			</PretendardVariableText>
 			{postData.postImage.length === 0 ? (
@@ -55,7 +55,7 @@ export default function CommunityPost() {
 									onSelect(index);
 								}}
 								key={index}>
-								<PostImage source={{uri: uri}} />
+								<PostImage resizeMode='contain' source={{uri: uri}} />
 							</PostImageWrapper>
 						))}
 					</PostImageSwiper>
@@ -103,33 +103,31 @@ export const PostImageSwiper = styled(Swiper)<{height?: number}>`
 `;
 export const Dot = styled.View`
 	background-color: #b1b6cc80;
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
+	width: ${widthPercentage(8)}px;
+	height: ${widthPercentage(8)}px;
+	border-radius: 99px;
+	margin: ${widthPercentage(4)}px;
 `;
 export const ActiveDot = styled.View`
 	background-color: ${colors.backgroundWhite};
-	width: 8px;
-	height: 8px;
-	border-radius: 4px;
-	margin: 4px;
+	width: ${widthPercentage(8)}px;
+	height: ${widthPercentage(8)}px;
+	border-radius: 99px;
+	margin: ${widthPercentage(4)}px;
 `;
 // 사진을 누를 수 있게 하기 위한 componenet
 const PostImageWrapper = styled.Pressable`
 	width: 100%;
 	aspect-ratio: 1;
+	align-items: center;
 `;
 const PostImage = styled.Image`
 	width: 100%;
+	height: ${heightPercentage(300)}px;
 	aspect-ratio: 1;
 `;
 
 // 사진 눌렀을 때 사진 보이는 화면
 export const PostImageView = styled.SafeAreaView`
 	align-items: center;
-`;
-export const PostImageIndicatorText = styled.Text`
-	font-size: 16px;
-	color: white;
 `;

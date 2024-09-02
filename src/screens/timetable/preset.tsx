@@ -22,6 +22,7 @@ import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {deleteAI, saveAI} from '../../redux/travel-info/travel.slice';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -33,7 +34,6 @@ export default function Preset({navigation}: any) {
 		day,
 		transit,
 		travelName,
-		cityIndex,
 		region,
 		aiFlag,
 		aiID,
@@ -92,7 +92,7 @@ export default function Preset({navigation}: any) {
 					<Image
 						resizeMode='contain'
 						source={require('../../../public/images/danim_logo_row.png')}
-						style={{height: 30, aspectRatio: 2.054}}
+						style={{height: heightPercentage(36), aspectRatio: 2.054}}
 					/>
 				</TouchableOpacity>
 			),
@@ -136,6 +136,17 @@ export default function Preset({navigation}: any) {
 			console.log(err, '에러');
 		}
 	};
+	const handleGoogleAnalytics = async () => {
+		let copy = {};
+		presetDatas.map((item, idx) => {
+			const keyName = 'recommand_result' + (idx + 1);
+			copy[keyName] = item[0][0].name;
+		});
+		await logEvent('course_complete', copy);
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'presetViewPager'});
 	useEffect(() => {
 		getMainViewPager();
@@ -163,7 +174,7 @@ export default function Preset({navigation}: any) {
 				</SvgContainer>
 				<WhiteContainer>
 					<RegionTextContainer gap={widthPercentage(4)}>
-						<SVGFlag color='#DDF2FE' />
+						<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color='#DDF2FE' />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
 							{region[0]}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
@@ -245,7 +256,12 @@ export default function Preset({navigation}: any) {
 												copy[idx] = !copy[idx];
 												setTendencyViewIndex(copy);
 											}}>
-											<SVGRightAdd color='black' rotation={tendencyViewIndex[idx] ? 90 : 270} />
+											<SVGRightAdd
+												width={widthPercentage(20)}
+												height={widthPercentage(20)}
+												color='black'
+												transform={tendencyViewIndex[idx] ? 90 : 270}
+											/>
 										</TouchableOpacity>
 									)}
 								</HStack>
@@ -306,12 +322,17 @@ export default function Preset({navigation}: any) {
 									alignSelf='center'
 									marginBottom={heightPercentage(10)}
 									marginTop={heightPercentage(10)}
-									width={290}
-									height={50}
+									width={widthPercentage(290)}
+									height={heightPercentage(50)}
 									label='일정 자세히 보기'
 									backgroundColor={colors.backgroundGray}
 									textColor={colors.PointYellow}
-									onPress={() => goDetail(idx)}></PrimaryButton>
+									onPress={async () => {
+										goDetail(idx);
+										await logEvent('view_course_result_detail', {
+											place: item[0][0].name,
+										});
+									}}></PrimaryButton>
 							</WhiteContainer>
 						),
 				)}
@@ -380,10 +401,4 @@ const SvgContainer = styled.View`
 	justify-content: center;
 	left: ${widthPercentage(122)}px;
 	top: ${heightPercentage(51)}px;
-`;
-export const PresetButton = styled.TouchableOpacity<{select: boolean}>`
-	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
-	border-radius: 20px;
-	padding: 10px;
-	margin: 10px 5px 0px 5px;
 `;

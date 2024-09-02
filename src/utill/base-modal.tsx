@@ -5,11 +5,12 @@ import {colors} from './colors';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
 import PrimaryButton from './component/primary-button';
 import {PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
+import {useEffect, useRef} from 'react';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 export default function BaseModal() {
 	const {
 		modalOpen,
-		modalBottom,
 		modalTitle,
 		modalSubTitle,
 		modalFunction,
@@ -17,6 +18,8 @@ export default function BaseModal() {
 		modalBottomText,
 		modalBottomFunctionUse,
 		modalSingleUse,
+		modalConfetti,
+		modalConfettiFlag,
 		modalBottomFunction,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
@@ -31,10 +34,23 @@ export default function BaseModal() {
 		close();
 		modalBottomFunction();
 	};
+	const confettiRef = useRef();
+	useEffect(() => {
+		if (modalConfetti && !modalConfettiFlag) {
+			confettiRef.current.start();
+			dispatch(modalSliceActions.setConfettiFlag());
+		}
+		// ref={confettiRef} confettiCount={50} timeout={0.1} duration={1300}
+	}, [modalConfetti, modalConfettiFlag]);
 	return (
 		<>
 			{modalOpen && (
 				<Container>
+					<ConfettiCannon
+						ref={confettiRef}
+						autoStart={false}
+						count={200}
+						origin={{x: -10, y: 0}}></ConfettiCannon>
 					<ModalContainer onPress={close}>
 						<ViewContaniner modalSingleUse={modalSingleUse}>
 							<PretendardSemiBoldText textAlign='center' size={20} lineHeight={27} color={colors.Gray5}>
@@ -95,15 +111,14 @@ const ModalContainer = styled.Pressable`
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.3);
 `;
-
+//height: ${props => (props.modalSingleUse ? heightPercentage(219) : heightPercentage(269))}px;
 const ViewContaniner = styled.Pressable<{modalSingleUse: boolean}>`
 	background-color: white;
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.modalSingleUse ? heightPercentage(219) : heightPercentage(269))}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	align-items: center;
 	justify-content: center;
 	padding: ${widthPercentage(24)}px;
-	border-color: ${colors.selectButton};
+	border-color: ${colors.Primary};
 `;

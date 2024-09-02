@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useLayoutEffect} from 'react';
-import {Alert, BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
+import {BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
 
 import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,21 +29,17 @@ import StackNavigator from './src/stacks';
 import BaseModal from './src/utill/base-modal';
 import usePermission from './src/utill/hooks/usePermisson';
 import Loading from './src/utill/loading';
-import NeedPermissions from './src/utill/need-permissions';
-import ViewPager from './src/utill/view-pager';
 import useVersion from './src/utill/hooks/useVersion';
 import Toast from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
 import Event from './src/utill/component/event/event';
-import moment from 'moment';
-import {eventSliceActions, getEventList} from './src/redux/event/event.slice';
 import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
-	const {isFirstLaunch} = useAppSelector((state: RootState) => state.userSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
 	const {eventState} = useAppSelector(state => state.eventSlice);
 	const {needVersionUpdate} = useAppSelector(state => state.settingSlice);
@@ -63,8 +59,13 @@ function App(): JSX.Element {
 				'loginProvider',
 			]);
 			const fcmToken = await getFcmToken();
-			if (userToken && userName && loginProvider) {
-				dispatch(
+			if (
+				userToken[1] != null &&
+				userName[1] != null &&
+				loginProvider[1] != null &&
+				userProfileImage[1] != null
+			) {
+				const data = await dispatch(
 					socialConnect({
 						userName: userName[1],
 						userProfileImage: userProfileImage[1],
@@ -74,15 +75,17 @@ function App(): JSX.Element {
 						signUpFlag: false,
 						version: 2,
 					}),
-				);
+				).unwrap();
 			}
 		} catch (err) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '네트워크 연결이 불안정합니다',
-					modalSubTitle: '확인후 다시 시도해주세요',
-				}),
-			);
+			console.log(err);
+			// dispatch(
+			// 	modalSliceActions.setOpenModal({
+			// 		modalTitle: '로그인에 실패하였습니다',
+			// 		modalSubTitle: '확인후 다시 시도해주세요',
+			// 		modalSingleUse: true,
+			// 	}),
+			// );
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -193,10 +196,8 @@ function App(): JSX.Element {
 
 	const getFcmToken = async () => {
 		const fcmToken = await messaging().getToken();
-		console.log(fcmToken);
 		dispatch(userSliceActions.setFcmToken({fcmToken: fcmToken}));
 		return fcmToken;
-		//console.log('[FCM Token] ', fcmToken);
 	};
 	useEffect(() => {
 		checkInitialPermission();
@@ -231,10 +232,6 @@ function App(): JSX.Element {
 			},
 		},
 	};
-	const handleFirstLaunch = async () => {
-		dispatch(userSliceActions.setIsFirstLaunch('false'));
-		await AsyncStorage.setItem('isFirstLaunch', 'true');
-	};
 
 	return (
 		<GestureHandlerRootView style={{flex: 1}}>
@@ -245,18 +242,7 @@ function App(): JSX.Element {
 					backgroundColor={backgroundStyle.backgroundColor}
 				/>
 				<NavigationContainer linking={linking}>
-					{
-						// isFirstLaunch == 'true' ? (
-						// 	<ViewPager handleFunction={handleFirstLaunch} />
-						//
-						<StackNavigator />
-						// isFirstLaunch == 'true' ? <ViewPager handleFunction={handleFirstLaunch} /> : <StackNavigator />
-						// hasPermission || noPermission ? (
-
-						// ) : (
-						// 	<NeedPermissions />
-						// )
-					}
+					{<StackNavigator />}
 					{needVersionUpdate && <NeedVersionUpdate />}
 					{eventState && <Event />}
 					{!(networkConn && serverConn) && <Connection />}

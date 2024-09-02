@@ -6,7 +6,7 @@ import Policy2 from '../../utill/component/policy/policy2';
 import Policy3 from '../../utill/component/policy/policy3';
 import Policy4 from '../../utill/component/policy/policy4';
 import Policy5 from '../../utill/component/policy/policy5';
-import {BackgroundGray, BackgroundGrayScrollView, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {BackgroundGrayScrollView, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGRightAdd} from '../../utill/svg/svg';
 export default function PolicyMain() {
@@ -31,7 +31,12 @@ export default function PolicyMain() {
 							width={widthPercentage(300)}>
 							{item.title}
 						</PretendardSemiBoldText>
-						<SVGRightAdd transform={value == view ? 270 : 90} color='black' />
+						<SVGRightAdd
+							width={widthPercentage(20)}
+							height={widthPercentage(20)}
+							transform={value == view ? 270 : 90}
+							color='black'
+						/>
 					</PolicyTouchableOpacity>
 					{value == view && <PolicyComponent />}
 				</Fragment>
@@ -50,11 +55,6 @@ const policyList = [
 export const MainViewContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding: 2px;
-`;
-export const TitleText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: black;
 `;
 
 const PolicyTouchableOpacity = styled.TouchableOpacity`

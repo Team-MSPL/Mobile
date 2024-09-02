@@ -47,7 +47,7 @@ export default function NoteList({navigation}: any) {
 					{noteList.map((item, idx) => (
 						<ElementContainer key={idx}>
 							<HStack marginHorizon={-widthPercentage(30)} gap={widthPercentage(10)}>
-								<SVGDanimLogo />
+								<SVGDanimLogo width={widthPercentage(24)} height={widthPercentage(24)} />
 								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 									다님
 								</PretendardSemiBoldText>

@@ -1,4 +1,4 @@
-import {useRef, useState, useLayoutEffect, Fragment} from 'react';
+import {useRef, useState, useLayoutEffect, Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {PlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -8,13 +8,14 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Platform, Pressable} from 'react-native';
+import {Platform, Pressable, ScrollView} from 'react-native';
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from './select-multi';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -106,7 +107,6 @@ export default function SelectDay({navigation}: any) {
 			minuteCopy[dateFlag.current] = parseInt(timeData.minute);
 			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
 			return true;
-			// setVisible(false);
 		}
 	};
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
@@ -122,7 +122,6 @@ export default function SelectDay({navigation}: any) {
 
 	const calculateDateDifference = () => {
 		if (selectStartDate && selectEndDate) {
-			console.log(selectEndDate.diff(selectStartDate));
 			const diffInMilliseconds = selectEndDate.diff(selectStartDate);
 			const duration = moment.duration(diffInMilliseconds);
 			const days = duration.asDays();
@@ -134,7 +133,12 @@ export default function SelectDay({navigation}: any) {
 		{step: '출발', title: '여행 시작', day: selectStartDate},
 		{step: '도착', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step3', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<DayBackground
 			onPress={() => {
@@ -194,31 +198,39 @@ export default function SelectDay({navigation}: any) {
 					</TimeItemContainer>
 				))}
 			</TimeContainer>
-			<CalendarContainer>
-				<CalendarPicker
-					weekdays={weekdays}
-					months={months}
-					minDate={new Date()}
-					startFromMonday={false}
-					onDateChange={onDateChange}
-					showDayStragglers={false}
-					allowRangeSelection={true}
-					selectedRangeStartStyle={{backgroundColor: colors.Primary}}
-					selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
-					selectedRangeEndStyle={{backgroundColor: colors.Primary}}
-					selectedDayColor={colors.Primary}
-					selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
-					selectedEndDate={
-						(selectedDateFlag || freeTicket) && selectEndDate != null ? selectEndDate.toDate() : undefined
-					}
-					previousTitle='이전'
-					nextTitle='다음'
-					previousTitleStyle={{color: 'black'}}
-					nextTitleStyle={{color: 'black'}}
-					allowBackwardRangeSelect={true}
-					selectYearTitle='년도 선택'
-				/>
-			</CalendarContainer>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				style={{marginLeft: -widthPercentage(24), width: widthPercentage(375)}}>
+				<CalendarContainer>
+					<CalendarPicker
+						width={widthPercentage(Platform.isPad ? 300 : 375)}
+						weekdays={weekdays}
+						months={months}
+						minDate={new Date()}
+						startFromMonday={false}
+						onDateChange={onDateChange}
+						showDayStragglers={false}
+						allowRangeSelection={true}
+						selectedRangeStartStyle={{backgroundColor: colors.Primary}}
+						selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
+						selectedRangeEndStyle={{backgroundColor: colors.Primary}}
+						selectedDayColor={colors.Primary}
+						selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
+						selectedEndDate={
+							(selectedDateFlag || freeTicket) && selectEndDate != null
+								? selectEndDate.toDate()
+								: undefined
+						}
+						previousTitle='이전'
+						nextTitle='다음'
+						previousTitleStyle={{color: 'black'}}
+						nextTitleStyle={{color: 'black'}}
+						allowBackwardRangeSelect={true}
+						selectYearTitle='년도 선택'
+					/>
+				</CalendarContainer>
+				<MarginBottom></MarginBottom>
+			</ScrollView>
 			<ButtonContainer>
 				<CustomButton
 					label={`다음`}
@@ -257,12 +269,6 @@ export const TimeItemContainer = styled.View<{zIndexs?: boolean}>`
 	gap: ${heightPercentage(5)}px;
 	${props => props.zIndexs && 'z-index:4'};
 `;
-export const TimeItemText = styled.Text`
-	font-size: 15px;
-	color: black;
-	font-weight: bold;
-	margin: 0px 12px 0px 0px;
-`;
 export const DayPressable = styled.Pressable`
 	align-items: center;
 	justify-content: center;
@@ -276,4 +282,9 @@ export const TimeStepText = styled(PretendardVariable)`
 	color: ${colors.PointYellow};
 	font-size: ${fontPercentage(12)}px;
 	margin-left: ${widthPercentage(10)}px;
+`;
+
+const MarginBottom = styled.View`
+	width: ${widthPercentage(375)}px;
+	height: ${heightPercentage(60)}px;
 `;

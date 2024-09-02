@@ -12,22 +12,20 @@ import {
 	MainContainer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
-	TagContainer,
 	VStack,
 } from '../../utill/layout/layout';
-import {Circle, DashLine, DashLineContainer, PresetButton} from './preset';
+import {Circle, DashLine, DashLineContainer} from './preset';
 import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
-import {RegionImage, WhiteContainer} from '../enroll-info/final-check';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {WhiteContainer} from '../enroll-info/final-check';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import InfoView from '../../utill/component/timetable/info-view';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
-import {TagShopText} from '../home/main';
 import {SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {
@@ -36,10 +34,10 @@ import {
 	ScaleDecorator,
 	RenderItemParams,
 } from 'react-native-draggable-flatlist';
+import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-top-bar-component';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, bandwidth, nDay, region, travelName, regionInfo, shareViewWithStartFlag} =
-		useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit, shareViewWithStartFlag} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -57,7 +55,14 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		for (let i = 0; i < idx; i++) {
 			totalScroll += timetable[i].length;
 		}
-		scrollRef.current.scrollTo({y: totalScroll * 76 + idx * 16.71 + idx * 6, animate: true});
+		scrollRef.current.scrollTo({
+			y:
+				totalScroll * heightPercentage(76) +
+				totalScroll * widthPercentage(3) +
+				idx * fontPercentage(16.71) +
+				idx * heightPercentage(36),
+			animate: true,
+		});
 	};
 	const change = (idx: number) => {
 		setSelect(idx);
@@ -65,16 +70,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number) => {
 		navigation.navigate('CourseDetail', {value: timetable[select][e]});
-		// setSecletPinIndex(e);
-		// mapRef.current?.animateCamera(
-		// 	{
-		// 		center: {
-		// 			latitude: timetable[select][e].lat,
-		// 			longitude: timetable[select][e].lng,
-		// 		},
-		// 	},
-		// 	{duration: 1000},
-		// );
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
@@ -141,7 +136,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							key={`marker_${idx}`}
 							coordinate={{latitude: item.lat, longitude: item.lng}}
 							title={item.name}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == select ? (
@@ -165,7 +160,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				key={`polyline_${index}`}
 				coordinates={polylineCoordinates}
 				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
-				strokeWidth={2} // You can change the width of the line here
+				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 			/>,
 		);
 	});
@@ -189,10 +184,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
-		// if (route.params.mapIndex != -1 && timetable[route.params.mapIndex].length != 0) {
-		// 	setSelect(route.params.mapIndex);
-		// 	setVisible(false);
-		// } else {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
@@ -201,22 +192,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				break;
 			}
 		}
-		//}
-		// if (polylineCoordinates.length == 0) {
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '보여질 정보가 없습니다.',
-		// 			modalFunction: goBack,
-		// 		}),
-		// 	);
-		// }
 	}, []);
 	const goRemove = () => {
 		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
 		dispatch(travelSliceActions.changeTimetable(a));
-	};
-	const goBack = () => {
-		navigation.goBack();
 	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
@@ -297,54 +276,14 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				dispatch(travelSliceActions.changeTimetable(changeCopy));
 			}
 		}
-		// setVisible(false);
-		// const newY = viewRef.current.y;
-		// const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
-		// if (newEnd >= 49) {
-		// 	dispatch(modalSliceActions.setOpenModal({modalTitle: '시간을 다시 설정해주세요.'}));
-		// } else {
-		// 	let copy = [...timetable[viewRef.current.index]];
-		// 	let changeCopy = [...timetable];
-		// 	let changeFlag = null;
-		// 	for (let i = 0; i < copy.length; i++) {
-		// 		if (
-		// 			((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
-		// 				(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
-		// 					newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
-		// 			copy[i].id != viewRef.current.id
-		// 		) {
-		// 			changeFlag = copy[i];
-		// 			break;
-		// 		}
-		// 	}
-		// 	let changeInputIndex = copy.findIndex(item => item.y >= newY);
-		// 	changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
-		// 	if (changeFlag) {
-		// 		dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`,
-		// 			}),
-		// 		);
-		// 	} else {
-		// 		let copyValue = {
-		// 			...changeCopy[viewRef.current.index][viewRef.current.idx],
-		// 			y: newY,
-		// 			x: viewRef.current.index,
-		// 			takenTime: (newEnd - newY) * 30,
-		// 		};
-		// 		let deleteCopy = [...timetable[viewRef.current.index]];
-		// 		deleteCopy.splice(viewRef.current.idx, 1);
-		// 		changeCopy[viewRef.current.index] = deleteCopy;
-		// 		let addCopy = [...changeCopy[viewRef.current.index]];
-		// 		addCopy.splice(changeInputIndex, 0, copyValue);
-		// 		changeCopy[viewRef.current.index] = addCopy;
-		// 		dispatch(travelSliceActions.changeTimetable(changeCopy));
-		// 	}
-		// }
 	};
 	let totalHeight = 0;
 	const presetScrollHeight = timetable.map((item, idx) => {
-		totalHeight += item.length * 76 + idx * 17 + idx * widthPercentage(10);
+		totalHeight +=
+			item.length * heightPercentage(76) +
+			item.length * widthPercentage(3) +
+			idx * fontPercentage(16.71) +
+			idx * heightPercentage(36);
 		return totalHeight;
 	});
 	const scrollhandle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -444,7 +383,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							idx={item.x}
 							modify={false}
 							CancelModify={CancelModify}
-							drag={drag}
 						/>
 					</HStack>
 				)}
@@ -462,68 +400,34 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const [changeDay, setChangeDay] = useState(0);
 	const changeLocationRef = useRef({before: 0, after: 1});
 	useEffect(() => {
-		console.log('옴', shareViewWithStartFlag);
 		shareViewWithStartFlag && getMainViewPager();
 	}, [shareViewWithStartFlag, modify]);
 	if (positions.length == 0) {
 		return <MainAllContainer></MainAllContainer>;
 	}
+	const [viewMap, setViewMap] = useState(true);
+	const [topbar, setTopBar] = useState(true);
 	return (
 		<MainAllContainer>
-			<AbsoluteTopBar opacityState={modify}>
-				<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
-					<RegionImage
-						source={{
-							uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
-						}}
-					/>
-					<VStack>
-						<HStack>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-								{region[0]}
-								{region.length >= 2 ? ` +${region.length - 1}` : ''}
-							</PretendardVariableText>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-								{' '}
-								| {moment(day[0]).format('YY.MM.DD') + ' - ' + moment(day[nDay]).format('YY.MM.DD')}
-							</PretendardVariableText>
-						</HStack>
-						<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
-							{travelName}
-						</PretendardSemiBoldText>
-					</VStack>
-					<VStack gap={heightPercentage(3)} alignItems='flex-end'>
-						<TagContainer backgroundColor={colors.backgroundWhite}>
-							<TagShopText color={colors.Gray2} size={12}>
-								#
-							</TagShopText>
-							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-								{!transit ? '자동차·렌트카' : '대중교통'}
-							</PretendardSemiBoldText>
-						</TagContainer>
-						<TagContainer backgroundColor={colors.backgroundWhite} width={widthPercentage(64)}>
-							<TagShopText color={colors.Gray2} size={12}>
-								#
-							</TagShopText>
-							<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-								{bandwidth ? '여유있는 일정' : '알찬 일정'}
-							</PretendardSemiBoldText>
-						</TagContainer>
-					</VStack>
-				</HStack>
-			</AbsoluteTopBar>
+			{topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>}
 			<VStack flex={1}>
 				{!modify &&
+					viewMap &&
 					timetable.map(
 						(item, idx) =>
 							select == idx && (
 								<MapView
 									key={idx}
 									ref={mapRef}
-									//provider={PROVIDER_GOOGLE}
 									showsMyLocationButton={true}
-									style={{width: '100%', flex: 0.45}}
+									style={{width: '100%', flex: 0.42}}
 									showsUserLocation={true}
+									onTouchStart={() => {
+										setTopBar(false);
+									}}
+									onTouchEnd={() => {
+										setTopBar(true);
+									}}
 									region={{
 										latitude: centerLatitude,
 										longitude: centerLongitude,
@@ -535,9 +439,22 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</MapView>
 							),
 					)}
-				<BackgroundGray modify={modify}>
+				{!modify && (
+					<ViewMapTouchable
+						onPress={() => {
+							setViewMap(!viewMap);
+						}}>
+						<SVGRightAdd
+							width={widthPercentage(20)}
+							height={widthPercentage(20)}
+							color='black'
+							transform={!viewMap ? 90 : 270}
+						/>
+					</ViewMapTouchable>
+				)}
+				<BackgroundGray modify={modify} viewMap={viewMap}>
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap gap={10} marginBottom={modify ? 15 : 0}>
+						<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
 							{timetable.map(
 								(item, idx) =>
 									item.length != 0 && (
@@ -553,10 +470,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												color={select == idx ? colors.Gray5 : colors.Gray3}>
 												{'DAY' + (idx + 1)}
 											</PretendardSemiBoldText>
-											{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-										<DaySubTitle select={idx === select}>
-											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-										</DaySubTitle> */}
 										</DayTouchablOpacity>
 									),
 							)}
@@ -573,7 +486,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									onPress={() => {
 										navigation.navigate('TimetableAddPlace', {x: select, y: [], status: 'travle'});
 									}}>
-									<SVGPlus color={colors.Primary} />
+									<SVGPlus
+										width={widthPercentage(16)}
+										height={widthPercentage(16)}
+										color={colors.Primary}
+									/>
 								</SVGContainer>
 							</HStack>
 						</WhiteContainer>
@@ -583,7 +500,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									숙소
 								</PretendardSemiBoldText>
 								<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
-									<SVGPlus color={colors.Primary} />
+									<SVGPlus
+										width={widthPercentage(16)}
+										height={widthPercentage(16)}
+										color={colors.Primary}
+									/>
 								</SVGContainer>
 							</HStack>
 						</WhiteContainer>
@@ -591,10 +512,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					{modify ? (
 						<DayScrollView
 							ref={scrollRef}
-							// onScroll={e => {
-							// 	console.log('a');
-							// 	scrollhandle(e);
-							// }}    TODO온스크롤이 안먹히기때문에 스크롤이 끝났을때 해야함.
 							onMomentumScrollEnd={e => {
 								changeViewState(e), scrollhandle(e);
 							}}>
@@ -616,7 +533,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												onPlaceholderIndexChange={qwe =>
 													(changeLocationRef.current.after = qwe)
 												}
-												containerStyle={{height: heightPercentage(76) * value.length}}
+												containerStyle={{
+													height:
+														heightPercentage(76) * value.length +
+														widthPercentage(3) * value.length,
+												}}
 												data={value}
 												onDragEnd={({data}) => changeLocation(data)}
 												keyExtractor={item => item.id}
@@ -634,7 +555,8 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							}}
 							onMomentumScrollEnd={e => {
 								changeViewState(e);
-							}}>
+							}}
+							viewMap={viewMap}>
 							{timetable.map(
 								(value, index) =>
 									value.length != 0 && (
@@ -802,10 +724,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
 													{moment(day[idx]).format('MM월DD일')}
 												</PretendardSemiBoldText>
-												{/* <DayTitle select={idx === select}>{idx + 1 + '일차'}</DayTitle>
-										<DaySubTitle select={idx === select}>
-											{moment(day[idx]).format('M월 D일')}({weekdays[moment(day[idx]).day()]})
-										</DaySubTitle> */}
 											</ChangeDayContainer>
 										),
 								)}
@@ -843,9 +761,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											{viewRef.current.endHours}
-											{/* {viewRef.current.endHours < 12
-												? viewRef.current.endHours
-												: viewRef.current.endHours - 12} */}
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 											:
@@ -923,7 +838,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={modify ? 4 : 3} handleFunction={deleteMainViewPager} />
+				<ViewPager sliceNumber={modify ? 5 : 3} handleFunction={deleteMainViewPager} />
 			</Modal>
 		</MainAllContainer>
 	);
@@ -976,60 +891,25 @@ const ModalContainer = styled.Pressable`
 	background-color: rgba(0, 0, 0, 0.4);
 `;
 export const DayContainer = styled.ScrollView``;
-const PlaceText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	color: black;
-`;
-export const DayButton = styled(PresetButton)`
-	width: 130px;
-	height: 60px;
-	border-radius: 15px;
-	padding: 10px;
-	background-color: ${props => (props.select ? colors.selectButton : colors.normalButton)};
-	align-items: center;
-	justify-content: center;
-`;
-
-export const DayTitle = styled(PlaceText)<{select: boolean}>`
-	color: ${props => (props.select ? 'white' : colors.selectButton)};
-`;
-export const DaySubTitle = styled(DayTitle)`
-	font-weight: 500;
-	font-size: 12px;
-`;
-export const DayElementContainer = styled.View`
-	border-bottom-width: 1px;
-	border-bottom-color: ${colors.regionNormal};
-`;
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
 `;
-const DayScrollViews = styled.ScrollView`
+const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(230)}px;
+	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
 `;
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(500)}px;
 `;
-export const MarkerText = styled.Text`
-	position: absolute;
-	font-size: 15px;
-	font-weight: bold;
-	color: black;
-	z-index: 1;
-	left: 20px;
-	bottom: 10px;
-`;
 
-const BackgroundGray = styled.View<{modify: boolean}>`
+const BackgroundGray = styled.View<{modify: boolean; viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
 	border-top-right-radius: 10px;
 	border-top-left-radius: 10px;
 	background-color: ${colors.backgroundGray};
 	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
-	flex: ${props => (props.modify ? 1 : 0.55)};
+	flex: ${props => (props.modify || !props.viewMap ? 1 : 0.55)};
 `;
 const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	width: ${widthPercentage(282)}px;
@@ -1040,13 +920,9 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	padding-horizontal: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
-
-export const AbsoluteTopBar = styled.View<{opacityState: boolean}>`
-	width: 100%;
-	height: ${heightPercentage(71)}px;
-	position: ${props => (props.opacityState ? 'relative' : 'absolute')};
-	top: 0;
-	z-index: 100;
-	background-color: rgba(255, 255, 255, 0.9);
-	padding: 0px ${widthPercentage(12)}px;
+const ViewMapTouchable = styled.TouchableOpacity`
+	flex: 0.03;
+	justify-content: center;
+	align-items: center;
+	padding: ${widthPercentage(3)}px;
 `;

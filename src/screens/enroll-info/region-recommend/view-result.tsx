@@ -1,6 +1,6 @@
 import {Fragment, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity, Dimensions, View} from 'react-native';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {
 	BackgroundGray,
@@ -19,12 +19,25 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/
 import {TagElement} from '../../home/main';
 import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 import {GraientBackground} from '../hiking-recommend/view-result';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
-
+	const windowWidth = Dimensions.get('window').width;
+	const handleGoogleAnalytics = async () => {
+		await logEvent('place_complete', {
+			recommand_result1: recommendList[0].name,
+			recommand_result2: recommendList[1].name,
+			recommand_result3: recommendList[2].name,
+			recommand_result4: recommendList[3].name,
+			recommand_result5: recommendList[4].name,
+		});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
 		navigation.setOptions({
@@ -46,7 +59,7 @@ export default function ViewResult({navigation}: any) {
 					<Image
 						resizeMode='contain'
 						source={require('../../../../public/images/danim_logo_row.png')}
-						style={{height: 30, aspectRatio: 2.054}}
+						style={{height: heightPercentage(36), aspectRatio: 2.054}}
 					/>
 				</TouchableOpacity>
 			),
@@ -88,22 +101,29 @@ export default function ViewResult({navigation}: any) {
 								</DayRecommendContainer>
 							)}
 							<RecommendContainer
-								onPress={() => {
+								onPress={async () => {
 									navigation.navigate('DetailResult', {item: item});
+									await logEvent('view_place_result', {location: item.name});
 								}}>
 								<ImageContainer>
 									{item.photo != '' ? (
 										<RecommendImage source={{uri: item.photo}}></RecommendImage>
 									) : (
 										<LogoCOntainer>
-											<SvgLoginLogo color={'white'} width={40} />
+											<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
 										</LogoCOntainer>
 									)}
 									<GraientBackground>
 										<RegionText>{item.name}</RegionText>
 										<TagContainer>
 											{item.tendency.slice(0, 5).map((value, index) => (
-												<Fragment key={index}>
+												<View
+													key={index}
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														justifyContent: 'center',
+													}}>
 													<TagElement opacityStatus={true}>
 														<HStack>
 															<PretendardVariableText
@@ -113,22 +133,23 @@ export default function ViewResult({navigation}: any) {
 																{'# '}
 															</PretendardVariableText>
 															<PretendardVariableText
-																size={10}
-																lineHeight={12}
+																size={12}
+																lineHeight={14}
 																color={colors.backgroundWhite}>
 																{value}
 															</PretendardVariableText>
 														</HStack>
 													</TagElement>
-													{index == 1 && item.tendency.length > 5 && (
-														<PretendardSemiBoldText
-															size={15}
-															lineHeight={21}
-															color={colors.Primary}>
-															+{item.tendency.length - 5}
-														</PretendardSemiBoldText>
-													)}
-												</Fragment>
+													{index == (windowWidth > 800 ? 2 : 1) &&
+														item.tendency.length > 5 && (
+															<PretendardSemiBoldText
+																size={15}
+																lineHeight={21}
+																color={colors.Primary}>
+																+{item.tendency.length - 5}
+															</PretendardSemiBoldText>
+														)}
+												</View>
 											))}
 										</TagContainer>
 									</GraientBackground>
@@ -175,9 +196,9 @@ const ImageContainer = styled.View`
 `;
 const RegionText = styled(PretendardSemiBold)`
 	position: absolute;
-	font-size: ${fontPercentage(20)}px;
+	font-size: ${fontPercentage(22)}px;
 	font-weight: 600;
-	line-height: ${heightPercentage(27)}px;
+	line-height: ${fontPercentage(27)}px;
 	color: ${colors.backgroundWhite};
 	bottom: ${heightPercentage(10)}px;
 	left: ${widthPercentage(10)}px;
@@ -210,15 +231,4 @@ const RecommendImage = styled.Image`
 	width: 100%;
 	height: 100%;
 	border-radius: 10px;
-`;
-export const RecommendElement = styled.View`
-	width: 100%;
-	background-color: ${colors.selectButton};
-	flex-direction: row;
-	border-bottom-right-radius: 10px;
-	border-bottom-left-radius: 10px;
-	position: absolute;
-	bottom: 0px;
-	align-items: center;
-	padding: 10px;
 `;

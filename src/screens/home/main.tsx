@@ -8,35 +8,39 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd, SVGSearch} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
 import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
-import {useFocusEffect, useIsFocused} from '@react-navigation/native';
-import {Modal, SafeAreaView} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
+import {Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
+import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
+import {useTranslation} from 'react-i18next';
 export default function Main({navigation}: any) {
-	const {homeRegionImage} = useAppSelector(state => state.settingSlice);
-	const {userName, signUpReward, reLogin} = useAppSelector(state => state.userSlice);
+	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
+	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
+	const {t, i18n} = useTranslation();
 
-	const regionRecommend = () => {
+	const regionRecommend = async () => {
 		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
 		navigation.navigate('RegionSelectWho');
+		await logEvent('place_step1', {});
 	};
 	const goEnroll = () => {
 		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
@@ -66,7 +70,9 @@ export default function Main({navigation}: any) {
 		);
 		navigation.navigate('EnrollTravelTitle');
 	};
-
+	const goSearch = useCallback(() => {
+		navigation.navigate('Search');
+	}, []);
 	const goCourseDetaile = (e: any) => {
 		let metropolitanStatus = metropolitanCheckList.includes(e.region);
 		const data = {
@@ -121,11 +127,22 @@ export default function Main({navigation}: any) {
 			clearTimeout(tick);
 		}
 	};
+	const getFirstRegion = async () => {
+		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
+	};
+	const handleGoogleAnalytics = async () => {
+		await logEvent('login', {});
+		await setUserId(userId ?? '');
+		await setUserProperty('user_id', userId ?? '');
+		dispatch(userSliceActions.setAnalyticeFlag(true));
+	};
 	useLayoutEffect(() => {
 		getMainScreen();
+		getFirstRegion();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');
+		!analyticeFlag && handleGoogleAnalytics();
 	}, []);
 
 	useEffect(() => {
@@ -145,13 +162,19 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: regionRecommend,
-			image: <SVGRegionRecommend></SVGRegionRecommend>,
+			image: (
+				<SVGRegionRecommend width={widthPercentage(200)} height={heightPercentage(150)}></SVGRegionRecommend>
+			),
 			text: '여행 지역 ',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: <SVGCalendarRecommend></SVGCalendarRecommend>,
+			image: (
+				<SVGCalendarRecommend
+					width={widthPercentage(200)}
+					height={heightPercentage(150)}></SVGCalendarRecommend>
+			),
 			text: '여행 코스 ',
 		},
 	];
@@ -166,7 +189,6 @@ export default function Main({navigation}: any) {
 		travelName: any;
 		region: any;
 	}) => {
-		console.log(data.region.split(','));
 		dispatch(
 			travelSliceActions.setCache({
 				presetDatas: JSON.parse(data.preset),
@@ -220,11 +242,12 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						<TicketTouchable onPress={goTokenLog}>
+						{/* <TicketTouchable onPress={goSearch}>
+							<SVGSearch />
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								이용권
+								{t('이용권')}
 							</PretendardSemiBoldText>
-						</TicketTouchable>
+						</TicketTouchable> */}
 						<HomeTextContainer
 							onPress={() => {
 								selectPopularity({
@@ -256,7 +279,7 @@ export default function Main({navigation}: any) {
 				</BackgroundImage>
 				<HomeBottomContainer>
 					<HStack gap={5}>
-						<SVGGood />
+						<SVGGood width={widthPercentage(25)} height={widthPercentage(25)} />
 						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
 							다님 AI에게 추천받기
 						</PretendardSemiBoldText>
@@ -314,13 +337,13 @@ export default function Main({navigation}: any) {
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
 export const TagElement = styled.View<{opacityStatus: boolean; height?: number; backgroundColor?: string}>`
-	height: ${props => props.height ?? heightPercentage(22)}px;
+	height: ${props => props.height ?? widthPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
 	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : props.backgroundColor)};
 	border-radius: 4px;
 	padding: 0px ${widthPercentage(6)}px;
-	margin: 2px;
+	margin: ${widthPercentage(2)}px;
 `;
 export const TagShopText = styled(PretendardVariable)<{size?: number; color?: string}>`
 	font-size: ${props => props.size ?? heightPercentage(12)}px;
@@ -373,15 +396,15 @@ const BackgroundImage = styled.ImageBackground`
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
 	top: ${heightPercentage(39)}px;
-	left: ${widthPercentage(295)}px;
-	width: ${widthPercentage(63)}px;
+	left: ${widthPercentage(325)}px;
+	width: ${widthPercentage(31)}px;
 	height: ${heightPercentage(31)}px;
 	background-color: ${colors.Primary};
 	align-items: center;
 	justify-content: center;
 `;
 const HomeTextContainer = styled.Pressable`
-	top: ${heightPercentage(244)}px;
+	top: ${heightPercentage(275)}px;
 	left: ${widthPercentage(26)}px;
 `;
 
@@ -396,12 +419,12 @@ const CollectionContentContainer = styled.ScrollView`
 const CollectionTouchableOpacity = styled.Pressable``;
 const CollectionRecommendContentItemImage = styled.Image`
 	position: absolute;
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	border-radius: 12px;
 `;
 const ImageContainer = styled.View`
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin-right: ${widthPercentage(12)}px;
 	padding: ${widthPercentage(12)}px;

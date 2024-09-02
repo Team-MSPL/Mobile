@@ -13,6 +13,8 @@ import {colors} from './colors';
 import CustomButton from './component/custom-button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Platform, SafeAreaView} from 'react-native';
+import {heightPercentage, widthPercentage} from './layout/responsive-size';
+import {PretendardBoldText, PretendardVariableText} from './layout/layout';
 /**
  * 필수 권한 허용 요청 페이지
  */
@@ -33,25 +35,25 @@ export default function NeedPermissions() {
 			id: '1',
 			title: '기기 및 앱 기록',
 			desc: '서비스 개선 및 오류 확인',
-			logo: <IconContainer name={'mobile1'} size={25} color={colors.selectButton} />,
+			logo: <IconContainer name={'mobile1'} size={25} color={colors.Primary} />,
 		},
 		{
 			id: '2',
 			title: '저장공간',
 			desc: '내여행,프로필사진에서 사진 업로드',
-			logo: <IconContainer name={'folder1'} size={25} color={colors.selectButton} />,
+			logo: <IconContainer name={'folder1'} size={25} color={colors.Primary} />,
 		},
 		{
 			id: '3',
 			title: '사진 / 카메라',
 			desc: '내여행,프로필사진에서 사진 업로드',
-			logo: <IconContainer name={'camera'} size={25} color={colors.selectButton} />,
+			logo: <IconContainer name={'camera'} size={25} color={colors.Primary} />,
 		},
 		Platform.OS == 'ios' && {
 			id: '4',
 			title: '추적',
 			desc: '광고 최적화와 사용자 경험 개선을 위해 데이터 추적',
-			logo: <IconContainer name={'filetext1'} size={25} color={colors.selectButton} />,
+			logo: <IconContainer name={'filetext1'} size={25} color={colors.Primary} />,
 		},
 	];
 
@@ -70,7 +72,6 @@ export default function NeedPermissions() {
 			const res = await requestMultiple(deniedList);
 			const checkResult = await checkPermissions(res);
 			const status = checkResult.hasBlocked ? 'blocked' : checkResult.deniedList.length ? 'denied' : 'granted';
-			console.log(status);
 			showDialogModal(status, checkResult.deniedList);
 		} catch (e) {
 			dispatch(
@@ -120,21 +121,28 @@ export default function NeedPermissions() {
 	return (
 		<SafeAreaView style={{flex: 1}}>
 			<PermissionMainContainer>
-				<PermissionText>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PermissionText>
+				<PretendardBoldText
+					size={21}
+					lineHeight={26}
+					color={colors.Black}>{`다님 앱 이용에 필요한\n접근 권한 안내`}</PretendardBoldText>
 				{items.map((item, idx) => (
 					<PermissionElementContainer key={idx}>
-						<SvgApple color={'black'} />
+						<SvgApple width={widthPercentage(25)} height={widthPercentage(25)} color={'black'} />
 						<ItemBox key={item.id}>
 							{item.logo}
 							<TextBox>
-								<TitleText>{item.title}</TitleText>
-								<SubText>{item.desc}</SubText>
+								<PretendardBoldText size={18} lineHeight={24} color={colors.Black}>
+									{item.title}
+								</PretendardBoldText>
+								<PretendardVariableText size={12} lineHeight={20} color={colors.Black}>
+									{item.desc}
+								</PretendardVariableText>
 							</TextBox>
 						</ItemBox>
 					</PermissionElementContainer>
 				))}
 				<CustomButtonContainer>
-					<CustomButton label='확인' width={80} onPress={clickConfirmBtn}></CustomButton>
+					<CustomButton label='확인' width={widthPercentage(80)} onPress={clickConfirmBtn}></CustomButton>
 				</CustomButtonContainer>
 				<AccessDialog
 					type={modalProps.current.type}
@@ -148,40 +156,25 @@ export default function NeedPermissions() {
 		</SafeAreaView>
 	);
 }
-const PermissionText = styled.Text`
-	font-size: 24px;
-	font-weight: 900;
-	color: black;
-`;
 const PermissionMainContainer = styled.ScrollView`
 	background-color: ${colors.main};
 	padding: 10%;
 `;
-const TitleText = styled.Text`
-	font-size: 18px;
-	font-weight: bold;
-	color: black;
-`;
-const SubText = styled.Text`
-	font-size: 15px;
-	color: grey;
-	margin: 2px 0px 0px 0px;
-`;
 const ItemBox = styled.View`
 	flex-direction: row;
 	align-items: center;
-	height: 65px;
-	padding: 8px;
+	height: ${heightPercentage(65)}px;
+	padding: ${widthPercentage(8)}px;
 `;
 const TextBox = styled.View`
-	margin-left: 16px;
+	margin-left: ${widthPercentage(12)}px;
 `;
 const PermissionElementContainer = styled.View`
 	width: 100%;
 `;
 
 const CustomButtonContainer = styled.View`
-	margin: 50px 0px 0px 0px;
+	margin: ${widthPercentage(50)}px 0px 0px 0px;
 `;
 interface ModalProps {
 	type: 'blocked' | 'denied';

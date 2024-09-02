@@ -11,12 +11,13 @@ import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
 import {CancelContainer, PictureElement, PictureElementContainer} from '../my-travel-list/input-diary';
-import {SVGCamera, SVGRightAdd, SvgCancel, SvgRight} from '../../utill/svg/svg';
+import {SVGCamera, SvgCancel, SvgRight} from '../../utill/svg/svg';
 import {usePhoto} from '../../utill/hooks/usePhoto';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {PretendardVariableText} from '../../utill/layout/layout';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function CommunityWritingScreen({navigation, route}: any) {
 	const [isImageModalVisible, setIsImageModalVisible] = useState<boolean>(false);
@@ -55,7 +56,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 	};
 
 	let diaryImageRef = useRef<string[]>([]);
-
+	useBackHandler({type: 'communityExit'});
 	const {uploadImage} = useFirebaseStorage();
 	// * 게시글 등록
 	const handlePostSubmit = async () => {
@@ -74,7 +75,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 				const ImageFunction = postData.postImage.map(async (item, idx) => {
 					let data = (await uploadImage({item: item, idx: idx, id: postId.postId, category: 'post'})) ?? '';
 					diaryImageRef.current[idx] = data;
-					console.log('데타', data);
 				});
 				await Promise.all(ImageFunction);
 				const uploadData = {
@@ -105,9 +105,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 					modalTitle: '등록',
 					modalSubTitle: '게시글이 등록되었습니다.',
 					modalFunction: handleRefresh,
-					modalBottomFunctionUse: true,
-					modalBottomFunction: handleRefresh,
-					modalBottomText: '확인',
+					modalSingleUse: true,
 				}),
 			);
 		} catch (error) {
@@ -132,6 +130,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 		navigation.setOptions({
 			headerRight: () => (
 				<TouchableOpacity
+					style={{
+						display:
+							postData.postTitle.trim() === '' || postData.postContent.trim() === '' ? 'none' : 'flex',
+					}}
 					disabled={postData.postTitle.trim() === '' || postData.postContent.trim() === ''}
 					onPress={handlePostSubmit}>
 					<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
@@ -141,9 +143,6 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 			),
 		});
 	}, [postData.postTitle, postData.postContent, postData.postImage]);
-	const asd = () => {
-		console.log('qwe');
-	};
 	return (
 		<SafeAreaView style={{flex: 1}}>
 			<Container>
@@ -161,6 +160,7 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 						placeholderTextColor={colors.Gray2}
 						value={postData.postContent}
 						onChangeText={changeContent}
+						textAlignVertical='top'
 						multiline={true}
 						blurOnSubmit={true}
 					/>
@@ -178,7 +178,10 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 											onPress={() => {
 												deletePicture(index);
 											}}>
-											<SvgCancel color='white' width={13} height={13}></SvgCancel>
+											<SvgCancel
+												color='white'
+												width={widthPercentage(15)}
+												height={widthPercentage(15)}></SvgCancel>
 										</CancelContainer>
 										<PictureElement source={{uri: uri}} />
 										<BarContainer>
@@ -187,7 +190,14 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 												onPress={() => {
 													moveImage({index: index, direction: false});
 												}}>
-												{index != 0 && <SvgRight color={colors.Black} transform={180} />}
+												{index != 0 && (
+													<SvgRight
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={colors.Black}
+														transform={180}
+													/>
+												)}
 											</MoveButton>
 											<MoveButton
 												disabled={index == postData.postImage.length - 1}
@@ -195,7 +205,11 @@ export default function CommunityWritingScreen({navigation, route}: any) {
 													moveImage({index: index, direction: true});
 												}}>
 												{index != postData.postImage.length - 1 && (
-													<SvgRight color={colors.Black} />
+													<SvgRight
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={colors.Black}
+													/>
 												)}
 											</MoveButton>
 										</BarContainer>

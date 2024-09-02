@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import Icon from 'react-native-vector-icons/AntDesign';
 import {HStack, PretendardVariableText, devicesWidth} from '../layout/layout';
 import {useEffect} from 'react';
 import {colors} from '../colors';
@@ -9,7 +8,6 @@ import {SVGPencil} from '../svg/svg';
 import {heightPercentage, widthPercentage} from '../layout/responsive-size';
 
 export default function ScrollButton({viewState, navigation}: {viewState: boolean; navigation: any}) {
-	const IconContainer = styled(Icon)``;
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {}, [viewState]);
@@ -30,7 +28,11 @@ export default function ScrollButton({viewState, navigation}: {viewState: boolea
 						글쓰기
 					</PretendardVariableText>
 				)}
-				<SVGPencil color={colors.Primary} width={widthPercentage(viewState ? 30 : 30)} />
+				<SVGPencil
+					color={colors.Primary}
+					width={widthPercentage(viewState ? 30 : 30)}
+					height={widthPercentage(20)}
+				/>
 			</HStack>
 		</CommunityButton>
 	);

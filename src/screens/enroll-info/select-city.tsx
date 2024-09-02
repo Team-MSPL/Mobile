@@ -12,9 +12,11 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 import {ButtonContainer} from './select-multi';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {useEffect} from 'react';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function SelectCity({navigation}: any) {
-	const {region, regionRecommendFlag, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
+	const {region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
@@ -70,7 +72,12 @@ export default function SelectCity({navigation}: any) {
 			);
 		}
 	};
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step2', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={2}></Stepper>
@@ -87,7 +94,11 @@ export default function SelectCity({navigation}: any) {
 									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.backgroundWhite}>
 										{item == '전체' ? cityViewList[cityIndex].title + ' ' + item : item}
 									</PretendardSemiBoldText>
-									<SvgCancel color={colors.Primary} />
+									<SvgCancel
+										width={widthPercentage(12)}
+										height={widthPercentage(12)}
+										color={colors.Primary}
+									/>
 								</RegionElementContainer>
 							);
 						})}
@@ -160,10 +171,6 @@ export default function SelectCity({navigation}: any) {
 		</BackgroundGray>
 	);
 }
-const TestImage = styled.Image`
-	width: ${widthPercentage(100)}px;
-	height: ${heightPercentage(100)}px;
-`;
 const FlexContainer = styled.View`
 	flex: 1;
 	justify-content: center;
@@ -476,7 +483,7 @@ export const cityViewList = [
 			{id: 10, subTitle: '의령군', lat: 35.3924481, lng: 128.2770734},
 			{id: 11, subTitle: '진주시', lat: 35.205153, lng: 128.1297905},
 			{id: 12, subTitle: '창녕군', lat: 35.5083094, lng: 128.4931971},
-			{id: 13, subTitle: '창원군', lat: 35.2028593, lng: 128.6000923},
+			{id: 13, subTitle: '창원시', lat: 35.2028593, lng: 128.6000923},
 			{id: 14, subTitle: '통영시', lat: 34.8544227, lng: 128.433182},
 			{id: 15, subTitle: '하동군', lat: 35.1381776, lng: 127.779014},
 			{id: 16, subTitle: '함안군', lat: 35.2909696, lng: 128.4308338},

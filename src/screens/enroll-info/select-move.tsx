@@ -1,12 +1,12 @@
 import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText, VStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function RecommendSelectMove({navigation}: any) {
 	const {transit} = useAppSelector(state => state.travelSlice);
@@ -68,6 +68,7 @@ const SelectButton = styled.TouchableOpacity<{color: string}>`
 	width: ${widthPercentage(157)}px;
 	height: ${widthPercentage(157)}px;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: center;
 	padding-bottom: ${heightPercentage(5)}px;
+	gap: ${heightPercentage(10)}px;
 `;

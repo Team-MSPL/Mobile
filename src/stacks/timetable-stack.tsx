@@ -11,7 +11,6 @@ import Timetable from '../screens/timetable/timetable';
 import CourseDetail from '../screens/timetable/course-detail';
 import TimetableAddPlace from '../screens/timetable/timetable-add-place';
 import Recommend from '../screens/timetable/recommend';
-import Modify from '../screens/timetable/modify';
 import MapInfo from '../screens/timetable/map-info';
 import EnrollTravelTitle from '../screens/enroll-info/enroll-travel-title';
 import {colors} from '../utill/colors';
@@ -93,6 +92,7 @@ export default function TimetableStack() {
 				name='Timetable'
 				component={Timetable}
 				options={{
+					headerBackVisible: false,
 					title: '여행 코스',
 				}}
 			/>
@@ -115,13 +115,6 @@ export default function TimetableStack() {
 				component={Recommend}
 				options={{
 					title: '추천',
-				}}
-			/>
-			<Stack.Screen
-				name='Modify'
-				component={Modify}
-				options={{
-					title: '수정',
 				}}
 			/>
 			<Stack.Screen

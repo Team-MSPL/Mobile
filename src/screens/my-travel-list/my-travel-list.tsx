@@ -1,11 +1,11 @@
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
-	deleteAI,
 	getAiList,
 	getMyTravelList,
 	getOneTravelCourse,
+	getRegionInfo,
 	travelSliceActions,
 } from '../../redux/travel-info/travel.slice';
 import 'moment/locale/ko';
@@ -17,23 +17,37 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
-import {Center, PretendardSemiBoldText, PretendardVariableText, TagContainer, VStack} from '../../utill/layout/layout';
-import {SVGFlag, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
-import {ButtonContainer, DayViewContainer} from '../enroll-info/select-multi';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {
+	Center,
+	HeaderContianer,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	TagContainer,
+	VStack,
+} from '../../utill/layout/layout';
+import {SVGFlag, SvgCheck} from '../../utill/svg/svg';
+import {DayViewContainer} from '../enroll-info/select-multi';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import PrimaryButton from '../../utill/component/primary-button';
 import CustomButton from '../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
+import {logEvent} from '../../../firebaseAnalytice';
+import useKakaoShare from '../../utill/hooks/useKakaoShare';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
-
+	const [shareFlag, setShareFlag] = useState(false);
+	const [shareSeleted, setShareSeleted] = useState(-1);
 	const dispatch = useAppDispatch();
+	const scrollViewRef = useRef<FlatList | null>(null);
 	const goMyTravelDetail = async (e: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const whenDday = dDayCalculate({startDay: e.day[0], endDay: e.day[e.nDay - 1]});
-			await dispatch(getOneTravelCourse({travelId: e._id}));
+			const data = await dispatch(getOneTravelCourse({travelId: e._id})).unwrap();
+			dispatch(
+				getRegionInfo({
+					region: data.region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
+				}),
+			);
 			if (!whenDday.endFlag) {
 				dispatch(
 					travelSliceActions.setMakeMode({shareViewWithStartFlag: !whenDday.endFlag, makeMode: 'modify'}),
@@ -68,8 +82,15 @@ export default function MyTravelList({navigation}: any) {
 	useFocusEffect(
 		useCallback(() => {
 			getTravelList();
+			setShareFlag(false);
 		}, []),
 	);
+	const handleGoogleAnalytics = async () => {
+		await logEvent('view_course_list', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const checkGoEnroll = async () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -82,18 +103,73 @@ export default function MyTravelList({navigation}: any) {
 			}),
 		);
 	};
-	const regionRecommend = () => {
+	const regionRecommend = async () => {
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
 		navigation.navigate('RegionSelectWho');
+		await logEvent('place_step1', {});
 	};
-	const goEnroll = () => {
+	const goEnroll = async () => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
 		navigation.navigate('EnrollTravelTitle');
+		await logEvent('course_step1', {});
 	};
+
+	const {kakaoShare} = useKakaoShare();
+	const handleShare = useCallback(() => {
+		goKakaoShare();
+	}, [shareSeleted]);
+	const goKakaoShare = async () => {
+		try {
+			const regionPhoto = await dispatch(
+				getRegionInfo({
+					region: myTravelList[shareSeleted].region[0].replace(
+						/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g,
+						'전체',
+					),
+				}),
+			).unwrap();
+			await kakaoShare({
+				travelName: myTravelList[shareSeleted].travelName,
+				travelId: myTravelList[shareSeleted]._id,
+				startDay: myTravelList[shareSeleted].day[0],
+				endDay: myTravelList[shareSeleted].day[myTravelList[shareSeleted].nDay - 1],
+				photo: regionPhoto?.photo ?? '',
+			});
+
+			await logEvent('share', {course: myTravelList[shareSeleted].travelName});
+			setShareFlag(false);
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
+				}),
+			);
+		}
+	};
+	useEffect(() => {
+		shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
+	}, [shareSeleted, shareFlag]);
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<HeaderContianer>
+					<SearchTouchableOpacity
+						onPress={() => {
+							setShareFlag(!shareFlag);
+							!shareFlag && setShareSeleted(-1);
+						}}>
+						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+							{shareFlag ? '취소' : '공유'}
+						</PretendardVariableText>
+					</SearchTouchableOpacity>
+				</HeaderContianer>
+			),
+		});
+	}, [shareFlag]);
 	const dDayCalculate = (e: any) => {
 		//e.startDay=시작날짜e.endDay=끝나느날짜
 		// 0~1 당일  -1 미래 1과거
@@ -145,7 +221,7 @@ export default function MyTravelList({navigation}: any) {
 		monthRef.current = moment(item.item.day[0]).format('MM');
 		return (
 			<>
-				{item.index == 0 && aiList.length != 0 && (
+				{item.index == 0 && aiList.length != 0 && !shareFlag && (
 					<>
 						<DivideDayContainer>
 							<PretendardVariableText
@@ -161,7 +237,9 @@ export default function MyTravelList({navigation}: any) {
 								key={idx}
 								onPress={() => {
 									goPreset(data);
-								}}>
+								}}
+								shareFlag={shareFlag}
+								shareSeleted={item.index == shareSeleted}>
 								<VStack>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
 										{moment(data.day[0]).format('YYYY년 MM월 DD일') +
@@ -183,14 +261,18 @@ export default function MyTravelList({navigation}: any) {
 										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 											{data.region[0]}
 										</PretendardVariableText>
-										<SVGFlag width={12} color={colors.Primary} />
+										<SVGFlag
+											width={widthPercentage(12)}
+											height={widthPercentage(15)}
+											color={colors.Primary}
+										/>
 									</TagContainer>
 								</VStack>
 							</MyTravelContainer>
 						))}
 					</>
 				)}
-				{monthRef.current != after && (
+				{(monthRef.current != after || item.index == 0) && (
 					<DivideDayContainer>
 						<PretendardVariableText
 							size={12}
@@ -202,8 +284,16 @@ export default function MyTravelList({navigation}: any) {
 					</DivideDayContainer>
 				)}
 				<MyTravelContainer
+					onLongPress={() => {
+						if (!shareFlag) {
+							setShareFlag(true);
+							setShareSeleted(item.index);
+						}
+					}}
+					shareFlag={shareFlag}
+					shareSeleted={item.index == shareSeleted}
 					onPress={() => {
-						goMyTravelDetail(item.item);
+						shareFlag ? setShareSeleted(item.index) : goMyTravelDetail(item.item);
 					}}>
 					<VStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
@@ -227,9 +317,14 @@ export default function MyTravelList({navigation}: any) {
 							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
 								{item.item.region[0]}
 							</PretendardVariableText>
-							<SVGFlag width={12} color={colors.Primary} />
+							<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color={colors.Primary} />
 						</TagContainer>
 					</VStack>
+					{shareFlag && (
+						<CircleContainer shareSeleted={item.index == shareSeleted}>
+							<SvgCheck color={item.index == shareSeleted ? colors.backgroundWhite : colors.Gray2} />
+						</CircleContainer>
+					)}
 				</MyTravelContainer>
 			</>
 		);
@@ -245,6 +340,7 @@ export default function MyTravelList({navigation}: any) {
 					</Center>
 				) : (
 					<FlatList
+						ref={scrollViewRef}
 						data={myTravelList}
 						renderItem={renderItem}
 						initialNumToRender={20}
@@ -254,8 +350,9 @@ export default function MyTravelList({navigation}: any) {
 				)}
 			</TravleListContainer>
 			<CustomButton
-				label='새로운 여행 떠나기'
-				onPress={checkGoEnroll}
+				label={shareFlag ? '공유하기' : '새로운 여행 떠나기'}
+				isDisabled={!shareFlag ? false : shareSeleted == -1 ? true : false}
+				onPress={shareFlag ? handleShare : checkGoEnroll}
 				width={widthPercentage(327)}
 				marginBottom={12}></CustomButton>
 		</TravelContainer>
@@ -272,14 +369,26 @@ const TravelContainer = styled.View`
 	padding: 0px 24px 0px 24px;
 	height: 100%;
 `;
-export const DayText = styled.Text`
-	font-size: 17px;
-	color: ${colors.selectButton};
-`;
 
-const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})`
+const MyTravelContainer = styled(DayViewContainer).attrs({as: TouchableOpacity})<{
+	shareFlag: boolean;
+	shareSeleted: boolean;
+}>`
+	opacity: ${props => (!props.shareFlag ? 1 : props.shareSeleted ? 1 : 0.5)};
 	margin: 5px 0px 5px 0px;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+`;
+const SearchTouchableOpacity = styled.TouchableOpacity`
+	width: 50%;
+	align-items: center;
+`;
+const CircleContainer = styled.View<{shareSeleted: boolean}>`
+	width: ${widthPercentage(30)}px;
+	height: ${widthPercentage(30)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 99px;
+	background-color: ${props => (props.shareSeleted ? colors.Primary : colors.Gray1)};
 `;

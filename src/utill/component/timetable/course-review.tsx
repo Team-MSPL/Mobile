@@ -1,6 +1,5 @@
 import styled from 'styled-components/native';
-import {BackgroundGray, MainContainer} from '../../layout/layout';
-import {Keyboard} from 'react-native';
+import {BackgroundGray} from '../../layout/layout';
 import shortId from 'shortid';
 import {useEffect, useRef, useState} from 'react';
 import {colors} from '../../colors';
@@ -8,7 +7,6 @@ import {useAppDispatch, useAppSelector} from '../../../redux';
 import {savePlaceReview} from '../../../redux/travel-info/travel.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import CustomButton from '../custom-button';
 import {CammeraContainer, ImageScrollViewContainer} from '../../../screens/community/community-writing-screen';
 import {SVGCamera, SvgCancel} from '../../svg/svg';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
@@ -45,7 +43,6 @@ export function CourseReview({navigation, route}: any) {
 		navigation.goBack();
 	};
 	const changeImage = (e: any) => {
-		console.log(typeof e[0]);
 		setReviewImage(e);
 	};
 	const diaryImageRef = useRef<string[]>([]);
@@ -54,7 +51,6 @@ export function CourseReview({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const randomId = shortId.generate();
 			// id 체크해서 변경 후에 파이어베이스 업로드 확인하기
-			console.log(randomId);
 			diaryImageRef.current = Array(reviewImage.length).fill('');
 			const ImageFunction = reviewImage.map(async (item, idx) => {
 				let data = (await uploadImage({item: item, idx: idx, id: randomId, category: 'review'})) ?? '';
@@ -114,7 +110,10 @@ export function CourseReview({navigation, route}: any) {
 									onPress={() => {
 										deletePicture(index);
 									}}>
-									<SvgCancel color='white' width={13} height={13}></SvgCancel>
+									<SvgCancel
+										color='white'
+										width={widthPercentage(13)}
+										height={widthPercentage(13)}></SvgCancel>
 								</CancelContainer>
 								<PictureElement source={{uri: uri}} />
 							</PictureElementContainer>

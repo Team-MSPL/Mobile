@@ -1,6 +1,6 @@
 import {useLayoutEffect, useRef, useState} from 'react';
 import shortId from 'shortid';
-import {Alert, Linking, TouchableOpacity, ScrollView, Platform, Image} from 'react-native';
+import {Linking, TouchableOpacity, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker} from 'react-native-maps';
@@ -9,19 +9,10 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {
-	HStack,
-	MainText,
-	PretendardSemiBoldText,
-	PretendardVariableText,
-	VStack,
-	devicesWidth,
-} from '../../utill/layout/layout';
+import {HStack, PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
 import CustomButton from '../../utill/component/custom-button';
 import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
-import {SVGHelp, SvgPlace} from '../../utill/svg/svg';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
-import {MarkerText} from './map-info';
 import PrimaryButton from '../../utill/component/primary-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarkerContainer} from './preset-detail';
@@ -29,12 +20,10 @@ export default function Recommend({navigation, route}: any) {
 	const {timetable} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
-	const newY = useRef(0);
 	const [select, setSelect] = useState(-1);
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 	const [recommendList, setRcommendList] = useState<RecommendList[]>();
 	const departure = useRef<DistanceType>({lat: 0, lng: 0});
-	const whereIndex = useRef(0);
 	const polylineCoordinates = recommendItem
 		.map((item, value) => {
 			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
@@ -54,7 +43,7 @@ export default function Recommend({navigation, route}: any) {
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
 							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
@@ -75,7 +64,7 @@ export default function Recommend({navigation, route}: any) {
 			key={`polyline_${ind}`}
 			coordinates={polylineCoordinates}
 			strokeColor={colors.Gray5}
-			strokeWidth={2} // You can change the width of the line here
+			strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 		/>
 	));
 
@@ -100,9 +89,6 @@ export default function Recommend({navigation, route}: any) {
 				copy[route.params.index] = updateItem;
 			}
 		}
-		// select == -1 && route.params.category != 1
-		// 	? copy.splice(route.params.index, 0, updateItem)
-		// 	: (copy[route.params.index] = updateItem);
 		setRecommendItem(copy);
 		setSelect(idx);
 		mapRef.current?.animateCamera(
@@ -116,7 +102,6 @@ export default function Recommend({navigation, route}: any) {
 		);
 	};
 	const checkMessage = () => {
-		//	console.log(departure);
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '바로 추가됩니다!',
@@ -191,10 +176,60 @@ export default function Recommend({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-
+	const returnImageIndex = (e: string) => {
+		let numberIndex = 0;
+		switch (e.trim()) {
+			case '한식':
+				numberIndex = 0;
+				break;
+			case '분식':
+				numberIndex = 1;
+				break;
+			case '양식':
+				numberIndex = 2;
+				break;
+			case '일식':
+				numberIndex = 3;
+				break;
+			case '중식':
+				numberIndex = 4;
+				break;
+			default:
+				numberIndex = 5;
+				break;
+		}
+		return numberIndex;
+	};
+	const returnAccomdationImageIndex = (e: string) => {
+		let numberIndex = 0;
+		switch (e.trim()) {
+			case '호텔':
+				numberIndex = 0;
+				break;
+			case '여관' || '모텔' || '펜션':
+				numberIndex = 1;
+				break;
+			default:
+				numberIndex = 2;
+				break;
+		}
+		return numberIndex;
+	};
+	const accommodationImageList = [
+		require('../../../public/images/hotel.png'),
+		require('../../../public/images/motel.png'),
+		require('../../../public/images/defalutAccomodation.png'),
+	];
+	const foodImageList = [
+		require('../../../public/images/koreaFood.png'),
+		require('../../../public/images/snackFood.png'),
+		require('../../../public/images/westernFood.png'),
+		require('../../../public/images/japanFood.png'),
+		require('../../../public/images/chinaFood.png'),
+		require('../../../public/images/defalutFood.png'),
+	];
 	useLayoutEffect(() => {
 		getRecommendList();
-		console.log(route.params.status);
 	}, []);
 
 	const mapRef = useRef<MapView>(null);
@@ -205,7 +240,7 @@ export default function Recommend({navigation, route}: any) {
 		<RecommendContainer>
 			<MapView
 				ref={mapRef}
-				style={{width: '100%', height: 300}}
+				style={{width: '100%', height: heightPercentage(350)}}
 				region={{
 					latitude: route.params.status.lat,
 					longitude: route.params.status.lng,
@@ -222,24 +257,21 @@ export default function Recommend({navigation, route}: any) {
 							<ImageContainer>
 								{route.params.name == '식당 추천' ? (
 									<Image
-										source={require('../../../public/images/food.png')}
+										source={foodImageList[returnImageIndex(item.category_name.split('>')[1])]}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								) : route.params.name == '숙소 추천' ? (
 									<Image
-										source={require('../../../public/images/accommodation.png')}
+										source={
+											accommodationImageList[
+												returnAccomdationImageIndex(item.category_name.split('>')[2])
+											]
+										}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								) : (
 									<Image
 										source={require('../../../public/images/coffee.png')}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								)}
-								{/* <Image
-									source={require(route.params.name == '식당 추천'
-										? '../../../public/images/food.png'
-										: route.params.name == '숙소 추천'
-										? '../../../public/images/accommodation.png'
-										: '../../../public/images/coffee.png')}
-									style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image> */}
 							</ImageContainer>
 							<ListVStack
 								onPress={() => {
@@ -263,7 +295,8 @@ export default function Recommend({navigation, route}: any) {
 										'm'}
 								</PretendardVariableText>
 								<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
-									{item.category_name.slice(6, item.category_name.length)}
+									{item.category_name.split('>')[route.params.name == '식당 추천' ? 1 : 2]}
+									{/* {item.category_name.slice(6, item.category_name.length)} */}
 								</PretendardVariableText>
 							</ListVStack>
 							<PrimaryButton
@@ -277,14 +310,6 @@ export default function Recommend({navigation, route}: any) {
 								onPress={() => {
 									Linking.openURL(item.place_url);
 								}}></PrimaryButton>
-							{/* <RecommendInfoTouchableOpacity
-								onPress={() => {
-									Linking.openURL(item.place_url);
-								}}>
-								<RecommendElementText color={idx == select ? 'white' : 'black'}>
-									정보보기
-								</RecommendElementText>
-							</RecommendInfoTouchableOpacity> */}
 						</ListHStack>
 					))
 				) : (
@@ -310,21 +335,16 @@ const RecommendContainer = styled.View`
 	background-color: ${colors.main};
 `;
 const RecommendView = styled.View`
-	margin: 5px 0px 0px 0px;
+	margin: ${widthPercentage(5)}px 0px 0px 0px;
 	padding: 1%;
 `;
 const RecommendInfoTouchableOpacity = styled.TouchableOpacity`
-	margin: 5px 0px 0px 0px;
+	margin: ${widthPercentage(5)}px 0px 0px 0px;
 	padding: 1%;
 	width: 20%;
 `;
-const RecommendElementText = styled.Text<{color: string}>`
-	font-size: 17px;
-	font-weight: bold;
-	color: ${props => props.color};
-`;
 const RecommendScrollView = styled.ScrollView`
-	padding: 10px;
+	padding: ${widthPercentage(10)}px;
 `;
 const ListHStack = styled(HStack)<{color: string}>`
 	justify-content: space-around;
@@ -334,5 +354,5 @@ const ListHStack = styled(HStack)<{color: string}>`
 `;
 const ListVStack = styled(VStack).attrs({as: TouchableOpacity})`
 	width: 65%;
-	padding: 3px;
+	padding: ${widthPercentage(3)}px;
 `;

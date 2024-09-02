@@ -133,19 +133,23 @@ function CommunityMain({
 							{data.item.postedAt.slice(0, 10)}
 						</PretendardVariableText>
 						<HStack gap={2}>
-							<SVGEmptyHeart />
+							<SVGEmptyHeart width={widthPercentage(12)} height={widthPercentage(12)} />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.likerLength}
 							</PretendardVariableText>
 						</HStack>
 						<HStack gap={2}>
-							<SVGMessageSquare />
+							<SVGMessageSquare width={widthPercentage(14)} height={widthPercentage(14)} />
 							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 								{data.item.commentLength}
 							</PretendardVariableText>
 							{data.item.ImageLength != 0 && (
 								<>
-									<SVGCamera color={colors.Gray3} />
+									<SVGCamera
+										width={widthPercentage(14)}
+										height={widthPercentage(14)}
+										color={colors.Gray3}
+									/>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 										{data.item.ImageLength}
 									</PretendardVariableText>
@@ -184,31 +188,6 @@ const FlatListItemSeperator = styled.View`
 	margin-horizontal: 24px;
 	background-color: #e0e0e0;
 `;
-const HeartIcon = styled(Icon)`
-	color: red;
-	margin-right: 4px;
-`;
-const LikeNumText = styled.Text`
-	font-size: 12px;
-	color: red;
-	margin-right: 8px;
-`;
-const CommentIcon = styled(Icon)`
-	color: green;
-	margin-right: 4px;
-`;
-const ImageIcon = styled(Icon)`
-	color: grey;
-	margin-right: 4px;
-`;
-const CommentNumText = styled.Text`
-	font-size: 12px;
-	color: green;
-`;
-export const MenuIcon = styled(FeatherIcon)`
-	font-size: 24px;
-	color: ${colors.selectButton};
-`;
 const PostItemContainer = styled.View`
 	gap: ${widthPercentage(5)}px;
 	padding: ${heightPercentage(10)}px ${widthPercentage(24)}px;
@@ -221,27 +200,5 @@ const PostWriterProfileImage = styled.Image`
 	width: ${widthPercentage(32)}px;
 	height: ${widthPercentage(32)}px;
 	border-radius: 8px;
-	margin-right: 8px;
-`;
-// border-width: 1px;
-// border-color: ${colors.border};
-const PostWriterText = styled.Text`
-	font-size: 12px;
-	font-weight: 400;
-	color: black;
-`;
-const PostTitleText = styled.Text`
-	font-size: 16px;
-	font-weight: bold;
-	margin-vertical: 8px;
-	color: black;
-`;
-const PostDetailInfoContainer = styled.View`
-	flex-direction: row;
-	align-items: center;
-`;
-const PostDetailInfoText = styled.Text`
-	font-size: 12px;
-	color: gray;
 	margin-right: 8px;
 `;

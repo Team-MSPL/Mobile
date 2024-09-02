@@ -3,7 +3,6 @@ import moment from 'moment';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, Keyboard, NativeModules, Platform, RefreshControl, TouchableOpacity, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
@@ -21,11 +20,15 @@ import {
 	saveCommentType,
 } from '../../redux/community/community.slice';
 import {colors} from '../../utill/colors';
-import {MenuIcon} from './community-main-screen';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
+import {
+	ClearTouchableOpacity,
+	InputWrap,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
 import CommunityPost from '../../utill/component/community/community-post';
 import LiKeCommentBar from '../../utill/component/community/like-comment-bar';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
@@ -113,11 +116,10 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '신고완료',
-					modalSubTitle:
-						'신고가 접수되었습니다.\n검토까지는 최대24시간 소요됩니다.\n\n⦁신고사유에 맞지 않는 신고일 경우,\n해당 신고는 처리되지않습니다.\n\n⦁누적 신고횟수가 3회 이상인 유저는 글 작성을 할 수 없게됩니다.',
+					modalSingleUse: true,
+					modalSubTitle: '신고가 접수되었습니다.\n⦁부적절한 신고일 경우 처리되지않습니다.',
 				}),
 			);
-			console.log(`"${reason}"`, '신고가 성공적으로 접수되었습니다.');
 		} catch (error) {
 			console.log('신고 접수 중에 오류가 발생했습니다:', error);
 		}
@@ -142,6 +144,24 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			console.log('댓글 신고 접수 중에 오류가 발생했습니다:', error);
 		}
 	};
+	const checkReport = (reason: string, commentId?: string | undefined) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: reason,
+				modalSubTitle: `신고하시겠습니까?`,
+				modalFunction: commentId
+					? () => {
+							handleCommentReport(reason, commentId);
+					  }
+					: () => {
+							handlePostReport(reason);
+					  },
+				modalTopText: '신고',
+				modalBottomText: '취소',
+				modalBottomFunciton: () => {},
+			}),
+		);
+	};
 
 	// ---------------- useEffect 모음(시작) -------------------
 
@@ -149,7 +169,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	useFocusEffect(
 		useCallback(() => {
 			fetchPostData();
-			console.log('CommunityReadingScreen 갱신됨');
 		}, []),
 	);
 
@@ -172,7 +191,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							actionSheetType.current = '게시글';
 							showCommunityReadingOptionActionSheet();
 						}}>
-						<SVGMoreHorizontal />
+						<SVGMoreHorizontal width={widthPercentage(24)} height={widthPercentage(24)} />
 					</TouchableOpacity>
 				</View>
 			),
@@ -202,7 +221,6 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 	const fetchPostData = async () => {
 		try {
 			await dispatch(getOnePost({postId: route.params.postId}));
-			console.log(postData.postTitle, '게시글 가져오기 성공');
 		} catch (error) {
 			console.log('DB로부터 데이터를 가져오는 중에 오류가 발생했습니다:', error);
 		}
@@ -281,7 +299,9 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 				<CommentWriterInfoNMenuContainer>
 					<CommentWriterInfoContainer>
 						<CommentWriterImage source={{uri: data.item.commentWriterProfile}} />
-						<CommentWriterText>{data.item.commentWriter}</CommentWriterText>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Black}>
+							{data.item.commentWriter}
+						</PretendardSemiBoldText>
 					</CommentWriterInfoContainer>
 					{/* 더보기 버튼 */}
 					<CommentMenu
@@ -289,11 +309,17 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 							setCommentData(data.item);
 							actionSheetType.current = '댓글';
 						}}>
-						<SVGMoreHorizontal />
+						<SVGMoreHorizontal width={widthPercentage(24)} height={widthPercentage(24)} />
 					</CommentMenu>
 				</CommentWriterInfoNMenuContainer>
-				<CommentContent>{data.item.commentContent}</CommentContent>
-				<CommentInfoText>{data.item.commentedAt.slice(0, 10)}</CommentInfoText>
+
+				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
+					{data.item.commentContent}
+				</PretendardSemiBoldText>
+
+				<PretendardVariableText size={12} lineHeight={18} color={colors.Black}>
+					{data.item.commentedAt.slice(0, 10)}
+				</PretendardVariableText>
 			</CommentItemContainer>
 		);
 	};
@@ -347,21 +373,21 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 			'취소',
 		],
 		reportPost: [
-			() => handlePostReport('무분별한 도배'),
-			() => handlePostReport('정당/정치인 비하 및 선거운동'),
-			() => handlePostReport('욕설/비하'),
-			() => handlePostReport('상업적 광고 및 판매'),
-			() => handlePostReport('음란물/불건전한 만남 및 대화'),
-			() => handlePostReport('유출/사칭/사기'),
+			() => checkReport('무분별한 도배'),
+			() => checkReport('정당/정치인 비하 및 선거운동'),
+			() => checkReport('욕설/비하'),
+			() => checkReport('상업적 광고 및 판매'),
+			() => checkReport('음란물/불건전한 만남 및 대화'),
+			() => checkReport('유출/사칭/사기'),
 			doNothing,
 		],
 		reportComment: [
-			() => handleCommentReport('무분별한 도배', commentData._id),
-			() => handleCommentReport('정당/정치인 비하 및 선거운동', commentData._id),
-			() => handleCommentReport('욕설/비하', commentData._id),
-			() => handleCommentReport('상업적 광고 및 판매', commentData._id),
-			() => handleCommentReport('음란물/불건전한 만남 및 대화', commentData._id),
-			() => handleCommentReport('유출/사칭/사기', commentData._id),
+			() => checkReport('무분별한 도배', commentData._id),
+			() => checkReport('정당/정치인 비하 및 선거운동', commentData._id),
+			() => checkReport('욕설/비하', commentData._id),
+			() => checkReport('상업적 광고 및 판매', commentData._id),
+			() => checkReport('음란물/불건전한 만남 및 대화', commentData._id),
+			() => checkReport('유출/사칭/사기', commentData._id),
 			doNothing,
 		],
 	};
@@ -453,7 +479,7 @@ export default function CommunityReadingScreen({navigation, route}: any) {
 						blurOnSubmit={true}
 					/>
 					<ClearContainer disabled={isCommentButtonDisabled} onPress={handleCommentSubmit}>
-						<SVGPencil color='#70768E' />
+						<SVGPencil width={widthPercentage(16)} height={widthPercentage(16)} color='#70768E' />
 					</ClearContainer>
 				</CommentTextInputContainer>
 			</CommentInputContainer>
@@ -476,29 +502,16 @@ const PostContentCommentContainer = styled.View`
 	justify-content: center;
 `;
 const FlatListHeaderContainer = styled.View`
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
-`;
-const Divider = styled.View`
-	border-bottom-color: #ccc;
-	border-bottom-width: 1px;
-`;
-
-// 사진 눌렀을 때 사진 보이는 화면
-export const PostImageView = styled.SafeAreaView`
-	align-items: center;
-`;
-export const PostImageIndicatorText = styled.Text`
-	font-size: 16px;
-	color: white;
+	padding-vertical: ${heightPercentage(12)}px;
+	padding-horizontal: ${widthPercentage(24)}px;
 `;
 
 const CommentItemContainer = styled.View`
 	width: 100%;
 	align-self: center;
-	margin-vertical: 8px;
-	padding-vertical: 12px;
-	padding-horizontal: 24px;
+	margin-vertical: ${widthPercentage(2)}px;
+	padding-vertical: ${widthPercentage(6)}px;
+	padding-horizontal: ${heightPercentage(24)}px;
 	background-color: ${colors.main};
 `;
 
@@ -506,7 +519,7 @@ const CommentItemContainer = styled.View`
 const CommentWriterInfoNMenuContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: 12px;
+	margin-bottom: ${heightPercentage(12)}px;
 `;
 const CommentWriterInfoContainer = styled.View`
 	flex-direction: row;
@@ -514,29 +527,15 @@ const CommentWriterInfoContainer = styled.View`
 	flex: 9;
 `;
 const CommentWriterImage = styled.Image`
-	height: 36px;
-	width: 36px;
+	height: ${widthPercentage(36)}px;
+	width: ${widthPercentage(36)}px;
 	border-radius: 18px;
 	margin-right: 12px;
-`;
-const CommentWriterText = styled.Text`
-	font-size: 12px;
-	font-weight: bold;
-	color: black;
 `;
 const CommentMenu = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-`;
-const CommentContent = styled.Text`
-	font-size: 16px;
-	margin-bottom: 8px;
-	color: black;
-`;
-const CommentInfoText = styled.Text`
-	font-size: 10px;
-	color: black;
 `;
 
 // 댓글 입력을 위해 전체 화면을 9:1로 나눈 곳 중 1인 영역

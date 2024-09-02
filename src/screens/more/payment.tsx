@@ -1,4 +1,4 @@
-import {ActivityIndicator, Platform, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Platform} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getWatchADTime, setWatchADTime, updateFunctionToken} from '../../redux/user/user.slice';
 import {
@@ -10,19 +10,20 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {RewardedAd, RewardedAdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
 import {Google_Ads_Key} from '@env';
 import {useShopping} from '../../utill/hooks/useShopping';
 import {colors} from '../../utill/colors';
-import {SVGCoin, SvgRight, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCoin} from '../../utill/svg/svg';
 import Toast from 'react-native-toast-message';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useFocusEffect} from '@react-navigation/native';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function Payment({navigation}: any) {
 	const {functionToken} = useAppSelector(state => state.userSlice);
-	const {purchaseItems, requestItemPurchase} = useShopping();
+	const {requestItemPurchase} = useShopping();
 	const [watchAD, setWatchAD] = useState(0);
 	useShopping();
 	const dispatch = useAppDispatch();
@@ -37,7 +38,12 @@ export default function Payment({navigation}: any) {
 		const data = await dispatch(getWatchADTime()).unwrap();
 		setWatchAD(data.watchADTime);
 	};
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('view_voucher_list', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			getWatchData();
@@ -62,7 +68,6 @@ export default function Payment({navigation}: any) {
 			rewarded.removeAllListeners();
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '이용권 1개가 지급되었습니다.'}));
 			dispatch(updateFunctionToken({functionToken: functionToken + 1}));
-			console.log('dddddd', watchAD, watchAD + 1);
 			dispatch(setWatchADTime({watchADTime: watchAD + 1}));
 			navigation.goBack();
 		});
@@ -123,7 +128,7 @@ export default function Payment({navigation}: any) {
 				<HStack justifyContent='space-between'>
 					<VStack>
 						<HStack>
-							<SVGCoin />
+							<SVGCoin width={widthPercentage(22)} height={widthPercentage(22)} />
 							<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
 								이용권 1개 - 광고 보상
 							</PretendardSemiBoldText>
@@ -149,7 +154,7 @@ export default function Payment({navigation}: any) {
 					<HStack justifyContent='space-between'>
 						<VStack>
 							<HStack>
-								<SVGCoin />
+								<SVGCoin width={widthPercentage(22)} height={widthPercentage(22)} />
 								<PretendardSemiBoldText size={16} lineHeight={19} color={colors.backgroundWhite}>
 									이용권 {item.title}개
 								</PretendardSemiBoldText>

@@ -5,53 +5,50 @@ import {
 	getOneTravelCourse,
 	getRegionInfo,
 	reCourseName,
+	reviewAndPoint,
 	travelSliceActions,
 	updateDiary,
 } from '../../redux/travel-info/travel.slice';
-import {Keyboard, Modal, Platform, Touchable, TouchableOpacity} from 'react-native';
+import {Alert, Modal, Platform, TouchableOpacity} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
 
-import KakaoShareLink from 'react-native-kakao-share-link';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
-	BackgroundGray,
 	HStack,
 	HeaderContianer,
+	PretendardBoldText,
 	PretendardSemiBoldText,
 	PretendardVariableText,
 	VStack,
-	devicesWidth,
 } from '../../utill/layout/layout';
-import {DayText} from './my-travel-list';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGMaps, SVGPencil, SVGTravlePencil, SvgShare} from '../../utill/svg/svg';
+import {SVGPencil, SvgShare, SvgStart} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
 
-import Icon from 'react-native-vector-icons/AntDesign';
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {ScrollView} from 'react-native';
-import {AbsoluteTopBar} from '../timetable/map-info';
+
 import {RegionImage} from '../enroll-info/final-check';
-import {MarginContainer, MarkerContainer} from '../timetable/preset-detail';
+import {MarkerContainer} from '../timetable/preset-detail';
 import {Circle} from '../timetable/preset';
 import PrimaryButton from '../../utill/component/primary-button';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
-import {ButtonContainer, MarginContainder} from '../enroll-info/select-multi';
+import {ButtonContainer} from '../enroll-info/select-multi';
 import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
+import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, reviewCheck, region, regionInfo, timetable, picture, diary} =
+	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck} =
 		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const Icons = styled(Icon)``;
 	const goMyTravelDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -102,7 +99,7 @@ export default function DetailInfo({navigation}: any) {
 							key={`marker_${idx}`}
 							coordinate={{latitude: item.lat, longitude: item.lng}}
 							title={item.name}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: -20}}
+							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == 0 ? (
@@ -126,7 +123,7 @@ export default function DetailInfo({navigation}: any) {
 				key={`polyline_${index}`}
 				coordinates={polylineCoordinates}
 				strokeColor={index == 0 ? colors.PointYellow : colors.Gray5}
-				strokeWidth={2} // You can change the width of the line here
+				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
 			/>,
 		);
 	});
@@ -189,7 +186,6 @@ export default function DetailInfo({navigation}: any) {
 				}),
 			);
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '다이어리 저장이 실패했습니다',
@@ -240,7 +236,6 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const {firebaseImageRemove} = useFirebaseStorage();
 	const goRemove = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -258,19 +253,7 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const goReviewAndRating = () => {
-		reviewCheck
-			? dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '이미 리뷰작성을 하셨습니다.',
-					}),
-			  )
-			: navigation.navigate('InputReviewAndPoint');
-		if (editing) {
-			setEditing(false);
-			setText(travelName);
-		}
-	}; //여행 리뷰 별점 저장하기
+	//여행 리뷰 별점 저장하기
 	const goTimetable = async () => {
 		dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'modify'}));
 		dispatch(getRegionInfo({region: region[0]}));
@@ -287,9 +270,15 @@ export default function DetailInfo({navigation}: any) {
 				setEditing(false);
 				setText(travelName);
 			}
-			await kakaoShare({travelName: travelName, travelId: travelId, startDay: day[0], endDay: day[nDay]});
+			await kakaoShare({
+				travelName: travelName,
+				travelId: travelId,
+				startDay: day[0],
+				endDay: day[nDay],
+				photo: regionInfo?.photo,
+			});
+			await logEvent('share', {course: travelName});
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
@@ -298,6 +287,7 @@ export default function DetailInfo({navigation}: any) {
 		}
 	};
 	const [modify, setModify] = useState(false);
+	const [starStatus, setStarStatus] = useState(-1);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -332,6 +322,15 @@ export default function DetailInfo({navigation}: any) {
 			),
 		});
 	}, [modify]);
+	const [modalView, setModalView] = useState(false);
+	const [reviewText, setReivewText] = useState('');
+	const handleReviewText = useCallback((e: string) => {
+		setReivewText(e);
+	}, []);
+	useEffect(() => {
+		setModalView(!reviewCheck);
+		console.log('하헬방', reviewCheck);
+	}, [reviewCheck]);
 	useEffect(() => {
 		getMainViewPager();
 	}, []);
@@ -342,37 +341,44 @@ export default function DetailInfo({navigation}: any) {
 	);
 	const [editing, setEditing] = useState(false);
 	const [text, setText] = useState(travelName);
-	const checkChange = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '제목 변경',
-				modalSubTitle: `${text}로 변경하시겠습니까?`,
-				modalLeft: true,
-				modalFunction: changeTravelName,
-			}),
-		);
-	};
-	const changeTravelName = async () => {
+	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'afterTravelViewPager'});
+	const handleReview = useCallback(() => {
 		try {
+			const data = {
+				travelId: travelId,
+				review: reviewText,
+				point: starStatus + 1,
+				tendencyPoint: [],
+			};
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {updateTravelName: text, travelId: travelId};
-			await dispatch(reCourseName(data));
-			setEditing(false);
-			dispatch(travelSliceActions.enrollTravelName(text));
-		} catch {
-			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '예기치 못한 오류가 발생했습니다.'}));
+			setModalView(false);
+			dispatch(reviewAndPoint(data));
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '리뷰 감사합니다.',
+					modalFunction: () => {},
+					modalSingleUse: true,
+					modalTopText: '확인',
+				}),
+			);
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '리뷰 저장이 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
+				}),
+			);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
-	};
-	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'afterTravelViewPager'});
-
+	}, [reviewCheck, starStatus, reviewText]);
 	return (
 		<>
 			<Scroll>
 				<AbsoluteTopBar opacityState={false}>
 					<HStack gap={10} marginVertical={heightPercentage(10)} width={widthPercentage(375)}>
 						<RegionImage
+							resizeMode='contain'
 							source={{
 								uri: regionInfo?.photo == '' ? 'https://danim.me/square_logo.png' : regionInfo?.photo,
 							}}
@@ -412,14 +418,18 @@ export default function DetailInfo({navigation}: any) {
 											onPress={() => {
 												setEditing(true);
 											}}>
-											<SVGPencil color={colors.PointYellow} />
+											<SVGPencil
+												width={widthPercentage(16)}
+												height={widthPercentage(16)}
+												color={colors.PointYellow}
+											/>
 										</TouchableOpacity>
 									)}
 								</HStack>
 							</VStack>
 							{!modify && (
 								<TouchableOpacity onPress={goKakaoShare}>
-									<SvgShare />
+									<SvgShare width={heightPercentage(45)} height={heightPercentage(45)} />
 								</TouchableOpacity>
 							)}
 						</HStack>
@@ -429,7 +439,7 @@ export default function DetailInfo({navigation}: any) {
 					<MapView
 						//provider={PROVIDER_GOOGLE}
 						showsMyLocationButton={true}
-						style={{width: '100%', height: 350}}
+						style={{width: '100%', height: heightPercentage(350)}}
 						showsUserLocation={true}
 						region={{
 							latitude: centerLatitude,
@@ -452,48 +462,6 @@ export default function DetailInfo({navigation}: any) {
 						</AbsoluteButton>
 					)}
 				</MapContainer>
-				{/* <CourseAndReview>
-				<HandleButtonContainer
-					backgroundColor={colors.Primary}
-					onPress={() => {
-						editing
-							? dispatch(
-									modalSliceActions.setOpenModal({
-										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
-										modalLeft: true,
-										modalFunction: goTimetable,
-										modalTopText: '코스확인하기',
-										modalBottomText: '수정계속하기',
-									}),
-							  )
-							: goTimetable();
-					}}>
-					<SVGMaps />
-					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.Gray5}>
-						여행 코스 확인
-					</PretendardSemiBoldText>
-				</HandleButtonContainer>
-				<HandleButtonContainer
-					backgroundColor='#5350FF'
-					onPress={() => {
-						editing
-							? dispatch(
-									modalSliceActions.setOpenModal({
-										modalSubTitle: '변경 사항을 저장하지않고 진행하시겠습니까?',
-										modalLeft: true,
-										modalFunction: goReviewAndRating,
-										modalTopText: '리뷰작성하기',
-										modalBottomText: '수정계속하기',
-									}),
-							  )
-							: goReviewAndRating();
-					}}>
-					<SVGTravlePencil />
-					<PretendardSemiBoldText size={16} lineHeight={19.09} color={colors.backgroundWhite}>
-						리뷰 작성
-					</PretendardSemiBoldText>
-				</HandleButtonContainer>
-			</CourseAndReview> */}
 				<InputDiary
 					navigation={navigation}
 					modify={modify}
@@ -517,6 +485,50 @@ export default function DetailInfo({navigation}: any) {
 					marginBottom={heightPercentage(15)}
 					marginTop={heightPercentage(30)}></CustomButton>
 			</ButtonContainer>
+			<Modal animationType={'fade'} transparent={true} visible={modalView}>
+				<ModalContainer>
+					<ReviewContainer>
+						<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>
+							이 여행은 어떠셨나요?
+						</PretendardBoldText>
+						<StarConstainer>
+							{[...Array(5)].map((star, startIndex) => {
+								return (
+									<TouchableOpacity
+										onPress={() => {
+											setStarStatus(startIndex);
+										}}>
+										<SvgStart
+											key={startIndex}
+											width={widthPercentage(45)}
+											height={widthPercentage(45)}
+											color={starStatus >= startIndex ? colors.Primary : colors.Gray1}
+										/>
+									</TouchableOpacity>
+								);
+							})}
+						</StarConstainer>
+						<PretendardBoldText
+							style={{opacity: starStatus == -1 ? 1 : 0}}
+							size={13}
+							lineHeight={17}
+							color={colors.PointGreen1}>
+							별점을 선택해주세요!
+						</PretendardBoldText>
+						<ReviewText
+							onChangeText={handleReviewText}
+							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
+						<PrimaryButton
+							label='완료'
+							disabled={starStatus == -1}
+							width={widthPercentage(300)}
+							height={heightPercentage(50)}
+							backgroundColor={colors.Primary}
+							onPress={handleReview}
+							textColor={colors.Black}></PrimaryButton>
+					</ReviewContainer>
+				</ModalContainer>
+			</Modal>
 		</>
 	);
 }
@@ -536,40 +548,37 @@ const MapContainer = styled.View`
 `;
 const Scroll = styled.ScrollView``;
 
-export const IconContainer = styled.View`
-	width: 100%;
-	align-items: flex-end;
-`;
-export const CourseAndReview = styled(HStack)`
-	width: 100%;
-	margin: 10px 0px 10px 0px;
-	justify-content: space-between;
-`;
-export const CourseContainer = styled.TouchableOpacity`
-	width: 45%;
-	padding: 15px;
-	height: 150px;
-	border-radius: 10px;
-	background: ${colors.Primary};
-	justify-content: space-between;
-`;
-export const CourseTitleText = styled.Text`
-	font-size: ${devicesWidth * 0.05}px;
-	font-weight: bold;
-	color: white;
-	margin: 0px 0px 5px 0px;
-`;
-export const CourseSubTitleText = styled.Text`
-	font-size: 15px;
-	color: white;
-`;
-export const HeaderHStack = styled(HStack)`
-	justify-content: space-between;
-`;
 const CustomTextInput = styled.TextInput<{text: string}>`
 	width: 80%;
 	padding: 8px;
 	font-size: 16px;
 	font-weight: 400;
 	border-radius: 8px;
+`;
+const ModalContainer = styled.View`
+	flex: 1;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+`;
+const ReviewContainer = styled.View`
+	width: 100%;
+	height: ${heightPercentage(300)}px;
+	background-color: #f8f9fc;
+	border-top-right-radius: 16px;
+	border-top-left-radius: 16px;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+`;
+const ReviewText = styled.TextInput`
+	width: ${widthPercentage(300)}px;
+	height: ${heightPercentage(50)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundWhite};
+`;
+const StarConstainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	width: ${widthPercentage(270)}px;
 `;

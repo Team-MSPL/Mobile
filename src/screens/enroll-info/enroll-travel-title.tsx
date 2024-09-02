@@ -3,7 +3,7 @@ import {colors} from '../../utill/colors';
 import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {BackgroundGray, ClearTouchableOpacity, InputWrap} from '../../utill/layout/layout';
 import {SvgCancel} from '../../utill/svg/svg';
@@ -11,6 +11,7 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {ButtonContainer} from './select-multi';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {logEvent} from '../../../firebaseAnalytice';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [textValue, setTextValue] = useState('신나는 여행');
@@ -23,6 +24,12 @@ export default function EnrollTravelTitle({navigation}: any) {
 		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('SelectCity');
 	};
 	const [onFocus, setOnFocus] = useState(false);
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step1', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={1}></Stepper>
@@ -50,7 +57,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 								onPress={() => {
 									changeTextValue('');
 								}}>
-								<SvgCancel width='20' height='20' color='black' />
+								<SvgCancel width={widthPercentage(20)} height={widthPercentage(20)} color='black' />
 							</ClearTouchableOpacity>
 						)}
 					</InputAllContainter>

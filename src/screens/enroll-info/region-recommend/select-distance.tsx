@@ -1,10 +1,10 @@
-import {useCallback, useState} from 'react';
+import {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
 import Geolocation from 'react-native-geolocation-service';
-import {Platform, PermissionsAndroid} from 'react-native';
-import {Center, BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
+import {Platform, PermissionsAndroid, ScrollView, TextInput, TextInputProps, Pressable, Keyboard} from 'react-native';
+import {BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
 
 import Slider from '@react-native-community/slider';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -21,13 +21,53 @@ import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import PrimaryButton from '../../../utill/component/primary-button';
+import {logEvent} from '../../../../firebaseAnalytice';
+import {SVGSearch} from '../../../utill/svg/svg';
+import {cityViewList} from '../select-city';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const [range, setRange] = useState(10);
+	const [regionText, setRegionText] = useState('');
+	const [regionSearchState, setRegionSearchState] = useState(false);
+	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
+		[],
+	);
+	const regionSearchRef = useRef<TextInput | null>(null);
+	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
-	const {functionToken, socialloginProvider, signUpReward} = useAppSelector(state => state.userSlice);
+	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
-
+	const handleGoogleAnalytics = async () => {
+		await logEvent('place_step3', {});
+	};
+	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
+	const searchRegionList = cityViewList
+		.map((item, index) => {
+			if (index != 0) {
+				return item.sub.map((value, idx) => {
+					if (value.subTitle == '전체') {
+						let copy = {...value, subTitle: item.title};
+						return copy;
+					} else {
+						return value;
+					}
+				});
+			}
+		})
+		.filter(item => item != undefined)
+		.reduce(function (acc, cur) {
+			return [...acc, ...cur];
+		})
+		?.filter(item => !filterList.includes(item?.subTitle));
+	const handleRegionMatch = useCallback((e: {id: number; lat: number; lng: number; subTitle: string}[]) => {
+		setRegionMatchList(e);
+	}, []);
+	const handleRegionText = useCallback((e: string) => {
+		setRegionText(e);
+		handleRegionMatch(searchRegionList?.filter((item, index) => item.subTitle.includes(e)));
+	}, []);
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		try {
@@ -42,14 +82,14 @@ export default function SelectDistance({navigation}: any) {
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
 			if (result.length != 0) {
-				dispatch(updateFunctionToken({functionToken: functionToken - 1}));
+				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 				navigation.popToTop();
 				navigation.navigate('RegionViewResult');
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalSubTitle:
-							'적절한 여행지를 찾지못하였습니다.\n이용권은 차감되지않습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
+							'적절한 여행지를 찾지못하였습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
 					}),
 				);
 			}
@@ -57,7 +97,7 @@ export default function SelectDistance({navigation}: any) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalSubTitle:
-						'적절한 여행지를 찾지못하였습니다.\n이용권은 차감되지않습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
+						'적절한 여행지를 찾지못하였습니다.\n성향,여행 반경 등을 조금 조절한 후 다시 시도해주세요.',
 				}),
 			);
 		} finally {
@@ -67,39 +107,40 @@ export default function SelectDistance({navigation}: any) {
 	const checkSignUpReward = () => {
 		dispatch(userSliceActions.setSignUpReward(false));
 	};
-	useFocusEffect(
-		useCallback(() => {
-			if (signUpReward) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '회원가입 축하드립니다',
-						modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-						modalFunction: checkSignUpReward,
-					}),
-				);
-			}
-		}, [signUpReward]),
-	);
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		if (signUpReward) {
+	// 			dispatch(
+	// 				modalSliceActions.setOpenModal({
+	// 					modalTitle: '회원가입 축하드립니다',
+	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
+	// 					modalFunction: checkSignUpReward,
+	// 				}),
+	// 			);
+	// 		}
+	// 	}, [signUpReward]),
+	// );
 	const goPayment = async () => {
 		navigation.navigate('Payment');
 	};
 	const checkToken = () => {
-		functionToken >= 1
-			? dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: `이용권이 하나 소모됩니다.`,
-						modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
-						modalFunction: goNext,
-						modalLeft: true,
-					}),
-			  )
-			: dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-						modalFunction: goPayment,
-						modalLeft: true,
-					}),
-			  );
+		goNext();
+		// functionToken >= 1
+		// 	? dispatch(
+		// 			modalSliceActions.setOpenModal({
+		// 				modalTitle: `이용권이 하나 소모됩니다.`,
+		// 				modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
+		// 				modalFunction: goNext,
+		// 				modalLeft: true,
+		// 			}),
+		// 	  )
+		// 	: dispatch(
+		// 			modalSliceActions.setOpenModal({
+		// 				modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
+		// 				modalFunction: goPayment,
+		// 				modalLeft: true,
+		// 			}),
+		// 	  );
 	};
 	const requestPermission = async () => {
 		try {
@@ -157,13 +198,61 @@ export default function SelectDistance({navigation}: any) {
 			}
 		});
 	};
+
 	return (
-		<BackgroundGray>
+		<BackgroundGrayPressable
+			onPress={() => {
+				setRegionSearchState(false);
+				Keyboard.dismiss();
+			}}>
 			<Stepper total={7} now={7}></Stepper>
 			<StepText
 				styleText='3.원하는 반경의 지역을 추천해드려요.'
 				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
+			<RegionTextInputContainer>
+				<SVGSearch />
+				<RegionTextInput
+					ref={regionSearchRef}
+					placeholder='다른 지역 기준으로 추천받기 (검색)'
+					value={regionText}
+					// onBlur={() => {
+					// 	setRegionSearchState(false);
+					// }}
+					onFocus={() => {
+						setRegionSearchState(true);
+					}}
+					placeholderTextColor={colors.Gray3}
+					onChangeText={e => {
+						handleRegionText(e);
+					}}></RegionTextInput>
+			</RegionTextInputContainer>
+			<SearchContainer>
+				<ScrollView style={{zIndex: 2}}>
+					{regionSearchState &&
+						regionMatchList.map((item, index) => {
+							return (
+								<SearchElements
+									key={index}
+									onPress={() => {
+										const latlngData = {
+											lat: item.lat,
+											lng: item.lng,
+											name: item.subTitle,
+										};
+										setGeoInfo(latlngData);
+										regionSearchRef.current?.blur();
+										setRegionText(item.subTitle);
+										setRegionSearchState(false);
+									}}>
+									<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+										{item.subTitle}
+									</PretendardSemiBoldText>
+								</SearchElements>
+							);
+						})}
+				</ScrollView>
+			</SearchContainer>
 			<MapContainer>
 				{geoInfo.name == '기본값:서울역' && (
 					<GeolocationGetContainer>
@@ -234,9 +323,10 @@ export default function SelectDistance({navigation}: any) {
 					onPress={checkToken}
 					marginBottom={12}></CustomButton>
 			</ButtonContainer>
-		</BackgroundGray>
+		</BackgroundGrayPressable>
 	);
 }
+const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: Pressable})``;
 const GeolocationGetContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(240)}px;
@@ -252,4 +342,36 @@ const ButtonContainer = styled.View`
 	align-items: center;
 	justify-content: flex-end;
 	margin-bottom: 2px;
+`;
+const RegionTextInput = styled.TextInput`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(50)}px;
+	background-color: ${colors.backgroundWhite};
+	border-radius: 10px;
+`;
+const RegionTextInputContainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+	background-color: ${colors.backgroundWhite};
+	border-radius: 10px;
+	padding-horizontal: ${widthPercentage(10)}px;
+`;
+const SearchContainer = styled.View`
+	position: absolute;
+	align-self: center;
+	z-index: 2;
+	top: ${heightPercentage(237)}px;
+	width: ${widthPercentage(327)}px;
+	max-height: ${heightPercentage(150)}px;
+	background-color: ${colors.backgroundWhite};
+`;
+const SearchElements = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+	height: ${heightPercentage(50)}px;
+	border-color: ${colors.Gray3};
+	border-top-width: 1px;
+	padding-horizontal: 35px;
+	justify-content: center;
+	background-color: ${colors.backgroundWhite};
+	z-index: 2;
 `;

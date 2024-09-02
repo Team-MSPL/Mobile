@@ -11,8 +11,10 @@ import {useState} from 'react';
 import {ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {ButtonContainer} from '../select-multi';
+import {Platform} from 'react-native';
+import {logEvent} from '../../../../firebaseAnalytice';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate} = useAppSelector(state => state.travelSlice);
@@ -64,7 +66,7 @@ export default function DetailResult({navigation, route}: any) {
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const goDetail = (e: {name: string; lat: number; lng: number}) => {
+	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
 			name: e.name,
@@ -74,6 +76,10 @@ export default function DetailResult({navigation, route}: any) {
 			metropolitan: metropolitanStatus,
 		};
 		navigation.navigate('CourseDetail', {value: data});
+		await logEvent('view_place_explore', {
+			location: route.params.item.name,
+			place: e.name,
+		});
 	};
 	const [visible, setVisible] = useState(false);
 	return (
@@ -87,7 +93,7 @@ export default function DetailResult({navigation, route}: any) {
 						<TitleImage source={{uri: route.params.item.photo}}></TitleImage>
 					) : (
 						<LogoCOntainer>
-							<SvgLoginLogo color={'white'} width={40} />
+							<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
 						</LogoCOntainer>
 					)}
 				</RecommendMainContainer>
@@ -118,11 +124,11 @@ export default function DetailResult({navigation, route}: any) {
 					<StepText
 						mainText='인기 관광지 Top 5'
 						subText='해당 지역의 인기 관광지를 확인하세요'
-						mainTextSize={fontPercentage(18)}
-						subTextSize={fontPercentage(12)}
+						mainTextSize={18}
+						subTextSize={12}
 						marginLeft={0}
 						marginTop={0}
-						marginBottom={heightPercentage(14)}
+						marginBottom={14}
 					/>
 					<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
 						{route.params.item.topPopularPlaceList.map((item, idx) => (
@@ -140,7 +146,7 @@ export default function DetailResult({navigation, route}: any) {
 									<RecommendImage source={{uri: item.photo}}></RecommendImage>
 								) : (
 									<LogoCOntainer>
-										<SvgLoginLogo color={'white'} width={20} />
+										<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
 									</LogoCOntainer>
 								)}
 								<PopularityInfoTitleTextContainer>
@@ -228,7 +234,7 @@ const TitleImage = styled.Image`
 	resize-mode: cover;
 `;
 const RecommendImage = styled.Image`
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin: 0px 10px 0px 0px;
 	border-radius: 10px;
@@ -246,21 +252,6 @@ const PopularityContainer = styled.TouchableOpacity`
 	margin: 0px ${widthPercentage(12)}px 0px 0px;
 	display: inline-block;
 	flex-direction: row;
-	width: ${widthPercentage(152)}px;
+	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
-`;
-export const GoRecommendButton = styled.TouchableOpacity<{state: boolean}>`
-	width: ${props => (props.state ? '20%' : '85%')};
-	align-self: ${props => (props.state ? 'flex-end' : 'center')};
-	right: 20px;
-	border-radius: 20px;
-	border-width: 1px;
-	border-color: ${colors.selectButton};
-	padding: 15px;
-	position: absolute;
-	bottom: 20px;
-	background-color: ${colors.main};
-`;
-export const ButtonHStack = styled(HStack)`
-	justify-content: space-between;
 `;

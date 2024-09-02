@@ -21,7 +21,6 @@ export default function LiKeCommentBar() {
 			} else {
 				dispatch(clickLike({postId: postData._id}));
 				setTotalLike(totalLike + 1);
-				console.log('좋아요를 했습니다.');
 			}
 			setIsLiked(!isLiked);
 		} catch (error) {
@@ -38,13 +37,17 @@ export default function LiKeCommentBar() {
 					{postData.postedAt.slice(0, 10)}
 				</PretendardVariableText>
 				<LikeButton onPress={handleLikePress}>
-					<SVGHeart color={isLiked ? 'red' : colors.backgroundWhite} />
+					<SVGHeart
+						width={widthPercentage(16)}
+						height={widthPercentage(16)}
+						color={isLiked ? 'red' : colors.backgroundWhite}
+					/>
 					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
 						{totalLike}
 					</PretendardVariableText>
 				</LikeButton>
 				<HStack gap={widthPercentage(3)}>
-					<SVGMessageSquare />
+					<SVGMessageSquare width={widthPercentage(16)} height={widthPercentage(17)} />
 					<PretendardVariableText size={14} lineHeight={21} color={colors.Gray4}>
 						{postData.comment.length}
 					</PretendardVariableText>

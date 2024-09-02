@@ -1,9 +1,10 @@
 import {useEffect, useState} from 'react';
-import {devicesHeight, devicesWidth} from './layout/layout';
+import {PretendardBoldText, devicesHeight, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
+import {Platform} from 'react-native';
 export default function ViewPager({
 	handleFunction,
 	timetable,
@@ -27,12 +28,10 @@ export default function ViewPager({
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
 	useEffect(() => {
-		console.log(sliceNumber);
 		if (timetable ?? false) {
 			let copy = [...viewList];
 			setViewList(copy.slice(2, 4));
 		} else if (sliceNumber ?? false) {
-			console.log('qwe');
 			let copy = [...viewList];
 			setViewList(copy.slice(sliceNumber - 1, sliceNumber));
 		}
@@ -65,7 +64,9 @@ export default function ViewPager({
 						))}
 					</DotHStack>
 					<CancelContainer onPress={handleFunction}>
-						<SkipText>닫기</SkipText>
+						<PretendardBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+							닫기
+						</PretendardBoldText>
 					</CancelContainer>
 				</HStack>
 			) : (
@@ -80,11 +81,6 @@ export default function ViewPager({
 const DotHStack = styled.View`
 	flex-direction: row;
 `;
-const SkipText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: white;
-`;
 const Carousel = styled.ScrollView``;
 const HStack = styled.View`
 	flex-direction: row;
@@ -94,17 +90,17 @@ const HStack = styled.View`
 	justify-content: center;
 `;
 const Dot = styled.View<{size: number}>`
-	width: ${props => props.size}px;
-	height: 10px;
+	width: ${props => widthPercentage(props.size)}px;
+	height: ${heightPercentage(10)}px;
 	background-color: ${props => (props.size == 20 ? colors.Primary : 'white')};
 	border-radius: 99px;
-	margin: 5px;
+	margin: ${widthPercentage(5)}px;
 `;
 const CancelContainer = styled.TouchableOpacity`
 	justify-content: center;
 	align-items: center;
 	position: absolute;
-	right: 20px;
+	right: ${widthPercentage(20)}px;
 `;
 const MainContainer = styled.SafeAreaView`
 	flex: 1;
@@ -117,6 +113,6 @@ const ImageAllContainer = styled.View<{scrollState: boolean}>`
 	margin-bottom: ${heightPercentage(10)}px;
 `;
 const ImageContainer = styled.Image`
-	width: ${widthPercentage(327)}px;
+	width: ${widthPercentage(Platform.isPad ? 280 : 327)}px;
 	height: 100%;
 `;

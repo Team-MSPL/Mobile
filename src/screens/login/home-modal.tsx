@@ -18,7 +18,8 @@ export default function HomeModal({navigation, route}: {navigation: any; route: 
 	const texts = {
 		회원가입: {
 			main: `${userName} 님, 반가워요.\n여행을 준비하러 가볼까요?`,
-			sub: `회원가입 기념으로 사용 가능한\n이용권이 ${functionToken}개 발급되었습니다.\n여행지 및 일정 추천을 받아봐요!`,
+			// sub: `회원가입 기념으로 사용 가능한\n이용권이 ${functionToken}개 발급되었습니다.\n\n여행지 및 일정 추천을 받아봐요!`,
+			sub: `여행지 및 일정 추천을 받아볼까요?`,
 		},
 		재가입: {
 			main: `${userName} 님,\n 다시 돌아온 것을 환영해요.\n기다리고 있었어요!`,
@@ -46,7 +47,7 @@ export default function HomeModal({navigation, route}: {navigation: any; route: 
 
 const ButtonContainer = styled.View`
 	position: absolute;
-	bottom: 0px;
+	bottom: ${heightPercentage(10)}px;
 	width: ${widthPercentage(375)}px;
 	align-items: center;
 	justify-content: center;
@@ -61,11 +62,11 @@ const MainText = styled(PretendardVariable)`
 	font-weight: 600;
 	color: ${colors.Gray5};
 	line-height: ${heightPercentage(30)}px;
-	margin-bottom: ${heightPercentage(10)}px;
-	margin-top: ${heightPercentage(209)}px;
+	margin-bottom: ${heightPercentage(39)}px;
+	margin-top: ${heightPercentage(189)}px;
 `;
 const SubText = styled(PretendardSemiBold)`
-	font-size: ${fontPercentage(16)}px;
+	font-size: ${fontPercentage(15)}px;
 	font-weight: 600;
 	color: ${colors.Gray4};
 	line-height: ${heightPercentage(22.4)}px;

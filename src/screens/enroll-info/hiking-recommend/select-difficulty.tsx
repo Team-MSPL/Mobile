@@ -1,11 +1,10 @@
-import {useRef, useState} from 'react';
+import {useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {BackgroundGray, Center, PretendardSemiBoldText} from '../../../utill/layout/layout';
+import {BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import StepText from '../../../utill/component/enroll-info/step-text';
-import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {heightPercentage} from '../../../utill/layout/responsive-size';
 import {colors} from '../../../utill/colors';
-import Slider from '@react-native-community/slider';
 import {ButtonContainer} from '../select-multi';
 import CustomButton from '../../../utill/component/custom-button';
 import styled from 'styled-components/native';
@@ -15,7 +14,7 @@ import {hikingSearch} from '../../../redux/travel-info/hiking.slice';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 
 export default function HikingSelectDifficulty({navigation, setViewComponent}: any) {
-	const {selectDifficulty, mountainName, selectList} = useAppSelector(state => state.hikingSlice);
+	const {mountainName, selectList} = useAppSelector(state => state.hikingSlice);
 	const dispatch = useAppDispatch();
 	const goNext = async () => {
 		try {

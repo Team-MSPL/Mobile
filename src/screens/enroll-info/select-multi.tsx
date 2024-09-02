@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SVGPlus} from '../../utill/svg/svg';
 import Stepper from '../../utill/component/enroll-info/stepper';
-import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function SelectMulti({navigation}: any) {
 	const [accommodation, setAccommodation] = useState(false);
@@ -86,6 +86,8 @@ export default function SelectMulti({navigation}: any) {
 												}}
 												color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PointYellow}>
 												<SVGPlus
+													width={widthPercentage(16)}
+													height={widthPercentage(16)}
 													color={filteredPlaces.length >= 3 ? colors.Gray2 : colors.Primary}
 												/>
 											</SVGContainer>
@@ -153,6 +155,8 @@ export default function SelectMulti({navigation}: any) {
 														accommodations[idx + 1].name ? colors.Gray1 : colors.PointYellow
 													}>
 													<SVGPlus
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
 														color={
 															accommodations[idx + 1].name ? colors.Gray2 : colors.Primary
 														}

@@ -8,6 +8,8 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {useEffect} from 'react';
+import {logEvent} from '../../../firebaseAnalytice';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
@@ -34,6 +36,12 @@ export default function RecommendSelectWho({navigation}: any) {
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 0, region: false, item: item});
 	};
+	const handleGoogleAnalytics = async () => {
+		await logEvent('course_step4', {});
+	};
+	useEffect(() => {
+		handleGoogleAnalytics();
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={4}></Stepper>
@@ -53,6 +61,7 @@ export default function RecommendSelectWho({navigation}: any) {
 						label={item}
 						key={idx}
 						divide={true}
+						imageUrl={tendencyList[0]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
 						}}></TendencyButton>

@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {Fragment, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getNotice} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -19,7 +19,6 @@ export default function Notice({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const dataList = await dispatch(getNotice()).unwrap();
 			setNoticeList(dataList);
-			console.log(dataList);
 		} catch (err) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
 		} finally {

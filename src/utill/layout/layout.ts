@@ -21,11 +21,17 @@ export const HStack = styled.View<{
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
 `;
-export const VStack = styled.View<{width?: number; gap?: number; alignItems?: string; flex?: number}>`
+export const VStack = styled.View<{
+	width?: number;
+	gap?: number;
+	alignItems?: string;
+	flex?: number;
+	justifyContent?: string;
+}>`
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: ${props => props.alignItems ?? 'center'};
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
@@ -69,12 +75,6 @@ export const Center = styled.View`
 `;
 export const HeaderContianer = styled(HStack)`
 	justify-content: space-between;
-`;
-export const HeaderText = styled.Text`
-	font-size: 20px;
-	font-weight: bold;
-	color: ${colors.selectButton};
-	margin: 0px 5px;
 `;
 export const InputWrap = styled.View`
 	flex-direction: row;
@@ -130,6 +130,7 @@ export const PretendardVariableText = styled.Text<{
 	textAlign?: string;
 	marginTop?: number;
 	maxWidth?: number;
+	marginBottom?: number;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -140,13 +141,15 @@ export const PretendardVariableText = styled.Text<{
 	text-align: ${props => props.textAlign ?? 'auto'};
 	margin-top: ${props => props.marginTop ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
+	margin-bottom: ${props => props.marginBottom ?? 0}px;
 `;
-export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number}>`
+export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number; marginBottom?: number}>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
 	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	font-weight: 700;
+	margin-bottom: ${props => props.marginBottom ?? 0}px;
 `;
 export const PretendardSemiBoldText = styled.Text<{
 	color: string;
@@ -157,6 +160,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	marginBottom?: number;
 	maxWidth?: number;
 	textAlign?: string;
+	marginTop?: number;
 }>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
@@ -167,6 +171,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	text-decoration: ${props => props.textDecoration ?? null};
 	text-align: ${props => props.textAlign ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	margin-top: ${props => props.marginTop ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 `;
 
@@ -174,7 +179,7 @@ export const TagContainer = styled.View<{backgroundColor: string; width?: number
 	border-radius: 4px;
 	background-color: ${props => props.backgroundColor};
 	justify-content: space-around;
-	padding: ${props => props.padding ?? widthPercentage(3)}px;
+	padding: 0px ${props => props.padding ?? widthPercentage(3)}px;
 	flex-direction: row;
 	align-items: center;
 	height: ${props => props.height ?? heightPercentage(24)}px;
