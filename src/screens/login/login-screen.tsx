@@ -220,7 +220,7 @@ export default function LoginScreen({navigation}: any) {
 			onPress: googleLogin,
 		},
 		{
-			title: 'Kakao',
+			title: ' Kakao',
 			color: colors.reviewBackground,
 			image: <SvgKakao width={widthPercentage(18)} height={widthPercentage(18)} />,
 			onPress: kakaoLogin,

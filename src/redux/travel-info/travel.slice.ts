@@ -271,6 +271,18 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 	}
 });
 
+// export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
+// 	try {
+// 		const response = await axiosGoogle.get(
+// 			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&radius=1500&type=restaurant&key=${GOOGLE_API_KEY}`,
+// 		);
+// 		console.log(response.data.results);
+// 		return response.data.documents;
+// 	} catch (error: any) {
+// 		throw rejectWithValue(error.code);
+// 	}
+// });
+
 //여행코스 제목 수정
 export const reCourseName = createAsyncThunk(
 	'/travelCourse/updateTravelCourseName',

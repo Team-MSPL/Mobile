@@ -5,6 +5,7 @@ import {
 	getOneTravelCourse,
 	getRegionInfo,
 	reCourseName,
+	reviewAndPoint,
 	travelSliceActions,
 	updateDiary,
 } from '../../redux/travel-info/travel.slice';
@@ -19,13 +20,14 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
 	HStack,
 	HeaderContianer,
+	PretendardBoldText,
 	PretendardSemiBoldText,
 	PretendardVariableText,
 	VStack,
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGPencil, SvgShare} from '../../utill/svg/svg';
+import {SVGPencil, SvgShare, SvgStart} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
 
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
@@ -44,9 +46,8 @@ import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 import {logEvent} from '../../../firebaseAnalytice';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck} =
+		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const goMyTravelDetail = async () => {
 		try {
@@ -286,6 +287,7 @@ export default function DetailInfo({navigation}: any) {
 		}
 	};
 	const [modify, setModify] = useState(false);
+	const [starStatus, setStarStatus] = useState(-1);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -320,6 +322,15 @@ export default function DetailInfo({navigation}: any) {
 			),
 		});
 	}, [modify]);
+	const [modalView, setModalView] = useState(false);
+	const [reviewText, setReivewText] = useState('');
+	const handleReviewText = useCallback((e: string) => {
+		setReivewText(e);
+	}, []);
+	useEffect(() => {
+		setModalView(!reviewCheck);
+		console.log('하헬방', reviewCheck);
+	}, [reviewCheck]);
 	useEffect(() => {
 		getMainViewPager();
 	}, []);
@@ -331,7 +342,36 @@ export default function DetailInfo({navigation}: any) {
 	const [editing, setEditing] = useState(false);
 	const [text, setText] = useState(travelName);
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'afterTravelViewPager'});
-
+	const handleReview = useCallback(() => {
+		try {
+			const data = {
+				travelId: travelId,
+				review: reviewText,
+				point: starStatus + 1,
+				tendencyPoint: [],
+			};
+			dispatch(LoadingSliceActions.onLoading());
+			setModalView(false);
+			dispatch(reviewAndPoint(data));
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '리뷰 감사합니다.',
+					modalFunction: () => {},
+					modalSingleUse: true,
+					modalTopText: '확인',
+				}),
+			);
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '리뷰 저장이 실패했습니다',
+					modalSubTitle: '잠시후 다시 시도해주세요',
+				}),
+			);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	}, [reviewCheck, starStatus, reviewText]);
 	return (
 		<>
 			<Scroll>
@@ -445,6 +485,50 @@ export default function DetailInfo({navigation}: any) {
 					marginBottom={heightPercentage(15)}
 					marginTop={heightPercentage(30)}></CustomButton>
 			</ButtonContainer>
+			<Modal animationType={'fade'} transparent={true} visible={modalView}>
+				<ModalContainer>
+					<ReviewContainer>
+						<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>
+							이 여행은 어떠셨나요?
+						</PretendardBoldText>
+						<StarConstainer>
+							{[...Array(5)].map((star, startIndex) => {
+								return (
+									<TouchableOpacity
+										onPress={() => {
+											setStarStatus(startIndex);
+										}}>
+										<SvgStart
+											key={startIndex}
+											width={widthPercentage(45)}
+											height={widthPercentage(45)}
+											color={starStatus >= startIndex ? colors.Primary : colors.Gray1}
+										/>
+									</TouchableOpacity>
+								);
+							})}
+						</StarConstainer>
+						<PretendardBoldText
+							style={{opacity: starStatus == -1 ? 1 : 0}}
+							size={13}
+							lineHeight={17}
+							color={colors.PointGreen1}>
+							별점을 선택해주세요!
+						</PretendardBoldText>
+						<ReviewText
+							onChangeText={handleReviewText}
+							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
+						<PrimaryButton
+							label='완료'
+							disabled={starStatus == -1}
+							width={widthPercentage(300)}
+							height={heightPercentage(50)}
+							backgroundColor={colors.Primary}
+							onPress={handleReview}
+							textColor={colors.Black}></PrimaryButton>
+					</ReviewContainer>
+				</ModalContainer>
+			</Modal>
 		</>
 	);
 }
@@ -470,4 +554,31 @@ const CustomTextInput = styled.TextInput<{text: string}>`
 	font-size: 16px;
 	font-weight: 400;
 	border-radius: 8px;
+`;
+const ModalContainer = styled.View`
+	flex: 1;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+`;
+const ReviewContainer = styled.View`
+	width: 100%;
+	height: ${heightPercentage(300)}px;
+	background-color: #f8f9fc;
+	border-top-right-radius: 16px;
+	border-top-left-radius: 16px;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+`;
+const ReviewText = styled.TextInput`
+	width: ${widthPercentage(300)}px;
+	height: ${heightPercentage(50)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundWhite};
+`;
+const StarConstainer = styled.View`
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	width: ${widthPercentage(270)}px;
 `;

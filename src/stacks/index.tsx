@@ -19,6 +19,7 @@ import {colors} from '../utill/colors';
 import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
 import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout/responsive-size';
+import Search from '../screens/home/search';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -41,6 +42,7 @@ export default function StackNavigator() {
 			/>
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
+			<Stack.Screen name='Search' component={Search} />
 
 			{TimetableStack()}
 			{CommunityStack()}

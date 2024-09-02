@@ -13,7 +13,7 @@ import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd, SVGSearch} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
@@ -70,7 +70,9 @@ export default function Main({navigation}: any) {
 		);
 		navigation.navigate('EnrollTravelTitle');
 	};
-
+	const goSearch = useCallback(() => {
+		navigation.navigate('Search');
+	}, []);
 	const goCourseDetaile = (e: any) => {
 		let metropolitanStatus = metropolitanCheckList.includes(e.region);
 		const data = {
@@ -240,7 +242,8 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						{/* <TicketTouchable onPress={goTokenLog}>
+						{/* <TicketTouchable onPress={goSearch}>
+							<SVGSearch />
 							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
 								{t('이용권')}
 							</PretendardSemiBoldText>
@@ -393,8 +396,8 @@ const BackgroundImage = styled.ImageBackground`
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
 	top: ${heightPercentage(39)}px;
-	left: ${widthPercentage(295)}px;
-	width: ${widthPercentage(63)}px;
+	left: ${widthPercentage(325)}px;
+	width: ${widthPercentage(31)}px;
 	height: ${heightPercentage(31)}px;
 	background-color: ${colors.Primary};
 	align-items: center;

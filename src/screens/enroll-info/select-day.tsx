@@ -107,7 +107,6 @@ export default function SelectDay({navigation}: any) {
 			minuteCopy[dateFlag.current] = parseInt(timeData.minute);
 			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
 			return true;
-			// setVisible(false);
 		}
 	};
 	const [selectDateFlag, setSelectDateFlag] = useState(false);

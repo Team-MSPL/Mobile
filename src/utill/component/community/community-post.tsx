@@ -35,7 +35,7 @@ export default function CommunityPost() {
 			<PretendardBoldText size={16} lineHeight={19} color={colors.Black}>
 				{postData.postTitle}
 			</PretendardBoldText>
-			<PretendardVariableText size={14} lineHeight={21} color={colors.Black}>
+			<PretendardVariableText selectable={true} size={14} lineHeight={21} color={colors.Black}>
 				{postData.postContent}
 			</PretendardVariableText>
 			{postData.postImage.length === 0 ? (
