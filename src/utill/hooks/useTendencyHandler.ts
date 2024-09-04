@@ -34,7 +34,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '테마는 무엇인가요?',
 			multi: true,
-			list: ['힐링', '액티비티', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+			list: ['힐링', '활동적인', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
 			photo: [
 				require('../../../public/tendency/healing.png'),
 				require('../../../public/tendency/kitesurfing.png'),

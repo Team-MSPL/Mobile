@@ -1,4 +1,4 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id, Tripadvisor_KEy} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -9,7 +9,7 @@ const tendencyList = [
 		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
 	},
 	{
-		list: ['힐링', '액티비티', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+		list: ['힐링', '활동적인', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
 	},
 	{
 		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '유적지', '박물관', '공원', '사찰', '성지'],
@@ -97,6 +97,11 @@ export const axiosNaver = axios.create({
 });
 export const axiosTour = axios.create({
 	baseURL: 'https://apis.data.go.kr/B551011/KorService1',
+
+	headers: {'content-type': 'application/json'},
+});
+export const axiosTripadvisor = axios.create({
+	baseURL: 'https://api.content.tripadvisor.com/api/v1/location/search',
 
 	headers: {'content-type': 'application/json'},
 });
@@ -266,6 +271,17 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 			`/category.json?category_group_code=${data.category}&x=${data.lng}&y=${data.lat}&radius=${data.radius}&sort=accuracy`,
 		);
 		return response.data.documents;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+//트립어드바이져 식당,카페 등 추천 장소 얻는 거
+export const recommendTripadvisor = createAsyncThunk('/recommendTripadvisor', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosTripadvisor.get(
+			`?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
+		);
+		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
 	}
@@ -895,6 +911,22 @@ interface Photos {
 	width: number;
 }
 
+//TODO트립어바이저
+// export interface RecommendList {
+// 	address_name: string;
+// 	category_group_code: string;
+// 	category_group_name: string;
+// 	category_name: string;
+// 	distance: number;
+// 	id: number;
+// 	phone: string;
+// 	place_name: string;
+// 	place_url: string;
+// 	road_address_name: string;
+// 	x: number;
+// 	y: number;
+// }
+
 export interface RecommendList {
 	address_name: string;
 	category_group_code: string;
@@ -909,7 +941,6 @@ export interface RecommendList {
 	x: number;
 	y: number;
 }
-
 interface saveAiType {
 	region: string[];
 	day: string[];

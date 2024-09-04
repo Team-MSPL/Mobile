@@ -3,8 +3,14 @@ import shortId from 'shortid';
 import {Linking, TouchableOpacity, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
-import MapView, {Polyline, Marker} from 'react-native-maps';
-import {recommendApi, RecommendList, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import MapView, {Polyline, Marker, Circle} from 'react-native-maps';
+import {
+	recommendApi,
+	RecommendList,
+	recommendTripadvisor,
+	TimetableType,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
@@ -138,6 +144,7 @@ export default function Recommend({navigation, route}: any) {
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.navigate('Timetable');
 	};
+	//국내 카카오용
 	const getRecommendList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -176,6 +183,49 @@ export default function Recommend({navigation, route}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	//TODO트립어드바이저용
+	// const getRecommendList = async () => {
+	// 	try {
+	// 		dispatch(LoadingSliceActions.onLoading());
+	// 		let result = await dispatch(
+	// 			recommendTripadvisor({
+	// 				category: route.params.apiCategory,
+	// 				lat: route.params.lat,
+	// 				lng: route.params.lng,
+	// 				radius: route.params.radius,
+	// 				name: route.params.status.name,
+	// 			}),
+	// 		).unwrap();
+	// 		departure.current.lat = route.params.lat;
+	// 		departure.current.lng = route.params.lng;
+	// 		if (result.data.length == 0) {
+	// 			result = await dispatch(
+	// 				recommendTripadvisor({
+	// 					category: route.params.apiCategory,
+	// 					lat: route.params.backupLat,
+	// 					lng: route.params.backupLng,
+	// 					radius: 20000,
+	// 					name: route.params.status.name,
+	// 				}),
+	// 			).unwrap();
+	// 			departure.current.lat = route.params.lat;
+	// 			departure.current.lng = route.params.lng;
+	// 			result.data.length == 0 &&
+	// 				dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
+	// 		}
+	// 		setRcommendList(result.data);
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '추천 아이템이 없습니다!',
+	// 			}),
+	// 		);
+	// 		navigation.goBack();
+	// 	} finally {
+	// 		dispatch(LoadingSliceActions.offLoading());
+	// 	}
+	// };
 	const returnImageIndex = (e: string) => {
 		let numberIndex = 0;
 		switch (e.trim()) {
@@ -249,6 +299,15 @@ export default function Recommend({navigation, route}: any) {
 				}}>
 				{markers}
 				{polylines}
+				{/* TODO 트립어드바이저 반경만 보여주는거*/}
+				{/* <Circle
+					center={{
+						latitude: route.params.status.lat,
+						longitude: route.params.status.lng,
+					}}
+					style={{alignItems: 'center', justifyContent: 'center'}}
+					fillColor='rgba(38, 152, 251, 0.3);'
+					radius={1500}></Circle> */}
 			</MapView>
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
@@ -279,6 +338,7 @@ export default function Recommend({navigation, route}: any) {
 								}}>
 								<RecommendView>
 									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.Gray5}>
+										{/* {item.name}  TODO트립어드바이져*/}
 										{item.place_name}
 									</PretendardSemiBoldText>
 								</RecommendView>
@@ -292,11 +352,11 @@ export default function Recommend({navigation, route}: any) {
 												arrival: {lat: route.params.lat, lng: route.params.lng},
 											}) * 1000,
 										) +
+										// Math.floor(Number(item.distance) * 1000) TODO 트립어드바이저
 										'm'}
 								</PretendardVariableText>
 								<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
 									{item.category_name.split('>')[route.params.name == '식당 추천' ? 1 : 2]}
-									{/* {item.category_name.slice(6, item.category_name.length)} */}
 								</PretendardVariableText>
 							</ListVStack>
 							<PrimaryButton

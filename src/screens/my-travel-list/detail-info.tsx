@@ -355,7 +355,7 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(reviewAndPoint(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '리뷰 감사합니다.',
+					modalTitle: '리뷰 남겨주셔서 정말 감사드립니다!',
 					modalFunction: () => {},
 					modalSingleUse: true,
 					modalTopText: '확인',
@@ -517,6 +517,7 @@ export default function DetailInfo({navigation}: any) {
 						</PretendardBoldText>
 						<ReviewText
 							onChangeText={handleReviewText}
+							placeholderTextColor={colors.Gray2}
 							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
 						<PrimaryButton
 							label='완료'
@@ -575,6 +576,7 @@ const ReviewText = styled.TextInput`
 	height: ${heightPercentage(50)}px;
 	border-radius: 12px;
 	background-color: ${colors.backgroundWhite};
+	color: ${colors.Black};
 `;
 const StarConstainer = styled.View`
 	flex-direction: row;

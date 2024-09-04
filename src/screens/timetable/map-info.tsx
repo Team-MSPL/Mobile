@@ -68,8 +68,8 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		setSelect(idx);
 	};
 	const [visible, setVisible] = useState(true);
-	const moveRegion = async (e: number) => {
-		navigation.navigate('CourseDetail', {value: timetable[select][e]});
+	const moveRegion = async (e: number, index: number) => {
+		navigation.navigate('CourseDetail', {value: timetable[index][e]});
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {
@@ -341,7 +341,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								drag();
 							}}
 							onPress={() => {
-								moveRegion(idx);
+								// moveRegion(idx);
 							}}>
 							<HStack justifyContent='space-between'>
 								<VStack>
@@ -588,7 +588,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 														</DashLineContainer>
 														<InsideGrayContainer
 															onPress={() => {
-																moveRegion(idx);
+																moveRegion(idx, index);
 															}}>
 															<HStack justifyContent='space-between'>
 																<VStack>

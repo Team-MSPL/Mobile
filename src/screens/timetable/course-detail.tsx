@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, Pressable} from 'react-native';
+import {Image, Linking, Pressable} from 'react-native';
 import {
 	getPlaceInfo,
 	courseInfoType,
@@ -22,7 +22,7 @@ import {
 	PretendardVariableText,
 } from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
+import {SVGReviewPencil, SvgCalendar, SvgCall, SvgGoogle, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
@@ -124,7 +124,7 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	};
 	const {firebaseImageRemove} = useFirebaseStorage();
-	const deleteReview = async (e: any) => {
+	const deleteReview = useCallback(async (e: any) => {
 		try {
 			let data = {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
@@ -150,15 +150,15 @@ export default function CourseDetail({navigation, route}: any) {
 				}),
 			);
 		}
-	};
+	}, []);
 	useFocusEffect(
 		useCallback(() => {
 			getDetail();
 		}, []),
 	);
-	const toDayNoShow = async () => {
+	const toDayNoShow = useCallback(async () => {
 		await AsyncStorage.setItem('sobaecksan', moment().format('DD').toString());
-	};
+	}, []);
 	const checkSobaecksan = async () => {
 		const checkFlag = await AsyncStorage.getItem('sobaecksan');
 		checkFlag != moment().format('DD').toString() &&
@@ -176,8 +176,8 @@ export default function CourseDetail({navigation, route}: any) {
 			);
 	};
 	useEffect(() => {
-		checkSobaecksan();
-	}, []);
+		route.params.value.name == '소백산국립공원(경북)' && checkSobaecksan();
+	}, [route.params.value.name]);
 	const detailList = [
 		{
 			title: courseDetail?.address,
@@ -200,7 +200,7 @@ export default function CourseDetail({navigation, route}: any) {
 			console.log('qwe', err);
 		}
 	};
-	const goIncludeRecommend = () => {
+	const goIncludeRecommend = useCallback(() => {
 		let region: string[] = [];
 		if (route.params.value.region.includes(' ')) {
 			region = route.params.value.region.split(' ');
@@ -234,7 +234,7 @@ export default function CourseDetail({navigation, route}: any) {
 		dispatch(travelSliceActions.setInclueRecommend(data));
 		navigation.popToTop();
 		navigation.navigate('EnrollTravelTitle');
-	};
+	}, []);
 	const goReviewEnroll = () => {
 		navigation.navigate('CourseReview', {
 			value: {
@@ -248,6 +248,11 @@ export default function CourseDetail({navigation, route}: any) {
 		navigation.navigate('HikingSelectPlay');
 	};
 	const [moreStatus, setMoreStatus] = useState(true);
+	const handleMoreGoogleReview = useCallback(() => {
+		Linking.openURL(
+			`https://www.google.com/maps/search/${route.params.value.name}/data=!3m1!4b1?authuser=1&entry=ttu&g_ep=EgoyMDI0MDkwMi4wIKXMDSoASAFQAw%3D%3D`,
+		);
+	}, []);
 	if (courseDetail?.name)
 		return (
 			<>
@@ -384,12 +389,20 @@ export default function CourseDetail({navigation, route}: any) {
 						<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 						<HStack width={widthPercentage(327)} justifyContent='space-between'>
 							<HStack gap={widthPercentage(10)}>
-								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
-									리뷰
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
-									{courseDetail.review.length}
-								</PretendardSemiBoldText>
+								<HStack gap={widthPercentage(10)}>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+										리뷰
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
+										{courseDetail.review.length}
+									</PretendardSemiBoldText>
+								</HStack>
+								<MoreGoogleReviewTouchable onPress={handleMoreGoogleReview}>
+									<SvgGoogle width={widthPercentage(16)} height={widthPercentage(16)} />
+									<PretendardSemiBoldText size={13} lineHeight={20.8} color={colors.Gray5}>
+										{courseDetail.rating ? '전체 리뷰 보기' : '구글 리뷰 보기'}
+									</PretendardSemiBoldText>
+								</MoreGoogleReviewTouchable>
 							</HStack>
 							<HStack justifyContent='space-between'>
 								{courseDetail.status == 'firebase' && (
@@ -503,9 +516,22 @@ export default function CourseDetail({navigation, route}: any) {
 				)}
 			</>
 		);
-	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
+	return (
+		<NullContainer>
+			{!isLoading && <MainText>해당 이름의 장소가 구글 지도에 등록되어 있지 않습니다.</MainText>}
+		</NullContainer>
+	);
 }
 
+const MoreGoogleReviewTouchable = styled.TouchableOpacity`
+	flex-direction: row;
+	gap: ${widthPercentage(2)}px;
+	background-color: ${colors.Primary};
+	padding-vertical: ${widthPercentage(4)}px;
+	padding-horizontal: ${widthPercentage(8)}px;
+	align-items: center;
+	border-radius: 12px;
+`;
 const MoreTouchable = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 `;

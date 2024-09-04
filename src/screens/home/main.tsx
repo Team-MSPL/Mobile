@@ -26,6 +26,7 @@ import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
+import Carousel from 'react-native-reanimated-carousel';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
@@ -237,6 +238,23 @@ export default function Main({navigation}: any) {
 		}
 		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
 	};
+	const vividList = [
+		{
+			name: '쥬쥬',
+			region: '전남 순천시, 여수시 여행',
+			title: '친구의 추천으로 한번 사용해봤습니다. 여행 계획 짜는걸 굉장히 싫어하는데 대신 짜주니 굉장히 편리하네요 특히 제가 처한 상황이나 특징을 고려해서 짜주는게 좋았습니다.',
+		},
+		{
+			name: '카우준',
+			region: '경남 김해시 여행',
+			title: '여행 계획 짤때마다 다 비슷해서 싫었는데 이 앱은 제가 원하는 조건을 입력하면 그에따른 결과 값을 줘서 좋은거같아요',
+		},
+		{
+			name: '맨유맨',
+			region: '강원 원주시, 횡성군 여행',
+			title: '여행 계획 짜기 귀찮았는데 ,클릭 몇 번으로 여행 계획 만들어줘서 좋았다 다음에 여행 계획 짤때 또 사용할 듯 하다',
+		},
+	];
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
@@ -322,6 +340,37 @@ export default function Main({navigation}: any) {
 							))}
 						</CollectionContentContainer>
 					</CollectionContainer>
+					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+						다님 사용자들의 생생한 후기
+					</PretendardSemiBoldText>
+					<Carousel
+						loop
+						style={{
+							marginTop: 18,
+						}}
+						width={widthPercentage(337)}
+						height={heightPercentage(160)}
+						autoPlay={true}
+						data={[1, 2, 3]}
+						scrollAnimationDuration={1000}
+						onSnapToItem={() => {}}
+						autoPlayInterval={4000}
+						renderItem={({index}) => (
+							<VividReviewContainer>
+								<HStack>
+									<PretendardBoldText size={16} lineHeight={20} color={colors.Black}>
+										{vividList[index].name} 님{' '}
+									</PretendardBoldText>
+									<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
+										( {vividList[index].region} ) 📝
+									</PretendardBoldText>
+								</HStack>
+								<PretendardBoldText size={12} lineHeight={18} color={colors.Gray3}>
+									{vividList[index].title}
+								</PretendardBoldText>
+							</VividReviewContainer>
+						)}
+					/>
 				</HomeBottomContainer>
 			</HomeContainer>
 			<Modal
@@ -410,7 +459,7 @@ const HomeTextContainer = styled.Pressable`
 
 const CollectionContainer = styled.View`
 	margin-top: ${heightPercentage(36)}px;
-	margin-bottom: 12px;
+	margin-bottom: ${heightPercentage(26)}px;
 `;
 const CollectionContentContainer = styled.ScrollView`
 	margin-top: ${heightPercentage(18)}px;
@@ -431,6 +480,17 @@ const ImageContainer = styled.View`
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
+`;
+const VividReviewContainer = styled.View`
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(155)}px;
+	padding-horizontal: ${widthPercentage(30)}px;
+	padding-top: ${widthPercentage(15)}px;
+	gap: ${widthPercentage(10)}px;
+	background-color: ${colors.backgroundWhite};
+	border-width: 2px;
+	border-radius: 12px;
+	border-color: ${colors.Gray2};
 `;
 interface mainScreensType {
 	region: string;

@@ -348,6 +348,7 @@ const RegionTextInput = styled.TextInput`
 	height: ${heightPercentage(50)}px;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
+	color: black;
 `;
 const RegionTextInputContainer = styled.View`
 	flex-direction: row;
