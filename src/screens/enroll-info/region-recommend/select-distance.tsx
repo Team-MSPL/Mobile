@@ -15,7 +15,6 @@ import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useFocusEffect} from '@react-navigation/native';
 import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
-import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
@@ -68,11 +67,9 @@ export default function SelectDistance({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalytics();
 	}, []);
-	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			let datas = {
 				selectList: regionTendency,
 				selectPopular: popularity,

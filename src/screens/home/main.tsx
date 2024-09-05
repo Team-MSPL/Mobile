@@ -17,7 +17,6 @@ import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd, SVGSearc
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
@@ -32,19 +31,16 @@ export default function Main({navigation}: any) {
 	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
 	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const {t, i18n} = useTranslation();
 
 	const regionRecommend = async () => {
-		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
 		navigation.navigate('RegionSelectWho');
 		await logEvent('place_step1', {});
 	};
 	const goEnroll = () => {
-		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
@@ -483,7 +479,7 @@ const ImageContainer = styled.View`
 `;
 const VividReviewContainer = styled.View`
 	width: ${widthPercentage(326)}px;
-	height: ${heightPercentage(155)}px;
+	height: ${heightPercentage(160)}px;
 	padding-horizontal: ${widthPercentage(30)}px;
 	padding-top: ${widthPercentage(15)}px;
 	gap: ${widthPercentage(10)}px;

@@ -13,7 +13,7 @@ import {
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import {HeaderContianer, PretendardBold, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
 import Toast from 'react-native-toast-message';
@@ -162,7 +162,6 @@ export default function Timetable({navigation, route}: any) {
 
 		return () => backHandler.remove();
 	}, [modifyCheck, userId]);
-	const {appsflyerLogEvent} = useAppsflyer();
 	const firstSave = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -188,7 +187,6 @@ export default function Timetable({navigation, route}: any) {
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
-			makeMode == 'solo' && appsflyerLogEvent({name: 'solo_save', value: {id: 'danim'}});
 			dispatch(LoadingSliceActions.onLoading());
 			const data = {travelId: travelId, timetable: timetable};
 			await dispatch(updateTravelCourse(data));

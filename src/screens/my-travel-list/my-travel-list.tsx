@@ -170,7 +170,7 @@ export default function MyTravelList({navigation}: any) {
 			),
 		});
 	}, [shareFlag]);
-	const dDayCalculate = (e: any) => {
+	const dDayCalculate = useCallback((e: any) => {
 		//e.startDay=시작날짜e.endDay=끝나느날짜
 		// 0~1 당일  -1 미래 1과거
 		//여행 전, 여행 당일 ,여행 중, 여행 끝나는날, 여행 끝나고
@@ -198,7 +198,7 @@ export default function MyTravelList({navigation}: any) {
 		}
 		let data = {result: result, endFlag: endFlag};
 		return data;
-	};
+	}, []);
 	const goPreset = (data: any) => {
 		dispatch(
 			travelSliceActions.setCache({

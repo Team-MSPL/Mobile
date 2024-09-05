@@ -23,7 +23,6 @@ import {SVGFall, SVGFlag, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../.
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
 import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer} from './select-multi';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -163,11 +162,9 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
-	const {appsflyerLogEvent} = useAppsflyer();
 	const goNext = async () => {
 		//navigation.reset({routes: [{name: 'Preset'}]});
 		try {
-			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			setLoading(true);
 			if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
 				let changeName =

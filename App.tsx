@@ -8,11 +8,10 @@
 import React, {useEffect, useLayoutEffect} from 'react';
 import {BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
 
-import {Appsflyer_ios_id, Appsflyer_key, KAKAO_NATIVE_KEY} from '@env';
+import {KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import appsFlyer from 'react-native-appsflyer';
 import CodePush from 'react-native-code-push';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -172,22 +171,7 @@ function App(): JSX.Element {
 			dispatch(networkSliceActions.setNetworkConn(networkConnection));
 		});
 	};
-	appsFlyer.initSdk(
-		{
-			devKey: Appsflyer_key,
-			isDebug: false,
-			appId: Appsflyer_ios_id,
-			onInstallConversionDataListener: false, //Optional
-			onDeepLinkListener: true, //Optional
-			timeToWaitForATTUserAuthorization: 10, //for iOS 14.5
-		},
-		result => {
-			console.log(result);
-		},
-		error => {
-			console.error(error);
-		},
-	);
+
 	const {hasPermission, noPermission} = useAppSelector((state: RootState) => state.settingSlice);
 	const lottieHide = () => {
 		setTimeout(() => LottieSplashScreen.hide(), 3000);

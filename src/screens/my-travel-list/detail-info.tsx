@@ -509,11 +509,15 @@ export default function DetailInfo({navigation}: any) {
 							})}
 						</StarConstainer>
 						<PretendardBoldText
-							style={{opacity: starStatus == -1 ? 1 : 0}}
+							style={{opacity: starStatus == -1 || reviewText.length == 0 ? 1 : 0}}
 							size={13}
 							lineHeight={17}
 							color={colors.PointGreen1}>
-							별점을 선택해주세요!
+							{starStatus == -1 && reviewText.length == 0
+								? '리뷰,별점을 입력해주세요!'
+								: starStatus == -1
+								? '별점을 입력해주세요'
+								: '리뷰를 입력해주세요'}
 						</PretendardBoldText>
 						<ReviewText
 							onChangeText={handleReviewText}
@@ -521,7 +525,7 @@ export default function DetailInfo({navigation}: any) {
 							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
 						<PrimaryButton
 							label='완료'
-							disabled={starStatus == -1}
+							disabled={starStatus == -1 || reviewText.length == 0}
 							width={widthPercentage(300)}
 							height={heightPercentage(50)}
 							backgroundColor={colors.Primary}

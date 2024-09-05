@@ -80,7 +80,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 46
-        versionName "2.7.2"
+        versionName "2.8.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         missingDimensionStrategy 'store', 'play'
@@ -136,7 +136,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation project(':react-native-lottie-splash-screen')
     implementation project(':react-native-version-check')
-    implementation project(':react-native-appsflyer')
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

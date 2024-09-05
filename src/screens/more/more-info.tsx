@@ -5,7 +5,6 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
@@ -35,13 +34,11 @@ export default function MoreInfo({navigation}: any) {
 			}),
 		);
 	};
-	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler({type: 'exit'});
 	const goNavigation = (route: string) => {
 		navigation.navigate(route);
 	};
 	const goPayment = () => {
-		appsflyerLogEvent({name: 'more_payment_click', value: {id: 'danim'}});
 		navigation.navigate('Payment');
 	};
 	const goBack = () => {

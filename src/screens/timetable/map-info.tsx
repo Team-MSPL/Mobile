@@ -922,6 +922,7 @@ const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 `;
 const ViewMapTouchable = styled.TouchableOpacity`
 	flex: 0.03;
+	width: 100%;
 	justify-content: center;
 	align-items: center;
 	padding: ${widthPercentage(3)}px;
