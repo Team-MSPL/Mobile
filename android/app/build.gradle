@@ -79,7 +79,7 @@ android {
         applicationId "com.danimmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 46
+        versionCode 47
         versionName "2.8.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true

@@ -243,7 +243,7 @@ export default function InputDiary({navigation, modify, setModify, text}: any) {
 		</RecommendBorderContainer>
 	);
 }
-const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
+export const PictureColorContainer = styled.TouchableOpacity<{noBorder: boolean}>`
 	width: ${widthPercentage(150)}px;
 	height: ${widthPercentage(150)}px;
 	border-radius: 12px;
@@ -273,14 +273,14 @@ export const DiaryTextInput = styled.TextInput`
 	text-align-vertical: top;
 	padding: 10px;
 `;
-const PictureCotainer = styled.View`
+export const PictureCotainer = styled.View`
 	padding: 10px 0px;
 	width: 100%;
 	align-items: center;
 	margin: 0px 0px 15px 0px;
 	flex-direction: row;
 `;
-const PictureScroll = styled.ScrollView`
+export const PictureScroll = styled.ScrollView`
 	flex-direction: row;
 `;
 export const PictureElementContainer = styled.Pressable`
