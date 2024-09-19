@@ -49,7 +49,7 @@ export default function Recommend({navigation, route}: any) {
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
+						centerOffset={{x: 0, y: 0}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
 							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
@@ -309,6 +309,11 @@ export default function Recommend({navigation, route}: any) {
 					fillColor='rgba(38, 152, 251, 0.3);'
 					radius={1500}></Circle> */}
 			</MapView>
+			<TextContainer>
+				<PretendardSemiBoldText size={12} color={colors.PointYellow} lineHeight={18}>
+					*카카오맵 기준으로 인기있는 장소들을 추천드려요.
+				</PretendardSemiBoldText>
+			</TextContainer>
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
@@ -384,6 +389,12 @@ export default function Recommend({navigation, route}: any) {
 		</RecommendContainer>
 	);
 }
+const TextContainer = styled.View`
+	width: 100%;
+	height: ${heightPercentage(25)}px;
+	align-items: center;
+	justify-content: center;
+`;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(71)}px;
 	height: ${widthPercentage(71)}px;

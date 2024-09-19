@@ -111,7 +111,7 @@ export default function PresetDetail({navigation, route}: any) {
 							key={`marker_${index}_${iindex}`}
 							style={{zIndex: 4}}
 							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
+							centerOffset={{x: 0, y: 0}}
 							anchor={{x: 0.5, y: 0.5}}
 							title={vvalue.name}>
 							{index == select ? (

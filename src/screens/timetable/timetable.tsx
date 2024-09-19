@@ -112,8 +112,8 @@ export default function Timetable({navigation, route}: any) {
 						modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
 						modalLeft: true,
 						modalFunction: goKakaoShare,
-						modalTopText: '일행과 일정 공유하기',
-						modalBottomText: '다음에',
+						modalTopText: '카카오톡으로 공유',
+						modalBottomText: '다음에 할게요',
 						modalConfetti: true,
 					}),
 				);
