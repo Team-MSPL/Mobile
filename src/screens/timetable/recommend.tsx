@@ -311,7 +311,7 @@ export default function Recommend({navigation, route}: any) {
 			</MapView>
 			<TextContainer>
 				<PretendardSemiBoldText size={12} color={colors.PointYellow} lineHeight={18}>
-					*카카오맵 기준으로 인기있는 장소들을 추천드려요.
+					*카카오맵 기준으로 인기있는 장소들을 추천드려요!
 				</PretendardSemiBoldText>
 			</TextContainer>
 			<RecommendScrollView>

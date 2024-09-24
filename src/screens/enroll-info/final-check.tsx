@@ -1,12 +1,10 @@
-import {Alert, BackHandler, Modal, TouchableOpacity} from 'react-native';
+import {BackHandler, Modal, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {cityViewList} from './select-city';
-import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useState} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
 import {
 	MainContainer,
 	VStack,
@@ -50,17 +48,10 @@ export default function FinalCheck({navigation}: any) {
 		regionInfo,
 		travelName,
 	} = useAppSelector(state => state.travelSlice);
-	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
-	const goPayment = async () => {
-		navigation.navigate('Payment');
-	};
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const goNewLogin = () => {
-		navigation.navigate('LoginScreen');
-	};
 	const [tendencyModify, setTendencyModify] = useState({status: false, index: 0});
 	const handleTendencyModify = (index: number) => {
 		setTendencyModify({status: true, index: index});
@@ -107,45 +98,7 @@ export default function FinalCheck({navigation}: any) {
 	];
 	const checkToken = () => {
 		goNext();
-		// if (freeTicket) {
-		// 	goNext();
-		// } else {
-		// 	functionToken >= 1
-		// 		? dispatch(
-		// 				modalSliceActions.setOpenModal({
-		// 					modalTitle: `이용권이 하나가 사용돼요`,
-		// 					modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
-		// 					modalFunction: goNext,
-		// 					modalLeft: true,
-		// 					modalTopText: '사용하기',
-		// 					modalBottomText: '취소',
-		// 				}),
-		// 		  )
-		// 		: dispatch(
-		// 				modalSliceActions.setOpenModal({
-		// 					modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-		// 					modalFunction: goPayment,
-		// 					modalLeft: true,
-		// 				}),
-		// 		  );
-		// }
 	};
-	const checkSignUpReward = () => {
-		dispatch(userSliceActions.setSignUpReward(false));
-	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused() && loading) {
@@ -162,8 +115,7 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
-	const goNext = async () => {
-		//navigation.reset({routes: [{name: 'Preset'}]});
+	const goNext = useCallback(async () => {
 		try {
 			setLoading(true);
 			if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
@@ -200,6 +152,7 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 					bandwidth: bandwidth,
 					freeTicket: freeTicket,
+					//version: 2,
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));
@@ -212,8 +165,6 @@ export default function FinalCheck({navigation}: any) {
 							modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
 						}),
 					);
-
-				// !freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 			} else {
 				dispatch(
 					modalSliceActions.setOpenModal({
@@ -232,7 +183,7 @@ export default function FinalCheck({navigation}: any) {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 	const checkDeleteAccommodation = (e: number) => {
 		dispatch(
 			modalSliceActions.setOpenModal({

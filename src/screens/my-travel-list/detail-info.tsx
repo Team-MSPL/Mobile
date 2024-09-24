@@ -355,7 +355,7 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(reviewAndPoint(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '리뷰 남겨주셔서 정말 감사드립니다!',
+					modalTitle: '리뷰 남겨주셔서\n정말 감사드립니다! :)',
 					modalFunction: () => {},
 					modalSingleUse: true,
 					modalTopText: '확인',
@@ -508,7 +508,7 @@ export default function DetailInfo({navigation}: any) {
 								);
 							})}
 						</StarConstainer>
-						<PretendardBoldText
+						<PretendardSemiBoldText
 							style={{opacity: starStatus == -1 || reviewText.length == 0 ? 1 : 0}}
 							size={13}
 							lineHeight={17}
@@ -518,11 +518,11 @@ export default function DetailInfo({navigation}: any) {
 								: starStatus == -1
 								? '별점을 입력해주세요'
 								: '리뷰를 입력해주세요'}
-						</PretendardBoldText>
+						</PretendardSemiBoldText>
 						<ReviewText
 							onChangeText={handleReviewText}
 							placeholderTextColor={colors.Gray2}
-							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
+							placeholder=' 방문했던 곳에 대해 이야기해주세요.'></ReviewText>
 						<PrimaryButton
 							label='완료'
 							disabled={starStatus == -1 || reviewText.length == 0}
