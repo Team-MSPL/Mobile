@@ -93,6 +93,7 @@ export default function Main({navigation}: any) {
 	};
 	const checkEvent = async () => {
 		const eventExist = await dispatch(getEventList()).unwrap();
+		console.log('ddd', eventExist);
 		const state = await AsyncStorage.getItem('eventState');
 		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
 			dispatch(eventSliceActions.setEventState(true));

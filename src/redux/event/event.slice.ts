@@ -5,6 +5,7 @@ const name = 'event';
 const initialState: EventState = {
 	eventState: false,
 	eventList: [],
+	eventLink: '',
 };
 
 const eventSlice = createSlice({
@@ -34,12 +35,14 @@ export const getEventList = createAsyncThunk('/event/eventList', async (_, {reje
 interface EventState {
 	eventState: boolean;
 	eventList: EventListType[];
+	eventLink: string;
 }
 
 interface EventListType {
 	_id: string;
 	eventImage: string;
 	eventEndDate: string;
+	eventLink: string;
 }
 
 export const eventSliceActions = eventSlice.actions;

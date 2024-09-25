@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {eventSliceActions} from '../../../redux/event/event.slice';
 import {useState} from 'react';
+import {Linking} from 'react-native';
 
 export default function Event() {
 	const dispatch = useAppDispatch();
@@ -36,7 +37,11 @@ export default function Event() {
 					}}
 					showsHorizontalScrollIndicator={false}>
 					{eventList.map((item, idx) => (
-						<ScrollContainer key={idx}>
+						<ScrollContainer
+							key={idx}
+							onPress={() => {
+								Linking.openURL(item.eventLink);
+							}}>
 							<EventImage
 								source={{
 									uri: item.eventImage,
@@ -65,7 +70,7 @@ export default function Event() {
 		</Container>
 	);
 }
-const ScrollContainer = styled.View`
+const ScrollContainer = styled.Pressable`
 	width: ${devicesWidth * 0.95}px;
 	align-items: center;
 	justify-content: center;
