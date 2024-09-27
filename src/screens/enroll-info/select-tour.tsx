@@ -5,12 +5,11 @@ import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
 import CustomButton from '../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {useAppDispatch, useAppSelector} from '../../redux';
+import {useAppSelector} from '../../redux';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 
 export default function RecommendSelectTour({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
 	const goNext = () => {
 		navigation.navigate('SelectDistance');
 	};

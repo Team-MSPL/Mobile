@@ -7,6 +7,7 @@ import moment from 'moment';
 import {eventSliceActions} from '../../../redux/event/event.slice';
 import {useState} from 'react';
 import {Linking} from 'react-native';
+import ImageView from 'react-native-image-viewing';
 
 export default function Event() {
 	const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ export default function Event() {
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
+	const [visible, setVisible] = useState(false);
 	return (
 		<Container>
 			<ViewContaniner>
@@ -40,7 +42,11 @@ export default function Event() {
 						<ScrollContainer
 							key={idx}
 							onPress={() => {
-								Linking.openURL(item.eventLink);
+								if (item.eventLink == '') {
+									setVisible(true);
+								} else {
+									Linking.openURL(item.eventLink);
+								}
 							}}>
 							<EventImage
 								source={{
@@ -67,6 +73,14 @@ export default function Event() {
 					</TextPressable>
 				</EventHStack>
 			</ViewContaniner>
+			<ImageView
+				images={eventList.map((value, index) => ({
+					uri: value.eventImage,
+				}))}
+				imageIndex={viewIndex}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+			/>
 		</Container>
 	);
 }

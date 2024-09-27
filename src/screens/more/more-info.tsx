@@ -14,10 +14,9 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import UserManage from './user-manage';
 import PrimaryButton from '../../utill/component/primary-button';
 import {WhiteContainer} from '../enroll-info/final-check';
-import Coupon from './coupon';
 import PushNotify from './push-notify';
 export default function MoreInfo({navigation}: any) {
-	const {userName, socialloginProvider, functionToken, userProfileImage} = useAppSelector(state => state.userSlice);
+	const {userName, socialloginProvider, userProfileImage} = useAppSelector(state => state.userSlice);
 	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
 	const dispatch = useAppDispatch();
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
@@ -37,9 +36,6 @@ export default function MoreInfo({navigation}: any) {
 	useBackHandler({type: 'exit'});
 	const goNavigation = (route: string) => {
 		navigation.navigate(route);
-	};
-	const goPayment = () => {
-		navigation.navigate('Payment');
 	};
 	const goBack = () => {
 		setViewPagerView(false);
@@ -141,25 +137,6 @@ export default function MoreInfo({navigation}: any) {
 						계정
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						{/* <SettingElement
-							onPress={() => {
-								goNavigation('TokenLog');
-							}}
-							bottomShow={true}>
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
-									이용권 갯수{'    '} {functionToken} 개
-								</PretendardSemiBoldText>
-								<PrimaryButton
-									label='이용권 구매'
-									width={widthPercentage(100)}
-									height={heightPercentage(40)}
-									onPress={goPayment}
-									backgroundColor={colors.Primary}
-									textColor={colors.Black}></PrimaryButton>
-							</HStack>
-						</SettingElement> */}
-						{/* {Platform.OS != 'ios' && <Coupon />} */}
 						<HStack width={widthPercentage(303)} justifyContent='space-between'>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 								계정타입

@@ -31,18 +31,6 @@ export const userWithdraw = createAsyncThunk(
 		}
 	},
 );
-//쿠폰입력
-export const couponCheck = createAsyncThunk(
-	'/marketing/useCoupon',
-	async (data: {couponCode: string; functionToken: number}, {rejectWithValue}) => {
-		try {
-			const response = await axiosAuth.patch('/marketing/useCoupon', data);
-			return response.data;
-		} catch (err: any) {
-			return rejectWithValue(err.response.data);
-		}
-	},
-);
 //이용권관리
 export const updateFunctionToken = createAsyncThunk(
 	'/user/updateFunctionToken',
@@ -99,16 +87,6 @@ export const updateProfile = createAsyncThunk(
 		}
 	},
 );
-
-//이용권 로그 확인하기
-export const getTokenLog = createAsyncThunk('/tokenLog', async (_, {rejectWithValue}) => {
-	try {
-		const response = await axiosAuth.get(`/manageUser/tokenLog`);
-		return response.data;
-	} catch (err: any) {
-		throw rejectWithValue(err.response.data);
-	}
-});
 
 //광고 시청 횟수 확인
 export const getWatchADTime = createAsyncThunk('/manageUser/watchADTime', async (_, {rejectWithValue}) => {
@@ -187,9 +165,6 @@ const userSlice = createSlice({
 		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {
 			state.functionToken = payload.functionToken;
 		});
-		builder.addCase(couponCheck.fulfilled, (state, {payload}) => {
-			state.functionToken = payload.functionToken;
-		});
 	},
 });
 
@@ -212,11 +187,4 @@ export interface UserState {
 	userIdToken: string;
 	reLogin: boolean;
 	analyticeFlag: boolean;
-}
-
-export interface TokenLogType {
-	tokenLogContent: string;
-	tokenLogNumber: number;
-	tokenLogDate: string;
-	_id: string;
 }

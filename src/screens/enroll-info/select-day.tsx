@@ -5,7 +5,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import moment from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Platform, Pressable, ScrollView} from 'react-native';

@@ -1,4 +1,4 @@
-import {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
@@ -13,8 +13,6 @@ import {DistanceCenter, DistanceSpace, MapContainer, Qwe} from '../select-distan
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {useFocusEffect} from '@react-navigation/native';
-import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
 import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
@@ -33,7 +31,6 @@ export default function SelectDistance({navigation}: any) {
 	const regionSearchRef = useRef<TextInput | null>(null);
 	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
-	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 	const handleGoogleAnalytics = async () => {
 		await logEvent('place_step3', {});
@@ -101,43 +98,8 @@ export default function SelectDistance({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const checkSignUpReward = () => {
-		dispatch(userSliceActions.setSignUpReward(false));
-	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
-	const goPayment = async () => {
-		navigation.navigate('Payment');
-	};
 	const checkToken = () => {
 		goNext();
-		// functionToken >= 1
-		// 	? dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: `이용권이 하나 소모됩니다.`,
-		// 				modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
-		// 				modalFunction: goNext,
-		// 				modalLeft: true,
-		// 			}),
-		// 	  )
-		// 	: dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-		// 				modalFunction: goPayment,
-		// 				modalLeft: true,
-		// 			}),
-		// 	  );
 	};
 	const requestPermission = async () => {
 		try {

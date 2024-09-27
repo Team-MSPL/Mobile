@@ -1,4 +1,4 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id, Tripadvisor_KEy} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -275,29 +275,6 @@ export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, 
 		throw rejectWithValue(error.code);
 	}
 });
-//트립어드바이져 식당,카페 등 추천 장소 얻는 거
-export const recommendTripadvisor = createAsyncThunk('/recommendTripadvisor', async (data: any, {rejectWithValue}) => {
-	try {
-		const response = await axiosTripadvisor.get(
-			`?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
-		);
-		return response.data;
-	} catch (error: any) {
-		throw rejectWithValue(error.code);
-	}
-});
-
-// export const recommendApi = createAsyncThunk('/recommendApi', async (data: any, {rejectWithValue}) => {
-// 	try {
-// 		const response = await axiosGoogle.get(
-// 			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&radius=1500&type=restaurant&key=${GOOGLE_API_KEY}`,
-// 		);
-// 		console.log(response.data.results);
-// 		return response.data.documents;
-// 	} catch (error: any) {
-// 		throw rejectWithValue(error.code);
-// 	}
-// });
 
 //여행코스 제목 수정
 export const reCourseName = createAsyncThunk(

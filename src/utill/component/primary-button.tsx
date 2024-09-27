@@ -1,7 +1,6 @@
 import styled from 'styled-components/native';
-import {colors} from '../colors';
-import {PretendardSemiBoldText, PretendardVariable} from '../layout/layout';
-import {fontPercentage, heightPercentage, widthPercentage} from '../layout/responsive-size';
+import {PretendardSemiBoldText} from '../layout/layout';
+import {widthPercentage} from '../layout/responsive-size';
 
 export default function PrimaryButton({
 	width,
@@ -56,13 +55,6 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	margin-bottom: ${props => widthPercentage(props?.marginBottom ?? 0)}px;
 	margin-top: ${props => widthPercentage(props?.marginTop ?? 0)}px;
 	opacity: ${props => (props.disabledStatus ? 0.4 : 1)};
-`;
-const InsideText = styled(PretendardVariable)<{
-	textColor: string;
-}>`
-	font-size: ${fontPercentage(14)}px;
-	color: ${props => props.textColor};
-	line-height: ${heightPercentage(21)}px;
 `;
 
 interface PrimarybuttonType {

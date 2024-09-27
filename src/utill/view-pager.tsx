@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {PretendardBoldText, devicesHeight, devicesWidth} from './layout/layout';
+import {PretendardBoldText, devicesWidth} from './layout/layout';
 import styled from 'styled-components/native';
 import {colors} from './colors';
 import CustomButton from './component/custom-button';

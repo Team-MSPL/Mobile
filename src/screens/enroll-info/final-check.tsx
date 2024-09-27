@@ -152,7 +152,7 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 					bandwidth: bandwidth,
 					freeTicket: freeTicket,
-					//version: 2,
+					// version: 2,
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));

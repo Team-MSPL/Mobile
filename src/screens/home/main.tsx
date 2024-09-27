@@ -83,9 +83,6 @@ export default function Main({navigation}: any) {
 		};
 		navigation.navigate('CourseDetail', {value: data});
 	};
-	const goTokenLog = () => {
-		navigation.navigate('TokenLog');
-	};
 
 	const pushPermission = async () => {
 		const authStatus = await messaging().requestPermission();
@@ -176,7 +173,6 @@ export default function Main({navigation}: any) {
 			text: '여행 코스 ',
 		},
 	];
-	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
 	const setPreset = (data: {
 		preset: any;
 		presetTendency: any;
@@ -257,12 +253,6 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						{/* <TicketTouchable onPress={goSearch}>
-							<SVGSearch />
-							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								{t('이용권')}
-							</PretendardSemiBoldText>
-						</TicketTouchable> */}
 						<HomeTextContainer
 							onPress={() => {
 								selectPopularity({

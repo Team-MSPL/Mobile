@@ -12,8 +12,6 @@ import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../colors';
 
-import Icon from 'react-native-vector-icons/AntDesign';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariableText} from '../../layout/layout';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';

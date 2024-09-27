@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import CustomButton from '../../utill/component/custom-button';
 import {
 	MainContainer,
@@ -20,8 +19,6 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 export default function SelectMulti({navigation}: any) {
-	const [accommodation, setAccommodation] = useState(false);
-	const [essential, setEssential] = useState(false);
 	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
 		state => state.travelSlice,
 	);
@@ -35,9 +32,6 @@ export default function SelectMulti({navigation}: any) {
 		navigation.navigate('RecommendSelectWho');
 	};
 
-	const openAccommodation = () => {
-		setAccommodation(!accommodation);
-	};
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
@@ -46,9 +40,6 @@ export default function SelectMulti({navigation}: any) {
 	const deleteEssential = (e: EssentialPlaceType) => {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
-	};
-	const openEssential = () => {
-		setEssential(!essential);
 	};
 	return (
 		<>
