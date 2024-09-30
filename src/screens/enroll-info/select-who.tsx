@@ -10,6 +10,7 @@ import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useEffect} from 'react';
 import {logEvent} from '../../../firebaseAnalytice';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
@@ -67,7 +68,7 @@ export default function RecommendSelectWho({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton marginBottom={12} onPress={checkNext} label='다음'></CustomButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectMove' goNext={checkNext}></RouteButton>
 		</BackgroundGray>
 	);
 }

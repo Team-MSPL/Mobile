@@ -2,7 +2,6 @@ import {ScrollView} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getRegionInfo, travelSliceActions} from '../../redux/travel-info/travel.slice';
 
-import CustomButton from '../../utill/component/custom-button';
 import {BackgroundGray, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -10,11 +9,11 @@ import {colors} from '../../utill/colors';
 import {SvgCancel} from '../../utill/svg/svg';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 
-import {ButtonContainer} from './select-multi';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useEffect} from 'react';
 import {logEvent} from '../../../firebaseAnalytice';
+import RouteButton from '../../utill/component/route-button';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -165,9 +164,7 @@ export default function SelectCity({navigation}: any) {
 					</SeoulContainer>
 				</FlexContainer>
 			)}
-			<ButtonContainer>
-				<CustomButton label={`다음`} onPress={goNext}></CustomButton>
-			</ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle='SelectMulti' goNext={goNext}></RouteButton>
 		</BackgroundGray>
 	);
 }

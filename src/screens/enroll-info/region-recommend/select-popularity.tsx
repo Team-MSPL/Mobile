@@ -1,5 +1,4 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import CustomButton from '../../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../../redux/travel-info/region-recommend.slice';
 import {BackgroundGray, MainContainer, PretendardSemiBoldText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
@@ -10,6 +9,7 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import RangeSlider from 'rn-range-slider';
 import {useEffect, useRef} from 'react';
 import {logEvent} from '../../../../firebaseAnalytice';
+import RouteButton from '../../../utill/component/route-button';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
@@ -69,9 +69,8 @@ export default function SelectPopularity({navigation}: any) {
 					: 서울, 제주 등 10개 지역
 				</PretendardSemiBoldText>
 			</BarContainer>
-			<ButtonContainer>
-				<CustomButton label='다음' onPress={goNext} marginBottom={12}></CustomButton>
-			</ButtonContainer>
+
+			<RouteButton navigation={navigation} nextTitle='RegionSelectPopularity' goNext={goNext}></RouteButton>
 		</BackgroundGray>
 	);
 }
@@ -81,10 +80,6 @@ const SpaceHstack = styled.View`
 	flex-direction: row;
 	align-self: center;
 	margin-top: ${heightPercentage(5)}px;
-`;
-const ButtonContainer = styled.View`
-	flex: 1;
-	justify-content: flex-end;
 `;
 export const ThumbInside = styled.View`
 	width: ${widthPercentage(15.53)}px;

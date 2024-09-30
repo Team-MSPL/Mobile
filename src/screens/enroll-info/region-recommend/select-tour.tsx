@@ -2,17 +2,14 @@ import styled from 'styled-components/native';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
-import CustomButton from '../../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {useAppSelector} from '../../../redux';
 import {BackgroundGray} from '../../../utill/layout/layout';
 import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
+import RouteButton from '../../../utill/component/route-button';
 
 export default function SelectTour({navigation}: any) {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
-	const goNext = () => {
-		navigation.navigate('RegionSelectPopularity');
-	};
 	const {handleButtonClick, regionTendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: true, item: item});
@@ -39,7 +36,7 @@ export default function SelectTour({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
+			<RouteButton navigation={navigation} nextTitle='RegionSelectPopularity'></RouteButton>
 		</BackgroundGray>
 	);
 }

@@ -16,6 +16,7 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
+import RouteButton from '../../utill/component/route-button';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -231,13 +232,7 @@ export default function SelectDay({navigation}: any) {
 				</CalendarContainer>
 				<MarginBottom></MarginBottom>
 			</ScrollView>
-			<ButtonContainer>
-				<CustomButton
-					label={`다음`}
-					onPress={() => {
-						navigation.navigate('SelectMulti');
-					}}></CustomButton>
-			</ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle='SelectMulti'></RouteButton>
 		</DayBackground>
 	);
 }

@@ -1,4 +1,3 @@
-import CustomButton from '../../utill/component/custom-button';
 import {
 	MainContainer,
 	VStack,
@@ -17,6 +16,7 @@ import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/tr
 import {SVGPlus} from '../../utill/svg/svg';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import RouteButton from '../../utill/component/route-button';
 
 export default function SelectMulti({navigation}: any) {
 	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
@@ -24,13 +24,9 @@ export default function SelectMulti({navigation}: any) {
 	);
 	const dispatch = useAppDispatch();
 	const goSearchPlace = (data: {idx: number; index: number}) => {
-		console.log(navigation);
 		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
 	};
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const goNext = () => {
-		navigation.navigate('RecommendSelectWho');
-	};
 
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
@@ -195,15 +191,7 @@ export default function SelectMulti({navigation}: any) {
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>
-			<ButtonContainer>
-				<CustomButton
-					label={`${
-						accommodations.find(value => value.name != '') || essentialPlaces.length != 0
-							? '다음'
-							: '건너뛰기'
-					}`}
-					onPress={goNext}></CustomButton>
-			</ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectWho'></RouteButton>
 		</>
 	);
 }
