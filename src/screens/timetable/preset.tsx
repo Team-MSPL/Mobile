@@ -209,62 +209,88 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								<HStack>
-									<FlexWrap
-										width={widthPercentage(280)}
-										gap={widthPercentage(10)}
-										marginBottom={10}
-										onPress={() => {
-											let copy = {...tendencyViewIndex};
-											copy[idx] = !copy[idx];
-											setTendencyViewIndex(copy);
-										}}>
-										{presetTendencyList[idx].tendencyNameList
-											.slice(
-												0,
-												tendencyViewIndex[idx]
-													? 4
-													: presetTendencyList[idx].tendencyNameList.length,
-											)
-											.map((item, index) => {
-												return (
-													<TagContainer
-														backgroundColor={colors.backgroundGray}
-														height={heightPercentage(28)}
-														key={index}>
-														<PretendardSemiBoldText
-															size={14}
-															lineHeight={17}
-															color={colors.Gray4}>
-															{item + ' '}
-														</PretendardSemiBoldText>
-														<PretendardSemiBoldText
-															size={14}
-															lineHeight={17}
-															color={colors.PointYellow}>
-															{presetTendencyList[idx].tendencyPointList[index]}점
-														</PretendardSemiBoldText>
-													</TagContainer>
-												);
-											})}
-									</FlexWrap>
-									{presetTendencyList[idx].tendencyNameList.length > 4 && (
-										<TouchableOpacity
-											style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
-											onPress={() => {
-												let copy = {...tendencyViewIndex};
-												copy[idx] = !copy[idx];
-												setTendencyViewIndex(copy);
-											}}>
-											<SVGRightAdd
-												width={widthPercentage(20)}
-												height={widthPercentage(20)}
-												color='black'
-												transform={tendencyViewIndex[idx] ? 90 : 270}
-											/>
-										</TouchableOpacity>
-									)}
-								</HStack>
+								{presetTendencyList.length != 0 && (
+									<>
+										<HStack>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={20.6}
+												color={colors.PointYellow}>
+												[
+												{
+													presetTendencyList[idx].tendencyNameList[
+														presetTendencyList[idx].tendencyPointList.findIndex(
+															point =>
+																point ==
+																Math.max(...presetTendencyList[idx].tendencyPointList),
+														)
+													]
+												}
+												]
+											</PretendardSemiBoldText>
+											<PretendardSemiBoldText size={14} lineHeight={20.6} color={colors.Black}>
+												{' '}
+												성향을 중점점으로 고려했어요!
+											</PretendardSemiBoldText>
+										</HStack>
+										<HStack>
+											<FlexWrap
+												width={widthPercentage(280)}
+												gap={widthPercentage(10)}
+												marginBottom={10}
+												onPress={() => {
+													let copy = {...tendencyViewIndex};
+													copy[idx] = !copy[idx];
+													setTendencyViewIndex(copy);
+												}}>
+												{presetTendencyList[idx].tendencyNameList
+													.slice(
+														0,
+														tendencyViewIndex[idx]
+															? 4
+															: presetTendencyList[idx].tendencyNameList.length,
+													)
+													.map((item, index) => {
+														return (
+															<TagContainer
+																backgroundColor={colors.backgroundGray}
+																height={heightPercentage(28)}
+																key={index}>
+																<PretendardSemiBoldText
+																	size={14}
+																	lineHeight={17}
+																	color={colors.Gray4}>
+																	{item + ' '}
+																</PretendardSemiBoldText>
+																<PretendardSemiBoldText
+																	size={14}
+																	lineHeight={17}
+																	color={colors.PointYellow}>
+																	{presetTendencyList[idx].tendencyPointList[index]}점
+																</PretendardSemiBoldText>
+															</TagContainer>
+														);
+													})}
+											</FlexWrap>
+											{presetTendencyList[idx].tendencyNameList.length > 4 && (
+												<TouchableOpacity
+													style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
+													onPress={() => {
+														let copy = {...tendencyViewIndex};
+														copy[idx] = !copy[idx];
+														setTendencyViewIndex(copy);
+													}}>
+													<SVGRightAdd
+														width={widthPercentage(20)}
+														height={widthPercentage(20)}
+														color='black'
+														transform={tendencyViewIndex[idx] ? 90 : 270}
+													/>
+												</TouchableOpacity>
+											)}
+										</HStack>
+									</>
+								)}
 								{item.map((value, index) =>
 									value.map((target, targetIndex) => {
 										if (targetIndex == 0) {

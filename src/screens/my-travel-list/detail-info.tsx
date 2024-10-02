@@ -46,7 +46,7 @@ import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 import {logEvent} from '../../../firebaseAnalytice';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck} =
+	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck, tendency} =
 		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const goMyTravelDetail = async () => {
@@ -329,7 +329,6 @@ export default function DetailInfo({navigation}: any) {
 	}, []);
 	useEffect(() => {
 		setModalView(!reviewCheck);
-		console.log('하헬방', reviewCheck);
 	}, [reviewCheck]);
 	useEffect(() => {
 		getMainViewPager();
@@ -348,7 +347,7 @@ export default function DetailInfo({navigation}: any) {
 				travelId: travelId,
 				review: reviewText,
 				point: starStatus + 1,
-				tendencyPoint: [],
+				tendencyPoint: tendency,
 			};
 			dispatch(LoadingSliceActions.onLoading());
 			setModalView(false);
