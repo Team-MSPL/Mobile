@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, TouchableOpacity} from 'react-native';
 import {BackgroundGray, FlexWrap, HStack, PretendardSemiBoldText, TagContainer} from '../../utill/layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -64,22 +64,23 @@ export default function PresetDetail({navigation, route}: any) {
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const mapRef = useRef<MapView>(null);
 	const scrollRef = useRef();
-	const change = (idx: number) => {
-		if (mapRef.current) {
-			mapRef.current.animateToRegion(
-				{
-					latitude: centerLatitude,
-					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + deltaLatitude / 2,
-					longitudeDelta: deltaLongitude + deltaLongitude / 5,
-				},
-				1000,
-			); // 1000ms 동안 목표 지점으로 애니메이션 이동
-		}
+	const changeTouch = (idx: number) => {
+		//setSelect(idx);
 		let totalScroll = 0;
 		for (let i = 0; i < idx; i++) {
 			totalScroll += presetDatas[route.params.index][i].length;
 		}
+		scrollRef.current.scrollTo({
+			y:
+				totalScroll * heightPercentage(46) +
+				idx * fontPercentage(17) +
+				idx * fontPercentage(17) +
+				idx * heightPercentage(52),
+
+			animate: true,
+		});
+	};
+	const change = (idx: number) => {
 		setSelect(idx);
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -162,7 +163,9 @@ export default function PresetDetail({navigation, route}: any) {
 		// 스크롤뷰의 높이를 가져옵니다.
 		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
 		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
-		if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+		if (scrollY + scrollViewHeight + (scrollY + scrollViewHeight) * 0.1 > e.nativeEvent.contentSize.height) {
+			change(presetScrollHeight.length - 1);
+		} else if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
 			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
 		}
 	};
@@ -232,7 +235,7 @@ export default function PresetDetail({navigation, route}: any) {
 									key={idx}
 									select={select == idx}
 									onPress={() => {
-										change(idx);
+										changeTouch(idx);
 									}}>
 									<PretendardSemiBoldText
 										size={14}

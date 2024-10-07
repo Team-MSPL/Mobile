@@ -155,6 +155,22 @@ export default function Preset({navigation}: any) {
 	useEffect(() => {
 		!aiFlag && saveCache();
 	}, [aiFlag]);
+	const calculateTendency = (e: any) => {
+		let copy = [];
+		let index = 0;
+		let copy2 = [];
+		e.tendencyNameList?.map((item, idx) => {
+			if (['봄', '여름', '가을', '겨울'].includes(item)) {
+				index = idx;
+			} else {
+				copy.push(item);
+			}
+		});
+		copy2 = e.tendencyPointList.filter((item, idx) => !idx == index);
+		let max = Math.max(copy2);
+		copy[copy2.findIndex((item, idx) => item == max)];
+		return copy[copy2.findIndex((item, idx) => item == max)];
+	};
 	return (
 		<BackgroundGray>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -209,30 +225,25 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								{presetTendencyList.length != 0 && (
+								{presetTendencyList[idx].tendencyNameList.length >= 1 && (
 									<>
-										<HStack>
-											<PretendardSemiBoldText
-												size={14}
-												lineHeight={20.6}
-												color={colors.PointYellow}>
-												[
-												{
-													presetTendencyList[idx].tendencyNameList[
-														presetTendencyList[idx].tendencyPointList.findIndex(
-															point =>
-																point ==
-																Math.max(...presetTendencyList[idx].tendencyPointList),
-														)
-													]
-												}
-												]
-											</PretendardSemiBoldText>
-											<PretendardSemiBoldText size={14} lineHeight={20.6} color={colors.Black}>
-												{' '}
-												성향을 중점점으로 고려했어요!
-											</PretendardSemiBoldText>
-										</HStack>
+										{presetTendencyList[idx].tendencyNameList.length >= 2 && (
+											<HStack>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={20.6}
+													color={colors.PointYellow}>
+													[{calculateTendency(presetTendencyList[idx])}]
+												</PretendardSemiBoldText>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={20.6}
+													color={colors.Black}>
+													{' '}
+													성향을 중점점으로 고려했어요!
+												</PretendardSemiBoldText>
+											</HStack>
+										)}
 										<HStack>
 											<FlexWrap
 												width={widthPercentage(280)}
