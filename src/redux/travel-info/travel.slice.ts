@@ -59,7 +59,7 @@ const initialState: LiteState = {
 	selectEndDate: null,
 	travelName: '',
 	regionRecommendFlag: false,
-	bandwidth: false,
+	bandwidth: true,
 	saveFlag: false,
 	checKStep: 0,
 	freeTicket: false,

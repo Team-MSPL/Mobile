@@ -151,9 +151,36 @@ export default function CourseDetail({navigation, route}: any) {
 			);
 		}
 	}, []);
+	const handleIntoInfo = () => {
+		console.log('여기옴');
+		setCourseDetail({
+			status: 'google',
+			name: route.params.info.name,
+			openInfo: route.params.info.opening_hours?.weekday_text ?? '',
+			review: route.params.info?.reviews
+				? route.params.info?.reviews?.map((item, value) => ({
+						name: item?.author_name,
+						content: item?.text,
+						rating: item?.rating,
+						reviewUserToken: null,
+						reviewPhotoList: null,
+						reviewId: null,
+						reviewerProfileImage: item?.profile_photo_url ?? null,
+				  }))
+				: [],
+			expense: null,
+			rating: route.params.info?.rating,
+			address: route.params.info?.formatted_address,
+			information: route.params.info?.formatted_phone_number,
+			infoTitle: null,
+			infoContent: route.params.info?.editorial_summary?.overview ?? null,
+			photo: route.params.info?.photos.map((item, idx) => item.photo_reference),
+		});
+	};
 	useFocusEffect(
 		useCallback(() => {
-			getDetail();
+			console.log(route.params);
+			route.params?.value ? getDetail() : handleIntoInfo();
 		}, []),
 	);
 	const toDayNoShow = useCallback(async () => {
@@ -176,8 +203,8 @@ export default function CourseDetail({navigation, route}: any) {
 			);
 	};
 	useEffect(() => {
-		route.params.value.name == '소백산국립공원(경북)' && checkSobaecksan();
-	}, [route.params.value.name]);
+		route.params?.value?.name == '소백산국립공원(경북)' && checkSobaecksan();
+	}, [route.params?.value?.name]);
 	const detailList = [
 		{
 			title: courseDetail?.address,
@@ -250,7 +277,7 @@ export default function CourseDetail({navigation, route}: any) {
 	const [moreStatus, setMoreStatus] = useState(true);
 	const handleMoreGoogleReview = useCallback(() => {
 		Linking.openURL(
-			`https://www.google.com/maps/search/${route.params.value.name}/data=!3m1!4b1?authuser=1&entry=ttu&g_ep=EgoyMDI0MDkwMi4wIKXMDSoASAFQAw%3D%3D`,
+			`https://www.google.com/maps/search/${courseDetail.name}/data=!3m1!4b1?authuser=1&entry=ttu&g_ep=EgoyMDI0MDkwMi4wIKXMDSoASAFQAw%3D%3D`,
 		);
 	}, []);
 	if (courseDetail?.name)
@@ -286,8 +313,8 @@ export default function CourseDetail({navigation, route}: any) {
 							))}
 						</PostImageSwiper>
 					)}
-					<RecommendBorderContainer paddingBottom={route.params.value.mainFlag}>
-						{route.params.value.name == '소백산국립공원(경북)' && (
+					<RecommendBorderContainer paddingBottom={route.params?.value?.mainFlag ?? false}>
+						{route.params?.value?.name == '소백산국립공원(경북)' && (
 							<PrimaryButton
 								marginBottom={heightPercentage(10)}
 								width={widthPercentage(200)}
@@ -415,7 +442,7 @@ export default function CourseDetail({navigation, route}: any) {
 								)}
 							</HStack>
 						</HStack>
-						{courseDetail.review.length == 0 && (
+						{courseDetail.review?.length == 0 && (
 							<ReviewNonContainer onPress={goReviewEnroll}>
 								<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
 									첫 번째 리뷰를 작성해 보세요!
@@ -477,7 +504,7 @@ export default function CourseDetail({navigation, route}: any) {
 								<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
 									{item.content}
 								</PretendardVariableText>
-								{idx != courseDetail.review.length - 1 && (
+								{idx != courseDetail.review?.length - 1 && (
 									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 								)}
 							</ReviewContainer>
@@ -507,7 +534,7 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
-				{route.params.value.mainFlag && (
+				{(route.params.value?.mainFlag ?? false) && (
 					<ButtonContainer>
 						<CustomButton
 							label={'이 지역의 여행 코스 추천 받기'}

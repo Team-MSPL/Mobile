@@ -342,7 +342,7 @@ export default function Preset({navigation}: any) {
 														size={16}
 														lineHeight={16}
 														color={colors.Primary}>
-														+{value.length - 1}
+														+{value.length - 1}개 장소
 													</PretendardVariableText>
 													<PretendardVariableText
 														size={14}

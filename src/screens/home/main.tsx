@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
@@ -13,7 +13,14 @@ import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd, SVGSearch} from '../../utill/svg/svg';
+import {
+	SVGCalendarRecommend,
+	SVGGood,
+	SVGNoteList,
+	SVGRegionRecommend,
+	SVGRightAdd,
+	SVGSearch,
+} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
@@ -26,6 +33,7 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
 import Carousel from 'react-native-reanimated-carousel';
+import {NoteCount, NoteListContainer} from '../more/more-info';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
@@ -90,7 +98,6 @@ export default function Main({navigation}: any) {
 	};
 	const checkEvent = async () => {
 		const eventExist = await dispatch(getEventList()).unwrap();
-		console.log('ddd', eventExist);
 		const state = await AsyncStorage.getItem('eventState');
 		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
 			dispatch(eventSliceActions.setEventState(true));
@@ -131,7 +138,18 @@ export default function Main({navigation}: any) {
 		await setUserProperty('user_id', userId ?? '');
 		dispatch(userSliceActions.setAnalyticeFlag(true));
 	};
+	const [noteList, setNoteList] = useState([]);
+	const getNoteListData = async () => {
+		try {
+			const dataList = await dispatch(getNoteList()).unwrap();
+			setNoteList(dataList);
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+		}
+	};
 	useLayoutEffect(() => {
+		getNoteListData();
 		getMainScreen();
 		getFirstRegion();
 	}, []);
@@ -253,6 +271,20 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
+						<TicketTouchable>
+							<NoteCount>
+								<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+									{noteList.length}
+								</PretendardSemiBoldText>
+							</NoteCount>
+							<SVGNoteList
+								onPress={() => {
+									goSearch();
+									// navigation.navigate('NoteList');
+								}}
+								width={widthPercentage(33)}
+								height={widthPercentage(33)}></SVGNoteList>
+						</TicketTouchable>
 						<HomeTextContainer
 							onPress={() => {
 								selectPopularity({
@@ -432,15 +464,14 @@ const BackgroundImage = styled.ImageBackground`
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
 	top: ${heightPercentage(39)}px;
-	left: ${widthPercentage(325)}px;
-	width: ${widthPercentage(31)}px;
-	height: ${heightPercentage(31)}px;
-	background-color: ${colors.Primary};
+	left: ${widthPercentage(305)}px;
+	width: ${widthPercentage(50)}px;
+	height: ${widthPercentage(50)}px;
 	align-items: center;
 	justify-content: center;
 `;
 const HomeTextContainer = styled.Pressable`
-	top: ${heightPercentage(275)}px;
+	top: ${heightPercentage(225)}px;
 	left: ${widthPercentage(26)}px;
 `;
 

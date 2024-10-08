@@ -131,8 +131,8 @@ export default function SelectDay({navigation}: any) {
 		return 0;
 	};
 	const DaySelectInfoList = [
-		{step: '출발', title: '여행 시작', day: selectStartDate},
-		{step: '도착', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
+		{step: '여행 출발 시간', title: '여행 시작', day: selectStartDate},
+		{step: '여행 도착 시간', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
 	const handleGoogleAnalytics = async () => {
 		await logEvent('course_step3', {});

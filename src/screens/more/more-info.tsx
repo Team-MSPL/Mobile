@@ -3,12 +3,12 @@ import {Modal, Platform, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
-import {useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import ViewPager from '../../utill/view-pager';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import UserManage from './user-manage';
@@ -44,7 +44,19 @@ export default function MoreInfo({navigation}: any) {
 		setViewPagerView(true);
 	};
 	const [viewPagerView, setViewPagerView] = useState(false);
-
+	const [noteList, setNoteList] = useState([]);
+	const getNoteListData = async () => {
+		try {
+			const dataList = await dispatch(getNoteList()).unwrap();
+			setNoteList(dataList);
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+		}
+	};
+	useLayoutEffect(() => {
+		getNoteListData();
+	}, []);
 	const useInfo = [
 		{
 			title: '공지사항',
@@ -109,7 +121,7 @@ export default function MoreInfo({navigation}: any) {
 					<NoteListContainer>
 						<NoteCount>
 							<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-								0
+								{noteList.length}
 							</PretendardSemiBoldText>
 						</NoteCount>
 						<SVGNoteList
@@ -212,7 +224,7 @@ export default function MoreInfo({navigation}: any) {
 		</ScrollView>
 	);
 }
-const NoteListContainer = styled.View`
+export const NoteListContainer = styled.View`
 	width: ${widthPercentage(50)}px;
 	height: ${widthPercentage(50)}px;
 	align-items: center;
@@ -220,7 +232,7 @@ const NoteListContainer = styled.View`
 	right: 3px;
 	top: 3px;
 `;
-const NoteCount = styled.View`
+export const NoteCount = styled.View`
 	width: ${widthPercentage(11)}px;
 	height: ${widthPercentage(15)}px;
 	background-color: ${colors.Gray5};
