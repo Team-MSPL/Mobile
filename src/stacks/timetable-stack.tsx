@@ -22,6 +22,7 @@ import RecommendSelectConcept from '../screens/enroll-info/select-concept';
 import RecommendSelectPlay from '../screens/enroll-info/select-play';
 import RecommendSelectTour from '../screens/enroll-info/select-tour';
 import PresetDetail from '../screens/timetable/preset-detail';
+import SearchRecommend from '../screens/enroll-info/search-recommend';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -56,6 +57,16 @@ export default function TimetableStack() {
 			<Stack.Screen
 				name='SearchPlace'
 				component={SearchPlace}
+				options={{
+					title: '요소 추가하기',
+					headerStyle: {backgroundColor: colors.main},
+					headerShadowVisible: false,
+					headerTitleAlign: 'center',
+				}}
+			/>
+			<Stack.Screen
+				name='SearchRecommend'
+				component={SearchRecommend}
 				options={{
 					title: '요소 추가하기',
 					headerStyle: {backgroundColor: colors.main},

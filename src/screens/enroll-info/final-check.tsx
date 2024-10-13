@@ -17,10 +17,10 @@ import {
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGFall, SVGFlag, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
+import {SVGFall, SVGFlag, SVGPlus, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
-import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer} from './select-multi';
+import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer, SVGContainer} from './select-multi';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -253,6 +253,9 @@ export default function FinalCheck({navigation}: any) {
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: tendencyModify.index, region: false, item: item});
 	};
+	const goSearchPlace = (data: {idx: number; index: number}) => {
+		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
+	};
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<>
@@ -442,6 +445,18 @@ export default function FinalCheck({navigation}: any) {
 										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
 											여행지
 										</PretendardSemiBoldText>
+										<SVGContainer
+											disabled={filteredPlaces.length >= 3}
+											onPress={() => {
+												goSearchPlace({idx: idx, index: 0});
+											}}
+											color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PointYellow}>
+											<SVGPlus
+												width={widthPercentage(16)}
+												height={widthPercentage(16)}
+												color={filteredPlaces.length >= 3 ? colors.Gray2 : colors.Primary}
+											/>
+										</SVGContainer>
 									</ElementContainer>
 									{filteredPlaces.length != 0 && (
 										<FlexWrap gap={10}>
@@ -492,6 +507,35 @@ export default function FinalCheck({navigation}: any) {
 											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
 												숙소
 											</PretendardSemiBoldText>
+											{accommodations[idx + 1].name != '' ? (
+												<DeleteContainer
+													onPress={() => {
+														goSearchPlace({idx: idx, index: 1});
+													}}>
+													<PretendardSemiBoldText
+														size={12}
+														lineHeight={18}
+														color={colors.Gray5}>
+														변경
+													</PretendardSemiBoldText>
+												</DeleteContainer>
+											) : (
+												<SVGContainer
+													onPress={() => {
+														goSearchPlace({idx: idx, index: 1});
+													}}
+													color={
+														accommodations[idx + 1].name ? colors.Gray1 : colors.PointYellow
+													}>
+													<SVGPlus
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={
+															accommodations[idx + 1].name ? colors.Gray2 : colors.Primary
+														}
+													/>
+												</SVGContainer>
+											)}
 										</ElementContainer>
 										{accommodations[idx + 1].name && (
 											<ElementContainer color={colors.backgroundGray}>

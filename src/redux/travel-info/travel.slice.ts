@@ -509,6 +509,7 @@ export const travelSlice = createSlice({
 			state.diary = payload;
 		},
 		drawTimetable: state => {
+			let updateItem = [];
 			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
 			state.timetable.forEach((item, idx) => {
 				let time = 6;

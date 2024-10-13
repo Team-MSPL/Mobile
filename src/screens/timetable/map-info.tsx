@@ -447,7 +447,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
 				navigation.navigate('Recommend', {
 					name: '숙소 추천',
-					x: e.value.x,
+					x: e.value?.x ?? e.idx,
 					index: e.index,
 					y: sequentialArray,
 					category: e.value.category,
@@ -471,6 +471,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			}
 		}
 	}, []);
+	const goSearchPlace = (data: {index: number; idx: number; category: string}) => {
+		navigation.navigate('SearchRecommend', {index: data.index, idx: data.idx, category: data.category});
+	};
 	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
 		let idx = getIndex() ?? 0;
 		return (
@@ -729,6 +732,17 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																}></DashLine>
 														</DashLineContainer>
 														<InsideGrayContainer
+															onLongPress={() => {
+																dispatch(
+																	modalSliceActions.setOpenModal({
+																		modalTitle:
+																			'편집 모드에서 여행 일정을 편집하시겠어요?',
+																		modalFunction: () => {
+																			setModify(true);
+																		},
+																	}),
+																);
+															}}
 															onPress={() => {
 																moveRegion(idx, index);
 															}}>
@@ -791,17 +805,60 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																				}></PrimaryButton>
 																			<PrimaryButton
 																				onPress={() => {
-																					item.category == 1
-																						? restaurantRecommend({
-																								value: item,
-																								index: idx,
-																								idx: index,
-																						  })
-																						: accommodationRecommend({
-																								value: item,
-																								index: idx,
-																								idx: index,
-																						  });
+																					dispatch(
+																						modalSliceActions.setOpenModal({
+																							modalTitle: `변경하실 ${
+																								item.category == 1
+																									? '식당을'
+																									: '숙소를'
+																							} 추천해드릴까요?`,
+																							modalTopText:
+																								'네, 추천해주세요',
+																							modalBottomText:
+																								'아니요, 직접 추가할게요',
+																							modalFunction: () => {
+																								item.category == 1
+																									? restaurantRecommend(
+																											{
+																												value: item,
+																												index: idx,
+																												idx: index,
+																											},
+																									  )
+																									: accommodationRecommend(
+																											{
+																												value: item,
+																												index: idx,
+																												idx: index,
+																											},
+																									  );
+																							},
+																							modalBottomFunctionUse:
+																								true,
+																							modalBottomFunction: () => {
+																								goSearchPlace({
+																									index: index,
+																									idx: idx,
+																									category:
+																										item.category ==
+																										1
+																											? '식당'
+																											: '숙소',
+																								});
+																							},
+																						}),
+																					);
+																					// item.category == 1
+																					// 	? restaurantRecommend({
+																					// 			value: item,
+																					// 			index: idx,
+																					// 			idx: index,
+																					// 	  })
+																					// 	: accommodationRecommend({
+																					// 			value: item,
+																					// 			index: idx,
+																					// 			idx: index,
+																					// 	  });
 																				}}
 																				label={
 																					item.category == 1
