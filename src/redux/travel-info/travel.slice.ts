@@ -247,7 +247,9 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(
-			`/place/placeInfo?region=${data.region}&name=${data.name}&lat=${data.lat}&lng=${data.lng}`,
+			`/place/placeInfo?region=${data.region}&name=${encodeURIComponent(data.name)}&lat=${data.lat}&lng=${
+				data.lng
+			}`,
 		);
 		return response;
 	} catch (error: any) {

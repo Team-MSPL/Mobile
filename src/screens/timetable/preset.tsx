@@ -38,7 +38,7 @@ export default function Preset({navigation}: any) {
 		aiFlag,
 		aiID,
 	} = useAppSelector(state => state.travelSlice);
-	const {userName} = useAppSelector(state => state.userSlice);
+	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const goDetail = (e: number) => {
 		navigation.navigate('PresetDetail', {index: e});
@@ -153,8 +153,10 @@ export default function Preset({navigation}: any) {
 	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		!aiFlag && saveCache();
-	}, [aiFlag]);
+		if (socialloginProvider != 'anonymous') {
+			!aiFlag && saveCache();
+		}
+	}, [aiFlag, socialloginProvider]);
 	const calculateTendency = (e: any) => {
 		let copy = [];
 		let index = 0;

@@ -8,19 +8,12 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {
-	SVGCalendarRecommend,
-	SVGGood,
-	SVGNoteList,
-	SVGRegionRecommend,
-	SVGRightAdd,
-	SVGSearch,
-} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGGood, SVGNoteList, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 import {cityViewList} from '../enroll-info/select-city';
 
@@ -33,10 +26,13 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
 import Carousel from 'react-native-reanimated-carousel';
-import {NoteCount, NoteListContainer} from '../more/more-info';
+import {NoteCount} from '../more/more-info';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
-	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
+	const {userName, signUpReward, reLogin, userId, analyticeFlag, socialloginProvider} = useAppSelector(
+		state => state.userSlice,
+	);
 	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
@@ -161,14 +157,18 @@ export default function Main({navigation}: any) {
 	useEffect(() => {
 		pushPermission();
 		getMainViewPager();
-		checkCache();
-		if (signUpReward) {
+		socialloginProvider != 'anonymous' && checkCache();
+		if (
+			navigation.getState().routes[navigation.getState().index].name != 'FinalCheck' &&
+			navigation.getState().routes[navigation.getState().index].name != 'RegionSelectDistance' &&
+			signUpReward
+		) {
 			navigation.navigate('HomeModal', {status: '회원가입'});
 		} else if (reLogin) {
 			navigation.navigate('HomeModal', {status: '재가입'});
 		}
 		checkEvent();
-	}, [signUpReward]);
+	}, [signUpReward, socialloginProvider]);
 
 	useBackHandler({type: 'exit'});
 	const buttonList: ButtonListType[] = [
@@ -271,21 +271,23 @@ export default function Main({navigation}: any) {
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						<TicketTouchable>
-							<NoteCount>
-								<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-									{noteList.length}
-								</PretendardSemiBoldText>
-							</NoteCount>
-							<SVGNoteList
-								onPress={() => {
-									goSearch();
-									// navigation.navigate('NoteList');
-								}}
-								width={widthPercentage(33)}
-								height={widthPercentage(33)}></SVGNoteList>
-						</TicketTouchable>
+						{socialloginProvider != 'anonymous' && (
+							<TicketTouchable>
+								<NoteCount>
+									<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+										{noteList.length}
+									</PretendardSemiBoldText>
+								</NoteCount>
+								<SVGNoteList
+									onPress={() => {
+										navigation.navigate('NoteList');
+									}}
+									width={widthPercentage(33)}
+									height={widthPercentage(33)}></SVGNoteList>
+							</TicketTouchable>
+						)}
 						<HomeTextContainer
+							heightFlag={socialloginProvider == 'anonymous'}
 							onPress={() => {
 								selectPopularity({
 									id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
@@ -470,8 +472,8 @@ const TicketTouchable = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 `;
-const HomeTextContainer = styled.Pressable`
-	top: ${heightPercentage(225)}px;
+const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
+	top: ${props => heightPercentage(props.heightFlag ? 275 : 225)}px;
 	left: ${widthPercentage(26)}px;
 `;
 

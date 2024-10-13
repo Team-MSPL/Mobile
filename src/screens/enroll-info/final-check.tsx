@@ -29,6 +29,8 @@ import {logEvent} from '../../../firebaseAnalytice';
 import StepText from '../../utill/component/enroll-info/step-text';
 import TendencyButton from '../../utill/component/tendency-button';
 import {SelectButtonsContainer} from './region-recommend/select-who';
+import {userSliceActions} from '../../redux/user/user.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const {
@@ -48,6 +50,7 @@ export default function FinalCheck({navigation}: any) {
 		regionInfo,
 		travelName,
 	} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
 
@@ -97,7 +100,7 @@ export default function FinalCheck({navigation}: any) {
 		],
 	];
 	const checkToken = () => {
-		goNext();
+		handleNext();
 	};
 	useEffect(() => {
 		const backAction = () => {
@@ -115,6 +118,28 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
+
+	const handleLogin = async () => {
+		dispatch(userSliceActions.setAnonymousKeep(true));
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
+		dispatch(userSliceActions.loginFalse());
+		navigation.navigate('LoginScreen');
+	};
+	const handleNext = () => {
+		socialloginProvider == 'anonymous'
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원만 이용 가능합니다',
+						modalTopText: '로그인하기',
+						modalFunction: handleLogin,
+					}),
+			  )
+			: goNext();
+	};
 	const goNext = useCallback(async () => {
 		try {
 			setLoading(true);

@@ -32,8 +32,10 @@ import CustomButton from '../../utill/component/custom-button';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {logEvent} from '../../../firebaseAnalytice';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
+import NeedLogin from '../../utill/component/login/need-login';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [shareFlag, setShareFlag] = useState(false);
 	const [shareSeleted, setShareSeleted] = useState(-1);
 	const dispatch = useAppDispatch();
@@ -81,12 +83,16 @@ export default function MyTravelList({navigation}: any) {
 	useBackHandler({type: 'exit'});
 	useFocusEffect(
 		useCallback(() => {
-			getTravelList();
-			setShareFlag(false);
-		}, []),
+			if (socialloginProvider != 'anonymous') {
+				getTravelList();
+				setShareFlag(false);
+			}
+		}, [socialloginProvider]),
 	);
 	const handleGoogleAnalytics = async () => {
-		await logEvent('view_course_list', {});
+		if (socialloginProvider == 'anonymous') {
+			await logEvent('view_course_list', {});
+		}
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();
@@ -151,25 +157,28 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	useEffect(() => {
-		shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
-	}, [shareSeleted, shareFlag]);
+		if (socialloginProvider == 'anonymous') {
+			shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
+		}
+	}, [shareSeleted, shareFlag, socialloginProvider]);
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () => (
-				<HeaderContianer>
-					<SearchTouchableOpacity
-						onPress={() => {
-							setShareFlag(!shareFlag);
-							!shareFlag && setShareSeleted(-1);
-						}}>
-						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-							{shareFlag ? '취소' : '공유'}
-						</PretendardVariableText>
-					</SearchTouchableOpacity>
-				</HeaderContianer>
-			),
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
+					<HeaderContianer>
+						<SearchTouchableOpacity
+							onPress={() => {
+								setShareFlag(!shareFlag);
+								!shareFlag && setShareSeleted(-1);
+							}}>
+							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+								{shareFlag ? '취소' : '공유'}
+							</PretendardVariableText>
+						</SearchTouchableOpacity>
+					</HeaderContianer>
+				),
 		});
-	}, [shareFlag]);
+	}, [shareFlag, socialloginProvider]);
 	const dDayCalculate = useCallback((e: any) => {
 		//e.startDay=시작날짜e.endDay=끝나느날짜
 		// 0~1 당일  -1 미래 1과거
@@ -329,6 +338,9 @@ export default function MyTravelList({navigation}: any) {
 			</>
 		);
 	};
+	if (socialloginProvider == 'anonymous') {
+		return <NeedLogin navigation={navigation} />;
+	}
 	return (
 		<TravelContainer>
 			<TravleListContainer>

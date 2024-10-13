@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {JSXElementConstructor, ReactElement, useEffect, useRef, useState} from 'react';
+import {JSXElementConstructor, ReactElement, useCallback, useEffect, useRef, useState} from 'react';
 import {Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
@@ -35,9 +35,11 @@ import {
 	RenderItemParams,
 } from 'react-native-draggable-flatlist';
 import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-top-bar-component';
+import {useDistance} from '../../utill/hooks/useDistance';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
@@ -329,6 +331,146 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({
 		title: modify ? 'modifyViewPager' : 'timetableViewPager',
 	});
+
+	const restaurantRecommend = useCallback((e: {value: any; index: number; idx: number}) => {
+		CancelModify();
+		let lat = 0;
+		let lng = 0;
+		let radius = 2000;
+		let status = timetable[e.idx][e.index - 1];
+		let goCheck = true;
+		if (timetable[e.idx].length == 1) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+				}),
+			);
+		} else {
+			if (e.index == timetable[e.idx].length - 1) {
+				if (timetable[e.idx][timetable[e.idx].length - 2].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
+					lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
+					status = timetable[e.idx][timetable[e.idx].length - 2];
+				}
+			} else if (e.index == 0) {
+				if (timetable[e.idx][1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][1].lat;
+					lng = timetable[e.idx][1].lng;
+					status = timetable[e.idx][1];
+				}
+			} else {
+				const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
+				const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
+				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
+				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
+				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				if (
+					timetable[e.idx][e.index - 1].name.includes('추천') &&
+					timetable[e.idx][e.index + 1].name.includes('추천')
+				) {
+					goCheck = false;
+				} else if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index + 1];
+				} else if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index - 1];
+				}
+			}
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+
+				navigation.navigate('Recommend', {
+					name: '식당 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					//TODO 해외랑 국내 차이 두기
+					apiCategory: 'FD6',
+					// apiCategory: 'restaurants',
+					radius: radius,
+					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
+					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
+					status: status,
+				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
+			}
+		}
+	}, []);
+	const accommodationRecommend = useCallback((e: {value: any; index: number; idx: number}) => {
+		CancelModify();
+		if (timetable[e.idx].length < 2) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천이 불가합니다.',
+					modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+				}),
+			);
+		} else {
+			let lat = 0;
+			let lng = 0;
+			let goCheck = true;
+			if (e.index == 0) {
+				if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index + 1].lat;
+					lng = timetable[e.idx][e.index + 1].lng;
+				}
+			} else {
+				if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index - 1].lat;
+					lng = timetable[e.idx][e.index - 1].lng;
+				}
+			}
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+				navigation.navigate('Recommend', {
+					name: '숙소 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					//TODO 해외랑 국내 차이 두기
+					apiCategory: 'AD5',
+					// apiCategory: 'hotels',
+					radius: 2000,
+					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
+					status: e.index != 0 ? timetable[e.idx][e.index - 1] : timetable[e.idx][e.index + 1],
+				});
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '추천이 불가합니다.',
+						modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+					}),
+				);
+			}
+		}
+	}, []);
 	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
 		let idx = getIndex() ?? 0;
 		return (
@@ -631,19 +773,63 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																		{item.name}
 																	</PretendardSemiBoldText>
 																</VStack>
-																{idx != 0 && (
-																	<PrimaryButton
-																		onPress={() => {
-																			goNavigation(idx);
-																		}}
-																		label='길찾기'
-																		textSize={12}
-																		lineHeight={18}
-																		width={widthPercentage(52)}
-																		height={heightPercentage(22)}
-																		backgroundColor={colors.Primary}
-																		textColor={colors.Gray5}></PrimaryButton>
-																)}
+																{idx != 0 &&
+																	(item.category == 1 || item.category == 4 ? (
+																		<VStack gap={5}>
+																			<PrimaryButton
+																				onPress={() => {
+																					goNavigation(idx);
+																				}}
+																				label='길찾기'
+																				textSize={12}
+																				lineHeight={18}
+																				width={widthPercentage(52)}
+																				height={heightPercentage(22)}
+																				backgroundColor={colors.Primary}
+																				textColor={
+																					colors.Gray5
+																				}></PrimaryButton>
+																			<PrimaryButton
+																				onPress={() => {
+																					item.category == 1
+																						? restaurantRecommend({
+																								value: item,
+																								index: idx,
+																								idx: index,
+																						  })
+																						: accommodationRecommend({
+																								value: item,
+																								index: idx,
+																								idx: index,
+																						  });
+																				}}
+																				label={
+																					item.category == 1
+																						? '식당변경'
+																						: '숙소변경'
+																				}
+																				textSize={12}
+																				lineHeight={18}
+																				width={widthPercentage(52)}
+																				height={heightPercentage(22)}
+																				backgroundColor={colors.Primary}
+																				textColor={
+																					colors.Gray5
+																				}></PrimaryButton>
+																		</VStack>
+																	) : (
+																		<PrimaryButton
+																			onPress={() => {
+																				goNavigation(idx);
+																			}}
+																			label='길찾기'
+																			textSize={12}
+																			lineHeight={18}
+																			width={widthPercentage(52)}
+																			height={heightPercentage(22)}
+																			backgroundColor={colors.Primary}
+																			textColor={colors.Gray5}></PrimaryButton>
+																	))}
 															</HStack>
 														</InsideGrayContainer>
 													</HStack>

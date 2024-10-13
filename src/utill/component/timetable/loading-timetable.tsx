@@ -8,7 +8,13 @@ import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 
 export default function LoadingTimetable({navigation}: any) {
 	const [view, setView] = useState(0);
-	const viewList = ['선호 지역 탐색 중 🗺', '여행 동선 설계 중 ✈', '수집 자료 정리 중 📑', '맞춤 성향 분석 중 ✍'];
+	const viewList = [
+		'선호 지역 탐색 중 🗺',
+		'여행 동선 설계 중 ✈',
+		'수집 자료 정리 중 📑',
+		'맞춤 성향 분석 중 ✍',
+		'다님 AI가 동시에 많은 요청을 처리 중이라 시간이 소요되고 있어요 ㅠㅠ',
+	];
 	const {userName} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		navigation.setOptions({
@@ -33,10 +39,10 @@ export default function LoadingTimetable({navigation}: any) {
 		<LoadingTimetableContainer>
 			<LoadingLottie />
 			<BarContainer>
-				<BarContinueContainer size={view}></BarContinueContainer>
+				<BarContinueContainer size={view <= 3 ? view : 3}></BarContinueContainer>
 			</BarContainer>
 			<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
-				다님만의 ai를 바탕으로{' '}
+				다님만의 AI를 바탕으로{' '}
 				<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
 					{userName}
 				</PretendardBoldText>

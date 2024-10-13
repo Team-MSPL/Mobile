@@ -29,6 +29,7 @@ import Plus from '../../../public/plus.svg';
 import Good from '../../../public/good.svg';
 import Minus from '../../../public/minus.svg';
 import Flag from '../../../public/flag.svg';
+import GuestLogo from '../../../public/ic-guest.svg';
 
 import Spring from '../../../public/spring.svg';
 import Summer from '../../../public/summer.svg';
@@ -195,5 +196,8 @@ export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
 	color: color;
 `;
 export const SVGSearch = styled(Search)<{color?: string}>`
+	color: color;
+`;
+export const SvgGuest = styled(GuestLogo)<{color?: string}>`
 	color: color;
 `;

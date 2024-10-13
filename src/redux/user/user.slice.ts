@@ -17,6 +17,7 @@ const initialUserState: UserState = {
 	userIdToken: '',
 	reLogin: false,
 	analyticeFlag: false,
+	anonymousKeep: false,
 };
 
 //회원탈퇴
@@ -135,6 +136,9 @@ const userSlice = createSlice({
 		login(state) {
 			state.isLogin = true;
 		},
+		loginFalse(state) {
+			state.isLogin = false;
+		},
 		setPushNotify(state, {payload}) {
 			state.pushNotify = payload;
 		},
@@ -157,6 +161,19 @@ const userSlice = createSlice({
 		setAnalyticeFlag(state, {payload}) {
 			state.analyticeFlag = payload;
 		},
+		setAnonymous(state) {
+			state.isLogin = true;
+			state.userId = 'x';
+			state.userName = '익명';
+			state.userProfileImage = '';
+			state.userJwtToken = '';
+			state.functionToken = 0;
+			state.socialloginProvider = 'anonymous';
+			axiosAuth.defaults.headers.Authorization = `Bearer x`;
+		},
+		setAnonymousKeep(state, {payload}) {
+			state.anonymousKeep = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(userWithdraw.fulfilled, state => {
@@ -174,7 +191,7 @@ export default userSlice.reducer;
 export interface UserState {
 	userId: string;
 	userName: string;
-	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
+	socialloginProvider: 'apple' | 'google' | 'kakao' | 'anonymous' | null | undefined;
 	userJwtToken: string | null;
 	isLogin: boolean;
 	functionToken: number;
@@ -187,4 +204,5 @@ export interface UserState {
 	userIdToken: string;
 	reLogin: boolean;
 	analyticeFlag: boolean;
+	anonymousKeep: boolean;
 }

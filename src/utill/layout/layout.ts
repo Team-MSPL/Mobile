@@ -67,11 +67,12 @@ export const SubText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-export const Center = styled.View`
+export const Center = styled.View<{backgroundColor?: string}>`
 	flex: 1;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
+	${props => props.backgroundColor != undefined && `background-color:${props.backgroundColor}`}
 `;
 export const HeaderContianer = styled(HStack)`
 	justify-content: space-between;

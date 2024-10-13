@@ -4,13 +4,7 @@ import {Linking, TouchableOpacity, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
 import MapView, {Polyline, Marker, Circle} from 'react-native-maps';
-import {
-	recommendApi,
-	RecommendList,
-	recommendTripadvisor,
-	TimetableType,
-	travelSliceActions,
-} from '../../redux/travel-info/travel.slice';
+import {recommendApi, RecommendList, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
@@ -110,7 +104,7 @@ export default function Recommend({navigation, route}: any) {
 	const checkMessage = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '바로 추가됩니다!',
+				modalTitle: '선택하신 장소를 추가하시겠어요?',
 				modalFunction: addRecommend,
 			}),
 		);

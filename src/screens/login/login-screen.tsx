@@ -14,9 +14,10 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {socialConnect} from '../../redux/user/login.slice';
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
-import {SvgApple, SvgGoogle, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
+import {SvgApple, SvgGoogle, SvgGuest, SvgKakao, SvgLoginLogo} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import Carousel from 'react-native-reanimated-carousel';
+import {userSliceActions} from '../../redux/user/user.slice';
 interface tokenType {
 	aud: string;
 	auth_time: number;
@@ -33,12 +34,20 @@ interface tokenType {
 }
 
 export default function LoginScreen({navigation}: any) {
-	const {isLogin, fcmToken} = useAppSelector(state => state.userSlice);
+	const {isLogin, fcmToken, anonymousKeep} = useAppSelector(state => state.userSlice);
 	useEffect(() => {
 		if (isLogin) {
-			navigation.reset({index: 0, routes: [{name: 'Tab'}]});
+			if (anonymousKeep) {
+				navigation.getState().routes[navigation.getState().index].name == 'Join1' && navigation.goBack();
+				navigation.goBack();
+				dispatch(userSliceActions.setAnonymousKeep(false));
+			} else {
+				navigation.getState().routes[navigation.getState().index].name != 'FinalCheck' &&
+					navigation.getState().routes[navigation.getState().index].name != 'RegionSelectDistance' &&
+					navigation.reset({index: 0, routes: [{name: 'Tab'}]});
+			}
 		}
-	}, [isLogin]);
+	}, [isLogin, anonymousKeep]);
 	// 랜덤으로 문자열 생성
 	const getRandomString = (length: number) => {
 		const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -65,7 +74,7 @@ export default function LoginScreen({navigation}: any) {
 				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
-			if (result == 202) {
+			if (result.status == 202) {
 				navigation.navigate('Join1', {
 					userToken: userInfo.id,
 					loginProvider: 'kakao',
@@ -99,7 +108,7 @@ export default function LoginScreen({navigation}: any) {
 				version: 2,
 			};
 			const result = await dispatch(socialConnect(data)).unwrap();
-			if (result == 202) {
+			if (result.status == 202) {
 				navigation.navigate('Join1', {
 					userToken: userInfo.user.id,
 					loginProvider: 'google',
@@ -166,7 +175,7 @@ export default function LoginScreen({navigation}: any) {
 					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
-				if (result == 202) {
+				if (result.status == 202) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
@@ -198,7 +207,7 @@ export default function LoginScreen({navigation}: any) {
 					version: 2,
 				};
 				const result = await dispatch(socialConnect(data)).unwrap();
-				if (result == 202) {
+				if (result.status == 202) {
 					navigation.navigate('Join1', {
 						userToken: decodeToken.sub,
 						loginProvider: 'apple',
@@ -211,7 +220,20 @@ export default function LoginScreen({navigation}: any) {
 			console.error('애플 로그인 실패', error);
 		}
 	};
-
+	const anonymousLogin = async () => {
+		try {
+			const data = {
+				userName: '익명',
+				userProfileImage: 'https://danim.me/square_logo.png',
+				userToken: '20230814',
+				loginProvider: 'anonymous',
+				signUpFlag: false,
+				fcmToken: fcmToken,
+				version: 2,
+			};
+			const result = await dispatch(socialConnect(data)).unwrap();
+		} catch (e: any) {}
+	};
 	const platforms = [
 		{
 			title: 'Google',
@@ -230,6 +252,12 @@ export default function LoginScreen({navigation}: any) {
 			color: 'black',
 			image: <SvgApple width={widthPercentage(24)} height={widthPercentage(24)} />,
 			onPress: appleLogin,
+		},
+		{
+			title: '로그인없이 앱 둘러보기',
+			color: 'black',
+			image: <SvgGuest width={widthPercentage(24)} height={widthPercentage(24)} />,
+			onPress: anonymousLogin,
 		},
 	];
 	const textList = [
@@ -281,8 +309,9 @@ export default function LoginScreen({navigation}: any) {
 								<PretendardVariableText
 									size={14}
 									lineHeight={21.6}
-									color={platform.title == 'Apple' ? 'white' : 'black'}>
-									{platform.title} {platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인'}
+									color={platform.color == 'black' ? 'white' : 'black'}>
+									{platform.title}{' '}
+									{index != 3 && (platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인')}
 								</PretendardVariableText>
 							</LogoHStack>
 						</LongCircleButton>
@@ -307,7 +336,7 @@ const CircleContainer = styled.View`
 	width: ${widthPercentage(326)}px;
 	justify-content: center;
 	position: absolute;
-	top: ${heightPercentage(511)}px;
+	top: ${heightPercentage(459)}px;
 	align-self: center;
 	gap: ${heightPercentage(10)}px;
 `;

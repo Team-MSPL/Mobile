@@ -21,6 +21,8 @@ import PrimaryButton from '../../../utill/component/primary-button';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {SVGSearch} from '../../../utill/svg/svg';
 import {cityViewList} from '../select-city';
+import {userSliceActions} from '../../../redux/user/user.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
@@ -32,6 +34,7 @@ export default function SelectDistance({navigation}: any) {
 	const [range, setRange] = useState(5);
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const handleGoogleAnalytics = async () => {
 		await logEvent('place_step3', {});
 	};
@@ -98,8 +101,30 @@ export default function SelectDistance({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
+	const handleLogin = async () => {
+		dispatch(userSliceActions.setAnonymousKeep(true));
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
+		dispatch(userSliceActions.loginFalse());
+		navigation.navigate('LoginScreen');
+	};
+	const handleNext = () => {
+		socialloginProvider == 'anonymous'
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '회원만 이용 가능합니다',
+						modalTopText: '로그인하기',
+						modalFunction: handleLogin,
+					}),
+			  )
+			: goNext();
+	};
+
 	const checkToken = () => {
-		goNext();
+		handleNext();
 	};
 	const requestPermission = async () => {
 		try {

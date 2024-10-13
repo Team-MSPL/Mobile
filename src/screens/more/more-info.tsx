@@ -59,15 +59,15 @@ export default function MoreInfo({navigation}: any) {
 	}, []);
 	const useInfo = [
 		{
-			title: '공지사항',
-			function: () => {
-				goNavigation('Notice');
-			},
-		},
-		{
 			title: '문의하기',
 			function: () => {
 				goNavigation('Inquire');
+			},
+		},
+		{
+			title: '공지사항',
+			function: () => {
+				goNavigation('Notice');
 			},
 		},
 		{
@@ -118,33 +118,37 @@ export default function MoreInfo({navigation}: any) {
 							{userName}
 						</PretendardSemiBoldText>
 					</HStack>
-					<NoteListContainer>
-						<NoteCount>
-							<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-								{noteList.length}
-							</PretendardSemiBoldText>
-						</NoteCount>
-						<SVGNoteList
+					{socialloginProvider != 'anonymous' && (
+						<NoteListContainer>
+							<NoteCount>
+								<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+									{noteList.length}
+								</PretendardSemiBoldText>
+							</NoteCount>
+							<SVGNoteList
+								onPress={() => {
+									goNavigation('NoteList');
+								}}
+								width={widthPercentage(33)}
+								height={widthPercentage(33)}></SVGNoteList>
+						</NoteListContainer>
+					)}
+				</HStack>
+				{socialloginProvider != 'anonymous' && <UserManage />}
+				{socialloginProvider != 'anonymous' && (
+					<HStack justifyContent='flex-end'>
+						<PrimaryButton
+							label='프로필 편집'
+							width={widthPercentage(100)}
+							height={heightPercentage(40)}
 							onPress={() => {
-								goNavigation('NoteList');
+								goNavigation('ChangeProfile');
 							}}
-							width={widthPercentage(33)}
-							height={widthPercentage(33)}></SVGNoteList>
-					</NoteListContainer>
-				</HStack>
-				<UserManage />
-				<HStack justifyContent='flex-end'>
-					<PrimaryButton
-						label='프로필 편집'
-						width={widthPercentage(100)}
-						height={heightPercentage(40)}
-						onPress={() => {
-							goNavigation('ChangeProfile');
-						}}
-						backgroundColor={colors.Primary}
-						textColor={colors.Black}></PrimaryButton>
-				</HStack>
-				<SettingContainer>
+							backgroundColor={colors.Primary}
+							textColor={colors.Black}></PrimaryButton>
+					</HStack>
+				)}
+				<SettingContainer marginTop={socialloginProvider == 'anonymous' ? 10 : 0}>
 					<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
 						계정
 					</PretendardSemiBoldText>
@@ -165,8 +169,8 @@ export default function MoreInfo({navigation}: any) {
 						이용안내
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						<PushNotify />
-						{useInfo.map((item, idx) => (
+						{socialloginProvider != 'anonymous' && <PushNotify />}
+						{useInfo.slice(socialloginProvider == 'anonymous' ? 1 : 0, useInfo.length).map((item, idx) => (
 							<SettingElement
 								key={idx}
 								onPress={item.function}
@@ -184,7 +188,7 @@ export default function MoreInfo({navigation}: any) {
 					</PretendardSemiBoldText>
 					<WhiteContainer>
 						<SettingElement
-							bottomShow={true}
+							bottomShow={socialloginProvider == 'anonymous' ? false : true}
 							onPress={() => {
 								dispatch(
 									modalSliceActions.setOpenModal({
@@ -202,15 +206,17 @@ export default function MoreInfo({navigation}: any) {
 								로그아웃
 							</PretendardSemiBoldText>
 						</SettingElement>
-						<SettingElement
-							bottomShow={false}
-							onPress={() => {
-								navigation.navigate('Withdraw');
-							}}>
-							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
-								계정 삭제
-							</PretendardSemiBoldText>
-						</SettingElement>
+						{socialloginProvider != 'anonymous' && (
+							<SettingElement
+								bottomShow={false}
+								onPress={() => {
+									navigation.navigate('Withdraw');
+								}}>
+								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
+									계정 삭제
+								</PretendardSemiBoldText>
+							</SettingElement>
+						)}
 					</WhiteContainer>
 				</SettingContainer>
 				<PretendardSemiBoldText
@@ -262,10 +268,11 @@ const NoProfileContainer = styled.View`
 	justify-content: center;
 	background-color: ${colors.Primary};
 `;
-const SettingContainer = styled.View`
+const SettingContainer = styled.View<{marginTop?: number}>`
 	width: 100%;
 	gap: ${widthPercentage(5)}px;
 	margin-bottom: ${heightPercentage(30)}px;
+	${props => (props.marginTop ? `margin-top:${props.marginTop}px` : null)}
 `;
 export const SettingElement = styled.TouchableOpacity<{bottomShow: boolean}>`
 	width: 100%;

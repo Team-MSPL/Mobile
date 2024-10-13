@@ -39,7 +39,7 @@ export default function Timetable({navigation, route}: any) {
 		shareViewWithStartFlag,
 		regionInfo,
 	} = useAppSelector(state => state.travelSlice);
-	const {userId, userName, isLogin} = useAppSelector(state => state.userSlice);
+	const {userId, userName, isLogin, socialloginProvider} = useAppSelector(state => state.userSlice);
 
 	const {modalConfettiFlag} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
@@ -308,7 +308,7 @@ export default function Timetable({navigation, route}: any) {
 				modalSliceActions.setOpenModal({
 					modalTitle: '공유자',
 					modalSubTitle: `${
-						userId == '' ? '로그인 후 ' : ''
+						userId == '' || socialloginProvider == 'anonymous' ? '로그인 후 ' : ''
 					}공유 받은 여행 코스를 함께 수정하시겠습니까?\n\n ⦁ 수정 후 저장 버튼을 누르면 공유한 사람의 일정도 함께 수정됩니다!`,
 					modalLeft: true,
 					modalRightText: '추가할래요',
@@ -318,7 +318,7 @@ export default function Timetable({navigation, route}: any) {
 					modalLeftFunction: noModifyView,
 				}),
 			);
-	}, [makeMode]);
+	}, [makeMode, socialloginProvider]);
 	useEffect(() => {
 		navigation.setOptions({
 			headerBackVisible: false,
@@ -326,11 +326,13 @@ export default function Timetable({navigation, route}: any) {
 			headerRight: () => (
 				<HeaderContianer>
 					<>
-						<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
-							<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
-								삭제
-							</PretendardVariableText>
-						</TouchableOpacity>
+						{socialloginProvider != 'anonymous' && (
+							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+									삭제
+								</PretendardVariableText>
+							</TouchableOpacity>
+						)}
 						<TouchableOpacity
 							onPress={async () => {
 								setModify(!modify);
@@ -346,46 +348,47 @@ export default function Timetable({navigation, route}: any) {
 					</>
 				</HeaderContianer>
 			),
-			headerLeft: () => (
-				<>
-					{Platform.OS != 'android' && (
-						<TouchableOpacity
-							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '홈으로',
-										modalSubTitle: modifyCheck
-											? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
-											: '홈으로 이동하시겠습니까?',
-										modalFunction: () => {},
-										modalBottomFunctionUse: true,
-										modalBottomFunction: goHome,
-										modalTopText: modifyCheck ? '저장하러 가기' : '둘러보기',
-										modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
-									}),
-								);
-							}}
-							style={{
-								justifyContent: 'center',
-								marginLeft: widthPercentage(4),
-								marginRight: widthPercentage(4),
-							}}>
-							<Image
-								resizeMode='contain'
-								source={require('../../../public/images/danim_logo_row.png')}
-								style={{height: heightPercentage(36), aspectRatio: 2.054}}
-							/>
-						</TouchableOpacity>
-					)}
-					{shareViewWithStartFlag && (
-						<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
-							<PretendardBoldText size={18} lineHeight={24} color={colors.PointYellow}>
-								공유
-							</PretendardBoldText>
-						</TouchableOpacity>
-					)}
-				</>
-			),
+			headerLeft: () =>
+				socialloginProvider != 'anonymous' && (
+					<>
+						{Platform.OS != 'android' && (
+							<TouchableOpacity
+								onPress={() => {
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: '홈으로',
+											modalSubTitle: modifyCheck
+												? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
+												: '홈으로 이동하시겠습니까?',
+											modalFunction: () => {},
+											modalBottomFunctionUse: true,
+											modalBottomFunction: goHome,
+											modalTopText: modifyCheck ? '저장하러 가기' : '둘러보기',
+											modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+										}),
+									);
+								}}
+								style={{
+									justifyContent: 'center',
+									marginLeft: widthPercentage(4),
+									marginRight: widthPercentage(4),
+								}}>
+								<Image
+									resizeMode='contain'
+									source={require('../../../public/images/danim_logo_row.png')}
+									style={{height: heightPercentage(36), aspectRatio: 2.054}}
+								/>
+							</TouchableOpacity>
+						)}
+						{shareViewWithStartFlag && (
+							<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
+								<PretendardBoldText size={18} lineHeight={24} color={colors.PointYellow}>
+									공유
+								</PretendardBoldText>
+							</TouchableOpacity>
+						)}
+					</>
+				),
 		});
 	}, [
 		timetable,
@@ -398,6 +401,7 @@ export default function Timetable({navigation, route}: any) {
 		shareLoginFlag,
 		modifyView,
 		modify,
+		socialloginProvider,
 	]);
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
 	return <MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>;
