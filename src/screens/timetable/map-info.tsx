@@ -184,7 +184,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
-	const noMove = timetable[select].filter(item => !item.name.includes('추천'));
+	// const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {

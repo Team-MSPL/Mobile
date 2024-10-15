@@ -75,6 +75,7 @@ const initialState: LiteState = {
 	aiList: [],
 	aiFlag: false,
 	selecedtDateFlag: false,
+	autoRecommendFlag: false,
 };
 
 export const axiosGoogle = axios.create({
@@ -452,6 +453,9 @@ export const travelSlice = createSlice({
 			state.freeTicket = false;
 			state.shareViewWithStartFlag = true;
 		},
+		setAutoRecommendFlag: (state, {payload}) => {
+			state.autoRecommendFlag = payload;
+		},
 		setPopuarityClickStart: (state, {payload}) => {
 			Object.assign(state, initialState);
 			state.makeMode = payload.makeMode;
@@ -509,111 +513,7 @@ export const travelSlice = createSlice({
 			state.diary = payload;
 		},
 		drawTimetable: state => {
-			let updateItem = [];
-			let copy: TimetableType[][] = [...Array(state.timetable.length)].map(() => []);
-			state.timetable.forEach((item, idx) => {
-				let time = 6;
-				let dinnerTime = [22, 29];
-				let lunchTime = [8, 15];
-				let lunch = false;
-				let dinner = false;
-				const updateItem = {
-					name: '', //넣을거
-					lat: 0,
-					lng: 0,
-					category: 0, //넣을거
-					x: idx,
-					y: 0, //넣을거
-					id: 0, //넣을거
-					takenTime: 0, //넣을거
-				};
-				item.forEach((value, index) => {
-					if (index == 0) {
-						if (idx == 0) {
-							time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
-						} else if (copy[idx - 1].at(-1)?.category == 4) {
-							copy[idx].push({
-								...copy[idx - 1].at(-1),
-								y: 0,
-								takenTime: 150,
-								x: idx,
-								key: shortId.generate(),
-							});
-						}
-					}
-					if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
-						copy[idx].push({
-							...updateItem,
-							name: '점심 추천',
-							y: time,
-							takenTime: 60,
-							id: shortId.generate(),
-							category: 1,
-							lat: value.lat,
-							lng: value.lng,
-							photo: '',
-							key: shortId.generate(),
-						});
-						lunch = true;
-						time += 3;
-					}
-					if (time >= dinnerTime[0] && time <= dinnerTime[1] && dinner == false) {
-						copy[idx].push({
-							...updateItem,
-							name: '저녁 추천',
-							y: time,
-							takenTime: 60,
-							id: shortId.generate(),
-							category: 1,
-							lat: value.lat,
-							lng: value.lng,
-							photo: '',
-							key: shortId.generate(),
-						});
-						dinner = true;
-						time += 3;
-					}
-					if (value.category != 4) {
-						copy[idx].push({...value, x: idx, y: time, id: shortId.generate(), key: shortId.generate()});
-						time += value.takenTime / 30;
-						let bandwidthTime = state.bandwidth ? 1 : 0;
-						index != item.length - 1 &&
-							(time += Math.ceil(state.moveTimeList[idx][index] / 1000 / 60 / 30) + bandwidthTime);
-					}
-					if (index == item.length - 1 && idx != state.timetable.length - 1 && value.category != 4) {
-						copy[idx].push({
-							...updateItem,
-							name: '숙소 추천',
-							y: 36,
-							//y: time < 36 ? 36 : time,
-							takenTime: time < 36 ? 360 : (48 - time) * 30,
-							id: shortId.generate(),
-							category: 4,
-							lat: value.lat,
-							lng: value.lng,
-							photo: '',
-							key: shortId.generate(),
-						});
-					} else if (value.category == 4 && index == item.length - 1) {
-						//copy[idx].pop();
-						copy[idx].push({
-							...value,
-							y: 36,
-							//y: time < 36 ? 36 : time,
-							takenTime: time < 36 ? 360 : (48 - time) * 30,
-							id: shortId.generate(),
-							category: 4,
-							lat: value.lat,
-							lng: value.lng,
-							photo: '',
-							key: shortId.generate(),
-						});
-					}
-				});
-			});
-
 			state.saveFlag = true;
-			state.timetable = copy;
 			state.tableShowFlag = true;
 		},
 		changeModify: (state, {payload}) => {
@@ -696,8 +596,120 @@ export const travelSlice = createSlice({
 			state.courseDetail = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
+			let updateItem = [[...Array(payload.data.resultData.length - 1)].map(() => [])];
+			payload.data.resultData.forEach((timeTable, tIndex) => {
+				let copy: TimetableType[][] = [...Array(timeTable.length)].map(() => []);
+				timeTable.forEach((item, idx) => {
+					let time = 6;
+					let dinnerTime = [22, 29];
+					let lunchTime = [8, 15];
+					let lunch = false;
+					let dinner = false;
+					const updateItem = {
+						name: '', //넣을거
+						lat: 0,
+						lng: 0,
+						category: 0, //넣을거
+						x: idx,
+						y: 0, //넣을거
+						id: 0, //넣을거
+						takenTime: 0, //넣을거
+					};
+					item.forEach((value, index) => {
+						if (index == 0) {
+							if (idx == 0) {
+								time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
+							} else if (copy[idx - 1].at(-1)?.category == 4) {
+								copy[idx].push({
+									...copy[idx - 1].at(-1),
+									y: 0,
+									takenTime: 150,
+									x: idx,
+									key: shortId.generate(),
+								});
+							}
+						}
+						if (time >= lunchTime[0] && time <= lunchTime[1] && lunch == false) {
+							copy[idx].push({
+								...updateItem,
+								name: '점심 추천',
+								y: time,
+								takenTime: 60,
+								id: shortId.generate(),
+								category: 1,
+								lat: value.lat,
+								lng: value.lng,
+								photo: '',
+								key: shortId.generate(),
+							});
+							lunch = true;
+							time += 3;
+						}
+						if (time >= dinnerTime[0] && time <= dinnerTime[1] && dinner == false) {
+							copy[idx].push({
+								...updateItem,
+								name: '저녁 추천',
+								y: time,
+								takenTime: 60,
+								id: shortId.generate(),
+								category: 1,
+								lat: value.lat,
+								lng: value.lng,
+								photo: '',
+								key: shortId.generate(),
+							});
+							dinner = true;
+							time += 3;
+						}
+						if (value.category != 4) {
+							copy[idx].push({
+								...value,
+								x: idx,
+								y: time,
+								id: shortId.generate(),
+								key: shortId.generate(),
+							});
+							time += value.takenTime / 30;
+							let bandwidthTime = state.bandwidth ? 1 : 0;
+							index != item.length - 1 && (time += 2 + bandwidthTime);
+						}
+						if (index == item.length - 1 && idx != timeTable.length - 1 && value.category != 4) {
+							copy[idx].push({
+								...updateItem,
+								name: '숙소 추천',
+								y: 36,
+								//y: time < 36 ? 36 : time,
+								takenTime: time < 36 ? 360 : (48 - time) * 30,
+								id: shortId.generate(),
+								category: 4,
+								lat: value.lat,
+								lng: value.lng,
+								photo: '',
+								key: shortId.generate(),
+							});
+						} else if (value.category == 4 && index == item.length - 1) {
+							//copy[idx].pop();
+							copy[idx].push({
+								...value,
+								y: 36,
+								//y: time < 36 ? 36 : time,
+								takenTime: time < 36 ? 360 : (48 - time) * 30,
+								id: shortId.generate(),
+								category: 4,
+								lat: value.lat,
+								lng: value.lng,
+								photo: '',
+								key: shortId.generate(),
+							});
+						}
+					});
+				});
+				updateItem[tIndex] = copy;
+				// updateItem.push(copy);
+			});
+			state.presetDatas = updateItem;
 			state.presetTendencyList = payload.data.bestPointList;
-			state.presetDatas = payload.data.resultData;
+			// state.presetDatas = payload.data.resultData;
 			state.enoughPlace = payload.data.enoughPlace;
 		});
 		builder.addCase(getMyTravelList.fulfilled, (state, {payload}) => {
@@ -782,6 +794,7 @@ interface LiteState {
 	aiList: aiListType[];
 	aiFlag: boolean;
 	selectedDateFlag: boolean;
+	autoRecommendFlag: boolean;
 }
 interface aiListType {
 	_id: string;

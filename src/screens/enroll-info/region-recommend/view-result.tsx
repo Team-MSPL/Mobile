@@ -22,18 +22,26 @@ import {GraientBackground} from '../hiking-recommend/view-result';
 import {logEvent} from '../../../../firebaseAnalytice';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
-	const {userName} = useAppSelector(state => state.userSlice);
+	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const {recommendList} = useAppSelector(state => state.regionRecommendSlice);
 	const windowWidth = Dimensions.get('window').width;
 	const handleGoogleAnalytics = async () => {
-		await logEvent('place_complete', {
-			recommand_result1: recommendList[0].name,
-			recommand_result2: recommendList[1].name,
-			recommand_result3: recommendList[2].name,
-			recommand_result4: recommendList[3].name,
-			recommand_result5: recommendList[4].name,
-		});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_place_complete', {
+					recommand_result1: recommendList[0].name,
+					recommand_result2: recommendList[1].name,
+					recommand_result3: recommendList[2].name,
+					recommand_result4: recommendList[3].name,
+					recommand_result5: recommendList[4].name,
+			  })
+			: await logEvent('place_complete', {
+					recommand_result1: recommendList[0].name,
+					recommand_result2: recommendList[1].name,
+					recommand_result3: recommendList[2].name,
+					recommand_result4: recommendList[3].name,
+					recommand_result5: recommendList[4].name,
+			  });
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

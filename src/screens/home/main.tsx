@@ -129,9 +129,16 @@ export default function Main({navigation}: any) {
 		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('login', {});
-		await setUserId(userId ?? '');
-		await setUserProperty('user_id', userId ?? '');
+		if (socialloginProvider == 'anonymous') {
+			await logEvent('anonymous_login', {});
+			await setUserId(userId ?? '');
+			await setUserProperty('anonymous_user_id', userId ?? '');
+		} else {
+			await logEvent('login', {});
+			await setUserId(userId ?? '');
+			await setUserProperty('user_id', userId ?? '');
+		}
+
 		dispatch(userSliceActions.setAnalyticeFlag(true));
 	};
 	const [noteList, setNoteList] = useState([]);

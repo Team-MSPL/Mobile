@@ -36,7 +36,9 @@ export default function SelectDistance({navigation}: any) {
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const handleGoogleAnalytics = async () => {
-		await logEvent('place_step3', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anontmous_place_step3', {})
+			: await logEvent('place_step3', {});
 	};
 	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
 	const searchRegionList = cityViewList

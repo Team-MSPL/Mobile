@@ -1,11 +1,11 @@
-import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {TouchableOpacity, BackHandler, Image, Platform} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
 	deleteTravelCourse,
-	getDrivingDuration,
+	recommendApi,
 	saveTravel,
 	travelSliceActions,
 	updateShareUserList,
@@ -13,13 +13,14 @@ import {
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import {HeaderContianer, PretendardBold, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
-
+import shortId from 'shortid';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
 import Toast from 'react-native-toast-message';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {logEvent} from '../../../firebaseAnalytice';
+import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -38,6 +39,7 @@ export default function Timetable({navigation, route}: any) {
 		shareLoginFlag,
 		shareViewWithStartFlag,
 		regionInfo,
+		autoRecommendFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin, socialloginProvider} = useAppSelector(state => state.userSlice);
 
@@ -46,36 +48,241 @@ export default function Timetable({navigation, route}: any) {
 	const [addList, setAddList] = useState<number[]>([]);
 	const [modifyState, setmodifyState] = useState({state: false, day: 0, index: 0, value: {}});
 	let wayPoint = {start: '', goal: '', wayPoint: ''};
+	const departure = useRef<DistanceType>({lat: 0, lng: 0});
+	const getRecommendList = async (e: {
+		name: string;
+		x: number;
+		index: number;
+		y: number;
+		category: string;
+		lat: number;
+		lng: number;
+		apiCategory: string;
+		radius: number;
+		backupLat: number;
+		backupLng: number;
+		status: any;
+	}) => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let result = await dispatch(
+				recommendApi({
+					category: e.apiCategory,
+					lat: e.lat,
+					lng: e.lng,
+					radius: e.radius,
+				}),
+			).unwrap();
+			departure.current.lat = e.lat;
+			departure.current.lng = e.lng;
+			if (result.length == 0) {
+				result = await dispatch(
+					recommendApi({
+						category: e.apiCategory,
+						lat: e.backupLat,
+						lng: e.backupLng,
+						radius: 20000,
+					}),
+				).unwrap();
+				departure.current.lat = e.lat;
+				departure.current.lng = e.lng;
+				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
+			}
+			return result[0];
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천 아이템이 없습니다!',
+				}),
+			);
+			navigation.goBack();
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const restaurantRecommend = useCallback(async (e: {value: any; index: number; idx: number}) => {
+		let lat = 0;
+		let lng = 0;
+		let radius = 2000;
+		let status = timetable[e.idx][e.index - 1];
+		let goCheck = true;
+		if (timetable[e.idx].length == 1) {
+		} else {
+			if (e.index == timetable[e.idx].length - 1) {
+				if (timetable[e.idx][timetable[e.idx].length - 2].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][timetable[e.idx].length - 2].lat;
+					lng = timetable[e.idx][timetable[e.idx].length - 2].lng;
+					status = timetable[e.idx][timetable[e.idx].length - 2];
+				}
+			} else if (e.index == 0) {
+				if (timetable[e.idx][1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][1].lat;
+					lng = timetable[e.idx][1].lng;
+					status = timetable[e.idx][1];
+				}
+			} else {
+				const departure = {lat: timetable[e.idx][e.index - 1].lat, lng: timetable[e.idx][e.index - 1].lng};
+				const arrival = {lat: timetable[e.idx][e.index + 1].lat, lng: timetable[e.idx][e.index + 1].lng};
+				const distance = Math.ceil(useDistance({departure: departure, arrival: arrival}));
+				lat = (timetable[e.idx][e.index - 1].lat + timetable[e.idx][e.index + 1].lat) / 2;
+				lng = (timetable[e.idx][e.index - 1].lng + timetable[e.idx][e.index + 1].lng) / 2;
+				radius = distance >= 20 ? 20000 : distance == 0 ? 2000 : distance * 1000;
+				if (
+					timetable[e.idx][e.index - 1].name.includes('추천') &&
+					timetable[e.idx][e.index + 1].name.includes('추천')
+				) {
+					goCheck = false;
+				} else if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index + 1];
+				} else if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					status = timetable[e.idx][e.index - 1];
+				}
+			}
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+
+				return await getRecommendList({
+					name: '식당 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					apiCategory: 'FD6',
+					radius: radius,
+					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
+					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
+					status: status,
+				});
+			} else {
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '추천이 불가합니다.',
+				// 		modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+				// 	}),
+				// );
+			}
+		}
+	}, []);
+
+	const accommodationRecommend = async (e: {value: any; index: number; idx: number}) => {
+		if (timetable[e.idx].length < 2) {
+		} else {
+			let lat = 0;
+			let lng = 0;
+			let goCheck = true;
+			if (e.index == 0) {
+				if (timetable[e.idx][e.index + 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index + 1].lat;
+					lng = timetable[e.idx][e.index + 1].lng;
+				}
+			} else {
+				if (timetable[e.idx][e.index - 1].name.includes('추천')) {
+					goCheck = false;
+				} else {
+					lat = timetable[e.idx][e.index - 1].lat;
+					lng = timetable[e.idx][e.index - 1].lng;
+				}
+			}
+			if (goCheck) {
+				const startNumber = e.value.y; // 시작 숫자
+				const count = e.value.takenTime / 30; // 원하는 갯수
+				const sequentialArray = Array.from({length: count}, (_, index) => startNumber + index);
+				return await getRecommendList({
+					name: '숙소 추천',
+					x: e.value.x,
+					index: e.index,
+					y: sequentialArray,
+					category: e.value.category,
+					lat: lat,
+					lng: lng,
+					apiCategory: 'AD5',
+					radius: 2000,
+					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
+					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
+					status: e.index != 0 ? timetable[e.idx][e.index - 1] : timetable[e.idx][e.index + 1],
+				});
+			} else {
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '추천이 불가합니다.',
+				// 		modalSubTitle: '앞,뒤 관광지를 바탕으로 추천을 해드려요\n관광지를 추가한 후 시도해주세요',
+				// 	}),
+				// );
+			}
+		}
+	};
+	const handleAutoRecommend = async ({item, copy, idx}: any) => {
+		let copy2 = [...item];
+		const handleItems = item.map(async (value, index) => {
+			if (value.name == '점심 추천' || value.name == '저녁 추천') {
+				let items = await restaurantRecommend({value: value, index: index, idx: idx});
+				copy2[index] = {
+					...copy2[index],
+					name: items.place_name,
+					lat: Number(items.y),
+					lng: Number(items.x),
+					category: value.category,
+					x: value.x,
+					y: value.y,
+					id: shortId.generate(),
+				};
+			} else if (value.name == '숙소 추천' && index != 0) {
+				let items = await accommodationRecommend({value: value, index: index, idx: idx});
+				copy2[index] = {
+					...copy2[index],
+					name: items.place_name,
+					lat: Number(items.y),
+					lng: Number(items.x),
+					category: value.category,
+					x: value.x,
+					y: value.y,
+					id: shortId.generate(),
+				};
+			} else if (index == 0 && value.name == '숙소 추천') {
+				if (copy[idx - 1].at(-1)?.category) {
+					copy2[index] = {
+						...copy2[index],
+						name: copy[idx - 1].at(-1)?.name,
+						lat: Number(copy[idx - 1].at(-1)?.lat),
+						lng: Number(copy[idx - 1].at(-1)?.lng),
+						category: value.category,
+						x: value.x,
+						y: value.y,
+						id: shortId.generate(),
+					};
+				}
+			}
+		});
+		await Promise.all(handleItems);
+		return copy2;
+	};
 	const getDuration = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			dispatch(travelSliceActions.resetMoveTimeList());
-			let count = 0;
-			for await (const timetableSubItems of timetable) {
-				count += 1;
-				try {
-					if (timetableSubItems.length > 1) {
-						for (let j = 0; j < timetableSubItems.length; j++) {
-							if (j === 0) {
-								wayPoint.start = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
-							} else if (j === timetableSubItems.length - 1) {
-								wayPoint.goal = `${timetableSubItems[j].lng},${timetableSubItems[j].lat}`;
-							} else {
-								wayPoint.wayPoint += `${timetableSubItems[j].lng},${timetableSubItems[j].lat}|`;
-							}
-						}
-						wayPoint.wayPoint && (wayPoint.wayPoint = wayPoint.wayPoint.slice(0, -1));
-						await dispatch(getDrivingDuration(wayPoint)).unwrap();
-						wayPoint = {start: '', goal: '', wayPoint: ''};
-					} else {
-						dispatch(travelSliceActions.pushMoveTimeList());
-					}
-				} catch {
-					dispatch(travelSliceActions.pushCatchMoveTimeList(count));
-				}
+			if (autoRecommendFlag) {
+				let copy = [...timetable];
+				await timetable.reduce(async (prev, item, idx) => {
+					await prev;
+					const newElem = await handleAutoRecommend({item, copy, idx});
+					copy[idx] = newElem;
+				}, Promise.resolve());
+				dispatch(travelSliceActions.changeTimetable(copy));
 			}
+
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',
@@ -403,6 +610,7 @@ export default function Timetable({navigation, route}: any) {
 		modify,
 		socialloginProvider,
 	]);
+	// if (true) return <></>;
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
 	return <MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>;
 }

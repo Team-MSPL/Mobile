@@ -25,9 +25,23 @@ export default function PresetDetail({navigation, route}: any) {
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '잠깐!',
-				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
+				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다',
 				modalLeft: true,
-				modalFunction: goNext,
+				modalFunction: handleRecommend,
+			}),
+		);
+	};
+	const handleRecommend = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '잠깐!',
+				modalSubTitle: '식당과 숙소까지 다님에서\n한 번에 추천해드릴까요?',
+				modalLeft: true,
+				modalTopText: '네, 한 번에 추천해주세요',
+				modalBottomText: '아니요, 제가 나중에 직접 고를래요',
+				modalFunction: () => goNext(true),
+				modalBottomFunctionUse: true,
+				modalBottomFunction: () => goNext(false),
 			}),
 		);
 	};
@@ -43,7 +57,7 @@ export default function PresetDetail({navigation, route}: any) {
 			'region',
 		]);
 	};
-	const goNext = () => {
+	const goNext = (e: boolean) => {
 		try {
 			removeCache();
 			dispatch(deleteAI({aiId: aiID}));
@@ -55,6 +69,7 @@ export default function PresetDetail({navigation, route}: any) {
 					copy.push([]);
 				}
 			}
+			dispatch(travelSliceActions.setAutoRecommendFlag(e));
 			dispatch(travelSliceActions.enrollTimetable(copy));
 			navigation.navigate('Timetable');
 		} catch (err) {
@@ -266,7 +281,10 @@ export default function PresetDetail({navigation, route}: any) {
 								{item.map((value, idx) => (
 									<TouchableOpacity
 										onPress={() => {
-											moveRegion(index, idx);
+											value.name != '점심 추천' &&
+												value.name != '저녁 추천' &&
+												value.name != '식당 추천' &&
+												moveRegion(index, idx);
 										}}
 										key={idx}>
 										<HStack gap={widthPercentage(10)}>

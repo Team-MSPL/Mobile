@@ -24,6 +24,7 @@ export default function SearchRecommend({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
 	const {Place, accommodations, essentialPlaces, timetable} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [placeState, setPlaceState] = useState<{
 		name: string | undefined;
 		lat: number | undefined;
@@ -104,9 +105,13 @@ export default function SearchRecommend({navigation, route}: any) {
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	const handleGoogleAnalytics = async () => {
-		await logEvent('select_place', {
-			place: placeState?.name,
-		});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_select_place', {
+					place: placeState?.name,
+			  })
+			: await logEvent('select_place', {
+					place: placeState?.name,
+			  });
 	};
 	const addPlace = () => {
 		let copy = [...timetable];

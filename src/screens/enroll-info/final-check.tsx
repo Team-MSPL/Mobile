@@ -199,6 +199,7 @@ export default function FinalCheck({navigation}: any) {
 				);
 			}
 		} catch (error) {
+			console.log(error);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '네트워크 연결이 불안정합니다',
@@ -239,7 +240,9 @@ export default function FinalCheck({navigation}: any) {
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step6', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step6', {})
+			: await logEvent('course_step6', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

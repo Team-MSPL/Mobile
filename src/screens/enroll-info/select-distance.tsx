@@ -31,8 +31,11 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 			  )
 			: (dispatch(travelSliceActions.enrollDistance(range)), navigation.navigate('FinalCheck'));
 	};
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step5', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step5', {})
+			: await logEvent('course_step5', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

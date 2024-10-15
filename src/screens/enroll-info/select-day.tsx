@@ -31,6 +31,7 @@ export default function SelectDay({navigation}: any) {
 		selectedDateFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
@@ -135,7 +136,9 @@ export default function SelectDay({navigation}: any) {
 		{step: '여행 도착 시간', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step3', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step3', {})
+			: await logEvent('course_step3', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

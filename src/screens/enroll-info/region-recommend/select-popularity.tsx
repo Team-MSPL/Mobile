@@ -13,8 +13,11 @@ import RouteButton from '../../../utill/component/route-button';
 export default function SelectPopularity({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const handleGoogleAnalytics = async () => {
-		await logEvent('place_step2', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymouse_place_step2', {})
+			: await logEvent('place_step2', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

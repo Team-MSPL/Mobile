@@ -14,6 +14,7 @@ import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const checkNext = () => {
 		if (tendency[0][tendency[0].length - 1] == 1) {
@@ -38,7 +39,9 @@ export default function RecommendSelectWho({navigation}: any) {
 		handleButtonClick({index: 0, region: false, item: item});
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step4', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step4', {})
+			: await logEvent('course_step4', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

@@ -16,6 +16,7 @@ import {logEvent} from '../../../firebaseAnalytice';
 import RouteButton from '../../utill/component/route-button';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
@@ -72,7 +73,9 @@ export default function SelectCity({navigation}: any) {
 		}
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step2', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step2', {})
+			: await logEvent('course_step2', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

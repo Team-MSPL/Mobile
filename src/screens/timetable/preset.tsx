@@ -161,7 +161,7 @@ export default function Preset({navigation}: any) {
 		let copy = [];
 		let index = 0;
 		let copy2 = [];
-		e.tendencyNameList?.map((item, idx) => {
+		e?.tendencyNameList?.map((item, idx) => {
 			if (['봄', '여름', '가을', '겨울'].includes(item)) {
 				index = idx;
 			} else {
@@ -199,7 +199,7 @@ export default function Preset({navigation}: any) {
 						</PretendardSemiBoldText>
 					</RegionTextContainer>
 					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-						{presetTendencyList[0].tendencyNameList.map((item, idx) => {
+						{presetTendencyList[0]?.tendencyNameList.map((item, idx) => {
 							return (
 								<TagContainer backgroundColor={colors.backgroundGray} key={idx}>
 									<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray4}>
@@ -227,9 +227,9 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								{presetTendencyList[idx].tendencyNameList.length >= 1 && (
+								{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
 									<>
-										{presetTendencyList[idx].tendencyNameList.length >= 2 && (
+										{presetTendencyList[idx]?.tendencyNameList.length >= 2 && (
 											<HStack>
 												<PretendardSemiBoldText
 													size={14}
@@ -256,12 +256,12 @@ export default function Preset({navigation}: any) {
 													copy[idx] = !copy[idx];
 													setTendencyViewIndex(copy);
 												}}>
-												{presetTendencyList[idx].tendencyNameList
+												{presetTendencyList[idx]?.tendencyNameList
 													.slice(
 														0,
 														tendencyViewIndex[idx]
 															? 4
-															: presetTendencyList[idx].tendencyNameList.length,
+															: presetTendencyList[idx]?.tendencyNameList.length,
 													)
 													.map((item, index) => {
 														return (
@@ -285,7 +285,7 @@ export default function Preset({navigation}: any) {
 														);
 													})}
 											</FlexWrap>
-											{presetTendencyList[idx].tendencyNameList.length > 4 && (
+											{presetTendencyList[idx]?.tendencyNameList.length > 4 && (
 												<TouchableOpacity
 													style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
 													onPress={() => {
