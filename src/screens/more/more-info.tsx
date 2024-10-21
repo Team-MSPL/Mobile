@@ -25,13 +25,18 @@ export default function MoreInfo({navigation}: any) {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
 			AsyncStorage.multiRemove(removeList);
 		});
-		dispatch(userSliceActions.reset());
-		navigation.replace('LoginScreen');
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '로그아웃에 성공했습니다.',
-			}),
-		);
+		if (socialloginProvider != 'anonymous') {
+			dispatch(userSliceActions.reset());
+			navigation.replace('LoginScreen');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '로그아웃에 성공했습니다.',
+				}),
+			);
+		} else {
+			dispatch(userSliceActions.reset());
+			navigation.replace('LoginScreen');
+		}
 	};
 	useBackHandler({type: 'exit'});
 	const goNavigation = (route: string) => {
@@ -174,7 +179,12 @@ export default function MoreInfo({navigation}: any) {
 							<SettingElement
 								key={idx}
 								onPress={item.function}
-								bottomShow={idx == useInfo.length - 1 ? false : true}>
+								bottomShow={
+									idx ==
+									useInfo.slice(socialloginProvider == 'anonymous' ? 1 : 0, useInfo.length).length - 1
+										? false
+										: true
+								}>
 								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 									{item.title}
 								</PretendardSemiBoldText>
@@ -190,17 +200,19 @@ export default function MoreInfo({navigation}: any) {
 						<SettingElement
 							bottomShow={socialloginProvider == 'anonymous' ? false : true}
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '로그아웃 하시겠습니까?',
-										modalSubTitle: `로그아웃하면 더 이상\n다님의 여행 추천 서비스를 받을 수 없어요 :(`,
-										modalTopText: '로그인 상태 유지',
-										modalBottomText: '아쉽지만 로그아웃',
-										modalBottomFunction: goLogout,
-										modalBottomFunctionUse: true,
-										modalLeft: true,
-									}),
-								);
+								socialloginProvider == 'anonymous'
+									? goLogout()
+									: dispatch(
+											modalSliceActions.setOpenModal({
+												modalTitle: '로그아웃 하시겠습니까?',
+												modalSubTitle: `로그아웃하면 더 이상\n다님의 여행 추천 서비스를 받을 수 없어요 :(`,
+												modalTopText: '로그인 상태 유지',
+												modalBottomText: '아쉽지만 로그아웃',
+												modalBottomFunction: goLogout,
+												modalBottomFunctionUse: true,
+												modalLeft: true,
+											}),
+									  );
 							}}>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.PointGreen1}>
 								로그아웃

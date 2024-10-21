@@ -24,7 +24,7 @@ export default function RouteButton({
 			style={{position: 'absolute', alignSelf: 'center', bottom: 10, width: widthPercentage(328)}}>
 			<ButtonContainer marginTop={marginTop ?? 0} marginBottom={marginBottom ?? 0} onPress={handleBack}>
 				<SVGRightAdd
-					style={{position: 'absolute', left: widthPercentage(25)}}
+					style={{position: 'absolute', left: widthPercentage(28)}}
 					color={colors.Primary}
 					transform={180}
 				/>
@@ -40,7 +40,7 @@ export default function RouteButton({
 				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 					다음
 				</PretendardSemiBoldText>
-				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(25)}} color={colors.Primary} />
+				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(28)}} color={colors.Primary} />
 			</ButtonContainer>
 		</HStack>
 	);

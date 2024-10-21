@@ -22,7 +22,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('SelectCity');
+		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('RecommendSelectCountry');
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	const handleGoogleAnalytics = async () => {

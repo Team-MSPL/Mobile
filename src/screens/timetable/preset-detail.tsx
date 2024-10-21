@@ -24,24 +24,24 @@ export default function PresetDetail({navigation, route}: any) {
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '잠깐!',
-				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다',
-				modalLeft: true,
-				modalFunction: handleRecommend,
-			}),
-		);
-	};
-	const handleRecommend = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '잠깐!',
-				modalSubTitle: '식당과 숙소까지 다님에서\n한 번에 추천해드릴까요?',
+				modalTitle: '식당과 숙소까지 다님에서\n한 번에 추천해드릴까요?',
+				modalSubTitle: '별점이 높은 장소를 우선적으로 추천해드려요',
 				modalLeft: true,
 				modalTopText: '네, 한 번에 추천해주세요',
 				modalBottomText: '아니요, 제가 나중에 직접 고를래요',
-				modalFunction: () => goNext(true),
+				modalFunction: () => handleRecommend(true),
 				modalBottomFunctionUse: true,
-				modalBottomFunction: () => goNext(false),
+				modalBottomFunction: () => handleRecommend(false),
+			}),
+		);
+	};
+	const handleRecommend = (e: boolean) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '잠깐!',
+				modalSubTitle: '일정을 확정하면 본 결과를 다시 확인하실 수 없습니다. 확정하시면 자동으로 저장됩니다.',
+				modalLeft: true,
+				modalFunction: goNext(e),
 			}),
 		);
 	};
@@ -281,10 +281,21 @@ export default function PresetDetail({navigation, route}: any) {
 								{item.map((value, idx) => (
 									<TouchableOpacity
 										onPress={() => {
-											value.name != '점심 추천' &&
+											if (
+												value.name != '점심 추천' &&
 												value.name != '저녁 추천' &&
-												value.name != '식당 추천' &&
+												value.name != '숙소 추천'
+											) {
 												moveRegion(index, idx);
+											} else
+												[
+													dispatch(
+														modalSliceActions.setOpenModal({
+															modalTitle: '여행 일정을 확정하시면\n추천이 가능해요!',
+															modalSingleUse: true,
+														}),
+													),
+												];
 										}}
 										key={idx}>
 										<HStack gap={widthPercentage(10)}>
@@ -330,7 +341,7 @@ export default function PresetDetail({navigation, route}: any) {
 				<MarginContainer />
 			</BackgroundGray>
 			<ButtonContainer>
-				<CustomButton label='이 코스로 할래요!' onPress={checkNext}></CustomButton>
+				<CustomButton label='이 여행 일정으로 정했어요!' onPress={checkNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

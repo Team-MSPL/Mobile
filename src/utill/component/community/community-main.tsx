@@ -121,8 +121,9 @@ function CommunityMain({
 					if (socialloginProvider == 'anonymous') {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '로그인이 필요합니다',
-								modalTopText: '로그인하기',
+								modalTitle: '지금 로그인하시고 다양한 여행 경험을 살펴보세요!',
+								modalTopText: '좋아요!',
+								modalBottomText: '다음에 할게요',
 								modalFunction: handleLogin,
 							}),
 						);

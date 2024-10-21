@@ -255,7 +255,7 @@ export default function LoginScreen({navigation}: any) {
 		},
 		{
 			title: '로그인없이 앱 둘러보기',
-			color: 'black',
+			color: 'grey',
 			image: <SvgGuest width={widthPercentage(24)} height={widthPercentage(24)} />,
 			onPress: anonymousLogin,
 		},
@@ -309,7 +309,7 @@ export default function LoginScreen({navigation}: any) {
 								<PretendardVariableText
 									size={14}
 									lineHeight={21.6}
-									color={platform.color == 'black' ? 'white' : 'black'}>
+									color={platform.color == 'black' || platform.color == 'grey' ? 'white' : 'black'}>
 									{platform.title}{' '}
 									{index != 3 && (platform.title == 'Apple' ? '로 로그인' : '아이디로 로그인')}
 								</PretendardVariableText>

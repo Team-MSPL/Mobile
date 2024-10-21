@@ -1,4 +1,4 @@
-import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id} from '@env';
+import {GOOGLE_API_KEY, KAKAO_REST_API_KEY, NAVER_API_KEY, NAVER_API_KEY_id, Tripadvisor_KEy} from '@env';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axios from 'axios';
 import moment, {Moment} from 'moment';
@@ -76,6 +76,8 @@ const initialState: LiteState = {
 	aiFlag: false,
 	selecedtDateFlag: false,
 	autoRecommendFlag: false,
+	globalFlag: false,
+	country: '',
 };
 
 export const axiosGoogle = axios.create({
@@ -385,6 +387,18 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		throw rejectWithValue(error.code);
 	}
 });
+
+//트립어드바이져 식당,카페 등 추천 장소 얻는 거
+export const recommendTripadvisor = createAsyncThunk('/recommendTripadvisor', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosTripadvisor.get(
+			`?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
+		);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -452,6 +466,7 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 			state.freeTicket = false;
 			state.shareViewWithStartFlag = true;
+			state.globalFlag = payload.globalFlag;
 		},
 		setAutoRecommendFlag: (state, {payload}) => {
 			state.autoRecommendFlag = payload;
@@ -545,6 +560,9 @@ export const travelSlice = createSlice({
 			state.freeTicket = true;
 			state.cityDistance = payload.cityDistance;
 			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
+		},
+		setCountry: (state, {payload}) => {
+			state.country = payload;
 		},
 		pushMoveTimeList: state => {
 			state.moveTimeList.push([]);
@@ -795,6 +813,8 @@ interface LiteState {
 	aiFlag: boolean;
 	selectedDateFlag: boolean;
 	autoRecommendFlag: boolean;
+	globalFlag: boolean;
+	country: string;
 }
 interface aiListType {
 	_id: string;
@@ -957,6 +977,8 @@ interface travelAiType {
 	distanceSensitivity: number;
 	bandwidth: boolean;
 	freeTicket: boolean;
+	version: number;
+	password: string;
 }
 
 interface myTravelListType {

@@ -133,8 +133,9 @@ export default function FinalCheck({navigation}: any) {
 		socialloginProvider == 'anonymous'
 			? dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '회원만 이용 가능합니다',
-						modalTopText: '로그인하기',
+						modalTitle: '지금 로그인하시고 \n맞춤 여행 추천을 받아보세요!',
+						modalTopText: '좋아요!',
+						modalBottomText: '다음에 할게요',
 						modalFunction: handleLogin,
 					}),
 			  )
@@ -177,7 +178,8 @@ export default function FinalCheck({navigation}: any) {
 					distanceSensitivity: distance,
 					bandwidth: bandwidth,
 					freeTicket: freeTicket,
-					// version: 2,
+					version: 2,
+					password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 				}),
 			).unwrap();
 			dispatch(travelSliceActions.selectRegion(a));

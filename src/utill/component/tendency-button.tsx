@@ -4,9 +4,23 @@ import {heightPercentage, widthPercentage} from '../layout/responsive-size';
 import {PretendardSemiBoldText} from '../layout/layout';
 import {Image} from 'react-native';
 
-export default function TendencyButton({onPress, label, bgColor, divide, marginBottom, imageUrl}: CustomButtonProps) {
+export default function TendencyButton({
+	onPress,
+	label,
+	bgColor,
+	divide,
+	marginBottom,
+	imageUrl,
+	imageSvg,
+	width,
+}: CustomButtonProps) {
 	return (
-		<ButtonContainer select={bgColor} onPress={onPress} divide={divide ?? false} marginBottom={marginBottom}>
+		<ButtonContainer
+			select={bgColor}
+			onPress={onPress}
+			divide={divide ?? false}
+			marginBottom={marginBottom}
+			width={width}>
 			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
 				{label}
 			</PretendardSemiBoldText>
@@ -16,6 +30,7 @@ export default function TendencyButton({onPress, label, bgColor, divide, marginB
 					resizeMode='contain'
 					source={imageUrl}></Image>
 			)}
+			{imageSvg && imageSvg}
 		</ButtonContainer>
 	);
 }
@@ -27,9 +42,16 @@ type CustomButtonProps = {
 	divide?: boolean;
 	marginBottom?: number;
 	imageUrl?: string;
+	width?: number;
+	imageSvg?: any;
 };
-const ButtonContainer = styled.TouchableOpacity<{select: boolean; divide: boolean; marginBottom?: number}>`
-	width: ${props => (props.divide ? 'null' : widthPercentage(327) + 'px')};
+const ButtonContainer = styled.TouchableOpacity<{
+	select: boolean;
+	divide: boolean;
+	marginBottom?: number;
+	width?: number;
+}>`
+	width: ${props => (props.divide ? props.width ?? 'null' : widthPercentage(327) + 'px')};
 	align-items: center;
 	height: ${heightPercentage(60)}px;
 	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(13) + 'px' : '0px')};

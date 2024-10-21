@@ -2,6 +2,7 @@ import {useDispatch} from 'react-redux';
 import {useAppSelector} from '../../redux';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {SvgChina} from '../svg/svg';
 
 export const useTendencyHandler = () => {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
@@ -16,6 +17,19 @@ export const useTendencyHandler = () => {
 			region ? regionRecommendSliceActions.enrollRegionTendency(copy) : travelSliceActions.enrollTendency(copy),
 		);
 	};
+	const handleCountryClick = (country: string) => {
+		dispatch(travelSliceActions.setCountry(country));
+	};
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '싱가포르', en: 'Singapore'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+	];
+
 	const tendencyList = [
 		{
 			title: '누구와 떠나시나요?',
@@ -143,5 +157,5 @@ export const useTendencyHandler = () => {
 		},
 	];
 
-	return {tendencyList, regionTendencyList, handleButtonClick};
+	return {tendencyList, regionTendencyList, handleButtonClick, countryList, handleCountryClick};
 };

@@ -119,7 +119,7 @@ export default function MyTravelList({navigation}: any) {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 		await logEvent('course_step1', {});
 	};

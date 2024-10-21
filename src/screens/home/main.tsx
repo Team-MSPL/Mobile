@@ -48,10 +48,26 @@ export default function Main({navigation}: any) {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-
+	const goGlobal = () => {
+		let season = Array(4).fill(0);
+		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
+		index < 0 ? (season[3] = 1) : (season[index] = 1);
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: true}));
+		navigation.navigate('EnrollTravelTitle');
+	};
+	// useEffect(() => {
+	// 	const japanList =
+	// 		'도쿄,후쿠오카,오사카,삿포로,오키나와,교토,나고야,유후,고베,요코하마,나가사키,나라,히로시마,가고시마,오타루,요이치,샤코탄,노보리베츠,무로란,도야코,쿄고쿠,니세코,굿찬,시라오이,아사히카와,우베,아바시리,소베츠,하코다테,우라호로,샤리,왓카나이,도요토미,토마마에,루모이,호쿠류,다키카와,아시베츠,우타시나이,비바이,토마코마이,니캇푸,신히다카,우라카와,에리모,타카스,오토이넷푸,오비히로,메무로,마쿠베츠,오토후케,시미즈,히다카,비라토리,란코시,쿠로마츠나이,세타나,오토베,에사시,카미노쿠니,마츠마에,후쿠시마,시리우치,키코나이,호쿠토,후쿠이,치바,시카베,모리,야쿠모,이와나이,에베쓰,이와미자와,미카사,우라우스,비에이,가미후라노,나카후라노,가루이자와마치,구사쓰,쓰마고이,다카야마,후라노,아카비라,스나가와,토마,히가시카와,몬베츠,나요로,가미시호로,가미카와,엔가루,키타미,타키노우에,유베츠,오조라,츠베츠,테시카가,시베차,코시미즈,기요사토,나카시베츠,쓰루이,구시로,앗케시,남포로,유니,나가누마,에니와,니키,다카마쓰,마루가메,가마쿠라시,야마토,마츠다,토요타,마츠모토,우에다,아즈미노,스와,시오지리,토미오카,안나카,다카사키,치치부,고후,하코네,타마,오야마,후지노미야,미시마,칸나미,아타미,이즈,이토,니시이즈,누마즈,아시카가,칸라,코가,마츠도,후나바시,이시오카,오시노,치요다,후지요시다,고토,쿠와나,타치카와,분쿄,세타가야,세키,한노,미하마,스미다,사가미하라,히가시쿠루메,후지사와,기타,하치오지,가쓰시카,코가네이,후지카와구치코,히타치오타,도코로자와,도요하시,미야즈,조후,닛코,마이즈루,하마마츠,야마나카코,시바야마,안조,네리마,히라츠카,사쿠라가와,토다,다카시마,나루사와,오츠키,케이힌지마,오카자키,나스,이비가와,요로,코시가야,요시미,가와사키,이즈노쿠니,후추,미노부,시모츠마,이타바시,이나베,이케다,히라카타,이가,다카토리,도베,야나가와,야마구치,마쓰에,야스기,사카이미나토,히메지,기시와다,사카이,가시하라,우쓰노미야,미토,히타치,시로이시,야마가타,요코테,히로사키,고쇼가와라,아오모리,코사카,히라이즈미,이치노세키,오사키,카미,이시노마키,마츠시마,리후,센다이,다가조,카미노야마,요네자와,기타카타,아이즈와카마츠,가타시나,아사고,이카루가,나가토,내 거,난토,다카오카,구리하라,가나자와,코야,와카야마,나루토,시부카와,요시오카,나가노,다테야마,이미즈,오쓰,야스,와카사,오바마,이네,구라요시,이즈모,구레,타마노,오카야마,아카이와,코카,모리야마,쓰루,와카야마현,치바현,미야기,미야기현';
+	// 	const asd = japanList.split(',');
+	// 	let zxc = [];
+	// 	asd.map((itema, aindex) => {
+	// 		zxc.push({id: aindex, subTitle: itema, lat: 0, lng: 0});
+	// 	});
+	// 	console.log(zxc);
+	// }, []);
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
@@ -197,6 +213,16 @@ export default function Main({navigation}: any) {
 			),
 			text: '여행 코스 ',
 		},
+		// {
+		// 	id: 2,
+		// 	onPress: goGlobal,
+		// 	image: (
+		// 		<SVGCalendarRecommend
+		// 			width={widthPercentage(200)}
+		// 			height={heightPercentage(150)}></SVGCalendarRecommend>
+		// 	),
+		// 	text: '해외 여행 코스 ',
+		// },
 	];
 	const setPreset = (data: {
 		preset: any;

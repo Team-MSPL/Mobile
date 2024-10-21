@@ -88,7 +88,7 @@ export default function Timetable({navigation, route}: any) {
 				departure.current.lng = e.lng;
 				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
 			}
-			return result[0];
+			return result;
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -227,6 +227,10 @@ export default function Timetable({navigation, route}: any) {
 		const handleItems = item.map(async (value, index) => {
 			if (value.name == '점심 추천' || value.name == '저녁 추천') {
 				let items = await restaurantRecommend({value: value, index: index, idx: idx});
+				let checks = copy2.filter((checkValue, checkIndex) => {
+					items[0].place_name == checkValue.name;
+				});
+				items = items[checks.length == 0 ? 0 : 1];
 				copy2[index] = {
 					...copy2[index],
 					name: items.place_name,
@@ -353,10 +357,12 @@ export default function Timetable({navigation, route}: any) {
 								modalSubTitle: modifyCheck
 									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
 									: '홈으로 이동하시겠습니까?',
-								modalFunction: () => {},
+								modalFunction: () => {
+									modifyCheck && goSave();
+								},
 								modalBottomFunctionUse: true,
 								modalBottomFunction: goHome,
-								modalTopText: modifyCheck ? '저장하러 가기' : '둘러보기',
+								modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
 								modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
 							}),
 					  );

@@ -19,8 +19,13 @@ export default function NeedLogin({navigation}: any) {
 	};
 	return (
 		<Center backgroundColor='white'>
-			<PretendardSemiBoldText size={15} color='black' lineHeight={20} marginBottom={heightPercentage(10)}>
-				로그인한 사용자만 이용 가능합니다
+			<PretendardSemiBoldText
+				size={15}
+				color='black'
+				lineHeight={20}
+				marginBottom={heightPercentage(10)}
+				textAlign='center'>
+				지금 로그인하시고 AI에게{`\n`}맞춤 여행 추천을 받아보세요!
 			</PretendardSemiBoldText>
 			<PrimaryButton
 				label='로그인하러 가기'

@@ -50,6 +50,14 @@ import TravlePencil from '../../../public/travlePenceil.svg';
 import MoreHorizontal from '../../../public/more-horizontal.svg';
 import Search from '../../../public/search.svg';
 
+import Korea from '../../../public/korea.svg';
+import Japan from '../../../public/japan.svg';
+import China from '../../../public/china.svg';
+import Tailiand from '../../../public/tailiand.svg';
+import Philippine from '../../../public/philippine.svg';
+import Singapore from '../../../public/singapore.svg';
+import Vietnam from '../../../public/vietnam.svg';
+
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -199,5 +207,27 @@ export const SVGSearch = styled(Search)<{color?: string}>`
 	color: color;
 `;
 export const SvgGuest = styled(GuestLogo)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgKorea = styled(Korea)<{color?: string}>`
+	color: color;
+`;
+export const SvgJapan = styled(Japan)<{color?: string}>`
+	color: color;
+`;
+export const SvgChina = styled(China)<{color?: string}>`
+	color: color;
+`;
+export const SvgTailiand = styled(Tailiand)<{color?: string}>`
+	color: color;
+`;
+export const SvgPhilippine = styled(Philippine)<{color?: string}>`
+	color: color;
+`;
+export const SvgSingapore = styled(Singapore)<{color?: string}>`
+	color: color;
+`;
+export const SvgVietnam = styled(Vietnam)<{color?: string}>`
 	color: color;
 `;

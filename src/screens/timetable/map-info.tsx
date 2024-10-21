@@ -797,7 +797,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																				label='길찾기'
 																				textSize={12}
 																				lineHeight={18}
-																				width={widthPercentage(52)}
+																				width={widthPercentage(62)}
 																				height={heightPercentage(22)}
 																				backgroundColor={colors.Primary}
 																				textColor={
@@ -867,7 +867,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																				}
 																				textSize={12}
 																				lineHeight={18}
-																				width={widthPercentage(52)}
+																				width={widthPercentage(62)}
 																				height={heightPercentage(22)}
 																				backgroundColor={colors.Primary}
 																				textColor={
@@ -882,7 +882,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																			label='길찾기'
 																			textSize={12}
 																			lineHeight={18}
-																			width={widthPercentage(52)}
+																			width={widthPercentage(62)}
 																			height={heightPercentage(22)}
 																			backgroundColor={colors.Primary}
 																			textColor={colors.Gray5}></PrimaryButton>

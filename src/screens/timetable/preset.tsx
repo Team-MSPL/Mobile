@@ -304,59 +304,51 @@ export default function Preset({navigation}: any) {
 										</HStack>
 									</>
 								)}
-								{item.map((value, index) =>
-									value.map((target, targetIndex) => {
-										if (targetIndex == 0) {
-											return (
-												<HStack gap={widthPercentage(10)} key={targetIndex}>
-													<DashLineContainer>
-														{target.category == 4 ? (
-															<Triangle />
-														) : (
-															<Circle
-																color={
-																	target.category == 5
-																		? colors.PointYellow
-																		: colors.Gray5
-																}
-															/>
-														)}
-														<DashLine
-															status={
-																index == 0 && targetIndex == 0
-																	? 'start'
-																	: index == item.length - 1
-																	? 'end'
-																	: 'center'
-															}
-														/>
-													</DashLineContainer>
-													<PretendardVariableText
-														maxWidth={widthPercentage(200)}
-														size={16}
-														lineHeight={19}
+								{item.map((value, index) => {
+									return (
+										<HStack gap={widthPercentage(10)} key={index}>
+											<DashLineContainer>
+												{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
+													<Triangle />
+												) : (
+													<Circle
 														color={
-															target.category == 5 ? colors.PointYellow : colors.Gray5
-														}>
-														{target.name}
-													</PretendardVariableText>
-													<PretendardVariableText
-														size={16}
-														lineHeight={16}
-														color={colors.Primary}>
-														+{value.length - 1}개 장소
-													</PretendardVariableText>
-													<PretendardVariableText
-														size={14}
-														lineHeight={17}
-														color={colors.Gray2}>
-														{index + 1}일차
-													</PretendardVariableText>
-												</HStack>
-											);
-										}
-									}),
-								)}
+															value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+																? colors.PointYellow
+																: colors.Gray5
+														}
+													/>
+												)}
+												<DashLine
+													status={
+														index == 0
+															? 'start'
+															: index == item.length - 1
+															? 'end'
+															: 'center'
+													}
+												/>
+											</DashLineContainer>
+											<PretendardVariableText
+												maxWidth={widthPercentage(200)}
+												size={16}
+												lineHeight={19}
+												color={
+													value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+														? colors.PointYellow
+														: colors.Gray5
+												}>
+												{value[value[0].name == '숙소 추천' ? 1 : 0].name}
+											</PretendardVariableText>
+											<PretendardVariableText size={16} lineHeight={16} color={colors.Primary}>
+												+{value.length - 1}개 장소
+											</PretendardVariableText>
+											<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
+												{index + 1}일차
+											</PretendardVariableText>
+										</HStack>
+									);
+								})}
 								<PrimaryButton
 									alignSelf='center'
 									marginBottom={heightPercentage(10)}
