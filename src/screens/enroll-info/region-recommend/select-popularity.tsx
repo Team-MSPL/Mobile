@@ -34,7 +34,7 @@ export default function SelectPopularity({navigation}: any) {
 		<BackgroundGray>
 			<Stepper total={7} now={6}></Stepper>
 			<StepText
-				styleText='2.여행지의 인기도를 선택해주세요.'
+				styleText='3.여행지의 인기도를 선택해주세요.'
 				mainText={'가고자 하는 여행지가 \n어떤 느낌이었으면 하나요?'}
 				subText={`2023년 지역별 관광객 수를 기준으로\n5단계의 인기도를 설정했습니다.`}></StepText>
 			<BarContainer>

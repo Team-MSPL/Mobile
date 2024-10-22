@@ -19,7 +19,7 @@ export default function SelectTour({navigation}: any) {
 			<Stepper total={7} now={5}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='어디를 가고 싶으신가요?'
 				subText='* 중복 선택 가능'></StepText>
 			<ButtonsContainer>

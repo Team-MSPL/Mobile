@@ -19,7 +19,7 @@ export default function SelectWho({navigation}: any) {
 			<Stepper total={7} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
-				styleText='1.여행 스타일을 알아볼게요.'
+				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='누구와 떠나시나요?'
 				subText='* 중복 선택 가능'></StepText>
 			<SelectButtonsContainer>

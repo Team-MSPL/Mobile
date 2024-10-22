@@ -24,7 +24,7 @@ export default function RouteButton({
 			style={{position: 'absolute', alignSelf: 'center', bottom: 10, width: widthPercentage(328)}}>
 			<ButtonContainer marginTop={marginTop ?? 0} marginBottom={marginBottom ?? 0} onPress={handleBack}>
 				<SVGRightAdd
-					style={{position: 'absolute', left: widthPercentage(28)}}
+					style={{position: 'absolute', left: widthPercentage(16)}}
 					color={colors.Primary}
 					transform={180}
 				/>
@@ -40,7 +40,7 @@ export default function RouteButton({
 				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 					다음
 				</PretendardSemiBoldText>
-				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(28)}} color={colors.Primary} />
+				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} />
 			</ButtonContainer>
 		</HStack>
 	);
@@ -59,7 +59,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	marginBottom: number;
 	marginTop: number;
 }>`
-	width: ${widthPercentage(160)}px;
+	width: ${widthPercentage(157)}px;
 	align-self: center;
 	align-items: center;
 	height: ${heightPercentage(60)}px;

@@ -347,6 +347,14 @@ const LongCircleButton = styled.TouchableOpacity<{bgColor: string}>`
 	align-items: center;
 	border-radius: 12px;
 	justify-content: center;
+	elevation: 20;
+	shadowcolor: '#000';
+	shadowoffset: {
+		width: 10;
+		height: 10;
+	}
+	shadowopacity: 0.5;
+	shadowradius: 10;
 `;
 const LogoHStack = styled(HStack)`
 	width: 100%;

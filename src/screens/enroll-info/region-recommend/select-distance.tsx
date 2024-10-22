@@ -40,6 +40,9 @@ export default function SelectDistance({navigation}: any) {
 			? await logEvent('anontmous_place_step3', {})
 			: await logEvent('place_step3', {});
 	};
+	const handleAnonymousLogin = async () => {
+		await logEvent('anonymous_region_login', {});
+	};
 	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
 	const searchRegionList = cityViewList
 		.map((item, index) => {
@@ -105,6 +108,7 @@ export default function SelectDistance({navigation}: any) {
 	};
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
 	const handleLogin = async () => {
+		handleAnonymousLogin();
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		await AsyncStorage.getAllKeys().then(allKeys => {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
@@ -194,7 +198,7 @@ export default function SelectDistance({navigation}: any) {
 			}}>
 			<Stepper total={7} now={7}></Stepper>
 			<StepText
-				styleText='3.원하는 반경의 지역을 추천해드려요.'
+				styleText='4.원하는 반경의 지역을 추천해드려요.'
 				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 			<RegionTextInputContainer>

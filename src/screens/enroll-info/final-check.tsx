@@ -121,6 +121,7 @@ export default function FinalCheck({navigation}: any) {
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
 
 	const handleLogin = async () => {
+		handleAnonymousLogin();
 		dispatch(userSliceActions.setAnonymousKeep(true));
 		await AsyncStorage.getAllKeys().then(allKeys => {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
@@ -240,6 +241,9 @@ export default function FinalCheck({navigation}: any) {
 	const deleteEssential = (e: EssentialPlaceType) => {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
+	};
+	const handleAnonymousLogin = async () => {
+		await logEvent('anonymous_course_login', {});
 	};
 	const handleGoogleAnalytics = async () => {
 		socialloginProvider == 'anonymous'

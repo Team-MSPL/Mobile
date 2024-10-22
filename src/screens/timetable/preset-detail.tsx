@@ -325,11 +325,16 @@ export default function PresetDetail({navigation, route}: any) {
 												lineHeight={19}
 												color={value.category == 5 ? colors.PointYellow : colors.Gray5}>
 												{value.name + ' '}
-												<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-													{Math.floor(value.takenTime / 60) != 0 &&
-														Math.floor(value.takenTime / 60) + '시간'}
-													{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
-												</PretendardSemiBoldText>
+												{value.name != '숙소 추천' && (
+													<PretendardSemiBoldText
+														size={12}
+														lineHeight={15}
+														color={colors.Gray5}>
+														{Math.floor(value.takenTime / 60) != 0 &&
+															Math.floor(value.takenTime / 60) + '시간'}
+														{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+													</PretendardSemiBoldText>
+												)}
 											</PretendardSemiBoldText>
 										</HStack>
 									</TouchableOpacity>
