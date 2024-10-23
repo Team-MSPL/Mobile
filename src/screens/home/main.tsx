@@ -15,7 +15,6 @@ import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} 
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGCalendarRecommend, SVGGood, SVGNoteList, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
-import {cityViewList} from '../enroll-info/select-city';
 
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
@@ -28,12 +27,13 @@ import {useTranslation} from 'react-i18next';
 import Carousel from 'react-native-reanimated-carousel';
 import {NoteCount} from '../more/more-info';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin, userId, analyticeFlag, socialloginProvider} = useAppSelector(
 		state => state.userSlice,
 	);
-	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, shareLoginFlag, country} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const {t, i18n} = useTranslation();
@@ -51,16 +51,16 @@ export default function Main({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	useEffect(() => {
-		const japanList =
-			'호치민시, 푸꾸옥 섬, 콘다오, 무이네, 빈증, 동탑, 바리아붕타우, 벤트레, 푸토, 동나이, 마이 토, 깐토, 바리아붕타우, 남딘, 까오란, 랑코, 바리아붕타우';
-		const asd = japanList.split(', ');
-		let zxc = [];
-		asd.map((itema, aindex) => {
-			zxc.push({id: aindex, subTitle: itema, lat: 0, lng: 0});
-		});
-		console.log(zxc);
-	}, []);
+	// useEffect(() => {
+	// 	const japanList =
+	// 		'호치민시, 푸꾸옥 섬, 콘다오, 무이네, 빈증, 동탑, 바리아붕타우, 벤트레, 푸토, 동나이, 마이 토, 깐토, 바리아붕타우, 남딘, 까오란, 랑코, 바리아붕타우';
+	// 	const asd = japanList.split(', ');
+	// 	let zxc = [];
+	// 	asd.map((itema, aindex) => {
+	// 		zxc.push({id: aindex, subTitle: itema, lat: 0, lng: 0});
+	// 	});
+	// 	console.log(zxc);
+	// }, []);
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
@@ -68,14 +68,14 @@ export default function Main({navigation}: any) {
 		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle.split(' ')[1]];
 		let cityDistance = metropolitanCheckList.includes(e.subTitle)
 			? 0
-			: cityViewList[e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
+			: cityViewList[country][e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
 				season: season,
 				cityIndex: e.id,
 				region: region,
-				cityDistance: [cityViewList[e.id].sub[cityDistance].id],
+				cityDistance: [cityViewList[country][e.id].sub[cityDistance].id],
 			}),
 		);
 		navigation.navigate('EnrollTravelTitle');

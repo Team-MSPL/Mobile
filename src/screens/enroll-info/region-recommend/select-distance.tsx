@@ -20,9 +20,9 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import PrimaryButton from '../../../utill/component/primary-button';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {SVGSearch} from '../../../utill/svg/svg';
-import {cityViewList} from '../select-city';
 import {userSliceActions} from '../../../redux/user/user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
@@ -35,6 +35,7 @@ export default function SelectDistance({navigation}: any) {
 	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
+	const {country} = useAppSelector(state => state.travelSlice);
 	const handleGoogleAnalytics = async () => {
 		socialloginProvider == 'anonymous'
 			? await logEvent('anontmous_place_step3', {})
@@ -44,7 +45,7 @@ export default function SelectDistance({navigation}: any) {
 		await logEvent('anonymous_region_login', {});
 	};
 	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
-	const searchRegionList = cityViewList
+	const searchRegionList = cityViewList[country]
 		.map((item, index) => {
 			if (index != 0) {
 				return item.sub.map((value, idx) => {

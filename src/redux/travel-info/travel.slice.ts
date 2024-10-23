@@ -77,7 +77,7 @@ const initialState: LiteState = {
 	selecedtDateFlag: false,
 	autoRecommendFlag: false,
 	globalFlag: false,
-	country: '',
+	country: 0,
 };
 
 export const axiosGoogle = axios.create({
@@ -814,7 +814,7 @@ interface LiteState {
 	selectedDateFlag: boolean;
 	autoRecommendFlag: boolean;
 	globalFlag: boolean;
-	country: string;
+	country: number;
 }
 interface aiListType {
 	_id: string;

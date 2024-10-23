@@ -2,11 +2,14 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray, FlexWrap} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../utill/component/route-button';
 import {SvgChina, SvgJapan, SvgKorea, SvgPhilippine, SvgSingapore, SvgTailiand, SvgVietnam} from '../../utill/svg/svg';
+import {useFocusEffect} from '@react-navigation/native';
+import {useCallback} from 'react';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 export default function RecommendSelectCountry({navigation}: any) {
 	const {country} = useAppSelector(state => state.travelSlice);
@@ -21,7 +24,13 @@ export default function RecommendSelectCountry({navigation}: any) {
 		<SvgTailiand width={30} height={20} />,
 		<SvgPhilippine width={30} height={20} />,
 	];
-
+	const dispatch = useAppDispatch();
+	useFocusEffect(
+		useCallback(() => {
+			dispatch(travelSliceActions.enrollCityIndex(0));
+			dispatch(travelSliceActions.selectRegion([]));
+		}, []),
+	);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={1}></Stepper>
@@ -32,18 +41,18 @@ export default function RecommendSelectCountry({navigation}: any) {
 			<FlexWrap gap={10}>
 				{countryList.map((item, idx) => (
 					<TendencyButton
-						bgColor={country == item.ko}
+						bgColor={country == idx}
 						label={item.ko}
 						key={idx}
 						divide={true}
 						width={widthPercentage(158)}
 						imageSvg={imageList[idx]}
 						onPress={() => {
-							handleCountryClick(item.ko);
+							handleCountryClick(idx);
 						}}></TendencyButton>
 				))}
 			</FlexWrap>
-			<RouteButton navigation={navigation} nextTitle='SelectCity' isDisabled={country == ''}></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='SelectCity'></RouteButton>
 		</BackgroundGray>
 	);
 }

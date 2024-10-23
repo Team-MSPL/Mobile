@@ -17,7 +17,7 @@ export const useTendencyHandler = () => {
 			region ? regionRecommendSliceActions.enrollRegionTendency(copy) : travelSliceActions.enrollTendency(copy),
 		);
 	};
-	const handleCountryClick = (country: string) => {
+	const handleCountryClick = (country: number) => {
 		dispatch(travelSliceActions.setCountry(country));
 	};
 	const countryList = [

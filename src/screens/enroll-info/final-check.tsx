@@ -2,7 +2,6 @@ import {BackHandler, Modal, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {cityViewList} from './select-city';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useState} from 'react';
 import {
@@ -31,8 +30,9 @@ import TendencyButton from '../../utill/component/tendency-button';
 import {SelectButtonsContainer} from './region-recommend/select-who';
 import {userSliceActions} from '../../redux/user/user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function FinalCheck({navigation}: any) {
-	const {handleButtonClick, tendencyList} = useTendencyHandler();
+	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
 	const {
 		day,
 		region,
@@ -49,6 +49,7 @@ export default function FinalCheck({navigation}: any) {
 		freeTicket,
 		regionInfo,
 		travelName,
+		country,
 	} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
@@ -155,18 +156,25 @@ export default function FinalCheck({navigation}: any) {
 					'여행';
 				dispatch(travelSliceActions.enrollTravelName(changeName));
 			}
-			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
+			let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
 			if (
-				(cityViewList[cityIndex].id >= 9 && region[0] == '전체') ||
-				(cityViewList[cityIndex].id == 1 && region[0] == '전체')
+				(country == 0 && cityViewList[country][cityIndex].id >= 9 && region[0] == '전체') ||
+				(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+				(country != 0 && region[0] == '전체')
 			) {
-				a = cityViewList[cityIndex].sub.map(
-					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
+				a = cityViewList[country][cityIndex].sub.map(
+					(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
 				);
 				a.shift();
 			}
+			//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 			let copy = [...tendency];
 			copy.push(season);
+			if (country != 0) {
+				a = a.map((item, idx) => {
+					return `해외/${countryList[country].en}/${item.split(' ')[1]}`;
+				});
+			}
 			const result = await dispatch(
 				getTravelAi({
 					regionList: a,
@@ -183,6 +191,9 @@ export default function FinalCheck({navigation}: any) {
 					password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 				}),
 			).unwrap();
+			result.data.resultData.map(item => {
+				console.log(item);
+			});
 			dispatch(travelSliceActions.selectRegion(a));
 			if (result) {
 				navigation.popToTop();
@@ -282,7 +293,7 @@ export default function FinalCheck({navigation}: any) {
 									lineHeight={27}
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
-									{cityViewList[cityIndex].title + region}
+									{cityViewList[country][cityIndex].title + region}
 									<SVGFlag
 										width={widthPercentage(20)}
 										height={widthPercentage(20)}

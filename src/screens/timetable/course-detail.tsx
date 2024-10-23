@@ -26,7 +26,6 @@ import {SVGReviewPencil, SvgCalendar, SvgCall, SvgGoogle, SvgInfos, SvgLocation,
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
-import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
 import {useFocusEffect} from '@react-navigation/native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -38,13 +37,14 @@ import PrimaryButton from '../../utill/component/primary-button';
 import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/community-post';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
 	const [imageIndex, setImageIndex] = useState(0);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-	const {region, selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {region, selectStartDate, country} = useAppSelector(state => state.travelSlice);
 	const {userIdToken} = useAppSelector(state => state.userSlice);
 	const getDetail = async () => {
 		try {
@@ -234,8 +234,8 @@ export default function CourseDetail({navigation, route}: any) {
 		} else {
 			region = [route.params.value.region, '전체'];
 		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		let cityDistance = cityViewList[cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		const cityIndex = cityViewList[country].find(city => city.title == region[0])?.id;
+		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);

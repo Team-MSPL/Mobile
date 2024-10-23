@@ -153,7 +153,9 @@ export default function Preset({navigation}: any) {
 	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
+		console.log('aaaaaaaaa');
 		if (socialloginProvider != 'anonymous') {
+			console.log('zzzzzz', aiFlag, socialloginProvider);
 			!aiFlag && saveCache();
 		}
 	}, [aiFlag, socialloginProvider]);

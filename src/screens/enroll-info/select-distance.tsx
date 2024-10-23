@@ -10,12 +10,12 @@ import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {ButtonContainer} from './select-multi';
 import MapView, {Circle} from 'react-native-maps';
-import {cityViewList} from './select-city';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {logEvent} from '../../../firebaseAnalytice';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function SelectDistance({navigation, setViewComponent}: any) {
-	const {distance, region, cityIndex, cityDistance} = useAppSelector(state => state.travelSlice);
+	const {distance, region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [range, setRange] = useState(distance);
 	const goRegionSelect = () => {
@@ -61,15 +61,15 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 							position: 'absolute',
 						}}
 						region={{
-							latitude: cityViewList[cityIndex].sub[cityDistance[0]].lat,
-							longitude: cityViewList[cityIndex].sub[cityDistance[0]].lng,
+							latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
+							longitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
 							latitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
 							longitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
 						}}>
 						<Circle
 							center={{
-								latitude: cityViewList[cityIndex].sub[cityDistance[0]].lat,
-								longitude: cityViewList[cityIndex].sub[cityDistance[0]].lng,
+								latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
+								longitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
 							}}
 							style={{alignItems: 'center', justifyContent: 'center'}}
 							fillColor='rgba(38, 152, 251, 0.3);'

@@ -1,6 +1,5 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import {cityViewList} from '../select-city';
 import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
@@ -15,9 +14,10 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import {ButtonContainer} from '../select-multi';
 import {Platform} from 'react-native';
 import {logEvent} from '../../../../firebaseAnalytice';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
-	const {selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, country} = useAppSelector(state => state.travelSlice);
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = () => {
 		let copy = [...regionTendency];
@@ -51,9 +51,9 @@ export default function DetailResult({navigation, route}: any) {
 		} else {
 			region = [route.params.item.name, '전체'];
 		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
+		const cityIndex = cityViewList[country].find(city => city.title == region[0])?.id;
 		let season = copy.pop();
-		let cityDistance = cityViewList[cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
 		const data = {
 			cityDistance: [cityDistance],
 			cityIndex: cityIndex,
