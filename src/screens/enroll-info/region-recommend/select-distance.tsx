@@ -27,15 +27,22 @@ export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
 	const [regionSearchState, setRegionSearchState] = useState(false);
+
 	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
 		[],
 	);
 	const regionSearchRef = useRef<TextInput | null>(null);
 	const [range, setRange] = useState(5);
-	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const {country} = useAppSelector(state => state.travelSlice);
+	const [geoInfo, setGeoInfo] = useState({
+		lat: cityViewList[country][1].sub[0].lat,
+		lng: cityViewList[country][1].sub[0].lng,
+		name: `기본값:${cityViewList[country][1].sub[0].subTitle}`,
+		default: true,
+	});
+
 	const handleGoogleAnalytics = async () => {
 		socialloginProvider == 'anonymous'
 			? await logEvent('anontmous_place_step3', {})
@@ -246,7 +253,7 @@ export default function SelectDistance({navigation}: any) {
 				</ScrollView>
 			</SearchContainer>
 			<MapContainer>
-				{geoInfo.name == '기본값:서울역' && (
+				{geoInfo.default && (
 					<GeolocationGetContainer>
 						<PrimaryButton
 							backgroundColor={colors.Primary}
@@ -272,7 +279,7 @@ export default function SelectDistance({navigation}: any) {
 							latitudeDelta: 8,
 							longitudeDelta: 8,
 						}}>
-						{geoInfo.name != '기본값:서울역' && (
+						{!geoInfo.default && (
 							<Circle
 								center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
 								style={{alignItems: 'center', justifyContent: 'center'}}
@@ -282,7 +289,7 @@ export default function SelectDistance({navigation}: any) {
 					</MapView>
 				</Qwe>
 			</MapContainer>
-			{geoInfo.name != '기본값:서울역' && (
+			{!geoInfo.default && (
 				<>
 					<DistanceCenter>
 						<DistanceSpace>

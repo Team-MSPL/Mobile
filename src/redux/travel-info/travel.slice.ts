@@ -104,7 +104,7 @@ export const axiosTour = axios.create({
 	headers: {'content-type': 'application/json'},
 });
 export const axiosTripadvisor = axios.create({
-	baseURL: 'https://api.content.tripadvisor.com/api/v1/location/search',
+	baseURL: 'https://api.content.tripadvisor.com/api/v1/location',
 
 	headers: {'content-type': 'application/json'},
 });
@@ -187,6 +187,7 @@ export const reviewAndPoint = createAsyncThunk(
 export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/ai/run`, data, {timeout: 60000});
+		console.log(response);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -298,6 +299,7 @@ export const reCourseName = createAsyncThunk(
 export const saveAI = createAsyncThunk('/ai/saveAI', async (data: saveAiType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/ai/saveAI`, data);
+		console.log('에에ㅔ', response, data);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -392,8 +394,18 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 export const recommendTripadvisor = createAsyncThunk('/recommendTripadvisor', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosTripadvisor.get(
-			`?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
+			`/search?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
 		);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//트립어드바이져 디테일
+export const detailTripadvisor = createAsyncThunk('/detailTripadvisor', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosTripadvisor.get(`${data.id}/details?key=${Tripadvisor_KEy}&&language=ko`);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);

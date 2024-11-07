@@ -144,13 +144,20 @@ export const PretendardVariableText = styled.Text<{
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 `;
-export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number; marginBottom?: number}>`
+export const PretendardBoldText = styled.Text<{
+	color: string;
+	size: number;
+	textAlign?: string;
+	lineHeight: number;
+	marginBottom?: number;
+}>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
 	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	font-weight: 700;
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	text-align: ${props => props.textAlign ?? 'auto'};
 `;
 export const PretendardSemiBoldText = styled.Text<{
 	color: string;

@@ -21,7 +21,7 @@ const AbsoluteTopBarComponent = ({modify, viewMap}: {modify: boolean; viewMap: b
 				<VStack>
 					<HStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-							{region[0]}
+							{region[0].split('/').at(-1)}
 							{region.length >= 2 ? ` +${region.length - 1}` : ''}
 						</PretendardVariableText>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>

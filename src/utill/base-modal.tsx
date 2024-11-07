@@ -21,6 +21,7 @@ export default function BaseModal() {
 		modalConfetti,
 		modalConfettiFlag,
 		modalBottomFunction,
+		modalTextSize,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
@@ -53,7 +54,11 @@ export default function BaseModal() {
 						origin={{x: -10, y: 0}}></ConfettiCannon>
 					<ModalContainer onPress={close}>
 						<ViewContaniner modalSingleUse={modalSingleUse}>
-							<PretendardSemiBoldText textAlign='center' size={20} lineHeight={27} color={colors.Gray5}>
+							<PretendardSemiBoldText
+								textAlign='center'
+								size={modalTextSize}
+								lineHeight={27}
+								color={colors.Gray5}>
 								{modalTitle}
 							</PretendardSemiBoldText>
 							{modalSubTitle && (

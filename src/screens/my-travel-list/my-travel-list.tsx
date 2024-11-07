@@ -90,7 +90,7 @@ export default function MyTravelList({navigation}: any) {
 		}, [socialloginProvider]),
 	);
 	const handleGoogleAnalytics = async () => {
-		if (socialloginProvider == 'anonymous') {
+		if (socialloginProvider != 'anonymous') {
 			await logEvent('view_course_list', {});
 		}
 	};
@@ -268,7 +268,7 @@ export default function MyTravelList({navigation}: any) {
 										height={heightPercentage(30)}
 										width={widthPercentage(105)}>
 										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-											{data.region[0]}
+											{data.region[0].split('/').at(-1)}
 										</PretendardVariableText>
 										<SVGFlag
 											width={widthPercentage(12)}
@@ -324,7 +324,7 @@ export default function MyTravelList({navigation}: any) {
 							height={heightPercentage(30)}
 							width={widthPercentage(105)}>
 							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-								{item.item.region[0]}
+								{item.item.region[0].split('/').at(-1)}
 							</PretendardVariableText>
 							<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color={colors.Primary} />
 						</TagContainer>
@@ -344,7 +344,7 @@ export default function MyTravelList({navigation}: any) {
 	return (
 		<TravelContainer>
 			<TravleListContainer>
-				{myTravelList.length == 0 ? (
+				{myTravelList.length == 0 && aiList.length == 0 ? (
 					<Center>
 						<PretendardSemiBoldText size={16} lineHeight={22} color={colors.Gray2}>
 							아직 만들어진 여행이 없어요:(

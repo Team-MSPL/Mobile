@@ -545,7 +545,11 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	return (
 		<NullContainer>
-			{!isLoading && <MainText>해당 이름의 장소가 구글 지도에 등록되어 있지 않습니다.</MainText>}
+			{!isLoading && (
+				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black} textAlign='center'>
+					해당 이름의 장소가 구글{`\n`} 지도에 등록되어 있지 않습니다.
+				</PretendardSemiBoldText>
+			)}
 		</NullContainer>
 	);
 }
@@ -594,6 +598,7 @@ export const InfoContainer = styled.Pressable`
 `;
 const NullContainer = styled(Center)`
 	flex: 1;
+	background-color: ${colors.backgroundGray};
 `;
 
 const DetailContainer = styled.ScrollView`

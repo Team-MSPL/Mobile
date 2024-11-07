@@ -21,7 +21,7 @@ export const useTendencyHandler = () => {
 		dispatch(travelSliceActions.setCountry(country));
 	};
 	const countryList = [
-		{ko: '한국', en: 'Korea'},
+		{ko: '대한민국', en: 'Korea'},
 		{ko: '일본', en: 'Japan'},
 		{ko: '중국', en: 'China'},
 		{ko: '싱가포르', en: 'Singapore'},

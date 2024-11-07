@@ -41,7 +41,7 @@ export default function PresetDetail({navigation, route}: any) {
 				modalTitle: '잠깐!',
 				modalSubTitle: '일정을 확정하면 본 결과를 다시 확인하실 수 없습니다. 확정하시면 자동으로 저장됩니다.',
 				modalLeft: true,
-				modalFunction: goNext(e),
+				modalFunction: () => goNext(e),
 			}),
 		);
 	};
@@ -61,10 +61,9 @@ export default function PresetDetail({navigation, route}: any) {
 		try {
 			removeCache();
 			dispatch(deleteAI({aiId: aiID}));
-			let copy = [...presetDatas[select]];
-			if (presetDatas[select].length != nDay + 1) {
-				const check = nDay + 1 - presetDatas[select].length;
-
+			let copy = [...presetDatas[route.params.index]];
+			if (presetDatas[route.params.index].length != nDay + 1) {
+				const check = nDay + 1 - presetDatas[route.params.index].length;
 				for (let i = 0; i < check; i++) {
 					copy.push([]);
 				}

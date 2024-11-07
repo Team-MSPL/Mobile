@@ -146,7 +146,6 @@ export default function SearchPlace({navigation, route}: any) {
 					query={{
 						key: GOOGLE_API_KEY,
 						language: 'ko',
-						components: 'country:kr',
 					}}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{

@@ -162,17 +162,37 @@ export default function FinalCheck({navigation}: any) {
 				(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
 				(country != 0 && region[0] == '전체')
 			) {
-				a = cityViewList[country][cityIndex].sub.map(
-					(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
-				);
-				a.shift();
+				if (country != 0 && cityIndex == 1) {
+					a = cityViewList[country]
+						.slice(2, cityViewList[country].length)
+						.map((value, index) =>
+							value.sub
+								.map((item, idx) => {
+									if (idx != 0) {
+										return cityViewList[country][index + 2].title + ' ' + item.subTitle;
+									} else {
+										return null;
+									}
+								})
+								.filter(item => item !== null),
+						)
+						.join(',')
+						.split(',');
+				} else {
+					a = cityViewList[country][cityIndex].sub.map(
+						(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+					);
+					a.shift();
+				}
 			}
+			console.log(a);
 			//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+
 			let copy = [...tendency];
 			copy.push(season);
 			if (country != 0) {
 				a = a.map((item, idx) => {
-					return `해외/${countryList[country].en}/${item.split(' ')[1]}`;
+					return `해외/${countryList[country].en}/${item.split(' ').slice(1).join(' ')}`;
 				});
 			}
 			const result = await dispatch(
@@ -201,7 +221,9 @@ export default function FinalCheck({navigation}: any) {
 				!result.data.enoughPlace &&
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
+							modalTitle: `해당 지역의 관광지 중 선택하신 성향의 \n 관광지가 부족하여,일정을 다 채울 수가 없었어요 ㅠㅠ`,
+							modalTextSize: 17,
+							modalSingleUse: true,
 						}),
 					);
 			} else {
@@ -223,7 +245,7 @@ export default function FinalCheck({navigation}: any) {
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [essentialPlaces]);
 	const checkDeleteAccommodation = (e: number) => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -293,7 +315,7 @@ export default function FinalCheck({navigation}: any) {
 									lineHeight={27}
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
-									{cityViewList[country][cityIndex].title + region}
+									{cityViewList[country][cityIndex].title + ' ' + region}
 									<SVGFlag
 										width={widthPercentage(20)}
 										height={widthPercentage(20)}

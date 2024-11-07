@@ -6,7 +6,7 @@ import {useDistance} from '../../hooks/useDistance';
 import PrimaryButton from '../primary-button';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => {
-	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {timetable, region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const accommodationRecommend = (e: {value: any; index: number; idx: number}) => {
 		CancelModify(false);
@@ -49,7 +49,7 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 					lat: lat,
 					lng: lng,
 					//TODO 해외랑 국내 차이 두기
-					apiCategory: 'AD5',
+					apiCategory: region[0].startsWith('해외') ? 'hotels' : 'AD5',
 					// apiCategory: 'hotels',
 					radius: 2000,
 					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
@@ -130,7 +130,7 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 					lat: lat,
 					lng: lng,
 					//TODO 해외랑 국내 차이 두기
-					apiCategory: 'FD6',
+					apiCategory: region[0].startsWith('해외') ? 'restaurants' : 'FD6',
 					// apiCategory: 'restaurants',
 					radius: radius,
 					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,

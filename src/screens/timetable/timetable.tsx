@@ -92,7 +92,7 @@ export default function Timetable({navigation, route}: any) {
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '추천 아이템이 없습니다!',
+					modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
 				}),
 			);
 			navigation.goBack();
@@ -227,34 +227,38 @@ export default function Timetable({navigation, route}: any) {
 		const handleItems = item.map(async (value, index) => {
 			if (value.name == '점심 추천' || value.name == '저녁 추천') {
 				let items = await restaurantRecommend({value: value, index: index, idx: idx});
-				let checks = copy2.filter((checkValue, checkIndex) => {
-					items[0].place_name == checkValue.name;
-				});
-				items = items[checks.length == 0 ? 0 : 1];
-				copy2[index] = {
-					...copy2[index],
-					name: items.place_name,
-					lat: Number(items.y),
-					lng: Number(items.x),
-					category: value.category,
-					x: value.x,
-					y: value.y,
-					id: shortId.generate(),
-				};
+				if (items.length != 0) {
+					let checks = copy2.filter((checkValue, checkIndex) => {
+						items[0].place_name == checkValue.name;
+					});
+					items = items[checks.length == 0 ? 0 : 1];
+					copy2[index] = {
+						...copy2[index],
+						name: items.place_name,
+						lat: Number(items.y),
+						lng: Number(items.x),
+						category: value.category,
+						x: value.x,
+						y: value.y,
+						id: shortId.generate(),
+					};
+				}
 			} else if (value.name == '숙소 추천' && index != 0) {
 				let items = await accommodationRecommend({value: value, index: index, idx: idx});
-				copy2[index] = {
-					...copy2[index],
-					name: items.place_name,
-					lat: Number(items.y),
-					lng: Number(items.x),
-					category: value.category,
-					x: value.x,
-					y: value.y,
-					id: shortId.generate(),
-				};
+				if (items.length != 0) {
+					copy2[index] = {
+						...copy2[index],
+						name: items.place_name,
+						lat: Number(items.y),
+						lng: Number(items.x),
+						category: value.category,
+						x: value.x,
+						y: value.y,
+						id: shortId.generate(),
+					};
+				}
 			} else if (index == 0 && value.name == '숙소 추천') {
-				if (copy[idx - 1].at(-1)?.category) {
+				if (copy[idx - 1].at(-1)?.category == value.category && copy[idx - 1].at(-1)?.name != '숙소 추천') {
 					copy2[index] = {
 						...copy2[index],
 						name: copy[idx - 1].at(-1)?.name,

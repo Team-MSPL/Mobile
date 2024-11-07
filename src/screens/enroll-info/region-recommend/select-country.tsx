@@ -40,18 +40,18 @@ export default function SelectCountry({navigation}: any) {
 			<FlexWrap gap={10}>
 				{countryList.map((item, idx) => (
 					<TendencyButton
-						bgColor={country == item.ko}
+						bgColor={country == idx}
 						label={item.ko}
 						key={idx}
 						divide={true}
 						width={widthPercentage(158)}
 						imageSvg={imageList[idx]}
 						onPress={() => {
-							handleCountryClick(item.ko);
+							handleCountryClick(idx);
 						}}></TendencyButton>
 				))}
 			</FlexWrap>
-			<RouteButton navigation={navigation} nextTitle='RegionSelectWho' isDisabled={country == ''}></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='RegionSelectWho'></RouteButton>
 		</BackgroundGray>
 	);
 }

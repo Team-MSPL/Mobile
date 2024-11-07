@@ -196,7 +196,7 @@ export default function Preset({navigation}: any) {
 					<RegionTextContainer gap={widthPercentage(4)}>
 						<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color='#DDF2FE' />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-							{region[0]}
+							{region[0].split('/').at(-1)}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
 						</PretendardSemiBoldText>
 					</RegionTextContainer>
@@ -332,7 +332,8 @@ export default function Preset({navigation}: any) {
 												/>
 											</DashLineContainer>
 											<PretendardVariableText
-												maxWidth={widthPercentage(200)}
+												maxWidth={widthPercentage(150)}
+												numberOfLines={1}
 												size={16}
 												lineHeight={19}
 												color={

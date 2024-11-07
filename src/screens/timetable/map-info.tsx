@@ -38,7 +38,7 @@ import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-to
 import {useDistance} from '../../utill/hooks/useDistance';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit, shareViewWithStartFlag, region} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -196,6 +196,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		}
 	}, []);
 	const goRemove = () => {
+		console.log('하이영', viewRef.current);
 		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
 		dispatch(travelSliceActions.changeTimetable(a));
 	};
@@ -218,6 +219,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		state != saveView && setSaveView(state);
 	};
 	const openModal = (index, idx) => {
+		console.log(index, idx);
 		viewRef.current = {
 			...timetable[index][idx],
 			endHours: Math.floor(
@@ -396,7 +398,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					lat: lat,
 					lng: lng,
 					//TODO 해외랑 국내 차이 두기
-					apiCategory: 'FD6',
+					apiCategory: region[0].startsWith('해외') ? 'restaurants' : 'FD6',
 					// apiCategory: 'restaurants',
 					radius: radius,
 					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
@@ -454,8 +456,8 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					lat: lat,
 					lng: lng,
 					//TODO 해외랑 국내 차이 두기
-					apiCategory: 'AD5',
-					// apiCategory: 'hotels',
+					//apiCategory: 'AD5',
+					apiCategory: region[0].startsWith('해외') ? 'hotels' : 'AD5',
 					radius: 2000,
 					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
 					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
@@ -783,6 +785,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																		maxWidth={widthPercentage(200)}
 																		size={14}
 																		lineHeight={18.9}
+																		numberOfLines={2}
 																		color={colors.Gray5}>
 																		{item.name}
 																	</PretendardSemiBoldText>
