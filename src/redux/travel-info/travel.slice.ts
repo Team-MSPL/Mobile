@@ -187,7 +187,6 @@ export const reviewAndPoint = createAsyncThunk(
 export const getTravelAi = createAsyncThunk('/getTravelAi', async (data: travelAiType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/ai/run`, data, {timeout: 60000});
-		console.log(response);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);
@@ -299,7 +298,6 @@ export const reCourseName = createAsyncThunk(
 export const saveAI = createAsyncThunk('/ai/saveAI', async (data: saveAiType, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/ai/saveAI`, data);
-		console.log('에에ㅔ', response, data);
 		return response.data;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);

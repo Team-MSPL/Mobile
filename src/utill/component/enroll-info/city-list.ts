@@ -958,7 +958,12 @@ const vietnamCityList = [
 const singaporeCityList = [
 	{
 		id: 0,
-		title: '전체',
+		title: '인기',
+		sub: [{id: 1, subId: 0, subTitle: '싱가포르'}],
+	},
+	{
+		id: 1,
+		title: '싱가포르',
 		sub: [{id: 0, lat: 1.2800945, lng: 103.8509491, subTitle: '싱가포르'}],
 	},
 ];

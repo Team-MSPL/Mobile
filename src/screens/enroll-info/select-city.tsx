@@ -1,4 +1,4 @@
-import {ScrollView} from 'react-native';
+import {ScrollView, TextInput} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {getRegionInfo, travelSliceActions} from '../../redux/travel-info/travel.slice';
 
@@ -6,20 +6,33 @@ import {BackgroundGray, PretendardSemiBoldText, PretendardVariableText} from '..
 import styled from 'styled-components/native';
 import StepText from '../../utill/component/enroll-info/step-text';
 import {colors} from '../../utill/colors';
-import {SvgCancel} from '../../utill/svg/svg';
+import {SVGSearch, SvgCancel} from '../../utill/svg/svg';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {logEvent} from '../../../firebaseAnalytice';
 import RouteButton from '../../utill/component/route-button';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 import {useFocusEffect} from '@react-navigation/native';
+import {
+	RegionTextInput,
+	RegionTextInputContainer,
+	SearchContainer,
+	SearchElements,
+} from './region-recommend/select-distance';
+import {useRegionSearch} from '../../utill/hooks/useRegionSearch';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
+	const [regionText, setRegionText] = useState('');
+	const [regionSearchState, setRegionSearchState] = useState(false);
+	const regionSearchRef = useRef<TextInput | null>(null);
+	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
+		[],
+	);
 	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
 		dispatch(
@@ -84,7 +97,11 @@ export default function SelectCity({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalytics();
 	}, []);
-
+	const {handleRegionSerarch} = useRegionSearch();
+	const handleRegionText = useCallback((e: string) => {
+		setRegionText(e);
+		setRegionMatchList(handleRegionSerarch(e));
+	}, []);
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={2}></Stepper>
@@ -92,6 +109,63 @@ export default function SelectCity({navigation}: any) {
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='어디로 떠나시나요?'></StepText>
+			{/* <RegionTextInputContainer>
+				<SVGSearch />
+				<RegionTextInput
+					ref={regionSearchRef}
+					placeholder='다른 지역 기준으로 추천받기 (검색)'
+					value={regionText}
+					// onBlur={() => {
+					// 	setRegionSearchState(false);
+					// }}
+					onFocus={() => {
+						setRegionSearchState(true);
+					}}
+					placeholderTextColor={colors.Gray3}
+					onChangeText={e => {
+						handleRegionText(e);
+					}}></RegionTextInput>
+			</RegionTextInputContainer>
+			<SearchContainer>
+				<ScrollView style={{zIndex: 2}}>
+					{regionSearchState &&
+						regionMatchList.map((item, index) => {
+							return (
+								<SearchElements
+									key={index}
+									onPress={() => {
+										dispatch(
+											travelSliceActions.selectPopularity({
+												region: cityViewList[country].filter(
+													asd => asd.title == item.subTitle,
+												)[0]?.id
+													? ['전체']
+													: [item.subTitle],
+												cityIndex:
+													cityViewList[country]
+														.slice(1)
+														.filter(
+															asd =>
+																asd.sub.filter(qqq => qqq.subTitle == item.subTitle)
+																	.length >= 1,
+														)[0]?.id ??
+													cityViewList[country].filter(asd => asd.title == item.subTitle)[0]
+														?.id,
+												cityDistance: [item.id],
+											}),
+										);
+										regionSearchRef.current?.blur();
+										setRegionText(item.subTitle);
+										setRegionSearchState(false);
+									}}>
+									<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+										{item.subTitle}
+									</PretendardSemiBoldText>
+								</SearchElements>
+							);
+						})}
+				</ScrollView>
+			</SearchContainer> */}
 			<ScrollView style={{marginBottom: widthPercentage(70)}} showsVerticalScrollIndicator={false}>
 				<Container>
 					<SelectAllContainer>

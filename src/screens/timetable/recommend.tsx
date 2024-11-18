@@ -95,7 +95,6 @@ export default function Recommend({navigation, route}: any) {
 				tripadvisorList.current[idx] = await dispatch(
 					detailTripadvisor({id: recommendList[idx].location_id}),
 				).unwrap();
-				console.log(tripadvisorList.current);
 			}
 
 			changeData = {

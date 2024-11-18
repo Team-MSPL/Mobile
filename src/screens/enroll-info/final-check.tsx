@@ -185,7 +185,6 @@ export default function FinalCheck({navigation}: any) {
 					a.shift();
 				}
 			}
-			console.log(a);
 			//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 
 			let copy = [...tendency];

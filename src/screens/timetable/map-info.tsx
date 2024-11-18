@@ -196,7 +196,6 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		}
 	}, []);
 	const goRemove = () => {
-		console.log('하이영', viewRef.current);
 		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
 		dispatch(travelSliceActions.changeTimetable(a));
 	};
@@ -793,19 +792,21 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																{idx != 0 &&
 																	(item.category == 1 || item.category == 4 ? (
 																		<VStack gap={5}>
-																			<PrimaryButton
-																				onPress={() => {
-																					goNavigation(idx);
-																				}}
-																				label='길찾기'
-																				textSize={12}
-																				lineHeight={18}
-																				width={widthPercentage(62)}
-																				height={heightPercentage(22)}
-																				backgroundColor={colors.Primary}
-																				textColor={
-																					colors.Gray5
-																				}></PrimaryButton>
+																			{!region[0].startsWith('해외') && (
+																				<PrimaryButton
+																					onPress={() => {
+																						goNavigation(idx);
+																					}}
+																					label='길찾기'
+																					textSize={12}
+																					lineHeight={18}
+																					width={widthPercentage(62)}
+																					height={heightPercentage(22)}
+																					backgroundColor={colors.Primary}
+																					textColor={
+																						colors.Gray5
+																					}></PrimaryButton>
+																			)}
 																			<PrimaryButton
 																				onPress={() => {
 																					dispatch(
@@ -878,17 +879,21 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 																				}></PrimaryButton>
 																		</VStack>
 																	) : (
-																		<PrimaryButton
-																			onPress={() => {
-																				goNavigation(idx);
-																			}}
-																			label='길찾기'
-																			textSize={12}
-																			lineHeight={18}
-																			width={widthPercentage(62)}
-																			height={heightPercentage(22)}
-																			backgroundColor={colors.Primary}
-																			textColor={colors.Gray5}></PrimaryButton>
+																		!region[0].startsWith('해외') && (
+																			<PrimaryButton
+																				onPress={() => {
+																					goNavigation(idx);
+																				}}
+																				label='길찾기'
+																				textSize={12}
+																				lineHeight={18}
+																				width={widthPercentage(62)}
+																				height={heightPercentage(22)}
+																				backgroundColor={colors.Primary}
+																				textColor={
+																					colors.Gray5
+																				}></PrimaryButton>
+																		)
 																	))}
 															</HStack>
 														</InsideGrayContainer>

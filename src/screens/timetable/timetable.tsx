@@ -5,7 +5,9 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {
 	deleteTravelCourse,
+	detailTripadvisor,
 	recommendApi,
+	recommendTripadvisor,
 	saveTravel,
 	travelSliceActions,
 	updateShareUserList,
@@ -66,27 +68,46 @@ export default function Timetable({navigation, route}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			let result = await dispatch(
-				recommendApi({
-					category: e.apiCategory,
-					lat: e.lat,
-					lng: e.lng,
-					radius: e.radius,
-				}),
+				region[0].startsWith('해외')
+					? recommendTripadvisor({
+							category: e.apiCategory,
+							lat: e.lat,
+							lng: e.lng,
+							radius: e.radius,
+							name: e.status.name,
+					  })
+					: recommendApi({
+							category: e.apiCategory,
+							lat: e.lat,
+							lng: e.lng,
+							radius: e.radius,
+					  }),
 			).unwrap();
-			departure.current.lat = e.lat;
-			departure.current.lng = e.lng;
+			result = region[0].startsWith('해외') ? result.data : result;
 			if (result.length == 0) {
 				result = await dispatch(
-					recommendApi({
-						category: e.apiCategory,
-						lat: e.backupLat,
-						lng: e.backupLng,
-						radius: 20000,
-					}),
+					region[0].startsWith('해외')
+						? recommendTripadvisor({
+								category: e.apiCategory,
+								lat: e.lat,
+								lng: e.lng,
+								radius: 20000,
+								name: e.status.name,
+						  })
+						: recommendApi({
+								category: e.apiCategory,
+								lat: e.lat,
+								lng: e.lng,
+								radius: 20000,
+						  }),
 				).unwrap();
-				departure.current.lat = e.lat;
-				departure.current.lng = e.lng;
+				result = region[0].startsWith('해외') ? result.data : result;
 				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
+			}
+			if (region[0].startsWith('해외')) {
+				let copy = await dispatch(detailTripadvisor({id: result[0].location_id})).unwrap();
+				console.log(copy);
+				result = [{...result, place_name: copy.name, y: copy.latitude, x: copy.longitude}, {}];
 			}
 			return result;
 		} catch (err) {
@@ -156,7 +177,7 @@ export default function Timetable({navigation, route}: any) {
 					category: e.value.category,
 					lat: lat,
 					lng: lng,
-					apiCategory: 'FD6',
+					apiCategory: region[0].startsWith('해외') ? 'restaurants' : 'FD6',
 					radius: radius,
 					backupLat: timetable[e.idx][e.index - 1]?.lat ?? 0,
 					backupLng: timetable[e.idx][e.index - 1]?.lng ?? 0,
@@ -206,7 +227,7 @@ export default function Timetable({navigation, route}: any) {
 					category: e.value.category,
 					lat: lat,
 					lng: lng,
-					apiCategory: 'AD5',
+					apiCategory: region[0].startsWith('해외') ? 'hotels' : 'AD5',
 					radius: 2000,
 					backupLat: e.index != 0 ? timetable[e.idx][e.index - 1].lat : timetable[e.idx][e.index + 1].lat,
 					backupLng: e.index != 0 ? timetable[e.idx][e.index - 1].lng : timetable[e.idx][e.index + 1].lng,
@@ -227,7 +248,7 @@ export default function Timetable({navigation, route}: any) {
 		const handleItems = item.map(async (value, index) => {
 			if (value.name == '점심 추천' || value.name == '저녁 추천') {
 				let items = await restaurantRecommend({value: value, index: index, idx: idx});
-				if (items.length != 0) {
+				if (items?.length != 0) {
 					let checks = copy2.filter((checkValue, checkIndex) => {
 						items[0].place_name == checkValue.name;
 					});
@@ -245,7 +266,8 @@ export default function Timetable({navigation, route}: any) {
 				}
 			} else if (value.name == '숙소 추천' && index != 0) {
 				let items = await accommodationRecommend({value: value, index: index, idx: idx});
-				if (items.length != 0) {
+				if (items?.length != 0) {
+					items = items[0];
 					copy2[index] = {
 						...copy2[index],
 						name: items.place_name,
@@ -290,7 +312,6 @@ export default function Timetable({navigation, route}: any) {
 
 			dispatch(travelSliceActions.drawTimetable());
 		} catch (err) {
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '타임테이블 로딩 중 문제가 발생했습니다.\n다시시도해주세요',

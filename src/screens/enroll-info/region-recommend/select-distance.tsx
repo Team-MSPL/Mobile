@@ -23,6 +23,7 @@ import {SVGSearch} from '../../../utill/svg/svg';
 import {userSliceActions} from '../../../redux/user/user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {useRegionSearch} from '../../../utill/hooks/useRegionSearch';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
@@ -51,31 +52,10 @@ export default function SelectDistance({navigation}: any) {
 	const handleAnonymousLogin = async () => {
 		await logEvent('anonymous_region_login', {});
 	};
-	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
-	const searchRegionList = cityViewList[country]
-		.map((item, index) => {
-			if (index != 0) {
-				return item.sub.map((value, idx) => {
-					if (value.subTitle == '전체') {
-						let copy = {...value, subTitle: item.title};
-						return copy;
-					} else {
-						return value;
-					}
-				});
-			}
-		})
-		.filter(item => item != undefined)
-		.reduce(function (acc, cur) {
-			return [...acc, ...cur];
-		})
-		?.filter(item => !filterList.includes(item?.subTitle));
-	const handleRegionMatch = useCallback((e: {id: number; lat: number; lng: number; subTitle: string}[]) => {
-		setRegionMatchList(e);
-	}, []);
+	const {handleRegionSerarch} = useRegionSearch();
 	const handleRegionText = useCallback((e: string) => {
 		setRegionText(e);
-		handleRegionMatch(searchRegionList?.filter((item, index) => item.subTitle.includes(e)));
+		setRegionMatchList(handleRegionSerarch(e));
 	}, []);
 	useEffect(() => {
 		handleGoogleAnalytics();
@@ -297,7 +277,7 @@ export default function SelectDistance({navigation}: any) {
 								내 근처
 							</PretendardSemiBoldText>
 							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-								한국 전체
+								{country == 0 ? '한국 전체' : cityViewList[country][1].title + ' 전체'}
 							</PretendardSemiBoldText>
 						</DistanceSpace>
 						<Slider
@@ -342,21 +322,21 @@ const ButtonContainer = styled.View`
 	justify-content: flex-end;
 	margin-bottom: 2px;
 `;
-const RegionTextInput = styled.TextInput`
+export const RegionTextInput = styled.TextInput`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(50)}px;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
 	color: black;
 `;
-const RegionTextInputContainer = styled.View`
+export const RegionTextInputContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
 	padding-horizontal: ${widthPercentage(10)}px;
 `;
-const SearchContainer = styled.View`
+export const SearchContainer = styled.View`
 	position: absolute;
 	align-self: center;
 	z-index: 2;
@@ -365,7 +345,7 @@ const SearchContainer = styled.View`
 	max-height: ${heightPercentage(150)}px;
 	background-color: ${colors.backgroundWhite};
 `;
-const SearchElements = styled.TouchableOpacity`
+export const SearchElements = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(50)}px;
 	border-color: ${colors.Gray3};
