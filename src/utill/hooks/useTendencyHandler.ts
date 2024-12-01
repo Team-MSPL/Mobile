@@ -24,10 +24,10 @@ export const useTendencyHandler = () => {
 		{ko: '대한민국', en: 'Korea'},
 		{ko: '일본', en: 'Japan'},
 		{ko: '중국', en: 'China'},
-		{ko: '싱가포르', en: 'Singapore'},
 		{ko: '베트남', en: 'Vietnam'},
 		{ko: '태국', en: 'Thailand'},
 		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
 	];
 
 	const tendencyList = [

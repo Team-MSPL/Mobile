@@ -24,6 +24,7 @@ import {userSliceActions} from '../../../redux/user/user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 import {useRegionSearch} from '../../../utill/hooks/useRegionSearch';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
@@ -43,7 +44,17 @@ export default function SelectDistance({navigation}: any) {
 		name: `기본값:${cityViewList[country][1].sub[0].subTitle}`,
 		default: true,
 	});
-
+	const countryMap: {[key: number]: number} = {
+		0: 1,
+		1: 1.5,
+		2: 3,
+		3: 0.25,
+		4: 2,
+		5: 2,
+		6: 2,
+	};
+	let variableDistance = countryMap[country];
+	//일본 1.5배 싱가포르 0.25 베트남 2
 	const handleGoogleAnalytics = async () => {
 		socialloginProvider == 'anonymous'
 			? await logEvent('anontmous_place_step3', {})
@@ -60,6 +71,7 @@ export default function SelectDistance({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalytics();
 	}, []);
+	const {countryList} = useTendencyHandler();
 	const goNext = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -69,8 +81,10 @@ export default function SelectDistance({navigation}: any) {
 				recentPosition: {lat: geoInfo.lat, lng: geoInfo.lng},
 				distanceSensitivity: range,
 				version: 2,
+				country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
+			console.log(result);
 			if (result.length != 0) {
 				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 				navigation.popToTop();
@@ -233,7 +247,7 @@ export default function SelectDistance({navigation}: any) {
 				</ScrollView>
 			</SearchContainer>
 			<MapContainer>
-				{geoInfo.default && (
+				{/* {geoInfo.default && (
 					<GeolocationGetContainer>
 						<PrimaryButton
 							backgroundColor={colors.Primary}
@@ -243,7 +257,7 @@ export default function SelectDistance({navigation}: any) {
 							height={heightPercentage(50)}
 							label='위치정보 불러오기'></PrimaryButton>
 					</GeolocationGetContainer>
-				)}
+				)} */}
 				<Qwe>
 					<MapView
 						showsMyLocationButton={false}
@@ -256,46 +270,42 @@ export default function SelectDistance({navigation}: any) {
 						region={{
 							latitude: geoInfo.lat,
 							longitude: geoInfo.lng,
-							latitudeDelta: 8,
-							longitudeDelta: 8,
+							latitudeDelta: 8 * variableDistance,
+							longitudeDelta: 8 * variableDistance,
 						}}>
-						{!geoInfo.default && (
-							<Circle
-								center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
-								style={{alignItems: 'center', justifyContent: 'center'}}
-								fillColor='rgba(38, 152, 251, 0.3);'
-								radius={range * 50000}></Circle>
-						)}
+						<Circle
+							center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
+							style={{alignItems: 'center', justifyContent: 'center'}}
+							fillColor='rgba(38, 152, 251, 0.3);'
+							radius={range * 50000 * variableDistance}></Circle>
 					</MapView>
 				</Qwe>
 			</MapContainer>
-			{!geoInfo.default && (
-				<>
-					<DistanceCenter>
-						<DistanceSpace>
-							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-								내 근처
-							</PretendardSemiBoldText>
-							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-								{country == 0 ? '한국 전체' : cityViewList[country][1].title + ' 전체'}
-							</PretendardSemiBoldText>
-						</DistanceSpace>
-						<Slider
-							style={{width: '100%', height: 40}}
-							minimumValue={1}
-							maximumValue={10}
-							minimumTrackTintColor={colors.Primary}
-							maximumTrackTintColor={colors.Gray2}
-							thumbTintColor={colors.Primary}
-							value={range}
-							step={1}
-							onValueChange={item => {
-								setRange(item);
-							}}
-						/>
-					</DistanceCenter>
-				</>
-			)}
+			<>
+				<DistanceCenter>
+					<DistanceSpace>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+							내 근처
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+							{country == 0 ? '한국 전체' : cityViewList[country][1].title + ' 전체'}
+						</PretendardSemiBoldText>
+					</DistanceSpace>
+					<Slider
+						style={{width: '100%', height: 40}}
+						minimumValue={1}
+						maximumValue={10}
+						minimumTrackTintColor={colors.Primary}
+						maximumTrackTintColor={colors.Gray2}
+						thumbTintColor={colors.Primary}
+						value={range}
+						step={1}
+						onValueChange={item => {
+							setRange(item);
+						}}
+					/>
+				</DistanceCenter>
+			</>
 			<ButtonContainer>
 				<CustomButton
 					label='맞춤형 여행지를 확인해볼게요!'

@@ -15,6 +15,7 @@ import {ButtonContainer} from '../select-multi';
 import {Platform} from 'react-native';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate, country} = useAppSelector(state => state.travelSlice);
@@ -51,30 +52,39 @@ export default function DetailResult({navigation, route}: any) {
 		} else {
 			region = [route.params.item.name, '전체'];
 		}
-		const cityIndex = cityViewList[country].find(city => city.title == region[0])?.id;
+		const cityIndex =
+			country == 0
+				? cityViewList[country].find(city => city.title == region[0])?.id
+				: cityViewList[country].filter(item => item.sub.find(city => city.subTitle == region[0]))[0].id;
 		let season = copy.pop();
-		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(
+			item => item.subTitle == region[country == 0 ? 1 : 0],
+		);
 		const data = {
 			cityDistance: [cityDistance],
 			cityIndex: cityIndex,
-			region: [region[1]],
+			region: [region[country == 0 ? 1 : 0]],
 			tendency: copy,
 			season: season,
 			selectEndDate: selectEndDate,
 			shareViewWithStartFlag: true,
+			country: country,
 		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
+	const {countryList} = useTendencyHandler();
 	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
 			name: e.name,
 			lat: e.lat,
 			lng: e.lng,
-			region: route.params.item.name,
+			// region: route.params.item.name,
+			region: country == 0 ? route.params.item.name : `해외/${countryList[country].en}/${route.params.item.name}`,
 			metropolitan: metropolitanStatus,
 		};
+		console.log(data);
 		navigation.navigate('CourseDetail', {value: data});
 		await logEvent('view_place_explore', {
 			location: route.params.item.name,
@@ -90,7 +100,12 @@ export default function DetailResult({navigation, route}: any) {
 						setVisible(true);
 					}}>
 					{route.params.item.photo != '' ? (
-						<TitleImage source={{uri: route.params.item.photo}}></TitleImage>
+						<TitleImage
+							source={{
+								uri: Array.isArray(route.params.item.photo)
+									? route.params.item.photo[0]
+									: route.params.item.photo,
+							}}></TitleImage>
 					) : (
 						<LogoCOntainer>
 							<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
@@ -150,7 +165,11 @@ export default function DetailResult({navigation, route}: any) {
 									</LogoCOntainer>
 								)}
 								<PopularityInfoTitleTextContainer>
-									<PretendardSemiBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+									<PretendardSemiBoldText
+										numberOfLines={2}
+										size={20}
+										lineHeight={26}
+										color={colors.backgroundWhite}>
 										{item.name}
 									</PretendardSemiBoldText>
 								</PopularityInfoTitleTextContainer>

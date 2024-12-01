@@ -343,9 +343,18 @@ export default function Preset({navigation}: any) {
 												}>
 												{value[value[0].name == '숙소 추천' ? 1 : 0].name}
 											</PretendardVariableText>
-											<PretendardVariableText size={16} lineHeight={16} color={colors.Primary}>
-												+{value.length - 1}개 장소
-											</PretendardVariableText>
+											{value.filter(itemValue => !itemValue.name.includes('추천')).length - 1 >=
+												1 && (
+												<PretendardVariableText
+													size={16}
+													lineHeight={16}
+													color={colors.Primary}>
+													+
+													{value.filter(itemValue => !itemValue.name.includes('추천'))
+														.length - 1}
+													개 장소
+												</PretendardVariableText>
+											)}
 											<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
 												{index + 1}일차
 											</PretendardVariableText>

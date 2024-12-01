@@ -115,7 +115,10 @@ export default function ViewResult({navigation}: any) {
 								}}>
 								<ImageContainer>
 									{item.photo != '' ? (
-										<RecommendImage source={{uri: item.photo}}></RecommendImage>
+										<RecommendImage
+											source={{
+												uri: Array.isArray(item.photo) ? item.photo[0] : item.photo,
+											}}></RecommendImage>
 									) : (
 										<LogoCOntainer>
 											<SvgLoginLogo color={'white'} width={widthPercentage(40)} />

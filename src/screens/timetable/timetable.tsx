@@ -517,7 +517,7 @@ export default function Timetable({navigation, route}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
 			await dispatch(deleteTravelCourse({travelId: travelId}));
-			navigation.goBack();
+			navigation.popToTop();
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({

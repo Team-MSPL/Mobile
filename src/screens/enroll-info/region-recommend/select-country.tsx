@@ -38,18 +38,22 @@ export default function SelectCountry({navigation}: any) {
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='어디로 떠나시나요?'></StepText>
 			<FlexWrap gap={10}>
-				{countryList.map((item, idx) => (
-					<TendencyButton
-						bgColor={country == idx}
-						label={item.ko}
-						key={idx}
-						divide={true}
-						width={widthPercentage(158)}
-						imageSvg={imageList[idx]}
-						onPress={() => {
-							handleCountryClick(idx);
-						}}></TendencyButton>
-				))}
+				{countryList.map(
+					(item, idx) =>
+						idx != countryList.length - 1 && (
+							<TendencyButton
+								bgColor={country == idx}
+								label={item.ko}
+								key={idx}
+								divide={true}
+								width={widthPercentage(158)}
+								imageSvg={imageList[idx]}
+								betaFlag={idx != 0}
+								onPress={() => {
+									handleCountryClick(idx);
+								}}></TendencyButton>
+						),
+				)}
 			</FlexWrap>
 			<RouteButton navigation={navigation} nextTitle='RegionSelectWho'></RouteButton>
 		</BackgroundGray>

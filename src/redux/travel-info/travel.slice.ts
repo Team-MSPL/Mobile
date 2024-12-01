@@ -562,6 +562,7 @@ export const travelSlice = createSlice({
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.makeMode = 'recommend';
+			state.country = payload.country;
 			state.regionRecommendFlag = true;
 			state.tableShowFlag = true;
 			state.season = payload.season;
