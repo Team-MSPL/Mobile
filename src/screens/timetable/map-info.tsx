@@ -38,7 +38,9 @@ import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-to
 import {useDistance} from '../../utill/hooks/useDistance';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag, region} = useAppSelector(state => state.travelSlice);
+	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -71,7 +73,11 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	};
 	const [visible, setVisible] = useState(true);
 	const moveRegion = async (e: number, index: number) => {
-		navigation.navigate('CourseDetail', {value: timetable[index][e]});
+		let copy = {
+			...timetable[index][e],
+			region: region[timetable[index][e].regionIndex],
+		};
+		navigation.navigate('CourseDetail', {value: copy});
 	};
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const goNavigation = async (e: number) => {

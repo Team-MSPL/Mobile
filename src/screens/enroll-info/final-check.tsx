@@ -50,6 +50,7 @@ export default function FinalCheck({navigation}: any) {
 		regionInfo,
 		travelName,
 		country,
+		cityDistance,
 	} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
@@ -141,110 +142,129 @@ export default function FinalCheck({navigation}: any) {
 						modalFunction: handleLogin,
 					}),
 			  )
-			: goNext();
+			: country == 0
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: 'ai버전을 선택해주세요!',
+						modalTopText: '다님 AI 1호',
+						modalBottomText: '다님 AI 2호 (Beta)',
+						modalFunction: () => {
+							goNext(1);
+						},
+						modalBottomFunction: () => {
+							goNext(2);
+						},
+					}),
+			  )
+			: goNext(2);
 	};
-	const goNext = useCallback(async () => {
-		try {
-			setLoading(true);
-			if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
-				let changeName =
-					tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
-					(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
-						? ' '
-						: ' 함께하는 ') +
-					seasonList[season.findIndex(item => item == 1)].title +
-					'여행';
-				dispatch(travelSliceActions.enrollTravelName(changeName));
-			}
-			let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
-			if (
-				(country == 0 && cityViewList[country][cityIndex].id >= 9 && region[0] == '전체') ||
-				(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
-				(country != 0 && region[0] == '전체')
-			) {
-				if (country != 0 && cityIndex == 1) {
-					a = cityViewList[country]
-						.slice(2, cityViewList[country].length)
-						.map((value, index) =>
-							value.sub
-								.map((item, idx) => {
-									if (idx != 0) {
-										return cityViewList[country][index + 2].title + ' ' + item.subTitle;
-									} else {
-										return null;
-									}
-								})
-								.filter(item => item !== null),
-						)
-						.join(',')
-						.split(',');
-				} else {
-					a = cityViewList[country][cityIndex].sub.map(
-						(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
-					);
-					a.shift();
+	const goNext = useCallback(
+		async (e: number) => {
+			try {
+				setLoading(true);
+				if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
+					let changeName =
+						tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
+						(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
+							? ' '
+							: ' 함께하는 ') +
+						seasonList[season.findIndex(item => item == 1)].title +
+						'여행';
+					dispatch(travelSliceActions.enrollTravelName(changeName));
 				}
-			}
-			//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+				let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
+				if (
+					(country == 0 && cityViewList[country][cityIndex].id >= 9 && region[0] == '전체') ||
+					(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+					(country != 0 && region[0] == '전체')
+				) {
+					if (country != 0 && cityIndex == 1) {
+						a = cityViewList[country]
+							.slice(2, cityViewList[country].length)
+							.map((value, index) =>
+								value.sub
+									.map((item, idx) => {
+										if (idx != 0) {
+											return cityViewList[country][index + 2].title + ' ' + item.subTitle;
+										} else {
+											return null;
+										}
+									})
+									.filter(item => item !== null),
+							)
+							.join(',')
+							.split(',');
+					} else {
+						a = cityViewList[country][cityIndex].sub.map(
+							(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+						);
+						a.shift();
+					}
+				}
+				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 
-			let copy = [...tendency];
-			copy.push(season);
-			if (country != 0) {
-				a = a.map((item, idx) => {
-					return `해외/${countryList[country].en}/${item.split(' ').slice(1).join(' ')}`;
+				let copy = [...tendency];
+				copy.push(season);
+				if (country != 0) {
+					a = a.map((item, idx) => {
+						return `해외/${countryList[country].en}/${
+							cityViewList[country][cityIndex].sub[cityDistance[idx]].subTitle
+						}`;
+					});
+				}
+				const result = await dispatch(
+					getTravelAi({
+						regionList: a,
+						accomodationList: accommodations,
+						selectList: copy,
+						essentialPlaceList: essentialPlaces,
+						timeLimitArray: timeLimitArray,
+						nDay: nDay + 1,
+						transit: transit,
+						distanceSensitivity: distance,
+						bandwidth: bandwidth,
+						freeTicket: freeTicket,
+						version: e,
+						password: '(주)나그네들_g5hb87r8765rt68i7ur78',
+					}),
+				).unwrap();
+				result.data.resultData.map(item => {
+					console.log(item);
 				});
-			}
-			const result = await dispatch(
-				getTravelAi({
-					regionList: a,
-					accomodationList: accommodations,
-					selectList: copy,
-					essentialPlaceList: essentialPlaces,
-					timeLimitArray: timeLimitArray,
-					nDay: nDay + 1,
-					transit: transit,
-					distanceSensitivity: distance,
-					bandwidth: bandwidth,
-					freeTicket: freeTicket,
-					version: 2,
-					password: '(주)나그네들_g5hb87r8765rt68i7ur78',
-				}),
-			).unwrap();
-			result.data.resultData.map(item => {
-				console.log(item);
-			});
-			dispatch(travelSliceActions.selectRegion(a));
-			if (result) {
-				navigation.popToTop();
-				navigation.navigate('Preset');
-				!result.data.enoughPlace &&
+				dispatch(travelSliceActions.selectRegion(a));
+				if (result) {
+					navigation.popToTop();
+					navigation.navigate('Preset');
+					!result.data.enoughPlace &&
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: `해당 지역의 관광지 중 선택하신 성향의 \n 관광지가 부족하여,일정을 다 채울 수가 없었어요 ㅠㅠ`,
+								modalTextSize: 17,
+								modalSingleUse: true,
+							}),
+						);
+				} else {
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: `해당 지역의 관광지 중 선택하신 성향의 \n 관광지가 부족하여,일정을 다 채울 수가 없었어요 ㅠㅠ`,
-							modalTextSize: 17,
-							modalSingleUse: true,
+							modalTitle: '네트워크 연결이 불안정합니다',
+							modalSubTitle: '확인후 다시 시도해주세요',
 						}),
 					);
-			} else {
+				}
+			} catch (error) {
+				console.log(error);
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '네트워크 연결이 불안정합니다',
 						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			console.log(error);
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '네트워크 연결이 불안정합니다',
-					modalSubTitle: '확인후 다시 시도해주세요',
-				}),
-			);
-		} finally {
-			setLoading(false);
-		}
-	}, [essentialPlaces]);
+		},
+		[essentialPlaces],
+	);
 	const checkDeleteAccommodation = (e: number) => {
 		dispatch(
 			modalSliceActions.setOpenModal({

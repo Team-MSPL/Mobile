@@ -346,11 +346,11 @@ export const RegionTextInputContainer = styled.View`
 	border-radius: 10px;
 	padding-horizontal: ${widthPercentage(10)}px;
 `;
-export const SearchContainer = styled.View`
+export const SearchContainer = styled.View<{top?: number}>`
 	position: absolute;
 	align-self: center;
 	z-index: 2;
-	top: ${heightPercentage(237)}px;
+	top: ${props => heightPercentage(props.top ?? 237)}px;
 	width: ${widthPercentage(327)}px;
 	max-height: ${heightPercentage(150)}px;
 	background-color: ${colors.backgroundWhite};

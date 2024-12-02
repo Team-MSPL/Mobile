@@ -10,6 +10,7 @@ import RouteButton from '../../../utill/component/route-button';
 
 export default function SelectTour({navigation}: any) {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
+	const {country} = useAppSelector(state => state.travelSlice);
 	const {handleButtonClick, regionTendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: true, item: item});
@@ -36,7 +37,11 @@ export default function SelectTour({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<RouteButton navigation={navigation} nextTitle='RegionSelectPopularity'></RouteButton>
+			<RouteButton
+				navigation={navigation}
+				nextTitle={'RegionSelectPopularity'}
+				// nextTitle={country == 0 ? 'RegionSelectPopularity' : 'RegionSelectDistance'}
+			></RouteButton>
 		</BackgroundGray>
 	);
 }

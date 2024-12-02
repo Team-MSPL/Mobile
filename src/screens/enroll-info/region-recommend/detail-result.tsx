@@ -55,7 +55,8 @@ export default function DetailResult({navigation, route}: any) {
 		const cityIndex =
 			country == 0
 				? cityViewList[country].find(city => city.title == region[0])?.id
-				: cityViewList[country].filter(item => item.sub.find(city => city.subTitle == region[0]))[0].id;
+				: cityViewList[country].slice(1).filter(item => item.sub.find(city => city.subTitle == region[0]))[0]
+						.id;
 		let season = copy.pop();
 		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(
 			item => item.subTitle == region[country == 0 ? 1 : 0],

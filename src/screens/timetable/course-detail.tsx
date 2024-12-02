@@ -263,6 +263,7 @@ export default function CourseDetail({navigation, route}: any) {
 		navigation.navigate('EnrollTravelTitle');
 	}, []);
 	const goReviewEnroll = () => {
+		console.log(route.params.value.region);
 		navigation.navigate('CourseReview', {
 			value: {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),

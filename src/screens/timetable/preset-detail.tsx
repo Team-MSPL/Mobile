@@ -17,7 +17,7 @@ import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice
 import {SVGRightAdd} from '../../utill/svg/svg';
 
 export default function PresetDetail({navigation, route}: any) {
-	const {presetTendencyList, presetDatas, day, nDay, aiID} = useAppSelector(state => state.travelSlice);
+	const {presetTendencyList, presetDatas, day, nDay, aiID, region} = useAppSelector(state => state.travelSlice);
 	const [select, setSelect] = useState(0);
 	const dispatch = useAppDispatch();
 	let markerCount = 0;
@@ -184,7 +184,11 @@ export default function PresetDetail({navigation, route}: any) {
 		}
 	};
 	const moveRegion = async (index: number, e: number) => {
-		navigation.navigate('CourseDetail', {value: presetDatas[route.params.index][index][e]});
+		let copy = {
+			...presetDatas[route.params.index][index][e],
+			region: region[presetDatas[route.params.index][index][e].regionIndex],
+		};
+		navigation.navigate('CourseDetail', {value: copy});
 	};
 	const [tendencyView, setTendencyView] = useState(true);
 	return (

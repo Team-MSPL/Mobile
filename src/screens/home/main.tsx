@@ -68,14 +68,14 @@ export default function Main({navigation}: any) {
 		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle.split(' ')[1]];
 		let cityDistance = metropolitanCheckList.includes(e.subTitle)
 			? 0
-			: cityViewList[country][e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
+			: cityViewList[0][e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
 				season: season,
 				cityIndex: e.id,
 				region: region,
-				cityDistance: [cityViewList[country][e.id].sub[cityDistance].id],
+				cityDistance: [cityViewList[0][e.id].sub[cityDistance].id],
 			}),
 		);
 		navigation.navigate('EnrollTravelTitle');
