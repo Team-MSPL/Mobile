@@ -20,6 +20,7 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SearchRecommend({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
@@ -128,14 +129,55 @@ export default function SearchRecommend({navigation, route}: any) {
 			let itemCopy = [...copy[route.params.index + 1]];
 			itemCopy[0] = updateItem;
 			copy[route.params.index + 1] = itemCopy;
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '나머지 날들도 같은 숙소 추가하겠습니까?',
+					modalTopText: '예, 전부 같은 숙소로 할래요',
+					modalBottomText: '아니요, 다른 숙소도 찾아볼래요.',
+					modalFunction: () => {
+						copy[route.params.index] = copy2;
+						let newCopy = copy.map((item, index) => {
+							let newCopy2 = [...item];
+							if (item[0].category == 4) {
+								newCopy2[0] = {
+									...placeState,
+									x: item[0].x,
+									y: item[0].y,
+									takenTime: item[0].takenTime,
+									category: item[0].category,
+								};
+							}
+							if (item[copy[index].length - 1].category == 4) {
+								newCopy2[item.length - 1] = {
+									...placeState,
+									x: item[item.length - 1].x,
+									y: item[item.length - 1].y,
+									takenTime: item[item.length - 1].takenTime,
+									category: item[item.length - 1].category,
+								};
+							}
+							return newCopy2;
+						});
+
+						dispatch(travelSliceActions.changeTimetable(newCopy));
+						handleGoogleAnalytics();
+						navigation.goBack();
+					},
+					modalBottomFunctionUse: true,
+					modalBottomFunction: () => {
+						copy[route.params.index] = copy2;
+						dispatch(travelSliceActions.changeTimetable(copy));
+						handleGoogleAnalytics();
+						navigation.goBack();
+					},
+				}),
+			);
+		} else {
+			copy[route.params.index] = copy2;
+			dispatch(travelSliceActions.changeTimetable(copy));
+			handleGoogleAnalytics();
+			navigation.goBack();
 		}
-		console.log('after', copy2);
-		copy[route.params.index] = copy2;
-
-		dispatch(travelSliceActions.changeTimetable(copy));
-
-		handleGoogleAnalytics();
-		navigation.goBack();
 	};
 	const clearInput = () => {
 		autocompleteRef.current?.setAddressText('');

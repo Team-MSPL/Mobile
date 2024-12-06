@@ -8,6 +8,7 @@ import {eventSliceActions} from '../../../redux/event/event.slice';
 import {useState} from 'react';
 import {Linking} from 'react-native';
 import ImageView from 'react-native-image-viewing';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Event() {
 	const dispatch = useAppDispatch();
@@ -24,6 +25,7 @@ export default function Event() {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
 	const [visible, setVisible] = useState(false);
+	const navigation = useNavigation();
 	return (
 		<Container>
 			<ViewContaniner>
@@ -45,7 +47,12 @@ export default function Event() {
 								if (item.eventLink == '') {
 									setVisible(true);
 								} else {
-									Linking.openURL(item.eventLink);
+									if (item.eventLink.includes('http')) {
+										Linking.openURL(item.eventLink);
+									} else {
+										navigation.navigate(item.eventLink);
+										closeModal();
+									}
 								}
 							}}>
 							<EventImage
