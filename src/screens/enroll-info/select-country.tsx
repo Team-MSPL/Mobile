@@ -31,6 +31,15 @@ export default function RecommendSelectCountry({navigation}: any) {
 			dispatch(travelSliceActions.selectRegion([]));
 		}, []),
 	);
+	const selectPopularity = () => {
+		dispatch(
+			travelSliceActions.selectPopularity({
+				region: '싱가포르',
+				cityIndex: 1,
+				cityDistance: [0],
+			}),
+		);
+	};
 	return (
 		<BackgroundGray>
 			<Stepper total={11} now={1}></Stepper>
@@ -53,7 +62,10 @@ export default function RecommendSelectCountry({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</FlexWrap>
-			<RouteButton navigation={navigation} nextTitle='SelectCity'></RouteButton>
+			<RouteButton
+				navigation={navigation}
+				nextTitle={country != 6 ? 'SelectCity' : 'SelectDay'}
+				btnFunction={country == 6 ? selectPopularity : undefined}></RouteButton>
 		</BackgroundGray>
 	);
 }

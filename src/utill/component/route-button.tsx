@@ -11,11 +11,13 @@ export default function RouteButton({
 	nextTitle,
 	goNext,
 	isDisabled,
+	btnFunction,
 }: RouteButtonProps) {
 	const handleBack = () => {
 		navigation.goBack();
 	};
 	const handleNext = () => {
+		btnFunction && btnFunction();
 		goNext ? goNext() : navigation.navigate(nextTitle);
 	};
 	return (
@@ -53,6 +55,7 @@ type RouteButtonProps = {
 	nextTitle: string;
 	goNext?: () => void;
 	isDisabled?: boolean;
+	btnFunction?: () => void;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{

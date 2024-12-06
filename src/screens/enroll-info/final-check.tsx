@@ -148,6 +148,7 @@ export default function FinalCheck({navigation}: any) {
 						modalTitle: 'ai버전을 선택해주세요!',
 						modalTopText: '다님 AI 1호',
 						modalBottomText: '다님 AI 2호 (Beta)',
+						modalBottomFunctionUse: true,
 						modalFunction: () => {
 							goNext(1);
 						},

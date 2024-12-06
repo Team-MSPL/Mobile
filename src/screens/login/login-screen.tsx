@@ -223,7 +223,7 @@ export default function LoginScreen({navigation}: any) {
 	const anonymousLogin = async () => {
 		try {
 			const data = {
-				userName: '익명',
+				userName: '나그네',
 				userProfileImage: 'https://danim.me/square_logo.png',
 				userToken: '20230814',
 				loginProvider: 'anonymous',

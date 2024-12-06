@@ -154,29 +154,91 @@ export default function Recommend({navigation, route}: any) {
 		copy[route.params.x] = recommendItem;
 		if (route.params.name === '숙소 추천') {
 			if (route.params.index != 0) {
-				let updateitem = {
-					...recommendItem.at(-1),
-					x: copy[route.params.x + 1][0].x,
-					y: copy[route.params.x + 1][0].y,
-					takenTime: copy[route.params.x + 1][0].takenTime,
-				};
-				let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
-				itemCopy[0] = updateitem;
-				copy[route.params.x + 1] = itemCopy;
+				if (copy[route.params.x + 1][0].category == 4) {
+					let updateitem = {
+						...recommendItem.at(-1),
+						x: copy[route.params.x + 1][0].x,
+						y: copy[route.params.x + 1][0].y,
+						takenTime: copy[route.params.x + 1][0].takenTime,
+					};
+					let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
+					itemCopy[0] = updateitem;
+					copy[route.params.x + 1] = itemCopy;
+				}
 			} else {
-				let updateitem = {
-					...recommendItem[0],
-					x: copy[route.params.x - 1].at(-1).x,
-					y: copy[route.params.x - 1].at(-1).y,
-					takenTime: copy[route.params.x - 1].at(-1).takenTime,
-				};
-				let itemCopy = [...copy[route.params.x - 1]];
-				itemCopy.splice(itemCopy.length - 1, 1, updateitem);
-				copy[route.params.x - 1] = itemCopy;
+				if (copy[route.params.x - 1][copy[route.params.x - 1].length - 1].category == 4) {
+					let updateitem = {
+						...recommendItem[0],
+						x: copy[route.params.x - 1].at(-1).x,
+						y: copy[route.params.x - 1].at(-1).y,
+						takenTime: copy[route.params.x - 1].at(-1).takenTime,
+					};
+					let itemCopy = [...copy[route.params.x - 1]];
+					itemCopy.splice(itemCopy.length - 1, 1, updateitem);
+					copy[route.params.x - 1] = itemCopy;
+				}
 			}
 		}
-		dispatch(travelSliceActions.changeTimetable(copy));
-		navigation.navigate('Timetable');
+		let checkFlag = copy.map((item, index) => {
+			let first = item[0].category == 4 && item[0].name == '숙소 추천';
+			let last = item[copy[index].length - 1].category == 4 && item[copy[index].length - 1].name == '숙소 추천';
+			if (first || last) {
+				return true;
+			}
+		});
+		if (route.params.name === '숙소 추천') {
+			if (checkFlag.includes(true)) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '나머지 날들도 같은 숙소 추가하겠습니까?',
+						modalTopText: '예, 전부 같은 숙소로 할래요',
+						modalBottomText: '아니요, 다른 숙소도 찾아볼래요.',
+						modalSubTitle: `숙소를 고려하지 않은 여행 코스라서, \n 동선이 약간 꼬일 수 있어요.`,
+						modalFunction: () => {
+							let newData = route.params.index != 0 ? recommendItem.at(-1) : recommendItem[0];
+							let newCopy = copy.map((item, index) => {
+								let newCopy2 = [...item];
+								if (item[0].category == 4 && item[0].name == '숙소 추천') {
+									newCopy2[0] = {
+										...newData,
+										x: item[0].x,
+										y: item[0].y,
+										takenTime: item[0].takenTime,
+										category: item[0].category,
+									};
+								}
+								if (
+									item[copy[index].length - 1].category == 4 &&
+									item[copy[index].length - 1].name == '숙소 추천'
+								) {
+									newCopy2[item.length - 1] = {
+										...newData,
+										x: item[item.length - 1].x,
+										y: item[item.length - 1].y,
+										takenTime: item[item.length - 1].takenTime,
+										category: item[item.length - 1].category,
+									};
+								}
+								return newCopy2;
+							});
+							dispatch(travelSliceActions.changeTimetable(newCopy));
+							navigation.navigate('Timetable');
+						},
+						modalBottomFunctionUse: true,
+						modalBottomFunction: () => {
+							dispatch(travelSliceActions.changeTimetable(copy));
+							navigation.navigate('Timetable');
+						},
+					}),
+				);
+			} else {
+				dispatch(travelSliceActions.changeTimetable(copy));
+				navigation.navigate('Timetable');
+			}
+		} else {
+			dispatch(travelSliceActions.changeTimetable(copy));
+			navigation.navigate('Timetable');
+		}
 	};
 	//TODO트립어드바이저용
 	const getRecommendList = async () => {

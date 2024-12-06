@@ -77,7 +77,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '어디를 가고싶으신가요?',
 			multi: true,
-			list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+			list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통'],
 			photo: [
 				require('../../../public/tendency/beach.png'),
 				require('../../../public/tendency/mountain.png'),
@@ -132,7 +132,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '어디를 가고 싶으신가요?',
 			multi: true,
-			list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통한옥'],
+			list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통'],
 			photo: [
 				require('../../../public/tendency/beach.png'),
 				require('../../../public/tendency/mountain.png'),

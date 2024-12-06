@@ -337,11 +337,11 @@ export default function Preset({navigation}: any) {
 												size={16}
 												lineHeight={19}
 												color={
-													value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+													value[value[0].category == 4 ? 1 : 0].category == 5
 														? colors.PointYellow
 														: colors.Gray5
 												}>
-												{value[value[0].name == '숙소 추천' ? 1 : 0].name}
+												{value[value[0].category == 4 ? 1 : 0].name}
 											</PretendardVariableText>
 											{value.filter(itemValue => !itemValue.name.includes('추천')).length - 1 >=
 												1 && (
