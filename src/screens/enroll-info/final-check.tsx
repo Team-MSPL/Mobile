@@ -213,6 +213,7 @@ export default function FinalCheck({navigation}: any) {
 						}`;
 					});
 				}
+				console.log(countryList[country].en);
 				const result = await dispatch(
 					getTravelAi({
 						regionList: a,

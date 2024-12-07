@@ -120,7 +120,9 @@ export default function Preset({navigation}: any) {
 				bestPointList: presetTendencyList,
 				travelName: travelName,
 			};
-			await dispatch(saveAI(data)).unwrap();
+			const aiIdData = await dispatch(saveAI(data)).unwrap();
+
+			console.log(aiIdData.aiId);
 			const cacheValues: [string, string][] = [
 				['preset', JSON.stringify(presetDatas)],
 				['presetTendency', JSON.stringify(presetTendencyList)],
@@ -130,7 +132,9 @@ export default function Preset({navigation}: any) {
 				['tendency', JSON.stringify(tendency)],
 				['travelName', travelName.toString()],
 				['region', region.toString()],
+				['aiId', aiIdData.aiId],
 			];
+			console.log(aiIdData.aiId);
 			AsyncStorage.multiSet(cacheValues);
 		} catch (err) {
 			console.log(err, '에러');
@@ -153,13 +157,13 @@ export default function Preset({navigation}: any) {
 	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		console.log('aaaaaaaaa');
 		if (socialloginProvider != 'anonymous') {
 			console.log('zzzzzz', aiFlag, socialloginProvider);
 			!aiFlag && saveCache();
 		}
 	}, [aiFlag, socialloginProvider]);
 	const calculateTendency = (e: any) => {
+		console.log(e);
 		let copy = [];
 		let index = 0;
 		let copy2 = [];
@@ -170,9 +174,8 @@ export default function Preset({navigation}: any) {
 				copy.push(item);
 			}
 		});
-		copy2 = e.tendencyPointList.filter((item, idx) => !idx == index);
-		let max = Math.max(copy2);
-		copy[copy2.findIndex((item, idx) => item == max)];
+		copy2 = e.tendencyPointList.filter((item, idx) => !(idx == index)).map(Number);
+		let max = Math.max(...copy2);
 		return copy[copy2.findIndex((item, idx) => item == max)];
 	};
 	return (

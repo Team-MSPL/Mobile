@@ -34,7 +34,7 @@ export default function RecommendSelectCountry({navigation}: any) {
 	const selectPopularity = () => {
 		dispatch(
 			travelSliceActions.selectPopularity({
-				region: '싱가포르',
+				region: ['싱가포르'],
 				cityIndex: 1,
 				cityDistance: [0],
 			}),

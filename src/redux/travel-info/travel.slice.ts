@@ -4,6 +4,7 @@ import axios from 'axios';
 import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import axiosAuth from '../api/api';
+import {Platform} from 'react-native';
 const tendencyList = [
 	{
 		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
@@ -250,9 +251,9 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 export const getPlaceInfo = createAsyncThunk('/place/placeInfo', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(
-			`/place/placeInfo?region=${data.region}&name=${encodeURIComponent(data.name)}&lat=${data.lat}&lng=${
-				data.lng
-			}`,
+			`/place/placeInfo?region=${data.region}&name=${
+				Platform.OS == 'ios' ? data.name : encodeURIComponent(data.name)
+			}&lat=${data.lat}&lng=${data.lng}`,
 		);
 		return response;
 	} catch (error: any) {
@@ -524,7 +525,7 @@ export const travelSlice = createSlice({
 			state.tendency = payload.tendency;
 			state.travelName = payload.travelName;
 			state.region = payload.region;
-			state.aiID = payload?.aiID ?? '';
+			state.aiID = payload?.aiId ?? '';
 			state.aiFlag = true;
 			state.shareViewWithStartFlag = true;
 		},

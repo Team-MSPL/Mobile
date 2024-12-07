@@ -179,7 +179,7 @@ export default function CourseDetail({navigation, route}: any) {
 	};
 	useFocusEffect(
 		useCallback(() => {
-			console.log(route.params);
+			console.log(route.params, 'dd');
 			route.params?.value ? getDetail() : handleIntoInfo();
 		}, []),
 	);
@@ -280,7 +280,7 @@ export default function CourseDetail({navigation, route}: any) {
 		Linking.openURL(
 			`https://www.google.com/maps/search/${courseDetail.name}/data=!3m1!4b1?authuser=1&entry=ttu&g_ep=EgoyMDI0MDkwMi4wIKXMDSoASAFQAw%3D%3D`,
 		);
-	}, []);
+	}, [courseDetail]);
 	if (courseDetail?.name)
 		return (
 			<>

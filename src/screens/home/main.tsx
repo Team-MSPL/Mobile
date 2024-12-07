@@ -226,6 +226,7 @@ export default function Main({navigation}: any) {
 		tendency: any;
 		travelName: any;
 		region: any;
+		aiId: any;
 	}) => {
 		dispatch(
 			travelSliceActions.setCache({
@@ -237,22 +238,25 @@ export default function Main({navigation}: any) {
 				tendency: JSON.parse(data.tendency),
 				travelName: data.travelName,
 				region: data.region.split(','),
+				aiId: data.aiId,
 			}),
 		);
 		navigation.navigate('Preset');
 	};
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'mainViewPager'});
 	const checkCache = async () => {
-		let [preset, presetTendency, day, nDay, transit, tendency, travelName, region] = await AsyncStorage.multiGet([
-			'preset',
-			'presetTendency',
-			'day',
-			'nDay',
-			'transit',
-			'tendency',
-			'travelName',
-			'region',
-		]);
+		let [preset, presetTendency, day, nDay, transit, tendency, travelName, region, aiId] =
+			await AsyncStorage.multiGet([
+				'preset',
+				'presetTendency',
+				'day',
+				'nDay',
+				'transit',
+				'tendency',
+				'travelName',
+				'region',
+				'aiId',
+			]);
 		if (preset[1] != null) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -268,12 +272,22 @@ export default function Main({navigation}: any) {
 							tendency: tendency[1],
 							travelName: travelName[1],
 							region: region[1],
+							aiId: aiId[1],
 						}),
 					modalLeft: true,
 				}),
 			);
 		}
-		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
+		AsyncStorage.multiRemove([
+			'preset',
+			'presetTendency',
+			'day',
+			'nDay',
+			'transit',
+			'tendency',
+			'travelName',
+			'aiId',
+		]);
 	};
 	const vividList = [
 		{

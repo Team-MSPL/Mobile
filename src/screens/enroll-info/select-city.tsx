@@ -200,21 +200,22 @@ export default function SelectCity({navigation}: any) {
 					</SelectAllContainer>
 					<ScrollView horizontal={true} nestedScrollEnabled={true} showsHorizontalScrollIndicator={false}>
 						{cityViewList[country].map((item, idx) => {
-							return (
-								<RegionItems
-									key={idx}
-									select={cityIndex == item.id}
-									onPress={() => {
-										selectCity(item.id);
-									}}>
-									<PretendardSemiBoldText
-										size={14}
-										lineHeight={18.9}
-										color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
-										{item.title}
-									</PretendardSemiBoldText>
-								</RegionItems>
-							);
+							if (idx != 1)
+								return (
+									<RegionItems
+										key={idx}
+										select={cityIndex == item.id}
+										onPress={() => {
+											selectCity(item.id);
+										}}>
+										<PretendardSemiBoldText
+											size={14}
+											lineHeight={18.9}
+											color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
+											{item.title}
+										</PretendardSemiBoldText>
+									</RegionItems>
+								);
 						})}
 					</ScrollView>
 					<WrapContainer>

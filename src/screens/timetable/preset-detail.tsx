@@ -55,6 +55,7 @@ export default function PresetDetail({navigation, route}: any) {
 			'tendency',
 			'travelName',
 			'region',
+			'aiId',
 		]);
 	};
 	const goNext = (e: boolean) => {
