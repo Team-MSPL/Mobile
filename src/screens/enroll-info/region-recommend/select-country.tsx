@@ -24,10 +24,10 @@ export default function SelectCountry({navigation}: any) {
 		<SvgKorea width={30} height={20} />,
 		<SvgJapan width={30} height={20} />,
 		<SvgChina width={30} height={20} />,
-		<SvgSingapore width={30} height={20} />,
 		<SvgVietnam width={30} height={20} />,
 		<SvgTailiand width={30} height={20} />,
 		<SvgPhilippine width={30} height={20} />,
+		<SvgSingapore width={30} height={20} />,
 	];
 
 	return (
