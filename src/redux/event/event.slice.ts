@@ -3,7 +3,7 @@ import axiosAuth from '../api/api';
 
 const name = 'event';
 const initialState: EventState = {
-	eventState: false,
+	eventState: null,
 	eventList: [],
 	eventLink: '',
 };
@@ -33,7 +33,7 @@ export const getEventList = createAsyncThunk('/event/eventList', async (_, {reje
 });
 
 interface EventState {
-	eventState: boolean;
+	eventState: boolean | null;
 	eventList: EventListType[];
 	eventLink: string;
 }

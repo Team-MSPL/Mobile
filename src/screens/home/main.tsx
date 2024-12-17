@@ -151,6 +151,8 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setAnalyticeFlag(true));
 	};
 	const [noteList, setNoteList] = useState([]);
+
+	const {eventState} = useAppSelector(state => state.eventSlice);
 	const getNoteListData = async () => {
 		try {
 			const dataList = await dispatch(getNoteList()).unwrap();
@@ -161,6 +163,7 @@ export default function Main({navigation}: any) {
 		}
 	};
 	useLayoutEffect(() => {
+		checkEvent();
 		getNoteListData();
 		getMainScreen();
 		getFirstRegion();
@@ -169,11 +172,14 @@ export default function Main({navigation}: any) {
 		shareLoginFlag && navigation.navigate('Timetable');
 		!analyticeFlag && handleGoogleAnalytics();
 	}, []);
-
+	useEffect(() => {
+		if (eventState == false) {
+			socialloginProvider != 'anonymous' && checkCache();
+		}
+	}, [eventState, socialloginProvider]);
 	useEffect(() => {
 		pushPermission();
 		getMainViewPager();
-		socialloginProvider != 'anonymous' && checkCache();
 		if (
 			navigation.getState().routes[navigation.getState().index].name != 'FinalCheck' &&
 			navigation.getState().routes[navigation.getState().index].name != 'RegionSelectDistance' &&
@@ -183,7 +189,6 @@ export default function Main({navigation}: any) {
 		} else if (reLogin) {
 			navigation.navigate('HomeModal', {status: '재가입'});
 		}
-		checkEvent();
 	}, [signUpReward, socialloginProvider]);
 
 	useBackHandler({type: 'exit'});
