@@ -37,7 +37,7 @@ export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [shareFlag, setShareFlag] = useState(false);
-	const [shareSeleted, setShareSeleted] = useState(-1);
+	const [shareSeleted, setShareSeleted] = useState(0);
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
 	const goMyTravelDetail = async (e: any) => {
@@ -157,10 +157,14 @@ export default function MyTravelList({navigation}: any) {
 		}
 	};
 	useEffect(() => {
-		if (socialloginProvider == 'anonymous') {
-			shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
+		if (scrollViewRef.current) {
+			shareSeleted != -1 &&
+				shareFlag &&
+				scrollViewRef.current?.scrollToIndex({animated: true, index: shareSeleted, viewPosition: 0.5});
 		}
-	}, [shareSeleted, shareFlag, socialloginProvider]);
+		// scrollViewRef.current?.scrollToOffset({offset: 300});
+		//shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
+	}, [shareSeleted, shareFlag]);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () =>
@@ -169,7 +173,7 @@ export default function MyTravelList({navigation}: any) {
 						<SearchTouchableOpacity
 							onPress={() => {
 								setShareFlag(!shareFlag);
-								!shareFlag && setShareSeleted(-1);
+								!shareFlag && setShareSeleted(0);
 							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								{shareFlag ? '취소' : '공유'}
@@ -218,7 +222,7 @@ export default function MyTravelList({navigation}: any) {
 				transit: data.transit,
 				tendency: data.tendency,
 				travelName: data.travelName ?? '임시여행',
-				aiID: data._id,
+				aiId: data._id,
 				region: data.region,
 			}),
 		);

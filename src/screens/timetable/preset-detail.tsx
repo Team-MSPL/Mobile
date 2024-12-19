@@ -122,25 +122,32 @@ export default function PresetDetail({navigation, route}: any) {
 			markers.push(
 				value.map((vvalue, iindex) => {
 					markerCount += 1;
-					return (
-						<Marker
-							key={`marker_${index}_${iindex}`}
-							style={{zIndex: 4}}
-							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-							centerOffset={{x: 0, y: 0}}
-							anchor={{x: 0.5, y: 0.5}}
-							title={vvalue.name}>
-							{index == select ? (
-								<MarkerContainer key={iindex}>
-									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
-										{iindex + 1}
-									</PretendardSemiBoldText>
-								</MarkerContainer>
-							) : (
-								<Circle color={colors.Gray5} key={iindex} />
-							)}
-						</Marker>
-					);
+					if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
+						return (
+							<Marker
+								key={`marker_${index}_${iindex}`}
+								style={{zIndex: 4}}
+								coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
+								centerOffset={{x: 0, y: 0}}
+								anchor={{x: 0.5, y: 0.5}}
+								title={vvalue.name}>
+								{index == select ? (
+									<MarkerContainer key={iindex}>
+										<PretendardSemiBoldText
+											size={13}
+											lineHeight={19}
+											color={colors.backgroundWhite}>
+											{iindex + 1}
+										</PretendardSemiBoldText>
+									</MarkerContainer>
+								) : (
+									<Circle color={colors.Gray5} key={iindex} />
+								)}
+							</Marker>
+						);
+					} else {
+						return null;
+					}
 				}),
 			);
 

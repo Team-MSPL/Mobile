@@ -102,10 +102,12 @@ export default function Main({navigation}: any) {
 		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
 	};
 	const checkEvent = async () => {
-		const eventExist = await dispatch(getEventList()).unwrap();
-		const state = await AsyncStorage.getItem('eventState');
-		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
-			dispatch(eventSliceActions.setEventState(true));
+		if (eventState == null) {
+			const eventExist = await dispatch(getEventList()).unwrap();
+			const state = await AsyncStorage.getItem('eventState');
+			if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
+				dispatch(eventSliceActions.setEventState(true));
+			}
 		}
 	};
 	const getMainScreen = async () => {

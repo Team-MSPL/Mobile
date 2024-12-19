@@ -42,6 +42,7 @@ function App(): JSX.Element {
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
 	const {eventState} = useAppSelector(state => state.eventSlice);
 	const {needVersionUpdate} = useAppSelector(state => state.settingSlice);
+	const {modalOpen} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const backgroundStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -92,6 +93,18 @@ function App(): JSX.Element {
 	const goOffApp = () => {
 		BackHandler.exitApp();
 	};
+	useEffect(() => {
+		const backAction = () => {
+			if (modalOpen) {
+				dispatch(modalSliceActions.setCloseModal());
+				return true;
+			}
+		};
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+		return () => backHandler.remove();
+	}, [modalOpen]);
 	const getDeepLink = async () => {
 		Linking.getInitialURL().then(async res => {
 			try {

@@ -165,7 +165,7 @@ export default function Preset({navigation}: any) {
 	const calculateTendency = (e: any) => {
 		console.log(e);
 		let copy = [];
-		let index = 0;
+		let index = -1;
 		let copy2 = [];
 		e?.tendencyNameList?.map((item, idx) => {
 			if (['봄', '여름', '가을', '겨울'].includes(item)) {
@@ -247,7 +247,7 @@ export default function Preset({navigation}: any) {
 													lineHeight={20.6}
 													color={colors.Black}>
 													{' '}
-													성향을 중점점으로 고려했어요!
+													성향을 중점적으로 고려했어요!
 												</PretendardSemiBoldText>
 											</HStack>
 										)}

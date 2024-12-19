@@ -79,7 +79,7 @@ export default function SelectCity({navigation}: any) {
 
 	const goNext = () => {
 		if (region.length == 0) {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.'}));
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.', modalSingleUse: true}));
 		} else {
 			navigation.navigate('SelectDay');
 			dispatch(

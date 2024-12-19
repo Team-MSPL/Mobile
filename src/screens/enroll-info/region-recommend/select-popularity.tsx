@@ -45,7 +45,7 @@ export default function SelectPopularity({navigation}: any) {
 				dispatch(LoadingSliceActions.onLoading());
 				let datas = {
 					selectList: regionTendency,
-					selectPopular: popularity,
+					selectPopular: [rangeRef.current.low * 20, rangeRef.current.hight * 20],
 					recentPosition: {
 						lat: cityViewList[country][1].sub[0].lat,
 						lng: cityViewList[country][1].sub[0].lng,
@@ -55,7 +55,6 @@ export default function SelectPopularity({navigation}: any) {
 					country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 				};
 				const result = await dispatch(regionSearch(datas)).unwrap();
-				console.log(result);
 				if (result.length != 0) {
 					// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 					navigation.popToTop();

@@ -393,7 +393,7 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 export const recommendTripadvisor = createAsyncThunk('/recommendTripadvisor', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosTripadvisor.get(
-			`/search?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko`,
+			`/search?key=${Tripadvisor_KEy}&searchQuery=${data.name}&category=${data.category}&latLong=${data.lat}%2C${data.lng}&language=ko&radius=${data.radius}&radiusUnit=m`,
 		);
 		return response.data;
 	} catch (error: any) {

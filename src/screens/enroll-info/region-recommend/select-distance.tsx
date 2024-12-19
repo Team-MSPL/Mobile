@@ -84,7 +84,6 @@ export default function SelectDistance({navigation}: any) {
 				country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
-			console.log(result);
 			if (result.length != 0) {
 				// dispatch(updateFunctionToken({functionToken: functionToken - 1}));
 				navigation.popToTop();
