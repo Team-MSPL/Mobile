@@ -93,14 +93,14 @@ export default function Timetable({navigation, route}: any) {
 								category: e.apiCategory,
 								lat: e.lat,
 								lng: e.lng,
-								radius: 20000,
+								radius: Number(e.radius) * 1.5,
 								name: e.status.name,
 						  })
 						: recommendApi({
 								category: e.apiCategory,
 								lat: e.lat,
 								lng: e.lng,
-								radius: 20000,
+								radius: Number(e.radius) * 1.5,
 						  }),
 				).unwrap();
 				result = region[0].startsWith('해외') ? result.data : result;
