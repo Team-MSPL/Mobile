@@ -80,7 +80,11 @@ export default function MyTravelList({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useBackHandler({type: 'exit'});
+	const shareFlagBackHandle = () => {
+		setShareFlag(false);
+	};
+	useBackHandler({type: shareFlag ? 'listBackHandle' : 'exit', propsFunction: shareFlagBackHandle});
+
 	useFocusEffect(
 		useCallback(() => {
 			if (socialloginProvider != 'anonymous') {
@@ -158,6 +162,7 @@ export default function MyTravelList({navigation}: any) {
 	};
 	useEffect(() => {
 		if (scrollViewRef.current) {
+			console.log(shareSeleted, '하엫', shareFlag);
 			shareSeleted != -1 &&
 				shareFlag &&
 				scrollViewRef.current?.scrollToIndex({animated: true, index: shareSeleted, viewPosition: 0.5});
@@ -234,7 +239,7 @@ export default function MyTravelList({navigation}: any) {
 		monthRef.current = moment(item.item.day[0]).format('MM');
 		return (
 			<>
-				{item.index == 0 && aiList.length != 0 && !shareFlag && (
+				{item.index == 0 && aiList.length != 0 && (
 					<>
 						<DivideDayContainer>
 							<PretendardVariableText
@@ -251,8 +256,9 @@ export default function MyTravelList({navigation}: any) {
 								onPress={() => {
 									goPreset(data);
 								}}
+								disabled={shareFlag}
 								shareFlag={shareFlag}
-								shareSeleted={item.index == shareSeleted}>
+								shareSeleted={!shareFlag}>
 								<VStack>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
 										{moment(data.day[0]).format('YYYY년 MM월 DD일') +

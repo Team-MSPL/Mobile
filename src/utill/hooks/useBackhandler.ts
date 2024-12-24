@@ -3,14 +3,14 @@ import {Alert, BackHandler} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useAppDispatch} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-export const useBackHandler = ({type}: BackHandlerType) => {
+export const useBackHandler = ({type, propsFunction}: BackHandlerType) => {
 	const navigation = useNavigation();
 	const dispatch = useAppDispatch();
 	const exitApp = () => {
 		BackHandler.exitApp();
 	};
 	const goPopToTop = () => {
-		navigation.popToTop();
+		navigation.popToTop?.();
 	};
 	const notFunction = () => {};
 	const goBack = () => {
@@ -53,22 +53,34 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 			modalBottomFunctionUse: false,
 			modalBottomFunction: () => {},
 		},
+		listBackHandle: {
+			title: '저장되지 않았어요',
+			subTitle: '작성중인 글은 저장되지않습니다\n뒤로가시겠습니까?.',
+			handleFunction: () => {},
+			modalTopText: '뒤로가기',
+			modalBottomText: '머무르기',
+			modalBottomFunctionUse: false,
+			modalBottomFunction: () => {},
+		},
 	};
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused()) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: typeList[type].title,
-						modalSubTitle: typeList[type].subTitle,
-						modalFunction: typeList[type].handleFunction,
-						modalTopText: typeList[type].modalTopText,
-						modalBottomText: typeList[type].modalBottomText,
-						modalBottomFunctionUse: typeList[type]?.modalBottomFunctionUse,
-						modalBottomFunction: typeList[type].modalBottomFunction,
-					}),
-				);
-
+				if (type == 'listBackHandle') {
+					propsFunction?.();
+				} else {
+					dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: typeList[type].title,
+							modalSubTitle: typeList[type].subTitle,
+							modalFunction: typeList[type].handleFunction,
+							modalTopText: typeList[type].modalTopText,
+							modalBottomText: typeList[type].modalBottomText,
+							modalBottomFunctionUse: typeList[type]?.modalBottomFunctionUse,
+							modalBottomFunction: typeList[type].modalBottomFunction,
+						}),
+					);
+				}
 				return true;
 			}
 		};
@@ -76,8 +88,9 @@ export const useBackHandler = ({type}: BackHandlerType) => {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
 		return () => backHandler.remove();
-	}, []);
+	}, [type, propsFunction]);
 };
 interface BackHandlerType {
-	type: 'exit' | 'popToTop' | 'stop' | 'communityExit';
+	type: 'exit' | 'popToTop' | 'stop' | 'communityExit' | 'listBackHandle';
+	propsFunction?: () => void;
 }

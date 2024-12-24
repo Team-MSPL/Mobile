@@ -400,6 +400,7 @@ export default function Main({navigation}: any) {
 										<PretendardSemiBoldText
 											size={20}
 											lineHeight={26}
+											numberOfLines={2}
 											color={colors.backgroundWhite}>
 											{item.name}
 										</PretendardSemiBoldText>
