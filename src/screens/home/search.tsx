@@ -12,19 +12,22 @@ export default function Search({navigation}: any) {
 		setText(e);
 	}, []);
 	const goCourseDetaile = async (e: any) => {
-		const response = await axiosGoogle.get(
-			`/place/textsearch/json?query=${text}&language=ko&key=${GOOGLE_API_KEY}`,
-		);
-		const a = await axiosGoogle.get(
-			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
-		);
-		navigation.navigate('CourseDetail', {info: a.data.result});
+		if (text != '') {
+			const response = await axiosGoogle.get(
+				`/place/textsearch/json?query=${text}&language=ko&key=${GOOGLE_API_KEY}`,
+			);
+			const a = await axiosGoogle.get(
+				`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+			);
+			navigation.navigate('CourseDetail', {info: a.data.result});
+		}
 	};
 	return (
 		<BackgroundGray>
 			<SearchTextInput
 				autoFocus
 				onChangeText={handleTextChange}
+				value={text}
 				onSubmitEditing={goCourseDetaile}
 				placeholder='검색어를 입력하세요'></SearchTextInput>
 		</BackgroundGray>
