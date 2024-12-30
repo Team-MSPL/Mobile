@@ -45,6 +45,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 import {logEvent} from '../../../firebaseAnalytice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck, tendency} =
 		useAppSelector(state => state.travelSlice);
@@ -240,6 +241,15 @@ export default function DetailInfo({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
+			if (!reviewCheck) {
+				const data = {
+					travelId: travelId,
+					review: '여행가기 전 삭제',
+					point: 5,
+					tendencyPoint: tendency,
+				};
+				dispatch(reviewAndPoint(data));
+			}
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
 		} catch (err) {
@@ -484,7 +494,13 @@ export default function DetailInfo({navigation}: any) {
 					marginBottom={heightPercentage(15)}
 					marginTop={heightPercentage(30)}></CustomButton>
 			</ButtonContainer>
-			<Modal animationType={'fade'} transparent={true} visible={modalView}>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={modalView}
+				onRequestClose={() => {
+					setModalView(false);
+				}}>
 				<ModalContainer>
 					<ReviewContainer>
 						<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>

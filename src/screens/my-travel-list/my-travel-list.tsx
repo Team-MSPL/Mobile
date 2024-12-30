@@ -2,6 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
+	deleteTravelCourse,
 	getAiList,
 	getMyTravelList,
 	getOneTravelCourse,
@@ -19,6 +20,7 @@ import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	Center,
+	HStack,
 	HeaderContianer,
 	PretendardSemiBoldText,
 	PretendardVariableText,
@@ -37,7 +39,7 @@ export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [shareFlag, setShareFlag] = useState(false);
-	const [shareSeleted, setShareSeleted] = useState(0);
+	const [shareSeleted, setShareSeleted] = useState<number[]>([0]);
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
 	const goMyTravelDetail = async (e: any) => {
@@ -129,28 +131,46 @@ export default function MyTravelList({navigation}: any) {
 	};
 
 	const {kakaoShare} = useKakaoShare();
-	const handleShare = useCallback(() => {
-		goKakaoShare();
-	}, [shareSeleted]);
-	const goKakaoShare = async () => {
+	//await dispatch(deleteTravelCourse({travelId: travelId}));
+	const handleShare = () => {
+		shareSeleted.forEach((item, index) => {
+			goKakaoShare(item);
+		}, []);
+	};
+	const handledelete = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const deleteFunction = shareSeleted.map(async item => {
+				await dispatch(deleteTravelCourse({travelId: myTravelList[item]._id}));
+			}, []);
+			await Promise.all(deleteFunction);
+			getTravelList();
+			setShareFlag(false);
+		} catch (e) {
+			console.log('ddd');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	const goKakaoShare = async (index: number) => {
 		try {
 			const regionPhoto = await dispatch(
 				getRegionInfo({
-					region: myTravelList[shareSeleted].region[0].replace(
+					region: myTravelList[shareSeleted[index]].region[0].replace(
 						/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g,
 						'전체',
 					),
 				}),
 			).unwrap();
 			await kakaoShare({
-				travelName: myTravelList[shareSeleted].travelName,
-				travelId: myTravelList[shareSeleted]._id,
-				startDay: myTravelList[shareSeleted].day[0],
-				endDay: myTravelList[shareSeleted].day[myTravelList[shareSeleted].nDay - 1],
+				travelName: myTravelList[shareSeleted[index]].travelName,
+				travelId: myTravelList[shareSeleted[index]]._id,
+				startDay: myTravelList[shareSeleted[index]].day[0],
+				endDay: myTravelList[shareSeleted[index]].day[myTravelList[shareSeleted[index]].nDay - 1],
 				photo: regionPhoto?.photo ?? '',
 			});
 
-			await logEvent('share', {course: myTravelList[shareSeleted].travelName});
+			await logEvent('share', {course: myTravelList[shareSeleted[index]].travelName});
 			setShareFlag(false);
 		} catch (err) {
 			dispatch(
@@ -162,10 +182,12 @@ export default function MyTravelList({navigation}: any) {
 	};
 	useEffect(() => {
 		if (scrollViewRef.current) {
-			console.log(shareSeleted, '하엫', shareFlag);
-			shareSeleted != -1 &&
-				shareFlag &&
-				scrollViewRef.current?.scrollToIndex({animated: true, index: shareSeleted, viewPosition: 0.5});
+			shareFlag &&
+				scrollViewRef.current?.scrollToIndex({
+					animated: true,
+					index: shareSeleted.at(-1) ?? 0,
+					viewPosition: 0.5,
+				});
 		}
 		// scrollViewRef.current?.scrollToOffset({offset: 300});
 		//shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
@@ -178,7 +200,7 @@ export default function MyTravelList({navigation}: any) {
 						<SearchTouchableOpacity
 							onPress={() => {
 								setShareFlag(!shareFlag);
-								!shareFlag && setShareSeleted(0);
+								!shareFlag && setShareSeleted([0]);
 							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								{shareFlag ? '취소' : '공유'}
@@ -188,6 +210,12 @@ export default function MyTravelList({navigation}: any) {
 				),
 		});
 	}, [shareFlag, socialloginProvider]);
+	useEffect(() => {
+		if (shareSeleted.length == 0) {
+			setShareFlag(false);
+			setShareSeleted([0]);
+		}
+	}, [shareSeleted]);
 	const dDayCalculate = useCallback((e: any) => {
 		//e.startDay=시작날짜e.endDay=끝나느날짜
 		// 0~1 당일  -1 미래 1과거
@@ -306,13 +334,23 @@ export default function MyTravelList({navigation}: any) {
 					onLongPress={() => {
 						if (!shareFlag) {
 							setShareFlag(true);
-							setShareSeleted(item.index);
+							setShareSeleted([item.index]);
 						}
 					}}
 					shareFlag={shareFlag}
-					shareSeleted={item.index == shareSeleted}
+					shareSeleted={shareSeleted.includes(item.index)}
 					onPress={() => {
-						shareFlag ? setShareSeleted(item.index) : goMyTravelDetail(item.item);
+						if (shareFlag) {
+							let copy = [...shareSeleted];
+							console.log(copy, item.index, copy.includes(item.index));
+							copy.includes(item.index)
+								? (copy = copy.filter((copyItem, copyIndex) => copyItem != item.index))
+								: copy.push(item.index);
+							setShareSeleted(copy);
+						} else {
+							goMyTravelDetail(item.item);
+						}
+						// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
 					}}>
 					<VStack>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
@@ -340,8 +378,10 @@ export default function MyTravelList({navigation}: any) {
 						</TagContainer>
 					</VStack>
 					{shareFlag && (
-						<CircleContainer shareSeleted={item.index == shareSeleted}>
-							<SvgCheck color={item.index == shareSeleted ? colors.backgroundWhite : colors.Gray2} />
+						<CircleContainer shareSeleted={shareSeleted.includes(item.index)}>
+							<SvgCheck
+								color={shareSeleted.includes(item.index) ? colors.backgroundWhite : colors.Gray2}
+							/>
 						</CircleContainer>
 					)}
 				</MyTravelContainer>
@@ -371,12 +411,23 @@ export default function MyTravelList({navigation}: any) {
 						nestedScrollEnabled></FlatList>
 				)}
 			</TravleListContainer>
-			<CustomButton
-				label={shareFlag ? '공유하기' : '새로운 여행 떠나기'}
-				isDisabled={!shareFlag ? false : shareSeleted == -1 ? true : false}
-				onPress={shareFlag ? handleShare : checkGoEnroll}
-				width={widthPercentage(327)}
-				marginBottom={12}></CustomButton>
+			<HStack gap={5}>
+				<CustomButton
+					label={shareFlag ? '삭제하기' : '새로운 여행 떠나기'}
+					isDisabled={!shareFlag ? false : false}
+					onPress={shareFlag ? handledelete : checkGoEnroll}
+					width={widthPercentage(327)}
+					divide={shareFlag ? true : false}
+					marginBottom={12}></CustomButton>
+				{shareFlag && (
+					<CustomButton
+						label={'공유하기'}
+						isDisabled={!shareFlag ? false : false}
+						onPress={handleShare}
+						divide={true}
+						marginBottom={12}></CustomButton>
+				)}
+			</HStack>
 		</TravelContainer>
 	);
 }
