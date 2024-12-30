@@ -165,7 +165,7 @@ export default function DetailResult({navigation, route}: any) {
 										<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
 									</LogoCOntainer>
 								)}
-								<PopularityInfoTitleTextContainer>
+								<GraientBackground>
 									<PretendardSemiBoldText
 										numberOfLines={2}
 										size={20}
@@ -173,7 +173,7 @@ export default function DetailResult({navigation, route}: any) {
 										color={colors.backgroundWhite}>
 										{item.name}
 									</PretendardSemiBoldText>
-								</PopularityInfoTitleTextContainer>
+								</GraientBackground>
 							</PopularityContainer>
 						))}
 					</RecommendAllContainer>
@@ -274,4 +274,15 @@ const PopularityContainer = styled.TouchableOpacity`
 	flex-direction: row;
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
+`;
+const GraientBackground = styled.View`
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: ${widthPercentage(80)}px;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+	border-bottom-right-radius: 12px;
+	border-bottom-left-radius: 12px;
+	padding: ${widthPercentage(12)}px;
 `;

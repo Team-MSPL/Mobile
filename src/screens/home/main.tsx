@@ -397,13 +397,15 @@ export default function Main({navigation}: any) {
 									<ImageContainer>
 										<CollectionRecommendContentItemImage
 											source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-										<PretendardSemiBoldText
-											size={20}
-											lineHeight={26}
-											numberOfLines={2}
-											color={colors.backgroundWhite}>
-											{item.name}
-										</PretendardSemiBoldText>
+										<GraientBackground>
+											<PretendardSemiBoldText
+												size={20}
+												lineHeight={26}
+												numberOfLines={2}
+												color={colors.backgroundWhite}>
+												{item.name}
+											</PretendardSemiBoldText>
+										</GraientBackground>
 									</ImageContainer>
 								</CollectionTouchableOpacity>
 							))}
@@ -544,7 +546,6 @@ const ImageContainer = styled.View`
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin-right: ${widthPercentage(12)}px;
-	padding: ${widthPercentage(12)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
@@ -559,6 +560,18 @@ const VividReviewContainer = styled.View`
 	border-width: 2px;
 	border-radius: 12px;
 	border-color: ${colors.Gray2};
+`;
+
+const GraientBackground = styled.View`
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: ${widthPercentage(80)}px;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+	border-bottom-right-radius: 12px;
+	border-bottom-left-radius: 12px;
+	padding: ${widthPercentage(12)}px;
 `;
 interface mainScreensType {
 	region: string;
