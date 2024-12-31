@@ -45,7 +45,7 @@ export default function SelectMulti({navigation}: any) {
 					<StepText
 						styleText='1.여행 계획을 알려주세요.'
 						mainText='미리 정해놓은 장소가 있나요?'
-						subText='숙소는 최대 1개, 여행지는 최대 3개 추가할 수 있어요.'></StepText>
+						subText={`1일당 숙소는 1개, 여행지는 3개까지 추가할 수 있어요.\n마지막날은 숙소를 설정할 수 없어요.`}></StepText>
 					<VStack>
 						{[...Array(nDay + 1)].map((item, idx) => {
 							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);

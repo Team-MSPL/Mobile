@@ -23,6 +23,7 @@ import {
 	SearchElements,
 } from './region-recommend/select-distance';
 import {useRegionSearch} from '../../utill/hooks/useRegionSearch';
+import Carousel from 'react-native-reanimated-carousel';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -102,6 +103,18 @@ export default function SelectCity({navigation}: any) {
 		setRegionText(e);
 		setRegionMatchList(handleRegionSerarch(e));
 	}, []);
+	const carouselRef = useRef(null);
+	const cityScrollRef = useRef(null);
+	useEffect(() => {
+		if (carouselRef.current) {
+			requestAnimationFrame(() => {
+				cityScrollRef.current.scrollTo({x: cityIndex < 4 ? 0 : cityIndex * 30});
+				carouselRef.current.scrollTo({
+					index: cityIndex,
+				});
+			});
+		}
+	}, [cityIndex]);
 	return (
 		<BackgroundGrayPressable
 			onPress={() => {
@@ -117,7 +130,7 @@ export default function SelectCity({navigation}: any) {
 				<SVGSearch />
 				<RegionTextInput
 					ref={regionSearchRef}
-					placeholder='다른 지역 기준으로 추천받기 (검색)'
+					placeholder='지역을 검색해보세요'
 					value={regionText}
 					// onBlur={() => {
 					// 	setRegionSearchState(false);
@@ -198,45 +211,68 @@ export default function SelectCity({navigation}: any) {
 							})}
 						</SelectListContainer>
 					</SelectAllContainer>
-					<ScrollView horizontal={true} nestedScrollEnabled={true} showsHorizontalScrollIndicator={false}>
+					<ScrollView
+						ref={cityScrollRef}
+						horizontal={true}
+						nestedScrollEnabled={true}
+						showsHorizontalScrollIndicator={false}>
 						{cityViewList[country].map((item, idx) => {
-							if (idx != 1)
-								return (
-									<RegionItems
-										key={idx}
-										select={cityIndex == item.id}
-										onPress={() => {
-											selectCity(item.id);
-										}}>
-										<PretendardSemiBoldText
-											size={14}
-											lineHeight={18.9}
-											color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
-											{item.title}
-										</PretendardSemiBoldText>
-									</RegionItems>
-								);
-						})}
-					</ScrollView>
-					<WrapContainer>
-						{cityViewList[country][cityIndex]?.sub.map((item, idx) => {
 							return (
-								<CityItems
+								<RegionItems
 									key={idx}
-									select={region.includes(item.subTitle)}
+									select={cityIndex == item.id}
 									onPress={() => {
-										cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
+										selectCity(item.id);
 									}}>
 									<PretendardSemiBoldText
 										size={14}
 										lineHeight={18.9}
-										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
-										{item.subTitle}
+										color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
+										{item.title}
 									</PretendardSemiBoldText>
-								</CityItems>
+								</RegionItems>
 							);
 						})}
-					</WrapContainer>
+					</ScrollView>
+					<Carousel
+						loop={false}
+						style={{
+							marginTop: 18,
+						}}
+						ref={carouselRef}
+						width={widthPercentage(337)}
+						height={heightPercentage(160)}
+						data={cityViewList[country]}
+						scrollAnimationDuration={500}
+						onSnapToItem={itemIndex => {
+							selectCity(itemIndex);
+						}}
+						// onProgressChange={(a, d) => {
+						// 	console.log(Math.round(d));
+						// 	Math.round(d) != cityIndex && selectCity(Math.round(d));
+						// }}
+						renderItem={({index}) => (
+							<WrapContainer>
+								{cityViewList[country][index]?.sub.map((item, idx) => {
+									return (
+										<CityItems
+											key={idx}
+											select={region.includes(item.subTitle)}
+											onPress={() => {
+												index == 0 ? selectPopularity(item) : selectRegion(item);
+											}}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={18.9}
+												color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
+												{item.subTitle}
+											</PretendardSemiBoldText>
+										</CityItems>
+									);
+								})}
+							</WrapContainer>
+						)}
+					/>
 				</Container>
 				{country == 0 && cityIndex == 1 && (
 					<FlexContainer>

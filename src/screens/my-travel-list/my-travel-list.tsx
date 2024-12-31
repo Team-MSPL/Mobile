@@ -137,6 +137,16 @@ export default function MyTravelList({navigation}: any) {
 			goKakaoShare(item);
 		}, []);
 	};
+	const hanldeCheckDelete = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '삭제하시겠습니까?',
+				modalFunction: handledelete,
+				modalTopText: '삭제',
+				modalBottomText: '아니요',
+			}),
+		);
+	};
 	const handledelete = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -415,14 +425,14 @@ export default function MyTravelList({navigation}: any) {
 				<CustomButton
 					label={shareFlag ? '삭제하기' : '새로운 여행 떠나기'}
 					isDisabled={!shareFlag ? false : false}
-					onPress={shareFlag ? handledelete : checkGoEnroll}
+					onPress={shareFlag ? hanldeCheckDelete : checkGoEnroll}
 					width={widthPercentage(327)}
 					divide={shareFlag ? true : false}
 					marginBottom={12}></CustomButton>
 				{shareFlag && (
 					<CustomButton
 						label={'공유하기'}
-						isDisabled={!shareFlag ? false : false}
+						isDisabled={shareSeleted.length >= 2}
 						onPress={handleShare}
 						divide={true}
 						marginBottom={12}></CustomButton>
