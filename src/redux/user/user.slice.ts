@@ -66,6 +66,20 @@ export const getNoteList = createAsyncThunk('/user/noteList', async (_, {rejectW
 		throw rejectWithValue(err.response.data);
 	}
 });
+//회원 쪽지 수정
+export const modifyNoteList = createAsyncThunk(
+	'/user/modifyNoteList',
+	async (data: {modifiedNoteList: string[]}, {rejectWithValue}) => {
+		try {
+			console.log(data);
+			const response = await axiosAuth.patch('/user/modifyNoteList', data);
+			return response;
+		} catch (err: any) {
+			console.log(err);
+			throw rejectWithValue(err.response.data);
+		}
+	},
+);
 //공지사항 조회
 export const getNotice = createAsyncThunk('/notice/noticeList', async (_, {rejectWithValue}) => {
 	try {

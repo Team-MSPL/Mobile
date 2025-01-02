@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {getNoteList} from '../../redux/user/user.slice';
+import {getNoteList, modifyNoteList} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
@@ -24,6 +24,8 @@ export default function NoteList({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const dataList = await dispatch(getNoteList()).unwrap();
 			setNoteList(dataList);
+			const data = dataList.map(item => (item.startsWith('read') ? item : 'read' + item));
+			dispatch(modifyNoteList({modifiedNoteList: data}));
 		} catch (err) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
 		} finally {
@@ -58,7 +60,7 @@ export default function NoteList({navigation}: any) {
 								lineHeight={21}
 								color={colors.Black}
 								textAlign='left'>
-								{item}
+								{item.replace('read', '')}
 							</PretendardVariableText>
 						</ElementContainer>
 					))}

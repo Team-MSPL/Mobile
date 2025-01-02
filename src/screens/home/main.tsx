@@ -164,9 +164,13 @@ export default function Main({navigation}: any) {
 		} finally {
 		}
 	};
+	useFocusEffect(
+		useCallback(() => {
+			getNoteListData();
+		}, []),
+	);
 	useLayoutEffect(() => {
 		checkEvent();
-		getNoteListData();
 		getMainScreen();
 		getFirstRegion();
 	}, []);
@@ -322,7 +326,7 @@ export default function Main({navigation}: any) {
 							<TicketTouchable>
 								<NoteCount>
 									<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-										{noteList.length}
+										{noteList.filter(item => !item.startsWith('read')).length}
 									</PretendardSemiBoldText>
 								</NoteCount>
 								<SVGNoteList
