@@ -264,7 +264,7 @@ export default function FinalCheck({navigation}: any) {
 				setLoading(false);
 			}
 		},
-		[essentialPlaces],
+		[essentialPlaces, accommodations],
 	);
 	const checkDeleteAccommodation = (e: number) => {
 		dispatch(

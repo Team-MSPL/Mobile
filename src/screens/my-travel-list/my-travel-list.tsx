@@ -2,6 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {
+	deleteAI,
 	deleteTravelCourse,
 	getAiList,
 	getMyTravelList,
@@ -39,7 +40,9 @@ export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [shareFlag, setShareFlag] = useState(false);
-	const [shareSeleted, setShareSeleted] = useState<number[]>([0]);
+	const [shareSeleted, setShareSeleted] = useState<{index: number; status: string}[]>([
+		{index: 0, status: 'unfinished'},
+	]);
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
 	const goMyTravelDetail = async (e: any) => {
@@ -133,9 +136,8 @@ export default function MyTravelList({navigation}: any) {
 	const {kakaoShare} = useKakaoShare();
 	//await dispatch(deleteTravelCourse({travelId: travelId}));
 	const handleShare = () => {
-		shareSeleted.forEach((item, index) => {
-			goKakaoShare(item);
-		}, []);
+		const data = shareSeleted.filter((value, idx) => value.status == 'finished');
+		goKakaoShare(data[0]);
 	};
 	const hanldeCheckDelete = () => {
 		dispatch(
@@ -150,37 +152,45 @@ export default function MyTravelList({navigation}: any) {
 	const handledelete = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const deleteFunction = shareSeleted.map(async item => {
-				await dispatch(deleteTravelCourse({travelId: myTravelList[item]._id}));
-			}, []);
+			const deleteFunction = shareSeleted
+				.filter(value => value.status == 'unfinished')
+				.map(async item => {
+					await dispatch(deleteAI({aiId: aiList[item.index]._id}));
+				}, []);
 			await Promise.all(deleteFunction);
+			const deleteFunctions = shareSeleted
+				.filter(value => value.status == 'finished')
+				.map(async item => {
+					await dispatch(deleteTravelCourse({travelId: myTravelList[item.index]._id}));
+				}, []);
+			await Promise.all(deleteFunctions);
 			getTravelList();
 			setShareFlag(false);
 		} catch (e) {
-			console.log('ddd');
+			console.log('ddd', e);
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const goKakaoShare = async (index: number) => {
+	const goKakaoShare = async (item: {index: number; status: string}) => {
 		try {
 			const regionPhoto = await dispatch(
 				getRegionInfo({
-					region: myTravelList[shareSeleted[index]].region[0].replace(
+					region: myTravelList[item.index].region[0].replace(
 						/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g,
 						'전체',
 					),
 				}),
 			).unwrap();
 			await kakaoShare({
-				travelName: myTravelList[shareSeleted[index]].travelName,
-				travelId: myTravelList[shareSeleted[index]]._id,
-				startDay: myTravelList[shareSeleted[index]].day[0],
-				endDay: myTravelList[shareSeleted[index]].day[myTravelList[shareSeleted[index]].nDay - 1],
+				travelName: myTravelList[item.index].travelName,
+				travelId: myTravelList[item.index]._id,
+				startDay: myTravelList[item.index].day[0],
+				endDay: myTravelList[item.index].day[myTravelList[item.index].nDay - 1],
 				photo: regionPhoto?.photo ?? '',
 			});
 
-			await logEvent('share', {course: myTravelList[shareSeleted[index]].travelName});
+			await logEvent('share', {course: myTravelList[item.index].travelName});
 			setShareFlag(false);
 		} catch (err) {
 			dispatch(
@@ -190,18 +200,16 @@ export default function MyTravelList({navigation}: any) {
 			);
 		}
 	};
-	useEffect(() => {
-		if (scrollViewRef.current) {
-			shareFlag &&
-				scrollViewRef.current?.scrollToIndex({
-					animated: true,
-					index: shareSeleted.at(-1) ?? 0,
-					viewPosition: 0.5,
-				});
-		}
-		// scrollViewRef.current?.scrollToOffset({offset: 300});
-		//shareSeleted != -1 && shareFlag && scrollViewRef.current?.scrollToIndex({index: shareSeleted});
-	}, [shareSeleted, shareFlag]);
+	// useEffect(() => {
+	// 	if (scrollViewRef.current) {
+	// 		shareFlag &&
+	// 			scrollViewRef.current?.scrollToIndex({
+	// 				animated: true,
+	// 				index: shareSeleted.at(-1)?.index ?? 0,
+	// 				viewPosition: 0.5,
+	// 			});
+	// 	}
+	// }, [shareSeleted, shareFlag]);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () =>
@@ -210,7 +218,7 @@ export default function MyTravelList({navigation}: any) {
 						<SearchTouchableOpacity
 							onPress={() => {
 								setShareFlag(!shareFlag);
-								!shareFlag && setShareSeleted([0]);
+								!shareFlag && setShareSeleted([{index: 0, status: 'unfinished'}]);
 							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								{shareFlag ? '취소' : '공유'}
@@ -223,7 +231,7 @@ export default function MyTravelList({navigation}: any) {
 	useEffect(() => {
 		if (shareSeleted.length == 0) {
 			setShareFlag(false);
-			setShareSeleted([0]);
+			setShareSeleted([{index: 0, status: 'unfinished'}]);
 		}
 	}, [shareSeleted]);
 	const dDayCalculate = useCallback((e: any) => {
@@ -291,12 +299,33 @@ export default function MyTravelList({navigation}: any) {
 						{aiList?.map((data, idx) => (
 							<MyTravelContainer
 								key={idx}
-								onPress={() => {
-									goPreset(data);
+								onLongPress={() => {
+									if (!shareFlag) {
+										setShareFlag(true);
+										setShareSeleted([{index: idx, status: 'unfinished'}]);
+									}
 								}}
-								disabled={shareFlag}
+								onPress={() => {
+									if (shareFlag) {
+										let copy = [...shareSeleted];
+										copy.filter(value => value.status == 'unfinished' && value.index == idx)
+											.length >= 1
+											? (copy = copy.filter(
+													(copyItem, copyIndex) =>
+														!(copyItem.index == idx && copyItem.status == 'unfinished'),
+											  ))
+											: copy.push({index: idx, status: 'unfinished'});
+										setShareSeleted(copy);
+									} else {
+										goPreset(data);
+									}
+									// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
+								}}
 								shareFlag={shareFlag}
-								shareSeleted={!shareFlag}>
+								shareSeleted={
+									shareSeleted.filter(value => value.status == 'unfinished' && value.index == idx)
+										.length >= 1
+								}>
 								<VStack>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
 										{moment(data.day[0]).format('YYYY년 MM월 DD일') +
@@ -325,6 +354,24 @@ export default function MyTravelList({navigation}: any) {
 										/>
 									</TagContainer>
 								</VStack>
+								{shareFlag && (
+									<CircleContainer
+										shareSeleted={
+											shareSeleted.filter(
+												value => value.status == 'unfinished' && value.index == idx,
+											).length >= 1
+										}>
+										<SvgCheck
+											color={
+												shareSeleted.filter(
+													value => value.status == 'unfinished' && value.index == idx,
+												).length >= 1
+													? colors.backgroundWhite
+													: colors.Gray2
+											}
+										/>
+									</CircleContainer>
+								)}
 							</MyTravelContainer>
 						))}
 					</>
@@ -344,18 +391,23 @@ export default function MyTravelList({navigation}: any) {
 					onLongPress={() => {
 						if (!shareFlag) {
 							setShareFlag(true);
-							setShareSeleted([item.index]);
+							setShareSeleted([{index: item.index, status: 'finished'}]);
 						}
 					}}
 					shareFlag={shareFlag}
-					shareSeleted={shareSeleted.includes(item.index)}
+					shareSeleted={
+						shareSeleted.filter(value => value.status == 'finished' && value.index == item.index).length >=
+						1
+					}
 					onPress={() => {
 						if (shareFlag) {
 							let copy = [...shareSeleted];
-							console.log(copy, item.index, copy.includes(item.index));
-							copy.includes(item.index)
-								? (copy = copy.filter((copyItem, copyIndex) => copyItem != item.index))
-								: copy.push(item.index);
+							copy.filter(value => value.status == 'finished' && value.index == item.index).length >= 1
+								? (copy = copy.filter(
+										(copyItem, copyIndex) =>
+											!(copyItem.index == item.index && copyItem.status == 'finished'),
+								  ))
+								: copy.push({index: item.index, status: 'finished'});
 							setShareSeleted(copy);
 						} else {
 							goMyTravelDetail(item.item);
@@ -388,9 +440,19 @@ export default function MyTravelList({navigation}: any) {
 						</TagContainer>
 					</VStack>
 					{shareFlag && (
-						<CircleContainer shareSeleted={shareSeleted.includes(item.index)}>
+						<CircleContainer
+							shareSeleted={
+								shareSeleted.filter(value => value.status == 'finished' && value.index == item.index)
+									.length >= 1
+							}>
 							<SvgCheck
-								color={shareSeleted.includes(item.index) ? colors.backgroundWhite : colors.Gray2}
+								color={
+									shareSeleted.filter(
+										value => value.status == 'finished' && value.index == item.index,
+									).length >= 1
+										? colors.backgroundWhite
+										: colors.Gray2
+								}
 							/>
 						</CircleContainer>
 					)}
@@ -432,7 +494,10 @@ export default function MyTravelList({navigation}: any) {
 				{shareFlag && (
 					<CustomButton
 						label={'공유하기'}
-						isDisabled={shareSeleted.length >= 2}
+						isDisabled={
+							shareSeleted.length >= 2 ||
+							shareSeleted.filter(item => item.status == 'finished').length == 0
+						}
 						onPress={handleShare}
 						divide={true}
 						marginBottom={12}></CustomButton>

@@ -132,6 +132,7 @@ export const PretendardVariableText = styled.Text<{
 	marginTop?: number;
 	maxWidth?: number;
 	marginBottom?: number;
+	decoration?: string;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -143,6 +144,7 @@ export const PretendardVariableText = styled.Text<{
 	margin-top: ${props => props.marginTop ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	text-decoration: ${props => props.decoration ?? null};
 `;
 export const PretendardBoldText = styled.Text<{
 	color: string;

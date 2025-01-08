@@ -11,6 +11,7 @@ export default function CustomButton({
 	isDisabled,
 	width,
 	divide,
+	textColor,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -21,7 +22,7 @@ export default function CustomButton({
 			onPress={onPress}
 			width={width}
 			divide={divide}>
-			<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
+			<PretendardSemiBoldText size={18} lineHeight={23.48} color={textColor ?? colors.Primary}>
 				{label}
 			</PretendardSemiBoldText>
 		</ButtonContainer>
@@ -36,6 +37,7 @@ type CustomButtonProps = {
 	isDisabled?: boolean;
 	width?: number;
 	divide?: boolean;
+	textColor?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{

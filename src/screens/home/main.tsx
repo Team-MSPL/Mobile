@@ -19,7 +19,7 @@ import styled from 'styled-components/native';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {Modal, Platform, SafeAreaView} from 'react-native';
+import {Linking, Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
@@ -228,6 +228,20 @@ export default function Main({navigation}: any) {
 		// 	text: '해외 여행 코스 ',
 		// },
 	];
+	const travleMedicHandle = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
+				modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
+				modalFunction: async () => {
+					await logEvent('travleMedic', {});
+					Linking.openURL('https://travelmedic.co.kr/mypage/event_view.php?idx=29');
+				},
+				travleMedic: true,
+				modalSubTitle: '* 해외3개월이하 보험가입시 적용됩니다.',
+			}),
+		);
+	};
 	const setPreset = (data: {
 		preset: any;
 		presetTendency: any;
@@ -446,6 +460,9 @@ export default function Main({navigation}: any) {
 							</VividReviewContainer>
 						)}
 					/>
+					<MouCouponTouchable onPress={travleMedicHandle}>
+						<MoiCouponImage source={require('../../../public/mou/travleMedic.jpg')}></MoiCouponImage>
+					</MouCouponTouchable>
 				</HomeBottomContainer>
 			</HomeContainer>
 			<Modal
@@ -576,6 +593,17 @@ const GraientBackground = styled.View`
 	border-bottom-right-radius: 12px;
 	border-bottom-left-radius: 12px;
 	padding: ${widthPercentage(12)}px;
+`;
+const MouCouponTouchable = styled.TouchableOpacity`
+	margin-top: ${widthPercentage(20)}px;
+	width: ${widthPercentage(326)}px;
+	height: ${widthPercentage(100)}px;
+	border-radius: 12px;
+`;
+const MoiCouponImage = styled.Image`
+	width: ${widthPercentage(326)}px;
+	height: ${widthPercentage(100)}px;
+	border-radius: 12px;
 `;
 interface mainScreensType {
 	region: string;

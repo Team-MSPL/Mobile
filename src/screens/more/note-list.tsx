@@ -25,7 +25,7 @@ export default function NoteList({navigation}: any) {
 			const dataList = await dispatch(getNoteList()).unwrap();
 			setNoteList(dataList);
 			const data = dataList.map(item => (item.startsWith('read') ? item : 'read' + item));
-			dispatch(modifyNoteList({modifiedNoteList: data}));
+			data.length != 0 && dispatch(modifyNoteList({modifiedNoteList: data}));
 		} catch (err) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
 		} finally {

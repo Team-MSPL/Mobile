@@ -8,13 +8,14 @@ import {colors} from '../../utill/colors';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
-import {useLayoutEffect, useState} from 'react';
+import {useCallback, useLayoutEffect, useState} from 'react';
 import ViewPager from '../../utill/view-pager';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import UserManage from './user-manage';
 import PrimaryButton from '../../utill/component/primary-button';
 import {WhiteContainer} from '../enroll-info/final-check';
 import PushNotify from './push-notify';
+import {useFocusEffect} from '@react-navigation/native';
 export default function MoreInfo({navigation}: any) {
 	const {userName, socialloginProvider, userProfileImage} = useAppSelector(state => state.userSlice);
 	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
@@ -59,9 +60,11 @@ export default function MoreInfo({navigation}: any) {
 		} finally {
 		}
 	};
-	useLayoutEffect(() => {
-		getNoteListData();
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			getNoteListData();
+		}, []),
+	);
 	const useInfo = [
 		{
 			title: '문의하기',
