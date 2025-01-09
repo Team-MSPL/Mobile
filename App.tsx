@@ -60,17 +60,17 @@ function App(): JSX.Element {
 			]);
 			const fcmToken = await getFcmToken();
 			if (
-				userToken[1] != null &&
-				userName[1] != null &&
-				loginProvider[1] != null &&
-				userProfileImage[1] != null
+				userToken[1] !== null &&
+				userName[1] !== null &&
+				loginProvider[1] !== null &&
+				userProfileImage[1] !== null
 			) {
-				const data = await dispatch(
+				await dispatch(
 					socialConnect({
 						userName: userName[1],
 						userProfileImage: userProfileImage[1],
 						userToken: userToken[1],
-						loginProvider: loginProvider[1] ?? '',
+						loginProvider: loginProvider[1],
 						fcmToken: fcmToken ?? '',
 						signUpFlag: false,
 						version: 2,
