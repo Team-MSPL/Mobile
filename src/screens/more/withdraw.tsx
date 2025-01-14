@@ -54,7 +54,7 @@ export default function Withdraw({navigation}: any) {
 		try {
 			const reason = select.filter((item, idx) => item.selected).map((value, index) => value.title);
 			reason.push(text);
-			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
+			let signUpFirebase = false;
 			const data = {userId: userId, signUpFirebase: !signUpFirebase, withdrawReasonList: reason};
 			await dispatch(userWithdraw(data));
 			await AsyncStorage.getAllKeys().then(allKeys => {

@@ -116,7 +116,7 @@ export default function SelectDay({navigation}: any) {
 		} else if (dateFlag.current == 1 && timeData.ampm == '오전') {
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '종료 시간을 13시 이전으로 설정하실 수 없습니다.',
+					modalTitle: '종료 시간을 오전으로 설정하실 수 없습니다.',
 					modalSingleUse: true,
 					modalTextSize: 17,
 				}),
