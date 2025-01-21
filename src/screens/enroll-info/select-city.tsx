@@ -241,7 +241,7 @@ export default function SelectCity({navigation}: any) {
 						}}
 						ref={carouselRef}
 						width={widthPercentage(337)}
-						height={heightPercentage(160)}
+						height={heightPercentage(country == 0 && cityIndex == 9 ? 360 : 160)}
 						data={cityViewList[country]}
 						scrollAnimationDuration={500}
 						onSnapToItem={itemIndex => {
