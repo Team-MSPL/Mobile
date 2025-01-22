@@ -188,7 +188,6 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				query={{
 					key: GOOGLE_API_KEY,
 					language: 'ko',
-					components: 'country:kr',
 				}}
 				ref={autocompleteRef}
 				textInputProps={{placeholderTextColor: 'grey'}}
