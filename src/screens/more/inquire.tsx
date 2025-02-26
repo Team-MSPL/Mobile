@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
-import {BackgroundGray, PretendardVariableText} from '../../utill/layout/layout';
-import {useState} from 'react';
+import {BackgroundGray, HStack, PretendardVariableText} from '../../utill/layout/layout';
+import {useCallback, useRef, useState} from 'react';
 import {Keyboard, Pressable} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {inquiryEnroll} from '../../redux/user/user.slice';
@@ -10,7 +10,19 @@ import {colors} from '../../utill/colors';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
+import {
+	CancelContainer,
+	PictureColorContainer,
+	PictureCotainer,
+	PictureElement,
+	PictureScroll,
+} from '../my-travel-list/input-diary';
+import {SvgCancel, SvgPicture} from '../../utill/svg/svg';
+import {usePhoto} from '../../utill/hooks/usePhoto';
 
+import ImageView from 'react-native-image-viewing';
+import {ImageText, ImageViewFooterComponent} from '../timetable/course-detail';
+import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
 export default function Inquire({navigation}: any) {
 	const [text, setText] = useState('');
 	const changeText = (e: string) => {
@@ -20,6 +32,12 @@ export default function Inquire({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const goBack = () => {
 		navigation.goBack();
+	};
+	const [imageIndex, setImageIndex] = useState(0);
+	const [visible, setVisible] = useState(false);
+	const viewingImgae = (e: number) => {
+		setVisible(true);
+		setImageIndex(e);
 	};
 	const checkHandle = () => {
 		Keyboard.dismiss();
@@ -32,10 +50,20 @@ export default function Inquire({navigation}: any) {
 			}),
 		);
 	};
+	const inquireImageRef = useRef<string[]>([]);
+	const {uploadImage} = useFirebaseStorage();
 	const handleInquire = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const a = await dispatch(inquiryEnroll({userName: userName, inquire: text})).unwrap();
+			inquireImageRef.current = Array(picture.length).fill('');
+			const ImageFunction = picture.map(async (item, idx) => {
+				let data = (await uploadImage({item: item, idx: idx, id: 'inquire', category: 'inquire'})) ?? ' ';
+				inquireImageRef.current[idx] = data;
+			});
+			await Promise.all(ImageFunction);
+			const a = await dispatch(
+				inquiryEnroll({userName: userName, inquire: text + [...inquireImageRef.current]}),
+			).unwrap();
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '문의완료',
@@ -55,6 +83,27 @@ export default function Inquire({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	const {handleImagePickerLaunch} = usePhoto();
+	const [picture, setPicture] = useState([]);
+	const changeImage = useCallback(
+		(e: any) => {
+			setPicture(e);
+		},
+		[picture],
+	);
+	const handelGetImage = async () => {
+		handleImagePickerLaunch({
+			photoData: picture,
+			changeFunction: changeImage,
+		});
+	};
+
+	const deletePicture = (e: number) => {
+		let copy = [...picture];
+		copy.splice(e, 1);
+		setPicture(copy);
+		// setpictureValue(copy);
+	};
 	return (
 		<CouponContainer
 			onPress={() => {
@@ -73,6 +122,41 @@ export default function Inquire({navigation}: any) {
 				placeholderTextColor={colors.Gray2}
 				blurOnSubmit={true}
 				onChangeText={(value: string) => changeText(value)}></CouponInput>
+			<PictureCotainer>
+				<PictureScroll horizontal={true} showsHorizontalScrollIndicator={false}>
+					<PictureColorContainer onPress={handelGetImage} noBorder={false}>
+						<HStack gap={3}>
+							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+								사진 추가
+							</PretendardVariableText>
+							<SvgPicture color={colors.PointYellow} width={widthPercentage(14)} />
+						</HStack>
+					</PictureColorContainer>
+					{picture.map((item, idx) => (
+						<PictureColorContainer
+							noBorder={true}
+							key={idx}
+							onPress={() => {
+								viewingImgae(idx);
+							}}>
+							<CancelContainer
+								onPress={() => {
+									deletePicture(idx);
+								}}>
+								<SvgCancel
+									color='white'
+									width={widthPercentage(13)}
+									height={widthPercentage(13)}></SvgCancel>
+							</CancelContainer>
+							<PictureElement
+								width={widthPercentage(150)}
+								height={widthPercentage(150)}
+								resizeMode='cover'
+								source={{uri: item}}></PictureElement>
+						</PictureColorContainer>
+					))}
+				</PictureScroll>
+			</PictureCotainer>
 			<ButtonContainer>
 				<PrimaryButton
 					alignSelf={'center'}
@@ -85,6 +169,24 @@ export default function Inquire({navigation}: any) {
 					backgroundColor={colors.Primary}
 					textColor={colors.Black}></PrimaryButton>
 			</ButtonContainer>
+			<ImageView
+				images={picture.map((item, idx) => ({
+					uri: item,
+				}))}
+				onImageIndexChange={item => console.log(item)}
+				imageIndex={imageIndex}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+				FooterComponent={index => {
+					return (
+						<ImageViewFooterComponent>
+							<ImageText>
+								{index.imageIndex + 1}/{1}
+							</ImageText>
+						</ImageViewFooterComponent>
+					);
+				}}
+			/>
 		</CouponContainer>
 	);
 }

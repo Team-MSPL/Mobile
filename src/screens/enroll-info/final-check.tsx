@@ -1,12 +1,9 @@
-import {Alert, BackHandler, Modal, TouchableOpacity} from 'react-native';
+import {BackHandler, Modal, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
-import {cityViewList} from './select-city';
-import {updateFunctionToken, userSliceActions} from '../../redux/user/user.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useState} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
 import {
 	MainContainer,
 	VStack,
@@ -19,11 +16,10 @@ import {
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGFall, SVGFlag, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
+import {SVGFall, SVGFlag, SVGPlus, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
-import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer} from './select-multi';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
+import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer, SVGContainer} from './select-multi';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -32,8 +28,11 @@ import {logEvent} from '../../../firebaseAnalytice';
 import StepText from '../../utill/component/enroll-info/step-text';
 import TendencyButton from '../../utill/component/tendency-button';
 import {SelectButtonsContainer} from './region-recommend/select-who';
+import {userSliceActions} from '../../redux/user/user.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function FinalCheck({navigation}: any) {
-	const {handleButtonClick, tendencyList} = useTendencyHandler();
+	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
 	const {
 		day,
 		region,
@@ -50,18 +49,14 @@ export default function FinalCheck({navigation}: any) {
 		freeTicket,
 		regionInfo,
 		travelName,
+		country,
+		cityDistance,
 	} = useAppSelector(state => state.travelSlice);
-	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
 	const dispatch = useAppDispatch();
-	const goPayment = async () => {
-		navigation.navigate('Payment');
-	};
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const goNewLogin = () => {
-		navigation.navigate('LoginScreen');
-	};
 	const [tendencyModify, setTendencyModify] = useState({status: false, index: 0});
 	const handleTendencyModify = (index: number) => {
 		setTendencyModify({status: true, index: index});
@@ -107,46 +102,8 @@ export default function FinalCheck({navigation}: any) {
 		],
 	];
 	const checkToken = () => {
-		goNext();
-		// if (freeTicket) {
-		// 	goNext();
-		// } else {
-		// 	functionToken >= 1
-		// 		? dispatch(
-		// 				modalSliceActions.setOpenModal({
-		// 					modalTitle: `이용권이 하나가 사용돼요`,
-		// 					modalSubTitle: `현재 이용권은 ${functionToken}개입니다.\n사용하시겠습니까?`,
-		// 					modalFunction: goNext,
-		// 					modalLeft: true,
-		// 					modalTopText: '사용하기',
-		// 					modalBottomText: '취소',
-		// 				}),
-		// 		  )
-		// 		: dispatch(
-		// 				modalSliceActions.setOpenModal({
-		// 					modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-		// 					modalFunction: goPayment,
-		// 					modalLeft: true,
-		// 				}),
-		// 		  );
-		// }
+		handleNext();
 	};
-	const checkSignUpReward = () => {
-		dispatch(userSliceActions.setSignUpReward(false));
-	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
 	useEffect(() => {
 		const backAction = () => {
 			if (navigation.isFocused() && loading) {
@@ -163,79 +120,152 @@ export default function FinalCheck({navigation}: any) {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 		return () => backHandler.remove();
 	}, [loading]);
-	const {appsflyerLogEvent} = useAppsflyer();
-	const goNext = async () => {
-		//navigation.reset({routes: [{name: 'Preset'}]});
-		try {
-			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
-			setLoading(true);
-			if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
-				let changeName =
-					tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
-					(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
-						? ' '
-						: ' 함께하는 ') +
-					seasonList[season.findIndex(item => item == 1)].title +
-					'여행';
-				dispatch(travelSliceActions.enrollTravelName(changeName));
-			}
-			let a = region.map(item => cityViewList[cityIndex].title + ' ' + item);
-			if (
-				(cityViewList[cityIndex].id >= 9 && region[0] == '전체') ||
-				(cityViewList[cityIndex].id == 1 && region[0] == '전체')
-			) {
-				a = cityViewList[cityIndex].sub.map(
-					(value, idx) => cityViewList[cityIndex].title + ' ' + value.subTitle,
-				);
-				a.shift();
-			}
-			let copy = [...tendency];
-			copy.push(season);
-			const result = await dispatch(
-				getTravelAi({
-					regionList: a,
-					accomodationList: accommodations,
-					selectList: copy,
-					essentialPlaceList: essentialPlaces,
-					timeLimitArray: timeLimitArray,
-					nDay: nDay + 1,
-					transit: transit,
-					distanceSensitivity: distance,
-					bandwidth: bandwidth,
-					freeTicket: freeTicket,
-				}),
-			).unwrap();
-			dispatch(travelSliceActions.selectRegion(a));
-			if (result) {
-				navigation.popToTop();
-				navigation.navigate('Preset');
-				!result.data.enoughPlace &&
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
+
+	const handleLogin = async () => {
+		handleAnonymousLogin();
+		dispatch(userSliceActions.setAnonymousKeep(true));
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
+		dispatch(userSliceActions.loginFalse());
+		navigation.navigate('LoginScreen');
+	};
+	const handleNext = () => {
+		socialloginProvider == 'anonymous'
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '지금 로그인하시고 \n맞춤 여행 추천을 받아보세요!',
+						modalTopText: '좋아요!',
+						modalBottomText: '다음에 할게요',
+						modalFunction: handleLogin,
+					}),
+			  )
+			: country == 0
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: 'ai버전을 선택해주세요!',
+						modalTopText: '다님 AI 1호',
+						modalBottomText: '다님 AI 2호 (Beta)',
+						modalBottomFunctionUse: true,
+						modalFunction: () => {
+							goNext(1);
+						},
+						modalBottomFunction: () => {
+							goNext(2);
+						},
+					}),
+			  )
+			: goNext(2);
+	};
+	const goNext = useCallback(
+		async (e: number) => {
+			try {
+				setLoading(true);
+				if (travelName == '신나는 여행' && tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]) {
+					let changeName =
+						tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)] +
+						(tendency[0].findIndex(item => item == 1) == 0 || tendency[0].findIndex(item => item == 1) == 4
+							? ' '
+							: ' 함께하는 ') +
+						seasonList[season.findIndex(item => item == 1)].title +
+						'여행';
+					dispatch(travelSliceActions.enrollTravelName(changeName));
+				}
+				let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
+				if (
+					(country == 0 && cityViewList[country][cityIndex].id >= 9 && region[0] == '전체') ||
+					(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+					(country != 0 && region[0] == '전체')
+				) {
+					if (country != 0 && cityIndex == 1) {
+						a = cityViewList[country]
+							.slice(2, cityViewList[country].length)
+							.map((value, index) =>
+								value.sub
+									.map((item, idx) => {
+										if (idx != 0) {
+											return cityViewList[country][index + 2].title + ' ' + item.subTitle;
+										} else {
+											return null;
+										}
+									})
+									.filter(item => item !== null),
+							)
+							.join(',')
+							.split(',');
+					} else {
+						a = cityViewList[country][cityIndex].sub.map(
+							(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+						);
+						a.shift();
+					}
+				}
+				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+
+				let copy = [...tendency];
+				copy.push(season);
+				if (country != 0) {
+					a = a.map((item, idx) => {
+						return `해외/${countryList[country].en}/${
+							cityViewList[country][cityIndex].sub[cityDistance[idx]].subTitle
+						}`;
+					});
+				}
+				const result = await dispatch(
+					getTravelAi({
+						regionList: a,
+						accomodationList: accommodations,
+						selectList: copy,
+						essentialPlaceList: essentialPlaces,
+						timeLimitArray: timeLimitArray,
+						nDay: nDay + 1,
+						transit: transit,
+						distanceSensitivity: distance,
+						bandwidth: bandwidth,
+						freeTicket: freeTicket,
+						version: e,
+						password: '(주)나그네들_g5hb87r8765rt68i7ur78',
+					}),
+				).unwrap();
+				result.data.resultData.map(item => {
+					console.log(item);
+				});
+				dispatch(travelSliceActions.selectRegion(a));
+				if (result) {
+					navigation.popToTop();
+					navigation.navigate('Preset');
+					!result.data.enoughPlace &&
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: `해당 지역의 관광지 중 선택하신 성향의 \n 관광지가 부족하여,일정을 다 채울 수가 없었어요 ㅠㅠ`,
+								modalTextSize: 17,
+								modalSingleUse: true,
+							}),
+						);
+				} else {
 					dispatch(
 						modalSliceActions.setOpenModal({
-							modalTitle: '해당 지역의 관광지 갯수가 부족하여 선택한 일정을 꽉 채우지못하였습니다. ',
+							modalTitle: '네트워크 연결이 불안정합니다',
+							modalSubTitle: '확인후 다시 시도해주세요',
 						}),
 					);
-
-				// !freeTicket && dispatch(updateFunctionToken({functionToken: functionToken - 1}));
-			} else {
+				}
+			} catch (error) {
+				console.log(error);
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '네트워크 연결이 불안정합니다',
 						modalSubTitle: '확인후 다시 시도해주세요',
 					}),
 				);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '네트워크 연결이 불안정합니다',
-					modalSubTitle: '확인후 다시 시도해주세요',
-				}),
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+		},
+		[essentialPlaces, accommodations],
+	);
 	const checkDeleteAccommodation = (e: number) => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -265,8 +295,13 @@ export default function FinalCheck({navigation}: any) {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
+	const handleAnonymousLogin = async () => {
+		await logEvent('anonymous_course_login', {});
+	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step6', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step6', {})
+			: await logEvent('course_step6', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();
@@ -279,6 +314,9 @@ export default function FinalCheck({navigation}: any) {
 	];
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: tendencyModify.index, region: false, item: item});
+	};
+	const goSearchPlace = (data: {idx: number; index: number}) => {
+		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
 	};
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
@@ -297,7 +335,7 @@ export default function FinalCheck({navigation}: any) {
 									lineHeight={27}
 									color={colors.Gray5}
 									width={widthPercentage(150)}>
-									{cityViewList[cityIndex].title + region}
+									{cityViewList[country][cityIndex].title + ' ' + region}
 									<SVGFlag
 										width={widthPercentage(20)}
 										height={widthPercentage(20)}
@@ -469,6 +507,18 @@ export default function FinalCheck({navigation}: any) {
 										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
 											여행지
 										</PretendardSemiBoldText>
+										<SVGContainer
+											disabled={filteredPlaces.length >= 3}
+											onPress={() => {
+												goSearchPlace({idx: idx, index: 0});
+											}}
+											color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PointYellow}>
+											<SVGPlus
+												width={widthPercentage(16)}
+												height={widthPercentage(16)}
+												color={filteredPlaces.length >= 3 ? colors.Gray2 : colors.Primary}
+											/>
+										</SVGContainer>
 									</ElementContainer>
 									{filteredPlaces.length != 0 && (
 										<FlexWrap gap={10}>
@@ -519,6 +569,35 @@ export default function FinalCheck({navigation}: any) {
 											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
 												숙소
 											</PretendardSemiBoldText>
+											{accommodations[idx + 1].name != '' ? (
+												<DeleteContainer
+													onPress={() => {
+														goSearchPlace({idx: idx, index: 1});
+													}}>
+													<PretendardSemiBoldText
+														size={12}
+														lineHeight={18}
+														color={colors.Gray5}>
+														변경
+													</PretendardSemiBoldText>
+												</DeleteContainer>
+											) : (
+												<SVGContainer
+													onPress={() => {
+														goSearchPlace({idx: idx, index: 1});
+													}}
+													color={
+														accommodations[idx + 1].name ? colors.Gray1 : colors.PointYellow
+													}>
+													<SVGPlus
+														width={widthPercentage(16)}
+														height={widthPercentage(16)}
+														color={
+															accommodations[idx + 1].name ? colors.Gray2 : colors.Primary
+														}
+													/>
+												</SVGContainer>
+											)}
 										</ElementContainer>
 										{accommodations[idx + 1].name && (
 											<ElementContainer color={colors.backgroundGray}>

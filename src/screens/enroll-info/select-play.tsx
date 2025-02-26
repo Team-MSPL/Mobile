@@ -3,16 +3,13 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
-import CustomButton from '../../utill/component/custom-button';
 import {useAppSelector} from '../../redux';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectPlay({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const goNext = () => {
-		navigation.navigate('RecommendSelectTour');
-	};
 
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
@@ -40,11 +37,7 @@ export default function RecommendSelectPlay({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton
-				marginBottom={12}
-				marginTop={heightPercentage(10)}
-				onPress={goNext}
-				label='다음'></CustomButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectTour'></RouteButton>
 		</BackgroundGray>
 	);
 }
@@ -55,4 +48,5 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: ${widthPercentage(10)}px;
+	margin-bottom: ${heightPercentage(70)}px;
 `;

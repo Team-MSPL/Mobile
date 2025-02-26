@@ -1,6 +1,5 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
-import {cityViewList} from '../select-city';
 import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
@@ -15,9 +14,11 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import {ButtonContainer} from '../select-multi';
 import {Platform} from 'react-native';
 import {logEvent} from '../../../../firebaseAnalytice';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
-	const {selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, country} = useAppSelector(state => state.travelSlice);
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
 	const goEnrollInfo = () => {
 		let copy = [...regionTendency];
@@ -51,30 +52,40 @@ export default function DetailResult({navigation, route}: any) {
 		} else {
 			region = [route.params.item.name, '전체'];
 		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
+		const cityIndex =
+			country == 0
+				? cityViewList[country].find(city => city.title == region[0])?.id
+				: cityViewList[country].slice(1).filter(item => item.sub.find(city => city.subTitle == region[0]))[0]
+						.id;
 		let season = copy.pop();
-		let cityDistance = cityViewList[cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(
+			item => item.subTitle == region[country == 0 ? 1 : 0],
+		);
 		const data = {
 			cityDistance: [cityDistance],
 			cityIndex: cityIndex,
-			region: [region[1]],
+			region: [region[country == 0 ? 1 : 0]],
 			tendency: copy,
 			season: season,
 			selectEndDate: selectEndDate,
 			shareViewWithStartFlag: true,
+			country: country,
 		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
+	const {countryList} = useTendencyHandler();
 	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
 			name: e.name,
 			lat: e.lat,
 			lng: e.lng,
-			region: route.params.item.name,
+			// region: route.params.item.name,
+			region: country == 0 ? route.params.item.name : `해외/${countryList[country].en}/${route.params.item.name}`,
 			metropolitan: metropolitanStatus,
 		};
+		console.log(data);
 		navigation.navigate('CourseDetail', {value: data});
 		await logEvent('view_place_explore', {
 			location: route.params.item.name,
@@ -90,7 +101,12 @@ export default function DetailResult({navigation, route}: any) {
 						setVisible(true);
 					}}>
 					{route.params.item.photo != '' ? (
-						<TitleImage source={{uri: route.params.item.photo}}></TitleImage>
+						<TitleImage
+							source={{
+								uri: Array.isArray(route.params.item.photo)
+									? route.params.item.photo[0]
+									: route.params.item.photo,
+							}}></TitleImage>
 					) : (
 						<LogoCOntainer>
 							<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
@@ -149,11 +165,15 @@ export default function DetailResult({navigation, route}: any) {
 										<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
 									</LogoCOntainer>
 								)}
-								<PopularityInfoTitleTextContainer>
-									<PretendardSemiBoldText size={20} lineHeight={26} color={colors.backgroundWhite}>
+								<GraientBackground>
+									<PretendardSemiBoldText
+										numberOfLines={2}
+										size={20}
+										lineHeight={26}
+										color={colors.backgroundWhite}>
 										{item.name}
 									</PretendardSemiBoldText>
-								</PopularityInfoTitleTextContainer>
+								</GraientBackground>
 							</PopularityContainer>
 						))}
 					</RecommendAllContainer>
@@ -254,4 +274,15 @@ const PopularityContainer = styled.TouchableOpacity`
 	flex-direction: row;
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
+`;
+const GraientBackground = styled.View`
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: ${widthPercentage(80)}px;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+	border-bottom-right-radius: 12px;
+	border-bottom-left-radius: 12px;
+	padding: ${widthPercentage(12)}px;
 `;

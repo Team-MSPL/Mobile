@@ -3,17 +3,13 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
-import CustomButton from '../../utill/component/custom-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {useAppDispatch, useAppSelector} from '../../redux';
+import {useAppSelector} from '../../redux';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectTour({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const dispatch = useAppDispatch();
-	const goNext = () => {
-		navigation.navigate('SelectDistance');
-	};
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: false, item: item});
@@ -45,12 +41,10 @@ export default function RecommendSelectTour({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton
-				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}
-				marginTop={heightPercentage(10)}
-				marginBottom={12}
-				onPress={goNext}
-				label='다음'></CustomButton>
+			<RouteButton
+				navigation={navigation}
+				nextTitle='SelectDistance'
+				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}></RouteButton>
 		</BackgroundGray>
 	);
 }
@@ -61,4 +55,5 @@ const ButtonsContainer = styled.View`
 	flex-wrap: wrap;
 	align-content: flex-end;
 	gap: ${widthPercentage(10)}px;
+	margin-bottom: ${heightPercentage(70)}px;
 `;

@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {eventSliceActions} from '../../../redux/event/event.slice';
 import {useState} from 'react';
+import {Linking} from 'react-native';
+import ImageView from 'react-native-image-viewing';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Event() {
 	const dispatch = useAppDispatch();
@@ -21,6 +24,8 @@ export default function Event() {
 	const newPage = (e: any) => {
 		setViewIndex(Math.round(e.nativeEvent.contentOffset.x / devicesWidth));
 	};
+	const [visible, setVisible] = useState(false);
+	const navigation = useNavigation();
 	return (
 		<Container>
 			<ViewContaniner>
@@ -36,7 +41,20 @@ export default function Event() {
 					}}
 					showsHorizontalScrollIndicator={false}>
 					{eventList.map((item, idx) => (
-						<ScrollContainer key={idx}>
+						<ScrollContainer
+							key={idx}
+							onPress={() => {
+								if (item.eventLink == '') {
+									setVisible(true);
+								} else {
+									if (item.eventLink.includes('http')) {
+										Linking.openURL(item.eventLink);
+									} else {
+										navigation.navigate(item.eventLink);
+										closeModal();
+									}
+								}
+							}}>
 							<EventImage
 								source={{
 									uri: item.eventImage,
@@ -62,10 +80,18 @@ export default function Event() {
 					</TextPressable>
 				</EventHStack>
 			</ViewContaniner>
+			<ImageView
+				images={eventList.map((value, index) => ({
+					uri: value.eventImage,
+				}))}
+				imageIndex={viewIndex}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+			/>
 		</Container>
 	);
 }
-const ScrollContainer = styled.View`
+const ScrollContainer = styled.Pressable`
 	width: ${devicesWidth * 0.95}px;
 	align-items: center;
 	justify-content: center;

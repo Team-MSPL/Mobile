@@ -10,9 +10,11 @@ import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useEffect} from 'react';
 import {logEvent} from '../../../firebaseAnalytice';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectWho({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const checkNext = () => {
 		if (tendency[0][tendency[0].length - 1] == 1) {
@@ -37,7 +39,9 @@ export default function RecommendSelectWho({navigation}: any) {
 		handleButtonClick({index: 0, region: false, item: item});
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step4', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step4', {})
+			: await logEvent('course_step4', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();
@@ -67,7 +71,7 @@ export default function RecommendSelectWho({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</ButtonsContainer>
-			<CustomButton marginBottom={12} onPress={checkNext} label='다음'></CustomButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectMove' goNext={checkNext}></RouteButton>
 		</BackgroundGray>
 	);
 }

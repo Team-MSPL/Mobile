@@ -47,7 +47,7 @@ export default function Join1({navigation, route}: any) {
 			const result = await dispatch(socialConnect(data)).unwrap();
 			dispatch(userSliceActions.setSignUpReward(true));
 			await logEvent('sign_up', {method: route.params.loginProvider, signup_date: moment().format('YYYY-MM-DD')});
-			await setUserId(result.userId);
+			await setUserId(result.data.userId);
 			await setUserProperty('user_method', route.params.loginProvider);
 			await setUserProperty('signup_date', moment().format('YYYY-MM-DD'));
 

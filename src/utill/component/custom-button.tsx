@@ -3,7 +3,16 @@ import {colors} from '../colors';
 import {heightPercentage, widthPercentage} from '../layout/responsive-size';
 import {PretendardSemiBoldText} from '../layout/layout';
 
-export default function CustomButton({marginTop, marginBottom, label, onPress, isDisabled, width}: CustomButtonProps) {
+export default function CustomButton({
+	marginTop,
+	marginBottom,
+	label,
+	onPress,
+	isDisabled,
+	width,
+	divide,
+	textColor,
+}: CustomButtonProps) {
 	return (
 		<ButtonContainer
 			marginTop={marginTop ?? 0}
@@ -11,8 +20,9 @@ export default function CustomButton({marginTop, marginBottom, label, onPress, i
 			disabled={isDisabled ?? false}
 			isDisabledOpacity={isDisabled ?? false}
 			onPress={onPress}
-			width={width}>
-			<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
+			width={width}
+			divide={divide}>
+			<PretendardSemiBoldText size={18} lineHeight={23.48} color={textColor ?? colors.Primary}>
 				{label}
 			</PretendardSemiBoldText>
 		</ButtonContainer>
@@ -26,6 +36,8 @@ type CustomButtonProps = {
 	onPress: () => void;
 	isDisabled?: boolean;
 	width?: number;
+	divide?: boolean;
+	textColor?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{
@@ -33,9 +45,10 @@ const ButtonContainer = styled.TouchableOpacity<{
 	marginTop: number;
 	width?: number;
 	isDisabledOpacity: boolean;
+	divide?: boolean;
 }>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
-	width: ${props => props.width ?? widthPercentage(327)}px;
+	width: ${props => (props.divide ?? false ? widthPercentage(160) : props.width ?? widthPercentage(327))}px;
 	align-self: center;
 	align-items: center;
 	height: ${heightPercentage(60)}px;

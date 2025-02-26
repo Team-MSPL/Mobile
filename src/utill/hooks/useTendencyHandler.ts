@@ -2,6 +2,7 @@ import {useDispatch} from 'react-redux';
 import {useAppSelector} from '../../redux';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {SvgChina} from '../svg/svg';
 
 export const useTendencyHandler = () => {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
@@ -16,6 +17,19 @@ export const useTendencyHandler = () => {
 			region ? regionRecommendSliceActions.enrollRegionTendency(copy) : travelSliceActions.enrollTendency(copy),
 		);
 	};
+	const handleCountryClick = (country: number) => {
+		dispatch(travelSliceActions.setCountry(country));
+	};
+	const countryList = [
+		{ko: '대한민국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
+
 	const tendencyList = [
 		{
 			title: '누구와 떠나시나요?',
@@ -34,7 +48,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '테마는 무엇인가요?',
 			multi: true,
-			list: ['힐링', '액티비티', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
+			list: ['힐링', '활동적인', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
 			photo: [
 				require('../../../public/tendency/healing.png'),
 				require('../../../public/tendency/kitesurfing.png'),
@@ -63,7 +77,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '어디를 가고싶으신가요?',
 			multi: true,
-			list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+			list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통'],
 			photo: [
 				require('../../../public/tendency/beach.png'),
 				require('../../../public/tendency/mountain.png'),
@@ -118,7 +132,7 @@ export const useTendencyHandler = () => {
 		{
 			title: '어디를 가고 싶으신가요?',
 			multi: true,
-			list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통한옥'],
+			list: ['바다', '산', '드라이브', '산책', '쇼핑', '자연경관', '시티투어', '전통'],
 			photo: [
 				require('../../../public/tendency/beach.png'),
 				require('../../../public/tendency/mountain.png'),
@@ -143,5 +157,5 @@ export const useTendencyHandler = () => {
 		},
 	];
 
-	return {tendencyList, regionTendencyList, handleButtonClick};
+	return {tendencyList, regionTendencyList, handleButtonClick, countryList, handleCountryClick};
 };

@@ -50,9 +50,6 @@ export default function UseDatePicker({hourData, minuteData, ampmData, visible, 
 		{value: hour, list: hourList, ref: hourRef, function: hoursCalculate},
 		{value: minute, list: minuteList, ref: minuteRef, function: minuteCalculate},
 	];
-	const onCancel = () => {
-		setVisible(false);
-	};
 	if (!visible) return <></>;
 	return (
 		<Container width={widthPercentage(157)}>

@@ -2,17 +2,14 @@ import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
-import CustomButton from '../../utill/component/custom-button';
 import {useAppSelector} from '../../redux';
 import {SelectButtonsContainer} from './region-recommend/select-who';
 import {heightPercentage} from '../../utill/layout/responsive-size';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectConcept({navigation}: any) {
 	const {tendency} = useAppSelector(state => state.travelSlice);
-	const goNext = () => {
-		navigation.navigate('RecommendSelectPlay');
-	};
 
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
@@ -39,7 +36,7 @@ export default function RecommendSelectConcept({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</SelectButtonsContainer>
-			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectPlay'></RouteButton>
 		</BackgroundGray>
 	);
 }

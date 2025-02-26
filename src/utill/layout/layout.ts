@@ -67,11 +67,12 @@ export const SubText = styled.Text`
 	font-weight: bold;
 	color: black;
 `;
-export const Center = styled.View`
+export const Center = styled.View<{backgroundColor?: string}>`
 	flex: 1;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
+	${props => props.backgroundColor != undefined && `background-color:${props.backgroundColor}`}
 `;
 export const HeaderContianer = styled(HStack)`
 	justify-content: space-between;
@@ -131,6 +132,7 @@ export const PretendardVariableText = styled.Text<{
 	marginTop?: number;
 	maxWidth?: number;
 	marginBottom?: number;
+	decoration?: string;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -142,14 +144,22 @@ export const PretendardVariableText = styled.Text<{
 	margin-top: ${props => props.marginTop ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	text-decoration: ${props => props.decoration ?? null};
 `;
-export const PretendardBoldText = styled.Text<{color: string; size: number; lineHeight: number; marginBottom?: number}>`
+export const PretendardBoldText = styled.Text<{
+	color: string;
+	size: number;
+	textAlign?: string;
+	lineHeight: number;
+	marginBottom?: number;
+}>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
 	font-size: ${props => fontPercentage(props.size)}px;
 	line-height: ${props => fontPercentage(props.lineHeight)}px;
 	font-weight: 700;
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
+	text-align: ${props => props.textAlign ?? 'auto'};
 `;
 export const PretendardSemiBoldText = styled.Text<{
 	color: string;

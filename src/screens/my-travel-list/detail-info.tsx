@@ -45,8 +45,9 @@ import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 import {logEvent} from '../../../firebaseAnalytice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 export default function DetailInfo({navigation}: any) {
-	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck} =
+	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck, tendency} =
 		useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const goMyTravelDetail = async () => {
@@ -99,7 +100,7 @@ export default function DetailInfo({navigation}: any) {
 							key={`marker_${idx}`}
 							coordinate={{latitude: item.lat, longitude: item.lng}}
 							title={item.name}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
+							centerOffset={{x: 0, y: 0}}
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == 0 ? (
@@ -240,6 +241,15 @@ export default function DetailInfo({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
+			if (!reviewCheck) {
+				const data = {
+					travelId: travelId,
+					review: '여행가기 전 삭제',
+					point: 5,
+					tendencyPoint: tendency,
+				};
+				dispatch(reviewAndPoint(data));
+			}
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
 		} catch (err) {
@@ -329,7 +339,6 @@ export default function DetailInfo({navigation}: any) {
 	}, []);
 	useEffect(() => {
 		setModalView(!reviewCheck);
-		console.log('하헬방', reviewCheck);
 	}, [reviewCheck]);
 	useEffect(() => {
 		getMainViewPager();
@@ -348,14 +357,14 @@ export default function DetailInfo({navigation}: any) {
 				travelId: travelId,
 				review: reviewText,
 				point: starStatus + 1,
-				tendencyPoint: [],
+				tendencyPoint: tendency,
 			};
 			dispatch(LoadingSliceActions.onLoading());
 			setModalView(false);
 			dispatch(reviewAndPoint(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '리뷰 감사합니다.',
+					modalTitle: '리뷰 남겨주셔서\n정말 감사드립니다! :)',
 					modalFunction: () => {},
 					modalSingleUse: true,
 					modalTopText: '확인',
@@ -387,7 +396,7 @@ export default function DetailInfo({navigation}: any) {
 							<VStack>
 								<HStack>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.PointYellow}>
-										{region[0]}
+										{region[0].split('/').at(-1)}
 										{region.length >= 2 ? ` +${region.length - 1}` : ''}
 									</PretendardVariableText>
 									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
@@ -485,7 +494,13 @@ export default function DetailInfo({navigation}: any) {
 					marginBottom={heightPercentage(15)}
 					marginTop={heightPercentage(30)}></CustomButton>
 			</ButtonContainer>
-			<Modal animationType={'fade'} transparent={true} visible={modalView}>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={modalView}
+				onRequestClose={() => {
+					setModalView(false);
+				}}>
 				<ModalContainer>
 					<ReviewContainer>
 						<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>
@@ -508,19 +523,24 @@ export default function DetailInfo({navigation}: any) {
 								);
 							})}
 						</StarConstainer>
-						<PretendardBoldText
-							style={{opacity: starStatus == -1 ? 1 : 0}}
+						<PretendardSemiBoldText
+							style={{opacity: starStatus == -1 || reviewText.length == 0 ? 1 : 0}}
 							size={13}
 							lineHeight={17}
 							color={colors.PointGreen1}>
-							별점을 선택해주세요!
-						</PretendardBoldText>
+							{starStatus == -1 && reviewText.length == 0
+								? '리뷰,별점을 입력해주세요!'
+								: starStatus == -1
+								? '별점을 입력해주세요'
+								: '리뷰를 입력해주세요'}
+						</PretendardSemiBoldText>
 						<ReviewText
 							onChangeText={handleReviewText}
-							placeholder='방문했던 곳에 대해 이야기해주세요.'></ReviewText>
+							placeholderTextColor={colors.Gray2}
+							placeholder=' 방문했던 곳에 대해 이야기해주세요.'></ReviewText>
 						<PrimaryButton
 							label='완료'
-							disabled={starStatus == -1}
+							disabled={starStatus == -1 || reviewText.length == 0}
 							width={widthPercentage(300)}
 							height={heightPercentage(50)}
 							backgroundColor={colors.Primary}
@@ -575,6 +595,7 @@ const ReviewText = styled.TextInput`
 	height: ${heightPercentage(50)}px;
 	border-radius: 12px;
 	background-color: ${colors.backgroundWhite};
+	color: ${colors.Black};
 `;
 const StarConstainer = styled.View`
 	flex-direction: row;

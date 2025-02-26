@@ -23,17 +23,19 @@ export const socialConnect = createAsyncThunk('/user/signUpAndIn', async (data: 
 			if (response.status == 203) {
 				thunkAPI.dispatch(userSliceActions.setReLogin(true));
 			}
-			const loginValues: [string, string][] = [
-				['userName', userData.userName],
-				['userProfileImage', data.userProfileImage],
-				['userToken', data.userToken?.toString()],
-				['loginProvider', data.loginProvider],
-				['fcmToken', data.fcmToken.toString()],
-			];
-			await AsyncStorage.multiSet(loginValues);
+			if (data.loginProvider != 'anonymous') {
+				const loginValues: [string, string][] = [
+					['userName', userData.userName],
+					['userProfileImage', data.userProfileImage],
+					['userToken', data.userToken?.toString()],
+					['loginProvider', data.loginProvider],
+					['fcmToken', data.fcmToken.toString()],
+				];
+				await AsyncStorage.multiSet(loginValues);
+			}
 			//axiosAuth.defaults.headers.Authorization = `Bearer ${userData.userJwtToken}`;
 		}
-		return response.status;
+		return response;
 	} catch (error) {
 		throw thunkAPI.rejectWithValue(error);
 	}

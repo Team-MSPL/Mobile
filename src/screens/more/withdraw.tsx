@@ -54,7 +54,7 @@ export default function Withdraw({navigation}: any) {
 		try {
 			const reason = select.filter((item, idx) => item.selected).map((value, index) => value.title);
 			reason.push(text);
-			let signUpFirebase = socialloginProvider == 'kakao' || socialloginProvider == 'apple';
+			let signUpFirebase = false;
 			const data = {userId: userId, signUpFirebase: !signUpFirebase, withdrawReasonList: reason};
 			await dispatch(userWithdraw(data));
 			await AsyncStorage.getAllKeys().then(allKeys => {
@@ -78,55 +78,57 @@ export default function Withdraw({navigation}: any) {
 		}
 	};
 	return (
-		<CouponContainer
-			onPress={() => {
-				Keyboard.dismiss();
-			}}>
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-				<ScrollView showsVerticalScrollIndicator={false}>
-					<StepText
-						marginTop={heightPercentage(10)}
-						styleText='계정 삭제 사유가 궁금해요'
-						mainText='무엇이 불편하셨나요?'></StepText>
-					<SelectButtonsContainer>
-						{select.map((item, idx) => (
-							<TendencyButton
-								bgColor={item.selected}
-								label={item.title}
-								key={idx}
-								divide={true}
-								onPress={() => {
-									let copy = [...select];
-									copy[idx].selected = !copy[idx].selected;
-									setSelect(copy);
-								}}></TendencyButton>
-						))}
-					</SelectButtonsContainer>
-					<PretendardSemiBoldText
-						size={12}
-						lineHeight={21}
-						color={colors.Gray3}
-						marginTop={heightPercentage(20)}
-						marginBottom={heightPercentage(10)}>
-						탈퇴 사유를 적어주시면, 다님에게 큰 도움이 될 거에요!
-					</PretendardSemiBoldText>
-					<CouponInput
-						multiline={true}
-						value={text}
-						placeholder='문의 사항을 적어주세요.'
-						placeholderTextColor={colors.Gray2}
-						blurOnSubmit={true}
-						onChangeText={(value: string) => changeText(value)}></CouponInput>
+		<ScrollView>
+			<CouponContainer
+				onPress={() => {
+					Keyboard.dismiss();
+				}}>
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+					<ScrollView showsVerticalScrollIndicator={false}>
+						<StepText
+							marginTop={heightPercentage(10)}
+							styleText='계정 삭제 사유가 궁금해요'
+							mainText='무엇이 불편하셨나요?'></StepText>
+						<SelectButtonsContainer>
+							{select.map((item, idx) => (
+								<TendencyButton
+									bgColor={item.selected}
+									label={item.title}
+									key={idx}
+									divide={true}
+									onPress={() => {
+										let copy = [...select];
+										copy[idx].selected = !copy[idx].selected;
+										setSelect(copy);
+									}}></TendencyButton>
+							))}
+						</SelectButtonsContainer>
+						<PretendardSemiBoldText
+							size={12}
+							lineHeight={21}
+							color={colors.Gray3}
+							marginTop={heightPercentage(20)}
+							marginBottom={heightPercentage(10)}>
+							탈퇴 사유를 적어주시면, 다님에게 큰 도움이 될 거에요!
+						</PretendardSemiBoldText>
+						<CouponInput
+							multiline={true}
+							value={text}
+							placeholder='문의 사항을 적어주세요.'
+							placeholderTextColor={colors.Gray2}
+							blurOnSubmit={true}
+							onChangeText={(value: string) => changeText(value)}></CouponInput>
 
-					<CustomButton
-						label={'계정 삭제하기'}
-						onPress={checkHandle}
-						width={widthPercentage(327)}
-						marginTop={20}
-						marginBottom={10}></CustomButton>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</CouponContainer>
+						<CustomButton
+							label={'계정 삭제하기'}
+							onPress={checkHandle}
+							width={widthPercentage(327)}
+							marginTop={20}
+							marginBottom={10}></CustomButton>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</CouponContainer>
+		</ScrollView>
 	);
 }
 const CouponContainer = styled(BackgroundGray).attrs({as: Pressable})`

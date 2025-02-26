@@ -1,19 +1,16 @@
 import StepText from '../../utill/component/enroll-info/step-text';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray, PretendardSemiBoldText, VStack} from '../../utill/layout/layout';
-import CustomButton from '../../utill/component/custom-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectMove({navigation}: any) {
 	const {transit} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const goNext = () => {
-		navigation.navigate('RecommendSelectBusy');
-	};
 
 	const moveList = [
 		{
@@ -48,7 +45,7 @@ export default function RecommendSelectMove({navigation}: any) {
 					</SelectButton>
 				))}
 			</SelectMoveContainer>
-			<CustomButton marginBottom={12} onPress={goNext} label='다음'></CustomButton>
+			<RouteButton marginBottom={12} navigation={navigation} nextTitle='RecommendSelectBusy'></RouteButton>
 		</BackgroundGray>
 	);
 }

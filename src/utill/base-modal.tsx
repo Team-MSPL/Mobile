@@ -4,9 +4,13 @@ import {modalSliceActions} from '../redux/modal/modalSlice';
 import {colors} from './colors';
 import {heightPercentage, widthPercentage} from './layout/responsive-size';
 import PrimaryButton from './component/primary-button';
-import {PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
+import {HStack, PretendardSemiBoldText, PretendardVariableText} from './layout/layout';
 import {useEffect, useRef} from 'react';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import {SVGCopy} from './svg/svg';
+import {TouchableOpacity} from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
 
 export default function BaseModal() {
 	const {
@@ -21,6 +25,8 @@ export default function BaseModal() {
 		modalConfetti,
 		modalConfettiFlag,
 		modalBottomFunction,
+		modalTextSize,
+		travleMedic,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
@@ -53,7 +59,11 @@ export default function BaseModal() {
 						origin={{x: -10, y: 0}}></ConfettiCannon>
 					<ModalContainer onPress={close}>
 						<ViewContaniner modalSingleUse={modalSingleUse}>
-							<PretendardSemiBoldText textAlign='center' size={20} lineHeight={27} color={colors.Gray5}>
+							<PretendardSemiBoldText
+								textAlign='center'
+								size={modalTextSize}
+								lineHeight={27}
+								color={colors.Gray5}>
 								{modalTitle}
 							</PretendardSemiBoldText>
 							{modalSubTitle && (
@@ -61,9 +71,42 @@ export default function BaseModal() {
 									textAlign='center'
 									size={13}
 									lineHeight={21}
-									color={colors.Gray4}>
+									color={colors.Gray4}
+									marginTop={5}>
 									{modalSubTitle}
 								</PretendardVariableText>
+							)}
+							{travleMedic && (
+								<HStack gap={10}>
+									<PretendardSemiBoldText
+										textAlign='center'
+										size={13}
+										lineHeight={21}
+										color={colors.Gray4}>
+										쿠폰번호
+									</PretendardSemiBoldText>
+									<TouchableOpacity
+										onPress={() => {
+											Clipboard.setString('다님 할인쿠폰_2501');
+											Toast.show({
+												type: 'success',
+												text1: '복사가 완료되었습니다.',
+												position: 'top',
+											});
+										}}>
+										<HStack gap={5}>
+											<PretendardVariableText
+												textAlign='center'
+												size={13}
+												lineHeight={21}
+												color={colors.Gray4}
+												decoration={'underline solid #888888'}>
+												다님 할인쿠폰_2501
+											</PretendardVariableText>
+											<SVGCopy width={widthPercentage(16)} height={widthPercentage(17)} />
+										</HStack>
+									</TouchableOpacity>
+								</HStack>
 							)}
 							<ButtonContainer>
 								<PrimaryButton
@@ -75,8 +118,12 @@ export default function BaseModal() {
 									label={modalTopText}></PrimaryButton>
 								{!modalSingleUse && (
 									<PrimaryButton
-										backgroundColor={colors.Gray1}
-										textColor={colors.Gray4}
+										backgroundColor={
+											modalBottomText == '다님 AI 2호 (Beta)' ? colors.Primary : colors.Gray1
+										}
+										textColor={
+											modalBottomText == '다님 AI 2호 (Beta)' ? colors.Gray5 : colors.Gray4
+										}
 										onPress={modalBottomFunctionUse ? handleLeftFunction : close}
 										width={widthPercentage(327)}
 										height={heightPercentage(50)}

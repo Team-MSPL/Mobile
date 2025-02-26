@@ -42,7 +42,13 @@ export default function StackNavigator() {
 			/>
 			<Stack.Screen name='Tab' component={TabBar} options={{headerShown: false}} />
 			<Stack.Screen name='HomeModal' component={HomeModal} options={{headerShown: false}} />
-			<Stack.Screen name='Search' component={Search} />
+			<Stack.Screen
+				name='Search'
+				component={Search}
+				options={{
+					title: '검색',
+				}}
+			/>
 
 			{TimetableStack()}
 			{CommunityStack()}

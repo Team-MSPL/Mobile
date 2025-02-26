@@ -12,12 +12,12 @@ import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../colors';
 
-import Icon from 'react-native-vector-icons/AntDesign';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariableText} from '../../layout/layout';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {SVGCamera, SVGEmptyHeart, SVGMessageSquare, SvgPicture} from '../../svg/svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {userSliceActions} from '../../../redux/user/user.slice';
 function CommunityMain({
 	navigation,
 	setViewState,
@@ -38,7 +38,7 @@ function CommunityMain({
 		{label: '댓글 순', value: 3},
 	]);
 	const {postList, searchList} = useAppSelector(state => state.communitySlice);
-	const {blockUserList} = useAppSelector(state => state.userSlice);
+	const {blockUserList, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const currentPage = useRef(2);
 	const last = useRef(false);
 	const dispatch = useAppDispatch();
@@ -103,12 +103,33 @@ function CommunityMain({
 		}
 	};
 	// 가져온 게시글 목록 UI
+
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
+	const handleLogin = async () => {
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
+		dispatch(userSliceActions.reset());
+		navigation.reset({index: 0, routes: [{name: 'LoginScreen'}]});
+	};
 	const renderPostItem = (data: {item: postListType}) => {
 		return (
 			<TouchableOpacity
 				style={{flex: 1}}
 				onPress={() => {
-					goCommunityReadingScreen(data.item.postId);
+					if (socialloginProvider == 'anonymous') {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '지금 로그인하시고 다양한 여행 경험을 살펴보세요!',
+								modalTopText: '좋아요!',
+								modalBottomText: '다음에 할게요',
+								modalFunction: handleLogin,
+							}),
+						);
+					} else {
+						goCommunityReadingScreen(data.item.postId);
+					}
 				}}>
 				<PostItemContainer>
 					<PostWriterInfoContainer>

@@ -33,15 +33,21 @@ export default function LoadingTimetable({navigation}: any) {
 		<LoadingTimetableContainer>
 			<LoadingLottie />
 			<BarContainer>
-				<BarContinueContainer size={view}></BarContinueContainer>
+				<BarContinueContainer size={view <= 3 ? view : 3}></BarContinueContainer>
 			</BarContainer>
-			<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
-				다님만의 ai를 바탕으로{' '}
-				<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
-					{userName}
+			{view == viewList.length - 1 ? (
+				<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black} textAlign='center'>
+					다님 AI가 동시에 많은 요청을 {`\n`}처리 중이라 시간이 소요되고 있어요 ㅠㅠ
 				</PretendardBoldText>
-				님께 {'\n'}꼭 맞는 여행지를 생성중이에요!
-			</PretendardBoldText>
+			) : (
+				<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
+					다님만의 AI를 바탕으로{' '}
+					<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
+						{userName}
+					</PretendardBoldText>
+					님께 {'\n'}꼭 맞는 여행지를 생성중이에요!
+				</PretendardBoldText>
+			)}
 			<MainText>{viewList[view]}</MainText>
 		</LoadingTimetableContainer>
 	);

@@ -25,7 +25,7 @@ public class MainActivity extends ReactActivity {
     @Override
   protected void onCreate(Bundle savedInstanceState) {
     SplashScreen.show(this, R.id.lottie); // 스플래시 화면 띄우기
-    super.onCreate(savedInstanceState);
+    super.onCreate(null);
   }
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {

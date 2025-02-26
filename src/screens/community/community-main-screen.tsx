@@ -16,7 +16,7 @@ import {SVGRightAdd} from '../../utill/svg/svg';
 export default function CommunityMainScreen({navigation}: any) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const dispatch = useAppDispatch(); // redux에 있는 함수를 쓸 수 있게 해줌.
-	const {blockUserList} = useAppSelector(state => state.userSlice);
+	const {blockUserList, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [sortOption, setSortOption] = useState(1);
 	const sortOptions = [
 		{label: '최신순', value: 1},
@@ -37,15 +37,16 @@ export default function CommunityMainScreen({navigation}: any) {
 	//앱 바 우측 더보기
 	useEffect(() => {
 		navigation.setOptions({
-			headerRight: () => (
-				<HeaderContianer>
-					<SearchTouchableOpacity onPress={goSearch}>
-						<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-							검색
-						</PretendardVariableText>
-					</SearchTouchableOpacity>
-				</HeaderContianer>
-			),
+			headerRight: () =>
+				socialloginProvider != 'anonymous' && (
+					<HeaderContianer>
+						<SearchTouchableOpacity onPress={goSearch}>
+							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+								검색
+							</PretendardVariableText>
+						</SearchTouchableOpacity>
+					</HeaderContianer>
+				),
 		});
 	}, []);
 
@@ -113,7 +114,7 @@ export default function CommunityMainScreen({navigation}: any) {
 						),
 				)}
 			<CommunityMain searchState={false} setViewState={setViewState} navigation={navigation}></CommunityMain>
-			<ScrollButton viewState={viewState} navigation={navigation} />
+			{socialloginProvider != 'anonymous' && <ScrollButton viewState={viewState} navigation={navigation} />}
 		</CommunityMainContainer>
 	);
 }

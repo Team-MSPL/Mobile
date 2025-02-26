@@ -1,4 +1,4 @@
-import {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import CustomButton from '../../../utill/component/custom-button';
 import {reverseGeocoding, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
@@ -13,9 +13,6 @@ import {DistanceCenter, DistanceSpace, MapContainer, Qwe} from '../select-distan
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {useFocusEffect} from '@react-navigation/native';
-import {updateFunctionToken, userSliceActions} from '../../../redux/user/user.slice';
-import {useAppsflyer} from '../../../utill/hooks/useAppsflyer';
 import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
@@ -23,62 +20,68 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import PrimaryButton from '../../../utill/component/primary-button';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {SVGSearch} from '../../../utill/svg/svg';
-import {cityViewList} from '../select-city';
+import {userSliceActions} from '../../../redux/user/user.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {useRegionSearch} from '../../../utill/hooks/useRegionSearch';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 export default function SelectDistance({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [regionText, setRegionText] = useState('');
 	const [regionSearchState, setRegionSearchState] = useState(false);
+
 	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
 		[],
 	);
 	const regionSearchRef = useRef<TextInput | null>(null);
 	const [range, setRange] = useState(5);
-	const [geoInfo, setGeoInfo] = useState({lat: 37.552987017, lng: 126.972591728, name: '기본값:서울역'});
-	const {functionToken, signUpReward} = useAppSelector(state => state.userSlice);
 	const {regionTendency, popularity} = useAppSelector(state => state.regionRecommendSlice);
-	const handleGoogleAnalytics = async () => {
-		await logEvent('place_step3', {});
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
+	const {country} = useAppSelector(state => state.travelSlice);
+	const [geoInfo, setGeoInfo] = useState({
+		lat: cityViewList[country][1].sub[0].lat,
+		lng: cityViewList[country][1].sub[0].lng,
+		name: `기본값:${cityViewList[country][1].sub[0].subTitle}`,
+		default: true,
+	});
+	const countryMap: {[key: number]: number} = {
+		0: 1,
+		1: 1.5,
+		2: 3,
+		3: 0.25,
+		4: 2,
+		5: 2,
+		6: 2,
 	};
-	const filterList = ['도심권', '동남권', '동북권', '서남권', '서북권'];
-	const searchRegionList = cityViewList
-		.map((item, index) => {
-			if (index != 0) {
-				return item.sub.map((value, idx) => {
-					if (value.subTitle == '전체') {
-						let copy = {...value, subTitle: item.title};
-						return copy;
-					} else {
-						return value;
-					}
-				});
-			}
-		})
-		.filter(item => item != undefined)
-		.reduce(function (acc, cur) {
-			return [...acc, ...cur];
-		})
-		?.filter(item => !filterList.includes(item?.subTitle));
-	const handleRegionMatch = useCallback((e: {id: number; lat: number; lng: number; subTitle: string}[]) => {
-		setRegionMatchList(e);
-	}, []);
+	let variableDistance = countryMap[country];
+	//일본 1.5배 싱가포르 0.25 베트남 2
+	const handleGoogleAnalytics = async () => {
+		socialloginProvider == 'anonymous'
+			? await logEvent('anontmous_place_step3', {})
+			: await logEvent('place_step3', {});
+	};
+	const handleAnonymousLogin = async () => {
+		await logEvent('anonymous_region_login', {});
+	};
+	const {handleRegionSerarch} = useRegionSearch();
 	const handleRegionText = useCallback((e: string) => {
 		setRegionText(e);
-		handleRegionMatch(searchRegionList?.filter((item, index) => item.subTitle.includes(e)));
+		setRegionMatchList(handleRegionSerarch(e));
 	}, []);
 	useEffect(() => {
 		handleGoogleAnalytics();
 	}, []);
-	const {appsflyerLogEvent} = useAppsflyer();
+	const {countryList} = useTendencyHandler();
 	const goNext = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			appsflyerLogEvent({name: 'travle_recommend_excute', value: {id: 'danim'}});
 			let datas = {
 				selectList: regionTendency,
 				selectPopular: popularity,
 				recentPosition: {lat: geoInfo.lat, lng: geoInfo.lng},
 				distanceSensitivity: range,
 				version: 2,
+				country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
 			if (result.length != 0) {
@@ -104,43 +107,32 @@ export default function SelectDistance({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const checkSignUpReward = () => {
-		dispatch(userSliceActions.setSignUpReward(false));
+	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
+	const handleLogin = async () => {
+		handleAnonymousLogin();
+		dispatch(userSliceActions.setAnonymousKeep(true));
+		await AsyncStorage.getAllKeys().then(allKeys => {
+			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
+			AsyncStorage.multiRemove(removeList);
+		});
+		dispatch(userSliceActions.loginFalse());
+		navigation.navigate('LoginScreen');
 	};
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		if (signUpReward) {
-	// 			dispatch(
-	// 				modalSliceActions.setOpenModal({
-	// 					modalTitle: '회원가입 축하드립니다',
-	// 					modalSubTitle: `회원가입 기념 이용권을 드렸습니다. ${functionToken}개 입니다.\n이용권은 추천 기능에 사용됩니다.`,
-	// 					modalFunction: checkSignUpReward,
-	// 				}),
-	// 			);
-	// 		}
-	// 	}, [signUpReward]),
-	// );
-	const goPayment = async () => {
-		navigation.navigate('Payment');
+	const handleNext = () => {
+		socialloginProvider == 'anonymous'
+			? dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '지금 로그인하시고 \n맞춤 여행 추천을 받아보세요!',
+						modalTopText: '좋아요!',
+						modalBottomText: '다음에 할게요',
+						modalFunction: handleLogin,
+					}),
+			  )
+			: goNext();
 	};
+
 	const checkToken = () => {
-		goNext();
-		// functionToken >= 1
-		// 	? dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: `이용권이 하나 소모됩니다.`,
-		// 				modalSubTitle: `현재 이용권은 ${functionToken}개입니다. 사용하시겠습니까?`,
-		// 				modalFunction: goNext,
-		// 				modalLeft: true,
-		// 			}),
-		// 	  )
-		// 	: dispatch(
-		// 			modalSliceActions.setOpenModal({
-		// 				modalTitle: '이용권이 부족합니다. 결제창으로 가시겠습니까?',
-		// 				modalFunction: goPayment,
-		// 				modalLeft: true,
-		// 			}),
-		// 	  );
+		handleNext();
 	};
 	const requestPermission = async () => {
 		try {
@@ -207,7 +199,7 @@ export default function SelectDistance({navigation}: any) {
 			}}>
 			<Stepper total={7} now={7}></Stepper>
 			<StepText
-				styleText='3.원하는 반경의 지역을 추천해드려요.'
+				styleText='4.원하는 반경의 지역을 추천해드려요.'
 				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 			<RegionTextInputContainer>
@@ -254,7 +246,7 @@ export default function SelectDistance({navigation}: any) {
 				</ScrollView>
 			</SearchContainer>
 			<MapContainer>
-				{geoInfo.name == '기본값:서울역' && (
+				{/* {geoInfo.default && (
 					<GeolocationGetContainer>
 						<PrimaryButton
 							backgroundColor={colors.Primary}
@@ -264,7 +256,7 @@ export default function SelectDistance({navigation}: any) {
 							height={heightPercentage(50)}
 							label='위치정보 불러오기'></PrimaryButton>
 					</GeolocationGetContainer>
-				)}
+				)} */}
 				<Qwe>
 					<MapView
 						showsMyLocationButton={false}
@@ -277,46 +269,42 @@ export default function SelectDistance({navigation}: any) {
 						region={{
 							latitude: geoInfo.lat,
 							longitude: geoInfo.lng,
-							latitudeDelta: 8,
-							longitudeDelta: 8,
+							latitudeDelta: 8 * variableDistance,
+							longitudeDelta: 8 * variableDistance,
 						}}>
-						{geoInfo.name != '기본값:서울역' && (
-							<Circle
-								center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
-								style={{alignItems: 'center', justifyContent: 'center'}}
-								fillColor='rgba(38, 152, 251, 0.3);'
-								radius={range * 50000}></Circle>
-						)}
+						<Circle
+							center={{latitude: geoInfo.lat, longitude: geoInfo.lng}}
+							style={{alignItems: 'center', justifyContent: 'center'}}
+							fillColor='rgba(38, 152, 251, 0.3);'
+							radius={range * 50000 * variableDistance}></Circle>
 					</MapView>
 				</Qwe>
 			</MapContainer>
-			{geoInfo.name != '기본값:서울역' && (
-				<>
-					<DistanceCenter>
-						<DistanceSpace>
-							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-								내 근처
-							</PretendardSemiBoldText>
-							<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-								한국 전체
-							</PretendardSemiBoldText>
-						</DistanceSpace>
-						<Slider
-							style={{width: '100%', height: 40}}
-							minimumValue={1}
-							maximumValue={10}
-							minimumTrackTintColor={colors.Primary}
-							maximumTrackTintColor={colors.Gray2}
-							thumbTintColor={colors.Primary}
-							value={range}
-							step={1}
-							onValueChange={item => {
-								setRange(item);
-							}}
-						/>
-					</DistanceCenter>
-				</>
-			)}
+			<>
+				<DistanceCenter>
+					<DistanceSpace>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+							내 근처
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+							{country == 0 ? '한국 전체' : cityViewList[country][1].title + ' 전체'}
+						</PretendardSemiBoldText>
+					</DistanceSpace>
+					<Slider
+						style={{width: '100%', height: 40}}
+						minimumValue={1}
+						maximumValue={10}
+						minimumTrackTintColor={colors.Primary}
+						maximumTrackTintColor={colors.Gray2}
+						thumbTintColor={colors.Primary}
+						value={range}
+						step={1}
+						onValueChange={item => {
+							setRange(item);
+						}}
+					/>
+				</DistanceCenter>
+			</>
 			<ButtonContainer>
 				<CustomButton
 					label='맞춤형 여행지를 확인해볼게요!'
@@ -343,29 +331,30 @@ const ButtonContainer = styled.View`
 	justify-content: flex-end;
 	margin-bottom: 2px;
 `;
-const RegionTextInput = styled.TextInput`
+export const RegionTextInput = styled.TextInput`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(50)}px;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
+	color: black;
 `;
-const RegionTextInputContainer = styled.View`
+export const RegionTextInputContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
 	padding-horizontal: ${widthPercentage(10)}px;
 `;
-const SearchContainer = styled.View`
+export const SearchContainer = styled.View<{top?: number}>`
 	position: absolute;
 	align-self: center;
 	z-index: 2;
-	top: ${heightPercentage(237)}px;
+	top: ${props => heightPercentage(props.top ?? 237)}px;
 	width: ${widthPercentage(327)}px;
 	max-height: ${heightPercentage(150)}px;
 	background-color: ${colors.backgroundWhite};
 `;
-const SearchElements = styled.TouchableOpacity`
+export const SearchElements = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 	height: ${heightPercentage(50)}px;
 	border-color: ${colors.Gray3};

@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {Image, Pressable} from 'react-native';
+import {Image, Linking, Pressable} from 'react-native';
 import {
 	getPlaceInfo,
 	courseInfoType,
@@ -22,11 +22,10 @@ import {
 	PretendardVariableText,
 } from '../../utill/layout/layout';
 import {colors} from '../../utill/colors';
-import {SVGReviewPencil, SvgCalendar, SvgCall, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
+import {SVGReviewPencil, SvgCalendar, SvgCall, SvgGoogle, SvgInfos, SvgLocation, SvgStart} from '../../utill/svg/svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import {RecommendBorderContainer} from '../enroll-info/region-recommend/detail-result';
-import {cityViewList} from '../enroll-info/select-city';
 import shortId from 'shortid';
 import {useFocusEffect} from '@react-navigation/native';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -38,13 +37,14 @@ import PrimaryButton from '../../utill/component/primary-button';
 import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/community-post';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
 	const [visible, setVisible] = useState(false);
 	const [imageIndex, setImageIndex] = useState(0);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
-	const {region, selectStartDate} = useAppSelector(state => state.travelSlice);
+	const {region, selectStartDate, country} = useAppSelector(state => state.travelSlice);
 	const {userIdToken} = useAppSelector(state => state.userSlice);
 	const getDetail = async () => {
 		try {
@@ -124,7 +124,7 @@ export default function CourseDetail({navigation, route}: any) {
 		);
 	};
 	const {firebaseImageRemove} = useFirebaseStorage();
-	const deleteReview = async (e: any) => {
+	const deleteReview = useCallback(async (e: any) => {
 		try {
 			let data = {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
@@ -150,15 +150,42 @@ export default function CourseDetail({navigation, route}: any) {
 				}),
 			);
 		}
+	}, []);
+	const handleIntoInfo = () => {
+		console.log('여기옴');
+		setCourseDetail({
+			status: 'google',
+			name: route.params.info.name,
+			openInfo: route.params.info.opening_hours?.weekday_text ?? '',
+			review: route.params.info?.reviews
+				? route.params.info?.reviews?.map((item, value) => ({
+						name: item?.author_name,
+						content: item?.text,
+						rating: item?.rating,
+						reviewUserToken: null,
+						reviewPhotoList: null,
+						reviewId: null,
+						reviewerProfileImage: item?.profile_photo_url ?? null,
+				  }))
+				: [],
+			expense: null,
+			rating: route.params.info?.rating,
+			address: route.params.info?.formatted_address,
+			information: route.params.info?.formatted_phone_number,
+			infoTitle: null,
+			infoContent: route.params.info?.editorial_summary?.overview ?? null,
+			photo: route.params.info?.photos.map((item, idx) => item.photo_reference),
+		});
 	};
 	useFocusEffect(
 		useCallback(() => {
-			getDetail();
+			console.log(route.params, 'dd');
+			route.params?.value ? getDetail() : handleIntoInfo();
 		}, []),
 	);
-	const toDayNoShow = async () => {
+	const toDayNoShow = useCallback(async () => {
 		await AsyncStorage.setItem('sobaecksan', moment().format('DD').toString());
-	};
+	}, []);
 	const checkSobaecksan = async () => {
 		const checkFlag = await AsyncStorage.getItem('sobaecksan');
 		checkFlag != moment().format('DD').toString() &&
@@ -176,8 +203,8 @@ export default function CourseDetail({navigation, route}: any) {
 			);
 	};
 	useEffect(() => {
-		checkSobaecksan();
-	}, []);
+		route.params?.value?.name == '소백산국립공원(경북)' && checkSobaecksan();
+	}, [route.params?.value?.name]);
 	const detailList = [
 		{
 			title: courseDetail?.address,
@@ -200,15 +227,15 @@ export default function CourseDetail({navigation, route}: any) {
 			console.log('qwe', err);
 		}
 	};
-	const goIncludeRecommend = () => {
+	const goIncludeRecommend = useCallback(() => {
 		let region: string[] = [];
 		if (route.params.value.region.includes(' ')) {
 			region = route.params.value.region.split(' ');
 		} else {
 			region = [route.params.value.region, '전체'];
 		}
-		const cityIndex = cityViewList.find(city => city.title == region[0])?.id;
-		let cityDistance = cityViewList[cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		const cityIndex = cityViewList[country].find(city => city.title == region[0])?.id;
+		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
@@ -234,8 +261,9 @@ export default function CourseDetail({navigation, route}: any) {
 		dispatch(travelSliceActions.setInclueRecommend(data));
 		navigation.popToTop();
 		navigation.navigate('EnrollTravelTitle');
-	};
+	}, []);
 	const goReviewEnroll = () => {
+		console.log(route.params.value.region);
 		navigation.navigate('CourseReview', {
 			value: {
 				region: route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
@@ -248,6 +276,11 @@ export default function CourseDetail({navigation, route}: any) {
 		navigation.navigate('HikingSelectPlay');
 	};
 	const [moreStatus, setMoreStatus] = useState(true);
+	const handleMoreGoogleReview = useCallback(() => {
+		Linking.openURL(
+			`https://www.google.com/maps/search/${courseDetail.name}/data=!3m1!4b1?authuser=1&entry=ttu&g_ep=EgoyMDI0MDkwMi4wIKXMDSoASAFQAw%3D%3D`,
+		);
+	}, [courseDetail]);
 	if (courseDetail?.name)
 		return (
 			<>
@@ -281,8 +314,8 @@ export default function CourseDetail({navigation, route}: any) {
 							))}
 						</PostImageSwiper>
 					)}
-					<RecommendBorderContainer paddingBottom={route.params.value.mainFlag}>
-						{route.params.value.name == '소백산국립공원(경북)' && (
+					<RecommendBorderContainer paddingBottom={route.params?.value?.mainFlag ?? false}>
+						{route.params?.value?.name == '소백산국립공원(경북)' && (
 							<PrimaryButton
 								marginBottom={heightPercentage(10)}
 								width={widthPercentage(200)}
@@ -384,12 +417,20 @@ export default function CourseDetail({navigation, route}: any) {
 						<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 						<HStack width={widthPercentage(327)} justifyContent='space-between'>
 							<HStack gap={widthPercentage(10)}>
-								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
-									리뷰
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
-									{courseDetail.review.length}
-								</PretendardSemiBoldText>
+								<HStack gap={widthPercentage(10)}>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray5}>
+										리뷰
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Gray2}>
+										{courseDetail.review.length}
+									</PretendardSemiBoldText>
+								</HStack>
+								<MoreGoogleReviewTouchable onPress={handleMoreGoogleReview}>
+									<SvgGoogle width={widthPercentage(16)} height={widthPercentage(16)} />
+									<PretendardSemiBoldText size={13} lineHeight={20.8} color={colors.Gray5}>
+										{courseDetail.rating ? '전체 리뷰 보기' : '구글 리뷰 보기'}
+									</PretendardSemiBoldText>
+								</MoreGoogleReviewTouchable>
 							</HStack>
 							<HStack justifyContent='space-between'>
 								{courseDetail.status == 'firebase' && (
@@ -402,7 +443,7 @@ export default function CourseDetail({navigation, route}: any) {
 								)}
 							</HStack>
 						</HStack>
-						{courseDetail.review.length == 0 && (
+						{courseDetail.review?.length == 0 && (
 							<ReviewNonContainer onPress={goReviewEnroll}>
 								<PretendardVariableText size={13} lineHeight={20.8} color={colors.PointYellow}>
 									첫 번째 리뷰를 작성해 보세요!
@@ -464,7 +505,7 @@ export default function CourseDetail({navigation, route}: any) {
 								<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
 									{item.content}
 								</PretendardVariableText>
-								{idx != courseDetail.review.length - 1 && (
+								{idx != courseDetail.review?.length - 1 && (
 									<Divider width={widthPercentage(327)} height={1} color={colors.Gray2} />
 								)}
 							</ReviewContainer>
@@ -494,7 +535,7 @@ export default function CourseDetail({navigation, route}: any) {
 						/>
 					)}
 				</DetailContainer>
-				{route.params.value.mainFlag && (
+				{(route.params.value?.mainFlag ?? false) && (
 					<ButtonContainer>
 						<CustomButton
 							label={'이 지역의 여행 코스 추천 받기'}
@@ -503,9 +544,26 @@ export default function CourseDetail({navigation, route}: any) {
 				)}
 			</>
 		);
-	return <NullContainer>{!isLoading && <MainText>정보가 없습니다!</MainText>}</NullContainer>;
+	return (
+		<NullContainer>
+			{!isLoading && (
+				<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black} textAlign='center'>
+					해당 이름의 장소가 구글{`\n`} 지도에 등록되어 있지 않습니다.
+				</PretendardSemiBoldText>
+			)}
+		</NullContainer>
+	);
 }
 
+const MoreGoogleReviewTouchable = styled.TouchableOpacity`
+	flex-direction: row;
+	gap: ${widthPercentage(2)}px;
+	background-color: ${colors.Primary};
+	padding-vertical: ${widthPercentage(4)}px;
+	padding-horizontal: ${widthPercentage(8)}px;
+	align-items: center;
+	border-radius: 12px;
+`;
 const MoreTouchable = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
 `;
@@ -541,6 +599,7 @@ export const InfoContainer = styled.Pressable`
 `;
 const NullContainer = styled(Center)`
 	flex: 1;
+	background-color: ${colors.backgroundGray};
 `;
 
 const DetailContainer = styled.ScrollView`

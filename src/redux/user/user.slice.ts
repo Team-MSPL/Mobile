@@ -17,6 +17,7 @@ const initialUserState: UserState = {
 	userIdToken: '',
 	reLogin: false,
 	analyticeFlag: false,
+	anonymousKeep: false,
 };
 
 //회원탈퇴
@@ -28,18 +29,6 @@ export const userWithdraw = createAsyncThunk(
 			return response.data;
 		} catch (err: any) {
 			throw rejectWithValue(err.response.data);
-		}
-	},
-);
-//쿠폰입력
-export const couponCheck = createAsyncThunk(
-	'/marketing/useCoupon',
-	async (data: {couponCode: string; functionToken: number}, {rejectWithValue}) => {
-		try {
-			const response = await axiosAuth.patch('/marketing/useCoupon', data);
-			return response.data;
-		} catch (err: any) {
-			return rejectWithValue(err.response.data);
 		}
 	},
 );
@@ -77,6 +66,20 @@ export const getNoteList = createAsyncThunk('/user/noteList', async (_, {rejectW
 		throw rejectWithValue(err.response.data);
 	}
 });
+//회원 쪽지 수정
+export const modifyNoteList = createAsyncThunk(
+	'/user/modifyNoteList',
+	async (data: {modifiedNoteList: string[]}, {rejectWithValue}) => {
+		try {
+			console.log(data);
+			const response = await axiosAuth.patch('/user/modifyNoteList', data);
+			return response;
+		} catch (err: any) {
+			console.log(err);
+			throw rejectWithValue(err.response.data);
+		}
+	},
+);
 //공지사항 조회
 export const getNotice = createAsyncThunk('/notice/noticeList', async (_, {rejectWithValue}) => {
 	try {
@@ -99,16 +102,6 @@ export const updateProfile = createAsyncThunk(
 		}
 	},
 );
-
-//이용권 로그 확인하기
-export const getTokenLog = createAsyncThunk('/tokenLog', async (_, {rejectWithValue}) => {
-	try {
-		const response = await axiosAuth.get(`/manageUser/tokenLog`);
-		return response.data;
-	} catch (err: any) {
-		throw rejectWithValue(err.response.data);
-	}
-});
 
 //광고 시청 횟수 확인
 export const getWatchADTime = createAsyncThunk('/manageUser/watchADTime', async (_, {rejectWithValue}) => {
@@ -157,6 +150,9 @@ const userSlice = createSlice({
 		login(state) {
 			state.isLogin = true;
 		},
+		loginFalse(state) {
+			state.isLogin = false;
+		},
 		setPushNotify(state, {payload}) {
 			state.pushNotify = payload;
 		},
@@ -179,15 +175,25 @@ const userSlice = createSlice({
 		setAnalyticeFlag(state, {payload}) {
 			state.analyticeFlag = payload;
 		},
+		setAnonymous(state) {
+			state.isLogin = true;
+			state.userId = 'x';
+			state.userName = '나그네';
+			state.userProfileImage = '';
+			state.userJwtToken = '';
+			state.functionToken = 0;
+			state.socialloginProvider = 'anonymous';
+			axiosAuth.defaults.headers.Authorization = `Bearer x`;
+		},
+		setAnonymousKeep(state, {payload}) {
+			state.anonymousKeep = payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(userWithdraw.fulfilled, state => {
 			return {...initialUserState};
 		});
 		builder.addCase(updateFunctionToken.fulfilled, (state, {payload}) => {
-			state.functionToken = payload.functionToken;
-		});
-		builder.addCase(couponCheck.fulfilled, (state, {payload}) => {
 			state.functionToken = payload.functionToken;
 		});
 	},
@@ -199,7 +205,7 @@ export default userSlice.reducer;
 export interface UserState {
 	userId: string;
 	userName: string;
-	socialloginProvider: 'apple' | 'google' | 'kakao' | null | undefined;
+	socialloginProvider: 'apple' | 'google' | 'kakao' | 'anonymous' | null | undefined;
 	userJwtToken: string | null;
 	isLogin: boolean;
 	functionToken: number;
@@ -212,11 +218,5 @@ export interface UserState {
 	userIdToken: string;
 	reLogin: boolean;
 	analyticeFlag: boolean;
-}
-
-export interface TokenLogType {
-	tokenLogContent: string;
-	tokenLogNumber: number;
-	tokenLogDate: string;
-	_id: string;
+	anonymousKeep: boolean;
 }

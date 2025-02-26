@@ -1,5 +1,3 @@
-import {useState} from 'react';
-import CustomButton from '../../utill/component/custom-button';
 import {
 	MainContainer,
 	VStack,
@@ -18,26 +16,18 @@ import {EssentialPlaceType, travelSliceActions} from '../../redux/travel-info/tr
 import {SVGPlus} from '../../utill/svg/svg';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import RouteButton from '../../utill/component/route-button';
 
 export default function SelectMulti({navigation}: any) {
-	const [accommodation, setAccommodation] = useState(false);
-	const [essential, setEssential] = useState(false);
 	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
 		state => state.travelSlice,
 	);
 	const dispatch = useAppDispatch();
 	const goSearchPlace = (data: {idx: number; index: number}) => {
-		console.log(navigation);
 		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
 	};
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const goNext = () => {
-		navigation.navigate('RecommendSelectWho');
-	};
 
-	const openAccommodation = () => {
-		setAccommodation(!accommodation);
-	};
 	const deleteAccommodation = (e: number) => {
 		let copy = [...accommodations];
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
@@ -47,9 +37,6 @@ export default function SelectMulti({navigation}: any) {
 		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 	};
-	const openEssential = () => {
-		setEssential(!essential);
-	};
 	return (
 		<>
 			<MainContainer>
@@ -58,7 +45,7 @@ export default function SelectMulti({navigation}: any) {
 					<StepText
 						styleText='1.여행 계획을 알려주세요.'
 						mainText='미리 정해놓은 장소가 있나요?'
-						subText='숙소는 최대 1개, 여행지는 최대 3개 추가할 수 있어요.'></StepText>
+						subText={`1일당 숙소는 1개, 여행지는 3개까지 추가할 수 있어요.\n마지막날은 숙소를 설정할 수 없어요.`}></StepText>
 					<VStack>
 						{[...Array(nDay + 1)].map((item, idx) => {
 							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
@@ -204,15 +191,7 @@ export default function SelectMulti({navigation}: any) {
 
 				<MarginContainder></MarginContainder>
 			</MainContainer>
-			<ButtonContainer>
-				<CustomButton
-					label={`${
-						accommodations.find(value => value.name != '') || essentialPlaces.length != 0
-							? '다음'
-							: '건너뛰기'
-					}`}
-					onPress={goNext}></CustomButton>
-			</ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectWho'></RouteButton>
 		</>
 	);
 }

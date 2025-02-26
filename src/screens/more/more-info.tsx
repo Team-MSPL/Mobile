@@ -3,22 +3,21 @@ import {Modal, Platform, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {colors} from '../../utill/colors';
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {BackgroundGray, HStack, PretendardSemiBoldText} from '../../utill/layout/layout';
 import {SVGNoteList, SvgLoginLogo} from '../../utill/svg/svg';
-import {useState} from 'react';
+import {useCallback, useLayoutEffect, useState} from 'react';
 import ViewPager from '../../utill/view-pager';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import UserManage from './user-manage';
 import PrimaryButton from '../../utill/component/primary-button';
 import {WhiteContainer} from '../enroll-info/final-check';
-import Coupon from './coupon';
 import PushNotify from './push-notify';
+import {useFocusEffect} from '@react-navigation/native';
 export default function MoreInfo({navigation}: any) {
-	const {userName, socialloginProvider, functionToken, userProfileImage} = useAppSelector(state => state.userSlice);
+	const {userName, socialloginProvider, userProfileImage} = useAppSelector(state => state.userSlice);
 	const {nowVersion, latestVersion} = useAppSelector(state => state.settingSlice);
 	const dispatch = useAppDispatch();
 	const exceptionKeys = ['isFirstLaunch', 'noPermission'];
@@ -27,22 +26,22 @@ export default function MoreInfo({navigation}: any) {
 			const removeList = allKeys.filter(k => !exceptionKeys.some(ek => ek === k));
 			AsyncStorage.multiRemove(removeList);
 		});
-		dispatch(userSliceActions.reset());
-		navigation.replace('LoginScreen');
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '로그아웃에 성공했습니다.',
-			}),
-		);
+		if (socialloginProvider != 'anonymous') {
+			dispatch(userSliceActions.reset());
+			navigation.replace('LoginScreen');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '로그아웃에 성공했습니다.',
+				}),
+			);
+		} else {
+			dispatch(userSliceActions.reset());
+			navigation.replace('LoginScreen');
+		}
 	};
-	const {appsflyerLogEvent} = useAppsflyer();
 	useBackHandler({type: 'exit'});
 	const goNavigation = (route: string) => {
 		navigation.navigate(route);
-	};
-	const goPayment = () => {
-		appsflyerLogEvent({name: 'more_payment_click', value: {id: 'danim'}});
-		navigation.navigate('Payment');
 	};
 	const goBack = () => {
 		setViewPagerView(false);
@@ -51,18 +50,32 @@ export default function MoreInfo({navigation}: any) {
 		setViewPagerView(true);
 	};
 	const [viewPagerView, setViewPagerView] = useState(false);
-
+	const [noteList, setNoteList] = useState([]);
+	const getNoteListData = async () => {
+		try {
+			const dataList = await dispatch(getNoteList()).unwrap();
+			setNoteList(dataList);
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+		}
+	};
+	useFocusEffect(
+		useCallback(() => {
+			getNoteListData();
+		}, []),
+	);
 	const useInfo = [
-		{
-			title: '공지사항',
-			function: () => {
-				goNavigation('Notice');
-			},
-		},
 		{
 			title: '문의하기',
 			function: () => {
 				goNavigation('Inquire');
+			},
+		},
+		{
+			title: '공지사항',
+			function: () => {
+				goNavigation('Notice');
 			},
 		},
 		{
@@ -113,56 +126,41 @@ export default function MoreInfo({navigation}: any) {
 							{userName}
 						</PretendardSemiBoldText>
 					</HStack>
-					<NoteListContainer>
-						<NoteCount>
-							<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-								0
-							</PretendardSemiBoldText>
-						</NoteCount>
-						<SVGNoteList
+					{socialloginProvider != 'anonymous' && (
+						<NoteListContainer>
+							<NoteCount>
+								<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+									{noteList.length}
+								</PretendardSemiBoldText>
+							</NoteCount>
+							<SVGNoteList
+								onPress={() => {
+									goNavigation('NoteList');
+								}}
+								width={widthPercentage(33)}
+								height={widthPercentage(33)}></SVGNoteList>
+						</NoteListContainer>
+					)}
+				</HStack>
+				{socialloginProvider != 'anonymous' && <UserManage />}
+				{socialloginProvider != 'anonymous' && (
+					<HStack justifyContent='flex-end'>
+						<PrimaryButton
+							label='프로필 편집'
+							width={widthPercentage(100)}
+							height={heightPercentage(40)}
 							onPress={() => {
-								goNavigation('NoteList');
+								goNavigation('ChangeProfile');
 							}}
-							width={widthPercentage(33)}
-							height={widthPercentage(33)}></SVGNoteList>
-					</NoteListContainer>
-				</HStack>
-				<UserManage />
-				<HStack justifyContent='flex-end'>
-					<PrimaryButton
-						label='프로필 편집'
-						width={widthPercentage(100)}
-						height={heightPercentage(40)}
-						onPress={() => {
-							goNavigation('ChangeProfile');
-						}}
-						backgroundColor={colors.Primary}
-						textColor={colors.Black}></PrimaryButton>
-				</HStack>
-				<SettingContainer>
+							backgroundColor={colors.Primary}
+							textColor={colors.Black}></PrimaryButton>
+					</HStack>
+				)}
+				<SettingContainer marginTop={socialloginProvider == 'anonymous' ? 10 : 0}>
 					<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
 						계정
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						{/* <SettingElement
-							onPress={() => {
-								goNavigation('TokenLog');
-							}}
-							bottomShow={true}>
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
-									이용권 갯수{'    '} {functionToken} 개
-								</PretendardSemiBoldText>
-								<PrimaryButton
-									label='이용권 구매'
-									width={widthPercentage(100)}
-									height={heightPercentage(40)}
-									onPress={goPayment}
-									backgroundColor={colors.Primary}
-									textColor={colors.Black}></PrimaryButton>
-							</HStack>
-						</SettingElement> */}
-						{/* {Platform.OS != 'ios' && <Coupon />} */}
 						<HStack width={widthPercentage(303)} justifyContent='space-between'>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 								계정타입
@@ -179,12 +177,17 @@ export default function MoreInfo({navigation}: any) {
 						이용안내
 					</PretendardSemiBoldText>
 					<WhiteContainer>
-						<PushNotify />
-						{useInfo.map((item, idx) => (
+						{socialloginProvider != 'anonymous' && <PushNotify />}
+						{useInfo.slice(socialloginProvider == 'anonymous' ? 1 : 0, useInfo.length).map((item, idx) => (
 							<SettingElement
 								key={idx}
 								onPress={item.function}
-								bottomShow={idx == useInfo.length - 1 ? false : true}>
+								bottomShow={
+									idx ==
+									useInfo.slice(socialloginProvider == 'anonymous' ? 1 : 0, useInfo.length).length - 1
+										? false
+										: true
+								}>
 								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Black}>
 									{item.title}
 								</PretendardSemiBoldText>
@@ -198,33 +201,37 @@ export default function MoreInfo({navigation}: any) {
 					</PretendardSemiBoldText>
 					<WhiteContainer>
 						<SettingElement
-							bottomShow={true}
+							bottomShow={socialloginProvider == 'anonymous' ? false : true}
 							onPress={() => {
-								dispatch(
-									modalSliceActions.setOpenModal({
-										modalTitle: '로그아웃 하시겠습니까?',
-										modalSubTitle: `로그아웃하면 더 이상\n다님의 여행 추천 서비스를 받을 수 없어요 :(`,
-										modalTopText: '로그인 상태 유지',
-										modalBottomText: '아쉽지만 로그아웃',
-										modalBottomFunction: goLogout,
-										modalBottomFunctionUse: true,
-										modalLeft: true,
-									}),
-								);
+								socialloginProvider == 'anonymous'
+									? goLogout()
+									: dispatch(
+											modalSliceActions.setOpenModal({
+												modalTitle: '로그아웃 하시겠습니까?',
+												modalSubTitle: `로그아웃하면 더 이상\n다님의 여행 추천 서비스를 받을 수 없어요 :(`,
+												modalTopText: '로그인 상태 유지',
+												modalBottomText: '아쉽지만 로그아웃',
+												modalBottomFunction: goLogout,
+												modalBottomFunctionUse: true,
+												modalLeft: true,
+											}),
+									  );
 							}}>
 							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.PointGreen1}>
 								로그아웃
 							</PretendardSemiBoldText>
 						</SettingElement>
-						<SettingElement
-							bottomShow={false}
-							onPress={() => {
-								navigation.navigate('Withdraw');
-							}}>
-							<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
-								계정 삭제
-							</PretendardSemiBoldText>
-						</SettingElement>
+						{socialloginProvider != 'anonymous' && (
+							<SettingElement
+								bottomShow={false}
+								onPress={() => {
+									navigation.navigate('Withdraw');
+								}}>
+								<PretendardSemiBoldText size={14} lineHeight={21} color={colors.Gray4}>
+									계정 삭제
+								</PretendardSemiBoldText>
+							</SettingElement>
+						)}
 					</WhiteContainer>
 				</SettingContainer>
 				<PretendardSemiBoldText
@@ -238,7 +245,7 @@ export default function MoreInfo({navigation}: any) {
 		</ScrollView>
 	);
 }
-const NoteListContainer = styled.View`
+export const NoteListContainer = styled.View`
 	width: ${widthPercentage(50)}px;
 	height: ${widthPercentage(50)}px;
 	align-items: center;
@@ -246,7 +253,7 @@ const NoteListContainer = styled.View`
 	right: 3px;
 	top: 3px;
 `;
-const NoteCount = styled.View`
+export const NoteCount = styled.View`
 	width: ${widthPercentage(11)}px;
 	height: ${widthPercentage(15)}px;
 	background-color: ${colors.Gray5};
@@ -276,10 +283,11 @@ const NoProfileContainer = styled.View`
 	justify-content: center;
 	background-color: ${colors.Primary};
 `;
-const SettingContainer = styled.View`
+const SettingContainer = styled.View<{marginTop?: number}>`
 	width: 100%;
 	gap: ${widthPercentage(5)}px;
 	margin-bottom: ${heightPercentage(30)}px;
+	${props => (props.marginTop ? `margin-top:${props.marginTop}px` : null)}
 `;
 export const SettingElement = styled.TouchableOpacity<{bottomShow: boolean}>`
 	width: 100%;

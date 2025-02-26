@@ -3,8 +3,15 @@ import shortId from 'shortid';
 import {Linking, TouchableOpacity, Platform, Image} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 
-import MapView, {Polyline, Marker} from 'react-native-maps';
-import {recommendApi, RecommendList, TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import MapView, {Polyline, Marker, Circle} from 'react-native-maps';
+import {
+	detailTripadvisor,
+	recommendApi,
+	RecommendList,
+	recommendTripadvisor,
+	TimetableType,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import styled from 'styled-components/native';
@@ -17,7 +24,7 @@ import PrimaryButton from '../../utill/component/primary-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarkerContainer} from './preset-detail';
 export default function Recommend({navigation, route}: any) {
-	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {timetable, region} = useAppSelector(state => state.travelSlice);
 	const {isLoading} = useAppSelector(state => state.loadingSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(-1);
@@ -43,7 +50,7 @@ export default function Recommend({navigation, route}: any) {
 						key={`marker_${index}`}
 						coordinate={{latitude: value.lat, longitude: value.lng}}
 						title={value.name}
-						centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
+						centerOffset={{x: 0, y: 0}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
 							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
@@ -68,12 +75,45 @@ export default function Recommend({navigation, route}: any) {
 		/>
 	));
 
-	const changeRecommend = (idx: number) => {
+	const tripadvisorList = useRef({});
+	const handleMore = async (idx: number) => {
+		if (region[0].startsWith('해외')) {
+			if (tripadvisorList?.current[idx] == undefined) {
+				tripadvisorList.current[idx] = await dispatch(
+					detailTripadvisor({id: recommendList[idx].location_id}),
+				).unwrap();
+			}
+			tripadvisorList.current[idx] && Linking.openURL(tripadvisorList.current[idx].web_url);
+		} else {
+			Linking.openURL(recommendList[idx].place_url);
+		}
+	};
+	const changeRecommend = async (idx: number) => {
+		let changeData;
+		if (region[0].startsWith('해외')) {
+			if (tripadvisorList?.current[idx] == undefined) {
+				tripadvisorList.current[idx] = await dispatch(
+					detailTripadvisor({id: recommendList[idx].location_id}),
+				).unwrap();
+			}
+
+			changeData = {
+				name: tripadvisorList.current[idx].name,
+				lat: tripadvisorList.current[idx].latitude,
+				lng: tripadvisorList.current[idx].longitude,
+			};
+		} else {
+			changeData = {
+				name: recommendList[idx].place_name,
+				lat: recommendList[idx].y,
+				lng: recommendList[idx].x,
+			};
+		}
 		let copy = [...recommendItem];
 		const updateItem = {
-			name: recommendList[idx].place_name,
-			lat: Number(recommendList[idx].y),
-			lng: Number(recommendList[idx].x),
+			name: changeData.name,
+			lat: Number(changeData.lat),
+			lng: Number(changeData.lng),
 			category: route.params.category,
 			x: route.params.x,
 			y: route.params.y[0],
@@ -104,7 +144,7 @@ export default function Recommend({navigation, route}: any) {
 	const checkMessage = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '바로 추가됩니다!',
+				modalTitle: '선택하신 장소를 추가하시겠어요?',
 				modalFunction: addRecommend,
 			}),
 		);
@@ -114,58 +154,147 @@ export default function Recommend({navigation, route}: any) {
 		copy[route.params.x] = recommendItem;
 		if (route.params.name === '숙소 추천') {
 			if (route.params.index != 0) {
-				let updateitem = {
-					...recommendItem.at(-1),
-					x: copy[route.params.x + 1][0].x,
-					y: copy[route.params.x + 1][0].y,
-					takenTime: copy[route.params.x + 1][0].takenTime,
-				};
-				let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
-				itemCopy[0] = updateitem;
-				copy[route.params.x + 1] = itemCopy;
+				if (copy[route.params.x + 1][0].category == 4) {
+					let updateitem = {
+						...recommendItem.at(-1),
+						x: copy[route.params.x + 1][0].x,
+						y: copy[route.params.x + 1][0].y,
+						takenTime: copy[route.params.x + 1][0].takenTime,
+					};
+					let itemCopy: TimetableType[] = [...copy[route.params.x + 1]];
+					itemCopy[0] = updateitem;
+					copy[route.params.x + 1] = itemCopy;
+				}
 			} else {
-				let updateitem = {
-					...recommendItem[0],
-					x: copy[route.params.x - 1].at(-1).x,
-					y: copy[route.params.x - 1].at(-1).y,
-					takenTime: copy[route.params.x - 1].at(-1).takenTime,
-				};
-				let itemCopy = [...copy[route.params.x - 1]];
-				itemCopy.splice(itemCopy.length - 1, 1, updateitem);
-				copy[route.params.x - 1] = itemCopy;
+				if (copy[route.params.x - 1][copy[route.params.x - 1].length - 1].category == 4) {
+					let updateitem = {
+						...recommendItem[0],
+						x: copy[route.params.x - 1].at(-1).x,
+						y: copy[route.params.x - 1].at(-1).y,
+						takenTime: copy[route.params.x - 1].at(-1).takenTime,
+					};
+					let itemCopy = [...copy[route.params.x - 1]];
+					itemCopy.splice(itemCopy.length - 1, 1, updateitem);
+					copy[route.params.x - 1] = itemCopy;
+				}
 			}
 		}
-		dispatch(travelSliceActions.changeTimetable(copy));
-		navigation.navigate('Timetable');
+		let checkFlag = copy.map((item, index) => {
+			let first = item[0].category == 4 && item[0].name == '숙소 추천';
+			let last = item[copy[index].length - 1].category == 4 && item[copy[index].length - 1].name == '숙소 추천';
+			if (first || last) {
+				return true;
+			}
+		});
+		if (route.params.name === '숙소 추천') {
+			if (checkFlag.includes(true)) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '나머지 날들도 같은 숙소 추가하겠습니까?',
+						modalTopText: '예, 전부 같은 숙소로 할래요',
+						modalBottomText: '아니요, 다른 숙소도 찾아볼래요.',
+						modalSubTitle: `숙소를 고려하지 않은 여행 코스라서, \n 동선이 약간 꼬일 수 있어요.`,
+						modalFunction: () => {
+							let newData = route.params.index != 0 ? recommendItem.at(-1) : recommendItem[0];
+							let newCopy = copy.map((item, index) => {
+								let newCopy2 = [...item];
+								if (item[0].category == 4 && item[0].name == '숙소 추천') {
+									newCopy2[0] = {
+										...newData,
+										x: item[0].x,
+										y: item[0].y,
+										takenTime: item[0].takenTime,
+										category: item[0].category,
+									};
+								}
+								if (
+									item[copy[index].length - 1].category == 4 &&
+									item[copy[index].length - 1].name == '숙소 추천'
+								) {
+									newCopy2[item.length - 1] = {
+										...newData,
+										x: item[item.length - 1].x,
+										y: item[item.length - 1].y,
+										takenTime: item[item.length - 1].takenTime,
+										category: item[item.length - 1].category,
+									};
+								}
+								return newCopy2;
+							});
+							dispatch(travelSliceActions.changeTimetable(newCopy));
+							navigation.navigate('Timetable');
+						},
+						modalBottomFunctionUse: true,
+						modalBottomFunction: () => {
+							dispatch(travelSliceActions.changeTimetable(copy));
+							navigation.navigate('Timetable');
+						},
+					}),
+				);
+			} else {
+				dispatch(travelSliceActions.changeTimetable(copy));
+				navigation.navigate('Timetable');
+			}
+		} else {
+			dispatch(travelSliceActions.changeTimetable(copy));
+			navigation.navigate('Timetable');
+		}
 	};
+	//TODO트립어드바이저용
 	const getRecommendList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			let result = await dispatch(
-				recommendApi({
-					category: route.params.apiCategory,
-					lat: route.params.lat,
-					lng: route.params.lng,
-					radius: route.params.radius,
-				}),
+				region[0].startsWith('해외')
+					? recommendTripadvisor({
+							category: route.params.apiCategory,
+							lat: route.params.lat,
+							lng: route.params.lng,
+							radius: route.params.radius,
+							name: route.params.status.name,
+					  })
+					: recommendApi({
+							category: route.params.apiCategory,
+							lat: route.params.lat,
+							lng: route.params.lng,
+							radius: route.params.radius,
+					  }),
 			).unwrap();
-			departure.current.lat = route.params.lat;
-			departure.current.lng = route.params.lng;
+			result = region[0].startsWith('해외') ? result.data : result;
+			// departure.current.lat = route.params.lat;
+			// departure.current.lng = route.params.lng;
 			if (result.length == 0) {
 				result = await dispatch(
-					recommendApi({
-						category: route.params.apiCategory,
-						lat: route.params.backupLat,
-						lng: route.params.backupLng,
-						radius: 20000,
-					}),
+					region[0].startsWith('해외')
+						? recommendTripadvisor({
+								category: route.params.apiCategory,
+								lat: route.params.lat,
+								lng: route.params.lng,
+								radius: 20000,
+								name: route.params.status.name,
+						  })
+						: recommendApi({
+								category: route.params.apiCategory,
+								lat: route.params.lat,
+								lng: route.params.lng,
+								radius: 20000,
+						  }),
 				).unwrap();
-				departure.current.lat = route.params.lat;
-				departure.current.lng = route.params.lng;
-				result.length == 0 && dispatch(modalSliceActions.setOpenModal({modalTitle: '추천 아이템이 없습니다!'}));
+				// departure.current.lat = route.params.lat;
+				// departure.current.lng = route.params.lng;
+				result = region[0].startsWith('해외') ? result.data : result;
+				result.length == 0 &&
+					(dispatch(
+						modalSliceActions.setOpenModal({
+							modalSingleUse: true,
+							modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
+						}),
+					),
+					navigation.goBack());
 			}
 			setRcommendList(result);
 		} catch (err) {
+			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '추천 아이템이 없습니다!',
@@ -231,7 +360,6 @@ export default function Recommend({navigation, route}: any) {
 	useLayoutEffect(() => {
 		getRecommendList();
 	}, []);
-
 	const mapRef = useRef<MapView>(null);
 	if (!recommendList || isLoading) {
 		return <RecommendContainer></RecommendContainer>;
@@ -249,7 +377,22 @@ export default function Recommend({navigation, route}: any) {
 				}}>
 				{markers}
 				{polylines}
+				{/* TODO 트립어드바이저 반경만 보여주는거*/}
+				{/* <Circle
+					center={{
+						latitude: route.params.status.lat,
+						longitude: route.params.status.lng,
+					}}
+					style={{alignItems: 'center', justifyContent: 'center'}}
+					fillColor='rgba(38, 152, 251, 0.3);'
+					radius={1500}></Circle> */}
 			</MapView>
+			<TextContainer>
+				<PretendardSemiBoldText size={12} color={colors.PointYellow} lineHeight={18}>
+					*{region[0].startsWith('해외') ? '트립어드바이저' : '카카오맵'} 기준으로 인기있는 장소들을
+					추천드려요!
+				</PretendardSemiBoldText>
+			</TextContainer>
 			<RecommendScrollView>
 				{recommendList.length != 0 ? (
 					recommendList.map((item, idx) => (
@@ -257,13 +400,15 @@ export default function Recommend({navigation, route}: any) {
 							<ImageContainer>
 								{route.params.name == '식당 추천' ? (
 									<Image
-										source={foodImageList[returnImageIndex(item.category_name.split('>')[1])]}
+										source={
+											foodImageList[returnImageIndex(item?.category_name?.split('>')[1] ?? '')]
+										}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
 								) : route.params.name == '숙소 추천' ? (
 									<Image
 										source={
 											accommodationImageList[
-												returnAccomdationImageIndex(item.category_name.split('>')[2])
+												returnAccomdationImageIndex(item?.category_name?.split('>')[2] ?? '')
 											]
 										}
 										style={{width: widthPercentage(45), height: widthPercentage(45)}}></Image>
@@ -279,25 +424,23 @@ export default function Recommend({navigation, route}: any) {
 								}}>
 								<RecommendView>
 									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.Gray5}>
-										{item.place_name}
+										{region[0].startsWith('해외') ? item.name : item.place_name}
 									</PretendardSemiBoldText>
 								</RecommendView>
 								<PretendardVariableText size={11} lineHeight={16.5} color={colors.PointYellow}>
 									{'* ' +
 										route.params.status.name +
 										' 기준 ' +
-										Math.floor(
-											useDistance({
-												departure: {lat: item.y, lng: item.x},
-												arrival: {lat: route.params.lat, lng: route.params.lng},
-											}) * 1000,
-										) +
+										(region[0].startsWith('해외')
+											? Math.floor(Number(item.distance) * 1000)
+											: item.distance) +
 										'm'}
 								</PretendardVariableText>
-								<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
-									{item.category_name.split('>')[route.params.name == '식당 추천' ? 1 : 2]}
-									{/* {item.category_name.slice(6, item.category_name.length)} */}
-								</PretendardVariableText>
+								{!region[0].startsWith('해외') && (
+									<PretendardVariableText size={11} lineHeight={16.5} color={colors.Gray3}>
+										{item.category_name.split('>')[route.params.name == '식당 추천' ? 1 : 2]}
+									</PretendardVariableText>
+								)}
 							</ListVStack>
 							<PrimaryButton
 								label='자세히보기'
@@ -308,7 +451,7 @@ export default function Recommend({navigation, route}: any) {
 								backgroundColor={colors.Primary}
 								textColor={colors.Gray5}
 								onPress={() => {
-									Linking.openURL(item.place_url);
+									handleMore(idx);
 								}}></PrimaryButton>
 						</ListHStack>
 					))
@@ -324,6 +467,12 @@ export default function Recommend({navigation, route}: any) {
 		</RecommendContainer>
 	);
 }
+const TextContainer = styled.View`
+	width: 100%;
+	height: ${heightPercentage(25)}px;
+	align-items: center;
+	justify-content: center;
+`;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(71)}px;
 	height: ${widthPercentage(71)}px;

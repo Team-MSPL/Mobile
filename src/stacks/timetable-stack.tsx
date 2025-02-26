@@ -22,6 +22,9 @@ import RecommendSelectConcept from '../screens/enroll-info/select-concept';
 import RecommendSelectPlay from '../screens/enroll-info/select-play';
 import RecommendSelectTour from '../screens/enroll-info/select-tour';
 import PresetDetail from '../screens/timetable/preset-detail';
+import SearchRecommend from '../screens/enroll-info/search-recommend';
+import RecommendSelectCountry from '../screens/enroll-info/select-country';
+import SelectCountry from '../screens/enroll-info/region-recommend/select-country';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -29,6 +32,25 @@ export default function TimetableStack() {
 			<Stack.Screen
 				name='SelectCity'
 				component={SelectCity}
+				options={{
+					title: '새 여행 (1/5)',
+					headerStyle: {backgroundColor: colors.main},
+					headerShadowVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name='RecommendSelectCountry'
+				component={RecommendSelectCountry}
+				options={{
+					title: '새 여행 (1/5)',
+					headerStyle: {backgroundColor: colors.main},
+					headerShadowVisible: false,
+				}}
+			/>
+			<Stack.Screen
+				name='SelectCountry'
+				component={SelectCountry}
 				options={{
 					title: '새 여행 (1/5)',
 					headerStyle: {backgroundColor: colors.main},
@@ -56,6 +78,16 @@ export default function TimetableStack() {
 			<Stack.Screen
 				name='SearchPlace'
 				component={SearchPlace}
+				options={{
+					title: '요소 추가하기',
+					headerStyle: {backgroundColor: colors.main},
+					headerShadowVisible: false,
+					headerTitleAlign: 'center',
+				}}
+			/>
+			<Stack.Screen
+				name='SearchRecommend'
+				component={SearchRecommend}
 				options={{
 					title: '요소 추가하기',
 					headerStyle: {backgroundColor: colors.main},

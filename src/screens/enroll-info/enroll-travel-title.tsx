@@ -15,17 +15,20 @@ import {logEvent} from '../../../firebaseAnalytice';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [textValue, setTextValue] = useState('신나는 여행');
-	const {makeMode} = useAppSelector(state => state.travelSlice);
+	const {makeMode, regionRecommendFlag} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const changeTextValue = (e: string) => {
 		setTextValue(e);
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		makeMode == 'solo' ? navigation.navigate('Timetable') : navigation.navigate('SelectCity');
+		regionRecommendFlag ? navigation.navigate('SelectCity') : navigation.navigate('RecommendSelectCountry');
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step1', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step1', {})
+			: await logEvent('course_step1', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();

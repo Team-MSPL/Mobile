@@ -5,7 +5,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import moment from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {VStack, HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {Platform, Pressable, ScrollView} from 'react-native';
@@ -16,6 +16,7 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
+import RouteButton from '../../utill/component/route-button';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -30,6 +31,7 @@ export default function SelectDay({navigation}: any) {
 		selectedDateFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
@@ -94,10 +96,31 @@ export default function SelectDay({navigation}: any) {
 	};
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
 		if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '출발 시간을 06시 이전으로 설정하실 수 없습니다.'}));
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '시작 시간을 06시 이전으로 설정하실 수 없습니다.',
+					modalSingleUse: true,
+					modalTextSize: 17,
+				}),
+			);
+			return false;
+		} else if (dateFlag.current == 0 && timeData.ampm == '오후' && parseInt(timeData.hour) > 7) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '시작 시간을 20시 이후로는 설정하실 수 없습니다.',
+					modalSingleUse: true,
+					modalTextSize: 17,
+				}),
+			);
 			return false;
 		} else if (dateFlag.current == 1 && timeData.ampm == '오전') {
-			dispatch(modalSliceActions.setOpenModal({modalTitle: '도착 시간을 13시 이전으로 설정하실 수 없습니다.'}));
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '종료 시간을 오전으로 설정하실 수 없습니다.',
+					modalSingleUse: true,
+					modalTextSize: 17,
+				}),
+			);
 			return false;
 		} else {
 			let timeCopy = [...timeLimitArray];
@@ -130,11 +153,13 @@ export default function SelectDay({navigation}: any) {
 		return 0;
 	};
 	const DaySelectInfoList = [
-		{step: '출발', title: '여행 시작', day: selectStartDate},
-		{step: '도착', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
+		{step: '여행 시작 시간', title: '여행 시작', day: selectStartDate},
+		{step: '여행 종료 시간', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
 	const handleGoogleAnalytics = async () => {
-		await logEvent('course_step3', {});
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_course_step3', {})
+			: await logEvent('course_step3', {});
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();
@@ -231,13 +256,7 @@ export default function SelectDay({navigation}: any) {
 				</CalendarContainer>
 				<MarginBottom></MarginBottom>
 			</ScrollView>
-			<ButtonContainer>
-				<CustomButton
-					label={`다음`}
-					onPress={() => {
-						navigation.navigate('SelectMulti');
-					}}></CustomButton>
-			</ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle='SelectMulti'></RouteButton>
 		</DayBackground>
 	);
 }

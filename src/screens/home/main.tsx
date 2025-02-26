@@ -5,52 +5,62 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
-import {userSliceActions} from '../../redux/user/user.slice';
+import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
-import {changeLanguage, getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
+import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
 import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGGood, SVGRegionRecommend, SVGRightAdd, SVGSearch} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGGood, SVGNoteList, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
-import {cityViewList} from '../enroll-info/select-city';
 
-import {useAppsflyer} from '../../utill/hooks/useAppsflyer';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {Modal, Platform, SafeAreaView} from 'react-native';
+import {Linking, Modal, Platform, SafeAreaView} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
+import Carousel from 'react-native-reanimated-carousel';
+import {NoteCount} from '../more/more-info';
+import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
-	const {userName, signUpReward, reLogin, userId, analyticeFlag} = useAppSelector(state => state.userSlice);
-	const {selectStartDate, shareLoginFlag, aiList} = useAppSelector(state => state.travelSlice);
+	const {userName, signUpReward, reLogin, userId, analyticeFlag, socialloginProvider} = useAppSelector(
+		state => state.userSlice,
+	);
+	const {selectStartDate, shareLoginFlag, country} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-	const {appsflyerLogEvent} = useAppsflyer();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const {t, i18n} = useTranslation();
 
 	const regionRecommend = async () => {
-		appsflyerLogEvent({name: 'region_recommend', value: {id: 'danim'}});
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
-		navigation.navigate('RegionSelectWho');
+		navigation.navigate('SelectCountry');
 		await logEvent('place_step1', {});
 	};
 	const goEnroll = () => {
-		appsflyerLogEvent({name: 'travel_recommend', value: {id: 'danim'}});
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season}));
+		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-
+	// useEffect(() => {
+	// 	const japanList =
+	// 		'호치민시, 푸꾸옥 섬, 콘다오, 무이네, 빈증, 동탑, 바리아붕타우, 벤트레, 푸토, 동나이, 마이 토, 깐토, 바리아붕타우, 남딘, 까오란, 랑코, 바리아붕타우';
+	// 	const asd = japanList.split(', ');
+	// 	let zxc = [];
+	// 	asd.map((itema, aindex) => {
+	// 		zxc.push({id: aindex, subTitle: itema, lat: 0, lng: 0});
+	// 	});
+	// 	console.log(zxc);
+	// }, []);
 	const selectPopularity = (e: {id: number; subTitle: string}) => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
@@ -58,14 +68,14 @@ export default function Main({navigation}: any) {
 		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle.split(' ')[1]];
 		let cityDistance = metropolitanCheckList.includes(e.subTitle)
 			? 0
-			: cityViewList[e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
+			: cityViewList[0][e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
 		dispatch(
 			travelSliceActions.setPopuarityClickStart({
 				makeMode: 'recommend',
 				season: season,
 				cityIndex: e.id,
 				region: region,
-				cityDistance: [cityViewList[e.id].sub[cityDistance].id],
+				cityDistance: [cityViewList[0][e.id].sub[cityDistance].id],
 			}),
 		);
 		navigation.navigate('EnrollTravelTitle');
@@ -86,19 +96,18 @@ export default function Main({navigation}: any) {
 		};
 		navigation.navigate('CourseDetail', {value: data});
 	};
-	const goTokenLog = () => {
-		navigation.navigate('TokenLog');
-	};
 
 	const pushPermission = async () => {
 		const authStatus = await messaging().requestPermission();
 		dispatch(userSliceActions.setPushNotify(authStatus ? true : false));
 	};
 	const checkEvent = async () => {
-		const eventExist = await dispatch(getEventList()).unwrap();
-		const state = await AsyncStorage.getItem('eventState');
-		if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
-			dispatch(eventSliceActions.setEventState(true));
+		if (eventState == null) {
+			const eventExist = await dispatch(getEventList()).unwrap();
+			const state = await AsyncStorage.getItem('eventState');
+			if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
+				dispatch(eventSliceActions.setEventState(true));
+			}
 		}
 	};
 	const getMainScreen = async () => {
@@ -131,12 +140,37 @@ export default function Main({navigation}: any) {
 		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
 	};
 	const handleGoogleAnalytics = async () => {
-		await logEvent('login', {});
-		await setUserId(userId ?? '');
-		await setUserProperty('user_id', userId ?? '');
+		if (socialloginProvider == 'anonymous') {
+			await logEvent('anonymous_login', {});
+			await setUserId(userId ?? '');
+			await setUserProperty('anonymous_user_id', userId ?? '');
+		} else {
+			await logEvent('login', {});
+			await setUserId(userId ?? '');
+			await setUserProperty('user_id', userId ?? '');
+		}
+
 		dispatch(userSliceActions.setAnalyticeFlag(true));
 	};
+	const [noteList, setNoteList] = useState([]);
+
+	const {eventState} = useAppSelector(state => state.eventSlice);
+	const getNoteListData = async () => {
+		try {
+			const dataList = await dispatch(getNoteList()).unwrap();
+			setNoteList(dataList);
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+		}
+	};
+	useFocusEffect(
+		useCallback(() => {
+			getNoteListData();
+		}, []),
+	);
 	useLayoutEffect(() => {
+		checkEvent();
 		getMainScreen();
 		getFirstRegion();
 	}, []);
@@ -144,18 +178,24 @@ export default function Main({navigation}: any) {
 		shareLoginFlag && navigation.navigate('Timetable');
 		!analyticeFlag && handleGoogleAnalytics();
 	}, []);
-
+	useEffect(() => {
+		if (eventState == false) {
+			socialloginProvider != 'anonymous' && checkCache();
+		}
+	}, [eventState, socialloginProvider]);
 	useEffect(() => {
 		pushPermission();
 		getMainViewPager();
-		checkCache();
-		if (signUpReward) {
+		if (
+			navigation.getState().routes[navigation.getState().index].name != 'FinalCheck' &&
+			navigation.getState().routes[navigation.getState().index].name != 'RegionSelectDistance' &&
+			signUpReward
+		) {
 			navigation.navigate('HomeModal', {status: '회원가입'});
 		} else if (reLogin) {
 			navigation.navigate('HomeModal', {status: '재가입'});
 		}
-		checkEvent();
-	}, [signUpReward]);
+	}, [signUpReward, socialloginProvider]);
 
 	useBackHandler({type: 'exit'});
 	const buttonList: ButtonListType[] = [
@@ -177,8 +217,31 @@ export default function Main({navigation}: any) {
 			),
 			text: '여행 코스 ',
 		},
+		// {
+		// 	id: 2,
+		// 	onPress: goGlobal,
+		// 	image: (
+		// 		<SVGCalendarRecommend
+		// 			width={widthPercentage(200)}
+		// 			height={heightPercentage(150)}></SVGCalendarRecommend>
+		// 	),
+		// 	text: '해외 여행 코스 ',
+		// },
 	];
-	const randomRegion = regionList[Math.floor(Math.random() * regionList.length)];
+	const travleMedicHandle = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
+				modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
+				modalFunction: async () => {
+					await logEvent('travleMedic', {});
+					Linking.openURL('https://travelmedic.co.kr/mypage/event_view.php?idx=29');
+				},
+				travleMedic: true,
+				modalSubTitle: '* 해외3개월이하 보험가입시 적용됩니다.',
+			}),
+		);
+	};
 	const setPreset = (data: {
 		preset: any;
 		presetTendency: any;
@@ -188,6 +251,7 @@ export default function Main({navigation}: any) {
 		tendency: any;
 		travelName: any;
 		region: any;
+		aiId: any;
 	}) => {
 		dispatch(
 			travelSliceActions.setCache({
@@ -199,22 +263,25 @@ export default function Main({navigation}: any) {
 				tendency: JSON.parse(data.tendency),
 				travelName: data.travelName,
 				region: data.region.split(','),
+				aiId: data.aiId,
 			}),
 		);
 		navigation.navigate('Preset');
 	};
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'mainViewPager'});
 	const checkCache = async () => {
-		let [preset, presetTendency, day, nDay, transit, tendency, travelName, region] = await AsyncStorage.multiGet([
-			'preset',
-			'presetTendency',
-			'day',
-			'nDay',
-			'transit',
-			'tendency',
-			'travelName',
-			'region',
-		]);
+		let [preset, presetTendency, day, nDay, transit, tendency, travelName, region, aiId] =
+			await AsyncStorage.multiGet([
+				'preset',
+				'presetTendency',
+				'day',
+				'nDay',
+				'transit',
+				'tendency',
+				'travelName',
+				'region',
+				'aiId',
+			]);
 		if (preset[1] != null) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -230,25 +297,62 @@ export default function Main({navigation}: any) {
 							tendency: tendency[1],
 							travelName: travelName[1],
 							region: region[1],
+							aiId: aiId[1],
 						}),
 					modalLeft: true,
 				}),
 			);
 		}
-		AsyncStorage.multiRemove(['preset', 'presetTendency', 'day', 'nDay', 'transit', 'tendency', 'travelName']);
+		AsyncStorage.multiRemove([
+			'preset',
+			'presetTendency',
+			'day',
+			'nDay',
+			'transit',
+			'tendency',
+			'travelName',
+			'aiId',
+		]);
 	};
+	const vividList = [
+		{
+			name: '쥬쥬',
+			region: '전남 순천시, 여수시 여행',
+			title: '친구의 추천으로 한번 사용해봤습니다. 여행 계획 짜는걸 굉장히 싫어하는데 대신 짜주니 굉장히 편리하네요 특히 제가 처한 상황이나 특징을 고려해서 짜주는게 좋았습니다.',
+		},
+		{
+			name: '카우준',
+			region: '경남 김해시 여행',
+			title: '여행 계획 짤때마다 다 비슷해서 싫었는데 이 앱은 제가 원하는 조건을 입력하면 그에따른 결과 값을 줘서 좋은거같아요',
+		},
+		{
+			name: '맨유맨',
+			region: '강원 원주시, 횡성군 여행',
+			title: '여행 계획 짜기 귀찮았는데 ,클릭 몇 번으로 여행 계획 만들어줘서 좋았다 다음에 여행 계획 짤때 또 사용할 듯 하다',
+		},
+	];
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<BackgroundImage source={{uri: homeRegionImage.photo}}>
 					<BrighnessBox>
-						{/* <TicketTouchable onPress={goSearch}>
-							<SVGSearch />
-							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								{t('이용권')}
-							</PretendardSemiBoldText>
-						</TicketTouchable> */}
+						{socialloginProvider != 'anonymous' && (
+							<TicketTouchable>
+								<NoteCount>
+									<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
+										{noteList.filter(item => !item.startsWith('read')).length}
+									</PretendardSemiBoldText>
+								</NoteCount>
+								<SVGNoteList
+									onPress={() => {
+										navigation.navigate('NoteList');
+									}}
+									width={widthPercentage(33)}
+									height={widthPercentage(33)}></SVGNoteList>
+							</TicketTouchable>
+						)}
 						<HomeTextContainer
+							heightFlag={socialloginProvider == 'anonymous'}
 							onPress={() => {
 								selectPopularity({
 									id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
@@ -311,17 +415,54 @@ export default function Main({navigation}: any) {
 									<ImageContainer>
 										<CollectionRecommendContentItemImage
 											source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-										<PretendardSemiBoldText
-											size={20}
-											lineHeight={26}
-											color={colors.backgroundWhite}>
-											{item.name}
-										</PretendardSemiBoldText>
+										<GraientBackground>
+											<PretendardSemiBoldText
+												size={20}
+												lineHeight={26}
+												numberOfLines={2}
+												color={colors.backgroundWhite}>
+												{item.name}
+											</PretendardSemiBoldText>
+										</GraientBackground>
 									</ImageContainer>
 								</CollectionTouchableOpacity>
 							))}
 						</CollectionContentContainer>
 					</CollectionContainer>
+					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+						다님 사용자들의 생생한 후기
+					</PretendardSemiBoldText>
+					<Carousel
+						loop
+						style={{
+							marginTop: 18,
+						}}
+						width={widthPercentage(337)}
+						height={heightPercentage(160)}
+						autoPlay={true}
+						data={[1, 2, 3]}
+						scrollAnimationDuration={1000}
+						onSnapToItem={() => {}}
+						autoPlayInterval={4000}
+						renderItem={({index}) => (
+							<VividReviewContainer>
+								<HStack>
+									<PretendardBoldText size={16} lineHeight={20} color={colors.Black}>
+										{vividList[index].name} 님{' '}
+									</PretendardBoldText>
+									<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
+										( {vividList[index].region} ) 📝
+									</PretendardBoldText>
+								</HStack>
+								<PretendardBoldText size={12} lineHeight={18} color={colors.Gray3}>
+									{vividList[index].title}
+								</PretendardBoldText>
+							</VividReviewContainer>
+						)}
+					/>
+					<MouCouponTouchable onPress={travleMedicHandle}>
+						<MoiCouponImage source={require('../../../public/mou/travleMedic.jpg')}></MoiCouponImage>
+					</MouCouponTouchable>
 				</HomeBottomContainer>
 			</HomeContainer>
 			<Modal
@@ -396,21 +537,20 @@ const BackgroundImage = styled.ImageBackground`
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
 	top: ${heightPercentage(39)}px;
-	left: ${widthPercentage(325)}px;
-	width: ${widthPercentage(31)}px;
-	height: ${heightPercentage(31)}px;
-	background-color: ${colors.Primary};
+	left: ${widthPercentage(305)}px;
+	width: ${widthPercentage(50)}px;
+	height: ${widthPercentage(50)}px;
 	align-items: center;
 	justify-content: center;
 `;
-const HomeTextContainer = styled.Pressable`
-	top: ${heightPercentage(275)}px;
+const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
+	top: ${props => heightPercentage(props.heightFlag ? 275 : 225)}px;
 	left: ${widthPercentage(26)}px;
 `;
 
 const CollectionContainer = styled.View`
 	margin-top: ${heightPercentage(36)}px;
-	margin-bottom: 12px;
+	margin-bottom: ${heightPercentage(26)}px;
 `;
 const CollectionContentContainer = styled.ScrollView`
 	margin-top: ${heightPercentage(18)}px;
@@ -427,10 +567,43 @@ const ImageContainer = styled.View`
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(196)}px;
 	margin-right: ${widthPercentage(12)}px;
-	padding: ${widthPercentage(12)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
+`;
+const VividReviewContainer = styled.View`
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(160)}px;
+	padding-horizontal: ${widthPercentage(30)}px;
+	padding-top: ${widthPercentage(15)}px;
+	gap: ${widthPercentage(10)}px;
+	background-color: ${colors.backgroundWhite};
+	border-width: 2px;
+	border-radius: 12px;
+	border-color: ${colors.Gray2};
+`;
+
+const GraientBackground = styled.View`
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: ${widthPercentage(80)}px;
+	background-color: rgba(0, 0, 0, 0.3);
+	justify-content: flex-end;
+	border-bottom-right-radius: 12px;
+	border-bottom-left-radius: 12px;
+	padding: ${widthPercentage(12)}px;
+`;
+const MouCouponTouchable = styled.TouchableOpacity`
+	margin-top: ${widthPercentage(20)}px;
+	width: ${widthPercentage(326)}px;
+	height: ${widthPercentage(100)}px;
+	border-radius: 12px;
+`;
+const MoiCouponImage = styled.Image`
+	width: ${widthPercentage(326)}px;
+	height: ${widthPercentage(100)}px;
+	border-radius: 12px;
 `;
 interface mainScreensType {
 	region: string;

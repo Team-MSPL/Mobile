@@ -20,10 +20,12 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
 	const {Place, accommodations, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [placeState, setPlaceState] = useState<{
 		name: string | undefined;
 		lat: number | undefined;
@@ -104,9 +106,44 @@ export default function SearchPlace({navigation, route}: any) {
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	const handleGoogleAnalytics = async () => {
-		await logEvent('select_place', {
-			place: placeState?.name,
+		socialloginProvider == 'anonymous'
+			? await logEvent('anonymous_select_place', {
+					place: placeState?.name,
+			  })
+			: await logEvent('select_place', {
+					place: placeState?.name,
+			  });
+	};
+	const handleCheck = () => {
+		if (route.params.id == 1) {
+			if (accommodations.slice(1, accommodations.length - 1).filter(item => item.name == '').length == 1) {
+				addPlace();
+			} else {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '나머지 날들도 같은 숙소 추가하겠습니까?',
+						modalTopText: '예, 전부 같은 숙소로 할래요',
+						modalBottomText: '아니요, 다른 숙소도 찾아볼래요.',
+						modalFunction: allAccomodation,
+						modalBottomFunctionUse: true,
+						modalBottomFunction: addPlace,
+					}),
+				);
+			}
+		} else {
+			addPlace();
+		}
+	};
+	const allAccomodation = () => {
+		let copy = accommodations.map((item, index) => {
+			if (index != 0 && index != accommodations.length - 1 && item.name == '') {
+				return placeState;
+			} else {
+				return item;
+			}
 		});
+		dispatch(SearchList[route.params.id].function(copy));
+		navigation.goBack();
 	};
 	const addPlace = () => {
 		let copy = [...SearchList[route.params.id].variable];
@@ -141,7 +178,6 @@ export default function SearchPlace({navigation, route}: any) {
 					query={{
 						key: GOOGLE_API_KEY,
 						language: 'ko',
-						components: 'country:kr',
 					}}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{
@@ -254,7 +290,7 @@ export default function SearchPlace({navigation, route}: any) {
 						label={SearchList[route.params.id].subTitle}
 						width={widthPercentage(327)}
 						height={heightPercentage(60)}
-						onPress={addPlace}
+						onPress={handleCheck}
 						backgroundColor={colors.Primary}
 						textColor={colors.Gray5}></PrimaryButton>
 				</BottomContainer>

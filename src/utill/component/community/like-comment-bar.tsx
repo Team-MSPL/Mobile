@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {clickLike, unclickLike} from '../../../redux/community/community.slice';
 import {colors} from '../../colors';
 import {HStack, PretendardVariableText} from '../../layout/layout';

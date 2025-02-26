@@ -1,4 +1,3 @@
-import {Dimensions} from 'react-native';
 import Swiper from 'react-native-swiper';
 import styled from 'styled-components/native';
 import {colors} from '../../colors';

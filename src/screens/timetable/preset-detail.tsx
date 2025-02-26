@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, TouchableOpacity} from 'react-native';
 import {BackgroundGray, FlexWrap, HStack, PretendardSemiBoldText, TagContainer} from '../../utill/layout/layout';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -17,17 +17,31 @@ import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice
 import {SVGRightAdd} from '../../utill/svg/svg';
 
 export default function PresetDetail({navigation, route}: any) {
-	const {presetTendencyList, presetDatas, day, nDay, aiID} = useAppSelector(state => state.travelSlice);
+	const {presetTendencyList, presetDatas, day, nDay, aiID, region} = useAppSelector(state => state.travelSlice);
 	const [select, setSelect] = useState(0);
 	const dispatch = useAppDispatch();
 	let markerCount = 0;
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '잠깐!',
-				modalSubTitle: '선택 후에는 다시 돌아올수없습니다.\n선택시 자동 저장됩니다.',
+				modalTitle: '식당과 숙소까지 다님에서\n한 번에 추천해드릴까요?',
+				modalSubTitle: '별점이 높은 장소를 우선적으로 추천해드려요',
 				modalLeft: true,
-				modalFunction: goNext,
+				modalTopText: '네, 한 번에 추천해주세요',
+				modalBottomText: '아니요, 제가 나중에 직접 고를래요',
+				modalFunction: () => handleRecommend(true),
+				modalBottomFunctionUse: true,
+				modalBottomFunction: () => handleRecommend(false),
+			}),
+		);
+	};
+	const handleRecommend = (e: boolean) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '잠깐!',
+				modalSubTitle: '일정을 확정하면 본 결과를 다시 확인하실 수 없습니다. 확정하시면 자동으로 저장됩니다.',
+				modalLeft: true,
+				modalFunction: () => goNext(e),
 			}),
 		);
 	};
@@ -41,20 +55,21 @@ export default function PresetDetail({navigation, route}: any) {
 			'tendency',
 			'travelName',
 			'region',
+			'aiId',
 		]);
 	};
-	const goNext = () => {
+	const goNext = (e: boolean) => {
 		try {
 			removeCache();
 			dispatch(deleteAI({aiId: aiID}));
-			let copy = [...presetDatas[select]];
-			if (presetDatas[select].length != nDay + 1) {
-				const check = nDay + 1 - presetDatas[select].length;
-
+			let copy = [...presetDatas[route.params.index]];
+			if (presetDatas[route.params.index].length != nDay + 1) {
+				const check = nDay + 1 - presetDatas[route.params.index].length;
 				for (let i = 0; i < check; i++) {
 					copy.push([]);
 				}
 			}
+			dispatch(travelSliceActions.setAutoRecommendFlag(e));
 			dispatch(travelSliceActions.enrollTimetable(copy));
 			navigation.navigate('Timetable');
 		} catch (err) {
@@ -64,22 +79,23 @@ export default function PresetDetail({navigation, route}: any) {
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const mapRef = useRef<MapView>(null);
 	const scrollRef = useRef();
-	const change = (idx: number) => {
-		if (mapRef.current) {
-			mapRef.current.animateToRegion(
-				{
-					latitude: centerLatitude,
-					longitude: centerLongitude,
-					latitudeDelta: deltaLatitude + deltaLatitude / 2,
-					longitudeDelta: deltaLongitude + deltaLongitude / 5,
-				},
-				1000,
-			); // 1000ms 동안 목표 지점으로 애니메이션 이동
-		}
+	const changeTouch = (idx: number) => {
+		//setSelect(idx);
 		let totalScroll = 0;
 		for (let i = 0; i < idx; i++) {
 			totalScroll += presetDatas[route.params.index][i].length;
 		}
+		scrollRef.current.scrollTo({
+			y:
+				totalScroll * heightPercentage(46) +
+				idx * fontPercentage(17) +
+				idx * fontPercentage(17) +
+				idx * heightPercentage(52),
+
+			animate: true,
+		});
+	};
+	const change = (idx: number) => {
 		setSelect(idx);
 	};
 	let positions: {latitude: number; longitude: number}[] = [];
@@ -106,25 +122,32 @@ export default function PresetDetail({navigation, route}: any) {
 			markers.push(
 				value.map((vvalue, iindex) => {
 					markerCount += 1;
-					return (
-						<Marker
-							key={`marker_${index}_${iindex}`}
-							style={{zIndex: 4}}
-							coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-							centerOffset={Platform.OS == 'android' ? {x: 0, y: 0} : {x: 0, y: Platform.isPad ? 0 : -20}}
-							anchor={{x: 0.5, y: 0.5}}
-							title={vvalue.name}>
-							{index == select ? (
-								<MarkerContainer key={iindex}>
-									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
-										{iindex + 1}
-									</PretendardSemiBoldText>
-								</MarkerContainer>
-							) : (
-								<Circle color={colors.Gray5} key={iindex} />
-							)}
-						</Marker>
-					);
+					if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
+						return (
+							<Marker
+								key={`marker_${index}_${iindex}`}
+								style={{zIndex: 4}}
+								coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
+								centerOffset={{x: 0, y: 0}}
+								anchor={{x: 0.5, y: 0.5}}
+								title={vvalue.name}>
+								{index == select ? (
+									<MarkerContainer key={iindex}>
+										<PretendardSemiBoldText
+											size={13}
+											lineHeight={19}
+											color={colors.backgroundWhite}>
+											{iindex + 1}
+										</PretendardSemiBoldText>
+									</MarkerContainer>
+								) : (
+									<Circle color={colors.Gray5} key={iindex} />
+								)}
+							</Marker>
+						);
+					} else {
+						return null;
+					}
 				}),
 			);
 
@@ -162,12 +185,18 @@ export default function PresetDetail({navigation, route}: any) {
 		// 스크롤뷰의 높이를 가져옵니다.
 		const scrollViewHeight = e.nativeEvent.layoutMeasurement.height;
 		const scrollIndex = presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2);
-		if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
+		if (scrollY + scrollViewHeight + (scrollY + scrollViewHeight) * 0.1 > e.nativeEvent.contentSize.height) {
+			change(presetScrollHeight.length - 1);
+		} else if (scrollIndex != -1 && scrollIndex < presetScrollHeight.length) {
 			change(presetScrollHeight.findIndex(item => item > scrollY + scrollViewHeight / 2));
 		}
 	};
 	const moveRegion = async (index: number, e: number) => {
-		navigation.navigate('CourseDetail', {value: presetDatas[route.params.index][index][e]});
+		let copy = {
+			...presetDatas[route.params.index][index][e],
+			region: region[presetDatas[route.params.index][index][e].regionIndex],
+		};
+		navigation.navigate('CourseDetail', {value: copy});
 	};
 	const [tendencyView, setTendencyView] = useState(true);
 	return (
@@ -232,7 +261,7 @@ export default function PresetDetail({navigation, route}: any) {
 									key={idx}
 									select={select == idx}
 									onPress={() => {
-										change(idx);
+										changeTouch(idx);
 									}}>
 									<PretendardSemiBoldText
 										size={14}
@@ -263,7 +292,21 @@ export default function PresetDetail({navigation, route}: any) {
 								{item.map((value, idx) => (
 									<TouchableOpacity
 										onPress={() => {
-											moveRegion(index, idx);
+											if (
+												value.name != '점심 추천' &&
+												value.name != '저녁 추천' &&
+												value.name != '숙소 추천'
+											) {
+												moveRegion(index, idx);
+											} else
+												[
+													dispatch(
+														modalSliceActions.setOpenModal({
+															modalTitle: '여행 일정을 확정하시면\n추천이 가능해요!',
+															modalSingleUse: true,
+														}),
+													),
+												];
 										}}
 										key={idx}>
 										<HStack gap={widthPercentage(10)}>
@@ -293,11 +336,16 @@ export default function PresetDetail({navigation, route}: any) {
 												lineHeight={19}
 												color={value.category == 5 ? colors.PointYellow : colors.Gray5}>
 												{value.name + ' '}
-												<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray5}>
-													{Math.floor(value.takenTime / 60) != 0 &&
-														Math.floor(value.takenTime / 60) + '시간'}
-													{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
-												</PretendardSemiBoldText>
+												{value.name != '숙소 추천' && (
+													<PretendardSemiBoldText
+														size={12}
+														lineHeight={15}
+														color={colors.Gray5}>
+														{Math.floor(value.takenTime / 60) != 0 &&
+															Math.floor(value.takenTime / 60) + '시간'}
+														{value.takenTime % 60 != 0 && (value.takenTime % 60) + '분'}
+													</PretendardSemiBoldText>
+												)}
 											</PretendardSemiBoldText>
 										</HStack>
 									</TouchableOpacity>
@@ -309,7 +357,7 @@ export default function PresetDetail({navigation, route}: any) {
 				<MarginContainer />
 			</BackgroundGray>
 			<ButtonContainer>
-				<CustomButton label='이 코스로 할래요!' onPress={checkNext}></CustomButton>
+				<CustomButton label='이 여행 일정으로 정했어요!' onPress={checkNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);

@@ -38,7 +38,7 @@ export default function Preset({navigation}: any) {
 		aiFlag,
 		aiID,
 	} = useAppSelector(state => state.travelSlice);
-	const {userName} = useAppSelector(state => state.userSlice);
+	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const goDetail = (e: number) => {
 		navigation.navigate('PresetDetail', {index: e});
@@ -120,7 +120,9 @@ export default function Preset({navigation}: any) {
 				bestPointList: presetTendencyList,
 				travelName: travelName,
 			};
-			await dispatch(saveAI(data)).unwrap();
+			const aiIdData = await dispatch(saveAI(data)).unwrap();
+
+			console.log(aiIdData.aiId);
 			const cacheValues: [string, string][] = [
 				['preset', JSON.stringify(presetDatas)],
 				['presetTendency', JSON.stringify(presetTendencyList)],
@@ -130,7 +132,9 @@ export default function Preset({navigation}: any) {
 				['tendency', JSON.stringify(tendency)],
 				['travelName', travelName.toString()],
 				['region', region.toString()],
+				['aiId', aiIdData.aiId],
 			];
+			console.log(aiIdData.aiId);
 			AsyncStorage.multiSet(cacheValues);
 		} catch (err) {
 			console.log(err, '에러');
@@ -153,8 +157,27 @@ export default function Preset({navigation}: any) {
 	}, []);
 	useBackHandler({type: 'popToTop'});
 	useEffect(() => {
-		!aiFlag && saveCache();
-	}, [aiFlag]);
+		if (socialloginProvider != 'anonymous') {
+			console.log('zzzzzz', aiFlag, socialloginProvider);
+			!aiFlag && saveCache();
+		}
+	}, [aiFlag, socialloginProvider]);
+	const calculateTendency = (e: any) => {
+		console.log(e);
+		let copy = [];
+		let index = -1;
+		let copy2 = [];
+		e?.tendencyNameList?.map((item, idx) => {
+			if (['봄', '여름', '가을', '겨울'].includes(item)) {
+				index = idx;
+			} else {
+				copy.push(item);
+			}
+		});
+		copy2 = e.tendencyPointList.filter((item, idx) => !(idx == index)).map(Number);
+		let max = Math.max(...copy2);
+		return copy[copy2.findIndex((item, idx) => item == max)];
+	};
 	return (
 		<BackgroundGray>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -176,12 +199,12 @@ export default function Preset({navigation}: any) {
 					<RegionTextContainer gap={widthPercentage(4)}>
 						<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color='#DDF2FE' />
 						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-							{region[0]}
+							{region[0].split('/').at(-1)}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
 						</PretendardSemiBoldText>
 					</RegionTextContainer>
 					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-						{presetTendencyList[0].tendencyNameList.map((item, idx) => {
+						{presetTendencyList[0]?.tendencyNameList.map((item, idx) => {
 							return (
 								<TagContainer backgroundColor={colors.backgroundGray} key={idx}>
 									<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray4}>
@@ -209,115 +232,138 @@ export default function Preset({navigation}: any) {
 										일정
 									</PretendardSemiBoldText>
 								</HStack>
-								<HStack>
-									<FlexWrap
-										width={widthPercentage(280)}
-										gap={widthPercentage(10)}
-										marginBottom={10}
-										onPress={() => {
-											let copy = {...tendencyViewIndex};
-											copy[idx] = !copy[idx];
-											setTendencyViewIndex(copy);
-										}}>
-										{presetTendencyList[idx].tendencyNameList
-											.slice(
-												0,
-												tendencyViewIndex[idx]
-													? 4
-													: presetTendencyList[idx].tendencyNameList.length,
-											)
-											.map((item, index) => {
-												return (
-													<TagContainer
-														backgroundColor={colors.backgroundGray}
-														height={heightPercentage(28)}
-														key={index}>
-														<PretendardSemiBoldText
-															size={14}
-															lineHeight={17}
-															color={colors.Gray4}>
-															{item + ' '}
-														</PretendardSemiBoldText>
-														<PretendardSemiBoldText
-															size={14}
-															lineHeight={17}
-															color={colors.PointYellow}>
-															{presetTendencyList[idx].tendencyPointList[index]}점
-														</PretendardSemiBoldText>
-													</TagContainer>
-												);
-											})}
-									</FlexWrap>
-									{presetTendencyList[idx].tendencyNameList.length > 4 && (
-										<TouchableOpacity
-											style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
-											onPress={() => {
-												let copy = {...tendencyViewIndex};
-												copy[idx] = !copy[idx];
-												setTendencyViewIndex(copy);
-											}}>
-											<SVGRightAdd
-												width={widthPercentage(20)}
-												height={widthPercentage(20)}
-												color='black'
-												transform={tendencyViewIndex[idx] ? 90 : 270}
-											/>
-										</TouchableOpacity>
-									)}
-								</HStack>
-								{item.map((value, index) =>
-									value.map((target, targetIndex) => {
-										if (targetIndex == 0) {
-											return (
-												<HStack gap={widthPercentage(10)} key={targetIndex}>
-													<DashLineContainer>
-														{target.category == 4 ? (
-															<Triangle />
-														) : (
-															<Circle
-																color={
-																	target.category == 5
-																		? colors.PointYellow
-																		: colors.Gray5
-																}
-															/>
-														)}
-														<DashLine
-															status={
-																index == 0 && targetIndex == 0
-																	? 'start'
-																	: index == item.length - 1
-																	? 'end'
-																	: 'center'
-															}
-														/>
-													</DashLineContainer>
-													<PretendardVariableText
-														maxWidth={widthPercentage(200)}
-														size={16}
-														lineHeight={19}
-														color={
-															target.category == 5 ? colors.PointYellow : colors.Gray5
-														}>
-														{target.name}
-													</PretendardVariableText>
-													<PretendardVariableText
-														size={16}
-														lineHeight={16}
-														color={colors.Primary}>
-														+{value.length - 1}
-													</PretendardVariableText>
-													<PretendardVariableText
-														size={14}
-														lineHeight={17}
-														color={colors.Gray2}>
-														{index + 1}일차
-													</PretendardVariableText>
-												</HStack>
-											);
-										}
-									}),
+								{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
+									<>
+										{presetTendencyList[idx]?.tendencyNameList.length >= 2 && (
+											<HStack>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={20.6}
+													color={colors.PointYellow}>
+													[{calculateTendency(presetTendencyList[idx])}]
+												</PretendardSemiBoldText>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={20.6}
+													color={colors.Black}>
+													{' '}
+													성향을 중점적으로 고려했어요!
+												</PretendardSemiBoldText>
+											</HStack>
+										)}
+										<HStack>
+											<FlexWrap
+												width={widthPercentage(280)}
+												gap={widthPercentage(10)}
+												marginBottom={10}
+												onPress={() => {
+													let copy = {...tendencyViewIndex};
+													copy[idx] = !copy[idx];
+													setTendencyViewIndex(copy);
+												}}>
+												{presetTendencyList[idx]?.tendencyNameList
+													.slice(
+														0,
+														tendencyViewIndex[idx]
+															? 4
+															: presetTendencyList[idx]?.tendencyNameList.length,
+													)
+													.map((item, index) => {
+														return (
+															<TagContainer
+																backgroundColor={colors.backgroundGray}
+																height={heightPercentage(28)}
+																key={index}>
+																<PretendardSemiBoldText
+																	size={14}
+																	lineHeight={17}
+																	color={colors.Gray4}>
+																	{item + ' '}
+																</PretendardSemiBoldText>
+																<PretendardSemiBoldText
+																	size={14}
+																	lineHeight={17}
+																	color={colors.PointYellow}>
+																	{presetTendencyList[idx].tendencyPointList[index]}점
+																</PretendardSemiBoldText>
+															</TagContainer>
+														);
+													})}
+											</FlexWrap>
+											{presetTendencyList[idx]?.tendencyNameList.length > 4 && (
+												<TouchableOpacity
+													style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
+													onPress={() => {
+														let copy = {...tendencyViewIndex};
+														copy[idx] = !copy[idx];
+														setTendencyViewIndex(copy);
+													}}>
+													<SVGRightAdd
+														width={widthPercentage(20)}
+														height={widthPercentage(20)}
+														color='black'
+														transform={tendencyViewIndex[idx] ? 90 : 270}
+													/>
+												</TouchableOpacity>
+											)}
+										</HStack>
+									</>
 								)}
+								{item.map((value, index) => {
+									return (
+										<HStack gap={widthPercentage(10)} key={index}>
+											<DashLineContainer>
+												{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
+													<Triangle />
+												) : (
+													<Circle
+														color={
+															value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+																? colors.PointYellow
+																: colors.Gray5
+														}
+													/>
+												)}
+												<DashLine
+													status={
+														index == 0
+															? 'start'
+															: index == item.length - 1
+															? 'end'
+															: 'center'
+													}
+												/>
+											</DashLineContainer>
+											<PretendardVariableText
+												maxWidth={widthPercentage(150)}
+												numberOfLines={1}
+												size={16}
+												lineHeight={19}
+												color={
+													value[value[0].category == 4 ? 1 : 0].category == 5
+														? colors.PointYellow
+														: colors.Gray5
+												}>
+												{value[value[0].category == 4 ? 1 : 0].name}
+											</PretendardVariableText>
+											{value.filter(itemValue => !itemValue.name.includes('추천')).length - 1 >=
+												1 && (
+												<PretendardVariableText
+													size={16}
+													lineHeight={16}
+													color={colors.Primary}>
+													+
+													{value.filter(itemValue => !itemValue.name.includes('추천'))
+														.length - 1}
+													개 장소
+												</PretendardVariableText>
+											)}
+											<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
+												{index + 1}일차
+											</PretendardVariableText>
+										</HStack>
+									);
+								})}
 								<PrimaryButton
 									alignSelf='center'
 									marginBottom={heightPercentage(10)}
