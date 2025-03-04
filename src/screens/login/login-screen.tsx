@@ -66,7 +66,7 @@ export default function LoginScreen({navigation}: any) {
 			const userInfo = await KakaoLogin.getProfile();
 			const data = {
 				userName: userInfo.nickname,
-				userProfileImage: userInfo.profileImageUrl,
+				userProfileImage: userInfo?.profileImageUrl ?? 'https://danim.me/square_logo.png',
 				userToken: userInfo.id,
 				loginProvider: 'kakao',
 				signUpFlag: false,
@@ -78,7 +78,7 @@ export default function LoginScreen({navigation}: any) {
 				navigation.navigate('Join1', {
 					userToken: userInfo.id,
 					loginProvider: 'kakao',
-					profileImage: userInfo.profileImageUrl,
+					profileImage: userInfo?.profileImageUrl ?? 'https://danim.me/square_logo.png',
 					nickname: userInfo.nickname,
 				});
 			}
@@ -100,7 +100,7 @@ export default function LoginScreen({navigation}: any) {
 			const userInfo = await GoogleSignin.signIn();
 			const data = {
 				userName: userInfo.user.name,
-				userProfileImage: userInfo.user.photo,
+				userProfileImage: userInfo?.user?.photo ?? 'https://danim.me/square_logo.png',
 				userToken: userInfo.user.id,
 				loginProvider: 'google',
 				signUpFlag: false,
@@ -112,7 +112,7 @@ export default function LoginScreen({navigation}: any) {
 				navigation.navigate('Join1', {
 					userToken: userInfo.user.id,
 					loginProvider: 'google',
-					profileImage: userInfo.user.photo,
+					profileImage: userInfo?.user?.photo ?? 'https://danim.me/square_logo.png',
 					nickname: userInfo.user.name,
 				});
 			}

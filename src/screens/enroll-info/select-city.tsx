@@ -53,9 +53,13 @@ export default function SelectCity({navigation}: any) {
 			copy.length == 0 && dispatch(travelSliceActions.changeChecKStep(3));
 			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		} else {
-			let copy = [...region];
+			let copy = [];
+			let copyIndex = [];
+			if (!(country == 0 && cityIndex == 2)) {
+				let copy = [...region];
+				let copyIndex = [...cityDistance];
+			}
 			copy.push(e.subTitle);
-			let copyIndex = [...cityDistance];
 			copyIndex.push(e.id);
 			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		}

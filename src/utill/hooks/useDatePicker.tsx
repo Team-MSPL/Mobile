@@ -7,7 +7,7 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../layout/respo
 
 export default function UseDatePicker({hourData, minuteData, ampmData, visible, setVisible, goConfirm}: PickerType) {
 	const ampmList = ['오전', '오후'];
-	const hourList = ['12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'];
+	const hourList = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'];
 	const minuteList = ['0', '30'];
 	const [ampm, setAmpm] = useState(0);
 	const [hour, setHour] = useState(0);

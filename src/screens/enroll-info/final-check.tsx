@@ -142,21 +142,6 @@ export default function FinalCheck({navigation}: any) {
 						modalFunction: handleLogin,
 					}),
 			  )
-			: country == 0
-			? dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: 'ai버전을 선택해주세요!',
-						modalTopText: '다님 AI 1호',
-						modalBottomText: '다님 AI 2호 (Beta)',
-						modalBottomFunctionUse: true,
-						modalFunction: () => {
-							goNext(1);
-						},
-						modalBottomFunction: () => {
-							goNext(2);
-						},
-					}),
-			  )
 			: goNext(2);
 	};
 	const goNext = useCallback(
@@ -179,28 +164,32 @@ export default function FinalCheck({navigation}: any) {
 					(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
 					(country != 0 && region[0] == '전체')
 				) {
-					if (country != 0 && cityIndex == 1) {
-						a = cityViewList[country]
-							.slice(2, cityViewList[country].length)
-							.map((value, index) =>
-								value.sub
-									.map((item, idx) => {
-										if (idx != 0) {
-											return cityViewList[country][index + 2].title + ' ' + item.subTitle;
-										} else {
-											return null;
-										}
-									})
-									.filter(item => item !== null),
-							)
-							.join(',')
-							.split(',');
-					} else {
-						a = cityViewList[country][cityIndex].sub.map(
-							(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
-						);
-						a.shift();
-					}
+					a = cityViewList[country][cityIndex].sub.map(
+						(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+					);
+					a.shift();
+					// if (country != 0 && cityIndex == 1) {
+					// 	a = cityViewList[country]
+					// 		.slice(2, cityViewList[country].length)
+					// 		.map((value, index) =>
+					// 			value.sub
+					// 				.map((item, idx) => {
+					// 					if (idx != 0) {
+					// 						return cityViewList[country][index + 2].title + ' ' + item.subTitle;
+					// 					} else {
+					// 						return null;
+					// 					}
+					// 				})
+					// 				.filter(item => item !== null),
+					// 		)
+					// 		.join(',')
+					// 		.split(',');
+					// } else {
+					// 	a = cityViewList[country][cityIndex].sub.map(
+					// 		(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+					// 	);
+					// 	a.shift();
+					// }
 				}
 				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 
@@ -208,9 +197,9 @@ export default function FinalCheck({navigation}: any) {
 				copy.push(season);
 				if (country != 0) {
 					a = a.map((item, idx) => {
-						return `해외/${countryList[country].en}/${
-							cityViewList[country][cityIndex].sub[cityDistance[idx]].subTitle
-						}`;
+						return `해외/${countryList[country].en}/${item
+							.split(cityViewList[country][cityIndex].title)[1]
+							.trim()}`;
 					});
 				}
 				const result = await dispatch(

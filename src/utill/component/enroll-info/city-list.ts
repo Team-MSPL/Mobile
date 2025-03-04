@@ -42,15 +42,57 @@ const koreaCityList = [
 			{id: 5, subTitle: '서북권', example: '은평구,서대문구,마포구', lat: 37.5663937, lng: 126.9387066},
 		],
 	},
-	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체', lat: 35.2100142, lng: 129.0688702}]},
-	{id: 3, title: '대구', sub: [{id: 0, subTitle: '전체', lat: 35.8294374, lng: 128.5655119}]},
-	{id: 4, title: '인천', sub: [{id: 0, subTitle: '전체', lat: 37.4562557, lng: 126.7052062}]},
-	{id: 5, title: '광주', sub: [{id: 0, subTitle: '전체', lat: 35.1557358, lng: 126.8354271}]},
-	{id: 6, title: '대전', sub: [{id: 0, subTitle: '전체', lat: 36.3398175, lng: 127.3940486}]},
-	{id: 7, title: '울산', sub: [{id: 0, subTitle: '전체', lat: 35.5537228, lng: 129.2380554}]},
-	{id: 8, title: '세종', sub: [{id: 0, subTitle: '전체', lat: 36.5606976, lng: 127.2587334}]},
 	{
-		id: 9,
+		id: 2,
+		title: '광역시',
+		sub: [
+			{
+				id: 0,
+				subTitle: '부산',
+				lat: 35.2100142,
+				lng: 129.0688702,
+			},
+			{
+				id: 1,
+				subTitle: '대구',
+				lat: 35.8294374,
+				lng: 128.5655119,
+			},
+			{
+				id: 2,
+				subTitle: '인천',
+				lat: 37.4562557,
+				lng: 126.7052062,
+			},
+			{
+				id: 3,
+				subTitle: '광주',
+				lat: 35.1557358,
+				lng: 126.8354271,
+			},
+			{
+				id: 4,
+				subTitle: '대전',
+				lat: 36.3398175,
+				lng: 127.3940486,
+			},
+			{
+				id: 5,
+				subTitle: '울산',
+				lat: 35.5537228,
+				lng: 129.2380554,
+			},
+			{
+				id: 6,
+				subTitle: '세종',
+				lat: 36.5606976,
+				lng: 127.2587334,
+			},
+		],
+	},
+
+	{
+		id: 3,
 		title: '경기',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.8184719, lng: 127.4502156},
@@ -88,7 +130,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 10,
+		id: 4,
 		title: '강원',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.7091295, lng: 128.8324462},
@@ -113,7 +155,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 11,
+		id: 5,
 		title: '충북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 36.7697608, lng: 127.8294253},
@@ -131,7 +173,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 12,
+		id: 6,
 		title: '충남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 36.2915841, lng: 127.2344325},
@@ -153,7 +195,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 13,
+		id: 7,
 		title: '전북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.4358216, lng: 126.7020806},
@@ -174,7 +216,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 14,
+		id: 8,
 		title: '전남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.6205005, lng: 126.7721492},
@@ -203,7 +245,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 15,
+		id: 9,
 		title: '경북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.8337972, lng: 128.8090748},
@@ -232,7 +274,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 16,
+		id: 10,
 		title: '경남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.8806427, lng: 128.6210824},
@@ -257,7 +299,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 17,
+		id: 11,
 		title: '제주',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 33.3846216, lng: 126.5534925},

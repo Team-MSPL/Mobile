@@ -192,7 +192,7 @@ export default function SelectDay({navigation}: any) {
 							}}>
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
+									{timeLimitArray[idx] < 12 ? '오전' : '오후'}
 								</PretendardSemiBoldText>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 									{String(timeLimitArray[idx]).padStart(2, '0')}
