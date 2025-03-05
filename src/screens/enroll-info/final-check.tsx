@@ -192,7 +192,9 @@ export default function FinalCheck({navigation}: any) {
 					// }
 				}
 				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
-
+				if (country == 0 && cityIndex == 2) {
+					a = [region[0] + ' 전체'];
+				}
 				let copy = [...tendency];
 				copy.push(season);
 				if (country != 0) {

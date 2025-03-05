@@ -596,12 +596,17 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 						onPress={() => {
 							setViewMap(!viewMap);
 						}}>
-						<SVGRightAdd
-							width={widthPercentage(20)}
-							height={widthPercentage(20)}
-							color='black'
-							transform={!viewMap ? 90 : 270}
-						/>
+						<HStack gap={5}>
+							<PretendardSemiBoldText size={14} lineHeight={19} color={colors.Gray5}>
+								{viewMap ? '접기' : '펼치기'}
+							</PretendardSemiBoldText>
+							<SVGRightAdd
+								width={widthPercentage(20)}
+								height={widthPercentage(20)}
+								color='black'
+								transform={!viewMap ? 90 : 270}
+							/>
+						</HStack>
 					</ViewMapTouchable>
 				)}
 				<BackgroundGray modify={modify} viewMap={viewMap}>

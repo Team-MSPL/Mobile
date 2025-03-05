@@ -34,7 +34,7 @@ export default function SelectCity({navigation}: any) {
 	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
 		[],
 	);
-	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
+	const checkList = ['서울', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
 		dispatch(
 			travelSliceActions.selectPopularity({
@@ -245,7 +245,7 @@ export default function SelectCity({navigation}: any) {
 						}}
 						ref={carouselRef}
 						width={widthPercentage(337)}
-						height={heightPercentage(country == 0 && cityIndex == 9 ? 360 : 160)}
+						height={heightPercentage(Math.ceil(cityViewList[country][cityIndex].sub.length / 4) * 50)}
 						data={cityViewList[country]}
 						scrollAnimationDuration={500}
 						onSnapToItem={itemIndex => {
@@ -367,4 +367,4 @@ const SelectAllContainer = styled.View`
 	width: 100%;
 	height: ${heightPercentage(30)}px;
 `;
-const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: Pressable})``;
+const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: ScrollView})``;
