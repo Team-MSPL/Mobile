@@ -37,6 +37,7 @@ import {
 import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-top-bar-component';
 import {useDistance} from '../../utill/hooks/useDistance';
 import {Image} from 'react-native';
+import Toast from 'react-native-toast-message';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
@@ -515,8 +516,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 						</VStack>
 						<InsideGrayContainer
 							onLongPress={() => {
-								changeLocationRef.current.before = idx;
-								drag();
+								if (item.category != 4) {
+									changeLocationRef.current.before = idx;
+									drag();
+								}
 							}}
 							onPress={() => {
 								// moveRegion(idx);
@@ -568,12 +571,20 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		);
 	};
 	const changeLocation = (data: any) => {
-		let copy = [...timetable];
-		timetable[data[0].x].map((item, index) => {
-			data[index] = {...data[index], y: item.y, takenTime: item.takenTime};
-		});
-		copy[data[0].x] = data;
-		dispatch(travelSliceActions.changeTimetable(copy));
+		if (
+			(timetable[data[0]?.x][0].category == 4 && timetable[data[0]?.x][0].category != data[0]?.category) ||
+			(timetable[data[0]?.x].at(-1)?.category == 4 &&
+				timetable[data[0]?.x].at(-1)?.category != data?.at(-1)?.category)
+		) {
+			Toast.show({type: 'success', text1: '숙소는 변경할 수 없습니다', position: 'bottom'});
+		} else {
+			let copy = [...timetable];
+			timetable[data[0].x].map((item, index) => {
+				data[index] = {...data[index], y: item.y, takenTime: item.takenTime};
+			});
+			copy[data[0].x] = data;
+			dispatch(travelSliceActions.changeTimetable(copy));
+		}
 	};
 	const [changeDay, setChangeDay] = useState(0);
 	const changeLocationRef = useRef({before: 0, after: 1});
