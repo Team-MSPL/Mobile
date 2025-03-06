@@ -57,6 +57,7 @@ import Tailiand from '../../../public/tailiand.svg';
 import Philippine from '../../../public/philippine.svg';
 import Singapore from '../../../public/singapore.svg';
 import Vietnam from '../../../public/vietnam.svg';
+import Polygon from '../../../public/polygon.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -230,4 +231,9 @@ export const SvgSingapore = styled(Singapore)<{color?: string}>`
 `;
 export const SvgVietnam = styled(Vietnam)<{color?: string}>`
 	color: color;
+`;
+
+export const SvgPolygon = styled(Polygon)<{color?: string; transform?: number}>`
+	color: color;
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;

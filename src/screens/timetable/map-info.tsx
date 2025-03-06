@@ -25,7 +25,7 @@ import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd, SvgPolygon} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {
@@ -36,6 +36,7 @@ import {
 } from 'react-native-draggable-flatlist';
 import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-top-bar-component';
 import {useDistance} from '../../utill/hooks/useDistance';
+import {Image} from 'react-native';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
@@ -148,13 +149,34 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 							anchor={{x: 0.5, y: 0.5}}
 							style={{zIndex: 4}}>
 							{index == select ? (
-								<MarkerContainer key={idx}>
-									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
-										{count}
-									</PretendardSemiBoldText>
-								</MarkerContainer>
+								item.category == 4 ? (
+									<Image
+										source={require('../../../public/images/hotel.png')}
+										style={{
+											width: widthPercentage(30),
+											height: widthPercentage(30),
+											zIndex: 200,
+										}}></Image>
+								) : item.category == 1 ? (
+									<Image
+										source={require('../../../public/images/defalutFood.png')}
+										style={{
+											width: widthPercentage(30),
+											height: widthPercentage(30),
+											zIndex: 200,
+										}}></Image>
+								) : (
+									<MarkerContainer key={idx}>
+										<PretendardSemiBoldText
+											size={13}
+											lineHeight={19}
+											color={colors.backgroundWhite}>
+											{count}
+										</PretendardSemiBoldText>
+									</MarkerContainer>
+								)
 							) : (
-								<Circle color={colors.Gray5} key={idx} />
+								<Circle color={colors.Gray5} key={idx} style={{zIndex: 1}} />
 							)}
 						</Marker>
 					);
@@ -487,6 +509,10 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			<ScaleDecorator>
 				{!excludeNames.includes(item.name) ? (
 					<HStack gap={widthPercentage(10)}>
+						<VStack gap={8}>
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
+						</VStack>
 						<InsideGrayContainer
 							onLongPress={() => {
 								changeLocationRef.current.before = idx;
@@ -912,17 +938,37 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 												) : (
 													<HStack key={idx}>
 														<DashLineContainer justifyContent='start'>
-															<MarkerContainer
-																backgroundColor={
-																	item.category == 4 ? colors.PointGreen1 : undefined
-																}>
-																<PretendardSemiBoldText
-																	size={13}
-																	lineHeight={19}
-																	color={colors.backgroundWhite}>
-																	{idx + 1}
-																</PretendardSemiBoldText>
-															</MarkerContainer>
+															{item.category == 4 ? (
+																<Image
+																	source={require('../../../public/images/hotel.png')}
+																	style={{
+																		width: widthPercentage(30),
+																		height: widthPercentage(30),
+																		zIndex: 200,
+																	}}></Image>
+															) : item.category == 1 ? (
+																<Image
+																	source={require('../../../public/images/defalutFood.png')}
+																	style={{
+																		width: widthPercentage(30),
+																		height: widthPercentage(30),
+																		zIndex: 200,
+																	}}></Image>
+															) : (
+																<MarkerContainer
+																	backgroundColor={
+																		item.category == 4
+																			? colors.PointGreen1
+																			: undefined
+																	}>
+																	<PretendardSemiBoldText
+																		size={13}
+																		lineHeight={19}
+																		color={colors.backgroundWhite}>
+																		{idx + 1}
+																	</PretendardSemiBoldText>
+																</MarkerContainer>
+															)}
 															<DashLine
 																status={
 																	idx == value.length - 1 ? 'end' : 'center'

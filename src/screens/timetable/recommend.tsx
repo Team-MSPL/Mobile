@@ -109,6 +109,7 @@ export default function Recommend({navigation, route}: any) {
 				lng: recommendList[idx].x,
 			};
 		}
+		console.log(tripadvisorList.current[idx]);
 		let copy = [...recommendItem];
 		const updateItem = {
 			name: changeData.name,
