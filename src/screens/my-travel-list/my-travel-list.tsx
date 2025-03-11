@@ -376,87 +376,99 @@ export default function MyTravelList({navigation}: any) {
 						))}
 					</>
 				)}
-				{(monthRef.current != after || item.index == 0) && (
-					<DivideDayContainer>
-						<PretendardVariableText
-							size={12}
-							lineHeight={18}
-							color={colors.Gray2}
-							marginTop={heightPercentage(30)}>
-							{moment(item.item.day[item.item.nDay - 1]).format('YYYY년 MM월')}
-						</PretendardVariableText>
-					</DivideDayContainer>
-				)}
-				<MyTravelContainer
-					onLongPress={() => {
-						if (!shareFlag) {
-							setShareFlag(true);
-							setShareSeleted([{index: item.index, status: 'finished'}]);
-						}
-					}}
-					shareFlag={shareFlag}
-					shareSeleted={
-						shareSeleted.filter(value => value.status == 'finished' && value.index == item.index).length >=
-						1
-					}
-					onPress={() => {
-						if (shareFlag) {
-							let copy = [...shareSeleted];
-							copy.filter(value => value.status == 'finished' && value.index == item.index).length >= 1
-								? (copy = copy.filter(
-										(copyItem, copyIndex) =>
-											!(copyItem.index == item.index && copyItem.status == 'finished'),
-								  ))
-								: copy.push({index: item.index, status: 'finished'});
-							setShareSeleted(copy);
-						} else {
-							goMyTravelDetail(item.item);
-						}
-						// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
-					}}>
-					<VStack>
-						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-							{moment(item.item.day[0]).format('YYYY년 MM월 DD일') +
-								' ~ ' +
-								moment(item.item.day[item.item.nDay - 1]).format('MM월 DD일')}
-						</PretendardVariableText>
-						<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
-							{item.item.travelName}
-						</PretendardVariableText>
-						<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-							{
-								dDayCalculate({startDay: item.item.day[0], endDay: item.item.day[item.item.nDay - 1]})
-									.result
-							}
-						</PretendardVariableText>
-						<TagContainer
-							backgroundColor={colors.backgroundGray}
-							height={heightPercentage(30)}
-							width={widthPercentage(105)}>
-							<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-								{item.item.region[0].split('/').at(-1)}
-							</PretendardVariableText>
-							<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color={colors.Primary} />
-						</TagContainer>
-					</VStack>
-					{shareFlag && (
-						<CircleContainer
+				{myTravelList.length != 0 && (
+					<>
+						{(monthRef.current != after || item.index == 0) && (
+							<DivideDayContainer>
+								<PretendardVariableText
+									size={12}
+									lineHeight={18}
+									color={colors.Gray2}
+									marginTop={heightPercentage(30)}>
+									{moment(item.item.day[item.item.nDay - 1]).format('YYYY년 MM월')}
+								</PretendardVariableText>
+							</DivideDayContainer>
+						)}
+						<MyTravelContainer
+							onLongPress={() => {
+								if (!shareFlag) {
+									setShareFlag(true);
+									setShareSeleted([{index: item.index, status: 'finished'}]);
+								}
+							}}
+							shareFlag={shareFlag}
 							shareSeleted={
 								shareSeleted.filter(value => value.status == 'finished' && value.index == item.index)
 									.length >= 1
-							}>
-							<SvgCheck
-								color={
-									shareSeleted.filter(
-										value => value.status == 'finished' && value.index == item.index,
-									).length >= 1
-										? colors.backgroundWhite
-										: colors.Gray2
+							}
+							onPress={() => {
+								if (shareFlag) {
+									let copy = [...shareSeleted];
+									copy.filter(value => value.status == 'finished' && value.index == item.index)
+										.length >= 1
+										? (copy = copy.filter(
+												(copyItem, copyIndex) =>
+													!(copyItem.index == item.index && copyItem.status == 'finished'),
+										  ))
+										: copy.push({index: item.index, status: 'finished'});
+									setShareSeleted(copy);
+								} else {
+									goMyTravelDetail(item.item);
 								}
-							/>
-						</CircleContainer>
-					)}
-				</MyTravelContainer>
+								// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
+							}}>
+							<VStack>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+									{moment(item.item.day[0]).format('YYYY년 MM월 DD일') +
+										' ~ ' +
+										moment(item.item.day[item.item.nDay - 1]).format('MM월 DD일')}
+								</PretendardVariableText>
+								<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5}>
+									{item.item.travelName}
+								</PretendardVariableText>
+								<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+									{
+										dDayCalculate({
+											startDay: item.item.day[0],
+											endDay: item.item.day[item.item.nDay - 1],
+										}).result
+									}
+								</PretendardVariableText>
+								<TagContainer
+									backgroundColor={colors.backgroundGray}
+									height={heightPercentage(30)}
+									width={widthPercentage(105)}>
+									<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+										{item.item.region[0].split('/').at(-1)}
+									</PretendardVariableText>
+									<SVGFlag
+										width={widthPercentage(12)}
+										height={widthPercentage(15)}
+										color={colors.Primary}
+									/>
+								</TagContainer>
+							</VStack>
+							{shareFlag && (
+								<CircleContainer
+									shareSeleted={
+										shareSeleted.filter(
+											value => value.status == 'finished' && value.index == item.index,
+										).length >= 1
+									}>
+									<SvgCheck
+										color={
+											shareSeleted.filter(
+												value => value.status == 'finished' && value.index == item.index,
+											).length >= 1
+												? colors.backgroundWhite
+												: colors.Gray2
+										}
+									/>
+								</CircleContainer>
+							)}
+						</MyTravelContainer>
+					</>
+				)}
 			</>
 		);
 	};
@@ -475,7 +487,7 @@ export default function MyTravelList({navigation}: any) {
 				) : (
 					<FlatList
 						ref={scrollViewRef}
-						data={myTravelList}
+						data={myTravelList.length == 0 ? aiList : myTravelList}
 						renderItem={renderItem}
 						initialNumToRender={20}
 						showsVerticalScrollIndicator={false}
