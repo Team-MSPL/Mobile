@@ -220,9 +220,9 @@ export default function FinalCheck({navigation}: any) {
 						password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 					}),
 				).unwrap();
-				result.data.resultData.map(item => {
-					console.log(item);
-				});
+				// result.data.resultData.map(item => {
+				// 	console.log(item);
+				// });
 				dispatch(travelSliceActions.selectRegion(a));
 				if (result) {
 					navigation.popToTop();

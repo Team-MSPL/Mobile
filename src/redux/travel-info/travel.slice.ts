@@ -645,7 +645,7 @@ export const travelSlice = createSlice({
 						id: 0, //넣을거
 						takenTime: 0, //넣을거
 					};
-					item.forEach((value, index) => {
+					item.some((value, index) => {
 						if (index == 0) {
 							if (idx == 0) {
 								time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
@@ -692,16 +692,36 @@ export const travelSlice = createSlice({
 							time += 3;
 						}
 						if (value.category != 4) {
-							copy[idx].push({
-								...value,
-								x: idx,
-								y: time,
-								id: shortId.generate(),
-								key: shortId.generate(),
-							});
-							time += value.takenTime / 30;
-							let bandwidthTime = state.bandwidth ? 1 : 0;
-							index != item.length - 1 && (time += 2 + bandwidthTime);
+							if (
+								idx == timeTable.length - 1 &&
+								time + value.takenTime / 30 >=
+									(state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30
+							) {
+								if (time >= (state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30)
+									return true;
+								copy[idx].push({
+									...value,
+									x: idx,
+									y: time,
+									id: shortId.generate(),
+									key: shortId.generate(),
+									takenTime:
+										((state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30 - time) *
+										30,
+								});
+								return true;
+							} else {
+								copy[idx].push({
+									...value,
+									x: idx,
+									y: time,
+									id: shortId.generate(),
+									key: shortId.generate(),
+								});
+								time += value.takenTime / 30;
+								let bandwidthTime = state.bandwidth ? 1 : 0;
+								index != item.length - 1 && (time += 2 + bandwidthTime);
+							}
 						}
 						if (index == item.length - 1 && idx != timeTable.length - 1 && value.category != 4) {
 							copy[idx].push({
