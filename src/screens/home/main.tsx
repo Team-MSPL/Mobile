@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -28,6 +29,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {NoteCount} from '../more/more-info';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
 	const {userName, signUpReward, reLogin, userId, analyticeFlag, socialloginProvider} = useAppSelector(
@@ -359,25 +361,36 @@ export default function Main({navigation}: any) {
 									subTitle: regionList.find(item => item.subTitle == homeRegionImage.name).subTitle,
 								});
 							}}>
-							<PretendardSemiBoldText
-								size={23}
-								lineHeight={34.5}
-								color={
-									colors.backgroundWhite
-								}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
-							<HStack>
-								<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
-									{homeRegionImage.name + ' '}
-								</PretendardBoldText>
-								<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
-									여행은 어때요?
-								</PretendardSemiBoldText>
-								<SVGRightAdd
-									color='white'
-									width={heightPercentage(24)}
-									height={heightPercentage(24)}
-									style={{marginLeft: 10}}></SVGRightAdd>
-							</HStack>
+							<LinearGradient
+								start={{x: 0, y: 0}}
+								end={{x: 0, y: 1}}
+								colors={['rgba(255,255,255,0)', 'black']}
+								style={{
+									zIndex: 101,
+									position: 'absolute',
+									width: '100%',
+									paddingHorizontal: widthPercentage(26),
+								}}>
+								<PretendardSemiBoldText
+									size={23}
+									lineHeight={34.5}
+									color={
+										colors.backgroundWhite
+									}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
+								<HStack>
+									<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
+										{homeRegionImage.name + ' '}
+									</PretendardBoldText>
+									<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
+										여행은 어때요?
+									</PretendardSemiBoldText>
+									<SVGRightAdd
+										color='white'
+										width={heightPercentage(24)}
+										height={heightPercentage(24)}
+										style={{marginLeft: 10}}></SVGRightAdd>
+								</HStack>
+							</LinearGradient>
 						</HomeTextContainer>
 					</BrighnessBox>
 				</BackgroundImage>
@@ -544,8 +557,7 @@ const TicketTouchable = styled.TouchableOpacity`
 	justify-content: center;
 `;
 const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
-	top: ${props => heightPercentage(props.heightFlag ? 275 : 225)}px;
-	left: ${widthPercentage(26)}px;
+	top: ${props => heightPercentage(props.heightFlag ? 275 : 215)}px;
 `;
 
 const CollectionContainer = styled.View`
