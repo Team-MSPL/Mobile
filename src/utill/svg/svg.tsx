@@ -59,6 +59,9 @@ import Singapore from '../../../public/singapore.svg';
 import Vietnam from '../../../public/vietnam.svg';
 import Polygon from '../../../public/polygon.svg';
 
+import Airport from '../../../public/airport.svg';
+import Train from '../../../public/train.svg';
+
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -236,4 +239,10 @@ export const SvgVietnam = styled(Vietnam)<{color?: string}>`
 export const SvgPolygon = styled(Polygon)<{color?: string; transform?: number}>`
 	color: color;
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
+`;
+export const SvgAirPort = styled(Airport)<{color?: string}>`
+	color: color;
+`;
+export const SvgTrain = styled(Train)<{color?: string}>`
+	color: color;
 `;

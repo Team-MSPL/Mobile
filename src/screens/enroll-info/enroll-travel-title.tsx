@@ -35,7 +35,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	}, []);
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={1}></Stepper>
+			<Stepper total={13} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='새 여행'

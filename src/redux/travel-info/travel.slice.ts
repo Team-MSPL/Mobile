@@ -410,6 +410,19 @@ export const detailTripadvisor = createAsyncThunk('/detailTripadvisor', async (d
 		throw rejectWithValue(error.code);
 	}
 });
+
+//좌표주면 주변 공항이나 기차역 알려주는거
+export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosGoogle.get(
+			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&type=airport&language=ko&radius=50000&key=${GOOGLE_API_KEY}`,
+		);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,

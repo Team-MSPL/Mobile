@@ -125,7 +125,7 @@ export default function SelectCity({navigation}: any) {
 				regionSearchRef.current?.blur();
 				setRegionSearchState(false);
 			}}>
-			<Stepper total={11} now={2}></Stepper>
+			<Stepper total={13} now={3}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'

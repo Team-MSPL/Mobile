@@ -16,7 +16,7 @@ export default function RecommendSelectTour({navigation}: any) {
 	};
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={9}></Stepper>
+			<Stepper total={13} now={12}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='2.여행 스타일을 알아볼게요.'

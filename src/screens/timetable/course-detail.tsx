@@ -6,6 +6,7 @@ import {
 	courseInfoType,
 	travelSliceActions,
 	deletePlaceReview,
+	handleNearBySearch,
 } from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -59,7 +60,8 @@ export default function CourseDetail({navigation, route}: any) {
 						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				}),
 			).unwrap();
-			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
+			// const e = await dispatch(handleNearBySearch(route.params.value)).unwrap();
+			// console.log(e.data?.results[0]);
 			const data = a.data;
 			if (a.status == 200) {
 				setCourseDetail({

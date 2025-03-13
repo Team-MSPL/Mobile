@@ -26,7 +26,7 @@ export default function RecommendSelectMove({navigation}: any) {
 	];
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={5}></Stepper>
+			<Stepper total={13} now={8}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='2.여행 스타일을 알아볼게요.'

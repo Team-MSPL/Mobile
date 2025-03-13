@@ -42,7 +42,7 @@ export default function RecommendSelectCountry({navigation}: any) {
 	};
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={1}></Stepper>
+			<Stepper total={13} now={2}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'

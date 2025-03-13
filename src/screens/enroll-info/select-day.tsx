@@ -169,7 +169,7 @@ export default function SelectDay({navigation}: any) {
 			onPress={() => {
 				setVisible(false);
 			}}>
-			<Stepper total={11} now={3}></Stepper>
+			<Stepper total={13} now={4}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
@@ -256,7 +256,7 @@ export default function SelectDay({navigation}: any) {
 				</CalendarContainer>
 				<MarginBottom></MarginBottom>
 			</ScrollView>
-			<RouteButton navigation={navigation} nextTitle='SelectMulti'></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='SelectDeparture'></RouteButton>
 		</DayBackground>
 	);
 }
