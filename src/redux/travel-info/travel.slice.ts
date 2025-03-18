@@ -79,6 +79,7 @@ const initialState: LiteState = {
 	autoRecommendFlag: false,
 	globalFlag: false,
 	country: 0,
+	departure: {search: false, lat: 0, lng: 0, name: ''},
 };
 
 export const axiosGoogle = axios.create({
@@ -415,7 +416,7 @@ export const detailTripadvisor = createAsyncThunk('/detailTripadvisor', async (d
 export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosGoogle.get(
-			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&type=airport&language=ko&radius=50000&key=${GOOGLE_API_KEY}`,
+			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&type=${data.type}&language=ko&radius=50000&key=${GOOGLE_API_KEY}`,
 		);
 		return response;
 	} catch (error: any) {
@@ -620,6 +621,9 @@ export const travelSlice = createSlice({
 		},
 		setMyTravelList: (state, {payload}) => {
 			state.myTravelList = payload;
+		},
+		setDeparture: (state, {payload}) => {
+			state.departure = payload;
 		},
 	},
 	extraReducers: builder => {
@@ -860,6 +864,12 @@ interface LiteState {
 	autoRecommendFlag: boolean;
 	globalFlag: boolean;
 	country: number;
+	departure: {
+		search: boolean;
+		lat: number;
+		lng: number;
+		name: string;
+	};
 }
 interface aiListType {
 	_id: string;

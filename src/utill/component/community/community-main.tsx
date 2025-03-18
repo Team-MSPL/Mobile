@@ -132,15 +132,15 @@ function CommunityMain({
 					}
 				}}>
 				<PostItemContainer>
-					<PostWriterInfoContainer>
-						<PostWriterProfileImage source={{uri: data.item.postWriterProfileImage}} resizeMode='contain' />
-						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
-							{data.item.postWriter}
-						</PretendardSemiBoldText>
-					</PostWriterInfoContainer>
-					<PretendardBoldText size={14} lineHeight={16.71} color={colors.Black}>
+					<PretendardBoldText size={20} lineHeight={27} color={colors.Black}>
 						{data.item.postTitle}
 					</PretendardBoldText>
+					{/* <PostWriterInfoContainer>
+						<PostWriterProfileImage source={{uri: data.item.postWriterProfileImage}} resizeMode='contain' />
+						<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.Black}>
+							{data.item.postWriter}
+						</PretendardSemiBoldText>
+					</PostWriterInfoContainer> */}
 					<PretendardVariableText
 						size={14}
 						lineHeight={21}
@@ -150,6 +150,15 @@ function CommunityMain({
 						{data.item.postContent}
 					</PretendardVariableText>
 					<HStack gap={7} justifyContent='flex-end'>
+						<PostWriterInfoContainer>
+							<PostWriterProfileImage
+								source={{uri: data.item.postWriterProfileImage}}
+								resizeMode='contain'
+							/>
+							<PretendardSemiBoldText size={12} lineHeight={15.71} color={colors.Black}>
+								{data.item.postWriter}
+							</PretendardSemiBoldText>
+						</PostWriterInfoContainer>
 						<PretendardVariableText size={12} lineHeight={18} color={colors.Gray4}>
 							{data.item.postedAt.slice(0, 10)}
 						</PretendardVariableText>
@@ -218,8 +227,8 @@ const PostWriterInfoContainer = styled.View`
 	align-items: center;
 `;
 const PostWriterProfileImage = styled.Image`
-	width: ${widthPercentage(32)}px;
-	height: ${widthPercentage(32)}px;
+	width: ${widthPercentage(18)}px;
+	height: ${widthPercentage(18)}px;
 	border-radius: 8px;
 	margin-right: 8px;
 `;
