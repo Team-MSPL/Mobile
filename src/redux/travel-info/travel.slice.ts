@@ -79,7 +79,10 @@ const initialState: LiteState = {
 	autoRecommendFlag: false,
 	globalFlag: false,
 	country: 0,
-	departure: {search: false, lat: 0, lng: 0, name: ''},
+	departure: {lat: 0, lng: 0, name: ''},
+	departureAirport: {lat: 0, lng: 0, name: ''},
+	departureTrain: {lat: 0, lng: 0, name: ''},
+	departureSelected: '',
 };
 
 export const axiosGoogle = axios.create({
@@ -625,6 +628,23 @@ export const travelSlice = createSlice({
 		setDeparture: (state, {payload}) => {
 			state.departure = payload;
 		},
+		updateFiled: (state, {payload}) => {
+			const {field, value} = payload;
+			if (state.hasOwnProperty(field)) {
+				state[field] = value;
+			}
+		},
+		setDepartureSelected: (state, {payload}) => {
+			state.departureSelected = payload;
+			let copy = state.accommodations;
+			copy[0] = {
+				...state[payload],
+				category: 0,
+				takenTime: 30,
+				photo: '',
+			};
+			state.accommodations = copy;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
@@ -865,11 +885,21 @@ interface LiteState {
 	globalFlag: boolean;
 	country: number;
 	departure: {
-		search: boolean;
 		lat: number;
 		lng: number;
 		name: string;
 	};
+	departureAirport: {
+		lat: number;
+		lng: number;
+		name: string;
+	};
+	departureTrain: {
+		lat: number;
+		lng: number;
+		name: string;
+	};
+	departureSelected: string;
 }
 interface aiListType {
 	_id: string;

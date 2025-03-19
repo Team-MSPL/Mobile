@@ -17,9 +17,10 @@ import styled from 'styled-components/native';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 
 export default function SelectDeparture({navigation}: any) {
-	const {bandwidth, country, cityIndex, cityDistance, departure} = useAppSelector(state => state.travelSlice);
+	const {departureSelected, country, cityIndex, cityDistance, departure, departureAirport, departureTrain} =
+		useAppSelector(state => state.travelSlice);
+	const asd = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
-
 	const handleNearBySearchApi = async () => {
 		const e = await dispatch(
 			handleNearBySearch({
@@ -29,27 +30,50 @@ export default function SelectDeparture({navigation}: any) {
 			}),
 		).unwrap();
 		dispatch(
-			travelSliceActions.setDeparture({
-				search: false,
-				name: e.data?.results[0].name,
-				lat: e.data?.results[0].geometry.location.lat,
-				lng: e.data?.results[0].geometry.location.lng,
+			travelSliceActions.updateFiled({
+				field: 'departureAirport',
+				value: {
+					name: e.data?.results[0].name,
+					lat: e.data?.results[0].geometry.location.lat,
+					lng: e.data?.results[0].geometry.location.lng,
+				},
+			}),
+		);
+		const e2 = await dispatch(
+			handleNearBySearch({
+				lat: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lat,
+				lng: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lng,
+				type: 'train_station', //airport||train_station
+			}),
+		).unwrap();
+		dispatch(
+			travelSliceActions.updateFiled({
+				field: 'departureTrain',
+				value: {
+					name: e2.data?.results[0].name,
+					lat: e2.data?.results[0].geometry.location.lat,
+					lng: e2.data?.results[0].geometry.location.lng,
+				},
 			}),
 		);
 	};
 	useEffect(() => {
 		handleNearBySearchApi();
-	}, []);
+	}, [cityIndex]);
 	const moveList = [
 		{
 			name: '공항',
 			function: () => dispatch(travelSliceActions.enrollBandwidth(false)),
 			photo: <SvgAirPort />,
+			text: departureAirport,
+			title: 'departureAirport',
 		},
 		{
 			name: '기차역',
 			function: () => dispatch(travelSliceActions.enrollBandwidth(true)),
 			photo: <SvgTrain />,
+			text: departureTrain,
+			title: 'departureTrain',
 		},
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
@@ -64,7 +88,7 @@ export default function SelectDeparture({navigation}: any) {
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='여행을 시작하려는 장소가 있나요?'
 				subText='선택하신 지역 근처의 공항과 기차역을 찾아봤어요.'></StepText>
-			<AutoContainer height={departure.search && departure.name != ''}>
+			<AutoContainer height={departure.name != ''}>
 				<GooglePlacesAutocomplete
 					placeholder='검색어를 입력하세요.'
 					disableScroll={false}
@@ -101,12 +125,14 @@ export default function SelectDeparture({navigation}: any) {
 					}}
 					onFail={error => console.log(error)}
 					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
-				{departure.search && departure.name != '' && (
+				{departure.name != '' && (
 					<TendencyButton
 						marginBottom={0}
-						bgColor={false}
+						bgColor={'departure' == departureSelected}
 						label={departure.name}
-						onPress={() => {}}></TendencyButton>
+						onPress={() => {
+							dispatch(travelSliceActions.setDepartureSelected('departure'));
+						}}></TendencyButton>
 				)}
 			</AutoContainer>
 			{moveList.map((item, index) => {
@@ -120,10 +146,12 @@ export default function SelectDeparture({navigation}: any) {
 						</HStack>
 						<TendencyButton
 							marginBottom={0}
-							bgColor={false}
-							label={'qwe'}
+							bgColor={item.title == departureSelected}
+							label={item.text.name}
 							key={index}
-							onPress={() => {}}></TendencyButton>
+							onPress={() => {
+								dispatch(travelSliceActions.setDepartureSelected(item.title));
+							}}></TendencyButton>
 					</VStack>
 				);
 			})}
@@ -136,4 +164,5 @@ const DepartureBackground = styled(BackgroundGray).attrs({as: Pressable})``;
 const AutoContainer = styled.View<{height: boolean}>`
 	width: 100%;
 	height: ${props => (props.height ? heightPercentage(202) : heightPercentage(152))}px;
+	margin-bottom: ${heightPercentage(10)}px;
 `;
