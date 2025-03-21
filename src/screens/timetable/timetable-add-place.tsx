@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
 import {
 	TimetableType,
+	detailTripadvisor,
 	recommendApi,
 	recommendTripadvisor,
 	travelSliceActions,
@@ -34,8 +35,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable, region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: '', formatted_address: ''});
+	const [recommendList, setRecommendList] = useState([]);
 	const newY = useRef(0);
 	const [qw, seA] = useState(0);
+	const tripadvisorList = useRef({});
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
 		if (timeView.value == 'left') {
 			viewRef.current.y =
@@ -156,88 +159,96 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			newY.current = timetable[route.params.x].findIndex(item => item?.y > newCurrentY);
 			let copy = [...timetable];
 			let xArrayCopy = [...copy[route.params.x]];
-			xArrayCopy.splice((newY.current = -1 ? timetable[route.params.x].length : newY.current), 0, updateItem);
+			xArrayCopy.splice(newY.current == -1 ? timetable[route.params.x].length : newY.current, 0, updateItem);
 			copy[route.params.x] = xArrayCopy;
 			dispatch(travelSliceActions.changeTimetable(copy));
 			navigation.goBack();
 		}
 	};
-	// const handleNearTravleSearch = async () => {
-	// 	try {
-	// 		dispatch(LoadingSliceActions.onLoading());
-	// 		let result = await dispatch(
-	// 			region[0].startsWith('해외')
-	// 				? recommendTripadvisor({
-	// 						category: 'attractions',
-	// 						lat: route.params.lat,
-	// 						lng: route.params.lng,
-	// 						radius: route.params.radius,
-	// 						name: route.params.status.name,
-	// 				  })
-	// 				: recommendApi({
-	// 						category: 'AT4',
-	// 						lat: route.params.lat,
-	// 						lng: route.params.lng,
-	// 						radius: route.params.radius,
-	// 				  }),
-	// 		).unwrap();
-	// 		//AT4 attractions
-	// 		result = region[0].startsWith('해외') ? result.data : result;
-	// 		// departure.current.lat = route.params.lat;
-	// 		// departure.current.lng = route.params.lng;
-	// 		if (result.length == 0) {
-	// 			result = await dispatch(
-	// 				region[0].startsWith('해외')
-	// 					? recommendTripadvisor({
-	// 							category: route.params.apiCategory,
-	// 							lat: route.params.lat,
-	// 							lng: route.params.lng,
-	// 							radius: 20000,
-	// 							name: route.params.status.name,
-	// 					  })
-	// 					: recommendApi({
-	// 							category: route.params.apiCategory,
-	// 							lat: route.params.lat,
-	// 							lng: route.params.lng,
-	// 							radius: 20000,
-	// 					  }),
-	// 			).unwrap();
-	// 			// departure.current.lat = route.params.lat;
-	// 			// departure.current.lng = route.params.lng;
-	// 			result = region[0].startsWith('해외') ? result.data : result;
-	// 			result.length == 0 &&
-	// 				(dispatch(
-	// 					modalSliceActions.setOpenModal({
-	// 						modalSingleUse: true,
-	// 						modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
-	// 					}),
-	// 				),
-	// 				navigation.goBack());
-	// 		}
-	// 		console.log(result);
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 		dispatch(
-	// 			modalSliceActions.setOpenModal({
-	// 				modalTitle: '추천 아이템이 없습니다!',
-	// 			}),
-	// 		);
-	// 		navigation.goBack();
-	// 	} finally {
-	// 		dispatch(LoadingSliceActions.offLoading());
-	// 	}
-	// };
-	// useEffect(() => {
-	// 	// newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
-	// 	// if (newY.current == -1) {
-	// 	// 	if (timetable[route.params.x].length == 0) {
-	// 	// 		newY.current = -1;
-	// 	// 	} else {
-	// 	// 		newY.current = timetable[route.params.x].length;
-	// 	// 	}
-	// 	// }
-	// 	handleNearTravleSearch();
-	// }, []);
+	const handleNearTravleSearch = async () => {
+		let lat =
+			timetable[route.params.x].reduce((item, current) => item + current?.lat, 0) /
+			timetable[route.params.x].length;
+		let lng =
+			timetable[route.params.x].reduce((item, current) => item + current?.lng, 0) /
+			timetable[route.params.x].length;
+		console.log(timetable[route.params.x]);
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let result = await dispatch(
+				region[0].startsWith('해외')
+					? recommendTripadvisor({
+							category: 'attractions',
+							lat: timetable[route.params.x].filter(item => item.category == 0)[0].lat,
+							lng: timetable[route.params.x].filter(item => item.category == 0)[0].lng,
+							radius: 100000,
+							name: timetable[route.params.x].filter(item => item.category == 0)[0].name,
+					  })
+					: recommendApi({
+							category: 'AT4',
+							lat: lat,
+							lng: lng,
+							radius: 10000,
+					  }),
+			).unwrap();
+			//AT4 attractions
+			result = region[0].startsWith('해외') ? result.data : result;
+			// departure.current.lat = route.params.lat;
+			// departure.current.lng = route.params.lng;
+			if (result.length == 0) {
+				result = await dispatch(
+					region[0].startsWith('해외')
+						? recommendTripadvisor({
+								category: 'attractions',
+								lat: timetable[route.params.x].filter(item => item.category == 0)[0].lat,
+								lng: timetable[route.params.x].filter(item => item.category == 0)[0].lng,
+								radius: 20000,
+								name: timetable[route.params.x].filter(item => item.category == 0)[0].name,
+						  })
+						: recommendApi({
+								category: 'AT4',
+								lat: lat,
+								lng: lng,
+								radius: 20000,
+						  }),
+				).unwrap();
+				// departure.current.lat = route.params.lat;
+				// departure.current.lng = route.params.lng;
+				result = region[0].startsWith('해외') ? result.data : result;
+				result.length == 0 &&
+					(dispatch(
+						modalSliceActions.setOpenModal({
+							modalSingleUse: true,
+							modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
+						}),
+					),
+					navigation.goBack());
+			}
+			console.log(result);
+			setRecommendList(result);
+		} catch (err) {
+			console.log(err);
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '추천 아이템이 없습니다!',
+				}),
+			);
+			navigation.goBack();
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		// newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
+		// if (newY.current == -1) {
+		// 	if (timetable[route.params.x].length == 0) {
+		// 		newY.current = -1;
+		// 	} else {
+		// 		newY.current = timetable[route.params.x].length;
+		// 	}
+		// }
+		handleNearTravleSearch();
+	}, []);
 
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	const clearInput = () => {
@@ -256,13 +267,13 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		<BackgroundGray paddingHorizental={0}>
 			<GooglePlacesAutocomplete
 				placeholder='장소를 검색해보세요!'
-				placeholderTextColor={'grey'}
+				disableScroll={false}
 				query={{
 					key: GOOGLE_API_KEY,
 					language: 'ko',
 				}}
 				ref={autocompleteRef}
-				textInputProps={{placeholderTextColor: 'grey'}}
+				textInputProps={{placeholderTextColor: colors.Gray2}}
 				styles={{
 					container: {alignItems: 'center'},
 					textInputContainer: {
@@ -272,7 +283,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						backgroundColor: colors.backgroundWhite,
 						alignItems: 'center',
 					},
-					listView: {width: widthPercentage(327)},
+					listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
 					textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
 					description: {color: 'black'},
 				}}
@@ -286,7 +297,49 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					});
 				}}
 				onFail={error => console.log(error)}
-				onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+				onNotFound={() => console.log('no results')}>
+				{recommendList.slice(0, 4).map((recommendItem, recommendIdx) => (
+					<ElementContainer color={colors.backgroundGray}>
+						<VStack width={widthPercentage(243)}>
+							<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+								{region[0].startsWith('해외') ? recommendItem.name : recommendItem?.place_name}
+							</PretendardSemiBoldText>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{region[0].startsWith('해외')
+									? recommendItem.address_obj.address_string
+									: recommendItem?.address_name}
+							</PretendardVariableText>
+						</VStack>
+						<DeleteContainer
+							onPress={async () => {
+								if (region[0].startsWith('해외')) {
+									if (tripadvisorList?.current[recommendIdx] == undefined) {
+										tripadvisorList.current[recommendIdx] = await dispatch(
+											detailTripadvisor({id: recommendList[recommendIdx].location_id}),
+										).unwrap();
+									}
+									setGetInfo({
+										lat: tripadvisorList.current[recommendIdx].latitude,
+										lng: tripadvisorList.current[recommendIdx].longitude,
+										name: tripadvisorList.current[recommendIdx].name,
+										formatted_address: recommendItem?.address_name,
+									});
+								} else {
+									setGetInfo({
+										lat: recommendItem.y,
+										lng: recommendItem.x,
+										name: recommendItem.place_name,
+										formatted_address: recommendItem?.address_name,
+									});
+								}
+							}}>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+								선택
+							</PretendardSemiBoldText>
+						</DeleteContainer>
+					</ElementContainer>
+				))}
+			</GooglePlacesAutocomplete>
 			{getInfo.name ? (
 				<BottomContainer
 					height={route.params.status == 'travle' ? heightPercentage(342) : heightPercentage(150)}
