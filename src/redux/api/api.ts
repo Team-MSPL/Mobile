@@ -4,7 +4,7 @@ import {store} from '..';
 import {networkSliceActions} from '../network/networkSlice';
 
 const axiosAuth = axios.create({
-	baseURL: __DEV__ ? API_ROUTE : API_ROUTE_RELEASE,
+	baseURL: API_ROUTE_RELEASE,
 	headers: {
 		'content-type': 'application/json',
 		withCredentials: true,

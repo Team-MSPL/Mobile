@@ -4,7 +4,12 @@ import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-nativ
 import {TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {GOOGLE_API_KEY} from '@env';
-import {TimetableType, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	TimetableType,
+	recommendApi,
+	recommendTripadvisor,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {
@@ -24,8 +29,9 @@ import PrimaryButton from '../../utill/component/primary-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {TimePickerContainer} from './map-info';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 export default function TimetableAddPlace({navigation, route}: any) {
-	const {day, timetable} = useAppSelector(state => state.travelSlice);
+	const {day, timetable, region} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [getInfo, setGetInfo] = useState({lat: 0, lng: 0, name: '', formatted_address: ''});
 	const newY = useRef(0);
@@ -156,16 +162,82 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			navigation.goBack();
 		}
 	};
-	useEffect(() => {
-		newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
-		if (newY.current == -1) {
-			if (timetable[route.params.x].length == 0) {
-				newY.current = -1;
-			} else {
-				newY.current = timetable[route.params.x].length;
-			}
-		}
-	}, []);
+	// const handleNearTravleSearch = async () => {
+	// 	try {
+	// 		dispatch(LoadingSliceActions.onLoading());
+	// 		let result = await dispatch(
+	// 			region[0].startsWith('해외')
+	// 				? recommendTripadvisor({
+	// 						category: 'attractions',
+	// 						lat: route.params.lat,
+	// 						lng: route.params.lng,
+	// 						radius: route.params.radius,
+	// 						name: route.params.status.name,
+	// 				  })
+	// 				: recommendApi({
+	// 						category: 'AT4',
+	// 						lat: route.params.lat,
+	// 						lng: route.params.lng,
+	// 						radius: route.params.radius,
+	// 				  }),
+	// 		).unwrap();
+	// 		//AT4 attractions
+	// 		result = region[0].startsWith('해외') ? result.data : result;
+	// 		// departure.current.lat = route.params.lat;
+	// 		// departure.current.lng = route.params.lng;
+	// 		if (result.length == 0) {
+	// 			result = await dispatch(
+	// 				region[0].startsWith('해외')
+	// 					? recommendTripadvisor({
+	// 							category: route.params.apiCategory,
+	// 							lat: route.params.lat,
+	// 							lng: route.params.lng,
+	// 							radius: 20000,
+	// 							name: route.params.status.name,
+	// 					  })
+	// 					: recommendApi({
+	// 							category: route.params.apiCategory,
+	// 							lat: route.params.lat,
+	// 							lng: route.params.lng,
+	// 							radius: 20000,
+	// 					  }),
+	// 			).unwrap();
+	// 			// departure.current.lat = route.params.lat;
+	// 			// departure.current.lng = route.params.lng;
+	// 			result = region[0].startsWith('해외') ? result.data : result;
+	// 			result.length == 0 &&
+	// 				(dispatch(
+	// 					modalSliceActions.setOpenModal({
+	// 						modalSingleUse: true,
+	// 						modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
+	// 					}),
+	// 				),
+	// 				navigation.goBack());
+	// 		}
+	// 		console.log(result);
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '추천 아이템이 없습니다!',
+	// 			}),
+	// 		);
+	// 		navigation.goBack();
+	// 	} finally {
+	// 		dispatch(LoadingSliceActions.offLoading());
+	// 	}
+	// };
+	// useEffect(() => {
+	// 	// newY.current = timetable[route.params.x].findIndex(item => item?.y > route.params.y[0]);
+	// 	// if (newY.current == -1) {
+	// 	// 	if (timetable[route.params.x].length == 0) {
+	// 	// 		newY.current = -1;
+	// 	// 	} else {
+	// 	// 		newY.current = timetable[route.params.x].length;
+	// 	// 	}
+	// 	// }
+	// 	handleNearTravleSearch();
+	// }, []);
 
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	const clearInput = () => {

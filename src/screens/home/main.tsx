@@ -370,6 +370,7 @@ export default function Main({navigation}: any) {
 									position: 'absolute',
 									width: '100%',
 									paddingHorizontal: widthPercentage(26),
+									height: heightPercentage(150),
 								}}>
 								<PretendardSemiBoldText
 									size={23}
@@ -643,15 +644,15 @@ interface ButtonListType {
 const regionList = [
 	{id: 1, subTitle: '서울'},
 	{id: 2, subTitle: '부산'},
-	{id: 17, subTitle: '제주'},
-	{id: 4, subTitle: '인천'},
-	{id: 3, subTitle: '대구'},
-	{id: 5, subTitle: '광주'},
-	{id: 6, subTitle: '대전'},
-	{id: 7, subTitle: '울산'},
-	{id: 10, subTitle: '강원 강릉시'},
-	{id: 10, subTitle: '강원 속초시'},
-	{id: 15, subTitle: '경북 경주시'},
-	{id: 15, subTitle: '경북 포항시'},
-	{id: 14, subTitle: '전남 여수시'},
+	{id: 11, subTitle: '제주'},
+	{id: 2, subTitle: '인천'},
+	{id: 2, subTitle: '대구'},
+	{id: 2, subTitle: '광주'},
+	{id: 2, subTitle: '대전'},
+	{id: 2, subTitle: '울산'},
+	{id: 4, subTitle: '강원 강릉시'},
+	{id: 4, subTitle: '강원 속초시'},
+	{id: 9, subTitle: '경북 경주시'},
+	{id: 9, subTitle: '경북 포항시'},
+	{id: 8, subTitle: '전남 여수시'},
 ];

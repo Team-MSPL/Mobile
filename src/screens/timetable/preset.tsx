@@ -256,18 +256,12 @@ export default function Preset({navigation}: any) {
 														lineHeight={20.6}
 														color={colors.Black}>
 														다른 코스에 비해{' '}
-													</PretendardSemiBoldText>
-													<PretendardSemiBoldText
-														size={14}
-														lineHeight={20.6}
-														color={colors.PointYellow}>
-														[{calculateTendency(presetTendencyList[idx])}]
-													</PretendardSemiBoldText>
-													<PretendardSemiBoldText
-														size={14}
-														lineHeight={20.6}
-														color={colors.Black}>
-														{' '}
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={20.6}
+															color={colors.PointYellow}>
+															[{calculateTendency(presetTendencyList[idx])}]
+														</PretendardSemiBoldText>{' '}
 														성향이 더 높아요
 													</PretendardSemiBoldText>
 												</HStack>

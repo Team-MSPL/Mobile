@@ -644,7 +644,7 @@ export const travelSlice = createSlice({
 				photo: '',
 			};
 			state.accommodations = copy;
-		},
+		}, //TODO카테고리
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
