@@ -73,7 +73,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const change = (idx: number) => {
 		setSelect(idx);
 	};
-	const [visible, setVisible] = useState(true);
+	const [visible, setVisible] = useState(false);
 	const moveRegion = async (e: number, index: number) => {
 		let copy = {
 			...timetable[index][e],
