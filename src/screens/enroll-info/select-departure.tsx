@@ -131,7 +131,11 @@ export default function SelectDeparture({navigation}: any) {
 						bgColor={'departure' == departureSelected}
 						label={departure.name}
 						onPress={() => {
-							dispatch(travelSliceActions.setDepartureSelected('departure'));
+							dispatch(
+								travelSliceActions.setDepartureSelected(
+									'departure' == departureSelected ? '' : 'departure',
+								),
+							);
 						}}></TendencyButton>
 				)}
 			</AutoContainer>
@@ -145,17 +149,24 @@ export default function SelectDeparture({navigation}: any) {
 							</PretendardSemiBoldText>
 						</HStack>
 						<TendencyButton
-							marginBottom={0}
+							marginBottom={10}
 							bgColor={item.title == departureSelected}
 							label={item.text.name}
 							key={index}
 							onPress={() => {
-								dispatch(travelSliceActions.setDepartureSelected(item.title));
+								dispatch(
+									travelSliceActions.setDepartureSelected(
+										departureSelected == item.title ? '' : item.title,
+									),
+								);
 							}}></TendencyButton>
 					</VStack>
 				);
 			})}
-			<RouteButton nextText={'건너뛰기'} navigation={navigation} nextTitle='SelectMulti'></RouteButton>
+			<RouteButton
+				nextText={departureSelected == '' ? '건너뛰기' : '다음'}
+				navigation={navigation}
+				nextTitle='SelectMulti'></RouteButton>
 		</DepartureBackground>
 	);
 }

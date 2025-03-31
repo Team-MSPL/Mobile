@@ -511,10 +511,12 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			<ScaleDecorator>
 				{!excludeNames.includes(item.name) ? (
 					<HStack gap={widthPercentage(10)}>
-						<VStack gap={8}>
-							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
-							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
-						</VStack>
+						{item.category != 4 && (
+							<VStack gap={8}>
+								<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
+								<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
+							</VStack>
+						)}
 						<InsideGrayContainer
 							onLongPress={() => {
 								if (item.category != 4) {

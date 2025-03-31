@@ -132,7 +132,7 @@ function CommunityMain({
 					}
 				}}>
 				<PostItemContainer>
-					<PretendardBoldText size={20} lineHeight={27} color={colors.Black}>
+					<PretendardBoldText size={19} lineHeight={27} color={colors.Black}>
 						{data.item.postTitle}
 					</PretendardBoldText>
 					{/* <PostWriterInfoContainer>
