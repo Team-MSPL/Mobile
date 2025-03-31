@@ -427,6 +427,30 @@ export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async 
 	}
 });
 
+//
+// export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async (data: any, {rejectWithValue}) => {
+// 	try {
+// 		const response = await axiosAuth.get(
+// 			`/place/placeInfo?region=${data.region}&name=${data.name}&version=${data.version}`,
+// 		);
+// 		return response;
+// 	} catch (error: any) {
+// 		throw rejectWithValue(error.code);
+// 	}
+// });
+
+//여행 추천 장소 리스트
+export const recommendPlace = createAsyncThunk(
+	'/ai/recommendPlace',
+	async (data: recommendPlaceType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/ai/recommendPlace`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -637,12 +661,22 @@ export const travelSlice = createSlice({
 		setDepartureSelected: (state, {payload}) => {
 			state.departureSelected = payload;
 			let copy = state.accommodations;
-			copy[0] = {
-				...state[payload],
-				category: 0,
-				takenTime: 30,
-				photo: '',
-			};
+			copy[0] =
+				payload == ''
+					? {
+							lat: 0,
+							lng: 0,
+							name: '',
+							category: 0,
+							takenTime: 30,
+							photo: '',
+					  }
+					: {
+							...state[payload],
+							category: 0,
+							takenTime: 30,
+							photo: '',
+					  };
 			state.accommodations = copy;
 		}, //TODO카테고리
 	},
@@ -1050,6 +1084,16 @@ interface saveAiType {
 	enoughPlace: boolean;
 	bestPointList: presetTendencyListType[];
 	travelName: string;
+}
+interface recommendPlaceType {
+	regionList: string[];
+	selectList: number[][];
+	transit: number;
+	distanceSensitivity: number;
+	bandwidth: boolean;
+	lat: number;
+	lng: number;
+	password: string;
 }
 interface travelAiType {
 	regionList: string[];
