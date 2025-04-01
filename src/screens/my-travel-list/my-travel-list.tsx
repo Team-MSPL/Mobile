@@ -45,7 +45,7 @@ export default function MyTravelList({navigation}: any) {
 	]);
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
-	const [tabView, setTabView] = useState('before');
+	const [tabView, setTabView] = useState('after');
 	const goMyTravelDetail = async (e: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -219,7 +219,8 @@ export default function MyTravelList({navigation}: any) {
 						<SearchTouchableOpacity
 							onPress={() => {
 								setShareFlag(!shareFlag);
-								!shareFlag && setShareSeleted([{index: 0, status: 'unfinished'}]);
+								!shareFlag && setShareSeleted([{index: 0, status: 'finished'}]);
+								tabView == 'before' && setTabView('after');
 							}}>
 							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
 								{shareFlag ? '취소' : '공유'}
@@ -228,7 +229,7 @@ export default function MyTravelList({navigation}: any) {
 					</HeaderContianer>
 				),
 		});
-	}, [shareFlag, socialloginProvider]);
+	}, [shareFlag, socialloginProvider, tabView]);
 	useEffect(() => {
 		if (shareSeleted.length == 0) {
 			setShareFlag(false);
@@ -281,102 +282,87 @@ export default function MyTravelList({navigation}: any) {
 		navigation.navigate('Preset');
 	};
 	const monthRef = useRef(moment().add(1, 'month').format('MM'));
+	const beforeRenderItem = (item: any) => {
+		return (
+			<>
+				{aiList?.map((data, idx) => (
+					<MyTravelContainer
+						key={idx}
+						onLongPress={() => {
+							if (!shareFlag) {
+								setShareFlag(true);
+								setShareSeleted([{index: idx, status: 'unfinished'}]);
+							}
+						}}
+						onPress={() => {
+							if (shareFlag) {
+								let copy = [...shareSeleted];
+								copy.filter(value => value.status == 'unfinished' && value.index == idx).length >= 1
+									? (copy = copy.filter(
+											(copyItem, copyIndex) =>
+												!(copyItem.index == idx && copyItem.status == 'unfinished'),
+									  ))
+									: copy.push({index: idx, status: 'unfinished'});
+								setShareSeleted(copy);
+							} else {
+								goPreset(data);
+							}
+							// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
+						}}
+						shareFlag={shareFlag}
+						shareSeleted={
+							shareSeleted.filter(value => value.status == 'unfinished' && value.index == idx).length >= 1
+						}>
+						<VStack>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+								{moment(data.day[0]).format('YYYY년 MM월 DD일') +
+									' ~ ' +
+									moment(data.day[data.nDay - 1]).format('MM월 DD일')}
+							</PretendardVariableText>
+							<PretendardVariableText size={14} lineHeight={21} color={colors.Gray5} marginTop={2}>
+								여행 코스를 선택하고{`\n`}편집하여 여행 계획을 완성해보세요!
+							</PretendardVariableText>
+
+							<TagContainer
+								backgroundColor={colors.backgroundGray}
+								height={heightPercentage(30)}
+								width={widthPercentage(105)}>
+								<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
+									{data.region[0].split('/').at(-1)}
+								</PretendardVariableText>
+								<SVGFlag
+									width={widthPercentage(12)}
+									height={widthPercentage(15)}
+									color={colors.Primary}
+								/>
+							</TagContainer>
+						</VStack>
+						{shareFlag && (
+							<CircleContainer
+								shareSeleted={
+									shareSeleted.filter(value => value.status == 'unfinished' && value.index == idx)
+										.length >= 1
+								}>
+								<SvgCheck
+									color={
+										shareSeleted.filter(value => value.status == 'unfinished' && value.index == idx)
+											.length >= 1
+											? colors.backgroundWhite
+											: colors.Gray2
+									}
+								/>
+							</CircleContainer>
+						)}
+					</MyTravelContainer>
+				))}
+			</>
+		);
+	};
 	const renderItem = (item: any) => {
 		let after = monthRef.current;
 		monthRef.current = moment(item.item.day[0]).format('MM');
 		return (
 			<>
-				{item.index == 0 && aiList.length != 0 && (
-					<>
-						<DivideDayContainer>
-							<PretendardVariableText
-								size={12}
-								lineHeight={18}
-								color={colors.Gray2}
-								marginTop={heightPercentage(30)}>
-								코스 미확정
-							</PretendardVariableText>
-						</DivideDayContainer>
-						{aiList?.map((data, idx) => (
-							<MyTravelContainer
-								key={idx}
-								onLongPress={() => {
-									if (!shareFlag) {
-										setShareFlag(true);
-										setShareSeleted([{index: idx, status: 'unfinished'}]);
-									}
-								}}
-								onPress={() => {
-									if (shareFlag) {
-										let copy = [...shareSeleted];
-										copy.filter(value => value.status == 'unfinished' && value.index == idx)
-											.length >= 1
-											? (copy = copy.filter(
-													(copyItem, copyIndex) =>
-														!(copyItem.index == idx && copyItem.status == 'unfinished'),
-											  ))
-											: copy.push({index: idx, status: 'unfinished'});
-										setShareSeleted(copy);
-									} else {
-										goPreset(data);
-									}
-									// shareFlag ? (let copy=[...shareSeleted],setShareSeleted(item.index),) : goMyTravelDetail(item.item);
-								}}
-								shareFlag={shareFlag}
-								shareSeleted={
-									shareSeleted.filter(value => value.status == 'unfinished' && value.index == idx)
-										.length >= 1
-								}>
-								<VStack>
-									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-										{moment(data.day[0]).format('YYYY년 MM월 DD일') +
-											' ~ ' +
-											moment(data.day[data.nDay - 1]).format('MM월 DD일')}
-									</PretendardVariableText>
-									<PretendardVariableText
-										size={14}
-										lineHeight={21}
-										color={colors.Gray5}
-										marginTop={2}>
-										여행 코스를 선택하고{`\n`}편집하여 여행 계획을 완성해보세요!
-									</PretendardVariableText>
-
-									<TagContainer
-										backgroundColor={colors.backgroundGray}
-										height={heightPercentage(30)}
-										width={widthPercentage(105)}>
-										<PretendardVariableText size={14} lineHeight={21} color={colors.PointYellow}>
-											{data.region[0].split('/').at(-1)}
-										</PretendardVariableText>
-										<SVGFlag
-											width={widthPercentage(12)}
-											height={widthPercentage(15)}
-											color={colors.Primary}
-										/>
-									</TagContainer>
-								</VStack>
-								{shareFlag && (
-									<CircleContainer
-										shareSeleted={
-											shareSeleted.filter(
-												value => value.status == 'unfinished' && value.index == idx,
-											).length >= 1
-										}>
-										<SvgCheck
-											color={
-												shareSeleted.filter(
-													value => value.status == 'unfinished' && value.index == idx,
-												).length >= 1
-													? colors.backgroundWhite
-													: colors.Gray2
-											}
-										/>
-									</CircleContainer>
-								)}
-							</MyTravelContainer>
-						))}
-					</>
-				)}
 				{myTravelList.length != 0 && (
 					<>
 						{(monthRef.current != after || item.index == 0) && (
@@ -473,19 +459,32 @@ export default function MyTravelList({navigation}: any) {
 			</>
 		);
 	};
+	useEffect(() => {
+		scrollViewRef.current?.scrollToOffset({offset: 0, animated: true});
+	}, [tabView]);
 	if (socialloginProvider == 'anonymous') {
 		return <NeedLogin navigation={navigation} />;
 	}
 	return (
 		<TravelContainer>
-			{/* <HStack justifyContent='space-between'>
-				<PretendardSemiBoldText size={16} lineHeight={22} color={colors.PointYellow}>
-					여행 계획
-				</PretendardSemiBoldText>
-				<PretendardSemiBoldText size={16} lineHeight={22} color={colors.Gray2}>
-					미확정된 계획
-				</PretendardSemiBoldText>
-			</HStack> */}
+			<HStack justifyContent='space-around' marginVertical={5}>
+				<TabPressable onPress={() => setTabView(prev => 'after')}>
+					<PretendardSemiBoldText
+						size={16}
+						lineHeight={22}
+						color={tabView == 'after' ? colors.PointYellow : colors.Gray2}>
+						여행 계획
+					</PretendardSemiBoldText>
+				</TabPressable>
+				<TabPressable onPress={() => setTabView(prev => 'before')}>
+					<PretendardSemiBoldText
+						size={16}
+						lineHeight={22}
+						color={tabView != 'after' ? colors.PointYellow : colors.Gray2}>
+						미확정된 계획
+					</PretendardSemiBoldText>
+				</TabPressable>
+			</HStack>
 
 			<TravleListContainer>
 				{myTravelList.length == 0 && aiList.length == 0 ? (
@@ -498,7 +497,7 @@ export default function MyTravelList({navigation}: any) {
 					<FlatList
 						ref={scrollViewRef}
 						data={myTravelList.length == 0 ? aiList : myTravelList}
-						renderItem={renderItem}
+						renderItem={tabView == 'after' ? renderItem : beforeRenderItem}
 						initialNumToRender={20}
 						showsVerticalScrollIndicator={false}
 						keyExtractor={item => item._id}
@@ -529,7 +528,7 @@ export default function MyTravelList({navigation}: any) {
 	);
 }
 const TravleListContainer = styled.View`
-	height: 85%;
+	height: 80%;
 `;
 const DivideDayContainer = styled.View`
 	padding: 0px 15px;
@@ -561,4 +560,9 @@ const CircleContainer = styled.View<{shareSeleted: boolean}>`
 	justify-content: center;
 	border-radius: 99px;
 	background-color: ${props => (props.shareSeleted ? colors.Primary : colors.Gray1)};
+`;
+const TabPressable = styled.Pressable`
+	width: 50%;
+	align-items: center;
+	justify-content: center;
 `;
