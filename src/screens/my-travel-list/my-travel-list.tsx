@@ -97,6 +97,7 @@ export default function MyTravelList({navigation}: any) {
 				getTravelList();
 				setShareFlag(false);
 			}
+			setTabView('after');
 		}, [socialloginProvider]),
 	);
 	const handleGoogleAnalytics = async () => {
@@ -281,6 +282,7 @@ export default function MyTravelList({navigation}: any) {
 		);
 		navigation.navigate('Preset');
 	};
+
 	const monthRef = useRef(moment().add(1, 'month').format('MM'));
 	const beforeRenderItem = (item: any) => {
 		return (
