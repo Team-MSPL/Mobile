@@ -17,42 +17,41 @@ import styled from 'styled-components/native';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 
 export default function SelectDeparture({navigation}: any) {
-	const {departureSelected, country, cityIndex, cityDistance, departure, departureAirport, departureTrain} =
+	const {region, departureSelected, country, cityIndex, cityDistance, departure, departureAirport, departureTrain} =
 		useAppSelector(state => state.travelSlice);
 	const asd = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const handleNearBySearchApi = async () => {
 		const e = await dispatch(
 			handleNearBySearch({
-				lat: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lat,
-				lng: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lng,
-				type: 'airport', //airport||train_station
+				region: cityViewList[country][cityIndex].title + region[0],
+				name: '공항',
 			}),
 		).unwrap();
+
 		dispatch(
 			travelSliceActions.updateFiled({
 				field: 'departureAirport',
 				value: {
-					name: e.data?.results[0].name,
-					lat: e.data?.results[0].geometry.location.lat,
-					lng: e.data?.results[0].geometry.location.lng,
+					name: e.data?.name,
+					lat: e.data?.geometry.location.lat,
+					lng: e.data?.geometry.location.lng,
 				},
 			}),
 		);
 		const e2 = await dispatch(
 			handleNearBySearch({
-				lat: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lat,
-				lng: cityViewList[country][cityIndex].sub[cityDistance[0]]?.lng,
-				type: 'train_station', //airport||train_station
+				region: cityViewList[country][cityIndex].title + region[0],
+				name: '역',
 			}),
 		).unwrap();
 		dispatch(
 			travelSliceActions.updateFiled({
 				field: 'departureTrain',
 				value: {
-					name: e2.data?.results[0].name,
-					lat: e2.data?.results[0].geometry.location.lat,
-					lng: e2.data?.results[0].geometry.location.lng,
+					name: e2.data?.name,
+					lat: e2.data?.geometry.location.lat,
+					lng: e2.data?.geometry.location.lng,
 				},
 			}),
 		);

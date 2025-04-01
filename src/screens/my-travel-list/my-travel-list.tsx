@@ -45,6 +45,7 @@ export default function MyTravelList({navigation}: any) {
 	]);
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
+	const [tabView, setTabView] = useState('before');
 	const goMyTravelDetail = async (e: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -477,6 +478,15 @@ export default function MyTravelList({navigation}: any) {
 	}
 	return (
 		<TravelContainer>
+			{/* <HStack justifyContent='space-between'>
+				<PretendardSemiBoldText size={16} lineHeight={22} color={colors.PointYellow}>
+					여행 계획
+				</PretendardSemiBoldText>
+				<PretendardSemiBoldText size={16} lineHeight={22} color={colors.Gray2}>
+					미확정된 계획
+				</PretendardSemiBoldText>
+			</HStack> */}
+
 			<TravleListContainer>
 				{myTravelList.length == 0 && aiList.length == 0 ? (
 					<Center>

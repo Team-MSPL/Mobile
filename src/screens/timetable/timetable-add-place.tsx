@@ -331,7 +331,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						이런 여행지는 어때요?
 					</PretendardSemiBoldText>
 
-					{recommendList.slice(0, 4).map((recommendItem, recommendIdx) => (
+					{recommendList.map((recommendItem, recommendIdx) => (
 						<ElementContainer color={colors.backgroundGray} onPress={() => moveRegion(recommendItem)}>
 							<VStack width={widthPercentage(243)}>
 								<PretendardSemiBoldText

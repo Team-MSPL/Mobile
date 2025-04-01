@@ -510,13 +510,19 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		return (
 			<ScaleDecorator>
 				{!excludeNames.includes(item.name) ? (
-					<HStack gap={widthPercentage(10)}>
-						{item.category != 4 && (
-							<VStack gap={8}>
-								<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
-								<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
-							</VStack>
-						)}
+					<DragHstack
+						gap={widthPercentage(10)}
+						onLongPress={() => {
+							if (item.category != 4) {
+								changeLocationRef.current.before = idx;
+								drag();
+							}
+						}}>
+						<VStack gap={8} style={{opacity: item.category == 4 ? 0 : 1}}>
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
+						</VStack>
+
 						<InsideGrayContainer
 							onLongPress={() => {
 								if (item.category != 4) {
@@ -541,6 +547,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 									</PretendardVariableText>
 									<PretendardSemiBoldText
 										maxWidth={widthPercentage(200)}
+										numberOfLines={2}
 										size={14}
 										lineHeight={18.9}
 										color={colors.Gray5}>
@@ -557,7 +564,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 								</Pressable>
 							</HStack>
 						</InsideGrayContainer>
-					</HStack>
+					</DragHstack>
 				) : (
 					<HStack>
 						<InfoView
@@ -1249,3 +1256,4 @@ const ViewMapTouchable = styled.TouchableOpacity`
 	align-items: center;
 	padding: ${widthPercentage(3)}px;
 `;
+const DragHstack = styled(HStack).attrs({as: Pressable})``;
