@@ -160,7 +160,7 @@ export default function FinalCheck({navigation}: any) {
 				}
 				let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
 				if (
-					(country == 0 && cityViewList[country][cityIndex].id >= 9 && region[0] == '전체') ||
+					(country == 0 && cityViewList[country][cityIndex].id >= 3 && region[0] == '전체') ||
 					(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
 					(country != 0 && region[0] == '전체')
 				) {
