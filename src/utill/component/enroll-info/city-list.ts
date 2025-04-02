@@ -14,7 +14,7 @@ const koreaCityList = [
 			{id: 4, subId: 1, subTitle: '강릉시'},
 			{id: 4, subId: 5, subTitle: '속초시'},
 			{id: 9, subId: 2, subTitle: '경주시'},
-			{id: 9, subId: 21, subTitle: '포항시'},
+			{id: 9, subId: 22, subTitle: '포항시'},
 			{id: 10, subId: 13, subTitle: '여수시'},
 		],
 	},
