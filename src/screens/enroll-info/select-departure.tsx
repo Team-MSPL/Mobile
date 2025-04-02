@@ -42,7 +42,7 @@ export default function SelectDeparture({navigation}: any) {
 		const e2 = await dispatch(
 			handleNearBySearch({
 				region: cityViewList[country][cityIndex].title + region[0],
-				name: '역',
+				name: '고속철도',
 			}),
 		).unwrap();
 		dispatch(
