@@ -38,6 +38,7 @@ import AbsoluteTopBarComponent from '../../utill/component/timetable/absolute-to
 import {useDistance} from '../../utill/hooks/useDistance';
 import {Image} from 'react-native';
 import Toast from 'react-native-toast-message';
+import CustomMapView from '../../utill/component/timetable/mapView';
 
 export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
@@ -209,13 +210,9 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	const deltaLatitude = maxLatitude - minLatitude;
 	const deltaLongitude = maxLongitude - minLongitude;
 
-	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
-	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
-	const zoomLevel = Math.log2(360 / maxDelta) + 1;
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	// const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
-		console.log(timetable);
 		for (let i = 0; i < timetable.length; i++) {
 			if (timetable[i].length != 0) {
 				a.current = true;
@@ -610,34 +607,14 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		<MainAllContainer>
 			{topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>}
 			<VStack flex={1}>
-				{!modify &&
-					viewMap &&
-					timetable.map(
-						(item, idx) =>
-							select == idx && (
-								<MapView
-									key={idx}
-									ref={mapRef}
-									showsMyLocationButton={true}
-									style={{width: '100%', flex: 0.42}}
-									showsUserLocation={true}
-									onTouchStart={() => {
-										setTopBar(false);
-									}}
-									onTouchEnd={() => {
-										setTopBar(true);
-									}}
-									region={{
-										latitude: centerLatitude,
-										longitude: centerLongitude,
-										latitudeDelta: deltaLatitude + deltaLatitude + 0.02,
-										longitudeDelta: deltaLongitude + deltaLongitude + 0.02,
-									}}>
-									{markers}
-									{polylines}
-								</MapView>
-							),
-					)}
+				{!modify && viewMap && (
+					<CustomMapView
+						timetable={timetable}
+						select={select}
+						onTouchStart={() => setTopBar(false)}
+						onTouchEnd={() => setTopBar(true)}
+					/>
+				)}
 				{!modify && (
 					<ViewMapTouchable
 						onPress={() => {

@@ -34,7 +34,9 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="true"
       android:theme="@style/AppTheme"
-      android:usesCleartextTraffic="true">
+      android:usesCleartextTraffic="true"
+      android:hardwareAccelerated="false"
+      android:largeHeap="true">
       <meta-data  android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_launcher" />
       <meta-data
