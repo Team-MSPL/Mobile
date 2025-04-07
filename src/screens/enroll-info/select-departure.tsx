@@ -28,7 +28,6 @@ export default function SelectDeparture({navigation}: any) {
 				name: '공항',
 			}),
 		).unwrap();
-
 		dispatch(
 			travelSliceActions.updateFiled({
 				field: 'departureAirport',

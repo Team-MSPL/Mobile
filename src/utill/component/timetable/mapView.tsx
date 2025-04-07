@@ -1,18 +1,86 @@
-import {JSXElementConstructor, ReactElement, memo, useMemo} from 'react';
+import {JSXElementConstructor, ReactElement, memo, startTransition, useEffect, useMemo} from 'react';
 import {Platform} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import {Image} from 'react-native';
 import {widthPercentage} from '../../layout/responsive-size';
 import {PretendardSemiBoldText} from '../../layout/layout';
-import {Circle} from '../../../screens/timetable/preset';
 import {MarkerContainer} from '../../../screens/timetable/preset-detail';
 import {colors} from '../../colors';
+import {useAppSelector} from '../../../redux';
+import styled from 'styled-components/native';
 
-function CustomMapView({timetable, select, onTouchStart, onTouchEnd}) {
-	// 메모리 최적화를 위해 useMemo 사용
-	const {markers, polylines, centerLatitude, centerLongitude, latitudeDelta, longitudeDelta} = useMemo(() => {
+function CustomMapView({select, onTouchStart, onTouchEnd}) {
+	// 메모리 최적화를 위해 useMemo 사
+	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {imageList} = useMemo(() => {
+		let images = [];
+		Array(timetable.length)
+			.fill(1)
+			.forEach((testItem, testIdx) => {
+				let markerElements: ReactElement[] = [];
+				timetable.forEach((value, index) => {
+					value.forEach((item, idx) => {
+						if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
+							// 고유한 key 생성 (index와 item.lat, item.lng을 조합)
+							const markerKey = `marker_${index}_${item.lat}_${item.lng}`;
+
+							markerElements.push(
+								<Marker
+									key={markerKey} // 고유한 key 사용
+									coordinate={{latitude: item.lat, longitude: item.lng}}
+									tracksViewChanges={false}
+									title={item.name}
+									centerOffset={{x: 0, y: 0}}
+									anchor={{x: 0.5, y: 0.5}}
+									style={{zIndex: 4}}>
+									{index === testIdx ? (
+										item.category === 4 || item.category === 1 ? (
+											<Image
+												source={
+													item.category === 4
+														? require('../../../../public/images/hotel.png')
+														: require('../../../../public/images/defalutFood.png')
+												}
+												style={{
+													width: widthPercentage(30),
+													height: widthPercentage(30),
+													zIndex: 200,
+												}}
+											/>
+										) : (
+											<MarkerContainer key={markerKey}>
+												<PretendardSemiBoldText
+													size={13}
+													lineHeight={19}
+													color={colors.backgroundWhite}>
+													{idx + 1}
+												</PretendardSemiBoldText>
+											</MarkerContainer>
+										)
+									) : (
+										// <MarkerContainer key={markerKey}>
+										// 	<PretendardSemiBoldText
+										// 		size={13}
+										// 		lineHeight={19}
+										// 		color={colors.backgroundWhite}>
+										// 		{idx + 21}
+										// 	</PretendardSemiBoldText>
+										// </MarkerContainer>
+										<Circle color={colors.Gray5} key={markerKey} />
+									)}
+								</Marker>,
+							);
+						}
+					});
+				});
+				images.push(markerElements);
+			});
+		return {
+			imageList: images,
+		};
+	}, [timetable]);
+	const {polylines, centerLatitude, centerLongitude, latitudeDelta, longitudeDelta} = useMemo(() => {
 		let positions: {latitude: number; longitude: number}[] = [];
-		let markerElements: ReactElement[] = [];
 		let polylineElements: ReactElement[] = [];
 
 		timetable.forEach((value, index) => {
@@ -25,56 +93,6 @@ function CustomMapView({timetable, select, onTouchStart, onTouchEnd}) {
 					return null;
 				})
 				.filter(item => item !== null);
-
-			value.forEach((item, idx) => {
-				if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
-					// 고유한 key 생성 (index와 item.lat, item.lng을 조합)
-					const markerKey = `marker_${index}_${item.lat}_${item.lng}`;
-
-					markerElements.push(
-						<Marker
-							key={markerKey} // 고유한 key 사용
-							coordinate={{latitude: item.lat, longitude: item.lng}}
-							title={item.name}
-							centerOffset={{x: 0, y: 0}}
-							anchor={{x: 0.5, y: 0.5}}
-							style={{zIndex: 4}}>
-							{index === select ? (
-								item.category === 4 ? (
-									<Image
-										source={require('../../../../public/images/hotel.png')}
-										style={{
-											width: widthPercentage(30),
-											height: widthPercentage(30),
-											zIndex: 200,
-										}}
-									/>
-								) : item.category === 1 ? (
-									<Image
-										source={require('../../../../public/images/defalutFood.png')}
-										style={{
-											width: widthPercentage(30),
-											height: widthPercentage(30),
-											zIndex: 200,
-										}}
-									/>
-								) : (
-									<MarkerContainer key={markerKey}>
-										<PretendardSemiBoldText
-											size={13}
-											lineHeight={19}
-											color={colors.backgroundWhite}>
-											{idx + 1}
-										</PretendardSemiBoldText>
-									</MarkerContainer>
-								)
-							) : (
-								<Circle color={colors.Gray5} key={markerKey} style={{zIndex: 1}} />
-							)}
-						</Marker>,
-					);
-				}
-			});
 
 			polylineElements.push(
 				<Polyline
@@ -97,7 +115,6 @@ function CustomMapView({timetable, select, onTouchStart, onTouchEnd}) {
 		const deltaLongitude = maxLongitude - minLongitude;
 
 		return {
-			markers: markerElements,
 			polylines: polylineElements,
 			centerLatitude,
 			centerLongitude,
@@ -109,23 +126,27 @@ function CustomMapView({timetable, select, onTouchStart, onTouchEnd}) {
 	return (
 		<MapView
 			showsMyLocationButton={true}
-			style={{width: '100%', flex: 0.42}}
+			style={{width: '100%', flex: onTouchStart ? 0.42 : 1}}
 			showsUserLocation={true}
-			onTouchStart={onTouchStart}
-			onTouchEnd={() => {
-				onTouchEnd;
-				console.log(markers);
-			}}
+			onTouchStart={onTouchStart ?? null}
+			onTouchEnd={onTouchEnd ?? null}
 			region={{
 				latitude: centerLatitude,
 				longitude: centerLongitude,
 				latitudeDelta: latitudeDelta,
 				longitudeDelta: longitudeDelta,
 			}}>
-			{/* {markers} */}
+			{imageList[select]}
 			{polylines}
 		</MapView>
 	);
 }
 
 export default memo(CustomMapView);
+const Circle = styled.View<{color: string}>`
+	width: ${widthPercentage(10)}px;
+	height: ${widthPercentage(10)}px;
+	border-radius: 99px;
+	background-color: ${props => props.color};
+	z-index: 2;
+`;

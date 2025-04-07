@@ -45,7 +45,7 @@ import CustomButton from '../../utill/component/custom-button';
 import {savePost, updatePost} from '../../redux/community/community.slice';
 import {AbsoluteTopBars as AbsoluteTopBar} from '../../utill/component/timetable/absolute-top-bar-component';
 import {logEvent} from '../../../firebaseAnalytice';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
+import CustomMapView from '../../utill/component/timetable/mapView';
 export default function DetailInfo({navigation}: any) {
 	const {travelId, nDay, day, travelName, region, regionInfo, timetable, picture, diary, reviewCheck, tendency} =
 		useAppSelector(state => state.travelSlice);
@@ -65,85 +65,7 @@ export default function DetailInfo({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const markers: ReactElement<any, string | JSXElementConstructor<any>> | JSX.Element[][] | null | undefined = [];
-	const polylines:
-		| string
-		| number
-		| boolean
-		| JSX.Element[]
-		| ReactElement<any, string | JSXElementConstructor<any>>
-		| null
-		| undefined = [];
-	let positions: {latitude: number; longitude: number}[] = [];
-	timetable.forEach((value, index) => {
-		const polylineCoordinates = value
-			.map((item, value) => {
-				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
-					return {latitude: item.lat, longitude: item.lng};
-				}
-				return null;
-			})
-			.filter(items => items !== null);
-		value.map(vvalue =>
-			positions.push({
-				latitude: vvalue.lat,
-				longitude: vvalue.lng,
-			}),
-		);
-		let count = 0;
-		markers.push(
-			value.map((item, idx) => {
-				if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
-					count += 1;
-					return (
-						<Marker
-							key={`marker_${idx}`}
-							coordinate={{latitude: item.lat, longitude: item.lng}}
-							title={item.name}
-							centerOffset={{x: 0, y: 0}}
-							anchor={{x: 0.5, y: 0.5}}
-							style={{zIndex: 4}}>
-							{index == 0 ? (
-								<MarkerContainer key={idx}>
-									<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
-										{count}
-									</PretendardSemiBoldText>
-								</MarkerContainer>
-							) : (
-								<Circle color={colors.Gray5} key={idx} />
-							)}
-						</Marker>
-					);
-				} else {
-					return null;
-				}
-			}),
-		);
-		polylines.push(
-			<Polyline
-				key={`polyline_${index}`}
-				coordinates={polylineCoordinates}
-				strokeColor={index == 0 ? colors.PointYellow : colors.Gray5}
-				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
-			/>,
-		);
-	});
 
-	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
-	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
-	const minLongitude = Math.min(...positions.map(marker => marker.longitude));
-	const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
-
-	// 경계 상자의 중심 좌표 계산
-	const centerLatitude = (maxLatitude + minLatitude) / 2;
-	const centerLongitude = (maxLongitude + minLongitude) / 2;
-
-	// 경계 상자의 너비와 높이 계산
-	const deltaLatitude = maxLatitude - minLatitude;
-	const deltaLongitude = maxLongitude - minLongitude;
-
-	// 너비와 높이 중 큰 값을 기준으로 줌 레벨 계산
-	const maxDelta = Math.max(deltaLatitude, deltaLongitude);
 	const removeCheck = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -445,20 +367,7 @@ export default function DetailInfo({navigation}: any) {
 					</HStack>
 				</AbsoluteTopBar>
 				<MapContainer>
-					<MapView
-						//provider={PROVIDER_GOOGLE}
-						showsMyLocationButton={true}
-						style={{width: '100%', height: heightPercentage(350)}}
-						showsUserLocation={true}
-						region={{
-							latitude: centerLatitude,
-							longitude: centerLongitude,
-							latitudeDelta: deltaLatitude + deltaLatitude,
-							longitudeDelta: deltaLongitude + deltaLongitude,
-						}}>
-						{markers}
-						{polylines}
-					</MapView>
+					<CustomMapView select={0}></CustomMapView>
 					{!modify && (
 						<AbsoluteButton>
 							<PrimaryButton
