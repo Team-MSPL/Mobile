@@ -79,8 +79,8 @@ android {
         applicationId "com.danimmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 66
-        versionName "3.3.0"
+        versionCode 67
+        versionName "3.3.1"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         missingDimensionStrategy 'store', 'play'
