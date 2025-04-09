@@ -161,6 +161,9 @@ export default function SelectDeparture({navigation}: any) {
 					</VStack>
 				);
 			})}
+			<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray2}>
+				* 검색에 오차가 있을 수 있어요
+			</PretendardSemiBoldText>
 			<RouteButton
 				nextText={departureSelected == '' ? '건너뛰기' : '다음'}
 				navigation={navigation}
