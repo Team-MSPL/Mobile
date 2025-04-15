@@ -19,7 +19,6 @@ import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function SelectDeparture({navigation}: any) {
 	const {region, departureSelected, country, cityIndex, cityDistance, departure, departureAirport, departureTrain} =
 		useAppSelector(state => state.travelSlice);
-	const asd = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const handleNearBySearchApi = async () => {
 		const e = await dispatch(
