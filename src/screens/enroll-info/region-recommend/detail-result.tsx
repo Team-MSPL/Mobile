@@ -54,17 +54,20 @@ export default function DetailResult({navigation, route}: any) {
 		}
 		const cityIndex =
 			country == 0
-				? cityViewList[country].find(city => city.title == region[0])?.id
+				? region.at(-1) == '전체' && region[0] != '제주'
+					? 2
+					: cityViewList[country].find(city => city.title == region[0])?.id
 				: cityViewList[country].slice(1).filter(item => item.sub.find(city => city.subTitle == region[0]))[0]
 						.id;
 		let season = copy.pop();
 		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(
-			item => item.subTitle == region[country == 0 ? 1 : 0],
+			item =>
+				item.subTitle == region[country == 0 ? (region.at(-1) == '전체' && region[0] != '제주' ? 0 : 1) : 0],
 		);
 		const data = {
 			cityDistance: [cityDistance],
 			cityIndex: cityIndex,
-			region: [region[country == 0 ? 1 : 0]],
+			region: [region[country == 0 ? (region.at(-1) == '전체' && region[0] != '제주' ? 0 : 1) : 0]],
 			tendency: copy,
 			season: season,
 			selectEndDate: selectEndDate,

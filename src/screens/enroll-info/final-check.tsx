@@ -200,7 +200,10 @@ export default function FinalCheck({navigation}: any) {
 				if (country != 0) {
 					a = a.map((item, idx) => {
 						return `해외/${countryList[country].en}/${item
-							.split(cityViewList[country][cityIndex].title)[1]
+							.slice(
+								item.indexOf(cityViewList[country][cityIndex].title) +
+									cityViewList[country][cityIndex].title.length,
+							)
 							.trim()}`;
 					});
 				}

@@ -149,8 +149,9 @@ export default function SelectDeparture({navigation}: any) {
 						<TendencyButton
 							marginBottom={10}
 							bgColor={item.title == departureSelected}
-							label={item.text.name}
+							label={item.text.name == '' ? '주변에 없습니다' : item.text.name}
 							key={index}
+							disabled={item.text.name == ''}
 							onPress={() => {
 								dispatch(
 									travelSliceActions.setDepartureSelected(

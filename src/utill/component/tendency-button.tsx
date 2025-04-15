@@ -14,6 +14,7 @@ export default function TendencyButton({
 	imageSvg,
 	width,
 	betaFlag,
+	disabled,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -21,6 +22,7 @@ export default function TendencyButton({
 			onPress={onPress}
 			divide={divide ?? false}
 			marginBottom={marginBottom}
+			disabled={disabled}
 			width={width}>
 			{betaFlag && (
 				<BetaContainer>
@@ -53,6 +55,7 @@ type CustomButtonProps = {
 	width?: number;
 	imageSvg?: any;
 	betaFlag?: boolean;
+	disabled?: boolean;
 };
 const ButtonContainer = styled.TouchableOpacity<{
 	select: boolean;

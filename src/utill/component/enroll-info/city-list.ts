@@ -321,7 +321,6 @@ const japanCityList = [
 			{id: 6, subId: 1, subTitle: '삿포로'},
 			{id: 3, subId: 2, subTitle: '교토'},
 			{id: 1, subId: 2, subTitle: '요코하마'},
-			{id: 1, subId: 2, subTitle: '요코하마'},
 			{id: 8, subId: 1, subTitle: '히로시마'},
 			{id: 5, subId: 1, subTitle: '오키나와'},
 		],

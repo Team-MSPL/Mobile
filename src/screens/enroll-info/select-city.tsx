@@ -56,8 +56,8 @@ export default function SelectCity({navigation}: any) {
 			let copy = [];
 			let copyIndex = [];
 			if (!(country == 0 && cityIndex == 2)) {
-				let copy = [...region];
-				let copyIndex = [...cityDistance];
+				copy = [...region];
+				copyIndex = [...cityDistance];
 			}
 			copy.push(e.subTitle);
 			copyIndex.push(e.id);
@@ -245,7 +245,7 @@ export default function SelectCity({navigation}: any) {
 						}}
 						ref={carouselRef}
 						width={widthPercentage(337)}
-						height={heightPercentage(Math.ceil(cityViewList[country][cityIndex].sub.length / 4) * 50)}
+						height={heightPercentage(Math.ceil(cityViewList[country][cityIndex].sub.length / 3) * 50)}
 						data={cityViewList[country]}
 						scrollAnimationDuration={500}
 						onSnapToItem={itemIndex => {
