@@ -238,7 +238,26 @@ export default function SelectCity({navigation}: any) {
 							);
 						})}
 					</ScrollView>
-					<Carousel
+					<WrapContainer>
+						{cityViewList[country][cityIndex]?.sub.map((item, idx) => {
+							return (
+								<CityItems
+									key={idx}
+									select={region.includes(item.subTitle)}
+									onPress={() => {
+										cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
+									}}>
+									<PretendardSemiBoldText
+										size={14}
+										lineHeight={18.9}
+										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
+										{item.subTitle}
+									</PretendardSemiBoldText>
+								</CityItems>
+							);
+						})}
+					</WrapContainer>
+					{/* <Carousel
 						loop={false}
 						style={{
 							marginTop: 18,
@@ -276,7 +295,7 @@ export default function SelectCity({navigation}: any) {
 								})}
 							</WrapContainer>
 						)}
-					/>
+					/> */}
 				</Container>
 				{country == 0 && cityIndex == 1 && (
 					<FlexContainer>
@@ -336,6 +355,7 @@ const WrapContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: ${widthPercentage(10)}px;
+	margin-bottom: ${heightPercentage(20)}px;
 `;
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;

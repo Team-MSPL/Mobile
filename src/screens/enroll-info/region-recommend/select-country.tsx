@@ -48,7 +48,6 @@ export default function SelectCountry({navigation}: any) {
 								divide={true}
 								width={widthPercentage(158)}
 								imageSvg={imageList[idx]}
-								betaFlag={idx != 0}
 								onPress={() => {
 									handleCountryClick(idx);
 								}}></TendencyButton>
