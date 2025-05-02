@@ -62,6 +62,17 @@ import Polygon from '../../../public/polygon.svg';
 import Airport from '../../../public/airport.svg';
 import Train from '../../../public/train.svg';
 
+import Phillgram from '../../../public/mou/pillgram.svg';
+import TravleMedic from '../../../public/mou/travleMedic.svg';
+
+import Main1 from '../../../public/main/1.svg';
+import Main2 from '../../../public/main/2.svg';
+import Main3 from '../../../public/main/3.svg';
+import Main4 from '../../../public/main/4.svg';
+import MainCourse from '../../../public/main/course.svg';
+import MainRegion from '../../../public/main/region.svg';
+import MainInstagram from '../../../public/main/instagram.svg';
+
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -244,5 +255,36 @@ export const SvgAirPort = styled(Airport)<{color?: string}>`
 	color: color;
 `;
 export const SvgTrain = styled(Train)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgPillgram = styled(Phillgram)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgMain1 = styled(Main1)<{color?: string}>`
+	color: color;
+`;
+export const SvgMain2 = styled(Main2)<{color?: string}>`
+	color: color;
+`;
+export const SvgMain3 = styled(Main3)<{color?: string}>`
+	color: color;
+`;
+export const SvgMain4 = styled(Main4)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgMainCourse = styled(MainCourse)<{color?: string}>`
+	color: color;
+`;
+export const SvgMainRegion = styled(MainRegion)<{color?: string}>`
+	color: color;
+`;
+export const SvgMainInstagram = styled(MainInstagram)<{color?: string}>`
 	color: color;
 `;

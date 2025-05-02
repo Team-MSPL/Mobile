@@ -245,6 +245,7 @@ export default function SelectCity({navigation}: any) {
 									key={idx}
 									select={region.includes(item.subTitle)}
 									onPress={() => {
+										console.log(region);
 										cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
 									}}>
 									<PretendardSemiBoldText

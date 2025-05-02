@@ -12,15 +12,33 @@ import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
 import {getHomeRegionInfo, getPlaceRecommendInMainScreen} from '../../redux/setting/settingSlice';
 
 import {colors} from '../../utill/colors';
-import {HStack, PretendardBoldText, PretendardSemiBoldText, PretendardVariable} from '../../utill/layout/layout';
+import {
+	HStack,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariable,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGCalendarRecommend, SVGGood, SVGNoteList, SVGRegionRecommend, SVGRightAdd} from '../../utill/svg/svg';
+import {
+	SVGCalendarRecommend,
+	SVGGood,
+	SVGNoteList,
+	SVGRegionRecommend,
+	SVGRightAdd,
+	SvgMainCourse,
+	SvgMainInstagram,
+	SvgMainRegion,
+	SvgPillgram,
+	SvgTravleMedic,
+} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {Linking, Modal, Platform, SafeAreaView} from 'react-native';
+import {FlatList, Linking, Modal, Platform, SafeAreaView, View} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
@@ -29,6 +47,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {NoteCount} from '../more/more-info';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import ImageRecursion from '../../utill/component/home/imageRecursion';
 
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
@@ -118,11 +137,11 @@ export default function Main({navigation}: any) {
 			setMainScreens(data);
 		} catch (err) {}
 	};
-	useFocusEffect(
-		useCallback(() => {
-			recursionCall();
-		}, []),
-	);
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		recursionCall();
+	// 	}, []),
+	// );
 	const countRef = useRef(0);
 	const recursionCall = () => {
 		const tick = setTimeout(async () => {
@@ -204,20 +223,16 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: regionRecommend,
-			image: (
-				<SVGRegionRecommend width={widthPercentage(200)} height={heightPercentage(150)}></SVGRegionRecommend>
-			),
-			text: '여행 지역 ',
+			image: <SvgMainRegion width={widthPercentage(176)} preserveAspectRatio='xMidYMid slice' />,
+			text: `여행은 가고 싶은데,${`\n`}어디로 가야 할지 모르겠다면? `,
+			title: '여행 지역 추천받기',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: (
-				<SVGCalendarRecommend
-					width={widthPercentage(200)}
-					height={heightPercentage(150)}></SVGCalendarRecommend>
-			),
-			text: '여행 코스 ',
+			image: <SvgMainCourse width={widthPercentage(176)} preserveAspectRatio='xMidYMid slice' />,
+			text: `여행지는 정했는데,${`\n`}계획 세우기 귀찮다면?`,
+			title: '여행 코스 추천받기',
 		},
 		// {
 		// 	id: 2,
@@ -230,20 +245,49 @@ export default function Main({navigation}: any) {
 		// 	text: '해외 여행 코스 ',
 		// },
 	];
-	const travleMedicHandle = () => {
-		dispatch(
-			modalSliceActions.setOpenModal({
-				modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
-				modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
-				modalFunction: async () => {
-					await logEvent('travleMedic', {});
-					Linking.openURL('https://travelmedic.co.kr/mypage/event_view.php?idx=29');
-				},
-				travleMedic: true,
-				modalSubTitle: '* 해외3개월이하 보험가입시 적용됩니다.',
-			}),
-		);
+	const hanldeCooperation = async (e: {title: string; link: string; photo: any}) => {
+		if (e.title == 'travleMedic') {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
+					modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
+					modalFunction: async () => {
+						await logEvent(e?.title, {});
+						Linking.openURL(e.link);
+					},
+					travleMedic: true,
+					modalSubTitle: '* 해외3개월이하 보험가입시 적용됩니다.',
+				}),
+			);
+		} else {
+			await logEvent(e?.title, {});
+			Linking.openURL(e.link);
+		}
 	};
+	const cooperationList = [
+		{
+			title: 'travleMedic',
+			link: 'https://travelmedic.co.kr/mypage/event_view.php?idx=29',
+			photo: (
+				<SvgTravleMedic
+					width={widthPercentage(115)}
+					height={widthPercentage(131)}
+					preserveAspectRatio='xMidYMid slice'
+				/>
+			),
+		},
+		{
+			title: 'pillgram',
+			link: 'https://pillgram.kr/Promotion/PackageLanding.aspx?promotionId=75AA4035-779F-43A1-8C26-E3FBAE0CCE40&utm_source=danim&utm_medium=event',
+			photo: (
+				<SvgPillgram
+					width={widthPercentage(115)}
+					height={widthPercentage(131)}
+					preserveAspectRatio='xMidYMid slice'
+				/>
+			),
+		},
+	];
 	const setPreset = (data: {
 		preset: any;
 		presetTendency: any;
@@ -336,85 +380,61 @@ export default function Main({navigation}: any) {
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
-				<BackgroundImage source={{uri: homeRegionImage.photo}}>
-					<BrighnessBox>
-						{socialloginProvider != 'anonymous' && (
-							<TicketTouchable>
-								<NoteCount>
-									<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
-										{noteList.filter(item => !item.startsWith('read')).length}
-									</PretendardSemiBoldText>
-								</NoteCount>
-								<SVGNoteList
-									onPress={() => {
-										navigation.navigate('NoteList');
-									}}
-									width={widthPercentage(33)}
-									height={widthPercentage(33)}></SVGNoteList>
-							</TicketTouchable>
-						)}
-						<HomeTextContainer
-							heightFlag={socialloginProvider == 'anonymous'}
-							onPress={() => {
-								selectPopularity({
-									id: regionList.find(item => item.subTitle == homeRegionImage.name).id,
-									subTitle: regionList.find(item => item.subTitle == homeRegionImage.name).subTitle,
-								});
-							}}>
-							<LinearGradient
-								start={{x: 0, y: 0}}
-								end={{x: 0, y: 1}}
-								colors={['rgba(255,255,255,0)', 'black']}
-								style={{
-									zIndex: 101,
-									position: 'absolute',
-									width: '100%',
-									paddingHorizontal: widthPercentage(26),
-									height: heightPercentage(150),
-								}}>
-								<PretendardSemiBoldText
-									size={23}
-									lineHeight={34.5}
-									color={
-										colors.backgroundWhite
-									}>{`${userName} 님,\n현재 인기 여행지`}</PretendardSemiBoldText>
-								<HStack>
-									<PretendardBoldText size={23} lineHeight={34.5} color={colors.Primary}>
-										{homeRegionImage.name + ' '}
-									</PretendardBoldText>
-									<PretendardSemiBoldText size={23} lineHeight={34.5} color={colors.backgroundWhite}>
-										여행은 어때요?
-									</PretendardSemiBoldText>
-									<SVGRightAdd
-										color='white'
-										width={heightPercentage(24)}
-										height={heightPercentage(24)}
-										style={{marginLeft: 10}}></SVGRightAdd>
-								</HStack>
-							</LinearGradient>
-						</HomeTextContainer>
-					</BrighnessBox>
-				</BackgroundImage>
+				<ImageRecursion navigation={navigation} />
 				<HomeBottomContainer>
-					<HStack gap={5}>
-						<SVGGood width={widthPercentage(25)} height={widthPercentage(25)} />
-						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
-							다님 AI에게 추천받기
-						</PretendardSemiBoldText>
-					</HStack>
-					{buttonList.map(item => (
-						<RecommendContainer onPress={item.onPress} key={item.id}>
-							<RecommendTextContainer>
-								<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
-									{item.text}
-									<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
-										추천
+					<VStack gap={5} deco='padding:0px 12px;'>
+						<PretendardBoldText size={15} lineHeight={21.6} color={colors.Black}>
+							{userName}님의 성향을 토대로,{' '}
+							<PretendardBoldText size={15} lineHeight={21.6} color={colors.Primary}>
+								다님 AI
+							</PretendardBoldText>
+							가 여행을 추천해 줘요!
+						</PretendardBoldText>
+						<PretendardBoldText size={13} lineHeight={21.6} color={colors.PointYellow}>
+							1분 투자로 하루를 아껴보세요
+						</PretendardBoldText>
+					</VStack>
+					<HStack justifyContent='space-around'>
+						{buttonList.map(item => (
+							<RecommendContainer onPress={item.onPress} key={item.id}>
+								<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
+									{item.image}
+								</View>
+								<LinearGradient
+									start={{x: 0, y: 0}}
+									end={{x: 0, y: 1}}
+									colors={['rgba(255,255,255,0)', 'black']}
+									style={{
+										zIndex: 101,
+										position: 'absolute',
+										width: '100%',
+										paddingHorizontal: widthPercentage(10),
+										height: '100%',
+										alignItems: 'center',
+										justifyContent: 'flex-end',
+										gap: 30,
+									}}>
+									<PretendardSemiBoldText size={16} lineHeight={28} color={colors.backgroundWhite}>
+										{item.text}
 									</PretendardSemiBoldText>
-								</PretendardSemiBoldText>
-							</RecommendTextContainer>
-							{item.image}
-						</RecommendContainer>
-					))}
+									<StartButton onPress={item.onPress}>
+										<PretendardSemiBoldText size={14} lineHeight={28} color={colors.Black}>
+											{item.title}
+										</PretendardSemiBoldText>
+									</StartButton>
+								</LinearGradient>
+
+								{/* <RecommendTextContainer>
+									<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
+										{item.text}
+										<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
+											추천
+										</PretendardSemiBoldText>
+									</PretendardSemiBoldText>
+								</RecommendTextContainer> */}
+							</RecommendContainer>
+						))}
+					</HStack>
 					<CollectionContainer>
 						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
 							다님이 추천하는 여행지
@@ -449,7 +469,11 @@ export default function Main({navigation}: any) {
 					<Carousel
 						loop
 						style={{
+							width: widthPercentage(375), // 전체 화면을 차지하되,
 							marginTop: 18,
+							alignItems: 'flex-start', // 상단 정렬
+							justifyContent: 'flex-start', // 왼쪽에 딱 붙임
+							paddingLeft: widthPercentage(20), // 왼쪽 여백
 						}}
 						width={widthPercentage(337)}
 						height={heightPercentage(160)}
@@ -474,9 +498,57 @@ export default function Main({navigation}: any) {
 							</VividReviewContainer>
 						)}
 					/>
-					<MouCouponTouchable onPress={travleMedicHandle}>
-						<MoiCouponImage source={require('../../../public/mou/travleMedic.jpg')}></MoiCouponImage>
-					</MouCouponTouchable>
+					<Carousel
+						loop
+						style={{
+							width: widthPercentage(375), // 전체 화면을 차지하되,
+							marginTop: 18,
+							alignItems: 'flex-start', // 상단 정렬
+							justifyContent: 'flex-start', // 왼쪽에 딱 붙임
+							paddingLeft: widthPercentage(20), // 왼쪽 여백
+						}}
+						width={widthPercentage(337)}
+						height={heightPercentage(160)}
+						autoPlay={true}
+						data={[1]}
+						scrollAnimationDuration={1000}
+						onSnapToItem={() => {}}
+						autoPlayInterval={4000}
+						renderItem={({index}) => (
+							<InstagramContainer
+								onPress={() => {
+									Linking.openURL('https://www.instagram.com/danim_kr/');
+								}}>
+								<SvgMainInstagram width={widthPercentage(326)} />
+							</InstagramContainer>
+						)}
+					/>
+					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Black}>
+						{userName}님을 위한 혜택
+					</PretendardSemiBoldText>
+					<FlatList
+						data={cooperationList}
+						numColumns={3}
+						style={{
+							marginVertical: 20,
+						}}
+						columnWrapperStyle={{gap: 7, marginBottom: 10}} // 각 행의 아래 간격
+						renderItem={({item}) => {
+							return (
+								<CooperationContainer onPress={() => hanldeCooperation(item)}>
+									{item.photo}
+								</CooperationContainer>
+							);
+						}}></FlatList>
+
+					{/* {cooperationList.map(cooItem => (
+						<MouCouponTouchable
+							onPress={() => {
+								hanldeCooperation(cooItem);
+							}}>
+							{cooItem.photo}
+						</MouCouponTouchable>
+					))} */}
 				</HomeBottomContainer>
 			</HomeContainer>
 			<Modal
@@ -511,23 +583,30 @@ export const TagText = styled(PretendardVariable)<{color: string; size?: number}
 	font-weight: 600;
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
+const InstagramContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(326)}px;
+	margin: 10px 0px;
+`;
 const RecommendContainer = styled.Pressable`
-	width: ${widthPercentage(327)}px;
-	height: ${heightPercentage(88)}px;
+	width: ${widthPercentage(176)}px;
+	height: ${heightPercentage(328)}px;
 	background-color: ${colors.Gray1};
 	border-radius: 12px;
 	top: ${heightPercentage(18)}px;
-	margin: 0px 0px ${heightPercentage(9)}px -${widthPercentage(24)}px;
+	margin: 0px 0px ${heightPercentage(9)}px 0px;
 	flex-direction: row;
 	overflow: hidden;
 	align-self: center;
+	align-items: center;
+	justify-content: center;
+`;
+const CooperationContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(115)}px;
+	height: ${widthPercentage(131)}px;
+	border-radius: 10px;
+	overflow: hidden; /* ✅ 중요 */
 `;
 
-const RecommendTextContainer = styled.View`
-	width: 50%;
-	justify-content: center;
-	left: ${widthPercentage(21)}px;
-`;
 const HomeContainer = styled.ScrollView`
 	background-color: ${colors.backgroundWhite};
 	width: 100%;
@@ -536,31 +615,9 @@ const HomeBottomContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: ${widthPercentage(35)}px 0px 0px ${widthPercentage(24)}px;
-	top: -${heightPercentage(20)}px;
+	padding: ${widthPercentage(35)}px ${widthPercentage(8)}px 0px ${widthPercentage(8)}px;
+	top: -${heightPercentage(50)}px;
 `;
-const BrighnessBox = styled.View`
-	flex: 1;
-	background-color: rgba(0, 0, 0, 0.3);
-	top: -${heightPercentage(20)}px;
-`;
-const BackgroundImage = styled.ImageBackground`
-	width: 100%;
-	height: ${heightPercentage(408)}px;
-`;
-const TicketTouchable = styled.TouchableOpacity`
-	border-radius: 99px;
-	top: ${heightPercentage(39)}px;
-	left: ${widthPercentage(305)}px;
-	width: ${widthPercentage(50)}px;
-	height: ${widthPercentage(50)}px;
-	align-items: center;
-	justify-content: center;
-`;
-const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
-	top: ${props => heightPercentage(props.heightFlag ? 275 : 215)}px;
-`;
-
 const CollectionContainer = styled.View`
 	margin-top: ${heightPercentage(36)}px;
 	margin-bottom: ${heightPercentage(26)}px;
@@ -573,12 +630,12 @@ const CollectionTouchableOpacity = styled.Pressable``;
 const CollectionRecommendContentItemImage = styled.Image`
 	position: absolute;
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
-	height: ${heightPercentage(196)}px;
+	height: ${heightPercentage(226)}px;
 	border-radius: 12px;
 `;
 const ImageContainer = styled.View`
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
-	height: ${heightPercentage(196)}px;
+	height: ${heightPercentage(226)}px;
 	margin-right: ${widthPercentage(12)}px;
 	align-items: start;
 	justify-content: flex-end;
@@ -610,13 +667,16 @@ const GraientBackground = styled.View`
 const MouCouponTouchable = styled.TouchableOpacity`
 	margin-top: ${widthPercentage(20)}px;
 	width: ${widthPercentage(326)}px;
-	height: ${widthPercentage(100)}px;
+	height: ${widthPercentage(300)}px;
 	border-radius: 12px;
 `;
-const MoiCouponImage = styled.Image`
-	width: ${widthPercentage(326)}px;
-	height: ${widthPercentage(100)}px;
-	border-radius: 12px;
+const StartButton = styled.TouchableOpacity`
+	width: ${widthPercentage(143)}px;
+	padding: ${widthPercentage(4)}px ${widthPercentage(11)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 20px;
+	background-color: ${colors.backgroundWhite};
 `;
 interface mainScreensType {
 	region: string;
@@ -639,6 +699,7 @@ interface ButtonListType {
 	onPress: () => void;
 	image: any;
 	text: string;
+	title: string;
 }
 
 const regionList = [

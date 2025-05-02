@@ -222,7 +222,18 @@ export const getDrivingDuration = createAsyncThunk(
 		}
 	},
 );
-
+//여행 추천 장소 리스트 ai
+export const getRecommendPlace = createAsyncThunk(
+	'/getRecommendPlace',
+	async (data: travelAiType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/ai/recommendPlace`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //장소 정보 얻어오는거
 export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, {rejectWithValue}) => {
 	try {
@@ -640,6 +651,8 @@ export const travelSlice = createSlice({
 			state.cityDistance = payload.cityDistance;
 			state.essentialPlaces = [payload.essential];
 			state.season = payload.season;
+			state.regionRecommendFlag = true;
+			state.country = payload.country;
 		},
 		setShareLoginFlag: (state, {payload}) => {
 			state.shareLoginFlag = payload;
