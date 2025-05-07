@@ -111,7 +111,7 @@ export default function RecommendPlaces({navigation, route}: any) {
 							justifyContent: 'flex-end',
 							paddingBottom: 20,
 						}}>
-						{mainViewList[route.params.index]?.title}
+						{mainViewList[route.params.index]?.subTitle}
 					</LinearGradient>
 				</HomeTextContainer>
 			</View>
@@ -161,7 +161,7 @@ export default function RecommendPlaces({navigation, route}: any) {
 									position: 'absolute',
 									width: '100%',
 									paddingHorizontal: widthPercentage(19),
-									height: heightPercentage(210),
+									height: widthPercentage(174),
 									justifyContent: 'flex-end',
 									paddingBottom: 20,
 								}}>

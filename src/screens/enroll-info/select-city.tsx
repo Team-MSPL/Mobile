@@ -107,15 +107,11 @@ export default function SelectCity({navigation}: any) {
 		setRegionText(e);
 		setRegionMatchList(handleRegionSerarch(e));
 	}, []);
-	const carouselRef = useRef(null);
 	const cityScrollRef = useRef(null);
 	useEffect(() => {
-		if (carouselRef.current) {
+		if (cityScrollRef.current) {
 			requestAnimationFrame(() => {
 				cityScrollRef.current.scrollTo({x: cityIndex < 4 ? 0 : cityIndex * 30});
-				carouselRef.current.scrollTo({
-					index: cityIndex,
-				});
 			});
 		}
 	}, [cityIndex]);

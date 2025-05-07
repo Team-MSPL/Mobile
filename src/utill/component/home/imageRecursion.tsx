@@ -31,19 +31,19 @@ export default function ImageRecursion({navigation}: any) {
 			getNoteListData();
 		}, []),
 	);
-	// useEffect(() => {
-	// 	const interval = setInterval(() => {
-	// 		setCurrentIndex(prevIndex => (prevIndex === mainViewList.length - 1 ? 0 : prevIndex + 1));
-	// 	}, 5000); // 5초마다 전환
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setCurrentIndex(prevIndex => (prevIndex === mainViewList.length - 1 ? 0 : prevIndex + 1));
+		}, 5000); // 5초마다 전환
 
-	// 	// 언마운트 시 interval 정리
-	// 	return () => clearInterval(interval);
-	// }, []);
+		// 언마운트 시 interval 정리
+		return () => clearInterval(interval);
+	}, []);
 	return (
 		<View style={{position: 'relative', width: '100%', height: heightPercentage(428)}}>
 			{/* SVG 배경 */}
 			<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
-				{mainViewList[currentIndex].photo()}
+				{mainViewList[currentIndex].photo(heightPercentage(428))}
 			</View>
 			<BrighnessBox>
 				{socialloginProvider != 'anonymous' && (
@@ -88,11 +88,6 @@ export default function ImageRecursion({navigation}: any) {
 								}}>
 								{mainViewList[currentIndex].title}
 							</Pressable>
-							<SVGRightAdd
-								color='white'
-								width={heightPercentage(24)}
-								height={heightPercentage(24)}
-								style={{marginLeft: 10}}></SVGRightAdd>
 						</HStack>
 					</LinearGradient>
 				</HomeTextContainer>
@@ -104,12 +99,30 @@ export default function ImageRecursion({navigation}: any) {
 export const mainViewList = [
 	{
 		title: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
-					자연 속 여유
+			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
+				<PretendardSemiBoldText
+					size={23}
+					lineHeight={35}
+					color={colors.backgroundWhite}
+					style={{maxWidth: widthPercentage(320)}} // 적절한 최대 폭
+				>
+					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+						자연 속 여유
+					</PretendardSemiBoldText>
+					를 느끼고{'\n'}싶은 당신을 초대합니다
 				</PretendardSemiBoldText>
-				를 느끼고{`\n`}싶은 당신을 초대합니다
-			</PretendardSemiBoldText>
+
+				<SVGRightAdd
+					color='white'
+					width={heightPercentage(24)}
+					height={heightPercentage(24)}
+					style={{
+						position: 'absolute',
+						right: -heightPercentage(28),
+						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+					}}
+				/>
+			</View>
 		),
 		subTitle: (
 			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
@@ -120,21 +133,33 @@ export const mainViewList = [
 			</PretendardSemiBoldText>
 		),
 		photo: (height?: number) => (
-			<SvgMain1 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='xMidYMid slice' />
+			<SvgMain1 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='none' />
 		),
 	},
 	{
 		title: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
-					문화
+			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
+				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+						문화
+					</PretendardSemiBoldText>
+					와{' '}
+					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+						트렌드
+					</PretendardSemiBoldText>
+					가 살아 숨 쉬는{`\n`}공간으로 당신을 초대합니다
 				</PretendardSemiBoldText>
-				와{' '}
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
-					트렌드
-				</PretendardSemiBoldText>
-				가 살아 숨 쉬는{`\n`}공간으로 당신을 초대합니다
-			</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={heightPercentage(24)}
+					height={heightPercentage(24)}
+					style={{
+						position: 'absolute',
+						right: -heightPercentage(28),
+						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+					}}
+				/>
+			</View>
 		),
 		subTitle: (
 			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
@@ -149,18 +174,30 @@ export const mainViewList = [
 			</PretendardSemiBoldText>
 		),
 		photo: (height?: number) => (
-			<SvgMain2 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='xMidYMid slice' />
+			<SvgMain2 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='none' />
 		),
 	},
 	{
 		title: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				이 순간과 연결된{' '}
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
-					과거의 세계
+			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
+				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+					이 순간과 연결된{' '}
+					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+						과거의 세계
+					</PretendardSemiBoldText>
+					로{`\n`}당신을 초대합니다
 				</PretendardSemiBoldText>
-				로{`\n`}당신을 초대합니다
-			</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={heightPercentage(24)}
+					height={heightPercentage(24)}
+					style={{
+						position: 'absolute',
+						right: heightPercentage(98),
+						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+					}}
+				/>
+			</View>
 		),
 		subTitle: (
 			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
@@ -171,17 +208,29 @@ export const mainViewList = [
 			</PretendardSemiBoldText>
 		),
 		photo: (height?: number) => (
-			<SvgMain3 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='xMidYMid slice' />
+			<SvgMain3 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='none' />
 		),
 	},
 	{
 		title: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
-					열정
+			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
+				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+						열정
+					</PretendardSemiBoldText>
+					이 가득한 당신을{`\n`}이곳으로 초대합니다
 				</PretendardSemiBoldText>
-				이 가득한 당신을{`\n`}이곳으로 초대합니다
-			</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={heightPercentage(24)}
+					height={heightPercentage(24)}
+					style={{
+						position: 'absolute',
+						right: -heightPercentage(28),
+						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+					}}
+				/>
+			</View>
 		),
 		subTitle: (
 			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
@@ -192,7 +241,7 @@ export const mainViewList = [
 			</PretendardSemiBoldText>
 		),
 		photo: (height?: number) => (
-			<SvgMain4 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='xMidYMid slice' />
+			<SvgMain4 width={widthPercentage(375)} height={height ?? '100%'} preserveAspectRatio='none' />
 		),
 	},
 ];

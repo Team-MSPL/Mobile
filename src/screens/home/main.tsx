@@ -19,6 +19,7 @@ import {
 	PretendardVariable,
 	PretendardVariableText,
 	VStack,
+	devicesWidth,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {
@@ -54,6 +55,8 @@ export default function Main({navigation}: any) {
 	const {userName, signUpReward, reLogin, userId, analyticeFlag, socialloginProvider} = useAppSelector(
 		state => state.userSlice,
 	);
+	const {eventList} = useAppSelector(state => state.eventSlice);
+
 	const {selectStartDate, shareLoginFlag, country} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
@@ -377,20 +380,29 @@ export default function Main({navigation}: any) {
 			title: '여행 계획 짜기 귀찮았는데 ,클릭 몇 번으로 여행 계획 만들어줘서 좋았다 다음에 여행 계획 짤때 또 사용할 듯 하다',
 		},
 	];
+	const displayList = [
+		...eventList,
+		{
+			type: 'instagram',
+			eventLink: 'https://www.instagram.com/danim_kr/',
+			eventImage:
+				'https://firebasestorage.googleapis.com/v0/b/danim-image/o/event%2F%E1%84%83%E1%85%A1%E1%84%82%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%89%E1%85%B3%E1%84%90%E1%85%A1.png?alt=media&token=1fb05468-5a33-4737-acfb-e90be34dd378',
+		},
+	];
 	return (
 		<SafeAreaView>
 			<HomeContainer showsVerticalScrollIndicator={false}>
 				<ImageRecursion navigation={navigation} />
 				<HomeBottomContainer>
 					<VStack gap={5} deco='padding:0px 12px;'>
-						<PretendardBoldText size={15} lineHeight={21.6} color={colors.Black}>
-							{userName}님의 성향을 토대로,{' '}
-							<PretendardBoldText size={15} lineHeight={21.6} color={colors.Primary}>
+						<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
+							{userName}님의 성향을 토대로,{`\n`}
+							<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
 								다님 AI
 							</PretendardBoldText>
 							가 여행을 추천해 줘요!
 						</PretendardBoldText>
-						<PretendardBoldText size={13} lineHeight={21.6} color={colors.PointYellow}>
+						<PretendardBoldText size={14} lineHeight={21.6} color={colors.PointYellow}>
 							1분 투자로 하루를 아껴보세요
 						</PretendardBoldText>
 					</VStack>
@@ -411,14 +423,28 @@ export default function Main({navigation}: any) {
 										paddingHorizontal: widthPercentage(10),
 										height: '100%',
 										alignItems: 'center',
-										justifyContent: 'flex-end',
 										gap: 30,
 									}}>
-									<PretendardSemiBoldText size={16} lineHeight={28} color={colors.backgroundWhite}>
+									<PretendardSemiBoldText
+										size={16}
+										lineHeight={20}
+										color={colors.backgroundWhite}
+										deco={`top:${heightPercentage(140)}`}>
 										{item.text}
 									</PretendardSemiBoldText>
 									<StartButton onPress={item.onPress}>
-										<PretendardSemiBoldText size={14} lineHeight={28} color={colors.Black}>
+										<PretendardSemiBoldText
+											size={14}
+											lineHeight={28}
+											color={colors.Black}
+											numberOfLines={1}
+											adjustsFontSizeToFit
+											minimumFontScale={0.5}
+											style={{
+												width: '100%',
+												textAlign: 'center',
+												includeFontPadding: false,
+											}}>
 											{item.title}
 										</PretendardSemiBoldText>
 									</StartButton>
@@ -436,7 +462,11 @@ export default function Main({navigation}: any) {
 						))}
 					</HStack>
 					<CollectionContainer>
-						<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+						<PretendardSemiBoldText
+							size={18}
+							lineHeight={21.6}
+							color={colors.Gray5}
+							deco={`margin-left:${widthPercentage(6)}`}>
 							다님이 추천하는 여행지
 						</PretendardSemiBoldText>
 						<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -463,25 +493,30 @@ export default function Main({navigation}: any) {
 							))}
 						</CollectionContentContainer>
 					</CollectionContainer>
-					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Gray5}>
+					<PretendardSemiBoldText
+						size={18}
+						lineHeight={21.6}
+						color={colors.Gray5}
+						deco={`margin-left:${widthPercentage(6)}`}>
 						다님 사용자들의 생생한 후기
 					</PretendardSemiBoldText>
 					<Carousel
 						loop
 						style={{
-							width: widthPercentage(375), // 전체 화면을 차지하되,
 							marginTop: 18,
-							alignItems: 'flex-start', // 상단 정렬
-							justifyContent: 'flex-start', // 왼쪽에 딱 붙임
-							paddingLeft: widthPercentage(20), // 왼쪽 여백
 						}}
 						width={widthPercentage(337)}
-						height={heightPercentage(160)}
+						height={heightPercentage(170)}
 						autoPlay={true}
 						data={[1, 2, 3]}
 						scrollAnimationDuration={1000}
 						onSnapToItem={() => {}}
-						autoPlayInterval={4000}
+						autoPlayInterval={5000}
+						mode='parallax'
+						modeConfig={{
+							parallaxScrollingScale: 0.9, // 옆 아이템 크기 비율
+							parallaxScrollingOffset: 50, // 옆 아이템이 보여질 정도
+						}}
 						renderItem={({index}) => (
 							<VividReviewContainer>
 								<HStack>
@@ -489,41 +524,67 @@ export default function Main({navigation}: any) {
 										{vividList[index].name} 님{' '}
 									</PretendardBoldText>
 									<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
-										( {vividList[index].region} ) 📝
+										( {vividList[index].region} )
 									</PretendardBoldText>
 								</HStack>
-								<PretendardBoldText size={12} lineHeight={18} color={colors.Gray3}>
+								<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray3}>
 									{vividList[index].title}
-								</PretendardBoldText>
+								</PretendardSemiBoldText>
 							</VividReviewContainer>
 						)}
 					/>
 					<Carousel
-						loop
+						loop={displayList.length > 1}
+						autoPlay={displayList.length > 1}
+						scrollAnimationDuration={displayList.length > 1 ? 1000 : 0}
+						autoPlayInterval={displayList.length > 1 ? 4000 : 0}
+						mode={displayList.length > 1 ? 'parallax' : 'default'}
+						modeConfig={
+							displayList.length > 1
+								? {
+										parallaxScrollingScale: 0.9,
+										parallaxScrollingOffset: 50,
+								  }
+								: undefined
+						}
 						style={{
-							width: widthPercentage(375), // 전체 화면을 차지하되,
-							marginTop: 18,
-							alignItems: 'flex-start', // 상단 정렬
-							justifyContent: 'flex-start', // 왼쪽에 딱 붙임
-							paddingLeft: widthPercentage(20), // 왼쪽 여백
+							marginTop: 70,
+							alignSelf: displayList.length == 1 ? 'center' : undefined,
 						}}
 						width={widthPercentage(337)}
 						height={heightPercentage(160)}
-						autoPlay={true}
-						data={[1]}
-						scrollAnimationDuration={1000}
+						data={displayList}
 						onSnapToItem={() => {}}
-						autoPlayInterval={4000}
 						renderItem={({index}) => (
-							<InstagramContainer
+							<EventContainer
 								onPress={() => {
-									Linking.openURL('https://www.instagram.com/danim_kr/');
+									if (displayList[index]?.eventLink == '') {
+									} else {
+										if (displayList[index]?.eventLink.includes('http')) {
+											Linking.openURL(displayList[index]?.eventLink);
+										} else {
+											navigation.navigate(displayList[index]?.eventLink);
+										}
+									}
 								}}>
-								<SvgMainInstagram width={widthPercentage(326)} />
-							</InstagramContainer>
+								<EventImage
+									source={{
+										uri: displayList[index]?.eventImage,
+									}}></EventImage>
+							</EventContainer>
+							// <InstagramContainer
+							// 	onPress={() => {
+							// 		Linking.openURL('https://www.instagram.com/danim_kr/');
+							// 	}}>
+							// 	<SvgMainInstagram width={widthPercentage(326)} />
+							// </InstagramContainer>
 						)}
 					/>
-					<PretendardSemiBoldText size={18} lineHeight={21.6} color={colors.Black}>
+					<PretendardSemiBoldText
+						size={18}
+						lineHeight={21.6}
+						color={colors.Black}
+						deco={`margin-left:${widthPercentage(6)}`}>
 						{userName}님을 위한 혜택
 					</PretendardSemiBoldText>
 					<FlatList
@@ -643,14 +704,14 @@ const ImageContainer = styled.View`
 `;
 const VividReviewContainer = styled.View`
 	width: ${widthPercentage(326)}px;
-	height: ${heightPercentage(160)}px;
+	height: ${heightPercentage(170)}px;
 	padding-horizontal: ${widthPercentage(30)}px;
 	padding-top: ${widthPercentage(15)}px;
 	gap: ${widthPercentage(10)}px;
 	background-color: ${colors.backgroundWhite};
-	border-width: 2px;
+	border-width: 1px;
 	border-radius: 12px;
-	border-color: ${colors.Gray2};
+	border-color: #dddddd;
 `;
 
 const GraientBackground = styled.View`
@@ -677,6 +738,19 @@ const StartButton = styled.TouchableOpacity`
 	justify-content: center;
 	border-radius: 20px;
 	background-color: ${colors.backgroundWhite};
+	position: absolute;
+	bottom: ${heightPercentage(30)}px;
+`;
+const EventImage = styled.Image`
+	width: ${widthPercentage(337)}px;
+	height: ${heightPercentage(70)}px;
+	object-fit: fill;
+`;
+const EventContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(337)}px;
+	height: ${heightPercentage(70)}px;
+	border-radius: 10px;
+	overflow: hidden;
 `;
 interface mainScreensType {
 	region: string;
