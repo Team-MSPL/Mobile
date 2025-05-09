@@ -479,7 +479,21 @@ export default function Main({navigation}: any) {
 									<ImageContainer>
 										<CollectionRecommendContentItemImage
 											source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-										<GraientBackground>
+										<LinearGradient
+											start={{x: 0, y: 0}}
+											end={{x: 0, y: 1}}
+											colors={['rgba(255,255,255,0)', 'black']}
+											style={{
+												zIndex: 101,
+												position: 'absolute',
+												width: '100%',
+												paddingHorizontal: widthPercentage(10),
+												height: '100%',
+												alignItems: 'flex-start',
+												justifyContent: 'flex-end',
+												gap: 10,
+												borderRadius: 12,
+											}}>
 											<PretendardSemiBoldText
 												size={20}
 												lineHeight={26}
@@ -487,7 +501,7 @@ export default function Main({navigation}: any) {
 												color={colors.backgroundWhite}>
 												{item.name}
 											</PretendardSemiBoldText>
-										</GraientBackground>
+										</LinearGradient>
 									</ImageContainer>
 								</CollectionTouchableOpacity>
 							))}
@@ -504,6 +518,7 @@ export default function Main({navigation}: any) {
 						loop
 						style={{
 							marginTop: 18,
+							marginBottom: 50,
 						}}
 						width={widthPercentage(337)}
 						height={heightPercentage(170)}
@@ -548,7 +563,6 @@ export default function Main({navigation}: any) {
 								: undefined
 						}
 						style={{
-							marginTop: 70,
 							alignSelf: displayList.length == 1 ? 'center' : undefined,
 						}}
 						width={widthPercentage(337)}
@@ -680,7 +694,7 @@ const HomeBottomContainer = styled.View`
 	top: -${heightPercentage(50)}px;
 `;
 const CollectionContainer = styled.View`
-	margin-top: ${heightPercentage(36)}px;
+	margin-top: ${widthPercentage(60)}px;
 	margin-bottom: ${heightPercentage(26)}px;
 `;
 const CollectionContentContainer = styled.ScrollView`

@@ -65,10 +65,6 @@ import Train from '../../../public/train.svg';
 import Phillgram from '../../../public/mou/pillgram.svg';
 import TravleMedic from '../../../public/mou/travleMedic.svg';
 
-import Main1 from '../../../public/main/1.svg';
-import Main2 from '../../../public/main/2.svg';
-import Main3 from '../../../public/main/3.svg';
-import Main4 from '../../../public/main/4.svg';
 import MainCourse from '../../../public/main/course.svg';
 import MainRegion from '../../../public/main/region.svg';
 import MainInstagram from '../../../public/main/instagram.svg';
@@ -263,19 +259,6 @@ export const SvgPillgram = styled(Phillgram)<{color?: string}>`
 `;
 
 export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
-	color: color;
-`;
-
-export const SvgMain1 = styled(Main1)<{color?: string}>`
-	color: color;
-`;
-export const SvgMain2 = styled(Main2)<{color?: string}>`
-	color: color;
-`;
-export const SvgMain3 = styled(Main3)<{color?: string}>`
-	color: color;
-`;
-export const SvgMain4 = styled(Main4)<{color?: string}>`
 	color: color;
 `;
 
