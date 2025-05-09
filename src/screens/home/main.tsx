@@ -582,16 +582,14 @@ export default function Main({navigation}: any) {
 									}
 								}}>
 								<EventImage
-									source={{
-										uri: displayList[index]?.eventImage,
-									}}></EventImage>
+									source={
+										displayList[index]?.type == 'instagram'
+											? require('../../../public/main/instagram.png')
+											: {
+													uri: displayList[index]?.eventImage,
+											  }
+									}></EventImage>
 							</EventContainer>
-							// <InstagramContainer
-							// 	onPress={() => {
-							// 		Linking.openURL('https://www.instagram.com/danim_kr/');
-							// 	}}>
-							// 	<SvgMainInstagram width={widthPercentage(326)} />
-							// </InstagramContainer>
 						)}
 					/>
 					<PretendardSemiBoldText

@@ -67,7 +67,6 @@ import TravleMedic from '../../../public/mou/travleMedic.svg';
 
 import MainCourse from '../../../public/main/course.svg';
 import MainRegion from '../../../public/main/region.svg';
-import MainInstagram from '../../../public/main/instagram.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -266,8 +265,5 @@ export const SvgMainCourse = styled(MainCourse)<{color?: string}>`
 	color: color;
 `;
 export const SvgMainRegion = styled(MainRegion)<{color?: string}>`
-	color: color;
-`;
-export const SvgMainInstagram = styled(MainInstagram)<{color?: string}>`
 	color: color;
 `;
