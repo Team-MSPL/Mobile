@@ -65,9 +65,6 @@ import Train from '../../../public/train.svg';
 import Phillgram from '../../../public/mou/pillgram.svg';
 import TravleMedic from '../../../public/mou/travleMedic.svg';
 
-import MainCourse from '../../../public/main/course.svg';
-import MainRegion from '../../../public/main/region.svg';
-
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -258,12 +255,5 @@ export const SvgPillgram = styled(Phillgram)<{color?: string}>`
 `;
 
 export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
-	color: color;
-`;
-
-export const SvgMainCourse = styled(MainCourse)<{color?: string}>`
-	color: color;
-`;
-export const SvgMainRegion = styled(MainRegion)<{color?: string}>`
 	color: color;
 `;

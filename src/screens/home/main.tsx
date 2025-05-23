@@ -22,18 +22,7 @@ import {
 	devicesWidth,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {
-	SVGCalendarRecommend,
-	SVGGood,
-	SVGNoteList,
-	SVGRegionRecommend,
-	SVGRightAdd,
-	SvgMainCourse,
-	SvgMainInstagram,
-	SvgMainRegion,
-	SvgPillgram,
-	SvgTravleMedic,
-} from '../../utill/svg/svg';
+import {SvgPillgram, SvgTravleMedic} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
@@ -75,38 +64,6 @@ export default function Main({navigation}: any) {
 		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	// useEffect(() => {
-	// 	const japanList =
-	// 		'호치민시, 푸꾸옥 섬, 콘다오, 무이네, 빈증, 동탑, 바리아붕타우, 벤트레, 푸토, 동나이, 마이 토, 깐토, 바리아붕타우, 남딘, 까오란, 랑코, 바리아붕타우';
-	// 	const asd = japanList.split(', ');
-	// 	let zxc = [];
-	// 	asd.map((itema, aindex) => {
-	// 		zxc.push({id: aindex, subTitle: itema, lat: 0, lng: 0});
-	// 	});
-	// 	console.log(zxc);
-	// }, []);
-	const selectPopularity = (e: {id: number; subTitle: string}) => {
-		let season = Array(4).fill(0);
-		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
-		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		let region = metropolitanCheckList.includes(e.subTitle) ? ['전체'] : [e.subTitle.split(' ')[1]];
-		let cityDistance = metropolitanCheckList.includes(e.subTitle)
-			? 0
-			: cityViewList[0][e.id].sub.findIndex(item => item.subTitle == e.subTitle.split(' ')[1]);
-		dispatch(
-			travelSliceActions.setPopuarityClickStart({
-				makeMode: 'recommend',
-				season: season,
-				cityIndex: e.id,
-				region: region,
-				cityDistance: [cityViewList[0][e.id].sub[cityDistance].id],
-			}),
-		);
-		navigation.navigate('EnrollTravelTitle');
-	};
-	const goSearch = useCallback(() => {
-		navigation.navigate('Search');
-	}, []);
 	const goCourseDetaile = (e: any) => {
 		let metropolitanStatus = metropolitanCheckList.includes(e.region);
 		const data = {
@@ -226,27 +183,17 @@ export default function Main({navigation}: any) {
 		{
 			id: 1,
 			onPress: regionRecommend,
-			image: <SvgMainRegion width={widthPercentage(176)} preserveAspectRatio='xMidYMid slice' />,
+			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/region.png')}></ImgContainer>,
 			text: `여행은 가고 싶은데,${`\n`}어디로 가야 할지 모르겠다면? `,
 			title: '여행 지역 추천받기',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
-			image: <SvgMainCourse width={widthPercentage(176)} preserveAspectRatio='xMidYMid slice' />,
+			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/course.png')}></ImgContainer>,
 			text: `여행지는 정했는데,${`\n`}계획 세우기 귀찮다면?`,
 			title: '여행 코스 추천받기',
 		},
-		// {
-		// 	id: 2,
-		// 	onPress: goGlobal,
-		// 	image: (
-		// 		<SVGCalendarRecommend
-		// 			width={widthPercentage(200)}
-		// 			height={heightPercentage(150)}></SVGCalendarRecommend>
-		// 	),
-		// 	text: '해외 여행 코스 ',
-		// },
 	];
 	const hanldeCooperation = async (e: {title: string; link: string; photo: any}) => {
 		if (e.title == 'travleMedic') {
@@ -267,30 +214,7 @@ export default function Main({navigation}: any) {
 			Linking.openURL(e.link);
 		}
 	};
-	const cooperationList = [
-		{
-			title: 'travleMedic',
-			link: 'https://travelmedic.co.kr/mypage/event_view.php?idx=29',
-			photo: (
-				<SvgTravleMedic
-					width={widthPercentage(115)}
-					height={widthPercentage(131)}
-					preserveAspectRatio='xMidYMid slice'
-				/>
-			),
-		},
-		{
-			title: 'pillgram',
-			link: 'https://pillgram.kr/Promotion/PackageLanding.aspx?promotionId=75AA4035-779F-43A1-8C26-E3FBAE0CCE40&utm_source=danim&utm_medium=event',
-			photo: (
-				<SvgPillgram
-					width={widthPercentage(115)}
-					height={widthPercentage(131)}
-					preserveAspectRatio='xMidYMid slice'
-				/>
-			),
-		},
-	];
+
 	const setPreset = (data: {
 		preset: any;
 		presetTendency: any;
@@ -449,15 +373,6 @@ export default function Main({navigation}: any) {
 										</PretendardSemiBoldText>
 									</StartButton>
 								</LinearGradient>
-
-								{/* <RecommendTextContainer>
-									<PretendardSemiBoldText size={20} lineHeight={28} color={colors.PointYellow}>
-										{item.text}
-										<PretendardSemiBoldText size={20} lineHeight={28} color={colors.Gray5}>
-											추천
-										</PretendardSemiBoldText>
-									</PretendardSemiBoldText>
-								</RecommendTextContainer> */}
 							</RecommendContainer>
 						))}
 					</HStack>
@@ -601,27 +516,22 @@ export default function Main({navigation}: any) {
 					</PretendardSemiBoldText>
 					<FlatList
 						data={cooperationList}
-						numColumns={3}
+						numColumns={2}
 						style={{
 							marginVertical: 20,
+							paddingHorizontal: widthPercentage(6),
 						}}
-						columnWrapperStyle={{gap: 7, marginBottom: 10}} // 각 행의 아래 간격
+						columnWrapperStyle={{
+							gap: widthPercentage(14),
+							marginBottom: 10,
+						}} // 각 행의 아래 간격
 						renderItem={({item}) => {
 							return (
 								<CooperationContainer onPress={() => hanldeCooperation(item)}>
-									{item.photo}
+									<CooperationImage resizeMode='cover' source={item.photo} />
 								</CooperationContainer>
 							);
 						}}></FlatList>
-
-					{/* {cooperationList.map(cooItem => (
-						<MouCouponTouchable
-							onPress={() => {
-								hanldeCooperation(cooItem);
-							}}>
-							{cooItem.photo}
-						</MouCouponTouchable>
-					))} */}
 				</HomeBottomContainer>
 			</HomeContainer>
 			<Modal
@@ -656,10 +566,6 @@ export const TagText = styled(PretendardVariable)<{color: string; size?: number}
 	font-weight: 600;
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
-const InstagramContainer = styled.TouchableOpacity`
-	width: ${widthPercentage(326)}px;
-	margin: 10px 0px;
-`;
 const RecommendContainer = styled.Pressable`
 	width: ${widthPercentage(176)}px;
 	height: ${heightPercentage(328)}px;
@@ -674,8 +580,8 @@ const RecommendContainer = styled.Pressable`
 	justify-content: center;
 `;
 const CooperationContainer = styled.TouchableOpacity`
-	width: ${widthPercentage(115)}px;
-	height: ${widthPercentage(131)}px;
+	width: ${widthPercentage(168)}px;
+	height: ${widthPercentage(181)}px;
 	border-radius: 10px;
 	overflow: hidden; /* ✅ 중요 */
 `;
@@ -726,23 +632,6 @@ const VividReviewContainer = styled.View`
 	border-color: #dddddd;
 `;
 
-const GraientBackground = styled.View`
-	position: absolute;
-	bottom: 0px;
-	width: 100%;
-	height: ${widthPercentage(80)}px;
-	background-color: rgba(0, 0, 0, 0.3);
-	justify-content: flex-end;
-	border-bottom-right-radius: 12px;
-	border-bottom-left-radius: 12px;
-	padding: ${widthPercentage(12)}px;
-`;
-const MouCouponTouchable = styled.TouchableOpacity`
-	margin-top: ${widthPercentage(20)}px;
-	width: ${widthPercentage(326)}px;
-	height: ${widthPercentage(300)}px;
-	border-radius: 12px;
-`;
 const StartButton = styled.TouchableOpacity`
 	width: ${widthPercentage(143)}px;
 	padding: ${widthPercentage(4)}px ${widthPercentage(11)}px;
@@ -763,6 +652,15 @@ const EventContainer = styled.TouchableOpacity`
 	height: ${heightPercentage(70)}px;
 	border-radius: 10px;
 	overflow: hidden;
+`;
+const ImgContainer = styled.Image`
+	width: 100%;
+	height: 100%;
+`;
+const CooperationImage = styled.Image`
+	width: ${widthPercentage(168)}px;
+	height: ${widthPercentage(181)}px;
+	border-radius: 12px;
 `;
 interface mainScreensType {
 	region: string;
@@ -802,4 +700,21 @@ const regionList = [
 	{id: 9, subTitle: '경북 경주시'},
 	{id: 9, subTitle: '경북 포항시'},
 	{id: 8, subTitle: '전남 여수시'},
+];
+export const cooperationList = [
+	{
+		title: 'travleMedic',
+		link: 'https://travelmedic.co.kr/mypage/event_view.php?idx=29',
+		photo: require('../../../public/mou/travleMedic.png'),
+	},
+	{
+		title: 'carmoa',
+		link: 'https://carmore.kr/home/?tak=eyqdjgde&utm_source=danim&utm_medium=affiliate&utm_campaign=outlink&utm_content=202505',
+		photo: require('../../../public/mou/carmoa.png'),
+	},
+	{
+		title: 'pillgram',
+		link: 'https://pillgram.kr/Promotion/PackageLanding.aspx?promotionId=75AA4035-779F-43A1-8C26-E3FBAE0CCE40&utm_source=danim&utm_medium=event',
+		photo: require('../../../public/mou/pillgram.png'),
+	},
 ];

@@ -155,7 +155,11 @@ export const mainViewList = [
 	{
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText
+					size={23}
+					lineHeight={35}
+					color={colors.backgroundWhite}
+					style={{maxWidth: widthPercentage(320)}}>
 					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
 						문화
 					</PretendardSemiBoldText>
@@ -199,7 +203,11 @@ export const mainViewList = [
 	{
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText
+					size={23}
+					lineHeight={35}
+					color={colors.backgroundWhite}
+					style={{maxWidth: widthPercentage(375)}}>
 					이 순간과 연결된{' '}
 					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
 						과거의 세계
@@ -236,7 +244,11 @@ export const mainViewList = [
 	{
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText
+					size={23}
+					lineHeight={35}
+					color={colors.backgroundWhite}
+					style={{maxWidth: widthPercentage(320)}}>
 					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
 						열정
 					</PretendardSemiBoldText>

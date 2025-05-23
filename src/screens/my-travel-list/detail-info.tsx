@@ -27,7 +27,7 @@ import {
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGPencil, SvgShare, SvgStart} from '../../utill/svg/svg';
+import {SVGPencil, SvgCancel, SvgShare, SvgStart} from '../../utill/svg/svg';
 import InputDiary from './input-diary';
 
 import useFirebaseStorage from '../../utill/hooks/useFirebaseStorage';
@@ -412,9 +412,15 @@ export default function DetailInfo({navigation}: any) {
 				}}>
 				<ModalContainer>
 					<ReviewContainer>
-						<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>
-							이 여행은 어떠셨나요?
-						</PretendardBoldText>
+						<HStack deco={'width:100%; align-items:center; justify-content:center;'}>
+							<PretendardBoldText size={19} lineHeight={25} color={colors.Black}>
+								이 여행은 어떠셨나요?
+							</PretendardBoldText>
+							<CancelContainer onPress={() => setModalView(false)}>
+								<SvgCancel color='black' width={widthPercentage(20)} height={widthPercentage(20)} />
+							</CancelContainer>
+						</HStack>
+
 						<StarConstainer>
 							{[...Array(5)].map((star, startIndex) => {
 								return (
@@ -511,4 +517,12 @@ const StarConstainer = styled.View`
 	align-items: center;
 	justify-content: space-between;
 	width: ${widthPercentage(270)}px;
+`;
+const CancelContainer = styled.TouchableOpacity`
+	width: ${widthPercentage(20)}px;
+	height: ${widthPercentage(20)}px;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	right: ${widthPercentage(30)}px;
 `;

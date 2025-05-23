@@ -396,7 +396,7 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		} else {
 			regionName = data.region;
 		}
-
+		console.log(regionName, 'asd');
 		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
 		return response.data;
 	} catch (error: any) {
