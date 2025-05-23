@@ -5,6 +5,7 @@ import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import axiosAuth from '../api/api';
 import {Platform} from 'react-native';
+import {useDistance} from '../../utill/hooks/useDistance';
 const tendencyList = [
 	{
 		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
@@ -802,7 +803,29 @@ export const travelSlice = createSlice({
 								});
 								time += value.takenTime / 30;
 								let bandwidthTime = state.bandwidth ? 1 : 0;
-								index != item.length - 1 && (time += 2 + bandwidthTime);
+								let calMoveTime = Math.ceil(
+									useDistance({
+										departure: {
+											lat:
+												copy[idx].at(copy[idx].at(-2)?.name?.includes('추천') ? -3 : -2)?.lat ??
+												value?.lat,
+											lng:
+												copy[idx].at(copy[idx].at(-2)?.name?.includes('추천') ? -3 : -2)?.lng ??
+												value?.lng,
+										},
+										arrival: {lat: value?.lat, lng: value?.lng},
+									}),
+								);
+								console.log(calMoveTime);
+								index != item.length - 1 &&
+									(time +=
+										calMoveTime <= 10
+											? 1
+											: calMoveTime <= 20
+											? 2
+											: calMoveTime <= 50
+											? 3
+											: 4 + bandwidthTime);
 							}
 						}
 						if (index == item.length - 1 && idx != timeTable.length - 1 && value.category != 4) {
