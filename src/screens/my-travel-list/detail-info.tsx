@@ -188,7 +188,14 @@ export default function DetailInfo({navigation}: any) {
 	//여행 리뷰 별점 저장하기
 	const goTimetable = async () => {
 		dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'modify'}));
-		dispatch(getRegionInfo({region: region[0]}));
+		// console.log(region[0]);
+		// dispatch(
+		// 	getRegionInfo({
+		// 		region: region[0].includes('해외')
+		// 			? findCityFromPath(region[0])
+		// 			: region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
+		// 	}),
+		// );
 		navigation.navigate('Timetable');
 		if (editing) {
 			setEditing(false);

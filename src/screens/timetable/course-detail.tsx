@@ -246,7 +246,7 @@ export default function CourseDetail({navigation, route}: any) {
 			China: 2,
 			Vietnam: 3,
 			Tailand: 4,
-			Philippine: 5,
+			Philippines: 5,
 			Singapore: 6,
 		};
 

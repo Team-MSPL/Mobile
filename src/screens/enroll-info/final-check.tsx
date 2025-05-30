@@ -207,6 +207,7 @@ export default function FinalCheck({navigation}: any) {
 							.trim()}`;
 					});
 				}
+				console.log(a);
 				const result = await dispatch(
 					getTravelAi({
 						regionList: a,

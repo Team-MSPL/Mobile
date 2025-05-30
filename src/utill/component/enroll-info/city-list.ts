@@ -333,6 +333,7 @@ const japanCityList = [
 	{
 		id: 1,
 		title: '간토',
+		eng: '(Kanto)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.6824, lng: 139.759},
 			{id: 1, lat: 35.6824, lng: 139.759, subTitle: '도쿄'},
@@ -348,6 +349,7 @@ const japanCityList = [
 	{
 		id: 2,
 		title: '주부',
+		eng: '(Chubu)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.1815, lng: 136.9066},
 			{id: 1, lat: 35.1815, lng: 136.9066, subTitle: '나고야'},
@@ -362,6 +364,7 @@ const japanCityList = [
 	{
 		id: 3,
 		title: '간사이',
+		eng: '(Kansai)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.6937, lng: 135.5023},
 			{id: 1, lat: 34.6937, lng: 135.5023, subTitle: '오사카'},
@@ -375,6 +378,7 @@ const japanCityList = [
 	{
 		id: 4,
 		title: '규슈',
+		eng: '(Kyushu)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 33.5902, lng: 130.4017},
 			{id: 1, lat: 33.5902, lng: 130.4017, subTitle: '후쿠오카'},
@@ -386,6 +390,7 @@ const japanCityList = [
 	{
 		id: 5,
 		title: '오키나와',
+		eng: '(Okinawa)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 26.2125, lng: 127.6811},
 			{id: 1, lat: 26.2125, lng: 127.6811, subTitle: '오키나와'},
@@ -413,6 +418,7 @@ const japanCityList = [
 	{
 		id: 7,
 		title: '도호쿠',
+		eng: '(Tohoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 38.2682, lng: 140.8719},
 			{id: 1, lat: 38.2682, lng: 140.8719, subTitle: '센다이'},
@@ -423,6 +429,7 @@ const japanCityList = [
 	{
 		id: 8,
 		title: '주고쿠',
+		eng: '(Chugoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.3963, lng: 132.4594},
 			{id: 1, lat: 34.3963, lng: 132.4594, subTitle: '히로시마'},
@@ -432,6 +439,7 @@ const japanCityList = [
 	{
 		id: 9,
 		title: '시코쿠',
+		eng: '(Shikoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.3405, lng: 134.0462},
 			{id: 1, lat: 34.3405, lng: 134.0462, subTitle: '다카마쓰'},

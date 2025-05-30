@@ -36,6 +36,7 @@ import {regionRecommendSliceActions} from '../../redux/travel-info/region-recomm
 import {logEvent} from '../../../firebaseAnalytice';
 import useKakaoShare from '../../utill/hooks/useKakaoShare';
 import NeedLogin from '../../utill/component/login/need-login';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function MyTravelList({navigation}: any) {
 	const {myTravelList, selectStartDate, aiList} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -46,6 +47,32 @@ export default function MyTravelList({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const scrollViewRef = useRef<FlatList | null>(null);
 	const [tabView, setTabView] = useState('after');
+	const findCityFromPath = (path: string) => {
+		const pathParts = path?.split('/');
+		const targetCity = pathParts[2];
+		const countryIndex = {
+			Japan: 1,
+			China: 2,
+			Vietnam: 3,
+			Tailand: 4,
+			Philippines: 5,
+			Singapore: 6,
+		};
+		for (const region of cityViewList[countryIndex[`${pathParts[1]}`]]) {
+			for (const city of region.sub) {
+				if (city.subTitle === targetCity) {
+					console.log(region.title);
+					if (region.title != '인기')
+						return path?.replace(
+							targetCity,
+							`${region.title.normalize('NFD')} ${region?.eng?.normalize('NFD') ?? ''}${
+								region?.eng ? ' ' : ''
+							}!${targetCity}`,
+						);
+				}
+			}
+		}
+	};
 	const goMyTravelDetail = async (e: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -53,7 +80,9 @@ export default function MyTravelList({navigation}: any) {
 			const data = await dispatch(getOneTravelCourse({travelId: e._id})).unwrap();
 			dispatch(
 				getRegionInfo({
-					region: data.region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
+					region: data?.region[0].includes('해외')
+						? findCityFromPath(data?.region[0])
+						: data.region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
 				}),
 			);
 			if (!whenDday.endFlag) {
@@ -178,12 +207,15 @@ export default function MyTravelList({navigation}: any) {
 		try {
 			const regionPhoto = await dispatch(
 				getRegionInfo({
-					region: myTravelList[item.index].region[0].replace(
-						/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g,
-						'전체',
-					),
+					region: myTravelList[item.index].region[0].includes('해외')
+						? findCityFromPath(myTravelList[item.index].region[0])
+						: myTravelList[item.index].region[0].replace(
+								/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g,
+								'전체',
+						  ),
 				}),
 			).unwrap();
+
 			await kakaoShare({
 				travelName: myTravelList[item.index].travelName,
 				travelId: myTravelList[item.index]._id,

@@ -397,10 +397,14 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		} else {
 			regionName = data.region;
 		}
-		console.log(regionName, 'asd');
+		// regionName = '해외/Japan/간토 (Kanto) !도쿄';
+		// console.log(regionName.split(''), regionName.length);
+		// console.log('해외/Japan/간토 (Kanto) !도쿄'.split(''), '해외/Japan/간토 (Kanto) !도쿄'.length);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
+		console.log(response.data, 'qwe');
 		return response.data;
 	} catch (error: any) {
+		console.log(error, 'cc');
 		throw rejectWithValue(error.code);
 	}
 });
@@ -891,7 +895,7 @@ export const travelSlice = createSlice({
 		});
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
 			state.regionInfo.name = payload.name;
-			state.regionInfo.photo = payload.photo;
+			state.regionInfo.photo = Array.isArray(payload.photo) ? payload.photo[0] : payload.photo;
 		});
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
 			state.aiList = payload.data;
