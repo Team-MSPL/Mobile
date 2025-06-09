@@ -53,7 +53,7 @@ export default function TimetableStack() {
 				name='SelectCountry'
 				component={SelectCountry}
 				options={{
-					title: '여행 일정 추천',
+					title: '여행 지역 추천',
 					headerStyle: {backgroundColor: colors.main},
 					headerShadowVisible: false,
 				}}
