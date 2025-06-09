@@ -6,6 +6,8 @@ const initialState: EventState = {
 	eventState: null,
 	eventList: [],
 	eventLink: '',
+	cooperationState: false,
+	cooperationType: '', //inbound국내 outbound 해외
 };
 
 const eventSlice = createSlice({
@@ -14,6 +16,10 @@ const eventSlice = createSlice({
 	reducers: {
 		setEventState: (state, {payload}) => {
 			state.eventState = payload;
+		},
+		setCooperationState: (state, {payload}) => {
+			state.cooperationState = payload.status;
+			state.cooperationType = payload.type;
 		},
 	},
 	extraReducers: builder => {
@@ -36,6 +42,8 @@ interface EventState {
 	eventState: boolean | null;
 	eventList: EventListType[];
 	eventLink: string;
+	cooperationState: boolean | null;
+	cooperationType: string;
 }
 
 interface EventListType {

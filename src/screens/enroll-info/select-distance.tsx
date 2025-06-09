@@ -42,7 +42,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 	}, []);
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={11}></Stepper>
+			<Stepper total={13} now={13}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='3.여행 반경 스타일을 알아볼게요.'

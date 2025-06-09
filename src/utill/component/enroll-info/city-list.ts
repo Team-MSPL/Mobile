@@ -5,17 +5,17 @@ const koreaCityList = [
 		sub: [
 			{id: 1, subId: 0, subTitle: '서울'},
 			{id: 2, subId: 0, subTitle: '부산'},
-			{id: 17, subId: 0, subTitle: '제주'},
-			{id: 4, subId: 0, subTitle: '인천'},
-			{id: 3, subId: 0, subTitle: '대구'},
-			{id: 5, subId: 0, subTitle: '광주'},
-			{id: 6, subId: 0, subTitle: '대전'},
-			{id: 7, subId: 0, subTitle: '울산'},
-			{id: 10, subId: 1, subTitle: '강릉시'},
-			{id: 10, subId: 5, subTitle: '속초시'},
-			{id: 15, subId: 2, subTitle: '경주시'},
-			{id: 15, subId: 21, subTitle: '포항시'},
-			{id: 14, subId: 13, subTitle: '여수시'},
+			{id: 11, subId: 0, subTitle: '제주'},
+			{id: 2, subId: 2, subTitle: '인천'},
+			{id: 2, subId: 1, subTitle: '대구'},
+			{id: 2, subId: 3, subTitle: '광주'},
+			{id: 2, subId: 4, subTitle: '대전'},
+			{id: 2, subId: 5, subTitle: '울산'},
+			{id: 4, subId: 1, subTitle: '강릉시'},
+			{id: 4, subId: 5, subTitle: '속초시'},
+			{id: 9, subId: 2, subTitle: '경주시'},
+			{id: 9, subId: 22, subTitle: '포항시'},
+			{id: 8, subId: 13, subTitle: '여수시'},
 		],
 	},
 	{
@@ -42,15 +42,57 @@ const koreaCityList = [
 			{id: 5, subTitle: '서북권', example: '은평구,서대문구,마포구', lat: 37.5663937, lng: 126.9387066},
 		],
 	},
-	{id: 2, title: '부산', sub: [{id: 0, subTitle: '전체', lat: 35.2100142, lng: 129.0688702}]},
-	{id: 3, title: '대구', sub: [{id: 0, subTitle: '전체', lat: 35.8294374, lng: 128.5655119}]},
-	{id: 4, title: '인천', sub: [{id: 0, subTitle: '전체', lat: 37.4562557, lng: 126.7052062}]},
-	{id: 5, title: '광주', sub: [{id: 0, subTitle: '전체', lat: 35.1557358, lng: 126.8354271}]},
-	{id: 6, title: '대전', sub: [{id: 0, subTitle: '전체', lat: 36.3398175, lng: 127.3940486}]},
-	{id: 7, title: '울산', sub: [{id: 0, subTitle: '전체', lat: 35.5537228, lng: 129.2380554}]},
-	{id: 8, title: '세종', sub: [{id: 0, subTitle: '전체', lat: 36.5606976, lng: 127.2587334}]},
 	{
-		id: 9,
+		id: 2,
+		title: '광역시',
+		sub: [
+			{
+				id: 0,
+				subTitle: '부산',
+				lat: 35.2100142,
+				lng: 129.0688702,
+			},
+			{
+				id: 1,
+				subTitle: '대구',
+				lat: 35.8294374,
+				lng: 128.5655119,
+			},
+			{
+				id: 2,
+				subTitle: '인천',
+				lat: 37.4562557,
+				lng: 126.7052062,
+			},
+			{
+				id: 3,
+				subTitle: '광주',
+				lat: 35.1557358,
+				lng: 126.8354271,
+			},
+			{
+				id: 4,
+				subTitle: '대전',
+				lat: 36.3398175,
+				lng: 127.3940486,
+			},
+			{
+				id: 5,
+				subTitle: '울산',
+				lat: 35.5537228,
+				lng: 129.2380554,
+			},
+			{
+				id: 6,
+				subTitle: '세종',
+				lat: 36.5606976,
+				lng: 127.2587334,
+			},
+		],
+	},
+
+	{
+		id: 3,
 		title: '경기',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.8184719, lng: 127.4502156},
@@ -88,7 +130,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 10,
+		id: 4,
 		title: '강원',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 37.7091295, lng: 128.8324462},
@@ -113,7 +155,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 11,
+		id: 5,
 		title: '충북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 36.7697608, lng: 127.8294253},
@@ -131,7 +173,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 12,
+		id: 6,
 		title: '충남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 36.2915841, lng: 127.2344325},
@@ -153,7 +195,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 13,
+		id: 7,
 		title: '전북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.4358216, lng: 126.7020806},
@@ -174,7 +216,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 14,
+		id: 8,
 		title: '전남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.6205005, lng: 126.7721492},
@@ -203,7 +245,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 15,
+		id: 9,
 		title: '경북',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.8337972, lng: 128.8090748},
@@ -232,7 +274,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 16,
+		id: 10,
 		title: '경남',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.8806427, lng: 128.6210824},
@@ -257,7 +299,7 @@ const koreaCityList = [
 		],
 	},
 	{
-		id: 17,
+		id: 11,
 		title: '제주',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 33.3846216, lng: 126.5534925},
@@ -279,7 +321,6 @@ const japanCityList = [
 			{id: 6, subId: 1, subTitle: '삿포로'},
 			{id: 3, subId: 2, subTitle: '교토'},
 			{id: 1, subId: 2, subTitle: '요코하마'},
-			{id: 1, subId: 2, subTitle: '요코하마'},
 			{id: 8, subId: 1, subTitle: '히로시마'},
 			{id: 5, subId: 1, subTitle: '오키나와'},
 		],
@@ -292,6 +333,7 @@ const japanCityList = [
 	{
 		id: 1,
 		title: '간토',
+		eng: '(Kanto)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.6824, lng: 139.759},
 			{id: 1, lat: 35.6824, lng: 139.759, subTitle: '도쿄'},
@@ -307,6 +349,7 @@ const japanCityList = [
 	{
 		id: 2,
 		title: '주부',
+		eng: '(Chubu)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 35.1815, lng: 136.9066},
 			{id: 1, lat: 35.1815, lng: 136.9066, subTitle: '나고야'},
@@ -321,6 +364,7 @@ const japanCityList = [
 	{
 		id: 3,
 		title: '간사이',
+		eng: '(Kansai)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.6937, lng: 135.5023},
 			{id: 1, lat: 34.6937, lng: 135.5023, subTitle: '오사카'},
@@ -334,6 +378,7 @@ const japanCityList = [
 	{
 		id: 4,
 		title: '규슈',
+		eng: '(Kyushu)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 33.5902, lng: 130.4017},
 			{id: 1, lat: 33.5902, lng: 130.4017, subTitle: '후쿠오카'},
@@ -345,6 +390,7 @@ const japanCityList = [
 	{
 		id: 5,
 		title: '오키나와',
+		eng: '(Okinawa)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 26.2125, lng: 127.6811},
 			{id: 1, lat: 26.2125, lng: 127.6811, subTitle: '오키나와'},
@@ -372,6 +418,7 @@ const japanCityList = [
 	{
 		id: 7,
 		title: '도호쿠',
+		eng: '(Tohoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 38.2682, lng: 140.8719},
 			{id: 1, lat: 38.2682, lng: 140.8719, subTitle: '센다이'},
@@ -382,6 +429,7 @@ const japanCityList = [
 	{
 		id: 8,
 		title: '주고쿠',
+		eng: '(Chugoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.3963, lng: 132.4594},
 			{id: 1, lat: 34.3963, lng: 132.4594, subTitle: '히로시마'},
@@ -391,6 +439,7 @@ const japanCityList = [
 	{
 		id: 9,
 		title: '시코쿠',
+		eng: '(Shikoku)',
 		sub: [
 			{id: 0, subTitle: '전체', lat: 34.3405, lng: 134.0462},
 			{id: 1, lat: 34.3405, lng: 134.0462, subTitle: '다카마쓰'},
@@ -623,8 +672,8 @@ const tailandCityList = [
 		sub: [
 			{id: 0, subTitle: '전체', lat: 13.7563, lng: 100.5018},
 			{id: 1, lat: 13.7563, lng: 100.5018, subTitle: '방콕'},
-			{id: 2, lat: 17.0072, lng: 99.7663, subTitle: '수코타이'},
-			{id: 3, lat: 14.3515, lng: 100.568, subTitle: '프라나콘시 아유타야'},
+			{id: 2, lat: 14.3515, lng: 100.568, subTitle: '프라나콘시 아유타야'},
+			{id: 3, lat: 17.0072, lng: 99.7663, subTitle: '수코타이'},
 			{id: 4, lat: 15.3625, lng: 100.2238, subTitle: '우타이타니'},
 			{id: 5, lat: 13.5904, lng: 100.5607, subTitle: '사뭇 프라칸'},
 		],

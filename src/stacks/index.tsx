@@ -20,6 +20,8 @@ import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
 import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout/responsive-size';
 import Search from '../screens/home/search';
+import RecommendPlace from '../screens/home/recommendPlace';
+import RecommendPlaces from '../screens/home/recommendPlaces';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -47,6 +49,13 @@ export default function StackNavigator() {
 				component={Search}
 				options={{
 					title: '검색',
+				}}
+			/>
+			<Stack.Screen
+				name='RecommendPlaces'
+				component={RecommendPlaces}
+				options={{
+					title: '',
 				}}
 			/>
 

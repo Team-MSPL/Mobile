@@ -12,6 +12,7 @@ export const HStack = styled.View<{
 	marginVertical?: number;
 	marginHorizon?: number;
 	alignItems?: string;
+	deco?: string;
 }>`
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
@@ -20,6 +21,7 @@ export const HStack = styled.View<{
 	justify-content: ${props => props.justifyContent ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
+	${props => props.deco};
 `;
 export const VStack = styled.View<{
 	width?: number;
@@ -27,6 +29,7 @@ export const VStack = styled.View<{
 	alignItems?: string;
 	flex?: number;
 	justifyContent?: string;
+	deco?: string;
 }>`
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
@@ -35,6 +38,7 @@ export const VStack = styled.View<{
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
+	${props => props.deco}
 `;
 export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; margintop?: number; width?: number}>`
 	display: flex;
@@ -171,6 +175,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	maxWidth?: number;
 	textAlign?: string;
 	marginTop?: number;
+	deco?: string;
 }>`
 	font-family: Pretendard-SemiBold;
 	color: ${props => props.color ?? colors.Black};
@@ -183,6 +188,7 @@ export const PretendardSemiBoldText = styled.Text<{
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	margin-top: ${props => props.marginTop ?? 0}px;
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
+	${props => props.deco}
 `;
 
 export const TagContainer = styled.View<{backgroundColor: string; width?: number; padding?: number; height?: number}>`

@@ -12,6 +12,7 @@ export default function RouteButton({
 	goNext,
 	isDisabled,
 	btnFunction,
+	nextText,
 }: RouteButtonProps) {
 	const handleBack = () => {
 		navigation.goBack();
@@ -40,7 +41,7 @@ export default function RouteButton({
 				marginBottom={marginBottom ?? 0}
 				onPress={handleNext}>
 				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
-					다음
+					{nextText ?? '다음'}
 				</PretendardSemiBoldText>
 				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} />
 			</ButtonContainer>
@@ -56,6 +57,7 @@ type RouteButtonProps = {
 	goNext?: () => void;
 	isDisabled?: boolean;
 	btnFunction?: () => void;
+	nextText?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{

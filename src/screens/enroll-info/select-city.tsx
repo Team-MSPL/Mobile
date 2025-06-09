@@ -24,6 +24,7 @@ import {
 } from './region-recommend/select-distance';
 import {useRegionSearch} from '../../utill/hooks/useRegionSearch';
 import Carousel from 'react-native-reanimated-carousel';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -34,7 +35,7 @@ export default function SelectCity({navigation}: any) {
 	const [regionMatchList, setRegionMatchList] = useState<{id: number; lat: number; lng: number; subTitle: string}[]>(
 		[],
 	);
-	const checkList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
+	const checkList = ['서울', '제주'];
 	const selectPopularity = (e: {id: number; subTitle: string; subId: number}) => {
 		dispatch(
 			travelSliceActions.selectPopularity({
@@ -53,9 +54,13 @@ export default function SelectCity({navigation}: any) {
 			copy.length == 0 && dispatch(travelSliceActions.changeChecKStep(3));
 			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		} else {
-			let copy = [...region];
+			let copy = [];
+			let copyIndex = [];
+			if (!(country == 0 && cityIndex == 2)) {
+				copy = [...region];
+				copyIndex = [...cityDistance];
+			}
 			copy.push(e.subTitle);
-			let copyIndex = [...cityDistance];
 			copyIndex.push(e.id);
 			dispatch(travelSliceActions.firstSelectRegion({region: copy, cityDistance: copyIndex}));
 		}
@@ -78,14 +83,38 @@ export default function SelectCity({navigation}: any) {
 		dispatch(travelSliceActions.enrollCityIndex(e));
 	};
 
+	const {countryList} = useTendencyHandler();
 	const goNext = () => {
 		if (region.length == 0) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: '지역을 선택해주세요.', modalSingleUse: true}));
 		} else {
 			navigation.navigate('SelectDay');
+			//서울== 서울 전체, 광역시 전체
+			const city = cityViewList[country][cityIndex];
+			const isDomestic = country == 0; //한국인지 해외인지
+			const regionName = region[0]; //지역 이름
+			const subTitle = city?.sub?.[1]?.subTitle ?? '';
+			const cityEng = city.eng ?? ''; // 일본은 영어정보가 같이 들어가야해서
+			const countryEn = countryList[country].en; //해외/japan 할때 쓰느 영어
+			// 한국일때 - 광역시면 해당광역시 + 전체 ex) ['광역시 부산'] == '부산 전체'
+			// 서울일때 - '서울 전체'
+			// 해외일때 - 파이어베이스에는 정규화가 이상하게 되어있어서 normalize를 이용해서 넘김.
+			// 특이사항- 일본은 영어를 같이 보내줘야해서 cityEng를 함께 넣음 + 영어 뒤에 띄어쓰기가 한칸 더 있어야함.
+			// 국내 = '서울 전체' ....  해외 = '해외/japan/간토 (Kanto) !도쿄 or 해외/Philippines/루손 섬 !마닐라
+			const data = isDomestic
+				? city.title === '광역시'
+					? `${regionName} 전체`
+					: city.title === '서울'
+					? '서울 전체'
+					: `${city.title} ${regionName !== '전체' ? regionName : subTitle}`
+				: `해외/${countryEn}/${city.title.normalize('NFD')} ${cityEng.normalize('NFD')}${cityEng ? ' ' : ''}${
+						regionName !== '전체' ? '!' + regionName : '!' + subTitle
+				  }`;
+
+			//regionINfo api
 			dispatch(
 				getRegionInfo({
-					region: cityViewList[country][cityIndex].title + (region[0] != '전체' ? ' ' + region[0] : ''),
+					region: data,
 				}),
 			);
 		}
@@ -103,15 +132,11 @@ export default function SelectCity({navigation}: any) {
 		setRegionText(e);
 		setRegionMatchList(handleRegionSerarch(e));
 	}, []);
-	const carouselRef = useRef(null);
 	const cityScrollRef = useRef(null);
 	useEffect(() => {
-		if (carouselRef.current) {
+		if (cityScrollRef.current) {
 			requestAnimationFrame(() => {
 				cityScrollRef.current.scrollTo({x: cityIndex < 4 ? 0 : cityIndex * 30});
-				carouselRef.current.scrollTo({
-					index: cityIndex,
-				});
 			});
 		}
 	}, [cityIndex]);
@@ -121,7 +146,7 @@ export default function SelectCity({navigation}: any) {
 				regionSearchRef.current?.blur();
 				setRegionSearchState(false);
 			}}>
-			<Stepper total={11} now={2}></Stepper>
+			<Stepper total={13} now={3}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
@@ -234,14 +259,34 @@ export default function SelectCity({navigation}: any) {
 							);
 						})}
 					</ScrollView>
-					<Carousel
+					<WrapContainer>
+						{cityViewList[country][cityIndex]?.sub.map((item, idx) => {
+							return (
+								<CityItems
+									key={idx}
+									select={region.includes(item.subTitle)}
+									onPress={() => {
+										console.log(region);
+										cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
+									}}>
+									<PretendardSemiBoldText
+										size={14}
+										lineHeight={18.9}
+										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
+										{item.subTitle}
+									</PretendardSemiBoldText>
+								</CityItems>
+							);
+						})}
+					</WrapContainer>
+					{/* <Carousel
 						loop={false}
 						style={{
 							marginTop: 18,
 						}}
 						ref={carouselRef}
 						width={widthPercentage(337)}
-						height={heightPercentage(country == 0 && cityIndex == 9 ? 360 : 160)}
+						height={heightPercentage(Math.ceil(cityViewList[country][cityIndex].sub.length / 3) * 50)}
 						data={cityViewList[country]}
 						scrollAnimationDuration={500}
 						onSnapToItem={itemIndex => {
@@ -272,7 +317,7 @@ export default function SelectCity({navigation}: any) {
 								})}
 							</WrapContainer>
 						)}
-					/>
+					/> */}
 				</Container>
 				{country == 0 && cityIndex == 1 && (
 					<FlexContainer>
@@ -332,6 +377,7 @@ const WrapContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: ${widthPercentage(10)}px;
+	margin-bottom: ${heightPercentage(20)}px;
 `;
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
@@ -363,4 +409,4 @@ const SelectAllContainer = styled.View`
 	width: 100%;
 	height: ${heightPercentage(30)}px;
 `;
-const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: Pressable})``;
+const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: ScrollView})``;

@@ -6,6 +6,7 @@ import {
 	courseInfoType,
 	travelSliceActions,
 	deletePlaceReview,
+	handleNearBySearch,
 } from '../../redux/travel-info/travel.slice';
 import {GOOGLE_API_KEY} from '@env';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -38,6 +39,7 @@ import {ActiveDot, Dot, PostImageSwiper} from '../../utill/component/community/c
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import {metropolitanCheckList} from '../home/main';
 export default function CourseDetail({navigation, route}: any) {
 	const [courseDetail, setCourseDetail] = useState<courseInfoType>();
 	const dispatch = useAppDispatch();
@@ -59,7 +61,8 @@ export default function CourseDetail({navigation, route}: any) {
 						route.params.value.region + (route.params.value.metropolitan ? ' 전체' : ''),
 				}),
 			).unwrap();
-			//const a = await dispatch(googleKeywordApi(route.params.value)).unwrap();
+			// const e = await dispatch(handleNearBySearch(route.params.value)).unwrap();
+			// console.log(e.data?.results[0]);
 			const data = a.data;
 			if (a.status == 200) {
 				setCourseDetail({
@@ -234,15 +237,47 @@ export default function CourseDetail({navigation, route}: any) {
 		} else {
 			region = [route.params.value.region, '전체'];
 		}
-		const cityIndex = cityViewList[country].find(city => city.title == region[0])?.id;
-		let cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(item => item.subTitle == region[1]);
+		console.log(region, country);
+		let checkFlag;
+		let cityIndex;
+		let cityDistance;
+		const countryIndex = {
+			Japan: 1,
+			China: 2,
+			Vietnam: 3,
+			Tailand: 4,
+			Philippines: 5,
+			Singapore: 6,
+		};
+
+		if (!region[0].includes('해외')) {
+			let metropolitanCheckList = ['부산', '대구', '인천', '광주', '대전', '울산', '세종'];
+			checkFlag = metropolitanCheckList.includes(region[0]);
+			cityIndex = checkFlag ? 2 : cityViewList[country].find(city => city.title == region[0])?.id;
+			cityDistance = cityViewList[country][cityIndex ?? 0].sub.findIndex(
+				item => item.subTitle == region[checkFlag ? 0 : 1],
+			);
+		} else {
+			console.log(region[0], 'd');
+			cityViewList[countryIndex[region[0].split('/')[1]]].slice(1).forEach((item, index) => {
+				item.sub.forEach(city => {
+					if (city.subTitle == region[0].split('/').at(-1)) {
+						cityIndex = index + 1;
+						console.log('dd');
+					}
+				});
+			});
+			cityDistance = cityViewList[countryIndex[region[0].split('/')[1]]][cityIndex ?? 0].sub.findIndex(
+				item => item.subTitle == region[0].split('/').at(-1),
+			);
+		}
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		let data = {
 			cityDistance: [cityDistance],
 			cityIndex: cityIndex,
-			region: [region[1]],
+			region: region[0].includes('해외') ? [region[0].split('/').at(-1)] : [region[checkFlag ? 0 : 1]],
 			essential: {
 				day: 1,
 				name: route.params.value.name,
@@ -254,9 +289,10 @@ export default function CourseDetail({navigation, route}: any) {
 				photo: route.params.value.photo,
 				cityDistance: [cityDistance],
 				cityIndex: cityIndex,
-				region: region[0] + ' ' + region[1],
+				region: region[0].includes('해외') ? region[0].split('/').at(-1) : region[0] + ' ' + region[1],
 			},
 			season: season,
+			country: region[0].includes('해외') ? countryIndex[region[0].split('/')[1]] : 0,
 		};
 		dispatch(travelSliceActions.setInclueRecommend(data));
 		navigation.popToTop();

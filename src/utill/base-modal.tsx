@@ -119,11 +119,9 @@ export default function BaseModal() {
 								{!modalSingleUse && (
 									<PrimaryButton
 										backgroundColor={
-											modalBottomText == '다님 AI 2호 (Beta)' ? colors.Primary : colors.Gray1
+											modalBottomText == '다님 AI 2호' ? colors.Primary : colors.Gray1
 										}
-										textColor={
-											modalBottomText == '다님 AI 2호 (Beta)' ? colors.Gray5 : colors.Gray4
-										}
+										textColor={modalBottomText == '다님 AI 2호' ? colors.Gray5 : colors.Gray4}
 										onPress={modalBottomFunctionUse ? handleLeftFunction : close}
 										width={widthPercentage(327)}
 										height={heightPercentage(50)}

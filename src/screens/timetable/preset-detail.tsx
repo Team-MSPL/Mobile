@@ -15,6 +15,7 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SVGRightAdd} from '../../utill/svg/svg';
+import {Image} from 'react-native';
 
 export default function PresetDetail({navigation, route}: any) {
 	const {presetTendencyList, presetDatas, day, nDay, aiID, region} = useAppSelector(state => state.travelSlice);
@@ -109,10 +110,18 @@ export default function PresetDetail({navigation, route}: any) {
 		| null
 		| undefined = [];
 	presetDatas[route.params.index].forEach((value, index) => {
-		const polylineCoordinates = value.map(vvalue => ({
-			latitude: vvalue.lat,
-			longitude: vvalue.lng,
-		}));
+		const polylineCoordinates = value
+			.map(vvalue => {
+				if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
+					return {
+						latitude: vvalue.lat,
+						longitude: vvalue.lng,
+					};
+				} else {
+					return null;
+				}
+			})
+			.filter(vvvalue => vvvalue != null);
 		value.map(vvalue =>
 			positions.push({
 				latitude: vvalue.lat,
@@ -120,35 +129,55 @@ export default function PresetDetail({navigation, route}: any) {
 			}),
 		),
 			markers.push(
-				value.map((vvalue, iindex) => {
-					markerCount += 1;
-					if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
-						return (
-							<Marker
-								key={`marker_${index}_${iindex}`}
-								style={{zIndex: 4}}
-								coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
-								centerOffset={{x: 0, y: 0}}
-								anchor={{x: 0.5, y: 0.5}}
-								title={vvalue.name}>
-								{index == select ? (
-									<MarkerContainer key={iindex}>
-										<PretendardSemiBoldText
-											size={13}
-											lineHeight={19}
-											color={colors.backgroundWhite}>
-											{iindex + 1}
-										</PretendardSemiBoldText>
-									</MarkerContainer>
-								) : (
-									<Circle color={colors.Gray5} key={iindex} />
-								)}
-							</Marker>
-						);
-					} else {
-						return null;
-					}
-				}),
+				value
+					.map((vvalue, iindex) => {
+						markerCount += 1;
+						if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
+							return (
+								<Marker
+									key={`marker_${index}_${iindex}`}
+									style={{zIndex: 4}}
+									coordinate={{latitude: vvalue.lat, longitude: vvalue.lng}}
+									centerOffset={{x: 0, y: 0}}
+									anchor={{x: 0.5, y: 0.5}}
+									title={vvalue.name}>
+									{index == select ? (
+										vvalue.category == 4 ? (
+											<Image
+												source={require('../../../public/images/hotel.png')}
+												style={{
+													width: widthPercentage(30),
+													height: widthPercentage(30),
+													zIndex: 200,
+												}}></Image>
+										) : vvalue.category == 1 ? (
+											<Image
+												source={require('../../../public/images/defalutFood.png')}
+												style={{
+													width: widthPercentage(30),
+													height: widthPercentage(30),
+													zIndex: 200,
+												}}></Image>
+										) : (
+											<MarkerContainer key={iindex}>
+												<PretendardSemiBoldText
+													size={13}
+													lineHeight={19}
+													color={colors.backgroundWhite}>
+													{iindex + 1}
+												</PretendardSemiBoldText>
+											</MarkerContainer>
+										)
+									) : (
+										<Circle color={colors.Gray5} key={iindex} />
+									)}
+								</Marker>
+							);
+						} else {
+							return null;
+						}
+					})
+					.filter(vvvalue => vvvalue != null),
 			);
 
 		polylines.push(

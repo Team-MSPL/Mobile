@@ -25,6 +25,8 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {logEvent} from '../../../firebaseAnalytice';
 import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 import moment from 'moment';
+import {eventSliceActions} from '../../redux/event/event.slice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -44,6 +46,7 @@ export default function Timetable({navigation, route}: any) {
 		shareViewWithStartFlag,
 		regionInfo,
 		autoRecommendFlag,
+		country,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin, socialloginProvider} = useAppSelector(state => state.userSlice);
 
@@ -400,6 +403,20 @@ export default function Timetable({navigation, route}: any) {
 			}, 1000);
 		}
 	};
+	const handleCooper = async () => {
+		let cooperType = await AsyncStorage.getItem(country == 0 ? 'inbound' : 'outbound');
+		if (cooperType != moment().format('DD').toString()) {
+			dispatch(
+				eventSliceActions.setCooperationState({
+					status: true,
+					type: country == 0 ? 'inbound' : 'outbound',
+				}),
+			);
+		}
+	};
+	useEffect(() => {
+		handleCooper();
+	}, []);
 	const goHome = () => {
 		navigation.popToTop();
 		navigation.replace('Tab');

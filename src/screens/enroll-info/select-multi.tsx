@@ -41,7 +41,7 @@ export default function SelectMulti({navigation}: any) {
 		<>
 			<MainContainer>
 				<BackgroundGray>
-					<Stepper total={11} now={3}></Stepper>
+					<Stepper total={13} now={6}></Stepper>
 					<StepText
 						styleText='1.여행 계획을 알려주세요.'
 						mainText='미리 정해놓은 장소가 있나요?'

@@ -5,6 +5,7 @@ import moment, {Moment} from 'moment';
 import shortId from 'shortid';
 import axiosAuth from '../api/api';
 import {Platform} from 'react-native';
+import {useDistance} from '../../utill/hooks/useDistance';
 const tendencyList = [
 	{
 		list: ['나홀로', '연인과', '친구와', '가족과', '효도', '자녀와', '반려동물과'],
@@ -79,6 +80,10 @@ const initialState: LiteState = {
 	autoRecommendFlag: false,
 	globalFlag: false,
 	country: 0,
+	departure: {lat: 0, lng: 0, name: ''},
+	departureAirport: {lat: 0, lng: 0, name: ''},
+	departureTrain: {lat: 0, lng: 0, name: ''},
+	departureSelected: '',
 };
 
 export const axiosGoogle = axios.create({
@@ -218,7 +223,18 @@ export const getDrivingDuration = createAsyncThunk(
 		}
 	},
 );
-
+//여행 추천 장소 리스트 ai
+export const getRecommendPlace = createAsyncThunk(
+	'/getRecommendPlace',
+	async (data: travelAiType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/ai/recommendPlace`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //장소 정보 얻어오는거
 export const googleDetailApi = createAsyncThunk('/googleDetailApi', async (data: any, {rejectWithValue}) => {
 	try {
@@ -381,10 +397,14 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		} else {
 			regionName = data.region;
 		}
-
+		// regionName = '해외/Japan/간토 (Kanto) !도쿄';
+		// console.log(regionName.split(''), regionName.length);
+		// console.log('해외/Japan/간토 (Kanto) !도쿄'.split(''), '해외/Japan/간토 (Kanto) !도쿄'.length);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
+		console.log(response.data, 'qwe');
 		return response.data;
 	} catch (error: any) {
+		console.log(error, 'cc');
 		throw rejectWithValue(error.code);
 	}
 });
@@ -410,6 +430,41 @@ export const detailTripadvisor = createAsyncThunk('/detailTripadvisor', async (d
 		throw rejectWithValue(error.code);
 	}
 });
+
+//좌표주면 주변 공항이나 기차역 알려주는거
+// export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async (data: any, {rejectWithValue}) => {
+// 	try {
+// 		const response = await axiosGoogle.get(
+// 			`/place/nearbysearch/json?location=${data.lat}%2C${data.lng}&type=${data.type}&language=ko&radius=50000&key=${GOOGLE_API_KEY}`,
+// 		);
+// 		return response;
+// 	} catch (error: any) {
+// 		throw rejectWithValue(error.code);
+// 	}
+// });
+
+//
+export const handleNearBySearch = createAsyncThunk('/place/nearbysearch', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/place/placeGeoInfo?region=${data.region}&name=${data.name}`);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//여행 추천 장소 리스트
+export const recommendPlace = createAsyncThunk(
+	'/ai/recommendPlace',
+	async (data: recommendPlaceType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/ai/recommendPlace`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -601,6 +656,8 @@ export const travelSlice = createSlice({
 			state.cityDistance = payload.cityDistance;
 			state.essentialPlaces = [payload.essential];
 			state.season = payload.season;
+			state.regionRecommendFlag = true;
+			state.country = payload.country;
 		},
 		setShareLoginFlag: (state, {payload}) => {
 			state.shareLoginFlag = payload;
@@ -608,6 +665,36 @@ export const travelSlice = createSlice({
 		setMyTravelList: (state, {payload}) => {
 			state.myTravelList = payload;
 		},
+		setDeparture: (state, {payload}) => {
+			state.departure = payload;
+		},
+		updateFiled: (state, {payload}) => {
+			const {field, value} = payload;
+			if (state.hasOwnProperty(field)) {
+				state[field] = value;
+			}
+		},
+		setDepartureSelected: (state, {payload}) => {
+			state.departureSelected = payload;
+			let copy = state.accommodations;
+			copy[0] =
+				payload == ''
+					? {
+							lat: 0,
+							lng: 0,
+							name: '',
+							category: 0,
+							takenTime: 30,
+							photo: '',
+					  }
+					: {
+							...state[payload],
+							category: 0,
+							takenTime: 30,
+							photo: '',
+					  };
+			state.accommodations = copy;
+		}, //TODO카테고리
 	},
 	extraReducers: builder => {
 		builder.addCase(getDrivingDuration.fulfilled, (state, {payload}) => {
@@ -645,7 +732,7 @@ export const travelSlice = createSlice({
 						id: 0, //넣을거
 						takenTime: 0, //넣을거
 					};
-					item.forEach((value, index) => {
+					item.some((value, index) => {
 						if (index == 0) {
 							if (idx == 0) {
 								time = (state.timeLimitArray[0] - 6) * 2 + state.minuteLimitArray[0] / 30;
@@ -692,16 +779,58 @@ export const travelSlice = createSlice({
 							time += 3;
 						}
 						if (value.category != 4) {
-							copy[idx].push({
-								...value,
-								x: idx,
-								y: time,
-								id: shortId.generate(),
-								key: shortId.generate(),
-							});
-							time += value.takenTime / 30;
-							let bandwidthTime = state.bandwidth ? 1 : 0;
-							index != item.length - 1 && (time += 2 + bandwidthTime);
+							if (
+								idx == timeTable.length - 1 &&
+								time + value.takenTime / 30 >=
+									(state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30
+							) {
+								if (time >= (state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30)
+									return true;
+								copy[idx].push({
+									...value,
+									x: idx,
+									y: time,
+									id: shortId.generate(),
+									key: shortId.generate(),
+									takenTime:
+										((state.timeLimitArray[1] - 6) * 2 + state.minuteLimitArray[1] / 30 - time) *
+										30,
+								});
+								return true;
+							} else {
+								copy[idx].push({
+									...value,
+									x: idx,
+									y: time,
+									id: shortId.generate(),
+									key: shortId.generate(),
+								});
+								time += value.takenTime / 30;
+								let bandwidthTime = state.bandwidth ? 1 : 0;
+								let calMoveTime = Math.ceil(
+									useDistance({
+										departure: {
+											lat:
+												copy[idx].at(copy[idx].at(-2)?.name?.includes('추천') ? -3 : -2)?.lat ??
+												value?.lat,
+											lng:
+												copy[idx].at(copy[idx].at(-2)?.name?.includes('추천') ? -3 : -2)?.lng ??
+												value?.lng,
+										},
+										arrival: {lat: value?.lat, lng: value?.lng},
+									}),
+								);
+								console.log(calMoveTime);
+								index != item.length - 1 &&
+									(time +=
+										calMoveTime <= 10
+											? 1
+											: calMoveTime <= 20
+											? 2
+											: calMoveTime <= 50
+											? 3
+											: 4 + bandwidthTime);
+							}
 						}
 						if (index == item.length - 1 && idx != timeTable.length - 1 && value.category != 4) {
 							copy[idx].push({
@@ -766,7 +895,7 @@ export const travelSlice = createSlice({
 		});
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
 			state.regionInfo.name = payload.name;
-			state.regionInfo.photo = payload.photo;
+			state.regionInfo.photo = Array.isArray(payload.photo) ? payload.photo[0] : payload.photo;
 		});
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
 			state.aiList = payload.data;
@@ -827,6 +956,22 @@ interface LiteState {
 	autoRecommendFlag: boolean;
 	globalFlag: boolean;
 	country: number;
+	departure: {
+		lat: number;
+		lng: number;
+		name: string;
+	};
+	departureAirport: {
+		lat: number;
+		lng: number;
+		name: string;
+	};
+	departureTrain: {
+		lat: number;
+		lng: number;
+		name: string;
+	};
+	departureSelected: string;
 }
 interface aiListType {
 	_id: string;
@@ -977,6 +1122,16 @@ interface saveAiType {
 	enoughPlace: boolean;
 	bestPointList: presetTendencyListType[];
 	travelName: string;
+}
+interface recommendPlaceType {
+	regionList: string[];
+	selectList: number[][];
+	transit: number;
+	distanceSensitivity: number;
+	bandwidth: boolean;
+	lat: number;
+	lng: number;
+	password: string;
 }
 interface travelAiType {
 	regionList: string[];

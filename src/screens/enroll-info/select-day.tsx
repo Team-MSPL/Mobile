@@ -169,7 +169,7 @@ export default function SelectDay({navigation}: any) {
 			onPress={() => {
 				setVisible(false);
 			}}>
-			<Stepper total={11} now={3}></Stepper>
+			<Stepper total={13} now={4}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
@@ -192,7 +192,7 @@ export default function SelectDay({navigation}: any) {
 							}}>
 							<HStack justifyContent='space-between'>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{timeLimitArray[idx] < 12 ? 'AM' : 'PM'}
+									{timeLimitArray[idx] < 12 ? '오전' : '오후'}
 								</PretendardSemiBoldText>
 								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
 									{String(timeLimitArray[idx]).padStart(2, '0')}
@@ -256,7 +256,7 @@ export default function SelectDay({navigation}: any) {
 				</CalendarContainer>
 				<MarginBottom></MarginBottom>
 			</ScrollView>
-			<RouteButton navigation={navigation} nextTitle='SelectMulti'></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='SelectDeparture'></RouteButton>
 		</DayBackground>
 	);
 }

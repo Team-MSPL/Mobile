@@ -35,12 +35,13 @@ import Event from './src/utill/component/event/event';
 import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
+import Cooperation from './src/utill/component/cooperation/cooperation';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
-	const {eventState} = useAppSelector(state => state.eventSlice);
+	const {eventState, cooperationState} = useAppSelector(state => state.eventSlice);
 	const {needVersionUpdate} = useAppSelector(state => state.settingSlice);
 	const {modalOpen} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
@@ -242,6 +243,7 @@ function App(): JSX.Element {
 					{<StackNavigator />}
 					{needVersionUpdate && <NeedVersionUpdate />}
 					{eventState && <Event />}
+					{cooperationState && <Cooperation />}
 					{!(networkConn && serverConn) && <Connection />}
 					{<BaseModal />}
 					{Boolean(isLoading) && <Loading />}

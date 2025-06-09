@@ -57,6 +57,13 @@ import Tailiand from '../../../public/tailiand.svg';
 import Philippine from '../../../public/philippine.svg';
 import Singapore from '../../../public/singapore.svg';
 import Vietnam from '../../../public/vietnam.svg';
+import Polygon from '../../../public/polygon.svg';
+
+import Airport from '../../../public/airport.svg';
+import Train from '../../../public/train.svg';
+
+import Phillgram from '../../../public/mou/pillgram.svg';
+import TravleMedic from '../../../public/mou/travleMedic.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -229,5 +236,24 @@ export const SvgSingapore = styled(Singapore)<{color?: string}>`
 	color: color;
 `;
 export const SvgVietnam = styled(Vietnam)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgPolygon = styled(Polygon)<{color?: string; transform?: number}>`
+	color: color;
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
+`;
+export const SvgAirPort = styled(Airport)<{color?: string}>`
+	color: color;
+`;
+export const SvgTrain = styled(Train)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgPillgram = styled(Phillgram)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
 	color: color;
 `;

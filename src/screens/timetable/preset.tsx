@@ -163,20 +163,34 @@ export default function Preset({navigation}: any) {
 		}
 	}, [aiFlag, socialloginProvider]);
 	const calculateTendency = (e: any) => {
-		console.log(e);
 		let copy = [];
-		let index = -1;
 		let copy2 = [];
-		e?.tendencyNameList?.map((item, idx) => {
-			if (['봄', '여름', '가을', '겨울'].includes(item)) {
-				index = idx;
-			} else {
+		e?.tendencyNameList?.forEach((item, idx) => {
+			if (!['봄', '여름', '가을', '겨울'].includes(item)) {
 				copy.push(item);
+				copy2.push(e.tendencyRanking[idx]);
 			}
 		});
-		copy2 = e.tendencyPointList.filter((item, idx) => !(idx == index)).map(Number);
-		let max = Math.max(...copy2);
-		return copy[copy2.findIndex((item, idx) => item == max)];
+		let min = 100;
+		let minIndex = -1;
+		let nextMin = 100;
+		let nextMinIndex = -1;
+		console.log(copy, copy2);
+		copy2.forEach((item, idx) => {
+			if (item <= min) {
+				nextMin = min;
+				nextMinIndex = minIndex;
+				min = item;
+				minIndex = idx;
+			} else if (item <= nextMin) {
+				nextMin = item;
+				nextMinIndex = idx;
+			}
+		});
+		let result =
+			(e?.tendencyNameList[minIndex] ?? '') +
+			(e?.tendencyNameList[nextMinIndex] ? ', ' + e?.tendencyNameList[nextMinIndex] : '');
+		return result;
 	};
 	return (
 		<BackgroundGray>
@@ -234,23 +248,24 @@ export default function Preset({navigation}: any) {
 								</HStack>
 								{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
 									<>
-										{presetTendencyList[idx]?.tendencyNameList.length >= 2 && (
-											<HStack>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={20.6}
-													color={colors.PointYellow}>
-													[{calculateTendency(presetTendencyList[idx])}]
-												</PretendardSemiBoldText>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={20.6}
-													color={colors.Black}>
-													{' '}
-													성향을 중점적으로 고려했어요!
-												</PretendardSemiBoldText>
-											</HStack>
-										)}
+										{presetTendencyList[idx]?.tendencyNameList.length >= 2 &&
+											presetDatas.length >= 2 && (
+												<HStack>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={20.6}
+														color={colors.Black}>
+														다른 코스에 비해{' '}
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={20.6}
+															color={colors.PointYellow}>
+															[{calculateTendency(presetTendencyList[idx])}]
+														</PretendardSemiBoldText>{' '}
+														성향이 더 높아요
+													</PretendardSemiBoldText>
+												</HStack>
+											)}
 										<HStack>
 											<FlexWrap
 												width={widthPercentage(280)}

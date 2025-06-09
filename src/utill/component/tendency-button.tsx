@@ -13,7 +13,7 @@ export default function TendencyButton({
 	imageUrl,
 	imageSvg,
 	width,
-	betaFlag,
+	disabled,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -21,14 +21,8 @@ export default function TendencyButton({
 			onPress={onPress}
 			divide={divide ?? false}
 			marginBottom={marginBottom}
+			disabled={disabled}
 			width={width}>
-			{betaFlag && (
-				<BetaContainer>
-					<PretendardSemiBoldText size={11} lineHeight={15.09} color={colors.backgroundWhite}>
-						Beta
-					</PretendardSemiBoldText>
-				</BetaContainer>
-			)}
 			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
 				{label}
 			</PretendardSemiBoldText>
@@ -52,7 +46,7 @@ type CustomButtonProps = {
 	imageUrl?: string;
 	width?: number;
 	imageSvg?: any;
-	betaFlag?: boolean;
+	disabled?: boolean;
 };
 const ButtonContainer = styled.TouchableOpacity<{
 	select: boolean;
@@ -72,15 +66,4 @@ const ButtonContainer = styled.TouchableOpacity<{
 	margin-bottom: ${props => props.marginBottom ?? heightPercentage(10)}px;
 	flex-direction: row;
 	gap: ${widthPercentage(5)}px;
-`;
-const BetaContainer = styled.View`
-	width: ${widthPercentage(32)}px;
-	height: ${heightPercentage(20)}px;
-	background-color: ${colors.PointYellow};
-	border-radius: 6px;
-	position: absolute;
-	top: -10px;
-	right: 15px;
-	align-items: center;
-	justify-content: center;
 `;

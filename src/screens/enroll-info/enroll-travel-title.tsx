@@ -15,7 +15,7 @@ import {logEvent} from '../../../firebaseAnalytice';
 export default function EnrollTravelTitle({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [textValue, setTextValue] = useState('신나는 여행');
-	const {makeMode, regionRecommendFlag} = useAppSelector(state => state.travelSlice);
+	const {makeMode, regionRecommendFlag, region} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const changeTextValue = (e: string) => {
 		setTextValue(e);
@@ -26,6 +26,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	const handleGoogleAnalytics = async () => {
+		console.log(region);
 		socialloginProvider == 'anonymous'
 			? await logEvent('anonymous_course_step1', {})
 			: await logEvent('course_step1', {});
@@ -35,7 +36,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	}, []);
 	return (
 		<BackgroundGray>
-			<Stepper total={11} now={1}></Stepper>
+			<Stepper total={13} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='새 여행'
