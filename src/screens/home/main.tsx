@@ -439,7 +439,7 @@ export default function Main({navigation}: any) {
 						height={heightPercentage(170)}
 						autoPlay={true}
 						data={[1, 2, 3]}
-						scrollAnimationDuration={1000}
+						scrollAnimationDuration={300}
 						onSnapToItem={() => {}}
 						autoPlayInterval={5000}
 						mode='parallax'
@@ -466,7 +466,7 @@ export default function Main({navigation}: any) {
 					<Carousel
 						loop={displayList.length > 1}
 						autoPlay={displayList.length > 1}
-						scrollAnimationDuration={displayList.length > 1 ? 1000 : 0}
+						scrollAnimationDuration={displayList.length > 1 ? 300 : 0}
 						autoPlayInterval={displayList.length > 1 ? 4000 : 0}
 						mode={displayList.length > 1 ? 'parallax' : 'default'}
 						modeConfig={

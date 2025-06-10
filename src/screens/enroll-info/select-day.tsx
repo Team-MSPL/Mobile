@@ -45,9 +45,9 @@ export default function SelectDay({navigation}: any) {
 		}
 	};
 	useLayoutEffect(() => {
-		goNext();
+		hanldleDay();
 	}, [selectStartDate, selectEndDate]);
-	const goNext = () => {
+	const hanldleDay = () => {
 		let data: PlaceType[] = [];
 		const checkDays = calculateDateDifference();
 		if (Object.keys(accommodations).length) {
@@ -94,8 +94,9 @@ export default function SelectDay({navigation}: any) {
 			}),
 		);
 	};
-	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
-		if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
+
+	const goNext = () => {
+		if (timeLimitArray[0] < 6) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '시작 시간을 06시 이전으로 설정하실 수 없습니다.',
@@ -103,8 +104,7 @@ export default function SelectDay({navigation}: any) {
 					modalTextSize: 17,
 				}),
 			);
-			return false;
-		} else if (dateFlag.current == 0 && timeData.ampm == '오후' && parseInt(timeData.hour) > 7) {
+		} else if (timeLimitArray[0] > 19) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '시작 시간을 20시 이후로는 설정하실 수 없습니다.',
@@ -112,8 +112,7 @@ export default function SelectDay({navigation}: any) {
 					modalTextSize: 17,
 				}),
 			);
-			return false;
-		} else if (dateFlag.current == 1 && timeData.ampm == '오전') {
+		} else if (timeLimitArray[1] < 12) {
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '종료 시간을 오전으로 설정하실 수 없습니다.',
@@ -121,16 +120,54 @@ export default function SelectDay({navigation}: any) {
 					modalTextSize: 17,
 				}),
 			);
-			return false;
 		} else {
-			let timeCopy = [...timeLimitArray];
-			let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
-			timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
-			let minuteCopy = [...minuteLimitArray];
-			minuteCopy[dateFlag.current] = parseInt(timeData.minute);
-			dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-			return true;
+			navigation.navigate('SelectDeparture');
 		}
+	};
+	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
+		// if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '시작 시간을 06시 이전으로 설정하실 수 없습니다.',
+		// 			modalSingleUse: true,
+		// 			modalTextSize: 17,
+		// 		}),
+		// 	);
+		// 	return false;
+		// } else if (dateFlag.current == 0 && timeData.ampm == '오후' && parseInt(timeData.hour) > 7) {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '시작 시간을 20시 이후로는 설정하실 수 없습니다.',
+		// 			modalSingleUse: true,
+		// 			modalTextSize: 17,
+		// 		}),
+		// 	);
+		// 	return false;
+		// } else if (dateFlag.current == 1 && timeData.ampm == '오전') {
+		// 	dispatch(
+		// 		modalSliceActions.setOpenModal({
+		// 			modalTitle: '종료 시간을 오전으로 설정하실 수 없습니다.',
+		// 			modalSingleUse: true,
+		// 			modalTextSize: 17,
+		// 		}),
+		// 	);
+		// 	return false;
+		// } else {
+		// 	let timeCopy = [...timeLimitArray];
+		// 	let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
+		// 	timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
+		// 	let minuteCopy = [...minuteLimitArray];
+		// 	minuteCopy[dateFlag.current] = parseInt(timeData.minute);
+		// 	dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+		// 	return true;
+		// }
+		let timeCopy = [...timeLimitArray];
+		let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
+		timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
+		let minuteCopy = [...minuteLimitArray];
+		minuteCopy[dateFlag.current] = parseInt(timeData.minute);
+		dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+		return true;
 	};
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
 	const onDateChange = (date: any, type: string) => {
@@ -256,7 +293,7 @@ export default function SelectDay({navigation}: any) {
 				</CalendarContainer>
 				<MarginBottom></MarginBottom>
 			</ScrollView>
-			<RouteButton navigation={navigation} nextTitle='SelectDeparture'></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='SelectDeparture' goNext={goNext}></RouteButton>
 		</DayBackground>
 	);
 }

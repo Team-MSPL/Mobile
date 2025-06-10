@@ -406,6 +406,7 @@ export default function Timetable({navigation, route}: any) {
 	const handleCooper = async () => {
 		let cooperType = await AsyncStorage.getItem(country == 0 ? 'inbound' : 'outbound');
 		if (cooperType != moment().format('DD').toString()) {
+			await logEvent('showTimetableCooperation', {});
 			dispatch(
 				eventSliceActions.setCooperationState({
 					status: true,

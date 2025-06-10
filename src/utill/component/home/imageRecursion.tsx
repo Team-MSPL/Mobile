@@ -53,7 +53,7 @@ export default function ImageRecursion({navigation}: any) {
 			<Carousel
 				loop
 				autoPlay
-				scrollAnimationDuration={1000}
+				scrollAnimationDuration={300}
 				autoPlayInterval={4000}
 				width={widthPercentage(378)}
 				height={heightPercentage(428)}
