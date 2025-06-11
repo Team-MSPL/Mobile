@@ -202,7 +202,7 @@ export default function Main({navigation}: any) {
 					modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
 					modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
 					modalFunction: async () => {
-						await logEvent(e?.title, {});
+						await logEvent('home ' + e?.title, {});
 						Linking.openURL(e.link);
 					},
 					travleMedic: true,
@@ -210,7 +210,7 @@ export default function Main({navigation}: any) {
 				}),
 			);
 		} else {
-			await logEvent(e?.title, {});
+			await logEvent('home ' + e?.title, {});
 			Linking.openURL(e.link);
 		}
 	};
@@ -305,11 +305,13 @@ export default function Main({navigation}: any) {
 		},
 	];
 	const displayList = [
-		...eventList,
+		...eventList.filter(item => !!item?.eventBannerImage),
 		{
 			type: 'instagram',
 			eventLink: 'https://www.instagram.com/danim_kr/',
 			eventImage:
+				'https://firebasestorage.googleapis.com/v0/b/danim-image/o/event%2F%E1%84%83%E1%85%A1%E1%84%82%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%89%E1%85%B3%E1%84%90%E1%85%A1.png?alt=media&token=1fb05468-5a33-4737-acfb-e90be34dd378',
+			eventBannerImage:
 				'https://firebasestorage.googleapis.com/v0/b/danim-image/o/event%2F%E1%84%83%E1%85%A1%E1%84%82%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%89%E1%85%B3%E1%84%90%E1%85%A1.png?alt=media&token=1fb05468-5a33-4737-acfb-e90be34dd378',
 		},
 	];
@@ -501,7 +503,7 @@ export default function Main({navigation}: any) {
 										displayList[index]?.type == 'instagram'
 											? require('../../../public/main/instagram.png')
 											: {
-													uri: displayList[index]?.eventImage,
+													uri: displayList[index]?.eventBannerImage,
 											  }
 									}></EventImage>
 							</EventContainer>
