@@ -298,7 +298,7 @@ const TicketTouchable = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 	${props => props.deco}
-	z-index:130;
+	z-index:1;
 `;
 const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
 	top: ${props => heightPercentage(props.heightFlag ? 275 : 215)}px;

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -28,7 +28,7 @@ import styled from 'styled-components/native';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
-import {FlatList, Linking, Modal, Platform, SafeAreaView, View} from 'react-native';
+import {Button, FlatList, Linking, Modal, Platform, SafeAreaView, StyleSheet, View, Text} from 'react-native';
 import ViewPager from '../../utill/view-pager';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
@@ -38,6 +38,8 @@ import {NoteCount} from '../more/more-info';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 import ImageRecursion from '../../utill/component/home/imageRecursion';
+
+import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
@@ -315,227 +317,254 @@ export default function Main({navigation}: any) {
 				'https://firebasestorage.googleapis.com/v0/b/danim-image/o/event%2F%E1%84%83%E1%85%A1%E1%84%82%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%89%E1%85%B3%E1%84%90%E1%85%A1.png?alt=media&token=1fb05468-5a33-4737-acfb-e90be34dd378',
 		},
 	];
-	return (
-		<SafeAreaView>
-			<HomeContainer showsVerticalScrollIndicator={false}>
-				<ImageRecursion navigation={navigation} />
-				<HomeBottomContainer>
-					<VStack gap={5} deco='padding:0px 12px;'>
-						<PretendardBoldText size={16} lineHeight={21.6} color={colors.Black}>
-							{userName}님의 성향을 토대로,{`\n`}
-							<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
-								다님 AI
-							</PretendardBoldText>
-							가 여행을 추천해 줘요!
+
+	// callbacks
+	const handleSheetChanges = useCallback((index: number) => {
+		console.log('handleSheetChanges', index);
+	}, []);
+	// renders
+
+	const sheetRef = useRef<BottomSheet>(null);
+
+	// variables
+	const snapPoints: ReadonlyArray<string | number> = useMemo(() => ['45%', '90%'], []);
+
+	// callbacks
+	const handleSheetChange = useCallback((index: number) => {
+		console.log('handleSheetChange', index);
+	}, []);
+	const renderItem = useCallback(
+		() => (
+			<HomeBottomContainer>
+				<VStack gap={5} deco='padding:0px 12px;'>
+					<PretendardBoldText size={16} lineHeight={26.6} color={colors.Black}>
+						{userName}님의 성향을 토대로,{`\n`}
+						<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
+							다님 AI
 						</PretendardBoldText>
-						<PretendardBoldText size={14} lineHeight={21.6} color={colors.PointYellow}>
-							1분 투자로 하루를 아껴보세요
-						</PretendardBoldText>
-					</VStack>
-					<HStack justifyContent='space-around'>
-						{buttonList.map(item => (
-							<RecommendContainer onPress={item.onPress} key={item.id}>
-								<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
-									{item.image}
-								</View>
-								<LinearGradient
-									start={{x: 0, y: 0}}
-									end={{x: 0, y: 1}}
-									colors={['rgba(255,255,255,0)', 'black']}
-									style={{
-										zIndex: 101,
-										position: 'absolute',
-										width: '100%',
-										paddingHorizontal: widthPercentage(10),
-										height: '100%',
-										alignItems: 'center',
-										gap: 30,
-									}}>
+						가 여행을 추천해 줘요!
+					</PretendardBoldText>
+					<PretendardBoldText size={14} lineHeight={21.6} color={colors.PointYellow}>
+						1분 투자로 하루를 아껴보세요
+					</PretendardBoldText>
+				</VStack>
+				<HStack justifyContent='space-around'>
+					{buttonList.map(item => (
+						<RecommendContainer onPress={item.onPress} key={item.id}>
+							<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
+								{item.image}
+							</View>
+							<LinearGradient
+								start={{x: 0, y: 0}}
+								end={{x: 0, y: 1}}
+								colors={['rgba(255,255,255,0)', 'black']}
+								style={{
+									zIndex: 101,
+									position: 'absolute',
+									width: '100%',
+									paddingHorizontal: widthPercentage(10),
+									height: '100%',
+									alignItems: 'center',
+									gap: 30,
+								}}>
+								<PretendardSemiBoldText
+									size={16}
+									lineHeight={20}
+									color={colors.backgroundWhite}
+									deco={`top:${heightPercentage(140)}`}>
+									{item.text}
+								</PretendardSemiBoldText>
+								<StartButton onPress={item.onPress}>
 									<PretendardSemiBoldText
-										size={16}
-										lineHeight={20}
-										color={colors.backgroundWhite}
-										deco={`top:${heightPercentage(140)}`}>
-										{item.text}
+										size={14}
+										lineHeight={28}
+										color={colors.Black}
+										numberOfLines={1}
+										adjustsFontSizeToFit
+										minimumFontScale={0.5}
+										style={{
+											width: '100%',
+											textAlign: 'center',
+											includeFontPadding: false,
+										}}>
+										{item.title}
 									</PretendardSemiBoldText>
-									<StartButton onPress={item.onPress}>
-										<PretendardSemiBoldText
-											size={14}
-											lineHeight={28}
-											color={colors.Black}
-											numberOfLines={1}
-											adjustsFontSizeToFit
-											minimumFontScale={0.5}
-											style={{
-												width: '100%',
-												textAlign: 'center',
-												includeFontPadding: false,
-											}}>
-											{item.title}
-										</PretendardSemiBoldText>
-									</StartButton>
-								</LinearGradient>
-							</RecommendContainer>
-						))}
-					</HStack>
-					<CollectionContainer>
-						<PretendardSemiBoldText
-							size={18}
-							lineHeight={21.6}
-							color={colors.Gray5}
-							deco={`margin-left:${widthPercentage(6)}`}>
-							다님이 추천하는 여행지
-						</PretendardSemiBoldText>
-						<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-							{mainScreens.map((item, idx) => (
-								<CollectionTouchableOpacity
-									key={idx}
-									onPress={() => {
-										goCourseDetaile(item);
-									}}>
-									<ImageContainer>
-										<CollectionRecommendContentItemImage
-											source={{uri: item.photo}}></CollectionRecommendContentItemImage>
-										<LinearGradient
-											start={{x: 0, y: 0}}
-											end={{x: 0, y: 1}}
-											colors={['rgba(255,255,255,0)', 'black']}
-											style={{
-												zIndex: 101,
-												position: 'absolute',
-												width: '100%',
-												paddingHorizontal: widthPercentage(10),
-												height: '100%',
-												alignItems: 'flex-start',
-												justifyContent: 'flex-end',
-												gap: 10,
-												borderRadius: 12,
-											}}>
-											<PretendardSemiBoldText
-												size={20}
-												lineHeight={26}
-												numberOfLines={2}
-												color={colors.backgroundWhite}>
-												{item.name}
-											</PretendardSemiBoldText>
-										</LinearGradient>
-									</ImageContainer>
-								</CollectionTouchableOpacity>
-							))}
-						</CollectionContentContainer>
-					</CollectionContainer>
+								</StartButton>
+							</LinearGradient>
+						</RecommendContainer>
+					))}
+				</HStack>
+				<CollectionContainer>
 					<PretendardSemiBoldText
 						size={18}
 						lineHeight={21.6}
 						color={colors.Gray5}
 						deco={`margin-left:${widthPercentage(6)}`}>
-						다님 사용자들의 생생한 후기
+						다님이 추천하는 여행지
 					</PretendardSemiBoldText>
-					<Carousel
-						loop
-						style={{
-							marginTop: 18,
-							marginBottom: 50,
-						}}
-						width={widthPercentage(337)}
-						height={heightPercentage(170)}
-						autoPlay={true}
-						data={[1, 2, 3]}
-						scrollAnimationDuration={300}
-						onSnapToItem={() => {}}
-						autoPlayInterval={5000}
-						mode='parallax'
-						modeConfig={{
-							parallaxScrollingScale: 0.9, // 옆 아이템 크기 비율
-							parallaxScrollingOffset: 50, // 옆 아이템이 보여질 정도
-						}}
-						renderItem={({index}) => (
-							<VividReviewContainer>
-								<HStack>
-									<PretendardBoldText size={16} lineHeight={20} color={colors.Black}>
-										{vividList[index].name} 님{' '}
-									</PretendardBoldText>
-									<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
-										( {vividList[index].region} )
-									</PretendardBoldText>
-								</HStack>
-								<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray3}>
-									{vividList[index].title}
-								</PretendardSemiBoldText>
-							</VividReviewContainer>
-						)}
-					/>
-					<Carousel
-						loop={displayList.length > 1}
-						autoPlay={displayList.length > 1}
-						scrollAnimationDuration={displayList.length > 1 ? 300 : 0}
-						autoPlayInterval={displayList.length > 1 ? 4000 : 0}
-						mode={displayList.length > 1 ? 'parallax' : 'default'}
-						modeConfig={
-							displayList.length > 1
-								? {
-										parallaxScrollingScale: 0.9,
-										parallaxScrollingOffset: 50,
-								  }
-								: undefined
-						}
-						style={{
-							alignSelf: displayList.length == 1 ? 'center' : undefined,
-						}}
-						width={widthPercentage(337)}
-						height={heightPercentage(160)}
-						data={displayList}
-						onSnapToItem={() => {}}
-						renderItem={({index}) => (
-							<EventContainer
+					<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						{mainScreens.map((item, idx) => (
+							<CollectionTouchableOpacity
+								key={idx}
 								onPress={() => {
-									if (displayList[index]?.eventLink == '') {
-									} else {
-										if (displayList[index]?.eventLink.includes('http')) {
-											Linking.openURL(displayList[index]?.eventLink);
-										} else {
-											navigation.navigate(displayList[index]?.eventLink);
-										}
-									}
+									goCourseDetaile(item);
 								}}>
-								<EventImage
-									source={
-										displayList[index]?.type == 'instagram'
-											? require('../../../public/main/instagram.png')
-											: {
-													uri: displayList[index]?.eventBannerImage,
-											  }
-									}></EventImage>
-							</EventContainer>
-						)}
-					/>
-					<PretendardSemiBoldText
-						size={18}
-						lineHeight={21.6}
-						color={colors.Black}
-						deco={`margin-left:${widthPercentage(6)}`}>
-						{userName}님을 위한 혜택
-					</PretendardSemiBoldText>
-					<FlatList
-						data={cooperationList}
-						numColumns={2}
-						style={{
-							marginVertical: 20,
-							paddingHorizontal: widthPercentage(6),
-						}}
-						columnWrapperStyle={{
-							gap: widthPercentage(14),
-							marginBottom: 10,
-						}} // 각 행의 아래 간격
-						renderItem={({item}) => {
-							return (
-								<CooperationContainer onPress={() => hanldeCooperation(item)}>
-									<CooperationImage resizeMode='cover' source={item.photo} />
-								</CooperationContainer>
-							);
-						}}></FlatList>
-				</HomeBottomContainer>
-			</HomeContainer>
+								<ImageContainer>
+									<CollectionRecommendContentItemImage
+										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
+									<LinearGradient
+										start={{x: 0, y: 0}}
+										end={{x: 0, y: 1}}
+										colors={['rgba(255,255,255,0)', 'black']}
+										style={{
+											zIndex: 101,
+											position: 'absolute',
+											width: '100%',
+											paddingHorizontal: widthPercentage(10),
+											height: '100%',
+											alignItems: 'flex-start',
+											justifyContent: 'flex-end',
+											gap: 10,
+											borderRadius: 12,
+										}}>
+										<PretendardSemiBoldText
+											size={20}
+											lineHeight={26}
+											numberOfLines={2}
+											color={colors.backgroundWhite}>
+											{item.name}
+										</PretendardSemiBoldText>
+									</LinearGradient>
+								</ImageContainer>
+							</CollectionTouchableOpacity>
+						))}
+					</CollectionContentContainer>
+				</CollectionContainer>
+				<PretendardSemiBoldText
+					size={18}
+					lineHeight={21.6}
+					color={colors.Gray5}
+					deco={`margin-left:${widthPercentage(6)}`}>
+					다님 사용자들의 생생한 후기
+				</PretendardSemiBoldText>
+				<Carousel
+					loop
+					style={{
+						marginTop: 18,
+						marginBottom: 50,
+					}}
+					width={widthPercentage(337)}
+					height={heightPercentage(170)}
+					autoPlay={true}
+					data={[1, 2, 3]}
+					scrollAnimationDuration={300}
+					onSnapToItem={() => {}}
+					autoPlayInterval={5000}
+					mode='parallax'
+					modeConfig={{
+						parallaxScrollingScale: 0.9, // 옆 아이템 크기 비율
+						parallaxScrollingOffset: 50, // 옆 아이템이 보여질 정도
+					}}
+					renderItem={({index}) => (
+						<VividReviewContainer>
+							<HStack>
+								<PretendardBoldText size={16} lineHeight={20} color={colors.Black}>
+									{vividList[index].name} 님{' '}
+								</PretendardBoldText>
+								<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
+									( {vividList[index].region} )
+								</PretendardBoldText>
+							</HStack>
+							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray3}>
+								{vividList[index].title}
+							</PretendardSemiBoldText>
+						</VividReviewContainer>
+					)}
+				/>
+				<Carousel
+					loop={displayList.length > 1}
+					autoPlay={displayList.length > 1}
+					scrollAnimationDuration={displayList.length > 1 ? 300 : 0}
+					autoPlayInterval={displayList.length > 1 ? 4000 : 0}
+					mode={displayList.length > 1 ? 'parallax' : 'default'}
+					modeConfig={
+						displayList.length > 1
+							? {
+									parallaxScrollingScale: 0.9,
+									parallaxScrollingOffset: 50,
+							  }
+							: undefined
+					}
+					style={{
+						alignSelf: displayList.length == 1 ? 'center' : undefined,
+					}}
+					width={widthPercentage(337)}
+					height={heightPercentage(160)}
+					data={displayList}
+					onSnapToItem={() => {}}
+					renderItem={({index}) => (
+						<EventContainer
+							onPress={() => {
+								if (displayList[index]?.eventLink == '') {
+								} else {
+									if (displayList[index]?.eventLink.includes('http')) {
+										Linking.openURL(displayList[index]?.eventLink);
+									} else {
+										navigation.navigate(displayList[index]?.eventLink);
+									}
+								}
+							}}>
+							<EventImage
+								source={
+									displayList[index]?.type == 'instagram'
+										? require('../../../public/main/instagram.png')
+										: {
+												uri: displayList[index]?.eventBannerImage,
+										  }
+								}></EventImage>
+						</EventContainer>
+					)}
+				/>
+				<PretendardSemiBoldText
+					size={18}
+					lineHeight={21.6}
+					color={colors.Black}
+					deco={`margin-left:${widthPercentage(6)}`}>
+					{userName}님을 위한 혜택
+				</PretendardSemiBoldText>
+				<FlatList
+					data={cooperationList}
+					numColumns={2}
+					style={{
+						marginVertical: 20,
+						paddingHorizontal: widthPercentage(6),
+					}}
+					columnWrapperStyle={{
+						gap: widthPercentage(14),
+						marginBottom: 10,
+					}} // 각 행의 아래 간격
+					renderItem={({item}) => {
+						return (
+							<CooperationContainer onPress={() => hanldeCooperation(item)}>
+								<CooperationImage resizeMode='cover' source={item.photo} />
+							</CooperationContainer>
+						);
+					}}></FlatList>
+			</HomeBottomContainer>
+		),
+		[],
+	);
+	return (
+		<>
+			<ImageRecursion navigation={navigation} />
+			<BottomSheet
+				containerStyle={{zIndex: 10}} // <-- 여기에 zIndex 적용
+				ref={sheetRef}
+				snapPoints={snapPoints}
+				enableDynamicSizing={false}
+				onChange={handleSheetChange}>
+				<BottomSheetScrollView showsVerticalScrollIndicator={false}>{renderItem()}</BottomSheetScrollView>
+			</BottomSheet>
 			<Modal
 				animationType={'fade'}
 				transparent={true}
@@ -543,7 +572,7 @@ export default function Main({navigation}: any) {
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={1} handleFunction={deleteMainViewPager} />
 			</Modal>
-		</SafeAreaView>
+		</>
 	);
 }
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];

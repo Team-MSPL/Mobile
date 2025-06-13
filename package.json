@@ -31,10 +31,10 @@
 		"StoreKit"
 	],
 	"dependencies": {
+		"@gorhom/bottom-sheet": "^4.5.1",
 		"@invertase/react-native-apple-authentication": "^2.2.2",
 		"@react-native-async-storage/async-storage": "^1.19.0",
 		"@react-native-clipboard/clipboard": "^1.12.1",
-		"@react-native-community/masked-view": "^0.1.11",
 		"@react-native-community/netinfo": "^9.4.1",
 		"@react-native-community/slider": "^4.4.3",
 		"@react-native-firebase/analytics": "^20.1.0",
@@ -44,6 +44,7 @@
 		"@react-native-firebase/messaging": "^20.1.0",
 		"@react-native-firebase/storage": "^20.1.0",
 		"@react-native-google-signin/google-signin": "^10.0.1",
+		"@react-native-masked-view/masked-view": "^0.3.2",
 		"@react-native-seoul/kakao-login": "^5.3.0",
 		"@react-navigation/bottom-tabs": "^6.5.8",
 		"@react-navigation/material-top-tabs": "^6.6.3",
