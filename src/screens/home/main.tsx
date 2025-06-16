@@ -558,7 +558,7 @@ export default function Main({navigation}: any) {
 		<>
 			<ImageRecursion navigation={navigation} />
 			<BottomSheet
-				containerStyle={{zIndex: 10}} // <-- 여기에 zIndex 적용
+				containerStyle={{zIndex: 10}}
 				ref={sheetRef}
 				snapPoints={snapPoints}
 				enableDynamicSizing={false}

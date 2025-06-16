@@ -48,7 +48,7 @@ export default function Cooperation() {
 				<Carousel
 					loop
 					style={{
-						height: heightPercentage(427),
+						height: heightPercentage(389),
 					}}
 					width={widthPercentage(337)}
 					autoPlay={true}
@@ -61,7 +61,7 @@ export default function Cooperation() {
 							onPress={() => {
 								hanldeCooperation(item);
 							}}>
-							<EventImage resizeMode='cover' source={item.photo}></EventImage>
+							<EventImage resizeMode='contain' source={item.photo}></EventImage>
 						</EventTouable>
 					)}
 				/>
@@ -97,12 +97,12 @@ const Container = styled.View`
 `;
 const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(427)}px;
+	height: ${heightPercentage(389)}px;
 `;
 const ViewContaniner = styled.View`
 	background-color: white;
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(487)}px;
+	height: ${heightPercentage(449)}px;
 	border-radius: 5px;
 `;
 const EventHStack = styled(HStack)`

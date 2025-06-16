@@ -207,7 +207,10 @@ export const mainViewList = [
 					size={23}
 					lineHeight={35}
 					color={colors.backgroundWhite}
-					style={{maxWidth: widthPercentage(375)}}>
+					style={{maxWidth: widthPercentage(375)}}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}>
 					이 순간과 연결된{' '}
 					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
 						과거의 세계

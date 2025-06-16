@@ -221,7 +221,9 @@ export default function MyTravelList({navigation}: any) {
 				travelId: myTravelList[item.index]._id,
 				startDay: myTravelList[item.index].day[0],
 				endDay: myTravelList[item.index].day[myTravelList[item.index].nDay - 1],
-				photo: regionPhoto?.photo ?? '',
+				photo: myTravelList[item.index].region[0].includes('해외')
+					? regionPhoto?.photo[0] ?? ''
+					: regionPhoto?.photo ?? '',
 			});
 
 			await logEvent('share', {course: myTravelList[item.index].travelName});
