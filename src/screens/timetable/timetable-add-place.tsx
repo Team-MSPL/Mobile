@@ -132,16 +132,16 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		const newEnd = (viewRef.current.endHours - 6) * 2 + viewRef.current.endMinute / 30;
 		let changeFlag = null;
 		let checkTimetalbe = [...timetable[route.params.x]];
-		for (let i = 0; i < checkTimetalbe.length; i++) {
-			if (
-				(newCurrentY <= checkTimetalbe[i]?.y && newEnd > checkTimetalbe[i]?.y) ||
-				(newCurrentY <= checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1 &&
-					newEnd > checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1)
-			) {
-				changeFlag = checkTimetalbe[i];
-				break;
-			}
-		}
+		// for (let i = 0; i < checkTimetalbe.length; i++) {
+		// 	if (
+		// 		(newCurrentY <= checkTimetalbe[i]?.y && newEnd > checkTimetalbe[i]?.y) ||
+		// 		(newCurrentY <= checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1 &&
+		// 			newEnd > checkTimetalbe[i]?.y + checkTimetalbe[i].takenTime / 30 - 1)
+		// 	) {
+		// 		changeFlag = checkTimetalbe[i];
+		// 		break;
+		// 	}
+		// }
 		if (changeFlag) {
 			dispatch(modalSliceActions.setOpenModal({modalTitle: `${changeFlag.name}과 겹치는 시간입니다!`}));
 		} else {

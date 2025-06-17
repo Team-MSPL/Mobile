@@ -163,17 +163,17 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			let copy = [...timetable[changeDay]];
 			let changeCopy = [...timetable];
 			let changeFlag = null;
-			for (let i = 0; i < copy.length; i++) {
-				if (
-					((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
-						(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
-							newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
-					copy[i].id != viewRef.current.id
-				) {
-					changeFlag = copy[i];
-					break;
-				}
-			}
+			// for (let i = 0; i < copy.length; i++) {
+			// 	if (
+			// 		((newY <= copy[i]?.y && newEnd > copy[i]?.y) ||
+			// 			(newY <= copy[i]?.y + copy[i].takenTime / 30 - 1 &&
+			// 				newEnd > copy[i]?.y + copy[i].takenTime / 30 - 1)) &&
+			// 		copy[i].id != viewRef.current.id
+			// 	) {
+			// 		changeFlag = copy[i];
+			// 		break;
+			// 	}
+			// }
 			let changeInputIndex = copy.findIndex(item => item.y >= newY);
 			changeInputIndex = changeInputIndex == -1 ? copy.length : changeInputIndex;
 			if (changeFlag) {

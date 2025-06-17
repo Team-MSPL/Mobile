@@ -547,14 +547,14 @@ function Timetable({
 }
 
 export default memo(Timetable);
-const DayScrollViews = styled.View<{viewMap: boolean}>`
-	width: ${widthPercentage(375)}px;
-`;
-//TODO 타임테이블 네이버지도ui
-// const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
+// const DayScrollViews = styled.View<{viewMap: boolean}>`
 // 	width: ${widthPercentage(375)}px;
-// 	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
 // `;
+//TODO 타임테이블 네이버지도ui
+const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
+	width: ${widthPercentage(375)}px;
+	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
+`;
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(500)}px;

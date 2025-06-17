@@ -483,22 +483,55 @@ export default function Timetable({navigation, route}: any) {
 		}
 	};
 
+	const hasOverlap = timetableList => {
+		const timeBlocks = timetableList.map(item => {
+			const start = item.y;
+			const end = item.y + item.takenTime / 30; // y 단위가 30분이면 takenTime/30을 더함
+			return {start, end};
+		});
+
+		// 시작시간 기준으로 정렬
+		timeBlocks.sort((a, b) => a.start - b.start);
+
+		for (let i = 1; i < timeBlocks.length; i++) {
+			const prev = timeBlocks[i - 1];
+			const current = timeBlocks[i];
+
+			if (current.start < prev.end) {
+				// 겹침 발생
+				return true;
+			}
+		}
+
+		return false; // 겹치는 시간 없음
+	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {travelId: travelId, timetable: timetable};
-			await dispatch(updateTravelCourse(data));
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '수정 완료',
-					modalSubTitle: '내 여행 리스트로 이동합니다.',
-					modalFunction: goMyTravelList,
-				}),
-			);
-			await logEvent('edit_course_save', {
-				course: travelName,
-			});
+			const checkList = timetable.map(item => hasOverlap(item));
+			if (checkList.includes(true)) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '겹치는 시간',
+						modalSubTitle: '겹치는 시간이 있습니다. 시간을 수정해주세요.',
+						modalFunction: () => {},
+					}),
+				);
+			} else {
+				const data = {travelId: travelId, timetable: timetable};
+				await dispatch(updateTravelCourse(data));
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '수정 완료',
+						modalSubTitle: '내 여행 리스트로 이동합니다.',
+						modalFunction: goMyTravelList,
+					}),
+				);
+				await logEvent('edit_course_save', {
+					course: travelName,
+				});
+			}
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
