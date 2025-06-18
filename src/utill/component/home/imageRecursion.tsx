@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {colors} from '../../colors';
 import {HStack, PretendardSemiBoldText} from '../../layout/layout';
-import {Pressable, View} from 'react-native';
+import {Platform, Pressable, View} from 'react-native';
 import {SVGNoteList, SVGRightAdd} from '../../svg/svg';
 import styled from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
@@ -53,7 +53,7 @@ export default function ImageRecursion({navigation}: any) {
 			<Carousel
 				loop
 				autoPlay
-				scrollAnimationDuration={300}
+				scrollAnimationDuration={Platform.OS == 'android' ? 200 : 300}
 				autoPlayInterval={4000}
 				width={widthPercentage(378)}
 				height={heightPercentage(428)}
@@ -159,6 +159,9 @@ export const mainViewList = [
 					size={23}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}}>
 					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
 						문화

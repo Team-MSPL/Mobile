@@ -17,12 +17,9 @@ import {
 	PretendardBoldText,
 	PretendardSemiBoldText,
 	PretendardVariable,
-	PretendardVariableText,
 	VStack,
-	devicesWidth,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SvgPillgram, SvgTravleMedic} from '../../utill/svg/svg';
 import styled from 'styled-components/native';
 
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
@@ -34,9 +31,7 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 import {logEvent, setUserId, setUserProperty} from '../../../firebaseAnalytice';
 import {useTranslation} from 'react-i18next';
 import Carousel from 'react-native-reanimated-carousel';
-import {NoteCount} from '../more/more-info';
-import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
-import {cityViewList} from '../../utill/component/enroll-info/city-list';
+
 import ImageRecursion from '../../utill/component/home/imageRecursion';
 
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
@@ -318,12 +313,6 @@ export default function Main({navigation}: any) {
 		},
 	];
 
-	// callbacks
-	const handleSheetChanges = useCallback((index: number) => {
-		console.log('handleSheetChanges', index);
-	}, []);
-	// renders
-
 	const sheetRef = useRef<BottomSheet>(null);
 
 	// variables
@@ -402,16 +391,30 @@ export default function Main({navigation}: any) {
 						deco={`margin-left:${widthPercentage(6)}`}>
 						다님이 추천하는 여행지
 					</PretendardSemiBoldText>
-					<CollectionContentContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						{mainScreens.map((item, idx) => (
+					<Carousel
+						style={{
+							marginTop: 18,
+							marginBottom: 50,
+							marginLeft: widthPercentage(6),
+						}}
+						width={widthPercentage(375)}
+						height={heightPercentage(226)}
+						autoPlay={true}
+						data={mainScreens}
+						autoPlayInterval={1000}
+						mode='parallax'
+						modeConfig={{
+							parallaxScrollingScale: 1, // 옆 아이템 크기 비율
+							parallaxScrollingOffset: widthPercentage(209), // 옆 아이템이 보여질 정도
+						}}
+						renderItem={({index}) => (
 							<CollectionTouchableOpacity
-								key={idx}
 								onPress={() => {
-									goCourseDetaile(item);
+									goCourseDetaile(mainScreens[index]);
 								}}>
 								<ImageContainer>
 									<CollectionRecommendContentItemImage
-										source={{uri: item.photo}}></CollectionRecommendContentItemImage>
+										source={{uri: mainScreens[index].photo}}></CollectionRecommendContentItemImage>
 									<LinearGradient
 										start={{x: 0, y: 0}}
 										end={{x: 0, y: 1}}
@@ -432,13 +435,13 @@ export default function Main({navigation}: any) {
 											lineHeight={26}
 											numberOfLines={2}
 											color={colors.backgroundWhite}>
-											{item.name}
+											{mainScreens[index].name}
 										</PretendardSemiBoldText>
 									</LinearGradient>
 								</ImageContainer>
 							</CollectionTouchableOpacity>
-						))}
-					</CollectionContentContainer>
+						)}
+					/>
 				</CollectionContainer>
 				<PretendardSemiBoldText
 					size={18}
@@ -552,7 +555,7 @@ export default function Main({navigation}: any) {
 					}}></FlatList>
 			</HomeBottomContainer>
 		),
-		[],
+		[userName, cooperationList, mainScreens, displayList],
 	);
 	return (
 		<>
@@ -575,6 +578,7 @@ export default function Main({navigation}: any) {
 		</>
 	);
 }
+//바텀시트안에 글자 위치, 사진글자 누르고 스크롤, 여행지 스크롤
 export const metropolitanCheckList = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '제주'];
 
 export const TagElement = styled.View<{opacityStatus: boolean; height?: number; backgroundColor?: string}>`
@@ -625,8 +629,7 @@ const HomeBottomContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
 	background-color: ${colors.backgroundWhite};
-	padding: ${widthPercentage(35)}px ${widthPercentage(8)}px 0px ${widthPercentage(8)}px;
-	top: -${heightPercentage(50)}px;
+	padding: 0px ${widthPercentage(8)}px 0px ${widthPercentage(8)}px;
 `;
 const CollectionContainer = styled.View`
 	margin-top: ${widthPercentage(60)}px;
@@ -646,7 +649,6 @@ const CollectionRecommendContentItemImage = styled.Image`
 const ImageContainer = styled.View`
 	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
 	height: ${heightPercentage(226)}px;
-	margin-right: ${widthPercentage(12)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
