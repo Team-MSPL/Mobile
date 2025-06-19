@@ -494,7 +494,7 @@ export default function Main({navigation}: any) {
 						displayList.length > 1
 							? {
 									parallaxScrollingScale: 0.9,
-									parallaxScrollingOffset: 50,
+									parallaxScrollingOffset: 40,
 							  }
 							: undefined
 					}
