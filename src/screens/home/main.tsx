@@ -316,7 +316,7 @@ export default function Main({navigation}: any) {
 	const sheetRef = useRef<BottomSheet>(null);
 
 	// variables
-	const snapPoints: ReadonlyArray<string | number> = useMemo(() => ['45%', '90%'], []);
+	const snapPoints: ReadonlyArray<string | number> = useMemo(() => [Platform.OS == 'ios' ? '50%' : '45%', '90%'], []);
 
 	// callbacks
 	const handleSheetChange = useCallback((index: number) => {
