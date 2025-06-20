@@ -117,16 +117,20 @@ function App(): JSX.Element {
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
-					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-					if (q.payload == 'ERR_BAD_REQUEST') {
-						dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '일정 소유자가 일정을 삭제했어요!',
-								modalFunction: goOffApp,
-							}),
-						);
-					} else {
-						dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+					if (!!match[1]) {
+						const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+						if (q.payload == 'ERR_BAD_REQUEST') {
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '일정 소유자가 일정을 삭제했어요!',
+									modalFunction: goOffApp,
+								}),
+							);
+						} else {
+							dispatch(
+								travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}),
+							);
+						}
 					}
 				}
 			} catch (err) {
@@ -143,16 +147,18 @@ function App(): JSX.Element {
 				//앱이 켜져있는데 켰을때
 				const pattern = /whatId=([a-zA-Z0-9]+)/;
 				const match = e.url.match(pattern) ?? '';
-				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-				if (q.payload == 0) {
-					dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '일정 소유자가 일정을 삭제했어요!',
-							modalFunction: goOffApp,
-						}),
-					);
-				} else {
-					dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+				if (!!match[1]) {
+					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+					if (q.payload == 0) {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '일정 소유자가 일정을 삭제했어요!',
+								modalFunction: goOffApp,
+							}),
+						);
+					} else {
+						dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+					}
 				}
 			} catch (err) {
 				dispatch(
