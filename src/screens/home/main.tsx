@@ -17,6 +17,7 @@ import {
 	PretendardBoldText,
 	PretendardSemiBoldText,
 	PretendardVariable,
+	PretendardVariableText,
 	VStack,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -182,14 +183,23 @@ export default function Main({navigation}: any) {
 			onPress: regionRecommend,
 			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/region.png')}></ImgContainer>,
 			text: `여행은 가고 싶은데,${`\n`}어디로 가야 할지 모르겠다면? `,
-			title: '여행 지역 추천받기',
+			title: '여행 지역 추천',
 		},
 		{
 			id: 2,
 			onPress: goEnroll,
 			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/course.png')}></ImgContainer>,
 			text: `여행지는 정했는데,${`\n`}계획 세우기 귀찮다면?`,
-			title: '여행 코스 추천받기',
+			title: '여행 코스 추천',
+		},
+		{
+			id: 3,
+			onPress: goEnroll,
+			image: (
+				<ImgContainer resizeMode='cover' source={require('../../../public/main/planner.png')}></ImgContainer>
+			),
+			text: `자유롭게 여행 계획을 세워보세요!`,
+			title: '여행 플래너',
 		},
 	];
 	const hanldeCooperation = async (e: {title: string; link: string; photo: any}) => {
@@ -327,17 +337,13 @@ export default function Main({navigation}: any) {
 			<HomeBottomContainer>
 				<VStack gap={5} deco='padding:0px 12px;'>
 					<PretendardBoldText size={16} lineHeight={26.6} color={colors.Black}>
-						{userName}님의 성향을 토대로,{`\n`}
-						<PretendardBoldText size={16} lineHeight={21.6} color={colors.Primary}>
-							다님 AI
-						</PretendardBoldText>
-						가 여행을 추천해 줘요!
+						성향에 딱 맞는 여행, 다님 AI가 추천 해줘요
 					</PretendardBoldText>
 					<PretendardBoldText size={14} lineHeight={21.6} color={colors.PointYellow}>
-						1분 투자로 하루를 아껴보세요
+						다님 AI와 함께 단 1분이면 충분해요!
 					</PretendardBoldText>
 				</VStack>
-				<HStack justifyContent='space-around'>
+				<VStack justifyContent='space-around'>
 					{buttonList.map(item => (
 						<RecommendContainer onPress={item.onPress} key={item.id}>
 							<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
@@ -354,20 +360,21 @@ export default function Main({navigation}: any) {
 									paddingHorizontal: widthPercentage(10),
 									height: '100%',
 									alignItems: 'center',
-									gap: 30,
+									justifyContent: 'flex-end',
+									gap: heightPercentage(15),
 								}}>
-								<PretendardSemiBoldText
-									size={16}
-									lineHeight={20}
+								<PretendardVariableText
+									size={19}
+									lineHeight={25}
 									color={colors.backgroundWhite}
-									deco={`top:${heightPercentage(140)}`}>
+									deco={'text-align:center'}>
 									{item.text}
-								</PretendardSemiBoldText>
+								</PretendardVariableText>
 								<StartButton onPress={item.onPress}>
 									<PretendardSemiBoldText
-										size={14}
-										lineHeight={28}
-										color={colors.Black}
+										size={20}
+										lineHeight={30}
+										color={colors.Primary}
 										numberOfLines={1}
 										adjustsFontSizeToFit
 										minimumFontScale={0.5}
@@ -382,7 +389,7 @@ export default function Main({navigation}: any) {
 							</LinearGradient>
 						</RecommendContainer>
 					))}
-				</HStack>
+				</VStack>
 				<CollectionContainer>
 					<PretendardSemiBoldText
 						size={18}
@@ -602,8 +609,8 @@ export const TagText = styled(PretendardVariable)<{color: string; size?: number}
 	line-height: ${props => props.size ?? heightPercentage(12)}px;
 `;
 const RecommendContainer = styled.Pressable`
-	width: ${widthPercentage(176)}px;
-	height: ${heightPercentage(328)}px;
+	width: ${widthPercentage(335)}px;
+	height: ${widthPercentage(152)}px;
 	background-color: ${colors.Gray1};
 	border-radius: 12px;
 	top: ${heightPercentage(18)}px;
@@ -666,14 +673,12 @@ const VividReviewContainer = styled.View`
 `;
 
 const StartButton = styled.TouchableOpacity`
-	width: ${widthPercentage(143)}px;
-	padding: ${widthPercentage(4)}px ${widthPercentage(11)}px;
+	width: ${widthPercentage(160)}px;
+	padding: ${heightPercentage(8)}px ${widthPercentage(23)}px;
 	align-items: center;
 	justify-content: center;
 	border-radius: 20px;
-	background-color: ${colors.backgroundWhite};
-	position: absolute;
-	bottom: ${heightPercentage(30)}px;
+	background-color: rgba(255, 255, 255, 0.2);
 `;
 const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
