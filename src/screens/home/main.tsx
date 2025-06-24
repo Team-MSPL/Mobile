@@ -297,19 +297,21 @@ export default function Main({navigation}: any) {
 	const vividList = [
 		{
 			name: '쥬쥬',
-			region: '전남 순천시, 여수시 여행',
+			region: '전남 순천시 여행',
 			title: '친구의 추천으로 한번 사용해봤습니다. 여행 계획 짜는걸 굉장히 싫어하는데 대신 짜주니 굉장히 편리하네요 특히 제가 처한 상황이나 특징을 고려해서 짜주는게 좋았습니다.',
+			photo: require('../../../public/main/zoo.png'),
 		},
 		{
 			name: '카우준',
 			region: '경남 김해시 여행',
 			title: '여행 계획 짤때마다 다 비슷해서 싫었는데 이 앱은 제가 원하는 조건을 입력하면 그에따른 결과 값을 줘서 좋은거같아요',
+			photo: require('../../../public/main/jun.png'),
 		},
-		{
-			name: '맨유맨',
-			region: '강원 원주시, 횡성군 여행',
-			title: '여행 계획 짜기 귀찮았는데 ,클릭 몇 번으로 여행 계획 만들어줘서 좋았다 다음에 여행 계획 짤때 또 사용할 듯 하다',
-		},
+		// {
+		// 	name: '맨유맨',
+		// 	region: '강원 원주시 여행',
+		// 	title: '여행 계획 짜기 귀찮았는데 ,클릭 몇 번으로 여행 계획 만들어줘서 좋았다 다음에 여행 계획 짤때 또 사용할 듯 하다',
+		// },
 	];
 	const displayList = [
 		...eventList.filter(item => !!item?.eventBannerImage),
@@ -405,18 +407,19 @@ export default function Main({navigation}: any) {
 							marginLeft: widthPercentage(6),
 						}}
 						width={widthPercentage(375)}
-						height={heightPercentage(226)}
+						height={heightPercentage(300)}
 						autoPlay={true}
 						data={mainScreens}
-						autoPlayInterval={1000}
+						autoPlayInterval={2000}
 						mode='parallax'
 						modeConfig={{
 							parallaxScrollingScale: 1, // 옆 아이템 크기 비율
-							parallaxScrollingOffset: widthPercentage(209), // 옆 아이템이 보여질 정도
+							parallaxScrollingOffset: widthPercentage(60), // 옆 아이템이 보여질 정도
 						}}
 						renderItem={({index}) => (
 							<CollectionTouchableOpacity
 								onPress={() => {
+									console.log(mainScreens[index]);
 									goCourseDetaile(mainScreens[index]);
 								}}>
 								<ImageContainer>
@@ -430,67 +433,33 @@ export default function Main({navigation}: any) {
 											zIndex: 101,
 											position: 'absolute',
 											width: '100%',
-											paddingHorizontal: widthPercentage(10),
+											paddingHorizontal: widthPercentage(24),
+											paddingBottom: widthPercentage(20),
 											height: '100%',
 											alignItems: 'flex-start',
 											justifyContent: 'flex-end',
-											gap: 10,
 											borderRadius: 12,
 										}}>
 										<PretendardSemiBoldText
 											size={20}
 											lineHeight={26}
-											numberOfLines={2}
+											numberOfLines={1}
 											color={colors.backgroundWhite}>
 											{mainScreens[index].name}
 										</PretendardSemiBoldText>
+										<PretendardVariableText
+											size={18}
+											lineHeight={24}
+											numberOfLines={1}
+											color={colors.backgroundWhite}>
+											{mainScreens[index]?.subTitle}
+										</PretendardVariableText>
 									</LinearGradient>
 								</ImageContainer>
 							</CollectionTouchableOpacity>
 						)}
 					/>
 				</CollectionContainer>
-				<PretendardSemiBoldText
-					size={18}
-					lineHeight={21.6}
-					color={colors.Gray5}
-					deco={`margin-left:${widthPercentage(6)}`}>
-					다님 사용자들의 생생한 후기
-				</PretendardSemiBoldText>
-				<Carousel
-					loop
-					style={{
-						marginTop: 18,
-						marginBottom: 50,
-					}}
-					width={widthPercentage(337)}
-					height={heightPercentage(170)}
-					autoPlay={true}
-					data={[1, 2, 3]}
-					scrollAnimationDuration={300}
-					onSnapToItem={() => {}}
-					autoPlayInterval={5000}
-					mode='parallax'
-					modeConfig={{
-						parallaxScrollingScale: 0.9, // 옆 아이템 크기 비율
-						parallaxScrollingOffset: 50, // 옆 아이템이 보여질 정도
-					}}
-					renderItem={({index}) => (
-						<VividReviewContainer>
-							<HStack>
-								<PretendardBoldText size={16} lineHeight={20} color={colors.Black}>
-									{vividList[index].name} 님{' '}
-								</PretendardBoldText>
-								<PretendardBoldText size={14} lineHeight={18} color={colors.Black}>
-									( {vividList[index].region} )
-								</PretendardBoldText>
-							</HStack>
-							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray3}>
-								{vividList[index].title}
-							</PretendardSemiBoldText>
-						</VividReviewContainer>
-					)}
-				/>
 				<Carousel
 					loop={displayList.length > 1}
 					autoPlay={displayList.length > 1}
@@ -535,6 +504,55 @@ export default function Main({navigation}: any) {
 						</EventContainer>
 					)}
 				/>
+				<PretendardSemiBoldText
+					size={18}
+					lineHeight={21.6}
+					color={colors.Gray5}
+					deco={`margin-left:${widthPercentage(6)}`}>
+					다님 사용자들의 생생한 후기
+				</PretendardSemiBoldText>
+				<Carousel
+					loop
+					style={{
+						marginTop: 18,
+						marginBottom: 50,
+					}}
+					width={widthPercentage(337)}
+					height={widthPercentage(245)}
+					autoPlay={true}
+					data={[1, 2]}
+					scrollAnimationDuration={300}
+					onSnapToItem={() => {}}
+					autoPlayInterval={5000}
+					// mode='parallax'
+					// modeConfig={{
+					// 	parallaxScrollingScale: 0.9, // 옆 아이템 크기 비율
+					// 	parallaxScrollingOffset: 50, // 옆 아이템이 보여질 정도
+					// }}
+					renderItem={({index}) => (
+						<VividReviewContainer>
+							<HStack gap={10}>
+								<VividImage source={vividList[index]?.photo}></VividImage>
+								<PretendardSemiBoldText size={20} lineHeight={24} color={colors.Black}>
+									{vividList[index].name}
+								</PretendardSemiBoldText>
+							</HStack>
+							<PretendardSemiBoldText
+								deco='font-weight:600;margin-top:5px;'
+								size={16}
+								lineHeight={20}
+								color={colors.Black}>
+								{vividList[index].title}
+							</PretendardSemiBoldText>
+							<VividRegionBox>
+								<PretendardSemiBoldText size={14} lineHeight={19} color={colors.Gray3}>
+									{vividList[index].region}
+								</PretendardSemiBoldText>
+							</VividRegionBox>
+						</VividReviewContainer>
+					)}
+				/>
+
 				<PretendardSemiBoldText
 					size={18}
 					lineHeight={21.6}
@@ -649,21 +667,21 @@ const CollectionContentContainer = styled.ScrollView`
 const CollectionTouchableOpacity = styled.Pressable``;
 const CollectionRecommendContentItemImage = styled.Image`
 	position: absolute;
-	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
-	height: ${heightPercentage(226)}px;
+	width: ${widthPercentage(300)}px;
+	height: ${heightPercentage(300)}px;
 	border-radius: 12px;
 `;
 const ImageContainer = styled.View`
-	width: ${widthPercentage(Platform.isPad ? 101 : 152)}px;
-	height: ${heightPercentage(226)}px;
+	width: ${widthPercentage(300)}px;
+	height: ${heightPercentage(300)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
 `;
 const VividReviewContainer = styled.View`
 	width: ${widthPercentage(326)}px;
-	height: ${heightPercentage(170)}px;
-	padding-horizontal: ${widthPercentage(30)}px;
+	height: ${widthPercentage(245)}px;
+	padding-horizontal: ${widthPercentage(20)}px;
 	padding-top: ${widthPercentage(15)}px;
 	gap: ${widthPercentage(10)}px;
 	background-color: ${colors.backgroundWhite};
@@ -671,7 +689,20 @@ const VividReviewContainer = styled.View`
 	border-radius: 12px;
 	border-color: #dddddd;
 `;
-
+const VividRegionBox = styled.View`
+	border-radius: 20px;
+	padding: ${widthPercentage(8)}px ${widthPercentage(23)}px;
+	background-color: #f2ffd4;
+	align-self: flex-start;
+	margin-top: auto;
+	margin-bottom: ${widthPercentage(20)}px;
+`;
+const VividImage = styled.Image`
+	width: ${widthPercentage(40)}px;
+	height: ${widthPercentage(40)}px;
+	border-radius: 99px;
+	resize-mode: contain;
+`;
 const StartButton = styled.TouchableOpacity`
 	width: ${widthPercentage(160)}px;
 	padding: ${heightPercentage(8)}px ${widthPercentage(23)}px;
@@ -714,6 +745,7 @@ interface mainScreensType {
 	season: number[];
 	category: number;
 	photo: string;
+	subTitle?: string;
 }
 
 interface ButtonListType {
