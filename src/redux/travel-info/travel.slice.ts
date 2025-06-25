@@ -84,6 +84,8 @@ const initialState: LiteState = {
 	departureAirport: {lat: 0, lng: 0, name: ''},
 	departureTrain: {lat: 0, lng: 0, name: ''},
 	departureSelected: '',
+	recommendProducts: [],
+	hotProducts: [],
 };
 
 export const axiosGoogle = axios.create({
@@ -125,6 +127,16 @@ export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data,
 		throw thunkAPI.rejectWithValue(error.code);
 	}
 });
+//여행 상품 가져오기
+export const getSellingProduct = createAsyncThunk('/sellingProduct/list', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/sellingProduct/list`, {params: data});
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 //여행 코스 하나 가져오기
 export const getOneTravelCourse = createAsyncThunk(
 	'/getOneTravelCourse',
@@ -597,6 +609,12 @@ export const travelSlice = createSlice({
 			state.saveFlag = true;
 			state.tableShowFlag = true;
 		},
+		enrollRecommendProducts: (state, {payload}) => {
+			state.recommendProducts = payload;
+		},
+		enrollHotProducts: (state, {payload}) => {
+			state.hotProducts = payload;
+		},
 		changeModify: (state, {payload}) => {
 			state.modifyCheck = payload;
 		},
@@ -972,6 +990,8 @@ interface LiteState {
 		name: string;
 	};
 	departureSelected: string;
+	recommendProducts: any;
+	hotProducts: any;
 }
 interface aiListType {
 	_id: string;

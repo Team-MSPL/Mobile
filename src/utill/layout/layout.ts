@@ -37,7 +37,7 @@ export const VStack = styled.View<{
 	justify-content: ${props => props.alignItems ?? 'center'};
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
-	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
+	${props => (props.flex != undefined ? `flex:${props.flex};` : '')}
 	${props => props.deco}
 `;
 export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; margintop?: number; width?: number}>`

@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getSellingProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
@@ -44,7 +44,9 @@ export default function Main({navigation}: any) {
 	);
 	const {eventList} = useAppSelector(state => state.eventSlice);
 
-	const {selectStartDate, shareLoginFlag, country} = useAppSelector(state => state.travelSlice);
+	const {selectStartDate, shareLoginFlag, recommendProducts, hotProducts} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const dispatch = useAppDispatch();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const {t, i18n} = useTranslation();
@@ -143,6 +145,33 @@ export default function Main({navigation}: any) {
 		} finally {
 		}
 	};
+	const handleProduct = async () => {
+		const type = {
+			country: '베트남',
+			company: '(주)수호천사컴퍼니',
+			regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
+			type: 'package', //투어 : "tour", 패키지 : "package"
+			period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
+			places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
+			// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
+		};
+		const result = await dispatch(getSellingProduct(type)).unwrap();
+		dispatch(travelSliceActions.enrollRecommendProducts(result.data.results));
+	};
+	const handleHotProduct = async () => {
+		//TODO핫플레이스 변경하기
+		const type = {
+			country: '베트남',
+			company: '(주)수호천사컴퍼니',
+			regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
+			type: 'package', //투어 : "tour", 패키지 : "package"
+			period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
+			places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
+			// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
+		};
+		const result = await dispatch(getSellingProduct(type)).unwrap();
+		dispatch(travelSliceActions.enrollHotProducts(result.data.results));
+	};
 	useFocusEffect(
 		useCallback(() => {
 			getNoteListData();
@@ -152,6 +181,8 @@ export default function Main({navigation}: any) {
 		checkEvent();
 		getMainScreen();
 		getFirstRegion();
+		handleProduct();
+		handleHotProduct();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');
@@ -392,6 +423,82 @@ export default function Main({navigation}: any) {
 						</RecommendContainer>
 					))}
 				</VStack>
+				{recommendProducts.length > 0 && (
+					<>
+						<VStack deco={`margin-top:40px;margin-left:${widthPercentage(12)}`}>
+							<PretendardSemiBoldText size={20} lineHeight={23.6} color={colors.Black}>
+								맞춤 여행 상품
+							</PretendardSemiBoldText>
+							<PretendardVariableText size={16} lineHeight={20} color={colors.Gray4}>
+								선택하신 일정과 관련된 여행 상품을 모아봤어요!
+							</PretendardVariableText>
+							<Carousel
+								style={{
+									marginTop: 18,
+									marginBottom: 50,
+								}}
+								width={widthPercentage(375)}
+								height={widthPercentage(335)}
+								autoPlay={true}
+								data={recommendProducts}
+								autoPlayInterval={2000}
+								renderItem={({index}) => (
+									<CollectionTouchableOpacity
+										onPress={() => {
+											Linking.openURL(recommendProducts[index]?.product?.sellingProductLink);
+											// goCourseDetaile(mainScreens[index]);
+										}}>
+										<ImageContainer width={335} height={335}>
+											<CollectionRecommendContentItemImage
+												width={335}
+												height={335}
+												source={{
+													uri: recommendProducts[index]?.product?.sellingProductImage[0],
+												}}></CollectionRecommendContentItemImage>
+											<LinearGradient
+												start={{x: 0, y: 0}}
+												end={{x: 0, y: 1}}
+												colors={['rgba(255,255,255,0)', 'black']}
+												style={{
+													zIndex: 101,
+													position: 'absolute',
+													width: '100%',
+													paddingHorizontal: widthPercentage(24),
+													paddingBottom: widthPercentage(20),
+													height: '100%',
+													alignItems: 'flex-start',
+													justifyContent: 'flex-end',
+													borderRadius: 12,
+												}}>
+												<PretendardSemiBoldText
+													size={20}
+													lineHeight={26}
+													numberOfLines={1}
+													color={colors.backgroundWhite}>
+													{recommendProducts[index]?.product?.sellingProductName}
+												</PretendardSemiBoldText>
+												<PretendardVariableText
+													size={16}
+													lineHeight={20}
+													numberOfLines={1}
+													color={colors.Primary}>
+													{recommendProducts[index]?.product?.sellingProductContent}
+												</PretendardVariableText>
+												<PretendardVariableText
+													size={24}
+													lineHeight={28}
+													numberOfLines={1}
+													color={colors.backgroundWhite}>
+													{recommendProducts[index]?.product?.sellingProductPrice}원~
+												</PretendardVariableText>
+											</LinearGradient>
+										</ImageContainer>
+									</CollectionTouchableOpacity>
+								)}
+							/>
+						</VStack>
+					</>
+				)}
 				<CollectionContainer>
 					<PretendardSemiBoldText
 						size={18}
@@ -407,7 +514,7 @@ export default function Main({navigation}: any) {
 							marginLeft: widthPercentage(6),
 						}}
 						width={widthPercentage(375)}
-						height={heightPercentage(300)}
+						height={widthPercentage(300)}
 						autoPlay={true}
 						data={mainScreens}
 						autoPlayInterval={2000}
@@ -419,11 +526,12 @@ export default function Main({navigation}: any) {
 						renderItem={({index}) => (
 							<CollectionTouchableOpacity
 								onPress={() => {
-									console.log(mainScreens[index]);
 									goCourseDetaile(mainScreens[index]);
 								}}>
-								<ImageContainer>
+								<ImageContainer width={300} height={300}>
 									<CollectionRecommendContentItemImage
+										width={300}
+										height={300}
 										source={{uri: mainScreens[index].photo}}></CollectionRecommendContentItemImage>
 									<LinearGradient
 										start={{x: 0, y: 0}}
@@ -504,6 +612,85 @@ export default function Main({navigation}: any) {
 						</EventContainer>
 					)}
 				/>
+				{hotProducts.length > 0 && (
+					<>
+						<VStack>
+							<LinearGradient
+								start={{x: 0, y: 0}}
+								end={{x: 0, y: 1}}
+								colors={['#ffffff', '#cfe1a5', '#cfe1a5', '#ffffff']}
+								locations={[0, 0.18, 0.88, 1]} // ✅ 위치 지정 (0 ~ 1 사이의 값)
+								style={{
+									width: widthPercentage(375),
+									paddingTop: widthPercentage(70),
+									paddingBottom: widthPercentage(70),
+									alignItems: 'flex-start',
+									justifyContent: 'flex-end',
+									borderRadius: 12,
+									paddingLeft: widthPercentage(20),
+									marginLeft: -widthPercentage(8),
+								}}>
+								<PretendardSemiBoldText size={20} lineHeight={23.6} color={colors.Black}>
+									요즘 뜨는 여행 상품
+								</PretendardSemiBoldText>
+								<PretendardVariableText
+									size={16}
+									lineHeight={20}
+									color={colors.Gray4}
+									deco={`margin-bottom:${widthPercentage(5)}px;`}>
+									많은 사람들이 찾는 여행 상품이에요
+								</PretendardVariableText>
+								{hotProducts.slice(0, 3)?.map((item, index) => (
+									<HotProductBox>
+										<HStack>
+											<CollectionRecommendContentItemImage
+												width={93}
+												height={93}
+												source={{
+													uri: item?.product?.sellingProductImage[0],
+												}}></CollectionRecommendContentItemImage>
+											<VStack flex={1} deco={`margin-left:${widthPercentage(15)}px;`}>
+												<VStack>
+													<PretendardSemiBoldText
+														size={20}
+														lineHeight={26}
+														numberOfLines={1}
+														color={colors.Black}>
+														{item?.product?.sellingProductName}
+													</PretendardSemiBoldText>
+													<PretendardVariableText
+														size={16}
+														lineHeight={20}
+														numberOfLines={1}
+														color={'#6F853D'}>
+														{item?.product?.sellingProductContent}
+													</PretendardVariableText>
+												</VStack>
+												<PretendardVariableText
+													size={18}
+													lineHeight={21}
+													numberOfLines={1}
+													color={colors.Black}
+													deco={'margin-top:10px;'}>
+													{item?.product?.sellingProductPrice}원~
+												</PretendardVariableText>
+											</VStack>
+										</HStack>
+									</HotProductBox>
+								))}
+								<HotMoreButton>
+									<PretendardSemiBoldText
+										size={20}
+										lineHeight={24}
+										numberOfLines={1}
+										color={colors.Gray4}>
+										여행 상품 더보기
+									</PretendardSemiBoldText>
+								</HotMoreButton>
+							</LinearGradient>
+						</VStack>
+					</>
+				)}
 				<PretendardSemiBoldText
 					size={18}
 					lineHeight={21.6}
@@ -665,15 +852,16 @@ const CollectionContentContainer = styled.ScrollView`
 	width: 100%;
 `;
 const CollectionTouchableOpacity = styled.Pressable``;
-const CollectionRecommendContentItemImage = styled.Image`
-	position: absolute;
-	width: ${widthPercentage(300)}px;
-	height: ${heightPercentage(300)}px;
+const CollectionRecommendContentItemImage = styled.Image<{position?: boolean; width: number; height: number}>`
+	${props => !!props.position && 'position: absolute;'}
+	width: ${props => widthPercentage(props.width)}px;
+	height: ${props => widthPercentage(props.height)}px;
 	border-radius: 12px;
+	resize-mode: stretch;
 `;
-const ImageContainer = styled.View`
-	width: ${widthPercentage(300)}px;
-	height: ${heightPercentage(300)}px;
+const ImageContainer = styled.View<{width: number; height: number}>`
+	width: ${props => widthPercentage(props.width)}px;
+	height: ${props => widthPercentage(props.height)}px;
 	align-items: start;
 	justify-content: flex-end;
 	margin-bottom: ${heightPercentage(10)}px;
@@ -730,6 +918,23 @@ const CooperationImage = styled.Image`
 	width: ${widthPercentage(168)}px;
 	height: ${widthPercentage(181)}px;
 	border-radius: 12px;
+`;
+const HotProductBox = styled.TouchableOpacity`
+	width: ${widthPercentage(335)}px;
+	height: ${widthPercentage(120)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundWhite};
+	padding: ${widthPercentage(14)}px ${widthPercentage(20)}px;
+	margin-top: ${widthPercentage(14)}px;
+`;
+const HotMoreButton = styled.TouchableOpacity`
+	width: ${widthPercentage(335)}px;
+	padding: ${widthPercentage(8)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 12px;
+	background-color: #f2ffd4;
+	margin-top: ${widthPercentage(20)}px;
 `;
 interface mainScreensType {
 	region: string;
