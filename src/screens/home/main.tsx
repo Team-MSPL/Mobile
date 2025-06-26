@@ -678,7 +678,10 @@ export default function Main({navigation}: any) {
 										</HStack>
 									</HotProductBox>
 								))}
-								<HotMoreButton>
+								<HotMoreButton
+									onPress={() => {
+										navigation.navigate('Products');
+									}}>
 									<PretendardSemiBoldText
 										size={20}
 										lineHeight={24}

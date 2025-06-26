@@ -633,6 +633,7 @@ export const travelSlice = createSlice({
 		},
 		setRecommendRegion: (state, {payload}) => {
 			Object.assign(state, initialState);
+			state.regionInfo = payload.regionInfo;
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.makeMode = 'recommend';

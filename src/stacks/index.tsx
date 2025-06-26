@@ -22,6 +22,7 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout
 import Search from '../screens/home/search';
 import RecommendPlace from '../screens/home/recommendPlace';
 import RecommendPlaces from '../screens/home/recommendPlaces';
+import ProductsStack from './products-stack';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -66,6 +67,7 @@ export default function StackNavigator() {
 			{MoreStack()}
 			{JoinStack()}
 			{HikingStack()}
+			{ProductsStack()}
 			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />

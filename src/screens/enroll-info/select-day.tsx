@@ -29,6 +29,7 @@ export default function SelectDay({navigation}: any) {
 		selectEndDate,
 		freeTicket,
 		selectedDateFlag,
+		regionRecommendFlag,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -206,7 +207,7 @@ export default function SelectDay({navigation}: any) {
 			onPress={() => {
 				setVisible(false);
 			}}>
-			<Stepper total={13} now={4}></Stepper>
+			<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 2 : 4}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'

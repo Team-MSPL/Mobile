@@ -17,8 +17,17 @@ import styled from 'styled-components/native';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 
 export default function SelectDeparture({navigation}: any) {
-	const {region, departureSelected, country, cityIndex, cityDistance, departure, departureAirport, departureTrain} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		region,
+		departureSelected,
+		country,
+		cityIndex,
+		cityDistance,
+		departure,
+		departureAirport,
+		departureTrain,
+		regionRecommendFlag,
+	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const handleNearBySearchApi = async () => {
 		const e = await dispatch(
@@ -79,7 +88,7 @@ export default function SelectDeparture({navigation}: any) {
 			onPress={() => {
 				Keyboard.dismiss();
 			}}>
-			<Stepper total={13} now={5}></Stepper>
+			<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 3 : 5}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
@@ -167,7 +176,7 @@ export default function SelectDeparture({navigation}: any) {
 			<RouteButton
 				nextText={departureSelected == '' ? '건너뛰기' : '다음'}
 				navigation={navigation}
-				nextTitle='SelectMulti'></RouteButton>
+				nextTitle={regionRecommendFlag ? 'SelectDistance' : 'SelectMulti'}></RouteButton>
 		</DepartureBackground>
 	);
 }

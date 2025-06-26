@@ -9,12 +9,12 @@
 		"strict": true,
 		"noImplicitAny": false,
 		"moduleResolution": "node",
-		"baseUrl": ".",
+		// "baseUrl": ".",
 		"jsx": "react-native",
 
-		"paths": {
-			"*": ["node_modules/*"]
-		},
+		// "paths": {
+		// 	"*": ["node_modules/*"]
+		// },
 
 		"esModuleInterop": true,
 		"skipLibCheck": true,

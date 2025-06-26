@@ -95,6 +95,10 @@ export default function DetailResult({navigation, route}: any) {
 			selectEndDate: selectEndDate,
 			shareViewWithStartFlag: true,
 			country: country,
+			regionInfo: {
+				name: route.params.item.name,
+				photo: Array.isArray(route.params.item.photo) ? route.params.item.photo[0] : route.params.item.photo,
+			},
 		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');

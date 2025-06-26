@@ -22,7 +22,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		regionRecommendFlag ? navigation.navigate('SelectCity') : navigation.navigate('RecommendSelectCountry');
+		regionRecommendFlag ? navigation.navigate('SelectDay') : navigation.navigate('RecommendSelectCountry');
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	const handleGoogleAnalytics = async () => {
@@ -36,7 +36,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	}, []);
 	return (
 		<BackgroundGray>
-			<Stepper total={13} now={1}></Stepper>
+			<Stepper total={regionRecommendFlag ? 4 : 13} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='새 여행'
