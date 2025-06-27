@@ -158,6 +158,7 @@ export const PretendardBoldText = styled.Text<{
 	textAlign?: string;
 	lineHeight: number;
 	marginBottom?: number;
+	deco?: string;
 }>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
@@ -166,6 +167,7 @@ export const PretendardBoldText = styled.Text<{
 	font-weight: 700;
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	text-align: ${props => props.textAlign ?? 'auto'};
+	${props => props?.deco}
 `;
 export const PretendardSemiBoldText = styled.Text<{
 	color: string;
@@ -203,4 +205,11 @@ export const TagContainer = styled.View<{backgroundColor: string; width?: number
 	height: ${props => props.height ?? heightPercentage(24)}px;
 	gap: ${widthPercentage(1.3)}px;
 	width: ${props => props.width + 'px' ?? null};
+`;
+
+export const ImageBox = styled.Image<{width: number; height: number; deco?: string}>`
+	width: ${props => props.width}px;
+	height: ${props => props.height}px;
+	object-fit: fill;
+	${props => props?.deco}
 `;

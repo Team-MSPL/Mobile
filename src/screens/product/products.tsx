@@ -1,3 +1,4 @@
+import {TouchableOpacity} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {styled} from 'styled-components/native';
 import {useAppSelector} from '../../redux';
@@ -13,9 +14,12 @@ import {
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
-export default function Products() {
+export default function Products({navigation}: any) {
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {recommendProducts} = useAppSelector(state => state.travelSlice);
+	const handleNext = (item: any) => {
+		navigation.navigate('ProductDetail', {item});
+	};
 	return (
 		<BackgroundGray>
 			<FlatList
@@ -54,7 +58,7 @@ export default function Products() {
 				// }}
 				renderItem={({item}) => {
 					return (
-						<HStack marginVertical={heightPercentage(10)}>
+						<ProductTouchable marginVertical={heightPercentage(10)} onPress={() => handleNext(item)}>
 							<EventImage source={{uri: item?.product?.sellingProductImage[0]}}></EventImage>
 							<VStack
 								flex={1}
@@ -93,13 +97,14 @@ export default function Products() {
 									{item?.product?.sellingProductPrice}원~
 								</PretendardBoldText>
 							</VStack>
-						</HStack>
+						</ProductTouchable>
 					); // 실제 카드 컴포넌트 렌더
 				}}
 			/>
 		</BackgroundGray>
 	);
 }
+const ProductTouchable = styled(HStack).attrs({as: TouchableOpacity})``;
 const EventImage = styled.Image`
 	width: ${widthPercentage(155)}px;
 	height: ${widthPercentage(141)}px;

@@ -18,4 +18,8 @@ export const colors = {
 	Blue2: '#DBF3C9',
 	Blue3: '#84FF03',
 	Blue4: '#DDF2FE',
+	Green1: '#D5FF73',
+	Green2: '#CAFB07',
+	Green3: '#C3F550',
+	Green4: '#B1E832',
 };
