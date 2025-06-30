@@ -335,7 +335,10 @@ function Timetable({
 										!excludeNames.includes(item.name) ? (
 											<HStack gap={widthPercentage(10)} key={idx}>
 												<DashLineContainer justifyContent='start'>
-													<MarkerContainer>
+													<MarkerContainer
+														backgroundColor={
+															item.category == 4 ? colors.Pink1 : colors.Green5
+														}>
 														<PretendardSemiBoldText
 															size={13}
 															lineHeight={19}
@@ -547,14 +550,14 @@ function Timetable({
 }
 
 export default memo(Timetable);
-// const DayScrollViews = styled.View<{viewMap: boolean}>`
-// 	width: ${widthPercentage(375)}px;
-// `;
-//TODO 타임테이블 네이버지도ui
-const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
+const DayScrollViews = styled.View<{viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
-	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
 `;
+//TODO 타임테이블 네이버지도ui
+// const DayScrollViews = styled.ScrollView<{viewMap: boolean}>`
+// 	width: ${widthPercentage(375)}px;
+// 	height: ${props => (props.viewMap ? heightPercentage(230) : heightPercentage(500))}px;
+// `;
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
 	height: ${heightPercentage(500)}px;

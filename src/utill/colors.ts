@@ -22,4 +22,6 @@ export const colors = {
 	Green2: '#CAFB07',
 	Green3: '#C3F550',
 	Green4: '#B1E832',
+	Green5: '#B1E832',
+	Pink1: '#FF8B6D',
 };
