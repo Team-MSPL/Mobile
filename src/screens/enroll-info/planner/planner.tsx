@@ -18,8 +18,7 @@ import {widthPercentage} from '../../../utill/layout/responsive-size';
 import {SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
 
 export default function Planner({navigation}: any) {
-	const {travelName, region, cityIndex, country, day} = useAppSelector(state => state.travelSlice);
-	const [nDay, setNday] = useState(3);
+	const {travelName, region, cityIndex, country, day, nDay} = useAppSelector(state => state.travelSlice);
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => <></>,
