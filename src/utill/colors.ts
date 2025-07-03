@@ -24,4 +24,6 @@ export const colors = {
 	Green4: '#B1E832',
 	Green5: '#B1E832',
 	Pink1: '#FF8B6D',
+	Blue1: '#93D5FF',
+	PlannerGray: '#BDBDBD',
 };

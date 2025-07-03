@@ -8,10 +8,11 @@ import {MarkerContainer} from '../../../screens/timetable/preset-detail';
 import {colors} from '../../colors';
 import {useAppSelector} from '../../../redux';
 import styled from 'styled-components/native';
+import {cityViewList} from '../enroll-info/city-list';
 
 function CustomMapView({select, onTouchStart, onTouchEnd}) {
 	// 메모리 최적화를 위해 useMemo 사
-	const {timetable} = useAppSelector(state => state.travelSlice);
+	const {timetable, country, cityIndex} = useAppSelector(state => state.travelSlice);
 	const {imageList} = useMemo(() => {
 		let images = [];
 		Array(timetable.length)
@@ -104,10 +105,10 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			);
 		});
 
-		const minLatitude = Math.min(...positions.map(marker => marker.latitude));
-		const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
-		const minLongitude = Math.min(...positions.map(marker => marker.longitude));
-		const maxLongitude = Math.max(...positions.map(marker => marker.longitude));
+		const minLatitude = Math.min(...positions?.map(marker => marker.latitude));
+		const maxLatitude = Math.max(...positions?.map(marker => marker.latitude));
+		const minLongitude = Math.min(...positions?.map(marker => marker.longitude));
+		const maxLongitude = Math.max(...positions?.map(marker => marker.longitude));
 
 		const centerLatitude = (maxLatitude + minLatitude) / 2;
 		const centerLongitude = (maxLongitude + minLongitude) / 2;
@@ -131,10 +132,10 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			onTouchStart={onTouchStart ?? null}
 			onTouchEnd={onTouchEnd ?? null}
 			region={{
-				latitude: centerLatitude,
-				longitude: centerLongitude,
-				latitudeDelta: latitudeDelta,
-				longitudeDelta: longitudeDelta,
+				latitude: isNaN(centerLatitude) ? cityViewList[country][cityIndex].sub[0].lat : centerLatitude,
+				longitude: isNaN(centerLongitude) ? cityViewList[country][cityIndex].sub[0].lng : centerLongitude,
+				latitudeDelta: latitudeDelta <= 0 ? 0.13 : latitudeDelta,
+				longitudeDelta: longitudeDelta <= 0 ? 0.13 : longitudeDelta,
 			}}>
 			{imageList[select]}
 			{polylines}

@@ -50,18 +50,18 @@ export default function Main({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [mainScreens, setMainScreens] = useState<mainScreensType[]>([]);
 	const {t, i18n} = useTranslation();
-
+	const [bannerIndex, setBannerIndex] = useState(0);
 	const regionRecommend = async () => {
 		dispatch(regionRecommendSliceActions.reset());
 		dispatch(travelSliceActions.reset());
 		navigation.navigate('SelectCountry');
 		await logEvent('place_step1', {});
 	};
-	const goEnroll = () => {
+	const goEnroll = e => {
 		let season = Array(4).fill(0);
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
-		dispatch(travelSliceActions.setTravelStart({makeMode: 'recommend', season: season, globalFlag: false}));
+		dispatch(travelSliceActions.setTravelStart({makeMode: e, season: season, globalFlag: false}));
 		navigation.navigate('EnrollTravelTitle');
 	};
 	const goCourseDetaile = (e: any) => {
@@ -218,14 +218,14 @@ export default function Main({navigation}: any) {
 		},
 		{
 			id: 2,
-			onPress: goEnroll,
+			onPress: () => goEnroll('recommend'),
 			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/course.png')}></ImgContainer>,
 			text: `여행지는 정했는데,${`\n`}계획 세우기 귀찮다면?`,
 			title: '여행 코스 추천',
 		},
 		{
 			id: 3,
-			onPress: goEnroll,
+			onPress: () => goEnroll('planner'),
 			image: (
 				<ImgContainer resizeMode='cover' source={require('../../../public/main/planner.png')}></ImgContainer>
 			),
@@ -586,9 +586,9 @@ export default function Main({navigation}: any) {
 						alignSelf: displayList.length == 1 ? 'center' : undefined,
 					}}
 					width={widthPercentage(337)}
-					height={heightPercentage(160)}
+					height={widthPercentage(160)}
 					data={displayList}
-					onSnapToItem={() => {}}
+					onSnapToItem={e => {}}
 					renderItem={({index}) => (
 						<EventContainer
 							onPress={() => {
@@ -609,6 +609,14 @@ export default function Main({navigation}: any) {
 												uri: displayList[index]?.eventBannerImage,
 										  }
 								}></EventImage>
+							<EventIndex>
+								<PretendardVariableText size={14} lineHeight={18} color={colors.backgroundWhite}>
+									{index + 1} /{' '}
+									<PretendardVariableText size={14} lineHeight={18} color={'#9F9F9F'}>
+										{displayList.length}
+									</PretendardVariableText>
+								</PretendardVariableText>
+							</EventIndex>
 						</EventContainer>
 					)}
 				/>
@@ -904,12 +912,24 @@ const StartButton = styled.TouchableOpacity`
 `;
 const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(70)}px;
+	height: ${widthPercentage(152)}px;
 	object-fit: fill;
+	background-color: red;
+`;
+const EventIndex = styled.View`
+	position: absolute;
+	top: ${widthPercentage(123)}px;
+	left: ${widthPercentage(264)}px;
+	width: ${widthPercentage(52)}px;
+	height: ${widthPercentage(19)}px;
+	background-color: rgba(0, 0, 0, 0.5);
+	border-radius: 12px;
+	align-items: center;
+	justify-content: center;
 `;
 const EventContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(70)}px;
+	height: ${widthPercentage(152)}px;
 	border-radius: 10px;
 	overflow: hidden;
 `;

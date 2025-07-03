@@ -9,7 +9,7 @@ import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../utill/component/route-button';
 
 export default function RecommendSelectTour({navigation}: any) {
-	const {tendency} = useAppSelector(state => state.travelSlice);
+	const {tendency, makeMode} = useAppSelector(state => state.travelSlice);
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: false, item: item});
@@ -43,7 +43,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			</ButtonsContainer>
 			<RouteButton
 				navigation={navigation}
-				nextTitle='SelectDistance'
+				nextTitle={makeMode == 'planner' ? 'Planner' : 'SelectDistance'}
 				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}></RouteButton>
 		</BackgroundGray>
 	);

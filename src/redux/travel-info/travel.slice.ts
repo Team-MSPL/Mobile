@@ -1016,7 +1016,7 @@ export interface presetTendencyListType {
 	tendencyRanking: number[];
 }
 
-type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
+type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share' | 'planner';
 export interface PlaceType {
 	name: string | undefined;
 	lat: number | undefined;

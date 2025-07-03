@@ -40,7 +40,13 @@ export const VStack = styled.View<{
 	${props => (props.flex != undefined ? `flex:${props.flex};` : '')}
 	${props => props.deco}
 `;
-export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; margintop?: number; width?: number}>`
+export const FlexWrap = styled.Pressable<{
+	gap?: number;
+	marginBottom?: number;
+	margintop?: number;
+	width?: number;
+	deco?: string;
+}>`
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
@@ -48,6 +54,7 @@ export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; m
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
 	width: ${props => props.width ?? null}px;
+	${props => props?.deco}
 `;
 
 export const Divider = styled.View<{width?: number; color?: string; height: number}>`

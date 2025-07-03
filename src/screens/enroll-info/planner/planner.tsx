@@ -1,0 +1,193 @@
+import {useEffect, useState} from 'react';
+import {useAppSelector} from '../../../redux';
+import {colors} from '../../../utill/colors';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {
+	FlexWrap,
+	HStack,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../../utill/layout/layout';
+import PlannerBottomSheet from '../../../utill/component/planner/bottom-sheet';
+import CustomMapView from '../../../utill/component/timetable/mapView';
+import moment from 'moment';
+import {styled} from 'styled-components/native';
+import {widthPercentage} from '../../../utill/layout/responsive-size';
+import {SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
+
+export default function Planner({navigation}: any) {
+	const {travelName, region, cityIndex, country, day} = useAppSelector(state => state.travelSlice);
+	const [nDay, setNday] = useState(3);
+	useEffect(() => {
+		navigation.setOptions({
+			headerRight: () => <></>,
+			headerTitle: () => (
+				<VStack>
+					<PretendardVariableText
+						size={16}
+						lineHeight={20}
+						color={colors.Black}
+						style={{textAlign: 'center'}}>
+						{(region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0]) +
+							' ' +
+							(nDay == 0 ? '당일치기' : nDay + '박' + (nDay + 1) + '일') +
+							' ' +
+							travelName}
+					</PretendardVariableText>
+					<PretendardVariableText
+						size={12}
+						lineHeight={16}
+						color={colors.Gray4}
+						style={{textAlign: 'center'}}>
+						{moment(day[0]).format('YYYY/MM/DD') + ' ~ ' + moment(day[nDay]).format('YYYY/MM/DD')}
+					</PretendardVariableText>
+				</VStack>
+			),
+		});
+	}, [travelName, region, country, cityIndex, nDay]);
+	const select = '';
+	const [popUpIsActive, setPopUpIsActive] = useState(false);
+	return (
+		<>
+			<StepPopUp
+				isActive={popUpIsActive}
+				onPress={() => {
+					setPopUpIsActive(!popUpIsActive);
+				}}>
+				{popUpIsActive ? (
+					<>
+						<FlexWrapScrollView horizontal>
+							<HorizontalBar
+								nDay={nDay}
+								a={
+									nDay == 0
+										? widthPercentage(46)
+										: nDay == 1
+										? widthPercentage(31)
+										: widthPercentage(22)
+								}
+							/>
+							{['항공', '숙소', ...Array(nDay + 1).fill('1')].map(
+								(item, idx) =>
+									item.length != 0 && (
+										<VStack
+											alignItems='center;'
+											width={widthPercentage(60)}
+											deco={`margin:${widthPercentage(25)}px ${
+												nDay == 0
+													? widthPercentage(31)
+													: nDay == 1
+													? widthPercentage(16)
+													: widthPercentage(7)
+											}px`}>
+											<Circle
+												color={colors.backgroundWhite}
+												flag={idx}
+												onPress={() => {
+													// changeTouch(idx);
+												}}></Circle>
+											<PretendardSemiBoldText
+												size={13}
+												lineHeight={18}
+												color={colors.backgroundWhite}
+												deco={'text-align:center;'}
+												numberOfLines={1}>
+												{idx <= 1 ? item : moment(day[idx - 2]).format('MM월DD일')}
+											</PretendardSemiBoldText>
+										</VStack>
+									),
+							)}
+						</FlexWrapScrollView>
+
+						<ArrowBox
+							onPress={() => {
+								setPopUpIsActive(!popUpIsActive);
+							}}>
+							<SVGRightAdd
+								width={widthPercentage(15)}
+								height={widthPercentage(15)}
+								color='white'
+								transform={270}
+							/>
+						</ArrowBox>
+					</>
+				) : (
+					<HStack justifyContent='center'>
+						<PretendardSemiBoldText
+							size={18}
+							lineHeight={22}
+							color={colors.backgroundWhite}
+							deco={'text-align:center;'}>
+							진행 상황{' '}
+						</PretendardSemiBoldText>
+						<SVGRightAdd
+							width={widthPercentage(15)}
+							height={widthPercentage(15)}
+							color='white'
+							transform={90}
+						/>
+					</HStack>
+				)}
+			</StepPopUp>
+			<CustomMapView select={select} onTouchStart={false} onTouchEnd={() => {}} />
+			<PlannerBottomSheet navigation={navigation} />
+		</>
+	);
+}
+const StepPopUp = styled.TouchableOpacity<{isActive: boolean}>`
+	width: ${props => widthPercentage(props.isActive ? 369 : 119)}px;
+	height: ${props => widthPercentage(props.isActive ? 91 : 46)}px;
+	border-radius: 22px;
+	background-color: rgba(0, 0, 0, 0.7);
+	position: absolute;
+	${props =>
+		!props.isActive &&
+		`left: ${widthPercentage(248)}px;
+	top: ${widthPercentage(8)}px;`}
+
+	z-index: 102;
+	align-item: center;
+	justify-content: center;
+	align-self: center;
+`;
+const Circle = styled.TouchableOpacity<{color: string}>`
+	width: ${widthPercentage(30)}px;
+	height: ${widthPercentage(30)}px;
+	border-radius: 99px;
+	background-color: ${props => (props.color == '#ccc' ? 'white' : props.color)};
+	border-color: ${props =>
+		props.color == '#ccc'
+			? props.color == '#ccc' && props.flag == 0
+				? '#93D5FF'
+				: props.color == '#ccc' && props.flag == 1
+				? '#FF8B6D'
+				: '#B1E832'
+			: props.color};
+	border-width: 2px;
+	margin-bottom: 8px;
+	align-items: center;
+	justify-content: center;
+`;
+
+const HorizontalBar = styled.View<{a: number; nDay: number}>`
+	width: ${props => widthPercentage((30 + props.a * 2) * (props.nDay + 2))}px;
+	height: ${widthPercentage(2)}px;
+	background-color: ${colors.backgroundWhite};
+	position: absolute;
+	left: ${props => props.a}px;
+	top: ${widthPercentage(37.5)}px;
+`;
+const ArrowBox = styled.Pressable`
+	position: absolute;
+	top: 10px;
+	left: ${widthPercentage(344)}px;
+`;
+const FlexWrapScrollView = styled.ScrollView`
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: ${widthPercentage(369)}px;
+	height: ${widthPercentage(91)}px;
+`;
