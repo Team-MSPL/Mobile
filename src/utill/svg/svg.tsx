@@ -67,6 +67,9 @@ import TravleMedic from '../../../public/mou/travleMedic.svg';
 
 import Share1 from '../../../public/share1.svg';
 
+import AirPortIcon from '../../../public/airportIcon.svg';
+import AirPortIngIcon from '../../../public/airPortIng.svg';
+
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -260,5 +263,12 @@ export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
 	color: color;
 `;
 export const SvgShare1 = styled(Share1)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgAirPortIcon = styled(AirPortIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgAirPortIngIcon = styled(AirPortIngIcon)<{color?: string}>`
 	color: color;
 `;

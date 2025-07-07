@@ -15,7 +15,7 @@ import CustomMapView from '../../../utill/component/timetable/mapView';
 import moment from 'moment';
 import {styled} from 'styled-components/native';
 import {widthPercentage} from '../../../utill/layout/responsive-size';
-import {SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
+import {SvgCheck, SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
 
 export default function Planner({navigation}: any) {
 	const {travelName, region, cityIndex, country, day, nDay} = useAppSelector(state => state.travelSlice);
@@ -48,6 +48,34 @@ export default function Planner({navigation}: any) {
 	}, [travelName, region, country, cityIndex, nDay]);
 	const select = '';
 	const [popUpIsActive, setPopUpIsActive] = useState(false);
+	const [step, setStep] = useState(0);
+	const colorReturn = (nowIndex: number, step: number) => {
+		let color = colors.backgroundWhite;
+		if (nowIndex >= step) {
+			color = colors.backgroundWhite;
+		} else if (nowIndex == 0) {
+			color = colors.Blue1;
+		} else if (nowIndex == 1) {
+			color = colors.Pink1;
+		} else {
+			color = colors.Green4;
+		}
+
+		return color;
+	};
+	const radiusColorReturn = (nowIndex: number, step: number) => {
+		let color = colors.backgroundWhite;
+		if (nowIndex <= step) {
+			if (nowIndex == 0) {
+				color = colors.Blue1;
+			} else if (nowIndex == 1) {
+				color = colors.Pink1;
+			} else {
+				color = colors.Green4;
+			}
+		}
+		return color;
+	};
 	return (
 		<>
 			<StepPopUp
@@ -82,11 +110,14 @@ export default function Planner({navigation}: any) {
 													: widthPercentage(7)
 											}px`}>
 											<Circle
-												color={colors.backgroundWhite}
-												flag={idx}
+												color={colorReturn(idx, step)}
+												borderColor={radiusColorReturn(idx, step)}
 												onPress={() => {
+													setStep(idx);
 													// changeTouch(idx);
-												}}></Circle>
+												}}>
+												<SvgCheck color={colors.backgroundWhite}></SvgCheck>
+											</Circle>
 											<PretendardSemiBoldText
 												size={13}
 												lineHeight={18}
@@ -131,7 +162,7 @@ export default function Planner({navigation}: any) {
 				)}
 			</StepPopUp>
 			<CustomMapView select={select} onTouchStart={false} onTouchEnd={() => {}} />
-			<PlannerBottomSheet navigation={navigation} />
+			<PlannerBottomSheet navigation={navigation} step={step} setStep={setStep} />
 		</>
 	);
 }
@@ -151,20 +182,13 @@ const StepPopUp = styled.TouchableOpacity<{isActive: boolean}>`
 	justify-content: center;
 	align-self: center;
 `;
-const Circle = styled.TouchableOpacity<{color: string}>`
+const Circle = styled.TouchableOpacity<{color: string; borderColor: string}>`
 	width: ${widthPercentage(30)}px;
 	height: ${widthPercentage(30)}px;
 	border-radius: 99px;
 	background-color: ${props => (props.color == '#ccc' ? 'white' : props.color)};
-	border-color: ${props =>
-		props.color == '#ccc'
-			? props.color == '#ccc' && props.flag == 0
-				? '#93D5FF'
-				: props.color == '#ccc' && props.flag == 1
-				? '#FF8B6D'
-				: '#B1E832'
-			: props.color};
-	border-width: 2px;
+	border-color: ${props => props.borderColor};
+	border-width: 3px;
 	margin-bottom: 8px;
 	align-items: center;
 	justify-content: center;

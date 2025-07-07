@@ -21,18 +21,18 @@ export default function RouteButton({
 	};
 	const handleNext = () => {
 		btnFunction && btnFunction();
-		goNext ? goNext() : navigation.navigate(nextTitle);
+		goNext ? goNext() : !!nextTitle && navigation.navigate(nextTitle);
 	};
 	return (
 		<HStack
 			justifyContent='space-between'
 			style={{position: 'absolute', alignSelf: 'center', bottom: 10, width: widthPercentage(328)}}>
 			<ButtonContainer marginTop={marginTop ?? 0} marginBottom={marginBottom ?? 0} onPress={handleBack}>
-				<SVGRightAdd
+				{/* <SVGRightAdd
 					style={{position: 'absolute', left: widthPercentage(16)}}
 					color={colors.Primary}
 					transform={180}
-				/>
+				/> */}
 				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 					{leftText ?? '이전'}
 				</PretendardSemiBoldText>
@@ -45,7 +45,7 @@ export default function RouteButton({
 				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Primary}>
 					{nextText ?? '다음'}
 				</PretendardSemiBoldText>
-				<SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} />
+				{/* <SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} /> */}
 			</ButtonContainer>
 		</HStack>
 	);
@@ -55,7 +55,7 @@ type RouteButtonProps = {
 	marginBottom?: number;
 	marginTop?: number;
 	navigation: any;
-	nextTitle: string;
+	nextTitle?: string;
 	goNext?: () => void;
 	isDisabled?: boolean;
 	btnFunction?: () => void;
