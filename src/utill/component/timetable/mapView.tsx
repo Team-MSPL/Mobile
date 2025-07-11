@@ -19,8 +19,8 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			.fill(1)
 			.forEach((testItem, testIdx) => {
 				let markerElements: ReactElement[] = [];
-				timetable.forEach((value, index) => {
-					value.forEach((item, idx) => {
+				timetable?.forEach((value, index) => {
+					value?.forEach((item, idx) => {
 						if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
 							// 고유한 key 생성 (index와 item.lat, item.lng을 조합)
 							const markerKey = `marker_${index}_${item.lat}_${item.lng}`;
@@ -84,25 +84,33 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 		let positions: {latitude: number; longitude: number}[] = [];
 		let polylineElements: ReactElement[] = [];
 
-		timetable.forEach((value, index) => {
-			const polylineCoordinates = value
-				.map(item => {
-					if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
-						positions.push({latitude: item.lat, longitude: item.lng});
-						return {latitude: item.lat, longitude: item.lng};
-					}
-					return null;
-				})
-				.filter(item => item !== null);
+		timetable?.forEach((value, index) => {
+			value?.length == 0
+				? polylineElements.push([])
+				: () => {
+						const polylineCoordinates = value
+							?.map(item => {
+								if (
+									item.name !== '점심 추천' &&
+									item.name !== '저녁 추천' &&
+									item.name !== '숙소 추천'
+								) {
+									positions.push({latitude: item.lat, longitude: item.lng});
+									return {latitude: item.lat, longitude: item.lng};
+								}
+								return null;
+							})
+							?.filter(item => item !== null);
 
-			polylineElements.push(
-				<Polyline
-					key={`polyline_${index}`}
-					coordinates={polylineCoordinates}
-					strokeColor={index === select ? colors.PointYellow : colors.Gray5}
-					strokeWidth={Platform.isPad ? 5 : 2}
-				/>,
-			);
+						polylineElements.push(
+							<Polyline
+								key={`polyline_${index}`}
+								coordinates={polylineCoordinates}
+								strokeColor={index === select ? colors.PointYellow : colors.Gray5}
+								strokeWidth={Platform.isPad ? 5 : 2}
+							/>,
+						);
+				  };
 		});
 
 		const minLatitude = Math.min(...positions?.map(marker => marker.latitude));

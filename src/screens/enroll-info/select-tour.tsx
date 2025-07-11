@@ -4,15 +4,40 @@ import Stepper from '../../utill/component/enroll-info/stepper';
 import {BackgroundGray} from '../../utill/layout/layout';
 import TendencyButton from '../../utill/component/tendency-button';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../utill/component/route-button';
+import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import shortid from 'shortid';
 
 export default function RecommendSelectTour({navigation}: any) {
-	const {tendency, makeMode} = useAppSelector(state => state.travelSlice);
+	const {tendency, makeMode, accommodations, nDay} = useAppSelector(state => state.travelSlice);
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: false, item: item});
+	};
+	const dispatch = useAppDispatch();
+	const goNext = () => {
+		let data = Array.from({length: nDay + 1}, () => []);
+
+		accommodations.slice(1).forEach((item, index) => {
+			console.log(item?.name != '');
+			if (item?.name != '') {
+				console.log('qwe', data[index]);
+				data[index].push({
+					category: 4,
+					id: shortid(),
+					takenTime: 360,
+					x: 0,
+					y: 36,
+					lat: item.lat,
+					lng: item.lng,
+					name: item.name,
+				});
+			}
+		});
+		makeMode == 'planner' && dispatch(travelSliceActions.changeTimetable(data));
+		navigation.navigate(makeMode == 'planner' ? 'Planner' : 'SelectDistance');
 	};
 	return (
 		<BackgroundGray>
@@ -44,6 +69,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			<RouteButton
 				navigation={navigation}
 				nextTitle={makeMode == 'planner' ? 'Planner' : 'SelectDistance'}
+				goNext={goNext}
 				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}></RouteButton>
 		</BackgroundGray>
 	);

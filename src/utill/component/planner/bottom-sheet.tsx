@@ -12,7 +12,7 @@ import {LeftBar, RegistButton} from './components';
 import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
 import {SvgAirPort, SvgAirPortIcon, SvgAirPortIngIcon} from '../../svg/svg';
 function PlannerBottomSheet({navigation, step, setStep}: any) {
-	const {day, region, cityIndex, country, nDay} = useAppSelector(state => state.travelSlice);
+	const {day, region, cityIndex, country, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const sheetRef = useRef<BottomSheet>(null);
 	const [btnVisible, setBtnVisible] = useState(true);
 	// variables
@@ -144,9 +144,8 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 				<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black} deco='margin-bottom:10px;'>
 					어디서 머무시나요?
 				</PretendardSemiBoldText>
-				{Array(nDay + 1)
-					.fill('')
-					.map((item, index) => (
+				{timetable.map((item, index) => (
+					<VStack deco={`margin-top:${widthPercentage(32)}px;`}>
 						<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
 							<HStack gap={3}>
 								<LeftBar color={colors.Pink1} />
@@ -162,17 +161,48 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 							<RegistButton
 								color={colors.Pink1}
 								onPress={() => {
-									navigation.navigate('RegistTransit');
+									console.log(item);
+									navigation.navigate('TimetableAddPlace', {
+										x: index,
+										y: [],
+										status: 'accommodation',
+									});
 								}}>
 								<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
 									숙소 등록
 								</PretendardSemiBoldText>
 							</RegistButton>
 						</HStack>
-					))}
+						{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '') && (
+							<GrayBox>
+								<VStack width={widthPercentage(243)}>
+									<PretendardSemiBoldText
+										size={18}
+										lineHeight={22}
+										color={colors.Black}
+										numberOfLines={1}>
+										{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '')?.name}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText
+										size={13}
+										lineHeight={18}
+										color={colors.Black}
+										numberOfLines={1}>
+										{
+											item?.find(
+												acc => acc?.category === 4 && acc?.formatted_address?.trim() !== '',
+											)?.formatted_address
+										}
+									</PretendardSemiBoldText>
+								</VStack>
+							</GrayBox>
+						)}
+					</VStack>
+				))}
 			</>
 		);
 	};
+	const timeTableScreen = () => {};
 	return (
 		<>
 			<BottomSheet
@@ -228,5 +258,13 @@ const Dash = styled.View`
 	height: ${widthPercentage(1)}px;
 	border-width: 1px;
 	border-style: dashed;
+`;
+const GrayBox = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(72)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundGray};
+	margin-top: ${widthPercentage(17)}px;
+	padding: ${widthPercentage(15)}px ${widthPercentage(16)}px;
 `;
 export default memo(PlannerBottomSheet);

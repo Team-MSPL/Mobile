@@ -26,6 +26,7 @@ import SearchRecommend from '../screens/enroll-info/search-recommend';
 import RecommendSelectCountry from '../screens/enroll-info/select-country';
 import SelectCountry from '../screens/enroll-info/region-recommend/select-country';
 import SelectDeparture from '../screens/enroll-info/select-departure';
+import AccommodationDay from '../screens/timetable/accommodation-day';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -227,6 +228,13 @@ export default function TimetableStack() {
 				component={PresetDetail}
 				options={{
 					title: '일정 자세히 보기',
+				}}
+			/>
+			<Stack.Screen
+				name='AccommodationDay'
+				component={AccommodationDay}
+				options={{
+					title: '숙소 추가',
 				}}
 			/>
 		</Fragment>

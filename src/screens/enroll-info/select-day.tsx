@@ -30,6 +30,8 @@ export default function SelectDay({navigation}: any) {
 		freeTicket,
 		selectedDateFlag,
 		regionRecommendFlag,
+		makeMode,
+		nDay,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);

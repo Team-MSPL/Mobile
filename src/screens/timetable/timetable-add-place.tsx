@@ -93,9 +93,9 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		return true;
 	};
 	const viewRef = useRef({
-		...timetable[0][0],
-		endHours: Math.floor((((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) / 60),
-		endMinute: (((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) % 60,
+		...timetable[0]?.[0],
+		endHours: Math.floor((((timetable[0]?.[0]?.y ?? 0) + timetable[0]?.[0]?.takenTime / 30) * 30 + 360) / 60),
+		endMinute: (((timetable[0]?.[0]?.y ?? 0) + timetable[0]?.[0]?.takenTime / 30) * 30 + 360) % 60,
 		index: 0,
 		idx: 0,
 	});
@@ -162,7 +162,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			newY.current = timetable[route.params.x].findIndex(item => item?.y > newCurrentY);
 			let copy = [...timetable];
 			let xArrayCopy = [...copy[route.params.x]];
-			xArrayCopy.splice(newY.current == -1 ? timetable[route.params.x].length : newY.current, 0, updateItem);
+			xArrayCopy.splice(newY.current == -1 ? timetable[route.params.x]?.length : newY.current, 0, updateItem);
 			copy[route.params.x] = xArrayCopy;
 			dispatch(travelSliceActions.changeTimetable(copy));
 			navigation.goBack();
@@ -176,10 +176,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			let lat =
-				timetable[route.params.x].reduce((item, current) => item + current?.lat, 0) /
+				timetable[route.params.x]?.reduce((item, current) => item + current?.lat, 0) /
 				timetable[route.params.x].length;
 			let lng =
-				timetable[route.params.x].reduce((item, current) => item + current?.lng, 0) /
+				timetable[route.params.x]?.reduce((item, current) => item + current?.lng, 0) /
 				timetable[route.params.x].length;
 			const data = {
 				regionList: region,
@@ -396,7 +396,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
 								{getInfo.name}
 							</PretendardSemiBoldText>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2} numberOfLines={1}>
 								{getInfo.formatted_address}
 							</PretendardVariableText>
 						</VStack>
@@ -492,14 +492,31 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							</TimePickerContainer>
 						</>
 					)}
-
-					<PrimaryButton
-						label={route.params.status == 'travle' ? '여행지 추가' : '숙소 추가'}
-						width={widthPercentage(327)}
-						height={heightPercentage(60)}
-						onPress={route.params.status == 'travle' ? addTimetable : addAccommodation}
-						backgroundColor={colors.Primary}
-						textColor={colors.Gray5}></PrimaryButton>
+					{route.params.status == 'travle' ? (
+						<PrimaryButton
+							label={route.params.status == 'travle' ? '여행지 추가' : '숙소 추가'}
+							width={widthPercentage(327)}
+							height={heightPercentage(60)}
+							onPress={route.params.status == 'travle' ? addTimetable : addAccommodation}
+							backgroundColor={colors.Primary}
+							textColor={colors.Gray5}></PrimaryButton>
+					) : (
+						<HStack justifyContent='center' gap={5}>
+							<AccommodationButton>
+								<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+									예약하기
+								</PretendardSemiBoldText>
+							</AccommodationButton>
+							<AccommodationButton
+								onPress={() => {
+									navigation.navigate('AccommodationDay', {info: getInfo});
+								}}>
+								<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+									등록하기
+								</PretendardSemiBoldText>
+							</AccommodationButton>
+						</HStack>
+					)}
 				</BottomContainer>
 			) : (
 				<ButtonContainer>
@@ -531,3 +548,11 @@ const ElementContainer = styled.Pressable<{color: string}>`
 	height: ${heightPercentage(64)}px;
 `;
 const InsideScrollView = styled.ScrollView``;
+const AccommodationButton = styled.TouchableOpacity`
+	width: ${widthPercentage(76)}px;
+	height: ${widthPercentage(28)}px;
+	align-items: center;
+	justify-content: center;
+	background-color: ${colors.Primary};
+	border-radius: 8px;
+`;
