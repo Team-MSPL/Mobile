@@ -10,6 +10,8 @@ export const colors = {
 	Gray3: '#8B91AA',
 	Gray4: '#70768E',
 	Gray5: '#2E3240',
+	Gray200: '#EEEEEE',
+	Gray400: '#B0B3C2',
 	Black: '#000000',
 	Primary: '#C3F550',
 	PointYellow: '#5350FF',

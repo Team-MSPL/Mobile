@@ -59,7 +59,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 							<RegistButton
 								color={colors.Blue1}
 								onPress={() => {
-									navigation.navigate('RegistTransit');
+									navigation.navigate('ChoiceTransit');
 								}}>
 								<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
 									{item} 편 등록
@@ -202,7 +202,13 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 			</>
 		);
 	};
-	const timeTableScreen = () => {};
+	const timeTableScreen = () => {
+		return timetable[step - 2].map(item => (
+			<PretendardSemiBoldText size={13} lineHeight={18} color={colors.Black} numberOfLines={1}>
+				{item?.name}
+			</PretendardSemiBoldText>
+		));
+	};
 	return (
 		<>
 			<BottomSheet
@@ -215,7 +221,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 				<CustomBottomSheetScrollView
 					showsVerticalScrollIndicator={false}
 					style={{marginBottom: heightPercentage(100)}}>
-					{step == 0 ? transitScreen() : accommodationScreen()}
+					{step == 0 ? transitScreen() : step == 1 ? accommodationScreen() : timeTableScreen()}
 				</CustomBottomSheetScrollView>
 			</BottomSheet>
 			{btnVisible && (
@@ -223,6 +229,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 					navigation={navigation}
 					nextText='다음으로'
 					leftText='건너뛰기'
+					type={'planner'}
 					btnFunction={() => {
 						setStep(step + 1);
 					}}
@@ -234,16 +241,17 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 	);
 }
 const CustomBottomSheetScrollView = styled(BottomSheetScrollView)`
-	padding: 0px ${widthPercentage(20)}px;
+	padding: 0px ${widthPercentage(24)}px;
 `;
 const TransitBox = styled.View`
-	width: ${widthPercentage(333)}px;
+	width: ${widthPercentage(327)}px;
 	height: ${widthPercentage(203)}px;
 	border-radius: 12px;
 	border-width: 1px;
 	border-color: ${colors.Gray2};
 	padding: ${widthPercentage(17)}px ${widthPercentage(24)}px;
 	gap: ${widthPercentage(10)}px;
+	margin-bottom: ${widthPercentage(10)}px;
 `;
 const IconContainer = styled.View`
 	width: ${widthPercentage(28)}px;

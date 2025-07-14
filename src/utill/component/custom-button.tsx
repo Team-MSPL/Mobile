@@ -12,6 +12,7 @@ export default function CustomButton({
 	width,
 	divide,
 	textColor,
+	bgColor,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -19,6 +20,7 @@ export default function CustomButton({
 			marginBottom={marginBottom ?? 0}
 			disabled={isDisabled ?? false}
 			isDisabledOpacity={isDisabled ?? false}
+			bgColor={bgColor ?? undefined}
 			onPress={onPress}
 			width={width}
 			divide={divide}>
@@ -38,6 +40,7 @@ type CustomButtonProps = {
 	width?: number;
 	divide?: boolean;
 	textColor?: string;
+	bgColor?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{
@@ -46,6 +49,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	width?: number;
 	isDisabledOpacity: boolean;
 	divide?: boolean;
+	bgColor?: string;
 }>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
 	width: ${props => (props.divide ?? false ? widthPercentage(160) : props.width ?? widthPercentage(327))}px;
@@ -53,8 +57,8 @@ const ButtonContainer = styled.TouchableOpacity<{
 	align-items: center;
 	height: ${heightPercentage(60)}px;
 	justify-content: center;
-	border-radius: 17px;
-	background-color: ${colors.Gray5};
+	border-radius: 8px;
+	background-color: ${props => props.bgColor ?? colors.Gray5};
 	margin-top: ${props => heightPercentage(props.marginTop)}px;
 	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
 `;

@@ -85,32 +85,28 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 		let polylineElements: ReactElement[] = [];
 
 		timetable?.forEach((value, index) => {
-			value?.length == 0
-				? polylineElements.push([])
-				: () => {
-						const polylineCoordinates = value
-							?.map(item => {
-								if (
-									item.name !== '점심 추천' &&
-									item.name !== '저녁 추천' &&
-									item.name !== '숙소 추천'
-								) {
-									positions.push({latitude: item.lat, longitude: item.lng});
-									return {latitude: item.lat, longitude: item.lng};
-								}
-								return null;
-							})
-							?.filter(item => item !== null);
+			if (!value || value.length === 0) {
+				polylineElements.push([]);
+			} else {
+				const polylineCoordinates = value
+					.map(item => {
+						if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
+							positions.push({latitude: item.lat, longitude: item.lng});
+							return {latitude: item.lat, longitude: item.lng};
+						}
+						return null;
+					})
+					.filter(item => item !== null);
 
-						polylineElements.push(
-							<Polyline
-								key={`polyline_${index}`}
-								coordinates={polylineCoordinates}
-								strokeColor={index === select ? colors.PointYellow : colors.Gray5}
-								strokeWidth={Platform.isPad ? 5 : 2}
-							/>,
-						);
-				  };
+				polylineElements.push(
+					<Polyline
+						key={`polyline_${index}`}
+						coordinates={polylineCoordinates}
+						strokeColor={index === select ? colors.PointYellow : colors.Gray5}
+						strokeWidth={Platform.isPad ? 5 : 2}
+					/>,
+				);
+			}
 		});
 
 		const minLatitude = Math.min(...positions?.map(marker => marker.latitude));
@@ -122,7 +118,6 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 		const centerLongitude = (maxLongitude + minLongitude) / 2;
 		const deltaLatitude = maxLatitude - minLatitude;
 		const deltaLongitude = maxLongitude - minLongitude;
-
 		return {
 			polylines: polylineElements,
 			centerLatitude,

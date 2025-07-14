@@ -69,6 +69,10 @@ import Share1 from '../../../public/share1.svg';
 
 import AirPortIcon from '../../../public/airportIcon.svg';
 import AirPortIngIcon from '../../../public/airPortIng.svg';
+import TrainIcon from '../../../public/trainIcon.svg';
+
+import Clock from '../../../public/clock.svg';
+import CalendarIcon from '../../../public/calendarIcon.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -88,8 +92,9 @@ export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
 	color: color;
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
-export const SvgAirplain = styled(AirPlain)<{color?: string}>`
+export const SvgAirplain = styled(AirPlain)<{color?: string; transform?: number}>`
 	color: color;
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SvgCalendar = styled(Calendar)<{color?: string}>`
 	color: color;
@@ -270,5 +275,16 @@ export const SvgAirPortIcon = styled(AirPortIcon)<{color?: string}>`
 	color: color;
 `;
 export const SvgAirPortIngIcon = styled(AirPortIngIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgTrainIcon = styled(TrainIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGClock = styled(Clock)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgCalendarIcon = styled(CalendarIcon)<{color?: string}>`
 	color: color;
 `;

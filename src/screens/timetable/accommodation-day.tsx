@@ -52,7 +52,6 @@ export default function AccommodationDay({navigation, route}: any) {
 			if (moment(new Date(item)).isSame(selectStartDate)) startIndex = idx;
 			if (moment(new Date(item)).isSame(selectEndDate)) endIndex = idx;
 		});
-		console.log(startIndex, endIndex, moment(new Date(day[0])).isSame(selectStartDate), timetable);
 		let copyTimetable = [...timetable];
 		copyTimetable.forEach((item, index) => {
 			if (index >= startIndex && index <= endIndex) {

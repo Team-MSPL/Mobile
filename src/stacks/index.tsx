@@ -151,7 +151,7 @@ function TabBar() {
 					),
 				}}
 			/>
-			<Tab.Screen
+			{/* <Tab.Screen
 				name='Community'
 				component={CommunityMainScreen}
 				options={{
@@ -176,7 +176,7 @@ function TabBar() {
 						<SvgCommunity width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
 					),
 				}}
-			/>
+			/> */}
 			<Tab.Screen
 				name='More'
 				component={MoreInfo}

@@ -1,6 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
 import AddInPerson from '../screens/enroll-info/planner/add-in-person';
+import ChoiceTransit from '../screens/enroll-info/planner/choice-transit';
 import Passport from '../screens/enroll-info/planner/passport';
 import Planner from '../screens/enroll-info/planner/planner';
 import RegistTransit from '../screens/enroll-info/planner/regist-transit';
@@ -34,6 +35,13 @@ export default function PlannerStack() {
 				component={AddInPerson}
 				options={{
 					title: '',
+				}}
+			/>
+			<Stack.Screen
+				name='ChoiceTransit'
+				component={ChoiceTransit}
+				options={{
+					title: '교통 등록하기',
 				}}
 			/>
 		</Fragment>
