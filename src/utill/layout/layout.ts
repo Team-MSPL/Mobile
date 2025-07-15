@@ -50,7 +50,7 @@ export const FlexWrap = styled.Pressable<{
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin-top: ${props => props.marginBottom ?? 15}px;
+	margin-top: ${props => props.margintop ?? 15}px;
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
 	width: ${props => props.width ?? null}px;
@@ -112,7 +112,7 @@ export const BackgroundGray = styled.View<{
 	backgroundColor?: string;
 }>`
 	flex: 1;
-	background-color: ${props => props.backgroundColor || colors.backgroundGray};
+	background-color: ${props => props.backgroundColor || colors.backgroundWhite};
 	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
@@ -124,7 +124,7 @@ export const BackgroundGrayScrollView = styled.ScrollView<{
 	backgroundColor?: string;
 }>`
 	flex: 1;
-	background-color: ${props => props.backgroundColor || colors.backgroundGray};
+	background-color: ${props => props.backgroundColor || colors.backgroundWhite};
 	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;

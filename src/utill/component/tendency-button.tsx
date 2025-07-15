@@ -54,12 +54,12 @@ const ButtonContainer = styled.TouchableOpacity<{
 	marginBottom?: number;
 	width?: number;
 }>`
-	width: ${props => (props.divide ? props.width ?? 'null' : widthPercentage(327) + 'px')};
+	width: ${props => (props.divide ? props.width ?? widthPercentage(159) + 'px' : widthPercentage(327) + 'px')};
 	align-items: center;
 	height: ${heightPercentage(60)}px;
 	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(13) + 'px' : '0px')};
 	justify-content: center;
-	border-radius: 17px;
+	border-radius: 8px;
 	border-width: ${props => (props.select ? '1px' : '1px')};
 	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
 	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};

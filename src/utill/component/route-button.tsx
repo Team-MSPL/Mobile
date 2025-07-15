@@ -32,18 +32,15 @@ export default function RouteButton({
 				marginTop={marginTop ?? 0}
 				marginBottom={marginBottom ?? 0}
 				onPress={handleBack}
-				type={type ?? 'default'}
+				type={type ?? 'planner'}
 				before={true}>
 				{/* <SVGRightAdd
 					style={{position: 'absolute', left: widthPercentage(16)}}
 					color={colors.Primary}
 					transform={180}
 				/> */}
-				<PretendardSemiBoldText
-					size={18}
-					lineHeight={23.48}
-					color={type == 'planner' ? colors.Gray400 : colors.Primary}>
-					{leftText ?? '이전'}
+				<PretendardSemiBoldText size={18} lineHeight={23.48} color={colors.Gray400}>
+					{leftText ?? '이전으로'}
 				</PretendardSemiBoldText>
 			</ButtonContainer>
 			<ButtonContainer
@@ -56,8 +53,8 @@ export default function RouteButton({
 				<PretendardSemiBoldText
 					size={18}
 					lineHeight={23.48}
-					color={type == 'planner' ? colors.backgroundWhite : colors.Primary}>
-					{nextText ?? '다음'}
+					color={type == 'planner' ? colors.backgroundWhite : colors.Gray5}>
+					{nextText ?? '다음으로'}
 				</PretendardSemiBoldText>
 				{/* <SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} /> */}
 			</ButtonContainer>
@@ -92,7 +89,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	padding: 0px ${widthPercentage(20)}px;
 	border-radius: 8px;
 	background-color: ${props =>
-		props.type == 'planner' ? (props.before ? colors.Gray200 : colors.Gray5) : colors.Gray5};
+		props.type == 'planner' ? (props.before ? colors.Gray200 : colors.Gray5) : colors.Primary};
 	margin-top: ${props => heightPercentage(props.marginTop)}px;
 	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
 	flex-direction: row;

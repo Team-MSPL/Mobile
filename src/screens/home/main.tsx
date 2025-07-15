@@ -810,7 +810,7 @@ export const TagElement = styled.View<{opacityStatus: boolean; height?: number; 
 	height: ${props => props.height ?? widthPercentage(22)}px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${props => (props.opacityStatus ? 'rgba(235, 236, 242, 0.6)' : props.backgroundColor)};
+	background-color: ${props => (props.opacityStatus ? 'rgba(248, 249, 252, 0.4)' : props.backgroundColor)};
 	border-radius: 4px;
 	padding: 0px ${widthPercentage(6)}px;
 	margin: ${widthPercentage(2)}px;

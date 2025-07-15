@@ -7,6 +7,7 @@ import {useAppSelector} from '../../../redux';
 import {BackgroundGray} from '../../../utill/layout/layout';
 import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../../utill/component/route-button';
+import {SelectButtonsContainer} from './select-who';
 
 export default function SelectTour({navigation}: any) {
 	const {regionTendency} = useAppSelector(state => state.regionRecommendSlice);
@@ -23,7 +24,7 @@ export default function SelectTour({navigation}: any) {
 				styleText='2.여행 스타일을 알아볼게요.'
 				mainText='어디를 가고 싶으신가요?'
 				subText='* 중복 선택 가능'></StepText>
-			<ButtonsContainer>
+			<SelectButtonsContainer>
 				{regionTendencyList[3].list.map((item, idx) => (
 					<TendencyButton
 						marginBottom={0}
@@ -36,7 +37,7 @@ export default function SelectTour({navigation}: any) {
 							handleSelect(idx);
 						}}></TendencyButton>
 				))}
-			</ButtonsContainer>
+			</SelectButtonsContainer>
 			<RouteButton
 				navigation={navigation}
 				nextTitle={'RegionSelectPopularity'}
@@ -45,12 +46,3 @@ export default function SelectTour({navigation}: any) {
 		</BackgroundGray>
 	);
 }
-const ButtonsContainer = styled.View`
-	flex: 1;
-	justify-content: center;
-	flex-direction: row;
-	flex-wrap: wrap;
-	align-items: center;
-	margin-top: ${heightPercentage(155)}px;
-	gap: ${widthPercentage(10)}px;
-`;

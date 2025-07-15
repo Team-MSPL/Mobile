@@ -4,7 +4,7 @@ import Stepper from '../../../utill/component/enroll-info/stepper';
 import TendencyButton from '../../../utill/component/tendency-button';
 import {useAppSelector} from '../../../redux';
 import {BackgroundGray} from '../../../utill/layout/layout';
-import {heightPercentage} from '../../../utill/layout/responsive-size';
+import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../../utill/component/route-button';
 
@@ -28,6 +28,7 @@ export default function SelectWho({navigation}: any) {
 						bgColor={regionTendency[0][idx] == 1}
 						label={item}
 						key={idx}
+						divide={true}
 						imageUrl={regionTendencyList[0]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);
@@ -40,6 +41,10 @@ export default function SelectWho({navigation}: any) {
 }
 export const SelectButtonsContainer = styled.View`
 	flex: 1;
-	justify-content: flex-end;
-	margin-bottom: ${heightPercentage(60)}px;
+	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	margin-top: ${heightPercentage(134)}px;
+	gap: ${widthPercentage(8)}px;
 `;

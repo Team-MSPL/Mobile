@@ -28,4 +28,5 @@ export const colors = {
 	Pink1: '#FF8B6D',
 	Blue1: '#93D5FF',
 	PlannerGray: '#BDBDBD',
+	Title: '#74788E',
 };

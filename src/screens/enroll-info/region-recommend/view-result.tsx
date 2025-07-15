@@ -9,6 +9,7 @@ import {
 	PretendardSemiBold,
 	PretendardSemiBoldText,
 	PretendardVariableText,
+	VStack,
 } from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
@@ -20,6 +21,7 @@ import {TagElement} from '../../home/main';
 import {useBackHandler} from '../../../utill/hooks/useBackhandler';
 import {GraientBackground} from '../hiking-recommend/view-result';
 import {logEvent} from '../../../../firebaseAnalytice';
+import LinearGradient from 'react-native-linear-gradient';
 export default function ViewResult({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -85,19 +87,19 @@ export default function ViewResult({navigation}: any) {
 					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
 					subText='여행 성향을 기반으로 추천된 여행지에요!'
 				/>
-				<SvgContainer>
+				{/* <SvgContainer>
 					<SVGRegionRecommend
 						transform={true}
 						width={widthPercentage(200)}
 						height={heightPercentage(150)}></SVGRegionRecommend>
-				</SvgContainer>
+				</SvgContainer> */}
 				<RecommendBorderContainer>
 					{recommendList.map((item, idx) => (
 						<Fragment key={idx}>
 							{(item.takenDay != recommendList[idx - 1]?.takenDay ?? 0) && (
 								<DayRecommendContainer>
 									<HStack>
-										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.PointGreen1}>
+										<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.PointYellow}>
 											{item.takenDay == 0
 												? '당일치기'
 												: item.takenDay + '박 ' + (item.takenDay + 1) + '일 '}
@@ -124,46 +126,68 @@ export default function ViewResult({navigation}: any) {
 											<SvgLoginLogo color={'white'} width={widthPercentage(40)} />
 										</LogoCOntainer>
 									)}
-									<GraientBackground>
-										<RegionText>{item.name}</RegionText>
-										<TagContainer>
-											{item.tendency.slice(0, 5).map((value, index) => (
-												<View
-													key={index}
-													style={{
-														flexDirection: 'row',
-														alignItems: 'center',
-														justifyContent: 'center',
-													}}>
-													<TagElement opacityStatus={true}>
-														<HStack>
-															<PretendardVariableText
-																size={12}
-																lineHeight={14}
-																color={colors.Primary}>
-																{'# '}
-															</PretendardVariableText>
-															<PretendardVariableText
-																size={12}
-																lineHeight={14}
-																color={colors.backgroundWhite}>
-																{value}
-															</PretendardVariableText>
-														</HStack>
-													</TagElement>
-													{index == (windowWidth > 800 ? 2 : 1) &&
-														item.tendency.length > 5 && (
+									<LinearGradient
+										start={{x: 0, y: 0}}
+										end={{x: 0, y: 1}}
+										colors={['rgba(255,255,255,0)', 'black']}
+										style={{
+											zIndex: 101,
+											position: 'absolute',
+											width: '100%',
+											paddingHorizontal: widthPercentage(24),
+											paddingBottom: widthPercentage(25),
+											height: '100%',
+											alignItems: 'flex-end',
+											justifyContent: 'flex-end',
+											borderRadius: 12,
+										}}>
+										<VStack>
+											<PretendardSemiBoldText
+												size={22}
+												lineHeight={25}
+												color={colors.backgroundWhite}
+												deco={'text-align:right;'}>
+												{item.name}
+											</PretendardSemiBoldText>
+											<TagContainer>
+												{item.tendency.slice(0, 5).map((value, index) => (
+													<View
+														key={index}
+														style={{
+															flexDirection: 'row',
+															alignItems: 'center',
+															justifyContent: 'center',
+															maxWidth: index < 3 ? '34%' : '50%',
+														}}>
+														<TagElement opacityStatus={true}>
+															<HStack>
+																<PretendardVariableText
+																	size={12}
+																	lineHeight={14}
+																	color={colors.Primary}>
+																	{'# '}
+																</PretendardVariableText>
+																<PretendardVariableText
+																	size={12}
+																	lineHeight={14}
+																	color={colors.backgroundWhite}>
+																	{value}
+																</PretendardVariableText>
+															</HStack>
+														</TagElement>
+														{index == 4 && item.tendency.length > 5 && (
 															<PretendardSemiBoldText
-																size={15}
+																size={13}
 																lineHeight={21}
 																color={colors.Primary}>
 																+{item.tendency.length - 5}
 															</PretendardSemiBoldText>
 														)}
-												</View>
-											))}
-										</TagContainer>
-									</GraientBackground>
+													</View>
+												))}
+											</TagContainer>
+										</VStack>
+									</LinearGradient>
 								</ImageContainer>
 							</RecommendContainer>
 						</Fragment>
@@ -215,13 +239,10 @@ const RegionText = styled(PretendardSemiBold)`
 	left: ${widthPercentage(10)}px;
 `;
 const TagContainer = styled.View`
-	position: absolute;
-	width: 60%;
-	height: ${widthPercentage(200)}px;
+	width: 80%;
+	height: ${widthPercentage(40)}px;
 	flex-direction: row;
-	flex-wrap: wrap-reverse;
-	right: ${widthPercentage(17.8)}px;
-	bottom: ${heightPercentage(19)}px;
+	flex-wrap: wrap;
 	justify-content: flex-end;
 `;
 const LogoCOntainer = styled.View`

@@ -146,7 +146,7 @@ export default function DetailResult({navigation, route}: any) {
 					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Gray5}>
 						{route.params.item.name}
 					</PretendardSemiBoldText>
-					<Divider color={colors.Gray2} height={0.5}></Divider>
+					<Divider color={colors.Gray200} height={0.5}></Divider>
 					<TagContainer>
 						{route.params.item.tendency.map((tendency, index) => (
 							<TagElement
@@ -169,8 +169,8 @@ export default function DetailResult({navigation, route}: any) {
 					<StepText
 						mainText='인기 관광지 Top 5'
 						subText='해당 지역의 인기 관광지를 확인하세요'
-						mainTextSize={18}
-						subTextSize={12}
+						mainTextSize={20}
+						subTextSize={16}
 						marginLeft={0}
 						marginTop={0}
 						marginBottom={14}

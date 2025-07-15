@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
-import {Modal, TouchableOpacity} from 'react-native';
+import {Modal, Platform, TouchableOpacity} from 'react-native';
+import CalendarPicker from 'react-native-calendar-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import {styled} from 'styled-components/native';
 import {colors} from '../../../utill/colors';
@@ -19,6 +20,10 @@ export default function RegistTransit({navigation, route}: any) {
 			headerTitle: route.params.title == 'train' ? '승차권 등록하기' : '항공권 등록하기',
 		});
 	}, [route]);
+
+	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+
 	const [select, setSelect] = useState('outbound');
 	const [show, setShow] = useState(false);
 	const [transportInfo, setTransportInfo] = useState({
@@ -48,6 +53,7 @@ export default function RegistTransit({navigation, route}: any) {
 			},
 		}));
 	};
+	const allowedDates = ['2025-07-20', '2025-07-25', '2025-08-01'];
 	return (
 		<BackgroundGrayScrollView backgroundColor={colors.backgroundWhite}>
 			<HStack gap={widthPercentage(30)} justifyContent='center' marginVertical={widthPercentage(30)}>
@@ -155,7 +161,37 @@ export default function RegistTransit({navigation, route}: any) {
 				}}>
 				<ModalBackground onPress={() => setShow(false)}>
 					<ModalBottomSheet>
-						<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
+						<CalendarPicker
+							width={widthPercentage(Platform.isPad ? 300 : 375)}
+							weekdays={weekdays}
+							months={months}
+							minDate={new Date('2025-07-01')}
+							maxDate={new Date('2025-08-10')}
+							disabledDates={date => {
+								return !allowedDates.includes(date.format('YYYY-MM-DD'));
+							}}
+							startFromMonday={false}
+							onDateChange={() => {}}
+							showDayStragglers={false}
+							allowRangeSelection={true}
+							selectedRangeStartStyle={{backgroundColor: colors.Primary}}
+							selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
+							selectedRangeEndStyle={{backgroundColor: colors.Primary}}
+							selectedDayColor={colors.Primary}
+							// selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
+							// selectedEndDate={
+							// 	(selectedDateFlag || freeTicket) && selectEndDate != null
+							// 		? selectEndDate.toDate()
+							// 		: undefined
+							// }
+							previousTitle='이전'
+							nextTitle='다음'
+							previousTitleStyle={{color: 'black'}}
+							nextTitleStyle={{color: 'black'}}
+							allowBackwardRangeSelect={true}
+							selectYearTitle='년도 선택'
+						/>
+						{/* <PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
 							오전 9:00
 						</PretendardSemiBoldText>
 						<TimePickerModal
@@ -164,7 +200,7 @@ export default function RegistTransit({navigation, route}: any) {
 							onConfirm={({ampm, hour, minute}) => {
 								console.log(`${ampm} ${hour}:${minute}`);
 							}}
-						/>
+						/> */}
 						<RouteButton
 							navigation={navigation}
 							type={'planner'}

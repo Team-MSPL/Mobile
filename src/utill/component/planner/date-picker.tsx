@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {Modal, FlatList, View, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
 import styled from 'styled-components/native';
 
@@ -34,6 +34,13 @@ export default function TimePickerModal({visible, onClose, onConfirm}) {
 		hour: hours[hourIndex],
 		minute: minutes[minuteIndex],
 	});
+	useEffect(() => {
+		if (visible) {
+			flatListRef.hour.current?.scrollToOffset({offset: hourIndex * ITEM_HEIGHT, animated: false});
+			flatListRef.minute.current?.scrollToOffset({offset: minuteIndex * ITEM_HEIGHT, animated: false});
+			flatListRef.ampm.current?.scrollToOffset({offset: ampmIndex * ITEM_HEIGHT, animated: false});
+		}
+	}, [visible]);
 
 	return (
 		<PickerContainer>
@@ -121,7 +128,7 @@ const PickerItem = styled.Pressable<{height: number}>`
 `;
 
 const PickerText = styled.Text<{selected: boolean}>`
-	font-size: ${({selected}) => (selected ? '22px' : '18px')};
+	font-size: ${({selected}) => (selected ? '32px' : '28px')};
 	color: ${({selected}) => (selected ? '#000' : '#aaa')};
 	font-weight: ${({selected}) => (selected ? 'bold' : 'normal')};
 `;
