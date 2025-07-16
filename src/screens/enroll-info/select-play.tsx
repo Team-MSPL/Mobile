@@ -43,10 +43,10 @@ export default function RecommendSelectPlay({navigation}: any) {
 }
 const ButtonsContainer = styled.View`
 	flex: 1;
-	align-content: flex-end;
 	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
-	gap: ${widthPercentage(10)}px;
-	margin-bottom: ${heightPercentage(70)}px;
+	align-items: center;
+	margin-top: ${heightPercentage(134)}px;
+	gap: ${widthPercentage(8)}px;
 `;

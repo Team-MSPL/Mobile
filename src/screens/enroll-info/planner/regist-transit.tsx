@@ -224,14 +224,14 @@ const InputBox = styled.TextInput`
 	color: ${colors.Black};
 `;
 const TouchableHstack = styled(HStack).attrs({as: TouchableOpacity})``;
-const ModalBackground = styled.Pressable`
+export const ModalBackground = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.4);
 	align-item: center;
 	justify-content: flex-end;
 `;
-const ModalBottomSheet = styled.Pressable`
-	flex: 0.6;
+export const ModalBottomSheet = styled.Pressable<{flex?: number}>`
+	flex: ${props => props.flex ?? '0.6'};
 	background-color: ${colors.backgroundWhite};
 	border-top-right-radius: 30px;
 	border-top-left-radius: 30px;

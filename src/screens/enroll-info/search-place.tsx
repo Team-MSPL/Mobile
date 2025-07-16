@@ -14,13 +14,14 @@ import {
 	PretendardVariableText,
 	VStack,
 } from '../../utill/layout/layout';
-import {Keyboard, Pressable, TouchableOpacity} from 'react-native';
-import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
+import {Keyboard, Modal, Pressable, TouchableOpacity} from 'react-native';
+import {SVGMinus, SVGPlus, SvgLoginLogo, SVGSearch, SvgCancel} from '../../utill/svg/svg';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
 export default function SearchPlace({navigation, route}: any) {
 	const [select, setSelect] = useState(false);
 	const dispatch = useAppDispatch();
@@ -119,6 +120,7 @@ export default function SearchPlace({navigation, route}: any) {
 			if (accommodations.slice(1, accommodations.length - 1).filter(item => item.name == '').length == 1) {
 				addPlace();
 			} else {
+				setPlaceState(null);
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '나머지 날들도 같은 숙소 추가하겠습니까?',
@@ -180,17 +182,26 @@ export default function SearchPlace({navigation, route}: any) {
 						language: 'ko',
 					}}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
+					renderLeftButton={() => <SVGSearch color={route.params.id == 0 ? colors.Primary : colors.Pink1} />}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {
 							width: widthPercentage(327),
-							height: heightPercentage(52),
-							borderRadius: 8,
+							height: widthPercentage(52),
+							borderRadius: 99,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
+							borderWidth: 2,
+							marginTop: 10,
+							borderColor: route.params.id == 0 ? colors.Primary : colors.Pink1,
+							paddingLeft: 20,
 						},
-						listView: {width: widthPercentage(327)},
-						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+						listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
+						textInput: {
+							color: 'black',
+							backgroundColor: colors.backgroundWhite,
+							flex: 0.9,
+						},
 						description: {color: 'black'},
 					}}
 					fetchDetails={true}
@@ -224,88 +235,98 @@ export default function SearchPlace({navigation, route}: any) {
 					onFail={error => console.log(error)}
 					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 			</SearchContainer>
-			{placeState ? (
-				<BottomContainer height={route.params.id == 0 ? heightPercentage(230) : heightPercentage(182)}>
-					<ElementContainer color={colors.backgroundGray}>
-						<VStack width={widthPercentage(243)}>
-							<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
-								{placeState.name}
-							</PretendardSemiBoldText>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-								{placeState.formatted_address}
-							</PretendardVariableText>
-						</VStack>
-						<DeleteContainer
-							onPress={() => {
-								setPlaceState(null);
-								clearInput();
-							}}>
-							<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
-								취소
-							</PretendardSemiBoldText>
-						</DeleteContainer>
-					</ElementContainer>
-					{route.params.id == 0 && (
-						<HStack justifyContent='space-around'>
-							<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={24}>
-								머무를 시간
-							</PretendardSemiBoldText>
-							<HStack justifyContent='space-around' width={widthPercentage(182)}>
-								<SVGContainer
-									disabled={timeValue < 1}
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={placeState?.name != undefined}
+				onRequestClose={() => {
+					// setShow(false);
+				}}>
+				<ModalBackground
+					onPress={() => {
+						setPlaceState(null);
+						clearInput();
+					}}>
+					<ModalBottomSheet flex={0.4}>
+						<BottomContainer
+							height={route.params.id == 0 ? heightPercentage(230) : heightPercentage(182)}
+							gap={20}>
+							<ElementContainer color={colors.backgroundGray}>
+								<VStack width={widthPercentage(243)}>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+										{placeState?.name}
+									</PretendardSemiBoldText>
+									<PretendardVariableText
+										size={12}
+										lineHeight={18}
+										color={colors.Gray2}
+										numberOfLines={1}>
+										{placeState?.formatted_address}
+									</PretendardVariableText>
+								</VStack>
+								<DeleteBox
 									onPress={() => {
-										setTimeValue(timeValue - 1);
-									}}
-									color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue >= 1 && (
-										<SVGMinus
-											width={widthPercentage(14)}
-											height={widthPercentage(4)}
-											color={colors.Gray2}
-										/>
-									)}
-								</SVGContainer>
+										setPlaceState(null);
+										clearInput();
+									}}>
+									<SvgCancel width={widthPercentage(12)} height={widthPercentage(12)} color='black' />
+									{/* <PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
+										취소
+									</PretendardSemiBoldText> */}
+								</DeleteBox>
+							</ElementContainer>
+							{route.params.id == 0 && (
+								<HStack justifyContent='space-around'>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={24}>
+										머무를 시간
+									</PretendardSemiBoldText>
+									<HStack justifyContent='space-around' width={widthPercentage(182)}>
+										<SVGContainer
+											disabled={timeValue < 1}
+											onPress={() => {
+												setTimeValue(timeValue - 1);
+											}}
+											color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
+											{timeValue >= 1 && (
+												<SVGMinus
+													width={widthPercentage(23)}
+													height={widthPercentage(23)}
+													color={colors.Gray2}
+												/>
+											)}
+										</SVGContainer>
 
-								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
-									{timeValue + 1}시간
-								</PretendardSemiBoldText>
-								<SVGContainer
-									disabled={timeValue > 1}
-									onPress={() => {
-										setTimeValue(timeValue + 1);
-									}}
-									color={timeValue > 1 ? colors.backgroundWhite : colors.Gray1}>
-									{timeValue <= 1 && (
-										<SVGPlus
-											width={widthPercentage(16)}
-											height={widthPercentage(16)}
-											color={colors.Gray2}
-										/>
-									)}
-								</SVGContainer>
-							</HStack>
-						</HStack>
-					)}
-					<PrimaryButton
-						label={SearchList[route.params.id].subTitle}
-						width={widthPercentage(327)}
-						height={heightPercentage(60)}
-						onPress={handleCheck}
-						backgroundColor={colors.Primary}
-						textColor={colors.Gray5}></PrimaryButton>
-				</BottomContainer>
-			) : (
-				<ButtonContainer>
-					<PrimaryButton
-						disabled={!placeState}
-						label={SearchList[route.params.id].subTitle}
-						width={widthPercentage(327)}
-						height={heightPercentage(60)}
-						onPress={() => {}}
-						backgroundColor={colors.Gray1}
-						textColor={colors.Gray4}></PrimaryButton>
-				</ButtonContainer>
-			)}
+										<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={21.6}>
+											{timeValue + 1}시간
+										</PretendardSemiBoldText>
+										<SVGContainer
+											disabled={timeValue > 1}
+											onPress={() => {
+												setTimeValue(timeValue + 1);
+											}}
+											color={timeValue > 1 ? colors.backgroundWhite : colors.Gray5}>
+											{timeValue <= 1 && (
+												<SVGPlus
+													width={widthPercentage(25)}
+													height={widthPercentage(25)}
+													color={colors.Primary}
+												/>
+											)}
+										</SVGContainer>
+									</HStack>
+								</HStack>
+							)}
+							<PrimaryButton
+								label={SearchList[route.params.id].subTitle}
+								width={widthPercentage(327)}
+								height={heightPercentage(60)}
+								onPress={handleCheck}
+								backgroundColor={colors.Gray5}
+								textColor={colors.backgroundWhite}></PrimaryButton>
+						</BottomContainer>
+					</ModalBottomSheet>
+				</ModalBackground>
+			</Modal>
 		</SearchPlaceContainer>
 	);
 }
@@ -349,9 +370,7 @@ export const SearchClearContainer = styled.View`
 	margin: 0px 10px 0px 0px;
 	width: 20%;
 `;
-const ButtonContainer = styled.View`
-	flex: 1;
-	align-items: center;
-	justify-content: flex-end;
-	padding-bottom: 10px;
+const DeleteBox = styled.TouchableOpacity`
+	width: ${widthPercentage(20)}px;
+	height: ${widthPercentage(20)}px;
 `;

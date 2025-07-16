@@ -70,8 +70,10 @@ export default function EnrollTravelTitle({navigation}: any) {
 			<ButtonContainer>
 				<CustomButton
 					marginBottom={12}
+					bgColor={colors.Primary}
+					textColor={colors.Gray5}
 					isDisabled={textValue == '' || textValue.startsWith(' ')}
-					label='다음'
+					label='다음으로'
 					onPress={goNext}
 				/>
 			</ButtonContainer>

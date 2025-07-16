@@ -13,7 +13,7 @@ export default function Stepper({total, now}: {total: number; now: number}) {
 const StepperBar = styled.View`
 	width: ${widthPercentage(343)}px;
 	height: ${heightPercentage(10)}px;
-	background-color: ${colors.Gray1};
+	background-color: ${colors.Gray200};
 	align-items: start;
 	border-radius: 6px;
 	align-self: center;

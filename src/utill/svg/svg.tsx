@@ -73,6 +73,7 @@ import TrainIcon from '../../../public/trainIcon.svg';
 
 import Clock from '../../../public/clock.svg';
 import CalendarIcon from '../../../public/calendarIcon.svg';
+import TripleDot from '../../../public/tripleDot.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -221,7 +222,7 @@ export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
 	color: color;
 `;
 export const SVGSearch = styled(Search)<{color?: string}>`
-	color: color;
+	color: ${props => props.color ?? '#B1B6CC'};
 `;
 export const SvgGuest = styled(GuestLogo)<{color?: string}>`
 	color: color;
@@ -286,5 +287,8 @@ export const SVGClock = styled(Clock)<{color?: string}>`
 `;
 
 export const SvgCalendarIcon = styled(CalendarIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgTripleDot = styled(TripleDot)<{color?: string}>`
 	color: color;
 `;

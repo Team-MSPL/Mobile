@@ -81,6 +81,6 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
-	margin-top: ${heightPercentage(155)}px;
-	gap: ${widthPercentage(10)}px;
+	margin-top: ${heightPercentage(134)}px;
+	gap: ${widthPercentage(8)}px;
 `;

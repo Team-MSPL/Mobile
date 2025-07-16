@@ -16,6 +16,7 @@ export default function PrimaryButton({
 	textSize,
 	lineHeight,
 	onLongPress,
+	deco,
 }: PrimarybuttonType) {
 	return (
 		<PrimaryButtonContainer
@@ -28,7 +29,8 @@ export default function PrimaryButton({
 			marginBottom={marginBottom ?? 0}
 			marginTop={marginTop ?? 0}
 			disabled={disabled ?? false}
-			disabledStatus={disabled ?? false}>
+			disabledStatus={disabled ?? false}
+			deco={deco}>
 			<PretendardSemiBoldText size={textSize ?? 14} lineHeight={lineHeight ?? 21} color={textColor}>
 				{label}
 			</PretendardSemiBoldText>
@@ -44,6 +46,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	marginBottom?: number;
 	marginTop?: number;
 	disabledStatus: boolean;
+	deco?: string;
 }>`
 	width: ${props => props.width}px;
 	height: ${props => props.height}px;
@@ -55,6 +58,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity<{
 	margin-bottom: ${props => widthPercentage(props?.marginBottom ?? 0)}px;
 	margin-top: ${props => widthPercentage(props?.marginTop ?? 0)}px;
 	opacity: ${props => (props.disabledStatus ? 0.4 : 1)};
+	${props => props.deco}
 `;
 
 interface PrimarybuttonType {
@@ -71,4 +75,5 @@ interface PrimarybuttonType {
 	lineHeight?: number;
 	marginTop?: number;
 	onLongPress?: () => void;
+	deco?: string;
 }

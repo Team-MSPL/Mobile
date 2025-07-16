@@ -29,4 +29,5 @@ export const colors = {
 	Blue1: '#93D5FF',
 	PlannerGray: '#BDBDBD',
 	Title: '#74788E',
+	PrimarySecondary: '#F2FFD4',
 };

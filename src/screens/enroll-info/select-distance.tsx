@@ -14,6 +14,7 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {logEvent} from '../../../firebaseAnalytice';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import RouteButton from '../../utill/component/route-button';
 export default function SelectDistance({navigation, setViewComponent}: any) {
 	const {distance, region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
@@ -100,9 +101,10 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 					}}
 				/>
 			</DistanceCenter>
-			<ButtonContainer>
+			<RouteButton navigation={navigation} nextTitle={'FinalCheck'} goNext={goNext}></RouteButton>
+			{/* <ButtonContainer>
 				<CustomButton label='맞춤형 여행 코스를 확인해볼게요!' onPress={goNext}></CustomButton>
-			</ButtonContainer>
+			</ButtonContainer> */}
 		</BackgroundGray>
 	);
 }
@@ -120,6 +122,8 @@ export const Qwe = styled.View`
 	position: absolute;
 	align-items: center;
 	justify-content: center;
+	border-radius: 8px;
+	overflow: hidden;
 `;
 export const DistanceSpace = styled.View`
 	width: 95%;

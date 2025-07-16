@@ -332,7 +332,7 @@ const ButtonContainer = styled.View`
 	margin-bottom: 2px;
 `;
 export const RegionTextInput = styled.TextInput`
-	width: ${widthPercentage(327)}px;
+	width: ${widthPercentage(287)}px;
 	height: ${heightPercentage(50)}px;
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
@@ -342,8 +342,10 @@ export const RegionTextInputContainer = styled.View`
 	flex-direction: row;
 	align-items: center;
 	background-color: ${colors.backgroundWhite};
-	border-radius: 10px;
+	border-radius: 22px;
 	padding-horizontal: ${widthPercentage(10)}px;
+	border-width: 2px;
+	border-color: ${colors.Primary};
 `;
 export const SearchContainer = styled.View<{top?: number}>`
 	position: absolute;

@@ -14,6 +14,7 @@ export default function TendencyButton({
 	imageSvg,
 	width,
 	disabled,
+	textSize,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -23,7 +24,10 @@ export default function TendencyButton({
 			marginBottom={marginBottom}
 			disabled={disabled}
 			width={width}>
-			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
+			<PretendardSemiBoldText
+				size={textSize ?? 16}
+				lineHeight={(textSize ?? 15.09) + 4}
+				color={bgColor ? colors.Gray5 : colors.Gray4}>
 				{label}
 			</PretendardSemiBoldText>
 			{imageUrl && (
@@ -47,6 +51,7 @@ type CustomButtonProps = {
 	width?: number;
 	imageSvg?: any;
 	disabled?: boolean;
+	textSize?: number;
 };
 const ButtonContainer = styled.TouchableOpacity<{
 	select: boolean;

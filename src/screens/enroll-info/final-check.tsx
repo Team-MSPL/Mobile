@@ -16,7 +16,17 @@ import {
 } from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {SVGFall, SVGFlag, SVGPlus, SVGSpring, SVGSummer, SVGWinter, SvgCancel} from '../../utill/svg/svg';
+import {
+	SVGFall,
+	SVGFlag,
+	SVGPlus,
+	SVGSpring,
+	SVGSummer,
+	SVGWinter,
+	SvgCancel,
+	SvgTripleDot,
+	SVGMinus,
+} from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
 import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer, SVGContainer} from './select-multi';
@@ -31,6 +41,10 @@ import {SelectButtonsContainer} from './region-recommend/select-who';
 import {userSliceActions} from '../../redux/user/user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import LinearGradient from 'react-native-linear-gradient';
+import PrimaryButton from '../../utill/component/primary-button';
+import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
+import {BottomContainer} from './search-place';
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
 	const {
@@ -313,61 +327,199 @@ export default function FinalCheck({navigation}: any) {
 	const goSearchPlace = (data: {idx: number; index: number}) => {
 		navigation.navigate('SearchPlace', {id: data.index, idx: data.idx});
 	};
+	const modifyEssential = (e: EssentialPlaceType) => {
+		let copy = [...essentialPlaces];
+		const updatedPlaces = copy.map(item => (item.id == e.id ? {...item, takenTime: (timeValue + 1) * 60} : item));
+		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
+		setModify(false);
+	};
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+	const [timeValue, setTimeValue] = useState(0);
+	const [modify, setModify] = useState(false);
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<>
-			<BackgroundGray>
+			<BackgroundGray backgroundColor={colors.backgroundWhite}>
 				<MainContainer showsVerticalScrollIndicator={false}>
-					<HStack justifyContent='space-between' marginVertical={heightPercentage(10)}>
-						<RegionImage source={{uri: regionInfo.photo}} />
-						<VStack>
-							<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-								{day[0].format('YY-MM-DD') + ' - ' + day[nDay].format('YY-MM-DD')}
-							</PretendardVariableText>
-							<HStack gap={widthPercentage(5)}>
-								<PretendardSemiBoldText
-									size={20}
-									lineHeight={27}
-									color={colors.Gray5}
-									width={widthPercentage(150)}>
-									{cityViewList[country][cityIndex].title + ' ' + region}
-									<SVGFlag
-										width={widthPercentage(20)}
-										height={widthPercentage(20)}
-										style={{marginLeft: widthPercentage(8)}}
-										color='#DDF2FE'
-									/>
-								</PretendardSemiBoldText>
+					<ImageContainer>
+						<BackgroundImage resizeMode='stretch' source={{uri: regionInfo.photo}}></BackgroundImage>
+						<LinearGradient
+							start={{x: 0, y: 0}}
+							end={{x: 0, y: 1}}
+							colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.5)']}
+							style={{
+								zIndex: 101,
+								position: 'absolute',
+								width: '100%',
+								paddingHorizontal: widthPercentage(24),
+								paddingVertical: widthPercentage(20),
+								justifyContent: 'space-between',
+								height: '100%',
+								borderRadius: 12,
+							}}>
+							<VStack>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.backgroundWhite}>
+									{day[0].format('YY.MM.DD') + ' - ' + day[nDay].format('YY.MM.DD')}
+								</PretendardVariableText>
+								<HStack gap={widthPercentage(5)}>
+									<PretendardSemiBoldText
+										size={26}
+										lineHeight={30}
+										color={colors.backgroundWhite}
+										width={widthPercentage(150)}>
+										{cityViewList[country][cityIndex].title + ' ' + region}
+									</PretendardSemiBoldText>
+								</HStack>
+							</VStack>
+							<WhoContainer>
+								<HStack width={widthPercentage(182)} gap={widthPercentage(9)}>
+									<SvgContainer>{seasonList[season.findIndex(item => item == 1)].svg}</SvgContainer>
+									<PretendardSemiBoldText
+										size={18}
+										lineHeight={22}
+										color={colors.backgroundWhite}
+										width={widthPercentage(113)}>
+										{tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]}
+										{tendency[0].find(item => item == 1) == undefined
+											? ''
+											: tendency[0].findIndex(item => item == 1) == 0 ||
+											  tendency[0].findIndex(item => item == 1) == 4
+											? ' '
+											: ' 함께하는 '}
+										{seasonList[season.findIndex(item => item == 1)].title} 여행
+									</PretendardSemiBoldText>
+								</HStack>
+							</WhoContainer>
+							<HStack gap={5}>
+								<TouchTagContainer
+									height={widthPercentage(28)}
+									onPress={() => {
+										handleBinaryModify(0);
+									}}
+									backgroundColor={colors.backgroundWhite}>
+									<TagShopText color={colors.Primary} size={fontPercentage(15)}>
+										#
+									</TagShopText>
+									<PretendardSemiBoldText size={16} lineHeight={20} color={colors.backgroundWhite}>
+										{!transit ? '자동차·렌트카' : '대중교통'}
+									</PretendardSemiBoldText>
+								</TouchTagContainer>
+								<TouchTagContainer
+									height={widthPercentage(28)}
+									onPress={() => {
+										handleBinaryModify(1);
+									}}
+									backgroundColor={colors.backgroundWhite}>
+									<TagShopText color={colors.Primary} size={fontPercentage(15)}>
+										#
+									</TagShopText>
+									<PretendardSemiBoldText size={16} lineHeight={20} color={colors.backgroundWhite}>
+										{bandwidth ? '여유있는 일정' : '알찬 일정'}
+									</PretendardSemiBoldText>
+								</TouchTagContainer>
 							</HStack>
-						</VStack>
-						<VStack gap={heightPercentage(3)} alignItems='flex-end'>
-							<TouchTagContainer
+						</LinearGradient>
+					</ImageContainer>
+					<TendencyContainer>
+						{tendency[1].find(item => item == 1) && (
+							<TouchWhiteContainer
+								width={widthPercentage(287)}
 								onPress={() => {
-									handleBinaryModify(0);
-								}}
-								backgroundColor={colors.backgroundWhite}>
-								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
-									#
-								</TagShopText>
-								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-									{!transit ? '자동차·렌트카' : '대중교통'}
+									handleTendencyModify(1);
+								}}>
+								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+									여행테마
 								</PretendardSemiBoldText>
-							</TouchTagContainer>
-							<TouchTagContainer
+								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+									{tendency[1].map((item, inx) => {
+										return item ? (
+											<TagContainer
+												height={widthPercentage(28)}
+												backgroundColor={colors.backgroundGray}
+												key={inx}>
+												<TagShopText color={colors.PointYellow} size={14}>
+													#
+												</TagShopText>
+												<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
+													{tendencyList[1]?.list[inx]}
+												</PretendardSemiBoldText>
+											</TagContainer>
+										) : null;
+									})}
+								</FlexWrap>
+							</TouchWhiteContainer>
+						)}
+						{tendency[2].find(item => item == 1) && (
+							<TouchWhiteContainer
+								width={widthPercentage(287)}
 								onPress={() => {
-									handleBinaryModify(1);
-								}}
-								backgroundColor={colors.backgroundWhite}>
-								<TagShopText color={colors.Gray2} size={fontPercentage(12)}>
-									#
-								</TagShopText>
-								<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-									{bandwidth ? '여유있는 일정' : '알찬 일정'}
+									handleTendencyModify(2);
+								}}>
+								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+									이런 걸 하고 싶어요
 								</PretendardSemiBoldText>
-							</TouchTagContainer>
-						</VStack>
-					</HStack>
-					<Parent>
+								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+									{tendency[2].map((item, inx) => {
+										return item ? (
+											<TagContainer
+												backgroundColor={colors.backgroundGray}
+												key={inx}
+												padding={widthPercentage(3)}
+												height={heightPercentage(27)}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={18}
+													color={colors.PointYellow}>
+													{tendencyList[2]?.list[inx]}
+												</PretendardSemiBoldText>
+											</TagContainer>
+										) : null;
+									})}
+								</FlexWrap>
+							</TouchWhiteContainer>
+						)}
+						{tendency[3].find(item => item == 1) && (
+							<TouchWhiteContainer
+								width={widthPercentage(287)}
+								onPress={() => {
+									handleTendencyModify(3);
+								}}>
+								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+									이런 곳에 가고 싶어요
+								</PretendardSemiBoldText>
+								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+									{tendency[3].map((item, inx) => {
+										return item ? (
+											<TagContainer
+												backgroundColor={colors.backgroundGray}
+												key={inx}
+												padding={widthPercentage(3)}
+												height={heightPercentage(27)}>
+												<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
+													{tendencyList[3]?.list[inx]}
+												</PretendardSemiBoldText>
+											</TagContainer>
+										) : null;
+									})}
+								</FlexWrap>
+							</TouchWhiteContainer>
+						)}
+
+						<HStack marginHorizon={widthPercentage(10)} gap={10}>
+							<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+								여행지 인기도
+							</PretendardSemiBoldText>
+							<TagContainer
+								backgroundColor={colors.backgroundGray}
+								padding={widthPercentage(3)}
+								height={heightPercentage(27)}>
+								<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
+									{distance}
+								</PretendardSemiBoldText>
+							</TagContainer>
+						</HStack>
+					</TendencyContainer>
+					{/* <Parent>
 						{tendency[0].find(item => item == 1) && (
 							<TouchWhiteContainer
 								justifyContent='flex-start'
@@ -481,7 +633,7 @@ export default function FinalCheck({navigation}: any) {
 								})}
 							</FlexWrap>
 						</TouchWhiteContainer>
-					)}
+					)} */}
 
 					{[...Array(nDay + 1)].map((item, idx) => {
 						const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
@@ -498,28 +650,18 @@ export default function FinalCheck({navigation}: any) {
 									</PretendardSemiBoldText>
 								</HStack>
 								<MultiAllContainer>
-									<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
-										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
-											여행지
-										</PretendardSemiBoldText>
-										<SVGContainer
-											disabled={filteredPlaces.length >= 3}
-											onPress={() => {
-												goSearchPlace({idx: idx, index: 0});
-											}}
-											color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PointYellow}>
-											<SVGPlus
-												width={widthPercentage(16)}
-												height={widthPercentage(16)}
-												color={filteredPlaces.length >= 3 ? colors.Gray2 : colors.Primary}
-											/>
-										</SVGContainer>
-									</ElementContainer>
 									{filteredPlaces.length != 0 && (
-										<FlexWrap gap={10}>
+										<FlexWrap gap={10} deco={'z-index:10;'}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={16.7}
+												color={colors.Gray2}
+												deco={`margin-left:${widthPercentage(20)}px;`}>
+												여행지
+											</PretendardSemiBoldText>
 											{filteredPlaces.map((data, index) => (
 												<ElementContainer color={colors.backgroundGray} key={index}>
-													<VStack width={widthPercentage(243)}>
+													<VStack width={widthPercentage(233)}>
 														<HStack gap={3}>
 															<PretendardSemiBoldText
 																size={16}
@@ -542,56 +684,112 @@ export default function FinalCheck({navigation}: any) {
 															{data.formatted_address}
 														</PretendardVariableText>
 													</VStack>
-													<DeleteContainer
-														onPress={() => {
-															checkDeleteEssential(data);
-														}}>
-														<PretendardSemiBoldText
-															size={12}
-															lineHeight={18}
-															color={colors.Gray5}>
-															취소
-														</PretendardSemiBoldText>
-													</DeleteContainer>
+													<VStack deco='z-index:1000'>
+														<DotBox
+															onPress={() =>
+																setOpen({
+																	status: !open.status,
+																	index: index,
+																	day: idx,
+																	type: 'essential',
+																})
+															}>
+															<SvgTripleDot />
+														</DotBox>
+														{open.status &&
+															open.index == index &&
+															open.day == idx &&
+															open.type == 'essential' && (
+																<Dropdown>
+																	<DropdownElement
+																		onPress={() => {
+																			setOpen({
+																				day: idx,
+																				index: index,
+																				status: false,
+																				type: 'essential',
+																			});
+																			setModify(true);
+																		}}>
+																		<PretendardSemiBoldText
+																			color={colors.Gray5}
+																			size={14}
+																			lineHeight={18}>
+																			편집
+																		</PretendardSemiBoldText>
+																	</DropdownElement>
+																	<DropdownElement
+																		onPress={() => {
+																			checkDeleteEssential(data);
+																		}}>
+																		<PretendardSemiBoldText
+																			color={colors.Gray5}
+																			size={14}
+																			lineHeight={18}>
+																			삭제
+																		</PretendardSemiBoldText>
+																	</DropdownElement>
+																</Dropdown>
+															)}
+													</VStack>
 												</ElementContainer>
 											))}
 										</FlexWrap>
 									)}
+									<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
+										<SVGContainer
+											disabled={filteredPlaces.length >= 3}
+											onPress={() => {
+												goSearchPlace({idx: idx, index: 0});
+											}}
+											color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PrimarySecondary}>
+											<SVGPlus
+												width={widthPercentage(16)}
+												height={widthPercentage(16)}
+												color={filteredPlaces.length >= 3 ? colors.Gray2 : '#6F853D'}
+											/>
+										</SVGContainer>
+										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
+											여행지 추가하기
+										</PretendardSemiBoldText>
+									</ElementContainer>
 								</MultiAllContainer>
 								{idx != nDay && (
 									<MultiAllContainer>
 										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
-											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
-												숙소
-											</PretendardSemiBoldText>
 											{accommodations[idx + 1].name != '' ? (
-												<DeleteContainer
-													onPress={() => {
-														goSearchPlace({idx: idx, index: 1});
-													}}>
-													<PretendardSemiBoldText
-														size={12}
-														lineHeight={18}
-														color={colors.Gray5}>
-														변경
-													</PretendardSemiBoldText>
-												</DeleteContainer>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={16.7}
+													color={colors.Gray2}>
+													숙소
+												</PretendardSemiBoldText>
 											) : (
-												<SVGContainer
-													onPress={() => {
-														goSearchPlace({idx: idx, index: 1});
-													}}
-													color={
-														accommodations[idx + 1].name ? colors.Gray1 : colors.PointYellow
-													}>
-													<SVGPlus
-														width={widthPercentage(16)}
-														height={widthPercentage(16)}
+												<>
+													<SVGContainer
+														onPress={() => {
+															goSearchPlace({idx: idx, index: 1});
+														}}
 														color={
-															accommodations[idx + 1].name ? colors.Gray2 : colors.Primary
-														}
-													/>
-												</SVGContainer>
+															accommodations[idx + 1].name
+																? colors.Gray1
+																: colors.PrimarySecondary
+														}>
+														<SVGPlus
+															width={widthPercentage(16)}
+															height={widthPercentage(16)}
+															color={
+																accommodations[idx + 1].name ? colors.Gray2 : '#6F853D'
+															}
+														/>
+													</SVGContainer>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={16.7}
+														color={colors.Gray2}>
+														숙소 추가하기
+													</PretendardSemiBoldText>
+												</>
 											)}
 										</ElementContainer>
 										{accommodations[idx + 1].name && (
@@ -612,17 +810,37 @@ export default function FinalCheck({navigation}: any) {
 													</PretendardVariableText>
 												</VStack>
 
-												<DeleteContainer
-													onPress={() => {
-														checkDeleteAccommodation(idx + 1);
-													}}>
-													<PretendardSemiBoldText
-														size={12}
-														lineHeight={18}
-														color={colors.Gray5}>
-														취소
-													</PretendardSemiBoldText>
-												</DeleteContainer>
+												<VStack deco='z-index:1000'>
+													<DotBox
+														onPress={() =>
+															setOpen({
+																status: !open.status,
+																index: idx,
+																day: idx,
+																type: 'accommodation',
+															})
+														}>
+														<SvgTripleDot />
+													</DotBox>
+													{open.status &&
+														open.index == idx &&
+														open.day == idx &&
+														open.type == 'accommodation' && (
+															<Dropdown>
+																<DropdownElement
+																	onPress={() => {
+																		deleteAccommodation(idx + 1);
+																	}}>
+																	<PretendardSemiBoldText
+																		color={colors.Gray5}
+																		size={14}
+																		lineHeight={18}>
+																		삭제
+																	</PretendardSemiBoldText>
+																</DropdownElement>
+															</Dropdown>
+														)}
+												</VStack>
 											</ElementContainer>
 										)}
 									</MultiAllContainer>
@@ -632,6 +850,97 @@ export default function FinalCheck({navigation}: any) {
 					})}
 				</MainContainer>
 				<MarginContainer />
+				<Modal
+					animationType={'fade'}
+					transparent={true}
+					visible={modify}
+					onRequestClose={() => {
+						// setShow(false);
+					}}>
+					<ModalBackground
+						onPress={() => {
+							setModify(false);
+							// setPlaceState(null);
+							// clearInput();
+						}}>
+						<ModalBottomSheet flex={0.4}>
+							<BottomContainer height={heightPercentage(230)} gap={20}>
+								<ElementContainer color={colors.backgroundGray}>
+									<VStack width={widthPercentage(243)}>
+										<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+											{
+												essentialPlaces.filter(place => place.day === open.day + 1)?.[
+													open.index
+												]?.name
+											}
+										</PretendardSemiBoldText>
+										<PretendardVariableText
+											size={12}
+											lineHeight={18}
+											color={colors.Gray2}
+											numberOfLines={1}>
+											{
+												essentialPlaces.filter(place => place.day === open.day + 1)?.[
+													open.index
+												]?.formatted_address
+											}
+										</PretendardVariableText>
+									</VStack>
+								</ElementContainer>
+								<HStack justifyContent='space-around'>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={24}>
+										머무를 시간
+									</PretendardSemiBoldText>
+									<HStack justifyContent='space-around' width={widthPercentage(182)}>
+										<SVGContainer
+											disabled={timeValue < 1}
+											onPress={() => {
+												setTimeValue(timeValue - 1);
+											}}
+											color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
+											{timeValue >= 1 && (
+												<SVGMinus
+													width={widthPercentage(23)}
+													height={widthPercentage(23)}
+													color={colors.Gray2}
+												/>
+											)}
+										</SVGContainer>
+
+										<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={21.6}>
+											{timeValue + 1}시간
+										</PretendardSemiBoldText>
+										<SVGContainer
+											disabled={timeValue > 1}
+											onPress={() => {
+												setTimeValue(timeValue + 1);
+											}}
+											color={timeValue > 1 ? colors.backgroundWhite : colors.Gray5}>
+											{timeValue <= 1 && (
+												<SVGPlus
+													width={widthPercentage(25)}
+													height={widthPercentage(25)}
+													color={colors.Primary}
+												/>
+											)}
+										</SVGContainer>
+									</HStack>
+								</HStack>
+								<PrimaryButton
+									label={'수정 완료'}
+									width={widthPercentage(327)}
+									height={heightPercentage(60)}
+									onPress={() =>
+										modifyEssential(
+											essentialPlaces.filter(place => place.day === open.day + 1)?.[open.index],
+										)
+									}
+									backgroundColor={colors.Gray5}
+									textColor={colors.backgroundWhite}></PrimaryButton>
+							</BottomContainer>
+						</ModalBottomSheet>
+					</ModalBackground>
+				</Modal>
 			</BackgroundGray>
 			<ButtonContainer>
 				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
@@ -739,9 +1048,9 @@ export const RegionImage = styled.Image`
 	border-radius: 12px;
 `;
 const SvgContainer = styled.View`
-	width: ${widthPercentage(40)}px;
-	height: ${widthPercentage(40)}px;
-	background-color: ${colors.backgroundGray};
+	width: ${widthPercentage(46)}px;
+	height: ${widthPercentage(46)}px;
+	background-color: rgba(248, 249, 252, 0.4);
 	border-radius: 6.4px;
 	align-items: center;
 	justify-content: center;
@@ -762,6 +1071,7 @@ const MultiAllContainer = styled.View`
 	border-radius: 12px;
 	background-color: ${colors.backgroundGray};
 	gap: ${widthPercentage(3)}px;
+	z-index: 0;
 `;
 const Parent = styled.View`
 	flex-direction: row;
@@ -770,17 +1080,17 @@ const Parent = styled.View`
 	width: 100%;
 	gap: ${widthPercentage(6)}px;
 `;
-const WhoContainer = styled.View`
-	flex: 1;
-	align-items: center;
-	justify-content: center;
-`;
+const WhoContainer = styled.View``;
 const MoveImage = styled.Image`
 	width: ${widthPercentage(60)}px;
 	height: ${heightPercentage(110)}px;
 `;
 
-const TouchTagContainer = styled(TagContainer).attrs({as: TouchableOpacity})``;
+const TouchTagContainer = styled(TagContainer).attrs({as: TouchableOpacity})`
+	background-color: rgba(248, 249, 252, 0.4);
+	padding: ${widthPercentage(4)}px;
+	height: auto;
+`;
 const SelectMoveContainer = styled.View`
 	flex: 1;
 	flex-direction: row;
@@ -796,4 +1106,49 @@ const SelectButton = styled.TouchableOpacity<{color: string}>`
 	justify-content: center;
 	padding-bottom: ${heightPercentage(5)}px;
 	gap: ${heightPercentage(10)}px;
+`;
+
+const ImageContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(195)}px;
+	border-radius: 8px;
+`;
+const BackgroundImage = styled.Image`
+	position: absolute;
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(195)}px;
+	border-radius: 8px;
+`;
+const TendencyContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	border-radius: 8px;
+	border-width: 1px;
+	border-color: ${colors.Gray200};
+	padding: ${widthPercentage(20)}px ${widthPercentage(24)}px;
+	background-color: ${colors.backgroundWhite};
+`;
+
+const Dropdown = styled.View`
+	width: ${widthPercentage(52)}px;
+	border-width: 1px;
+	position: absolute;
+	left: -${widthPercentage(40)}px;
+	top: ${widthPercentage(10)}px;
+	border-radius: 12px;
+	border-color: ${colors.Gray200};
+	background-color: ${colors.backgroundWhite};
+	z-index: 1111;
+`;
+const DropdownElement = styled.TouchableOpacity`
+	width: 100%;
+	height: ${widthPercentage(48)}px;
+	align-items: center;
+	border-radius: 12px;
+	justify-content: center;
+	background-color: ${colors.backgroundWhite};
+	z-index: 1111;
+`;
+const DotBox = styled.TouchableOpacity`
+	width: ${widthPercentage(30)}px;
+	height: ${widthPercentage(30)}px;
 `;

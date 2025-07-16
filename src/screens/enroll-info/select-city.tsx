@@ -152,7 +152,7 @@ export default function SelectCity({navigation}: any) {
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='어디로 떠나시나요?'></StepText>
 			<RegionTextInputContainer>
-				<SVGSearch />
+				<SVGSearch width={widthPercentage(20)} height={widthPercentage(20)} />
 				<RegionTextInput
 					ref={regionSearchRef}
 					placeholder='지역을 검색해보세요'
@@ -165,7 +165,7 @@ export default function SelectCity({navigation}: any) {
 					}}
 					placeholderTextColor={colors.Gray3}
 					onChangeText={e => {
-						setRegionSearchState(true);
+						setRegionSearchState(e.length == 0 && regionText.length >= 1 ? false : true);
 						handleRegionText(e);
 					}}></RegionTextInput>
 			</RegionTextInputContainer>
@@ -249,12 +249,12 @@ export default function SelectCity({navigation}: any) {
 									onPress={() => {
 										selectCity(item.id);
 									}}>
-									<PretendardSemiBoldText
+									<PretendardVariableText
 										size={14}
 										lineHeight={18.9}
-										color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
+										color={cityIndex == item.id ? colors.backgroundWhite : colors.Title}>
 										{item.title}
-									</PretendardSemiBoldText>
+									</PretendardVariableText>
 								</RegionItems>
 							);
 						})}
@@ -272,7 +272,7 @@ export default function SelectCity({navigation}: any) {
 									<PretendardSemiBoldText
 										size={14}
 										lineHeight={18.9}
-										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
+										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray400}>
 										{item.subTitle}
 									</PretendardSemiBoldText>
 								</CityItems>
@@ -349,6 +349,9 @@ export default function SelectCity({navigation}: any) {
 const FlexContainer = styled.View`
 	flex: 1;
 	justify-content: center;
+	border-width: 1px;
+	border-radius: 12px;
+	border-color: ${colors.Gray200};
 `;
 const SeoulContainer = styled.View`
 	width: ${widthPercentage(326)}px;
@@ -382,20 +385,20 @@ const WrapContainer = styled.View`
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
 	align-items: center;
-	padding: ${heightPercentage(5)}px ${widthPercentage(8)}px;
-	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundGray)};
+	padding: ${heightPercentage(8)}px ${widthPercentage(16)}px;
+	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundWhite)};
 	border-radius: 99px;
 `;
 const CityItems = styled(RegionItems)`
 	background-color: ${props => (props.select ? colors.Primary : colors.backgroundWhite)};
 	border-width: 1px;
-	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray3)};
+	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray400)};
 	flex-direction: row;
 `;
 const RegionElementContainer = styled.TouchableOpacity`
 	background-color: ${colors.Gray5};
 	border-radius: 99px;
-	padding: ${heightPercentage(5)}px ${widthPercentage(8)}px;
+	padding: ${heightPercentage(12)}px ${widthPercentage(16)}px;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
@@ -407,6 +410,6 @@ const SelectListContainer = styled.ScrollView`
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;
-	height: ${heightPercentage(30)}px;
+	height: ${heightPercentage(60)}px;
 `;
 const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: ScrollView})``;
