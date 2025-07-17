@@ -64,8 +64,8 @@ export const Divider = styled.View<{width?: number; color?: string; height: numb
 	margin: 10px 0px 10px 0px;
 `;
 
-export const MainContainer = styled.ScrollView`
-	background-color: ${colors.backgroundGray};
+export const MainContainer = styled.ScrollView<{backgroundColor?: string}>`
+	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
 	width: 100%;
 `;
 export const MainText = styled.Text`

@@ -45,6 +45,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import PrimaryButton from '../../utill/component/primary-button';
 import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
 import {BottomContainer} from './search-place';
+import {ScrollView} from 'react-native';
+import RouteButton from '../../utill/component/route-button';
+import {DistanceCenter, DistanceSpace, MapContainer, Qwe} from './select-distance';
+import MapView, {Circle} from 'react-native-maps';
+import Slider from '@react-native-community/slider';
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
 	const {
@@ -71,20 +76,14 @@ export default function FinalCheck({navigation}: any) {
 	const dispatch = useAppDispatch();
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-	const [tendencyModify, setTendencyModify] = useState({status: false, index: 0});
-	const handleTendencyModify = (index: number) => {
-		setTendencyModify({status: true, index: index});
+	const [tendencyModify, setTendencyModify] = useState({status: false, index: 0, type: ''});
+	const handleTendencyModify = (index: number, type: string) => {
+		setTendencyModify({status: true, index: index, type: type});
 	};
 	const handleClose = () => {
-		setTendencyModify({status: false, index: 0});
+		setTendencyModify({status: false, index: 0, type: tendencyModify.type});
 	};
-	const [binaryModify, setBinaryModify] = useState({status: false, index: 0});
-	const handleBinaryModify = (index: number) => {
-		setBinaryModify({status: true, index: index});
-	};
-	const handleBinaryClose = () => {
-		setBinaryModify({status: false, index: 0});
-	};
+
 	const BinaryList = [
 		[
 			{
@@ -145,6 +144,30 @@ export default function FinalCheck({navigation}: any) {
 		});
 		dispatch(userSliceActions.loginFalse());
 		navigation.navigate('LoginScreen');
+	};
+	const handleModifyModalFunction = () => {
+		if (tendencyModify.status) {
+			if (tendencyModify.type == 'tendency') {
+				tendencyModify.index == 0
+					? handleTendencyModify(0, 'binary')
+					: tendencyModify.index == 4
+					? handleClose()
+					: handleTendencyModify(tendencyModify.index + 1, 'tendency');
+			} else {
+				tendencyModify.index == 1 ? handleClose() : handleTendencyModify(tendencyModify.index + 1, 'binary');
+			}
+		}
+	};
+	const handleModifyModalBackFunction = () => {
+		if (tendencyModify.status) {
+			if (tendencyModify.type == 'tendency') {
+				handleTendencyModify(tendencyModify.index - 1, 'tendency');
+			} else {
+				tendencyModify.index == 0
+					? handleTendencyModify(0, 'tendency')
+					: handleTendencyModify(tendencyModify.index - 1, 'binary');
+			}
+		}
 	};
 	const handleNext = () => {
 		socialloginProvider == 'anonymous'
@@ -332,15 +355,17 @@ export default function FinalCheck({navigation}: any) {
 		const updatedPlaces = copy.map(item => (item.id == e.id ? {...item, takenTime: (timeValue + 1) * 60} : item));
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 		setModify(false);
+		setTimeValue(0);
 	};
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
 	const [timeValue, setTimeValue] = useState(0);
 	const [modify, setModify] = useState(false);
+	const [viewType, setViewType] = useState(0);
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<>
 			<BackgroundGray backgroundColor={colors.backgroundWhite}>
-				<MainContainer showsVerticalScrollIndicator={false}>
+				<MainContainer showsVerticalScrollIndicator={false} backgroundColor={colors.backgroundWhite}>
 					<ImageContainer>
 						<BackgroundImage resizeMode='stretch' source={{uri: regionInfo.photo}}></BackgroundImage>
 						<LinearGradient
@@ -357,6 +382,14 @@ export default function FinalCheck({navigation}: any) {
 								height: '100%',
 								borderRadius: 12,
 							}}>
+							<ModifyTouchable
+								onPress={() => {
+									handleTendencyModify(0, 'tendency');
+								}}>
+								<PretendardVariableText size={14} lineHeight={18} color={colors.backgroundWhite}>
+									편집
+								</PretendardVariableText>
+							</ModifyTouchable>
 							<VStack>
 								<PretendardVariableText size={12} lineHeight={18} color={colors.backgroundWhite}>
 									{day[0].format('YY.MM.DD') + ' - ' + day[nDay].format('YY.MM.DD')}
@@ -394,7 +427,7 @@ export default function FinalCheck({navigation}: any) {
 								<TouchTagContainer
 									height={widthPercentage(28)}
 									onPress={() => {
-										handleBinaryModify(0);
+										handleTendencyModify(0, 'tendency');
 									}}
 									backgroundColor={colors.backgroundWhite}>
 									<TagShopText color={colors.Primary} size={fontPercentage(15)}>
@@ -407,7 +440,7 @@ export default function FinalCheck({navigation}: any) {
 								<TouchTagContainer
 									height={widthPercentage(28)}
 									onPress={() => {
-										handleBinaryModify(1);
+										handleTendencyModify(1, 'tendency');
 									}}
 									backgroundColor={colors.backgroundWhite}>
 									<TagShopText color={colors.Primary} size={fontPercentage(15)}>
@@ -420,307 +453,350 @@ export default function FinalCheck({navigation}: any) {
 							</HStack>
 						</LinearGradient>
 					</ImageContainer>
-					<TendencyContainer>
-						{tendency[1].find(item => item == 1) && (
-							<TouchWhiteContainer
-								width={widthPercentage(287)}
-								onPress={() => {
-									handleTendencyModify(1);
-								}}>
-								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
-									여행테마
-								</PretendardSemiBoldText>
-								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-									{tendency[1].map((item, inx) => {
-										return item ? (
-											<TagContainer
-												height={widthPercentage(28)}
-												backgroundColor={colors.backgroundGray}
-												key={inx}>
-												<TagShopText color={colors.PointYellow} size={14}>
-													#
-												</TagShopText>
-												<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
-													{tendencyList[1]?.list[inx]}
-												</PretendardSemiBoldText>
-											</TagContainer>
-										) : null;
-									})}
-								</FlexWrap>
-							</TouchWhiteContainer>
-						)}
-						{tendency[2].find(item => item == 1) && (
-							<TouchWhiteContainer
-								width={widthPercentage(287)}
-								onPress={() => {
-									handleTendencyModify(2);
-								}}>
-								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
-									이런 걸 하고 싶어요
-								</PretendardSemiBoldText>
-								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-									{tendency[2].map((item, inx) => {
-										return item ? (
-											<TagContainer
-												backgroundColor={colors.backgroundGray}
-												key={inx}
-												padding={widthPercentage(3)}
-												height={heightPercentage(27)}>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={18}
-													color={colors.PointYellow}>
-													{tendencyList[2]?.list[inx]}
-												</PretendardSemiBoldText>
-											</TagContainer>
-										) : null;
-									})}
-								</FlexWrap>
-							</TouchWhiteContainer>
-						)}
-						{tendency[3].find(item => item == 1) && (
-							<TouchWhiteContainer
-								width={widthPercentage(287)}
-								onPress={() => {
-									handleTendencyModify(3);
-								}}>
-								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
-									이런 곳에 가고 싶어요
-								</PretendardSemiBoldText>
-								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-									{tendency[3].map((item, inx) => {
-										return item ? (
-											<TagContainer
-												backgroundColor={colors.backgroundGray}
-												key={inx}
-												padding={widthPercentage(3)}
-												height={heightPercentage(27)}>
-												<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
-													{tendencyList[3]?.list[inx]}
-												</PretendardSemiBoldText>
-											</TagContainer>
-										) : null;
-									})}
-								</FlexWrap>
-							</TouchWhiteContainer>
-						)}
 
-						<HStack marginHorizon={widthPercentage(10)} gap={10}>
-							<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
-								여행지 인기도
-							</PretendardSemiBoldText>
-							<TagContainer
-								backgroundColor={colors.backgroundGray}
-								padding={widthPercentage(3)}
-								height={heightPercentage(27)}>
-								<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
-									{distance}
-								</PretendardSemiBoldText>
-							</TagContainer>
-						</HStack>
-					</TendencyContainer>
-					{/* <Parent>
-						{tendency[0].find(item => item == 1) && (
-							<TouchWhiteContainer
-								justifyContent='flex-start'
-								width={
-									tendency[1].find(item => item == 1) ? widthPercentage(182) : widthPercentage(327)
-								}
-								onPress={() => {
-									handleTendencyModify(0);
-								}}>
-								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-									이런 여행을 할래요
-								</PretendardVariableText>
-								<WhoContainer>
-									<HStack width={widthPercentage(182)} gap={widthPercentage(9)}>
-										<SvgContainer>
-											{seasonList[season.findIndex(item => item == 1)].svg}
-										</SvgContainer>
-										<PretendardSemiBoldText
+					<ScrollView
+						horizontal={true}
+						nestedScrollEnabled={true}
+						showsHorizontalScrollIndicator={false}
+						style={{marginVertical: widthPercentage(20)}}>
+						{['내 여행 성향', ...Array.from({length: nDay + 1}, (item, index) => index)].map(
+							(item, idx) => {
+								return (
+									<RegionItems
+										key={idx}
+										select={idx == viewType}
+										onPress={() => {
+											setViewType(idx);
+										}}>
+										<PretendardVariableText
 											size={14}
-											lineHeight={18}
-											color={colors.Gray5}
-											width={widthPercentage(113)}>
-											{tendencyList[0]?.list[tendency[0].findIndex(item => item == 1)]}
-											{tendency[0].findIndex(item => item == 1) == 0 ||
-											tendency[0].findIndex(item => item == 1) == 4
-												? ' '
-												: ' 함께하는 '}
-											{seasonList[season.findIndex(item => item == 1)].title} 여행
+											lineHeight={18.9}
+											color={idx == viewType ? colors.backgroundWhite : colors.Gray400}>
+											{idx == 0 ? item : `DAY ${item + 1}`}
+										</PretendardVariableText>
+									</RegionItems>
+								);
+							},
+						)}
+					</ScrollView>
+					{viewType == 0 ? (
+						<TendencyContainer>
+							<ModifyTouchable
+								onPress={() => {
+									handleTendencyModify(1, 'tendency');
+								}}>
+								<PretendardVariableText size={14} lineHeight={18} color={colors.Black}>
+									편집
+								</PretendardVariableText>
+							</ModifyTouchable>
+							{tendency[1].find(item => item == 1) && (
+								<TouchWhiteContainer
+									width={widthPercentage(287)}
+									onPress={() => {
+										handleTendencyModify(0, 'tendency');
+									}}>
+									<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+										여행테마
+									</PretendardSemiBoldText>
+									<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+										{tendency[1].map((item, inx) => {
+											return item ? (
+												<TagContainer
+													height={widthPercentage(28)}
+													backgroundColor={colors.backgroundGray}
+													key={inx}>
+													<TagShopText color={colors.PointYellow} size={14}>
+														#
+													</TagShopText>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={18}
+														color={colors.Gray5}>
+														{tendencyList[1]?.list[inx]}
+													</PretendardSemiBoldText>
+												</TagContainer>
+											) : null;
+										})}
+									</FlexWrap>
+								</TouchWhiteContainer>
+							)}
+							{tendency[2].find(item => item == 1) && (
+								<TouchWhiteContainer
+									width={widthPercentage(287)}
+									onPress={() => {
+										handleTendencyModify(2, 'tendency');
+									}}>
+									<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+										이런 걸 하고 싶어요
+									</PretendardSemiBoldText>
+									<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+										{tendency[2].map((item, inx) => {
+											return item ? (
+												<TagContainer
+													backgroundColor={colors.backgroundGray}
+													key={inx}
+													padding={widthPercentage(3)}
+													height={heightPercentage(27)}>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={18}
+														color={colors.PointYellow}>
+														{tendencyList[2]?.list[inx]}
+													</PretendardSemiBoldText>
+												</TagContainer>
+											) : null;
+										})}
+									</FlexWrap>
+								</TouchWhiteContainer>
+							)}
+							{tendency[3].find(item => item == 1) && (
+								<TouchWhiteContainer
+									width={widthPercentage(287)}
+									onPress={() => {
+										handleTendencyModify(3, 'tendency');
+									}}>
+									<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+										이런 곳에 가고 싶어요
+									</PretendardSemiBoldText>
+									<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+										{tendency[3].map((item, inx) => {
+											return item ? (
+												<TagContainer
+													backgroundColor={colors.backgroundGray}
+													key={inx}
+													padding={widthPercentage(3)}
+													height={heightPercentage(27)}>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={18}
+														color={colors.Gray5}>
+														{tendencyList[3]?.list[inx]}
+													</PretendardSemiBoldText>
+												</TagContainer>
+											) : null;
+										})}
+									</FlexWrap>
+								</TouchWhiteContainer>
+							)}
+
+							<HStack marginHorizon={widthPercentage(10)} gap={10}>
+								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+									여행지 인기도
+								</PretendardSemiBoldText>
+								<TagContainer
+									backgroundColor={colors.backgroundGray}
+									padding={widthPercentage(3)}
+									height={heightPercentage(27)}>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
+										{distance}
+									</PretendardSemiBoldText>
+								</TagContainer>
+							</HStack>
+						</TendencyContainer>
+					) : (
+						(() => {
+							const filteredPlaces = essentialPlaces.filter(place => place.day === viewType);
+							return (
+								<DayViewContainer>
+									<HStack>
+										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Primary}>
+											{'DAY' + viewType}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray5}>
+											{'   '}
+											{day[viewType - 1].format('YY.MM.DD') +
+												' (' +
+												weekdays[day[viewType - 1].days()] +
+												')'}
 										</PretendardSemiBoldText>
 									</HStack>
-								</WhoContainer>
-							</TouchWhiteContainer>
-						)}
-						{tendency[1].find(item => item == 1) && (
-							<TouchWhiteContainer
-								width={
-									tendency[0].find(item => item == 1) ? widthPercentage(139) : widthPercentage(327)
-								}
-								onPress={() => {
-									handleTendencyModify(1);
-								}}>
-								<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-									여행테마
-								</PretendardVariableText>
-								<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-									{tendency[1].map((item, inx) => {
-										return item ? (
-											<TagContainer backgroundColor={colors.backgroundGray} key={inx}>
-												<TagShopText color={colors.Gray2}>#</TagShopText>
-												<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-													{tendencyList[1]?.list[inx]}
+									<MultiAllContainer>
+										{filteredPlaces.length != 0 && (
+											<FlexWrap gap={10} deco={'z-index:10;'}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={16.7}
+													color={colors.Gray2}
+													deco={`margin-left:${widthPercentage(20)}px;`}>
+													여행지
 												</PretendardSemiBoldText>
-											</TagContainer>
-										) : null;
-									})}
-								</FlexWrap>
-							</TouchWhiteContainer>
-						)}
-					</Parent>
-					{tendency[2].find(item => item == 1) && (
-						<TouchWhiteContainer
-							width={widthPercentage(327)}
-							onPress={() => {
-								handleTendencyModify(2);
-							}}>
-							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-								이런 걸 하고 싶어요
-							</PretendardVariableText>
-							<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-								{tendency[2].map((item, inx) => {
-									return item ? (
-										<TagContainer
-											backgroundColor={colors.backgroundGray}
-											key={inx}
-											padding={widthPercentage(3)}
-											height={heightPercentage(27)}>
-											<PretendardSemiBoldText
-												size={12}
-												lineHeight={16}
-												color={colors.PointYellow}>
-												{tendencyList[2]?.list[inx]}
-											</PretendardSemiBoldText>
-										</TagContainer>
-									) : null;
-								})}
-							</FlexWrap>
-						</TouchWhiteContainer>
-					)}
-					{tendency[3].find(item => item == 1) && (
-						<TouchWhiteContainer
-							width={widthPercentage(327)}
-							onPress={() => {
-								handleTendencyModify(3);
-							}}>
-							<PretendardVariableText size={12} lineHeight={14.32} color={colors.Gray2}>
-								이런 곳에 가고 싶어요
-							</PretendardVariableText>
-							<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-								{tendency[3].map((item, inx) => {
-									return item ? (
-										<TagContainer
-											backgroundColor={colors.backgroundGray}
-											key={inx}
-											padding={widthPercentage(3)}
-											height={heightPercentage(27)}>
-											<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray5}>
-												{tendencyList[3]?.list[inx]}
-											</PretendardSemiBoldText>
-										</TagContainer>
-									) : null;
-								})}
-							</FlexWrap>
-						</TouchWhiteContainer>
-					)} */}
-
-					{[...Array(nDay + 1)].map((item, idx) => {
-						const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
-
-						return (
-							<DayViewContainer key={idx}>
-								<HStack>
-									<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Primary}>
-										{'DAY' + (idx + 1)}
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray5}>
-										{'   '}
-										{day[idx].format('YY.MM.DD') + ' (' + weekdays[day[idx].days()] + ')'}
-									</PretendardSemiBoldText>
-								</HStack>
-								<MultiAllContainer>
-									{filteredPlaces.length != 0 && (
-										<FlexWrap gap={10} deco={'z-index:10;'}>
-											<PretendardSemiBoldText
-												size={14}
-												lineHeight={16.7}
-												color={colors.Gray2}
-												deco={`margin-left:${widthPercentage(20)}px;`}>
-												여행지
-											</PretendardSemiBoldText>
-											{filteredPlaces.map((data, index) => (
-												<ElementContainer color={colors.backgroundGray} key={index}>
-													<VStack width={widthPercentage(233)}>
-														<HStack gap={3}>
-															<PretendardSemiBoldText
-																size={16}
-																lineHeight={21.6}
-																color={colors.Gray5}
-																width={widthPercentage(200)}>
-																{data.name}
-															</PretendardSemiBoldText>
-															<PretendardSemiBoldText
+												{filteredPlaces.map((data, index) => (
+													<ElementContainer color={colors.backgroundGray} key={index}>
+														<VStack width={widthPercentage(233)}>
+															<HStack gap={3}>
+																<PretendardSemiBoldText
+																	size={16}
+																	lineHeight={21.6}
+																	color={colors.Gray5}
+																	width={widthPercentage(200)}>
+																	{data.name}
+																</PretendardSemiBoldText>
+																<PretendardSemiBoldText
+																	size={12}
+																	lineHeight={16.2}
+																	color={colors.PointYellow}>
+																	{data.takenTime / 60}시간
+																</PretendardSemiBoldText>
+															</HStack>
+															<PretendardVariableText
+																color={colors.Gray2}
 																size={12}
-																lineHeight={16.2}
-																color={colors.PointYellow}>
-																{data.takenTime / 60}시간
-															</PretendardSemiBoldText>
-														</HStack>
+																lineHeight={18}>
+																{data.formatted_address}
+															</PretendardVariableText>
+														</VStack>
+														<VStack deco='z-index:1000'>
+															<DotBox
+																onPress={() =>
+																	setOpen({
+																		status: !open.status,
+																		index: index,
+																		day: viewType - 1,
+																		type: 'essential',
+																	})
+																}>
+																<SvgTripleDot />
+															</DotBox>
+															{open.status &&
+																open.index == index &&
+																open.day == viewType - 1 &&
+																open.type == 'essential' && (
+																	<Dropdown>
+																		<DropdownElement
+																			onPress={() => {
+																				setOpen({
+																					day: viewType - 1,
+																					index: index,
+																					status: false,
+																					type: 'essential',
+																				});
+																				setModify(true);
+																			}}>
+																			<PretendardSemiBoldText
+																				color={colors.Gray5}
+																				size={14}
+																				lineHeight={18}>
+																				편집
+																			</PretendardSemiBoldText>
+																		</DropdownElement>
+																		<DropdownElement
+																			onPress={() => {
+																				checkDeleteEssential(data);
+																			}}>
+																			<PretendardSemiBoldText
+																				color={colors.Gray5}
+																				size={14}
+																				lineHeight={18}>
+																				삭제
+																			</PretendardSemiBoldText>
+																		</DropdownElement>
+																	</Dropdown>
+																)}
+														</VStack>
+													</ElementContainer>
+												))}
+											</FlexWrap>
+										)}
+										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
+											<SVGContainer
+												disabled={filteredPlaces.length >= 3}
+												onPress={() => {
+													goSearchPlace({idx: viewType - 1, index: 0});
+												}}
+												color={
+													filteredPlaces.length >= 3 ? colors.Gray1 : colors.PrimarySecondary
+												}>
+												<SVGPlus
+													width={widthPercentage(16)}
+													height={widthPercentage(16)}
+													color={filteredPlaces.length >= 3 ? colors.Gray2 : '#6F853D'}
+												/>
+											</SVGContainer>
+											<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
+												여행지 추가하기
+											</PretendardSemiBoldText>
+										</ElementContainer>
+									</MultiAllContainer>
+									{viewType - 1 != nDay && (
+										<MultiAllContainer>
+											<ElementContainer
+												color={colors.backgroundGray}
+												height={heightPercentage(43)}>
+												{accommodations[viewType].name != '' ? (
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={16.7}
+														color={colors.Gray2}>
+														숙소
+													</PretendardSemiBoldText>
+												) : (
+													<>
+														<SVGContainer
+															onPress={() => {
+																goSearchPlace({idx: viewType - 1, index: 1});
+															}}
+															color={
+																accommodations[viewType].name
+																	? colors.Gray1
+																	: colors.PrimarySecondary
+															}>
+															<SVGPlus
+																width={widthPercentage(16)}
+																height={widthPercentage(16)}
+																color={
+																	accommodations[viewType].name
+																		? colors.Gray2
+																		: '#6F853D'
+																}
+															/>
+														</SVGContainer>
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={16.7}
+															color={colors.Gray2}>
+															숙소 추가하기
+														</PretendardSemiBoldText>
+													</>
+												)}
+											</ElementContainer>
+											{accommodations[viewType].name && (
+												<ElementContainer color={colors.backgroundGray}>
+													<VStack width={widthPercentage(243)}>
+														<PretendardSemiBoldText
+															size={16}
+															lineHeight={21.6}
+															width={widthPercentage(200)}
+															color={colors.Gray5}>
+															{accommodations[viewType].name}
+														</PretendardSemiBoldText>
 														<PretendardVariableText
 															color={colors.Gray2}
 															size={12}
 															lineHeight={18}>
-															{data.formatted_address}
+															{accommodations[viewType].formatted_address}
 														</PretendardVariableText>
 													</VStack>
+
 													<VStack deco='z-index:1000'>
 														<DotBox
 															onPress={() =>
 																setOpen({
 																	status: !open.status,
-																	index: index,
-																	day: idx,
-																	type: 'essential',
+																	index: viewType - 1,
+																	day: viewType - 1,
+																	type: 'accommodation',
 																})
 															}>
 															<SvgTripleDot />
 														</DotBox>
 														{open.status &&
-															open.index == index &&
-															open.day == idx &&
-															open.type == 'essential' && (
+															open.index == viewType - 1 &&
+															open.day == viewType - 1 &&
+															open.type == 'accommodation' && (
 																<Dropdown>
 																	<DropdownElement
 																		onPress={() => {
-																			setOpen({
-																				day: idx,
-																				index: index,
-																				status: false,
-																				type: 'essential',
-																			});
-																			setModify(true);
-																		}}>
-																		<PretendardSemiBoldText
-																			color={colors.Gray5}
-																			size={14}
-																			lineHeight={18}>
-																			편집
-																		</PretendardSemiBoldText>
-																	</DropdownElement>
-																	<DropdownElement
-																		onPress={() => {
-																			checkDeleteEssential(data);
+																			deleteAccommodation(viewType);
 																		}}>
 																		<PretendardSemiBoldText
 																			color={colors.Gray5}
@@ -733,121 +809,13 @@ export default function FinalCheck({navigation}: any) {
 															)}
 													</VStack>
 												</ElementContainer>
-											))}
-										</FlexWrap>
-									)}
-									<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
-										<SVGContainer
-											disabled={filteredPlaces.length >= 3}
-											onPress={() => {
-												goSearchPlace({idx: idx, index: 0});
-											}}
-											color={filteredPlaces.length >= 3 ? colors.Gray1 : colors.PrimarySecondary}>
-											<SVGPlus
-												width={widthPercentage(16)}
-												height={widthPercentage(16)}
-												color={filteredPlaces.length >= 3 ? colors.Gray2 : '#6F853D'}
-											/>
-										</SVGContainer>
-										<PretendardSemiBoldText size={14} lineHeight={16.7} color={colors.Gray2}>
-											여행지 추가하기
-										</PretendardSemiBoldText>
-									</ElementContainer>
-								</MultiAllContainer>
-								{idx != nDay && (
-									<MultiAllContainer>
-										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
-											{accommodations[idx + 1].name != '' ? (
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={16.7}
-													color={colors.Gray2}>
-													숙소
-												</PretendardSemiBoldText>
-											) : (
-												<>
-													<SVGContainer
-														onPress={() => {
-															goSearchPlace({idx: idx, index: 1});
-														}}
-														color={
-															accommodations[idx + 1].name
-																? colors.Gray1
-																: colors.PrimarySecondary
-														}>
-														<SVGPlus
-															width={widthPercentage(16)}
-															height={widthPercentage(16)}
-															color={
-																accommodations[idx + 1].name ? colors.Gray2 : '#6F853D'
-															}
-														/>
-													</SVGContainer>
-													<PretendardSemiBoldText
-														size={14}
-														lineHeight={16.7}
-														color={colors.Gray2}>
-														숙소 추가하기
-													</PretendardSemiBoldText>
-												</>
 											)}
-										</ElementContainer>
-										{accommodations[idx + 1].name && (
-											<ElementContainer color={colors.backgroundGray}>
-												<VStack width={widthPercentage(243)}>
-													<PretendardSemiBoldText
-														size={16}
-														lineHeight={21.6}
-														width={widthPercentage(200)}
-														color={colors.Gray5}>
-														{accommodations[idx + 1].name}
-													</PretendardSemiBoldText>
-													<PretendardVariableText
-														color={colors.Gray2}
-														size={12}
-														lineHeight={18}>
-														{accommodations[idx + 1].formatted_address}
-													</PretendardVariableText>
-												</VStack>
-
-												<VStack deco='z-index:1000'>
-													<DotBox
-														onPress={() =>
-															setOpen({
-																status: !open.status,
-																index: idx,
-																day: idx,
-																type: 'accommodation',
-															})
-														}>
-														<SvgTripleDot />
-													</DotBox>
-													{open.status &&
-														open.index == idx &&
-														open.day == idx &&
-														open.type == 'accommodation' && (
-															<Dropdown>
-																<DropdownElement
-																	onPress={() => {
-																		deleteAccommodation(idx + 1);
-																	}}>
-																	<PretendardSemiBoldText
-																		color={colors.Gray5}
-																		size={14}
-																		lineHeight={18}>
-																		삭제
-																	</PretendardSemiBoldText>
-																</DropdownElement>
-															</Dropdown>
-														)}
-												</VStack>
-											</ElementContainer>
-										)}
-									</MultiAllContainer>
-								)}
-							</DayViewContainer>
-						);
-					})}
+										</MultiAllContainer>
+									)}
+								</DayViewContainer>
+							);
+						})()
+					)}
 				</MainContainer>
 				<MarginContainer />
 				<Modal
@@ -946,37 +914,191 @@ export default function FinalCheck({navigation}: any) {
 				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
 			</ButtonContainer>
 			<Modal animationType='fade' visible={tendencyModify.status} transparent={true}>
-				<InModalContainer onPress={handleClose}>
-					<InModal>
-						<SvgCancel
-							style={{alignSelf: 'flex-end'}}
-							color={colors.Gray5}
-							width={widthPercentage(18)}
-							height={widthPercentage(18)}
-						/>
-						<StepText
-							mainText={tendencyList[tendencyModify.index].title}
-							subText={
-								tendencyList[tendencyModify.index].multi ? '* 중복 선택 가능' : '*단일선택'
-							}></StepText>
-						<ButtonsContainer>
-							{tendencyList[tendencyModify.index]?.list.map((item, idx) => (
-								<TendencyButton
-									marginBottom={0}
-									bgColor={tendency[tendencyModify.index][idx] == 1}
-									label={item}
-									key={idx}
-									divide={true}
-									imageUrl={tendencyList[tendencyModify.index]?.photo[idx]}
-									onPress={() => {
-										handleSelect(idx);
-									}}></TendencyButton>
-							))}
-						</ButtonsContainer>
-					</InModal>
+				<InModalContainer onPress={() => {}}>
+					{tendencyModify.type == 'tendency' ? (
+						<InModal>
+							{tendencyModify.index != 4 ? (
+								<>
+									<CancelBox onPress={handleClose}>
+										<SvgCancel
+											style={{
+												position: 'absolute',
+												left: widthPercentage(301),
+												top: widthPercentage(13),
+											}}
+											color={colors.Gray5}
+											width={widthPercentage(18)}
+											height={widthPercentage(18)}
+										/>
+									</CancelBox>
+									<StepText
+										mainText={tendencyList[tendencyModify.index].title}
+										subText={
+											tendencyList[tendencyModify.index].multi ? '* 중복 선택 가능' : '*단일선택'
+										}></StepText>
+									<ButtonsContainer>
+										{tendencyList[tendencyModify.index]?.list.map((item, idx) => (
+											<TendencyButton
+												marginBottom={0}
+												bgColor={tendency[tendencyModify.index][idx] == 1}
+												label={item}
+												key={idx}
+												divide={true}
+												imageUrl={tendencyList[tendencyModify.index]?.photo[idx]}
+												onPress={() => {
+													handleSelect(idx);
+												}}></TendencyButton>
+										))}
+									</ButtonsContainer>
+								</>
+							) : (
+								<>
+									<CancelBox onPress={handleClose}>
+										<SvgCancel
+											style={{
+												position: 'absolute',
+												left: widthPercentage(301),
+												top: widthPercentage(13),
+											}}
+											color={colors.Gray5}
+											width={widthPercentage(18)}
+											height={widthPercentage(18)}
+										/>
+									</CancelBox>
+									<StepText
+										mainText={'현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'}
+										subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
+									<MapContainer>
+										<Qwe>
+											<MapView
+												//provider={PROVIDER_GOOGLE}
+												showsMyLocationButton={false}
+												showsUserLocation={false}
+												style={{
+													width: widthPercentage(327),
+													height: heightPercentage(240),
+													position: 'absolute',
+												}}
+												region={{
+													latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
+													longitude:
+														cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
+													latitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
+													longitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
+												}}>
+												<Circle
+													center={{
+														latitude:
+															cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
+														longitude:
+															cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
+													}}
+													style={{alignItems: 'center', justifyContent: 'center'}}
+													fillColor='rgba(38, 152, 251, 0.3);'
+													radius={distance * (cityDistance[0] == 0 ? 5000 : 1500)}></Circle>
+											</MapView>
+										</Qwe>
+									</MapContainer>
+									<DistanceCenter>
+										<DistanceSpace>
+											<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+												내 근처
+											</PretendardSemiBoldText>
+											<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+												전체
+											</PretendardSemiBoldText>
+										</DistanceSpace>
+										<Slider
+											style={{width: '100%', height: 40}}
+											minimumValue={1}
+											maximumValue={10}
+											minimumTrackTintColor={colors.Primary}
+											maximumTrackTintColor={colors.Gray2}
+											thumbTintColor={colors.Primary}
+											value={distance}
+											step={1}
+											onValueChange={item => {
+												dispatch(travelSliceActions.enrollDistance(item));
+											}}
+										/>
+									</DistanceCenter>
+								</>
+							)}
+
+							{tendencyModify.index == 0 ? (
+								<ButtonContainer>
+									<CustomButton
+										marginBottom={12}
+										bgColor={colors.Primary}
+										textColor={colors.Gray5}
+										isDisabled={false}
+										label='다음으로'
+										onPress={handleModifyModalFunction}
+									/>
+								</ButtonContainer>
+							) : (
+								<RouteButton
+									navigation={navigation}
+									nextTitle='RecommendSelectMove'
+									nextText={tendencyModify.index == 4 ? '완료' : undefined}
+									LeftBtnFunction={handleModifyModalBackFunction}
+									goNext={handleModifyModalFunction}></RouteButton>
+							)}
+						</InModal>
+					) : (
+						<InModal>
+							<CancelBox onPress={handleClose}>
+								<SvgCancel
+									style={{
+										position: 'absolute',
+										left: widthPercentage(301),
+										top: widthPercentage(13),
+									}}
+									color={colors.Gray5}
+									width={widthPercentage(18)}
+									height={widthPercentage(18)}
+								/>
+							</CancelBox>
+							<StepText
+								mainText={tendencyModify.index ? '어떻게 이동하시나요?' : '어떤 여행을 원하시나요?'}
+								subText={'* 단일선택'}></StepText>
+							{tendencyModify.index == 0 ? (
+								<SelectMoveContainer>
+									{BinaryList[tendencyModify.index]?.map((item, idx) => (
+										<SelectButton
+											color={idx == transit ? 'rgba(195,245,80,0.3)' : colors.Gray1}
+											key={idx}
+											onPress={item.function}>
+											{item?.image}
+											<PretendardSemiBoldText size={15} lineHeight={18} color={colors.Gray4}>
+												{item.name}
+											</PretendardSemiBoldText>
+										</SelectButton>
+									))}
+								</SelectMoveContainer>
+							) : (
+								<SelectButtonsContainer>
+									{BinaryList[tendencyModify.index].map((item, idx) => (
+										<TendencyButton
+											bgColor={bandwidth == Boolean(idx)}
+											label={item.name}
+											imageUrl={item?.photo}
+											key={idx}
+											onPress={item.function}></TendencyButton>
+									))}
+								</SelectButtonsContainer>
+							)}
+							<RouteButton
+								navigation={navigation}
+								nextTitle='RecommendSelectMove'
+								nextText={tendencyModify.index == 1 ? '완료' : undefined}
+								LeftBtnFunction={handleModifyModalBackFunction}
+								goNext={handleModifyModalFunction}></RouteButton>
+						</InModal>
+					)}
 				</InModalContainer>
 			</Modal>
-			<Modal animationType='fade' visible={binaryModify.status} transparent={true}>
+			{/* <Modal animationType='fade' visible={binaryModify.status} transparent={true}>
 				<InModalContainer onPress={handleBinaryClose}>
 					<InModal>
 						<SvgCancel
@@ -1014,23 +1136,30 @@ export default function FinalCheck({navigation}: any) {
 								))}
 							</SelectButtonsContainer>
 						)}
+						<RouteButton
+							navigation={navigation}
+							nextTitle='RecommendSelectMove'
+							nextText={binaryModify.index == 1 ? '완료' : undefined}
+							LeftBtnFunction={handleModifyModalBackFunction}
+							goNext={handleModifyModalFunction}></RouteButton>
 					</InModal>
 				</InModalContainer>
-			</Modal>
+			</Modal> */}
 		</>
 	);
 }
 const ButtonsContainer = styled.View`
 	flex: 1;
-	align-content: flex-end;
 	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
-	gap: ${widthPercentage(10)}px;
+	align-items: center;
+	margin-top: ${heightPercentage(104)}px;
+	gap: ${widthPercentage(8)}px;
 `;
 const InModal = styled.View`
 	width: 100%;
-	height: ${heightPercentage(607)}px;
+	height: ${heightPercentage(688)}px;
 	background-color: ${colors.backgroundWhite};
 	border-top-left-radius: 30px;
 	border-top-right-radius: 30px;
@@ -1152,3 +1281,18 @@ const DotBox = styled.TouchableOpacity`
 	width: ${widthPercentage(30)}px;
 	height: ${widthPercentage(30)}px;
 `;
+const RegionItems = styled.TouchableOpacity<{select: boolean}>`
+	justify-content: center;
+	align-items: center;
+	padding: ${heightPercentage(8)}px ${widthPercentage(16)}px;
+	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundWhite)};
+	border-radius: 99px;
+`;
+const ModifyTouchable = styled.TouchableOpacity`
+	position: absolute;
+	left: ${widthPercentage(278)}px;
+	top: ${widthPercentage(20)}px;
+	z-index: 102;
+`;
+
+const CancelBox = styled.TouchableOpacity``;
