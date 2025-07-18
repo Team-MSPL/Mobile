@@ -1184,7 +1184,12 @@ const SvgContainer = styled.View`
 	align-items: center;
 	justify-content: center;
 `;
-export const WhiteContainer = styled.View<{width?: number; justifyContent?: string; alignItems?: string}>`
+export const WhiteContainer = styled.View<{
+	width?: number;
+	justifyContent?: string;
+	alignItems?: string;
+	deco?: string;
+}>`
 	width: ${props => props.width + 'px' ?? '100%'};
 	background-color: ${colors.backgroundWhite};
 	border-radius: 8px;
@@ -1193,6 +1198,7 @@ export const WhiteContainer = styled.View<{width?: number; justifyContent?: stri
 	padding: ${heightPercentage(8)}px ${widthPercentage(10)}px;
 	gap: ${widthPercentage(3)}px;
 	margin-bottom: ${heightPercentage(10)}px;
+	${props => props.deco}
 `;
 const TouchWhiteContainer = styled(WhiteContainer).attrs({as: TouchableOpacity})``;
 const MultiAllContainer = styled.View`

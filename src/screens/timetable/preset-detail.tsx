@@ -25,7 +25,7 @@ export default function PresetDetail({navigation, route}: any) {
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '식당과 숙소까지 다님에서\n한 번에 추천해드릴까요?',
+				modalTitle: '식당과 숙소까지 한 번에 추천해드릴까요?',
 				modalSubTitle: '별점이 높은 장소를 우선적으로 추천해드려요',
 				modalLeft: true,
 				modalTopText: '네, 한 번에 추천해주세요',
@@ -40,7 +40,7 @@ export default function PresetDetail({navigation, route}: any) {
 		dispatch(
 			modalSliceActions.setOpenModal({
 				modalTitle: '잠깐!',
-				modalSubTitle: '일정을 확정하면 본 결과를 다시 확인하실 수 없습니다. 확정하시면 자동으로 저장됩니다.',
+				modalSubTitle: '일정을 확정하면 본 결과를 다시 확인하실 수 없습니다.\n확정하시면 자동으로 저장됩니다.',
 				modalLeft: true,
 				modalFunction: () => goNext(e),
 			}),
@@ -228,33 +228,49 @@ export default function PresetDetail({navigation, route}: any) {
 		navigation.navigate('CourseDetail', {value: copy});
 	};
 	const [tendencyView, setTendencyView] = useState(true);
+	const calculateTendency = (e: any) => {
+		let copy = [];
+		let copy2 = [];
+		e?.tendencyNameList?.forEach((item, idx) => {
+			if (!['봄', '여름', '가을', '겨울'].includes(item)) {
+				copy.push(item);
+				copy2.push(e.tendencyRanking[idx]);
+			}
+		});
+		let min = 100;
+		let minIndex = -1;
+		let nextMin = 100;
+		let nextMinIndex = -1;
+		console.log(copy, copy2);
+		copy2.forEach((item, idx) => {
+			if (item <= min) {
+				nextMin = min;
+				nextMinIndex = minIndex;
+				min = item;
+				minIndex = idx;
+			} else if (item <= nextMin) {
+				nextMin = item;
+				nextMinIndex = idx;
+			}
+		});
+		let result =
+			(e?.tendencyNameList[minIndex] ?? '') +
+			(e?.tendencyNameList[nextMinIndex] ? ', ' + e?.tendencyNameList[nextMinIndex] : '');
+		return result;
+	};
 	return (
 		<>
-			<BackgroundGray>
+			<BackgroundGray paddingHorizental={0}>
 				<TopFixContainer>
-					<HStack>
-						<FlexWrap
-							width={widthPercentage(300)}
-							gap={widthPercentage(3)}
-							onPress={() => {
-								setTendencyView(!tendencyView);
-							}}>
-							{presetTendencyList[route.params.index].tendencyNameList
-								.slice(
-									0,
-									tendencyView ? 4 : presetTendencyList[route.params.index].tendencyNameList.length,
-								)
-								.map((item, idx) => (
-									<TagContainer key={idx} height={28} backgroundColor={colors.backgroundWhite}>
-										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray4}>
-											{item}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.PointYellow}>
-											{presetTendencyList[route.params.index].tendencyPointList[idx]}점
-										</PretendardSemiBoldText>
-									</TagContainer>
-								))}
-						</FlexWrap>
+					<HStack marginHorizon={widthPercentage(24)}>
+						<HStack marginVertical={10}>
+							<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.Black}>
+								<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.PointYellow}>
+									[{calculateTendency(presetTendencyList[route.params.index])}]
+								</PretendardSemiBoldText>{' '}
+								성향이 높은 코스에요!
+							</PretendardSemiBoldText>
+						</HStack>
 						{presetTendencyList[route.params.index].tendencyNameList.length > 4 && (
 							<TouchableOpacity
 								style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
@@ -271,7 +287,11 @@ export default function PresetDetail({navigation, route}: any) {
 						)}
 					</HStack>
 					<MapView
-						style={{width: '100%', height: heightPercentage(248), marginBottom: heightPercentage(13)}}
+						style={{
+							width: widthPercentage(375),
+							height: heightPercentage(268),
+							marginBottom: heightPercentage(13),
+						}}
 						showsMyLocationButton={true}
 						ref={mapRef}
 						region={{
@@ -283,7 +303,7 @@ export default function PresetDetail({navigation, route}: any) {
 						{markers}
 						{polylines}
 					</MapView>
-					<ScrollView horizontal>
+					<ScrollView horizontal style={{paddingHorizontal: widthPercentage(24)}}>
 						<FlexWrap gap={10}>
 							{presetDatas[route.params.index].map((item, idx) => (
 								<DayTouchablOpacity
@@ -295,7 +315,7 @@ export default function PresetDetail({navigation, route}: any) {
 									<PretendardSemiBoldText
 										size={14}
 										lineHeight={18.9}
-										color={select == idx ? colors.Gray5 : colors.Gray3}>
+										color={select == idx ? colors.Gray5 : colors.Gray400}>
 										DAY{idx + 1}
 									</PretendardSemiBoldText>
 								</DayTouchablOpacity>
@@ -306,13 +326,18 @@ export default function PresetDetail({navigation, route}: any) {
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					ref={scrollRef}
+					style={{paddingHorizontal: widthPercentage(24)}}
 					onScroll={e => {
 						scrollhandle(e);
 					}}>
 					{presetDatas[route.params.index].map((item, index) => (
-						<WhiteContainer key={index}>
+						<WhiteContainer
+							key={index}
+							deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
+								20,
+							)}px ${widthPercentage(20)}px;`}>
 							<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray5}>
-								{moment(day[index]).format('YY.MM.DD') + ' '}({weekdays[moment(day[index]).days()]})
+								{moment(day[index]).format('YY-MM-DD') + ' '}({weekdays[moment(day[index]).days()]})
 							</PretendardSemiBoldText>
 							<InsideGray>
 								<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray2}>
@@ -341,14 +366,19 @@ export default function PresetDetail({navigation, route}: any) {
 										<HStack gap={widthPercentage(10)}>
 											<DashLineContainer>
 												{value.category == 4 ? (
-													<Triangle />
+													<Triangle style={{borderTopColor: colors.PointYellow}} />
 												) : (
 													<Circle
-														color={value.category == 5 ? colors.PointYellow : colors.Gray5}
+														color={
+															value.category == 5
+																? colors.PointYellow
+																: colors.PointYellow
+														}
 													/>
 												)}
 												{item.length != 1 && (
 													<DashLine
+														color={colors.PointYellow}
 														dash={false}
 														status={
 															idx == 0
@@ -386,24 +416,28 @@ export default function PresetDetail({navigation, route}: any) {
 				<MarginContainer />
 			</BackgroundGray>
 			<ButtonContainer>
-				<CustomButton label='이 여행 일정으로 정했어요!' onPress={checkNext}></CustomButton>
+				<CustomButton
+					bgColor={colors.Gray5}
+					textColor={colors.backgroundWhite}
+					label='이 여행 일정으로 정했어요!'
+					onPress={checkNext}></CustomButton>
 			</ButtonContainer>
 		</>
 	);
 }
 
 const TopFixContainer = styled.View`
-	width: ${widthPercentage(327)}px;
+	width: ${widthPercentage(375)}px;
 `;
 export const DayTouchablOpacity = styled.TouchableOpacity<{select: boolean}>`
-	width: ${widthPercentage(59)}px;
-	height: ${heightPercentage(27)}px;
+	width: ${widthPercentage(73)}px;
+	height: ${heightPercentage(35)}px;
 	align-items: center;
 	justify-content: center;
 	border-radius: 99px;
-	border-width: ${props => (props.select ? '0px' : '1px')};
-	border-color: ${colors.Gray3};
-	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
+	border-width: ${props => (props.select ? '1px' : '0px')};
+	border-color: ${colors.Primary};
+	background-color: ${props => (props.select ? colors.PrimarySecondary : colors.backgroundWhite)};
 `;
 export const MarkerContainer = styled.View<{backgroundColor?: string}>`
 	width: ${widthPercentage(Platform.isPad ? 20 : 24)}px;
@@ -415,7 +449,7 @@ export const MarkerContainer = styled.View<{backgroundColor?: string}>`
 	z-index: 3;
 `;
 const InsideGray = styled.View`
-	width: ${widthPercentage(300)}px;
+	width: ${widthPercentage(287)}px;
 	border-radius: 8px;
 	background-color: ${colors.backgroundGray};
 	padding: ${heightPercentage(13)}px ${widthPercentage(15)}px;

@@ -11,8 +11,9 @@ import {
 	FlexWrap,
 	TagContainer,
 	PretendardVariableText,
+	VStack,
 } from '../../utill/layout/layout';
-import {SVGCalendarRecommend, SVGFlag, SVGRightAdd} from '../../utill/svg/svg';
+import {SVGCalendarRecommend, SVGFlag, SvgHomeIcon, SVGRightAdd} from '../../utill/svg/svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -23,6 +24,7 @@ import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {deleteAI, saveAI} from '../../redux/travel-info/travel.slice';
 import {logEvent} from '../../../firebaseAnalytice';
+import LinearGradient from 'react-native-linear-gradient';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -37,6 +39,7 @@ export default function Preset({navigation}: any) {
 		region,
 		aiFlag,
 		aiID,
+		regionInfo,
 	} = useAppSelector(state => state.travelSlice);
 	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -79,21 +82,23 @@ export default function Preset({navigation}: any) {
 					onPress={() => {
 						dispatch(
 							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로 이동시 코스 추천이 종료됩니다.',
-								modalSubTitle: '그래도 나가시겠습니까?\n변경 사항이 있다면 저장하기 버튼을 눌러주세요.',
-								modalFunction: () => {
+								modalTitle: '저장되지 않았어요',
+								modalSubTitle:
+									'홈으로 이동시 지역 추천이 종료돼요.\n일정 선택 후에 종료해야 저장할 수 있어요.',
+								// modalFunction: () => {
+								// 	navigation.popToTop();
+								// },
+								modalTopText: '일정 선택하러 가기',
+								modalBottomText: '종료하기',
+								modalBottomFunction: () => {
 									navigation.popToTop();
 								},
 								modalLeft: true,
 							}),
 						);
 					}}
-					style={{justifyContent: 'center'}}>
-					<Image
-						resizeMode='contain'
-						source={require('../../../public/images/danim_logo_row.png')}
-						style={{height: heightPercentage(36), aspectRatio: 2.054}}
-					/>
+					style={{justifyContent: 'center', paddingLeft: 10}}>
+					<SvgHomeIcon />
 				</TouchableOpacity>
 			),
 			headerRight: () =>
@@ -198,203 +203,283 @@ export default function Preset({navigation}: any) {
 				<StepText
 					mainTextSize={23}
 					styleTextColor={colors.Gray4}
-					styleText='일정 추천'
-					mainText={`${userName} 님, \n이런 여행지는 어떠신가요?`}
+					styleTextSize={14}
+					styleText='다님의 일정 추천!'
+					mainText={`${userName} 님, \n이런 여행 일정은 어떠신가요?`}
 					subText='점수가 낮은 일정은 간단한 동선을 우선시했어요!'
 				/>
-				<SvgContainer>
+				{/* <SvgContainer>
 					<SVGCalendarRecommend
 						style={{zIndex: 0}}
 						width={widthPercentage(200)}
 						height={heightPercentage(150)}
 					/>
-				</SvgContainer>
-				<WhiteContainer>
-					<RegionTextContainer gap={widthPercentage(4)}>
-						<SVGFlag width={widthPercentage(12)} height={widthPercentage(15)} color='#DDF2FE' />
-						<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray5}>
-							{region[0].split('/').at(-1)}
-							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
-						</PretendardSemiBoldText>
-					</RegionTextContainer>
-					<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
-						{presetTendencyList[0]?.tendencyNameList.map((item, idx) => {
-							return (
-								<TagContainer backgroundColor={colors.backgroundGray} key={idx}>
-									<PretendardSemiBoldText size={12} lineHeight={14} color={colors.Gray4}>
-										{item}
+				</SvgContainer> */}
+				<BackgroundContainer>
+					<BackgroundImage resizeMode='stretch' source={{uri: regionInfo.photo}}></BackgroundImage>
+					<LinearGradient
+						start={{x: 0, y: 0}}
+						end={{x: 0, y: 1}}
+						colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.5)']}
+						style={{
+							zIndex: 101,
+							position: 'absolute',
+							width: '100%',
+							paddingHorizontal: widthPercentage(24),
+							paddingVertical: widthPercentage(20),
+							justifyContent: 'space-between',
+							height: '100%',
+							borderRadius: 12,
+						}}>
+						<VStack>
+							<PretendardSemiBoldText size={22} lineHeight={26} color={colors.backgroundWhite}>
+								{region[0].split('/').at(-1)}
+								{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
+							</PretendardSemiBoldText>
+							<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+								{presetTendencyList[0]?.tendencyNameList.slice(0, 3).map((item, idx) => {
+									return (
+										<TagContainer backgroundColor={'rgba(195,245,80,0.3)'} key={idx}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={18}
+												color={colors.backgroundWhite}>
+												{item}
+											</PretendardSemiBoldText>
+										</TagContainer>
+									);
+								})}
+								{presetTendencyList[0]?.tendencyNameList.length >= 4 && (
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Primary}>
+										+{presetTendencyList[0]?.tendencyNameList.length - 3}
 									</PretendardSemiBoldText>
-								</TagContainer>
-							);
-						})}
-					</FlexWrap>
-				</WhiteContainer>
+								)}
+							</FlexWrap>
+						</VStack>
+					</LinearGradient>
+				</BackgroundContainer>
+				{/* <ScrollView
+						horizontal={true}
+						nestedScrollEnabled={true}
+						showsHorizontalScrollIndicator={false}
+						style={{marginVertical: widthPercentage(20)}}>
+						{['내 여행 성향', ...Array.from({length: nDay + 1}, (item, index) => index)].map(
+							(item, idx) => {
+								return (
+									<RegionItems
+										key={idx}
+										select={idx == viewType}
+										onPress={() => {
+											setViewType(idx);
+										}}>
+										<PretendardVariableText
+											size={14}
+											lineHeight={18.9}
+											color={idx == viewType ? colors.backgroundWhite : colors.Gray400}>
+											{idx == 0 ? item : `DAY ${item + 1}`}
+										</PretendardVariableText>
+									</RegionItems>
+								);
+							},
+						)}
+					</ScrollView> */}
+
 				{presetDatas.map(
 					(item, idx) =>
 						item != null && (
-							<WhiteContainer key={idx}>
-								<HStack marginVertical={heightPercentage(10)}>
-									<IndexContainer>
+							<>
+								<HStack
+									deco={`background-color:${colors.Green1};width:${widthPercentage(
+										130,
+									)}px;border-top-right-radius:8px;border-top-left-radius:8px;height:${widthPercentage(
+										48,
+									)}px;align-items:center;justify-content:center;`}>
+									{/* <IndexContainer>
 										<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray5}>
 											{idx + 1}
 										</PretendardSemiBoldText>
-									</IndexContainer>
-									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray5}>
+									</IndexContainer> */}
+									<PretendardSemiBoldText size={18} lineHeight={22.6} color={colors.Gray5}>
 										{nDay == 0 ? '당일치기 ' : nDay + '박 ' + (nDay + 1) + '일 '}
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray3}>
+									{/* <PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray3}>
 										일정
-									</PretendardSemiBoldText>
+									</PretendardSemiBoldText> */}
 								</HStack>
-								{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
-									<>
-										{presetTendencyList[idx]?.tendencyNameList.length >= 2 &&
-											presetDatas.length >= 2 && (
-												<HStack>
-													<PretendardSemiBoldText
-														size={14}
-														lineHeight={20.6}
-														color={colors.Black}>
-														다른 코스에 비해{' '}
+								<WhiteContainer
+									key={idx}
+									deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
+										20,
+									)}px ${widthPercentage(24)}px;`}>
+									{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
+										<>
+											{presetTendencyList[idx]?.tendencyNameList.length >= 2 &&
+												presetDatas.length >= 2 && (
+													<HStack>
 														<PretendardSemiBoldText
 															size={14}
 															lineHeight={20.6}
-															color={colors.PointYellow}>
-															[{calculateTendency(presetTendencyList[idx])}]
-														</PretendardSemiBoldText>{' '}
-														성향이 더 높아요
-													</PretendardSemiBoldText>
-												</HStack>
-											)}
-										<HStack>
-											<FlexWrap
-												width={widthPercentage(280)}
-												gap={widthPercentage(10)}
-												marginBottom={10}
-												onPress={() => {
-													let copy = {...tendencyViewIndex};
-													copy[idx] = !copy[idx];
-													setTendencyViewIndex(copy);
-												}}>
-												{presetTendencyList[idx]?.tendencyNameList
-													.slice(
-														0,
-														tendencyViewIndex[idx]
-															? 4
-															: presetTendencyList[idx]?.tendencyNameList.length,
-													)
-													.map((item, index) => {
-														return (
-															<TagContainer
-																backgroundColor={colors.backgroundGray}
-																height={heightPercentage(28)}
-																key={index}>
-																<PretendardSemiBoldText
-																	size={14}
-																	lineHeight={17}
-																	color={colors.Gray4}>
-																	{item + ' '}
-																</PretendardSemiBoldText>
-																<PretendardSemiBoldText
-																	size={14}
-																	lineHeight={17}
-																	color={colors.PointYellow}>
-																	{presetTendencyList[idx].tendencyPointList[index]}점
-																</PretendardSemiBoldText>
-															</TagContainer>
-														);
-													})}
-											</FlexWrap>
-											{presetTendencyList[idx]?.tendencyNameList.length > 4 && (
-												<TouchableOpacity
-													style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
+															color={colors.Black}>
+															다른 코스에 비해{' '}
+															<PretendardSemiBoldText
+																size={14}
+																lineHeight={20.6}
+																color={colors.PointYellow}>
+																[{calculateTendency(presetTendencyList[idx])}]
+															</PretendardSemiBoldText>{' '}
+															성향이 더 높아요
+														</PretendardSemiBoldText>
+													</HStack>
+												)}
+											<HStack>
+												<FlexWrap
+													width={widthPercentage(250)}
+													gap={widthPercentage(10)}
+													marginBottom={10}
 													onPress={() => {
 														let copy = {...tendencyViewIndex};
 														copy[idx] = !copy[idx];
 														setTendencyViewIndex(copy);
 													}}>
-													<SVGRightAdd
-														width={widthPercentage(20)}
-														height={widthPercentage(20)}
-														color='black'
-														transform={tendencyViewIndex[idx] ? 90 : 270}
-													/>
-												</TouchableOpacity>
-											)}
-										</HStack>
-									</>
-								)}
-								{item.map((value, index) => {
-									return (
-										<HStack gap={widthPercentage(10)} key={index}>
-											<DashLineContainer>
-												{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
-													<Triangle />
-												) : (
-													<Circle
+													{presetTendencyList[idx]?.tendencyNameList
+														.slice(
+															0,
+															tendencyViewIndex[idx]
+																? 4
+																: presetTendencyList[idx]?.tendencyNameList.length,
+														)
+														.map((item, index) => {
+															return (
+																<TagContainer
+																	backgroundColor={colors.backgroundGray}
+																	height={heightPercentage(28)}
+																	key={index}>
+																	<PretendardSemiBoldText
+																		size={14}
+																		lineHeight={17}
+																		color={colors.Gray4}>
+																		{item + ' '}
+																	</PretendardSemiBoldText>
+																	<PretendardSemiBoldText
+																		size={14}
+																		lineHeight={17}
+																		color={colors.PointYellow}>
+																		{
+																			presetTendencyList[idx].tendencyPointList[
+																				index
+																			]
+																		}
+																		점
+																	</PretendardSemiBoldText>
+																</TagContainer>
+															);
+														})}
+												</FlexWrap>
+												{presetTendencyList[idx]?.tendencyNameList.length > 4 && (
+													<TouchableOpacity
+														style={{
+															height: 'auto',
+															justifyContent: 'flex-end',
+															marginLeft: 4,
+														}}
+														onPress={() => {
+															let copy = {...tendencyViewIndex};
+															copy[idx] = !copy[idx];
+															setTendencyViewIndex(copy);
+														}}>
+														<SVGRightAdd
+															width={widthPercentage(20)}
+															height={widthPercentage(20)}
+															color='black'
+															transform={tendencyViewIndex[idx] ? 90 : 270}
+														/>
+													</TouchableOpacity>
+												)}
+											</HStack>
+										</>
+									)}
+									{item.map((value, index) => {
+										return (
+											<HStack gap={widthPercentage(10)} key={index} deco={'width:100%;'}>
+												<HStack deco='width:30%;'>
+													<DashLineContainer>
+														{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
+															<Triangle />
+														) : (
+															<Circle
+																color={
+																	value[value[0].name == '숙소 추천' ? 1 : 0]
+																		.category == 5
+																		? colors.PointYellow
+																		: colors.Gray5
+																}
+															/>
+														)}
+														<DashLine
+															status={
+																index == 0
+																	? 'start'
+																	: index == item.length - 1
+																	? 'end'
+																	: 'center'
+															}
+														/>
+													</DashLineContainer>
+													<PretendardVariableText
+														size={14}
+														lineHeight={17}
+														color={colors.Title}>
+														{index + 1}일차
+													</PretendardVariableText>
+												</HStack>
+												<VStack deco='width:50%;' justifyContent='center'>
+													<PretendardVariableText
+														maxWidth={widthPercentage(150)}
+														numberOfLines={1}
+														size={16}
+														lineHeight={19}
 														color={
-															value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+															value[value[0].category == 4 ? 1 : 0].category == 5
 																? colors.PointYellow
 																: colors.Gray5
-														}
-													/>
-												)}
-												<DashLine
-													status={
-														index == 0
-															? 'start'
-															: index == item.length - 1
-															? 'end'
-															: 'center'
-													}
-												/>
-											</DashLineContainer>
-											<PretendardVariableText
-												maxWidth={widthPercentage(150)}
-												numberOfLines={1}
-												size={16}
-												lineHeight={19}
-												color={
-													value[value[0].category == 4 ? 1 : 0].category == 5
-														? colors.PointYellow
-														: colors.Gray5
-												}>
-												{value[value[0].category == 4 ? 1 : 0].name}
-											</PretendardVariableText>
-											{value.filter(itemValue => !itemValue.name.includes('추천')).length - 1 >=
-												1 && (
-												<PretendardVariableText
-													size={16}
-													lineHeight={16}
-													color={colors.Primary}>
-													+
+														}>
+														{value[value[0].category == 4 ? 1 : 0].name}
+													</PretendardVariableText>
 													{value.filter(itemValue => !itemValue.name.includes('추천'))
-														.length - 1}
-													개 장소
-												</PretendardVariableText>
-											)}
-											<PretendardVariableText size={14} lineHeight={17} color={colors.Gray2}>
-												{index + 1}일차
-											</PretendardVariableText>
-										</HStack>
-									);
-								})}
-								<PrimaryButton
-									alignSelf='center'
-									marginBottom={heightPercentage(10)}
-									marginTop={heightPercentage(10)}
-									width={widthPercentage(290)}
-									height={heightPercentage(50)}
-									label='일정 자세히 보기'
-									backgroundColor={colors.backgroundGray}
-									textColor={colors.PointYellow}
-									onPress={async () => {
-										goDetail(idx);
-										await logEvent('view_course_result_detail', {
-											place: item[0][0].name,
-										});
-									}}></PrimaryButton>
-							</WhiteContainer>
+														.length -
+														1 >=
+														1 && (
+														<PretendardVariableText
+															size={16}
+															lineHeight={16}
+															color={colors.Title}>
+															+
+															{value.filter(itemValue => !itemValue.name.includes('추천'))
+																.length - 1}
+															개 장소
+														</PretendardVariableText>
+													)}
+												</VStack>
+											</HStack>
+										);
+									})}
+									<PrimaryButton
+										alignSelf='center'
+										marginBottom={heightPercentage(10)}
+										marginTop={heightPercentage(10)}
+										width={widthPercentage(290)}
+										height={heightPercentage(50)}
+										label='일정 자세히 보기'
+										backgroundColor={colors.backgroundGray}
+										textColor={colors.PointYellow}
+										onPress={async () => {
+											goDetail(idx);
+											await logEvent('view_course_result_detail', {
+												place: item[0][0].name,
+											});
+										}}></PrimaryButton>
+								</WhiteContainer>
+							</>
 						),
 				)}
 			</ScrollView>
@@ -435,10 +520,10 @@ export const Triangle = styled.View`
 	border-right-color: transparent;
 	border-top-color: black;
 `;
-export const DashLine = styled.View<{status: string; dash?: boolean}>`
+export const DashLine = styled.View<{status: string; dash?: boolean; color?: string}>`
 	width: 1px;
 	height: ${props => (props.status == 'center' ? '100%' : '50%')};
-	border: ${props => (props.dash ?? true ? 'dashed' : '')} ${colors.Gray5};
+	border: ${props => (props.dash ?? true ? 'dashed' : '')} ${props => props.color ?? colors.Gray5};
 	position: absolute;
 	left: ${widthPercentage(9)}px;
 	bottom: 0;
@@ -462,4 +547,17 @@ const SvgContainer = styled.View`
 	justify-content: center;
 	left: ${widthPercentage(122)}px;
 	top: ${heightPercentage(51)}px;
+`;
+const BackgroundImage = styled.Image`
+	position: absolute;
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(89)}px;
+	border-radius: 8px;
+`;
+
+const BackgroundContainer = styled.View`
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(89)}px;
+	border-radius: 8px;
+	margin-vertical: ${widthPercentage(10)}px;
 `;

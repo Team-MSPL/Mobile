@@ -74,6 +74,7 @@ import TrainIcon from '../../../public/trainIcon.svg';
 import Clock from '../../../public/clock.svg';
 import CalendarIcon from '../../../public/calendarIcon.svg';
 import TripleDot from '../../../public/tripleDot.svg';
+import HomeIcon from '../../../public/homeIcon.svg';
 
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
@@ -290,5 +291,9 @@ export const SvgCalendarIcon = styled(CalendarIcon)<{color?: string}>`
 	color: color;
 `;
 export const SvgTripleDot = styled(TripleDot)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgHomeIcon = styled(HomeIcon)<{color?: string}>`
 	color: color;
 `;
