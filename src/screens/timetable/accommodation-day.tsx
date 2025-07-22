@@ -48,10 +48,12 @@ export default function AccommodationDay({navigation, route}: any) {
 		// {"category": 4, "id": "SUDV5kkBz", "lat": 37.4852144611646, "lng": 127.012853494146, "name": "유원호텔", "takenTime": 360, "x": 0, "y": 36}
 		let startIndex;
 		let endIndex;
+		console.log('qwe', day, selectStartDate, selectEndDate);
 		day.forEach((item, idx) => {
 			if (moment(new Date(item)).isSame(selectStartDate)) startIndex = idx;
-			if (moment(new Date(item)).isSame(selectEndDate)) endIndex = idx;
+			if (moment(new Date(item)).isSame(selectEndDate ?? selectStartDate)) endIndex = idx;
 		});
+		console.log(startIndex, endIndex);
 		let copyTimetable = [...timetable];
 		copyTimetable.forEach((item, index) => {
 			if (index >= startIndex && index <= endIndex) {
@@ -69,6 +71,7 @@ export default function AccommodationDay({navigation, route}: any) {
 				copyTimetable[index] = data;
 			}
 		});
+		console.log(copyTimetable);
 		dispatch(travelSliceActions.changeTimetable(copyTimetable));
 		navigation.pop(2);
 	};

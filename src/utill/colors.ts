@@ -30,4 +30,5 @@ export const colors = {
 	PlannerGray: '#BDBDBD',
 	Title: '#74788E',
 	PrimarySecondary: '#F2FFD4',
+	Orange: '#FFA500',
 };

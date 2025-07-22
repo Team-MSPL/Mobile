@@ -398,15 +398,15 @@ export const DayViewContainer = styled.View`
 	z-index: 0;
 `;
 
-export const SVGContainer = styled.TouchableOpacity<{color: string}>`
-	width: ${widthPercentage(33)}px;
-	height: ${widthPercentage(33)}px;
+export const SVGContainer = styled.TouchableOpacity<{color: string; width?: number}>`
+	width: ${props => widthPercentage(props.width ?? 33)}px;
+	height: ${props => widthPercentage(props.width ?? 33)}px;
 	background-color: ${props => props.color};
 	border-radius: 99px;
 	align-items: center;
 	justify-content: center;
 `;
-export const ElementContainer = styled.View<{color: string; height?: number; marginBottom?: number}>`
+export const ElementContainer = styled.View<{width?: string; color: string; height?: number; marginBottom?: number}>`
 	border-radius: 8px;
 	background-color: ${props => props.color};
 	align-items: center;
@@ -415,7 +415,7 @@ export const ElementContainer = styled.View<{color: string; height?: number; mar
 	flex-direction: row;
 	margin-right: ${widthPercentage(5)}px;
 	margin-bottom: ${props => props.marginBottom ?? widthPercentage(5)}px;
-	width: ${widthPercentage(300)}px;
+	width: ${props => widthPercentage(props?.width ?? 300)}px;
 	height: ${props => props.height + 'px' ?? 'auto'};
 	z-index: 0;
 `;
@@ -440,7 +440,7 @@ export const DeleteContainer = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 `;
-const Dropdown = styled.View`
+export const Dropdown = styled.View`
 	width: ${widthPercentage(52)}px;
 	border-width: 1px;
 	position: absolute;
@@ -451,7 +451,7 @@ const Dropdown = styled.View`
 	background-color: ${colors.backgroundWhite};
 	z-index: 1111;
 `;
-const DropdownElement = styled.TouchableOpacity`
+export const DropdownElement = styled.TouchableOpacity`
 	width: 100%;
 	height: ${widthPercentage(48)}px;
 	align-items: center;
@@ -460,7 +460,8 @@ const DropdownElement = styled.TouchableOpacity`
 	background-color: ${colors.backgroundWhite};
 	z-index: 1111;
 `;
-const DotBox = styled.TouchableOpacity`
+export const DotBox = styled.TouchableOpacity<{deco?: string}>`
 	width: ${widthPercentage(30)}px;
 	height: ${widthPercentage(30)}px;
+	${props => props.deco}
 `;

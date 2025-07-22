@@ -76,6 +76,10 @@ import CalendarIcon from '../../../public/calendarIcon.svg';
 import TripleDot from '../../../public/tripleDot.svg';
 import HomeIcon from '../../../public/homeIcon.svg';
 
+import CarIcon from '../../../public/carIcon.svg';
+import BagIcon from '../../../public/bagIcon.svg';
+import BuildingIcon from '../../../public/buildingIcon.svg';
+import SpoonIcon from '../../../public/spoonIcon.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -295,5 +299,20 @@ export const SvgTripleDot = styled(TripleDot)<{color?: string}>`
 `;
 
 export const SvgHomeIcon = styled(HomeIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgCarIcon = styled(CarIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgBagIcon = styled(BagIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgBuildingIcon = styled(BuildingIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgSpoonIcon = styled(SpoonIcon)<{color?: string}>`
 	color: color;
 `;

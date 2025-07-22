@@ -915,6 +915,8 @@ export const travelSlice = createSlice({
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
 			state.regionInfo.name = payload.name;
 			state.regionInfo.photo = Array.isArray(payload.photo) ? payload.photo[0] : payload.photo;
+			state.regionInfo.lat = payload.latitude;
+			state.regionInfo.lng = payload.longitude;
 		});
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
 			state.aiList = payload.data;
@@ -1009,6 +1011,8 @@ interface aiListType {
 interface regionInfoType {
 	name: string;
 	photo: string;
+	lat: number;
+	lng: number;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];

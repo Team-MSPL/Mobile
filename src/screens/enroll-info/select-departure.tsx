@@ -193,7 +193,7 @@ export default function SelectDeparture({navigation}: any) {
 					</VStack>
 				);
 			})}
-			<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray2}>
+			<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray2} deco={'margin-bottom:70px;'}>
 				* 검색에 오차가 있을 수 있어요
 			</PretendardSemiBoldText>
 			<RouteButton
@@ -204,7 +204,7 @@ export default function SelectDeparture({navigation}: any) {
 	);
 }
 
-const DepartureBackground = styled(BackgroundGrayScrollView).attrs({as: Pressable})``;
+const DepartureBackground = styled(BackgroundGrayScrollView)``;
 const AutoContainer = styled.View<{height: boolean}>`
 	width: 100%;
 	height: ${props => (props.height ? heightPercentage(202) : heightPercentage(152))}px;

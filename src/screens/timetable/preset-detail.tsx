@@ -263,14 +263,16 @@ export default function PresetDetail({navigation, route}: any) {
 			<BackgroundGray paddingHorizental={0}>
 				<TopFixContainer>
 					<HStack marginHorizon={widthPercentage(24)}>
-						<HStack marginVertical={10}>
-							<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.Black}>
-								<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.PointYellow}>
-									[{calculateTendency(presetTendencyList[route.params.index])}]
-								</PretendardSemiBoldText>{' '}
-								성향이 높은 코스에요!
-							</PretendardSemiBoldText>
-						</HStack>
+						{presetTendencyList[route.params.index]?.tendencyNameList.length >= 2 && (
+							<HStack marginVertical={10}>
+								<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.Black}>
+									<PretendardSemiBoldText size={16} lineHeight={20.6} color={colors.PointYellow}>
+										[{calculateTendency(presetTendencyList[route.params.index])}]
+									</PretendardSemiBoldText>{' '}
+									성향이 높은 코스에요!
+								</PretendardSemiBoldText>
+							</HStack>
+						)}
 						{presetTendencyList[route.params.index].tendencyNameList.length > 4 && (
 							<TouchableOpacity
 								style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}

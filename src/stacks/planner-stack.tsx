@@ -1,6 +1,8 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
+import AddCategory from '../screens/enroll-info/planner/add-category';
 import AddInPerson from '../screens/enroll-info/planner/add-in-person';
+import AddSearchRecommend from '../screens/enroll-info/planner/add-search-recommend';
 import ChoiceTransit from '../screens/enroll-info/planner/choice-transit';
 import Passport from '../screens/enroll-info/planner/passport';
 import Planner from '../screens/enroll-info/planner/planner';
@@ -34,7 +36,7 @@ export default function PlannerStack() {
 				name='AddInPerson'
 				component={AddInPerson}
 				options={{
-					title: '',
+					title: '직접 추가',
 				}}
 			/>
 			<Stack.Screen
@@ -42,6 +44,20 @@ export default function PlannerStack() {
 				component={ChoiceTransit}
 				options={{
 					title: '교통 등록하기',
+				}}
+			/>
+			<Stack.Screen
+				name='AddCategory'
+				component={AddCategory}
+				options={{
+					title: '여행지 추가',
+				}}
+			/>
+			<Stack.Screen
+				name='AddSearchRecommend'
+				component={AddSearchRecommend}
+				options={{
+					title: '여행지 추가',
 				}}
 			/>
 		</Fragment>

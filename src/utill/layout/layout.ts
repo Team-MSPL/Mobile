@@ -21,6 +21,7 @@ export const HStack = styled.View<{
 	justify-content: ${props => props.justifyContent ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
+	z-index: 0;
 	${props => props.deco};
 `;
 export const VStack = styled.View<{

@@ -15,7 +15,14 @@ import {
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import {HeaderContianer, PretendardBold, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {
+	HeaderContianer,
+	PretendardBold,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import shortId from 'shortid';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
@@ -27,6 +34,7 @@ import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 import moment from 'moment';
 import {eventSliceActions} from '../../redux/event/event.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -47,6 +55,7 @@ export default function Timetable({navigation, route}: any) {
 		regionInfo,
 		autoRecommendFlag,
 		country,
+		cityIndex,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin, socialloginProvider} = useAppSelector(state => state.userSlice);
 
@@ -383,6 +392,10 @@ export default function Timetable({navigation, route}: any) {
 		}
 	}, [moveTimeErrorIndex]);
 	const timeRef = useRef(null);
+	const hanldeHome = () => {
+		navigation.popToTop();
+		navigation.navigate('Home');
+	};
 	const goMyTravelList = () => {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
@@ -424,6 +437,17 @@ export default function Timetable({navigation, route}: any) {
 	};
 	const exitApp = () => {
 		BackHandler.exitApp();
+	};
+	const checkSave = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '일정을 저장하시겠습니까?',
+				modalFunction: goSave,
+				modalTopText: '네',
+				modalBottomText: '아니오',
+				modalLeft: true,
+			}),
+		);
 	};
 	useEffect(() => {
 		const backAction = () => {
@@ -523,9 +547,12 @@ export default function Timetable({navigation, route}: any) {
 				await dispatch(updateTravelCourse(data));
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '수정 완료',
-						modalSubTitle: '내 여행 리스트로 이동합니다.',
+						modalTitle: '일정이 저장되었습니다',
+						modalTopText: '일정 확인하러 가기',
+						modalBottomText: '홈으로 돌아가기',
 						modalFunction: goMyTravelList,
+						modalBottomFunctionUse: true,
+						modalBottomFunction: hanldeHome,
 					}),
 				);
 				await logEvent('edit_course_save', {
@@ -665,32 +692,56 @@ export default function Timetable({navigation, route}: any) {
 		navigation.setOptions({
 			headerBackVisible: false,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
-			headerRight: () => (
-				<HeaderContianer>
-					<>
-						{socialloginProvider != 'anonymous' && (
-							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
-								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
-									삭제
-								</PretendardVariableText>
-							</TouchableOpacity>
-						)}
-						<TouchableOpacity
-							onPress={async () => {
-								setModify(!modify);
-								!modify &&
-									(await logEvent('edit_course_start', {
-										course: travelName,
-									}));
-							}}>
-							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-								{modify ? '취소' : '편집'}
-							</PretendardVariableText>
-						</TouchableOpacity>
-					</>
-				</HeaderContianer>
-			),
-			headerLeft: () =>
+			headerTitle: () => {
+				return (
+					<VStack>
+						<PretendardSemiBoldText
+							size={16}
+							lineHeight={20}
+							color={colors.Black}
+							style={{textAlign: 'center'}}>
+							{(region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0]) +
+								' ' +
+								(nDay == 0 ? '당일치기' : nDay + '박' + (nDay + 1) + '일') +
+								' ' +
+								travelName}
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText
+							size={12}
+							lineHeight={16}
+							color={colors.Gray4}
+							style={{textAlign: 'center'}}>
+							{moment(day[0]).format('YYYY/MM/DD') + ' ~ ' + moment(day[nDay]).format('YYYY/MM/DD')}
+						</PretendardSemiBoldText>
+					</VStack>
+				);
+			},
+			// headerRight: () => (
+			// 	<HeaderContianer>
+			// 		<>
+			// 			{socialloginProvider != 'anonymous' && (
+			// 				<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
+			// 					<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
+			// 						삭제
+			// 					</PretendardVariableText>
+			// 				</TouchableOpacity>
+			// 			)}
+			// 			<TouchableOpacity
+			// 				onPress={async () => {
+			// 					setModify(!modify);
+			// 					!modify &&
+			// 						(await logEvent('edit_course_start', {
+			// 							course: travelName,
+			// 						}));
+			// 				}}>
+			// 				<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
+			// 					{modify ? '취소' : '편집'}
+			// 				</PretendardVariableText>
+			// 			</TouchableOpacity>
+			// 		</>
+			// 	</HeaderContianer>
+			// ),
+			headerRight: () =>
 				socialloginProvider != 'anonymous' && (
 					<>
 						{Platform.OS != 'android' && (
@@ -724,7 +775,7 @@ export default function Timetable({navigation, route}: any) {
 						)}
 						{shareViewWithStartFlag && (
 							<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
-								<PretendardBoldText size={18} lineHeight={24} color={colors.PointYellow}>
+								<PretendardBoldText size={16} lineHeight={24} color={colors.PointYellow}>
 									공유
 								</PretendardBoldText>
 							</TouchableOpacity>
@@ -744,8 +795,12 @@ export default function Timetable({navigation, route}: any) {
 		modifyView,
 		modify,
 		socialloginProvider,
+		travelName,
+		nDay,
+		day,
+		cityIndex,
 	]);
 	// if (true) return <></>;
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
-	return <MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>;
+	return <MapInfo navigation={navigation} checkSave={checkSave} modify={modify} setModify={setModify}></MapInfo>;
 }

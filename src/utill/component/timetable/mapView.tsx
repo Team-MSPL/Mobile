@@ -135,7 +135,7 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			onTouchStart={onTouchStart ?? null}
 			onTouchEnd={onTouchEnd ?? null}
 			region={{
-				latitude: isNaN(centerLatitude) ? cityViewList[country][cityIndex].sub[0].lat : centerLatitude,
+				latitude: (isNaN(centerLatitude) ? cityViewList[country][cityIndex].sub[0].lat : centerLatitude) - 0.1,
 				longitude: isNaN(centerLongitude) ? cityViewList[country][cityIndex].sub[0].lng : centerLongitude,
 				latitudeDelta: latitudeDelta <= 0 ? 0.13 : latitudeDelta,
 				longitudeDelta: longitudeDelta <= 0 ? 0.13 : longitudeDelta,

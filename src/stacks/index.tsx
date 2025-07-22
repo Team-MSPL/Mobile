@@ -36,7 +36,7 @@ export default function StackNavigator() {
 					fontSize: fontPercentage(16),
 					fontWeight: '900',
 				},
-				headerStyle: {backgroundColor: colors.main},
+				headerStyle: {backgroundColor: colors.backgroundWhite},
 				headerShadowVisible: false,
 			})}>
 			<Stack.Screen
