@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import shortid from 'shortid';
@@ -28,6 +28,11 @@ export default function AccommodationDay({navigation, route}: any) {
 	const [selectStartDate, setSelectStartDate] = useState();
 	const [selectedDateFlag, setSelectedDateFlag] = useState(false);
 	const {info} = route.params;
+	useEffect(() => {
+		setSelectStartDate(moment(new Date(day[route.params?.index])));
+		setSelectEndDate(moment(new Date(day[route.params?.index])));
+		setSelectedDateFlag(true);
+	}, [route.params]);
 	const onDateChange = (date: any, type: string) => {
 		!selectDateFlag && setSelectDateFlag(true);
 		if (type == 'END_DATE') {
@@ -48,30 +53,52 @@ export default function AccommodationDay({navigation, route}: any) {
 		// {"category": 4, "id": "SUDV5kkBz", "lat": 37.4852144611646, "lng": 127.012853494146, "name": "유원호텔", "takenTime": 360, "x": 0, "y": 36}
 		let startIndex;
 		let endIndex;
-		console.log('qwe', day, selectStartDate, selectEndDate);
 		day.forEach((item, idx) => {
 			if (moment(new Date(item)).isSame(selectStartDate)) startIndex = idx;
 			if (moment(new Date(item)).isSame(selectEndDate ?? selectStartDate)) endIndex = idx;
 		});
-		console.log(startIndex, endIndex);
 		let copyTimetable = [...timetable];
 		copyTimetable.forEach((item, index) => {
 			if (index >= startIndex && index <= endIndex) {
-				let data = item?.filter((filterItem, idx) => filterItem.category != 4);
-				data.push({
-					category: 4,
-					id: shortid(),
-					takenTime: 360,
-					x: 0,
-					y: 36,
-					lat: info.lat,
-					lng: info.lng,
-					name: info.name,
-				});
+				let data = [...item];
+				if (data.length > 1 && data[data.length - 1]?.category === 4) {
+					data.pop(); // 마지막 요소 제거
+				}
+				if (!(index == copyTimetable.length - 1)) {
+					data.push({
+						category: 4,
+						id: shortid(),
+						takenTime: 360,
+						x: 0,
+						y: 36,
+						lat: info.lat,
+						lng: info.lng,
+						name: info.name,
+					});
+				}
+
+				if (index != copyTimetable.length - 1) {
+					let copy = [...copyTimetable[index + 1]];
+					if (copyTimetable[index + 1][0]?.category == 4) {
+						copy.shift();
+					}
+					copy.push({
+						category: 4,
+						id: shortid(),
+						takenTime: 0,
+						x: index + 1,
+						y: 6,
+						lat: info.lat,
+						lng: info.lng,
+						name: info.name,
+					});
+					copy = copy.sort((a, b) => a.y - b.y);
+					copyTimetable[index + 1] = copy;
+				}
+				data = data.sort((a, b) => a.y - b.y);
 				copyTimetable[index] = data;
 			}
 		});
-		console.log(copyTimetable);
 		dispatch(travelSliceActions.changeTimetable(copyTimetable));
 		navigation.pop(2);
 	};

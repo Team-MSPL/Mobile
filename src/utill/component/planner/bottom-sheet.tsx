@@ -121,7 +121,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 									</PretendardSemiBoldText>
 								</VStack>
 							</HStack>
-							<HStack gap={widthPercentage(13)} s>
+							<HStack gap={widthPercentage(13)}>
 								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
 									출발 정보
 								</PretendardSemiBoldText>
@@ -155,7 +155,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 				<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black} deco='margin-bottom:10px;'>
 					어디서 머무시나요?
 				</PretendardSemiBoldText>
-				{timetable.map((item, index) => (
+				{timetable.slice(0, timetable.length - 1).map((item, index) => (
 					<VStack deco={`margin-top:${widthPercentage(32)}px;`}>
 						<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
 							<HStack gap={3}>
@@ -184,7 +184,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 								</PretendardSemiBoldText>
 							</RegistButton>
 						</HStack>
-						{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '') && (
+						{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36) && (
 							<GrayBox>
 								<VStack width={widthPercentage(243)}>
 									<PretendardSemiBoldText
@@ -192,7 +192,11 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 										lineHeight={22}
 										color={colors.Black}
 										numberOfLines={1}>
-										{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '')?.name}
+										{
+											item?.find(
+												acc => acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36,
+											)?.name
+										}
 									</PretendardSemiBoldText>
 									<PretendardSemiBoldText
 										size={13}
@@ -201,7 +205,10 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 										numberOfLines={1}>
 										{
 											item?.find(
-												acc => acc?.category === 4 && acc?.formatted_address?.trim() !== '',
+												acc =>
+													acc?.category === 4 &&
+													acc?.formatted_address?.trim() !== '' &&
+													acc?.y == 36,
 											)?.formatted_address
 										}
 									</PretendardSemiBoldText>
@@ -238,98 +245,121 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 						</PretendardVariableText>
 					</HStack>
 					{timetable[step - 2].map((item, index) => (
-						<HStack>
-							<VStack>
-								<HStack gap={widthPercentage(10)} marginVertical={widthPercentage(10)}>
-									<DashLineContainer justifyContent='start'>
-										<MarkerContainer
-											backgroundColor={item.category == 4 ? colors.Pink1 : colors.Green5}>
-											<PretendardSemiBoldText
-												size={13}
-												lineHeight={19}
-												color={colors.backgroundWhite}>
-												{index + 1}
-											</PretendardSemiBoldText>
-										</MarkerContainer>
-										{/* <DashLine
-												status={idx == value.length - 1 ? 'end' : 'center'}></DashLine> */}
-									</DashLineContainer>
-									<InsideGrayContainer
-										onLongPress={() => {
-											dispatch(
-												modalSliceActions.setOpenModal({
-													modalTitle: '편집 모드에서 여행 일정을 편집하시겠어요?',
-													modalFunction: () => {
-														// setModify(true);
-													},
-												}),
-											);
-										}}
-										onPress={() => {
-											// moveRegion(idx, index);
-										}}>
-										<HStack justifyContent='space-between;'>
-											<VStack>
-												<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-													{categoryTitle[item.category]}{' '}
-													{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
-													{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
-													{Math.floor(
-														(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
-													) < 25 &&
-														Math.floor(
-															(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
-														) +
-															':' +
-															String(
-																(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) % 60,
-															).padStart(2, '0')}
-												</PretendardVariableText>
+						<>
+							{timetable[step - 2].at(-1)?.category === 4 &&
+								timetable[step - 2].length === 1 &&
+								timetable[step - 2].at(-1)?.y === 36 && (
+									<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
+										<PlusBox
+											onPress={() => {
+												navigation.navigate('AddCategory', {
+													info: {day: step - 2, index: timetable[step - 2].length},
+												});
+											}}>
+											<SVGPlus color={colors.Gray400} />
+										</PlusBox>
+									</HStack>
+								)}
+							<HStack>
+								<VStack>
+									<HStack gap={widthPercentage(10)} marginVertical={widthPercentage(10)}>
+										<DashLineContainer justifyContent='start'>
+											<MarkerContainer
+												backgroundColor={item.category == 4 ? colors.Pink1 : colors.Green5}>
 												<PretendardSemiBoldText
-													maxWidth={widthPercentage(200)}
-													size={14}
-													lineHeight={18.9}
-													numberOfLines={2}
-													color={colors.Gray5}>
-													{item.name}
+													size={13}
+													lineHeight={19}
+													color={colors.backgroundWhite}>
+													{index + 1}
 												</PretendardSemiBoldText>
-											</VStack>
-											<VStack deco='z-index:1000;'>
-												<DotBox
-													deco='align-items:center; justify-content:center;'
-													onPress={() =>
-														setOpen({
-															status: !open.status,
-															index: index,
-															day: index,
-															type: 'essential',
-														})
-													}>
-													<SvgTripleDot />
-												</DotBox>
-												{open.status &&
-													open.index == index &&
-													open.day == index &&
-													open.type == 'essential' && (
-														<Dropdown>
-															<DropdownElement
-																onPress={() => {
-																	setOpen({
-																		day: 0,
-																		index: 0,
-																		status: false,
-																	});
-																	// setModify(true);
-																	//openModal(item.x, idx);
-																}}>
-																<PretendardSemiBoldText
-																	color={colors.Gray5}
-																	size={14}
-																	lineHeight={18}>
-																	편집
-																</PretendardSemiBoldText>
-															</DropdownElement>
-															{/* <DropdownElement
+											</MarkerContainer>
+											{/* <DashLine
+												status={idx == value.length - 1 ? 'end' : 'center'}></DashLine> */}
+										</DashLineContainer>
+										<InsideGrayContainer
+											onLongPress={() => {
+												dispatch(
+													modalSliceActions.setOpenModal({
+														modalTitle: '편집 모드에서 여행 일정을 편집하시겠어요?',
+														modalFunction: () => {
+															// setModify(true);
+														},
+													}),
+												);
+											}}
+											onPress={() => {
+												console.log('category', timetable[step - 2]?.at(-1)?.category);
+												console.log('length', timetable[step - 2]?.length);
+												console.log('y', timetable[step - 2]?.at(-1)?.y);
+
+												// moveRegion(idx, index);
+											}}>
+											<HStack justifyContent='space-between;'>
+												<VStack>
+													<PretendardVariableText
+														size={12}
+														lineHeight={18}
+														color={colors.Gray2}>
+														{categoryTitle[item.category]}{' '}
+														{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+														{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
+														{Math.floor(
+															(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
+														) < 25 &&
+															Math.floor(
+																(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
+															) +
+																':' +
+																String(
+																	(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) %
+																		60,
+																).padStart(2, '0')}
+													</PretendardVariableText>
+													<PretendardSemiBoldText
+														maxWidth={widthPercentage(200)}
+														size={14}
+														lineHeight={18.9}
+														numberOfLines={2}
+														color={colors.Gray5}>
+														{item.name}
+													</PretendardSemiBoldText>
+												</VStack>
+												<VStack deco='z-index:1000;'>
+													<DotBox
+														deco='align-items:center; justify-content:center;'
+														onPress={() =>
+															setOpen({
+																status: !open.status,
+																index: index,
+																day: index,
+																type: 'essential',
+															})
+														}>
+														<SvgTripleDot />
+													</DotBox>
+													{open.status &&
+														open.index == index &&
+														open.day == index &&
+														open.type == 'essential' && (
+															<Dropdown>
+																<DropdownElement
+																	onPress={() => {
+																		setOpen({
+																			day: 0,
+																			index: 0,
+																			status: false,
+																		});
+																		// setModify(true);
+																		//openModal(item.x, idx);
+																	}}>
+																	<PretendardSemiBoldText
+																		color={colors.Gray5}
+																		size={14}
+																		lineHeight={18}>
+																		편집
+																	</PretendardSemiBoldText>
+																</DropdownElement>
+																{/* <DropdownElement
 																	onPress={() => {
 																		// deleteEssential(data);
 																	}}>
@@ -340,25 +370,41 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 																		삭제
 																	</PretendardSemiBoldText>
 																</DropdownElement> */}
-														</Dropdown>
-													)}
-											</VStack>
-										</HStack>
-									</InsideGrayContainer>
+															</Dropdown>
+														)}
+												</VStack>
+											</HStack>
+										</InsideGrayContainer>
+									</HStack>
+								</VStack>
+							</HStack>
+							{((timetable[step - 2].at(-1)?.category == 4 && timetable[step - 2].length - 2 == index) ||
+								(timetable[step - 2].at(-1)?.category == 4 && timetable[step - 2].at(-1)?.y == 6)) && (
+								<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
+									<PlusBox
+										onPress={() => {
+											navigation.navigate('AddCategory', {
+												info: {day: step - 2, index: index},
+											});
+										}}>
+										<SVGPlus color={colors.Gray400} />
+									</PlusBox>
 								</HStack>
-							</VStack>
-						</HStack>
+							)}
+						</>
 					))}
-					<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
-						<PlusBox
-							onPress={() => {
-								navigation.navigate('AddCategory', {
-									info: {day: step - 2, index: timetable[step - 2].length},
-								});
-							}}>
-							<SVGPlus color={colors.Gray400} />
-						</PlusBox>
-					</HStack>
+					{timetable[step - 2].at(-1)?.category != 4 && (
+						<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
+							<PlusBox
+								onPress={() => {
+									navigation.navigate('AddCategory', {
+										info: {day: step - 2, index: timetable[step - 2].length},
+									});
+								}}>
+								<SVGPlus color={colors.Gray400} />
+							</PlusBox>
+						</HStack>
+					)}
 				</WhiteContainer>
 			</>
 		);

@@ -265,14 +265,18 @@ export default function AddSearchRecommend({navigation, route}: any) {
 			...placeState,
 			category: handleCategoryIndex(route?.params?.title),
 			x: route.params?.info?.day,
-			y: isNaN(copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30)
-				? 8
-				: copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30,
+			y:
+				isNaN(copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30) ||
+				copy2[route.params?.info?.index - 1]?.y == 36
+					? 6
+					: copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30,
 			id: shortid.generate(),
 			takenTime: (timeValue + 1) * 60,
 			lat: Number(placeState?.lat),
 			lng: Number(placeState?.lng),
 		});
+		copy2 = copy2.sort((a, b) => a.y - b.y);
+		console.log(copy2);
 		copy[route.params?.info?.day] = copy2;
 		console.log(copy);
 		dispatch(travelSliceActions.changeTimetable(copy));

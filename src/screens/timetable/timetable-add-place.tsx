@@ -509,7 +509,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 							</AccommodationButton>
 							<AccommodationButton
 								onPress={() => {
-									navigation.navigate('AccommodationDay', {info: getInfo});
+									navigation.navigate('AccommodationDay', {info: getInfo, index: route.params.x});
 								}}>
 								<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray5}>
 									등록하기

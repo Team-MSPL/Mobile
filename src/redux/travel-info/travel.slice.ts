@@ -409,6 +409,10 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		} else {
 			regionName = data.region;
 		}
+		if (regionName.includes('제주')) {
+			regionName = '제주 전체';
+		}
+		console.log(regionName, data);
 		// regionName = '해외/Japan/간토 (Kanto) !도쿄';
 		// console.log(regionName.split(''), regionName.length);
 		// console.log('해외/Japan/간토 (Kanto) !도쿄'.split(''), '해외/Japan/간토 (Kanto) !도쿄'.length);
