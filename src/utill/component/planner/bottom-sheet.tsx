@@ -17,6 +17,7 @@ import {DashLineContainer} from '../../../screens/timetable/preset';
 import {MarkerContainer} from '../../../screens/timetable/preset-detail';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {DotBox, Dropdown, DropdownElement} from '../../../screens/enroll-info/select-multi';
+import LinearGradient from 'react-native-linear-gradient';
 function PlannerBottomSheet({navigation, step, setStep}: any) {
 	const {day, region, cityIndex, country, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const sheetRef = useRef<BottomSheet>(null);
@@ -258,6 +259,29 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 											}}>
 											<SVGPlus color={colors.Gray400} />
 										</PlusBox>
+										<PressBox>
+											<LeftTriangle />
+											<LinearGradient
+												start={{x: 0, y: 0}}
+												end={{x: 1, y: 0}}
+												colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
+												style={{
+													zIndex: 101,
+													position: 'absolute',
+													width: '100%',
+													height: '100%',
+													alignItems: 'center',
+													justifyContent: 'center',
+													borderRadius: 18,
+												}}>
+												<PretendardSemiBoldText
+													color={colors.backgroundWhite}
+													size={14}
+													lineHeight={18}>
+													버튼을 눌러 추가하세요
+												</PretendardSemiBoldText>
+											</LinearGradient>
+										</PressBox>
 									</HStack>
 								)}
 							<HStack>
@@ -389,6 +413,29 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 										}}>
 										<SVGPlus color={colors.Gray400} />
 									</PlusBox>
+									<PressBox>
+										<LeftTriangle />
+										<LinearGradient
+											start={{x: 0, y: 0}}
+											end={{x: 1, y: 0}}
+											colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
+											style={{
+												zIndex: 101,
+												position: 'absolute',
+												width: '100%',
+												height: '100%',
+												alignItems: 'center',
+												justifyContent: 'center',
+												borderRadius: 18,
+											}}>
+											<PretendardSemiBoldText
+												color={colors.backgroundWhite}
+												size={14}
+												lineHeight={18}>
+												버튼을 눌러 추가하세요
+											</PretendardSemiBoldText>
+										</LinearGradient>
+									</PressBox>
 								</HStack>
 							)}
 						</>
@@ -403,6 +450,27 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 								}}>
 								<SVGPlus color={colors.Gray400} />
 							</PlusBox>
+
+							<PressBox>
+								<LeftTriangle />
+								<LinearGradient
+									start={{x: 0, y: 0}}
+									end={{x: 1, y: 0}}
+									colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
+									style={{
+										zIndex: 101,
+										position: 'absolute',
+										width: '100%',
+										height: '100%',
+										alignItems: 'center',
+										justifyContent: 'center',
+										borderRadius: 18,
+									}}>
+									<PretendardSemiBoldText color={colors.backgroundWhite} size={14} lineHeight={18}>
+										버튼을 눌러 추가하세요
+									</PretendardSemiBoldText>
+								</LinearGradient>
+							</PressBox>
 						</HStack>
 					)}
 				</WhiteContainer>
@@ -483,5 +551,26 @@ const StartContainer = styled.View`
 	border-color: ${colors.Gray200};
 	align-items: center;
 	justify-content: center;
+`;
+const PressBox = styled.View`
+	width: ${widthPercentage(160)}px;
+	height: ${widthPercentage(30)}px;
+	border-radius: 18px;
+	align-items: center;
+	justify-content: center;
+`;
+const LeftTriangle = styled.View`
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	border-style: solid;
+	border-right-width: ${widthPercentage(8)}px;
+	border-top-width: ${widthPercentage(4)}px;
+	border-bottom-width: ${widthPercentage(4)}px;
+	border-top-color: transparent;
+	border-bottom-color: transparent;
+	border-right-color: rgba(83, 80, 255, 1);
+	position: absolute;
+	left: -${widthPercentage(7)}px;
 `;
 export default memo(PlannerBottomSheet);
