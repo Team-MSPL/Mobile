@@ -1,19 +1,20 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {Modal, FlatList, View, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
 import styled from 'styled-components/native';
+import RouteButton from '../route-button';
 
-const ITEM_HEIGHT = 40;
-const VISIBLE_ITEMS = 5;
-
-const hours = Array.from({length: 12}, (_, i) => i + 1);
-const minutes = Array.from({length: 60}, (_, i) => i.toString().padStart(2, '0'));
-const ampmList = ['오전', '오후'];
-
-export default function TimePickerModal({visible, onClose, onConfirm}) {
+export default function TimePickerModal({visible, onClose, onConfirm, navigation, minuteDivide, handleAllApply}) {
 	const [ampmIndex, setAmpmIndex] = useState(0);
 	const [hourIndex, setHourIndex] = useState(8); // default: 9시
 	const [minuteIndex, setMinuteIndex] = useState(0);
+	const ITEM_HEIGHT = 40;
+	const VISIBLE_ITEMS = 5;
 
+	const hours = Array.from({length: 12}, (_, i) => i + 1);
+	const minutes = Array.from({length: minuteDivide ? 2 : 60}, (_, i) =>
+		minuteDivide ? i * 30 : i.toString().padStart(2, '0'),
+	);
+	const ampmList = ['오전', '오후'];
 	const flatListRef = {
 		ampm: useRef(null),
 		hour: useRef(null),
@@ -43,56 +44,82 @@ export default function TimePickerModal({visible, onClose, onConfirm}) {
 	}, [visible]);
 
 	return (
-		<PickerContainer>
-			{/* AMPM */}
-			<PickerFlatList
-				ref={flatListRef.ampm}
-				data={ampmList}
-				keyExtractor={(item, index) => `${item}-${index}`}
-				showsVerticalScrollIndicator={false}
-				snapToInterval={ITEM_HEIGHT}
-				decelerationRate='fast'
-				onMomentumScrollEnd={onScrollEnd('ampm')}
-				contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
-				renderItem={({item, index}) => (
-					<PickerItem height={ITEM_HEIGHT}>
-						<PickerText selected={index === ampmIndex}>{item}</PickerText>
-					</PickerItem>
-				)}
-			/>
-			{/* Hour */}
-			<PickerFlatList
-				ref={flatListRef.hour}
-				data={hours}
-				keyExtractor={(item, index) => `${item}-${index}`}
-				showsVerticalScrollIndicator={false}
-				snapToInterval={ITEM_HEIGHT}
-				decelerationRate='fast'
-				onMomentumScrollEnd={onScrollEnd('hour')}
-				contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
-				renderItem={({item, index}) => (
-					<PickerItem height={ITEM_HEIGHT}>
-						<PickerText selected={index === hourIndex}>{item}</PickerText>
-					</PickerItem>
-				)}
-			/>
-			{/* Minute */}
-			<PickerFlatList
-				ref={flatListRef.minute}
-				data={minutes}
-				keyExtractor={(item, index) => `${item}-${index}`}
-				showsVerticalScrollIndicator={false}
-				snapToInterval={ITEM_HEIGHT}
-				decelerationRate='fast'
-				onMomentumScrollEnd={onScrollEnd('minute')}
-				contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
-				renderItem={({item, index}) => (
-					<PickerItem height={ITEM_HEIGHT}>
-						<PickerText selected={index === minuteIndex}>{item}</PickerText>
-					</PickerItem>
-				)}
-			/>
-		</PickerContainer>
+		<>
+			<PickerContainer>
+				{/* AMPM */}
+				<PickerFlatList
+					ref={flatListRef.ampm}
+					data={ampmList}
+					keyExtractor={(item, index) => `${item}-${index}`}
+					showsVerticalScrollIndicator={false}
+					snapToInterval={ITEM_HEIGHT}
+					decelerationRate='fast'
+					onMomentumScrollEnd={onScrollEnd('ampm')}
+					contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
+					renderItem={({item, index}) => (
+						<PickerItem height={ITEM_HEIGHT}>
+							<PickerText selected={index === ampmIndex}>{item}</PickerText>
+						</PickerItem>
+					)}
+				/>
+				{/* Hour */}
+				<PickerFlatList
+					ref={flatListRef.hour}
+					data={hours}
+					keyExtractor={(item, index) => `${item}-${index}`}
+					showsVerticalScrollIndicator={false}
+					snapToInterval={ITEM_HEIGHT}
+					decelerationRate='fast'
+					onMomentumScrollEnd={onScrollEnd('hour')}
+					contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
+					renderItem={({item, index}) => (
+						<PickerItem height={ITEM_HEIGHT}>
+							<PickerText selected={index === hourIndex}>{item}</PickerText>
+						</PickerItem>
+					)}
+				/>
+				{/* Minute */}
+				<PickerFlatList
+					ref={flatListRef.minute}
+					data={minutes}
+					keyExtractor={(item, index) => `${item}-${index}`}
+					showsVerticalScrollIndicator={false}
+					snapToInterval={ITEM_HEIGHT}
+					decelerationRate='fast'
+					onMomentumScrollEnd={onScrollEnd('minute')}
+					contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
+					renderItem={({item, index}) => (
+						<PickerItem height={ITEM_HEIGHT}>
+							<PickerText selected={index === minuteIndex}>{item}</PickerText>
+						</PickerItem>
+					)}
+				/>
+			</PickerContainer>
+			<RouteButton
+				navigation={navigation}
+				type={'planner'}
+				leftText={'전체 일정에 적용하기'}
+				LeftBtnFunction={() => {
+					handleAllApply({
+						ampm: ampmList[ampmIndex],
+						hour: hours[hourIndex],
+						minute: minutes[minuteIndex],
+					});
+				}}
+				btnFunction={() => {
+					onConfirm({
+						ampm: ampmList[ampmIndex],
+						hour: hours[hourIndex],
+						minute: minutes[minuteIndex],
+					});
+					console.log({
+						ampm: ampmList[ampmIndex],
+						hour: hours[hourIndex],
+						minute: minutes[minuteIndex],
+					});
+				}}
+				nextText={'완료'}></RouteButton>
+		</>
 	);
 }
 const Overlay = styled.Pressable`

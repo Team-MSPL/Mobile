@@ -11,7 +11,7 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import shortid from 'shortid';
 
 export default function RecommendSelectTour({navigation}: any) {
-	const {tendency, makeMode, accommodations, nDay} = useAppSelector(state => state.travelSlice);
+	const {tendency, makeMode, accommodations, nDay, essentialPlaces} = useAppSelector(state => state.travelSlice);
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: false, item: item});
@@ -20,10 +20,26 @@ export default function RecommendSelectTour({navigation}: any) {
 	const goNext = () => {
 		let data = Array.from({length: nDay + 1}, () => []);
 
+		essentialPlaces.forEach((item, index) => {
+			data[item?.day - 1].push({
+				category: 5,
+				id: shortid(),
+				takenTime: 60,
+				x: item?.day - 1,
+				y:
+					(essentialPlaces
+						.filter((filterItem, idx) => filterItem.day == item.day)
+						.findIndex(findItem => findItem.id == item.id) +
+						1) *
+						2 +
+					6,
+				lat: item?.lat,
+				lng: item?.lng,
+				name: item?.name,
+			});
+		});
 		accommodations.slice(1).forEach((item, index) => {
-			console.log(item?.name != '');
 			if (item?.name != '') {
-				console.log('qwe', data[index]);
 				data[index].push({
 					category: 4,
 					id: shortid(),

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useAppSelector} from '../../../redux';
 import {colors} from '../../../utill/colors';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
@@ -16,6 +16,10 @@ import moment from 'moment';
 import {styled} from 'styled-components/native';
 import {widthPercentage} from '../../../utill/layout/responsive-size';
 import {SvgCheck, SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
+import {ModalBackground, ModalBottomSheet} from './regist-transit';
+import TimePickerModal from '../../../utill/component/planner/date-picker';
+import RouteButton from '../../../utill/component/route-button';
+import {Modal} from 'react-native';
 
 export default function Planner({navigation}: any) {
 	const {travelName, region, cityIndex, country, day, nDay} = useAppSelector(state => state.travelSlice);
@@ -49,6 +53,29 @@ export default function Planner({navigation}: any) {
 	const select = '';
 	const [popUpIsActive, setPopUpIsActive] = useState(false);
 	const [step, setStep] = useState(0);
+	const [show, setShow] = useState(false);
+	const [startTime, setStartTime] = useState(6);
+	const allApply = useRef(false);
+	const handleStartTime = e => {
+		let ampm = e.ampm == '오전' ? 0 : 24;
+		let hours = (Number(e.hour) - 6) * 2;
+		let minute = Number(e.minute) / 30;
+		setStartTime(ampm + hours + minute);
+		setShow(false);
+	};
+	const handleAllApply = e => {
+		allApply.current = true;
+
+		let ampm = e.ampm == '오전' ? 0 : 24;
+		let hours = (Number(e.hour) - 6) * 2;
+		let minute = Number(e.minute) / 30;
+		setStartTime(ampm + hours + minute);
+		setShow(false);
+		// setStartTime();
+	};
+	useEffect(() => {
+		step - 2 >= 0 && setShow(!allApply.current);
+	}, [step, allApply.current]);
 	const colorReturn = (nowIndex: number, step: number) => {
 		let color = colors.backgroundWhite;
 		if (nowIndex >= step) {
@@ -161,8 +188,45 @@ export default function Planner({navigation}: any) {
 					</HStack>
 				)}
 			</StepPopUp>
-			<CustomMapView select={select} onTouchStart={false} onTouchEnd={() => {}} />
-			<PlannerBottomSheet navigation={navigation} step={step} setStep={setStep} />
+			<CustomMapView select={step - 2 < 0 ? '' : step - 2} onTouchStart={false} onTouchEnd={() => {}} />
+			<PlannerBottomSheet
+				navigation={navigation}
+				step={step}
+				setStep={setStep}
+				setShow={setShow}
+				startTime={startTime}
+			/>
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={show}
+				onRequestClose={() => {
+					setShow(false);
+				}}>
+				<ModalBackground onPress={() => setShow(false)}>
+					<ModalBottomSheet>
+						<PretendardVariableText size={20} lineHeight={24} color={colors.Title}>
+							{step - 1}일 차 일정, 몇시에 시작할까요?
+						</PretendardVariableText>
+						<TimePickerModal
+							visible={show}
+							navigation={navigation}
+							minuteDivide={true}
+							onClose={() => setShow(false)}
+							onConfirm={handleStartTime}
+							handleAllApply={handleAllApply}
+						/>
+						{/* <RouteButton
+							navigation={navigation}
+							type={'planner'}
+							leftText={'전체 일정에 적용하기'}
+							LeftBtnFunction={() => {
+								handleAllApply();
+							}}
+							nextText={'완료'}></RouteButton> */}
+					</ModalBottomSheet>
+				</ModalBackground>
+			</Modal>
 		</>
 	);
 }

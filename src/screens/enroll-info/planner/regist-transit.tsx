@@ -161,7 +161,7 @@ export default function RegistTransit({navigation, route}: any) {
 				}}>
 				<ModalBackground onPress={() => setShow(false)}>
 					<ModalBottomSheet>
-						<CalendarPicker
+						{/* <CalendarPicker
 							width={widthPercentage(Platform.isPad ? 300 : 375)}
 							weekdays={weekdays}
 							months={months}
@@ -190,8 +190,8 @@ export default function RegistTransit({navigation, route}: any) {
 							nextTitleStyle={{color: 'black'}}
 							allowBackwardRangeSelect={true}
 							selectYearTitle='년도 선택'
-						/>
-						{/* <PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
+						/> */}
+						<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
 							오전 9:00
 						</PretendardSemiBoldText>
 						<TimePickerModal
@@ -200,7 +200,7 @@ export default function RegistTransit({navigation, route}: any) {
 							onConfirm={({ampm, hour, minute}) => {
 								console.log(`${ampm} ${hour}:${minute}`);
 							}}
-						/> */}
+						/>
 						<RouteButton
 							navigation={navigation}
 							type={'planner'}

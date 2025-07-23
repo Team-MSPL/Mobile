@@ -18,8 +18,17 @@ import {MarkerContainer} from '../../../screens/timetable/preset-detail';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {DotBox, Dropdown, DropdownElement} from '../../../screens/enroll-info/select-multi';
 import LinearGradient from 'react-native-linear-gradient';
-function PlannerBottomSheet({navigation, step, setStep}: any) {
-	const {day, region, cityIndex, country, nDay, timetable} = useAppSelector(state => state.travelSlice);
+import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
+import {saveTravel, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {logEvent} from '@react-native-firebase/analytics';
+import useKakaoShare from '../../hooks/useKakaoShare';
+import {useTendencyHandler} from '../../hooks/useTendencyHandler';
+function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
+	const {day, region, cityIndex, country, nDay, timetable, transit, tendency, travelName, travelId, regionInfo} =
+		useAppSelector(state => state.travelSlice);
+	const {userId, userName} = useAppSelector(state => state.userSlice);
+	const {modalConfettiFlag} = useAppSelector(state => state.modalSlice);
+	const [modify, setModify] = useState(false);
 	const sheetRef = useRef<BottomSheet>(null);
 	const [btnVisible, setBtnVisible] = useState(true);
 	// variables
@@ -30,7 +39,122 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 	}, []);
 
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+	const {kakaoShare} = useKakaoShare();
+	const goKakaoShare = async () => {
+		try {
+			await kakaoShare({
+				travelName: travelName,
+				travelId: travelId,
+				startDay: day[0],
+				endDay: day[nDay],
+				photo: regionInfo?.photo,
+			});
 
+			await logEvent('share', {course: travelName});
+		} catch (err) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '카카오 공유 중 문제가 발생했습니다.',
+				}),
+			);
+		}
+	};
+	const timeRef = useRef(null);
+	const goMyTravelList = () => {
+		navigation.popToTop();
+		navigation.navigate('MyTravelListStack');
+		if (!modalConfettiFlag) {
+			timeRef.current = setTimeout(() => {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: `${userName}님`,
+						modalSubTitle: `여행을 성공적으로 만드셨군요! 이제 여행 계획을 일행과 공유해보세요!`,
+						modalLeft: true,
+						modalFunction: goKakaoShare,
+						modalTopText: '카카오톡으로 공유',
+						modalBottomText: '다음에 할게요',
+						modalConfetti: true,
+					}),
+				);
+				clearTimeout(timeRef.current);
+			}, 1000);
+		}
+	};
+	const hanldeHome = () => {
+		navigation.popToTop();
+		navigation.navigate('Home');
+	};
+
+	const {countryList} = useTendencyHandler();
+	const firstSave = async () => {
+		try {
+			let check = timetable.findIndex(item => item.length == 0);
+			if (check != -1) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '일정이 비어있습니다',
+						modalTopText: '확인',
+						modalSingleUse: true,
+					}),
+				);
+			} else {
+				dispatch(LoadingSliceActions.onLoading());
+
+				let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
+				if (
+					(country == 0 && cityViewList[country][cityIndex].id >= 3 && region[0] == '전체') ||
+					(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+					(country != 0 && region[0] == '전체')
+				) {
+					a = cityViewList[country][cityIndex].sub.map(
+						(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+					);
+					a.shift();
+				}
+				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+				if (country == 0 && cityIndex == 2) {
+					a = [region[0] + ' 전체'];
+				}
+				let copy = [...tendency];
+				if (country != 0) {
+					a = a.map((item, idx) => {
+						return `해외/${countryList[country].en}/${item
+							.slice(
+								item.indexOf(cityViewList[country][cityIndex].title) +
+									cityViewList[country][cityIndex].title.length,
+							)
+							.trim()}`;
+					});
+				}
+
+				const data = {
+					userId: userId,
+					region: a,
+					day: day.slice(0, nDay + 1),
+					nDay: nDay + 1,
+					transit: transit,
+					timetable: timetable,
+					tendency: tendency,
+					travelName: travelName,
+				};
+				await dispatch(saveTravel(data));
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '일정이 저장되었습니다',
+						modalTopText: '일정 확인하러 가기',
+						modalBottomText: '홈으로 돌아가기',
+						modalFunction: goMyTravelList,
+						modalBottomFunctionUse: true,
+						modalBottomFunction: hanldeHome,
+					}),
+				);
+			}
+		} catch (err) {
+			dispatch(modalSliceActions.setOpenModal({modalSubTitle: '잠시후 다시 시도해주세요'}));
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
 	function SheetContent() {
 		const {animatedIndex} = useBottomSheetInternal();
@@ -228,7 +352,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 					<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} numberOfLines={1}>
 						{step - 1}일 차 일정은{' '}
 						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.PointYellow} numberOfLines={1}>
-							오전 9시에
+							{Math.floor(((startTime ?? 0) * 30 + 360) / 60)} 시에
 						</PretendardSemiBoldText>
 						시작할게요!
 					</PretendardSemiBoldText>
@@ -355,7 +479,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 															setOpen({
 																status: !open.status,
 																index: index,
-																day: index,
+																day: step - 2,
 																type: 'essential',
 															})
 														}>
@@ -363,7 +487,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 													</DotBox>
 													{open.status &&
 														open.index == index &&
-														open.day == index &&
+														open.day == step - 2 &&
 														open.type == 'essential' && (
 															<Dropdown>
 																<DropdownElement
@@ -374,7 +498,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 																			status: false,
 																		});
 																		// setModify(true);
-																		//openModal(item.x, idx);
+																		// openModal(item.x, idx);
 																	}}>
 																	<PretendardSemiBoldText
 																		color={colors.Gray5}
@@ -445,7 +569,7 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 							<PlusBox
 								onPress={() => {
 									navigation.navigate('AddCategory', {
-										info: {day: step - 2, index: timetable[step - 2].length},
+										info: {day: step - 2, index: timetable[step - 2].length, startTime: startTime},
 									});
 								}}>
 								<SVGPlus color={colors.Gray400} />
@@ -495,11 +619,11 @@ function PlannerBottomSheet({navigation, step, setStep}: any) {
 			{btnVisible && (
 				<RouteButton
 					navigation={navigation}
-					nextText='다음으로'
+					nextText={nDay + 2 == step ? '저장하기' : '다음으로'}
 					leftText='건너뛰기'
 					type={'planner'}
 					btnFunction={() => {
-						setStep(step + 1);
+						nDay + 2 == step ? firstSave() : setStep(step + 1);
 					}}
 					LeftBtnFunction={() => {
 						setStep(step + 1);

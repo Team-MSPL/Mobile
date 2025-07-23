@@ -268,7 +268,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 			y:
 				isNaN(copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30) ||
 				copy2[route.params?.info?.index - 1]?.y == 36
-					? 6
+					? route.params?.info?.startTime
 					: copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30,
 			id: shortid.generate(),
 			takenTime: (timeValue + 1) * 60,
@@ -276,9 +276,8 @@ export default function AddSearchRecommend({navigation, route}: any) {
 			lng: Number(placeState?.lng),
 		});
 		copy2 = copy2.sort((a, b) => a.y - b.y);
-		console.log(copy2);
 		copy[route.params?.info?.day] = copy2;
-		console.log(copy);
+		console.log(route.params);
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.pop(2);
 	};
