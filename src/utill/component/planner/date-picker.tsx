@@ -99,6 +99,7 @@ export default function TimePickerModal({visible, onClose, onConfirm, navigation
 				navigation={navigation}
 				type={'planner'}
 				leftText={'전체 일정에 적용하기'}
+				resize={true}
 				LeftBtnFunction={() => {
 					handleAllApply({
 						ampm: ampmList[ampmIndex],
@@ -108,11 +109,6 @@ export default function TimePickerModal({visible, onClose, onConfirm, navigation
 				}}
 				btnFunction={() => {
 					onConfirm({
-						ampm: ampmList[ampmIndex],
-						hour: hours[hourIndex],
-						minute: minutes[minuteIndex],
-					});
-					console.log({
 						ampm: ampmList[ampmIndex],
 						hour: hours[hourIndex],
 						minute: minutes[minuteIndex],

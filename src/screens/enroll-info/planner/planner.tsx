@@ -23,6 +23,7 @@ import {Modal} from 'react-native';
 
 export default function Planner({navigation}: any) {
 	const {travelName, region, cityIndex, country, day, nDay} = useAppSelector(state => state.travelSlice);
+	const balanceIndex = 2;
 	useEffect(() => {
 		navigation.setOptions({
 			headerRight: () => <></>,
@@ -54,13 +55,15 @@ export default function Planner({navigation}: any) {
 	const [popUpIsActive, setPopUpIsActive] = useState(false);
 	const [step, setStep] = useState(0);
 	const [show, setShow] = useState(false);
-	const [startTime, setStartTime] = useState(6);
-	const allApply = useRef(false);
+	const [startTime, setStartTime] = useState({});
+	const allApply = useRef({});
 	const handleStartTime = e => {
 		let ampm = e.ampm == '오전' ? 0 : 24;
 		let hours = (Number(e.hour) - 6) * 2;
 		let minute = Number(e.minute) / 30;
-		setStartTime(ampm + hours + minute);
+		let copy = [...startTime];
+		copy[step - balanceIndex] = {time: ampm + hours + minute, choose: true};
+		setStartTime(copy);
 		setShow(false);
 	};
 	const handleAllApply = e => {
@@ -69,13 +72,24 @@ export default function Planner({navigation}: any) {
 		let ampm = e.ampm == '오전' ? 0 : 24;
 		let hours = (Number(e.hour) - 6) * 2;
 		let minute = Number(e.minute) / 30;
-		setStartTime(ampm + hours + minute);
+		setStartTime(
+			Array.from({length: nDay + 1}, () => {
+				return {tiem: ampm + hours + minute, choose: true};
+			}),
+		);
+
 		setShow(false);
-		// setStartTime();
 	};
 	useEffect(() => {
-		step - 2 >= 0 && setShow(!allApply.current);
-	}, [step, allApply.current]);
+		step - balanceIndex >= 0 && !startTime[step - balanceIndex]?.choose && setShow(true);
+	}, [step, startTime]);
+	useEffect(() => {
+		setStartTime(
+			Array.from({length: nDay + 1}, () => {
+				return {time: 6, choose: false};
+			}),
+		);
+	}, [nDay]);
 	const colorReturn = (nowIndex: number, step: number) => {
 		let color = colors.backgroundWhite;
 		if (nowIndex >= step) {
@@ -102,6 +116,9 @@ export default function Planner({navigation}: any) {
 			}
 		}
 		return color;
+	};
+	const handleClose = () => {
+		setPopUpIsActive(false);
 	};
 	return (
 		<>
@@ -188,13 +205,18 @@ export default function Planner({navigation}: any) {
 					</HStack>
 				)}
 			</StepPopUp>
-			<CustomMapView select={step - 2 < 0 ? '' : step - 2} onTouchStart={false} onTouchEnd={() => {}} />
+			<CustomMapView
+				select={step - balanceIndex < 0 ? '' : step - balanceIndex}
+				onTouchStart={false}
+				onTouchEnd={() => {}}
+			/>
 			<PlannerBottomSheet
 				navigation={navigation}
 				step={step}
 				setStep={setStep}
 				setShow={setShow}
 				startTime={startTime}
+				handleClose={handleClose}
 			/>
 			<Modal
 				animationType={'fade'}

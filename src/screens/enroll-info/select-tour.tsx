@@ -11,7 +11,17 @@ import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import shortid from 'shortid';
 
 export default function RecommendSelectTour({navigation}: any) {
-	const {tendency, makeMode, accommodations, nDay, essentialPlaces} = useAppSelector(state => state.travelSlice);
+	const {
+		tendency,
+		makeMode,
+		accommodations,
+		nDay,
+		essentialPlaces,
+		departure,
+		departureSelected,
+		departureAirport,
+		departureTrain,
+	} = useAppSelector(state => state.travelSlice);
 	const {handleButtonClick, tendencyList} = useTendencyHandler();
 	const handleSelect = (item: number) => {
 		handleButtonClick({index: 3, region: false, item: item});
@@ -19,6 +29,29 @@ export default function RecommendSelectTour({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const goNext = () => {
 		let data = Array.from({length: nDay + 1}, () => []);
+		let departureInfo;
+		switch (departureSelected) {
+			case 'departureAirport':
+				departureInfo = departureAirport;
+				break;
+			case 'departureTrain':
+				departureInfo = departureTrain;
+				break;
+			case 'departure':
+				departureInfo = departure;
+				break;
+		}
+		departureSelected != '' &&
+			data[0].push({
+				category: 6,
+				id: shortid(),
+				takenTime: 0,
+				x: 0,
+				y: 6,
+				lat: departureInfo?.lat,
+				lng: departureInfo?.lng,
+				name: departureInfo?.name,
+			});
 
 		essentialPlaces.forEach((item, index) => {
 			data[item?.day - 1].push({

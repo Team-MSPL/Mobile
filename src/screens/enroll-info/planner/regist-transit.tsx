@@ -1,8 +1,10 @@
-import {useEffect, useState} from 'react';
+import moment from 'moment';
+import {useEffect, useRef, useState} from 'react';
 import {Modal, Platform, TouchableOpacity} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import {styled} from 'styled-components/native';
+import {useAppSelector} from '../../../redux';
 import {colors} from '../../../utill/colors';
 import CustomButton from '../../../utill/component/custom-button';
 import TimePickerModal from '../../../utill/component/planner/date-picker';
@@ -23,23 +25,25 @@ export default function RegistTransit({navigation, route}: any) {
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+	const {nDay, day} = useAppSelector(state => state.travelSlice);
 
 	const [select, setSelect] = useState('outbound');
 	const [show, setShow] = useState(false);
+	const indexRef = useRef(0);
 	const [transportInfo, setTransportInfo] = useState({
 		outbound: {
 			departureAirport: '', //출밢녀
-			departureTime: '', //출발시간
+			departureTime: new Date(day[0]), //출발시간
 			arrivalAirport: '', //도착편
-			arrivalTime: '', //도착시간
+			arrivalTime: new Date(day[0]), //도착시간
 			airline: '', //항공사혹은 기차번호
 			reservationNumber: '', //에약번호
 		},
 		inbound: {
 			departureAirport: '',
-			departureTime: '',
+			departureTime: new Date(day[0]),
 			arrivalAirport: '',
-			arrivalTime: '',
+			arrivalTime: new Date(day[0]),
 			airline: '',
 			reservationNumber: '',
 		},
@@ -84,19 +88,20 @@ export default function RegistTransit({navigation, route}: any) {
 					출발
 				</PretendardSemiBoldText>
 				<InputBox
-					value={
-						select == 'outbound'
-							? transportInfo.outbound.departureAirport
-							: transportInfo.inbound.departureAirport
-					}
+					value={transportInfo[select].departureAirport}
 					onChangeText={e => handleFlightChange(select, 'departureAirport', e)}
 					placeholder={route.params.title == 'train' ? '출발역' : '출발 공항'}
 					placeholderTextColor={colors.Gray400}></InputBox>
 				<HStack justifyContent='center' gap={widthPercentage(30)}>
-					<TouchableHstack gap={10} onPress={() => setShow(true)}>
+					<TouchableHstack
+						gap={10}
+						onPress={() => {
+							indexRef.current = 0;
+							setShow(true);
+						}}>
 						<SvgCalendarIcon width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-							2020.02.04(화)
+							{moment(new Date(transportInfo[select].departureTime)).format('YYYY.MM.DD')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
 					<TouchableHstack gap={10}>
@@ -112,24 +117,25 @@ export default function RegistTransit({navigation, route}: any) {
 					도착
 				</PretendardSemiBoldText>
 				<InputBox
-					value={
-						select == 'outbound'
-							? transportInfo.outbound.arrivalAirport
-							: transportInfo.inbound.arrivalAirport
-					}
+					value={transportInfo[select].arrivalAirport}
 					onChangeText={e => handleFlightChange(select, 'arrivalAirport', e)}
 					placeholder={route.params.title == 'train' ? '도착역' : '도착 공항'}></InputBox>
 				<HStack justifyContent='center' gap={widthPercentage(30)}>
-					<TouchableHstack gap={10}>
+					<TouchableHstack
+						gap={10}
+						onPress={() => {
+							indexRef.current = 1;
+							setShow(true);
+						}}>
 						<SvgCalendarIcon width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-							2020.02.04(화)
+							{moment(new Date(transportInfo[select].arrivalTime)).format('YYYY.MM.DD')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
 					<TouchableHstack gap={10}>
 						<SVGClock width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-							오전 9:00
+							오전 9:00{transportInfo[select].airline}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
 				</HStack>
@@ -160,24 +166,43 @@ export default function RegistTransit({navigation, route}: any) {
 					setShow(false);
 				}}>
 				<ModalBackground onPress={() => setShow(false)}>
-					<ModalBottomSheet>
-						{/* <CalendarPicker
+					<ModalBottomSheet flex={0.7}>
+						<CalendarPicker
 							width={widthPercentage(Platform.isPad ? 300 : 375)}
 							weekdays={weekdays}
 							months={months}
-							minDate={new Date('2025-07-01')}
-							maxDate={new Date('2025-08-10')}
-							disabledDates={date => {
-								return !allowedDates.includes(date.format('YYYY-MM-DD'));
-							}}
+							minDate={new Date(day[0])}
+							maxDate={new Date(day[nDay])}
+							// disabledDates={date => {
+							// 	return !allowedDates.includes(date.format('YYYY-MM-DD'));
+							// }}
 							startFromMonday={false}
-							onDateChange={() => {}}
+							onDateChange={e => {
+								handleFlightChange(select, indexRef.current == 0 ? 'departureTime' : 'arrivalTime', e);
+							}}
+							customDatesStyles={[
+								{
+									date: new Date(
+										select == 'outbound'
+											? indexRef.current == 0
+												? transportInfo.outbound.departureTime
+												: transportInfo.outbound.arrivalTime
+											: indexRef.current == 0
+											? transportInfo.inbound.departureTime
+											: transportInfo.inbound.arrivalTime,
+									),
+									// Random colors
+									style: {
+										backgroundColor: colors.Primary,
+									},
+									textStyle: {color: 'black'}, // sets the font color
+									containerStyle: [], // extra styling for day container
+									allowDisabled: true, // allow custom style to apply to disabled dates
+								},
+							]}
 							showDayStragglers={false}
-							allowRangeSelection={true}
-							selectedRangeStartStyle={{backgroundColor: colors.Primary}}
-							selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
-							selectedRangeEndStyle={{backgroundColor: colors.Primary}}
 							selectedDayColor={colors.Primary}
+							todayBackgroundColor={'#ffffff'}
 							// selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
 							// selectedEndDate={
 							// 	(selectedDateFlag || freeTicket) && selectEndDate != null
@@ -190,8 +215,8 @@ export default function RegistTransit({navigation, route}: any) {
 							nextTitleStyle={{color: 'black'}}
 							allowBackwardRangeSelect={true}
 							selectYearTitle='년도 선택'
-						/> */}
-						<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
+						/>
+						{/* <PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
 							오전 9:00
 						</PretendardSemiBoldText>
 						<TimePickerModal
@@ -200,7 +225,7 @@ export default function RegistTransit({navigation, route}: any) {
 							onConfirm={({ampm, hour, minute}) => {
 								console.log(`${ampm} ${hour}:${minute}`);
 							}}
-						/>
+						/> */}
 						<RouteButton
 							navigation={navigation}
 							type={'planner'}

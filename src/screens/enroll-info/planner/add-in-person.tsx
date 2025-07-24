@@ -13,6 +13,16 @@ export default function AddInPerson({navigation}: any) {
 	const [category, setCategory] = useState('');
 	const [timeValue, setTimeValue] = useState(0);
 	const categoryList = ['관광지', '숙소', '식당/카페'];
+	// const handleSubmit = () => {
+	// 	let data={
+	// 		name: place,
+	// 		lat: Number(details?.geometry.location.lat),
+	// 		lng: Number(details?.geometry.location.lng),
+	// 		formatted_address: details?.formatted_address.replace('대한민국 ', ''),
+	// 		photo: '',
+	// 		region: details?.formatted_address.replace('대한민국 ', ''),
+	// 	}
+	// };
 	return (
 		<BackgroundGrayScrollView>
 			<PretendardSemiBoldText
@@ -30,7 +40,7 @@ export default function AddInPerson({navigation}: any) {
 				deco={`margin-top:${widthPercentage(22)}`}>
 				주소
 			</PretendardSemiBoldText>
-			<InputBox onChangeText={e => setPlace(e)} value={address} placeholder={'주소'}></InputBox>
+			<InputBox onChangeText={e => setAddress(e)} value={address} placeholder={'주소'}></InputBox>
 			<PretendardSemiBoldText
 				size={18}
 				lineHeight={23.48}

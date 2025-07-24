@@ -10,7 +10,15 @@ import {cityViewList} from '../enroll-info/city-list';
 import RouteButton from '../route-button';
 import {LeftBar, RegistButton} from './components';
 import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
-import {SvgAirPort, SvgAirPortIcon, SvgAirPortIngIcon, SvgCarIcon, SVGPlus, SvgTripleDot} from '../../svg/svg';
+import {
+	SvgAirPort,
+	SvgAirPortIcon,
+	SvgAirPortIngIcon,
+	SvgCarIcon,
+	SVGPlus,
+	SVGRightAdd,
+	SvgTripleDot,
+} from '../../svg/svg';
 import {WhiteContainer} from '../../../screens/enroll-info/final-check';
 import {InsideGrayContainer, PlusBox} from '../timetable/timetable';
 import {DashLineContainer} from '../../../screens/timetable/preset';
@@ -23,7 +31,8 @@ import {saveTravel, travelSliceActions} from '../../../redux/travel-info/travel.
 import {logEvent} from '@react-native-firebase/analytics';
 import useKakaoShare from '../../hooks/useKakaoShare';
 import {useTendencyHandler} from '../../hooks/useTendencyHandler';
-function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
+import {Pressable} from 'react-native';
+function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose}: any) {
 	const {day, region, cityIndex, country, nDay, timetable, transit, tendency, travelName, travelId, regionInfo} =
 		useAppSelector(state => state.travelSlice);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
@@ -35,6 +44,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 	const snapPoints: ReadonlyArray<string | number> = useMemo(() => ['10%', '65%', '90%'], []);
 	// callbacks
 	const handleSheetChange = useCallback((index: number) => {
+		handleClose();
 		console.log('handleSheetChange', index);
 	}, []);
 
@@ -93,6 +103,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 				dispatch(
 					modalSliceActions.setOpenModal({
 						modalTitle: '일정이 비어있습니다',
+						modalSubTitle: '일정을 채워주세요',
 						modalTopText: '확인',
 						modalSingleUse: true,
 					}),
@@ -111,7 +122,6 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 					);
 					a.shift();
 				}
-				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 				if (country == 0 && cityIndex == 2) {
 					a = [region[0] + ' 전체'];
 				}
@@ -155,7 +165,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
 	function SheetContent() {
 		const {animatedIndex} = useBottomSheetInternal();
 
@@ -280,82 +290,98 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 				<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black} deco='margin-bottom:10px;'>
 					어디서 머무시나요?
 				</PretendardSemiBoldText>
-				{timetable.slice(0, timetable.length - 1).map((item, index) => (
-					<VStack deco={`margin-top:${widthPercentage(32)}px;`}>
-						<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
-							<HStack gap={3}>
-								<LeftBar color={colors.Pink1} />
-								<VStack>
-									<PretendardSemiBoldText size={19} lineHeight={23} color={colors.Black}>
-										{index + 1}일 차
+				{nDay == 0 ? (
+					<PretendardSemiBoldText
+						size={20}
+						lineHeight={25}
+						color={colors.PointYellow}
+						textAlign={'center'}
+						marginTop={70}>
+						당일치기는 숙소 등록이 불가합니다
+					</PretendardSemiBoldText>
+				) : (
+					timetable.slice(0, timetable.length - 1).map((item, index) => (
+						<VStack deco={`margin-top:${widthPercentage(32)}px;`}>
+							<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
+								<HStack gap={3}>
+									<LeftBar color={colors.Pink1} />
+									<VStack>
+										<PretendardSemiBoldText size={19} lineHeight={23} color={colors.Black}>
+											{index + 1}일 차
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={13} lineHeight={17} color={colors.PlannerGray}>
+											{moment(day[index == 0 ? index : nDay]).format('YYYY-MM-DD')}
+										</PretendardSemiBoldText>
+									</VStack>
+								</HStack>
+								<RegistButton
+									color={colors.Pink1}
+									onPress={() => {
+										console.log(item);
+										navigation.navigate('TimetableAddPlace', {
+											x: index,
+											y: [],
+											status: 'accommodation',
+										});
+									}}>
+									<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
+										숙소 등록
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={13} lineHeight={17} color={colors.PlannerGray}>
-										{moment(day[index == 0 ? index : nDay]).format('YYYY-MM-DD')}
-									</PretendardSemiBoldText>
-								</VStack>
+								</RegistButton>
 							</HStack>
-							<RegistButton
-								color={colors.Pink1}
-								onPress={() => {
-									console.log(item);
-									navigation.navigate('TimetableAddPlace', {
-										x: index,
-										y: [],
-										status: 'accommodation',
-									});
-								}}>
-								<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
-									숙소 등록
-								</PretendardSemiBoldText>
-							</RegistButton>
-						</HStack>
-						{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36) && (
-							<GrayBox>
-								<VStack width={widthPercentage(243)}>
-									<PretendardSemiBoldText
-										size={18}
-										lineHeight={22}
-										color={colors.Black}
-										numberOfLines={1}>
-										{
-											item?.find(
-												acc => acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36,
-											)?.name
-										}
-									</PretendardSemiBoldText>
-									<PretendardSemiBoldText
-										size={13}
-										lineHeight={18}
-										color={colors.Black}
-										numberOfLines={1}>
-										{
-											item?.find(
-												acc =>
-													acc?.category === 4 &&
-													acc?.formatted_address?.trim() !== '' &&
-													acc?.y == 36,
-											)?.formatted_address
-										}
-									</PretendardSemiBoldText>
-								</VStack>
-							</GrayBox>
-						)}
-					</VStack>
-				))}
+							{item?.find(acc => acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36) && (
+								<GrayBox>
+									<VStack width={widthPercentage(243)}>
+										<PretendardSemiBoldText
+											size={18}
+											lineHeight={22}
+											color={colors.Black}
+											numberOfLines={1}>
+											{
+												item?.find(
+													acc =>
+														acc?.category === 4 && acc?.name?.trim() !== '' && acc?.y == 36,
+												)?.name
+											}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText
+											size={13}
+											lineHeight={18}
+											color={colors.Black}
+											numberOfLines={1}>
+											{
+												item?.find(
+													acc =>
+														acc?.category === 4 &&
+														acc?.formatted_address?.trim() !== '' &&
+														acc?.y == 36,
+												)?.formatted_address
+											}
+										</PretendardSemiBoldText>
+									</VStack>
+								</GrayBox>
+							)}
+						</VStack>
+					))
+				)}
 			</>
 		);
 	};
 	const timeTableScreen = () => {
 		return (
 			<>
-				<StartContainer>
+				<StartContainer
+					onPress={() => {
+						setShow(true);
+					}}>
 					<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} numberOfLines={1}>
 						{step - 1}일 차 일정은{' '}
 						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.PointYellow} numberOfLines={1}>
-							{Math.floor(((startTime ?? 0) * 30 + 360) / 60)} 시에
+							{Math.floor(((startTime[step - 2]?.time ?? 0) * 30 + 360) / 60)} 시에
 						</PretendardSemiBoldText>
 						시작할게요!
 					</PretendardSemiBoldText>
+					<SVGRightAdd transform={90} color={'black'} style={{marginLeft: 20}}></SVGRightAdd>
 				</StartContainer>
 				<WhiteContainer
 					deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
@@ -450,18 +476,24 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 														color={colors.Gray2}>
 														{categoryTitle[item.category]}{' '}
 														{Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
-														{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
-														{Math.floor(
-															(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
-														) < 25 &&
-															Math.floor(
-																(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60,
-															) +
-																':' +
-																String(
-																	(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) %
+														{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')}{' '}
+														{!(item.category == 4 || item.category == 6) &&
+															`~ ${
+																Math.floor(
+																	(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) /
 																		60,
-																).padStart(2, '0')}
+																) < 25 &&
+																Math.floor(
+																	(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) /
+																		60,
+																) +
+																	':' +
+																	String(
+																		(((item.y ?? 0) + item.takenTime / 30) * 30 +
+																			360) %
+																			60,
+																	).padStart(2, '0')
+															}`}
 													</PretendardVariableText>
 													<PretendardSemiBoldText
 														maxWidth={widthPercentage(200)}
@@ -569,7 +601,11 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 							<PlusBox
 								onPress={() => {
 									navigation.navigate('AddCategory', {
-										info: {day: step - 2, index: timetable[step - 2].length, startTime: startTime},
+										info: {
+											day: step - 2,
+											index: timetable[step - 2].length,
+											startTime: startTime[step - 2]?.time,
+										},
 									});
 								}}>
 								<SVGPlus color={colors.Gray400} />
@@ -620,13 +656,13 @@ function PlannerBottomSheet({navigation, step, setStep, startTime}: any) {
 				<RouteButton
 					navigation={navigation}
 					nextText={nDay + 2 == step ? '저장하기' : '다음으로'}
-					leftText='건너뛰기'
+					leftText='이전으로'
 					type={'planner'}
 					btnFunction={() => {
 						nDay + 2 == step ? firstSave() : setStep(step + 1);
 					}}
 					LeftBtnFunction={() => {
-						setStep(step + 1);
+						step == 0 ? navigation.goBack() : setStep(step - 1);
 					}}></RouteButton>
 			)}
 		</>
@@ -667,7 +703,7 @@ const GrayBox = styled.View`
 	margin-top: ${widthPercentage(17)}px;
 	padding: ${widthPercentage(15)}px ${widthPercentage(16)}px;
 `;
-const StartContainer = styled.View`
+const StartContainer = styled(HStack).attrs({as: Pressable})`
 	width: ${widthPercentage(327)}px;
 	height: ${widthPercentage(60)}px;
 	border-radius: 8px;
@@ -675,6 +711,7 @@ const StartContainer = styled.View`
 	border-color: ${colors.Gray200};
 	align-items: center;
 	justify-content: center;
+	margin-bottom: ${widthPercentage(20)}px;
 `;
 const PressBox = styled.View`
 	width: ${widthPercentage(160)}px;

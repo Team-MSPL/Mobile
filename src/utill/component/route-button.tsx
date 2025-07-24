@@ -16,6 +16,7 @@ export default function RouteButton({
 	nextText,
 	leftText,
 	type,
+	resize,
 }: RouteButtonProps) {
 	const handleBack = () => {
 		LeftBtnFunction ? LeftBtnFunction() : navigation.goBack();
@@ -33,7 +34,8 @@ export default function RouteButton({
 				marginBottom={marginBottom ?? 0}
 				onPress={handleBack}
 				type={type ?? 'planner'}
-				before={true}>
+				before={true}
+				resize={resize ?? false}>
 				{/* <SVGRightAdd
 					style={{position: 'absolute', left: widthPercentage(16)}}
 					color={colors.Primary}
@@ -49,6 +51,7 @@ export default function RouteButton({
 				marginBottom={marginBottom ?? 0}
 				onPress={handleNext}
 				type={type ?? 'default'}
+				resize={resize ?? false}
 				before={false}>
 				<PretendardSemiBoldText
 					size={18}
@@ -74,6 +77,7 @@ type RouteButtonProps = {
 	nextText?: string;
 	leftText?: string;
 	type?: string;
+	resize?: boolean;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{
@@ -81,12 +85,13 @@ const ButtonContainer = styled.TouchableOpacity<{
 	marginTop: number;
 	type: string;
 	before: boolean;
+	resize?: boolean;
 }>`
-	width: ${widthPercentage(160)}px;
+	width: ${props => widthPercentage(props.resize ? (props.before ? 188 : 132) : 160)}px;
 	align-self: center;
 	align-items: center;
 	height: ${heightPercentage(60)}px;
-	padding: 0px ${widthPercentage(20)}px;
+	padding: 0px ${widthPercentage(0)}px;
 	border-radius: 8px;
 	background-color: ${props =>
 		props.type == 'planner' ? (props.before ? colors.Gray200 : colors.Gray5) : colors.Primary};

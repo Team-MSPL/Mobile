@@ -34,7 +34,7 @@ import shortid from 'shortid';
 export default function AddSearchRecommend({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
-	const {region, regionInfo, timetable} = useAppSelector(state => state.travelSlice);
+	const {region, regionInfo, timetable, country} = useAppSelector(state => state.travelSlice);
 	const handleColor = (e: string) => {
 		let color = '';
 		switch (e) {
@@ -69,13 +69,13 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		let title = '';
 		switch (e) {
 			case 'travle':
-				title = region[0].startsWith('해외') ? 'attractions' : 'AT4';
+				title = country != 0 ? 'attractions' : 'AT4';
 				break;
 			case 'accommodation':
-				title = region[0].startsWith('해외') ? 'hotels' : 'AD5';
+				title = country != 0 ? 'hotels' : 'AD5';
 				break;
 			case 'cafe':
-				title = region[0].startsWith('해외') ? 'restaurants' : 'FD6';
+				title = country != 0 ? 'restaurants' : 'FD6';
 				break;
 		}
 		return title;
@@ -190,9 +190,19 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	const [recommendList, setRcommendList] = useState([]);
 	const getRecommendList = async () => {
 		try {
+			console.log(
+				{
+					category: handleCategory(route.params.title),
+					lat: regionInfo.lat,
+					lng: regionInfo.lng,
+					radius: 10000,
+					name: region[0].split('/').at(-1),
+				},
+				region,
+			);
 			dispatch(LoadingSliceActions.onLoading());
 			let result = await dispatch(
-				region[0].startsWith('해외')
+				country != 0
 					? recommendTripadvisor({
 							category: handleCategory(route.params.title),
 							lat: regionInfo.lat,
@@ -207,10 +217,10 @@ export default function AddSearchRecommend({navigation, route}: any) {
 							radius: 1000,
 					  }),
 			).unwrap();
-			result = region[0].startsWith('해외') ? result.data : result;
+			result = country != 0 ? result.data : result;
 			if (result.length == 0) {
 				result = await dispatch(
-					region[0].startsWith('해외')
+					country != 0
 						? recommendTripadvisor({
 								category: handleCategory(route.params.title),
 								lat: regionInfo.lat,
@@ -227,7 +237,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 				).unwrap();
 				// departure.current.lat = route.params.lat;
 				// departure.current.lng = route.params.lng;
-				result = region[0].startsWith('해외') ? result.data : result;
+				result = country != 0 ? result.data : result;
 				result.length == 0 &&
 					(dispatch(
 						modalSliceActions.setOpenModal({
@@ -282,15 +292,18 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		navigation.pop(2);
 	};
 
-	useLayoutEffect(() => {
-		getRecommendList();
-	}, []);
+	// useLayoutEffect(() => {
+	// 	getRecommendList();
+	// }, []);
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setView(false);
 		}, 3000);
 		return () => clearTimeout(timer);
 	}, []);
+	const handleAiRecommmend = async () => {
+		getRecommendList();
+	};
 	return (
 		<BackgroundGray>
 			<SearchContainer height={heightPercentage(200)}>
@@ -306,7 +319,9 @@ export default function AddSearchRecommend({navigation, route}: any) {
 					renderRightButton={() => (
 						<AIBox
 							onPress={() => {
-								console.log(regionInfo);
+								// navigation.navigate('AiRecommend', {title: route.params.title});
+								// console.log(regionInfo);
+								handleAiRecommmend();
 							}}>
 							{view && (
 								<AlertBox>
@@ -423,10 +438,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 								color={colors.PointYellow}
 								deco={'margin-left:auto;'}>
 								이전 장소로부터{' '}
-								{region[0].startsWith('해외')
-									? Math.floor(Number(item?.distance) * 1000)
-									: item?.distance}
-								m
+								{country != 0 ? Math.floor(Number(item?.distance) * 1000) : item?.distance}m
 							</PretendardVariableText>
 						</VStack>
 					</ItemPressBox>
