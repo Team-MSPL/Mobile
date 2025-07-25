@@ -700,7 +700,11 @@ export default function Timetable({navigation, route}: any) {
 							lineHeight={20}
 							color={colors.Black}
 							style={{textAlign: 'center'}}>
-							{(region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0]) +
+							{(region[0] == '전체'
+								? cityViewList[country][cityIndex].title
+								: region[0].startsWith('해외')
+								? region[0].split('/').at(-1)
+								: region[0]) +
 								' ' +
 								(nDay == 0 ? '당일치기' : nDay + '박' + (nDay + 1) + '일') +
 								' ' +

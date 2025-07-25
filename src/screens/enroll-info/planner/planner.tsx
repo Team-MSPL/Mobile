@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useAppSelector} from '../../../redux';
+import {useAppDispatch, useAppSelector} from '../../../redux';
 import {colors} from '../../../utill/colors';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 import {
@@ -20,9 +20,11 @@ import {ModalBackground, ModalBottomSheet} from './regist-transit';
 import TimePickerModal from '../../../utill/component/planner/date-picker';
 import RouteButton from '../../../utill/component/route-button';
 import {Modal} from 'react-native';
+import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {View} from 'react-native';
 
 export default function Planner({navigation}: any) {
-	const {travelName, region, cityIndex, country, day, nDay} = useAppSelector(state => state.travelSlice);
+	const {travelName, region, cityIndex, country, day, nDay, timetable} = useAppSelector(state => state.travelSlice);
 	const balanceIndex = 2;
 	useEffect(() => {
 		navigation.setOptions({
@@ -57,12 +59,22 @@ export default function Planner({navigation}: any) {
 	const [show, setShow] = useState(false);
 	const [startTime, setStartTime] = useState({});
 	const allApply = useRef({});
+	const dispatch = useAppDispatch();
 	const handleStartTime = e => {
 		let ampm = e.ampm == '오전' ? 0 : 24;
 		let hours = (Number(e.hour) - 6) * 2;
 		let minute = Number(e.minute) / 30;
 		let copy = [...startTime];
+		let gap = ampm + hours + minute - copy[step - balanceIndex]?.time;
 		copy[step - balanceIndex] = {time: ampm + hours + minute, choose: true};
+		if (timetable[step - balanceIndex].length != 0) {
+			let timetableCopy = [...timetable];
+			let newTimetable = timetableCopy[step - balanceIndex].map(item =>
+				item?.y == 36 ? item : {...item, y: item?.y + gap},
+			);
+			timetableCopy[step - balanceIndex] = newTimetable;
+			dispatch(travelSliceActions.changeTimetable(timetableCopy));
+		}
 		setStartTime(copy);
 		setShow(false);
 	};
@@ -121,7 +133,7 @@ export default function Planner({navigation}: any) {
 		setPopUpIsActive(false);
 	};
 	return (
-		<>
+		<View style={{flex: 1, zIndex: 0}}>
 			<StepPopUp
 				isActive={popUpIsActive}
 				onPress={() => {
@@ -237,6 +249,8 @@ export default function Planner({navigation}: any) {
 							onClose={() => setShow(false)}
 							onConfirm={handleStartTime}
 							handleAllApply={handleAllApply}
+							hour={Math.floor(((startTime[step - balanceIndex]?.time ?? 0) * 30 + 360) / 60)}
+							minute={((startTime[step - balanceIndex]?.time ?? 0) * 30 + 360) % 60}
 						/>
 						{/* <RouteButton
 							navigation={navigation}
@@ -249,7 +263,7 @@ export default function Planner({navigation}: any) {
 					</ModalBottomSheet>
 				</ModalBackground>
 			</Modal>
-		</>
+		</View>
 	);
 }
 const StepPopUp = styled.TouchableOpacity<{isActive: boolean}>`

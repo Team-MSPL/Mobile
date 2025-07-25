@@ -287,7 +287,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		});
 		copy2 = copy2.sort((a, b) => a.y - b.y);
 		copy[route.params?.info?.day] = copy2;
-		console.log(route.params);
 		dispatch(travelSliceActions.changeTimetable(copy));
 		navigation.pop(2);
 	};

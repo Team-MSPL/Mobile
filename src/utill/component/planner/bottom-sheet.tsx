@@ -15,6 +15,7 @@ import {
 	SvgAirPortIcon,
 	SvgAirPortIngIcon,
 	SvgCarIcon,
+	SVGMinus,
 	SVGPlus,
 	SVGRightAdd,
 	SvgTripleDot,
@@ -24,20 +25,28 @@ import {InsideGrayContainer, PlusBox} from '../timetable/timetable';
 import {DashLineContainer} from '../../../screens/timetable/preset';
 import {MarkerContainer} from '../../../screens/timetable/preset-detail';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {DotBox, Dropdown, DropdownElement} from '../../../screens/enroll-info/select-multi';
+import {
+	DotBox,
+	Dropdown,
+	DropdownElement,
+	ElementContainer,
+	SVGContainer,
+} from '../../../screens/enroll-info/select-multi';
 import LinearGradient from 'react-native-linear-gradient';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import {saveTravel, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {logEvent} from '@react-native-firebase/analytics';
 import useKakaoShare from '../../hooks/useKakaoShare';
 import {useTendencyHandler} from '../../hooks/useTendencyHandler';
-import {Pressable} from 'react-native';
+import {Modal, Pressable} from 'react-native';
+import {ModalBackground, ModalBottomSheet} from '../../../screens/enroll-info/planner/regist-transit';
+import {BottomContainer} from '../../../screens/enroll-info/search-place';
+import PrimaryButton from '../primary-button';
 function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose}: any) {
 	const {day, region, cityIndex, country, nDay, timetable, transit, tendency, travelName, travelId, regionInfo} =
 		useAppSelector(state => state.travelSlice);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const {modalConfettiFlag} = useAppSelector(state => state.modalSlice);
-	const [modify, setModify] = useState(false);
 	const sheetRef = useRef<BottomSheet>(null);
 	const [btnVisible, setBtnVisible] = useState(true);
 	// variables
@@ -47,6 +56,8 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 		handleClose();
 		console.log('handleSheetChange', index);
 	}, []);
+	const [timeValue, setTimeValue] = useState(0);
+	const [modify, setModify] = useState(false);
 
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
 	const {kakaoShare} = useKakaoShare();
@@ -165,6 +176,9 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
+	// const handleCheck=()=>{
+
+	// }
 	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
 	function SheetContent() {
 		const {animatedIndex} = useBottomSheetInternal();
@@ -202,15 +216,17 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 									</PretendardSemiBoldText>
 								</VStack>
 							</HStack>
-							<RegistButton
-								color={colors.Blue1}
-								onPress={() => {
-									navigation.navigate('ChoiceTransit');
-								}}>
-								<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
-									{item} 편 등록
-								</PretendardSemiBoldText>
-							</RegistButton>
+							{!(index == 0 && timetable[0]?.[0]?.category == 6) && (
+								<RegistButton
+									color={colors.Blue1}
+									onPress={() => {
+										navigation.navigate('ChoiceTransit');
+									}}>
+									<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
+										{item} 편 등록
+									</PretendardSemiBoldText>
+								</RegistButton>
+							)}
 						</HStack>
 						<TransitBox>
 							<HStack>
@@ -377,7 +393,12 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 					<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} numberOfLines={1}>
 						{step - 1}일 차 일정은{' '}
 						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.PointYellow} numberOfLines={1}>
-							{Math.floor(((startTime[step - 2]?.time ?? 0) * 30 + 360) / 60)} 시에
+							{Math.floor(((startTime[step - 2]?.time ?? 0) * 30 + 360) / 60)}시{''}
+							{((startTime[step - 2]?.time ?? 0) * 30 + 360) % 60 != 0 &&
+								' ' +
+									String(((startTime[step - 2]?.time ?? 0) * 30 + 360) % 60).padStart(2, '0') +
+									'분'}
+							에{' '}
 						</PretendardSemiBoldText>
 						시작할게요!
 					</PretendardSemiBoldText>
@@ -386,7 +407,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				<WhiteContainer
 					deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
 						20,
-					)}px ${widthPercentage(24)}px;`}>
+					)}px ${widthPercentage(24)}px;z-index:0;`}>
 					<HStack>
 						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} numberOfLines={1}>
 							DAY {step - 1}{' '}
@@ -404,7 +425,11 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 										<PlusBox
 											onPress={() => {
 												navigation.navigate('AddCategory', {
-													info: {day: step - 2, index: timetable[step - 2].length},
+													info: {
+														day: step - 2,
+														index: timetable[step - 2].length,
+														startTime: startTime[step - 2]?.time,
+													},
 												});
 											}}>
 											<SVGPlus color={colors.Gray400} />
@@ -435,7 +460,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 									</HStack>
 								)}
 							<HStack>
-								<VStack>
+								<VStack deco='z-index:0;'>
 									<HStack gap={widthPercentage(10)} marginVertical={widthPercentage(10)}>
 										<DashLineContainer justifyContent='start'>
 											<MarkerContainer
@@ -451,16 +476,16 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 												status={idx == value.length - 1 ? 'end' : 'center'}></DashLine> */}
 										</DashLineContainer>
 										<InsideGrayContainer
-											onLongPress={() => {
-												dispatch(
-													modalSliceActions.setOpenModal({
-														modalTitle: '편집 모드에서 여행 일정을 편집하시겠어요?',
-														modalFunction: () => {
-															// setModify(true);
-														},
-													}),
-												);
-											}}
+											// onLongPress={() => {
+											// 	dispatch(
+											// 		modalSliceActions.setOpenModal({
+											// 			modalTitle: '편집 모드에서 여행 일정을 편집하시겠어요?',
+											// 			modalFunction: () => {
+											// 				// setModify(true);
+											// 			},
+											// 		}),
+											// 	);
+											// }}
 											onPress={() => {
 												console.log('category', timetable[step - 2]?.at(-1)?.category);
 												console.log('length', timetable[step - 2]?.length);
@@ -524,12 +549,9 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 															<Dropdown>
 																<DropdownElement
 																	onPress={() => {
-																		setOpen({
-																			day: 0,
-																			index: 0,
-																			status: false,
-																		});
-																		// setModify(true);
+																		setOpen({...open, status: false});
+																		setTimeValue(item?.takenTime / 60 - 1);
+																		setModify(true);
 																		// openModal(item.x, idx);
 																	}}>
 																	<PretendardSemiBoldText
@@ -539,7 +561,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 																		편집
 																	</PretendardSemiBoldText>
 																</DropdownElement>
-																{/* <DropdownElement
+																<DropdownElement
 																	onPress={() => {
 																		// deleteEssential(data);
 																	}}>
@@ -549,7 +571,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 																		lineHeight={18}>
 																		삭제
 																	</PretendardSemiBoldText>
-																</DropdownElement> */}
+																</DropdownElement>
 															</Dropdown>
 														)}
 												</VStack>
@@ -564,7 +586,11 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 									<PlusBox
 										onPress={() => {
 											navigation.navigate('AddCategory', {
-												info: {day: step - 2, index: index},
+												info: {
+													day: step - 2,
+													index: index,
+													startTime: startTime[step - 2]?.time,
+												},
 											});
 										}}>
 										<SVGPlus color={colors.Gray400} />
@@ -665,6 +691,110 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 						step == 0 ? navigation.goBack() : setStep(step - 1);
 					}}></RouteButton>
 			)}
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={modify}
+				onRequestClose={() => {
+					// setShow(false);
+				}}>
+				<ModalBackground
+					onPress={() => {
+						setModify(false);
+						console.log(timetable[open.day][open.index]);
+						// setPlaceState(null);
+						// clearInput();
+					}}>
+					<ModalBottomSheet flex={0.4}>
+						<BottomContainer height={heightPercentage(230)} gap={20}>
+							<ElementContainer color={colors.backgroundGray}>
+								<VStack width={widthPercentage(243)}>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+										{/* {
+												essentialPlaces.filter(place => place.day === open.day + 1)?.[
+													open.index
+												]?.name
+											} */}
+										{timetable[open.day][open.index]?.name}
+									</PretendardSemiBoldText>
+									<PretendardVariableText
+										size={12}
+										lineHeight={18}
+										color={colors.Gray2}
+										numberOfLines={1}>
+										{/* {
+												essentialPlaces.filter(place => place.day === open.day + 1)?.[
+													open.index
+												]?.formatted_address
+											} */}
+										{timetable[open.day][open.index]?.formatted_address}
+									</PretendardVariableText>
+								</VStack>
+							</ElementContainer>
+							<HStack justifyContent='space-around'>
+								<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={24}>
+									머무를 시간
+								</PretendardSemiBoldText>
+								<HStack justifyContent='space-around' width={widthPercentage(182)}>
+									<SVGContainer
+										disabled={timeValue < 1}
+										onPress={() => {
+											setTimeValue(timeValue - 1);
+										}}
+										color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
+										{timeValue >= 1 && (
+											<SVGMinus
+												width={widthPercentage(23)}
+												height={widthPercentage(23)}
+												color={colors.Gray2}
+											/>
+										)}
+									</SVGContainer>
+
+									<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={21.6}>
+										{timeValue + 1}시간
+									</PretendardSemiBoldText>
+									<SVGContainer
+										disabled={timeValue > 1}
+										onPress={() => {
+											setTimeValue(timeValue + 1);
+										}}
+										color={timeValue > 1 ? colors.backgroundWhite : colors.Gray5}>
+										{timeValue <= 1 && (
+											<SVGPlus
+												width={widthPercentage(25)}
+												height={widthPercentage(25)}
+												color={colors.Primary}
+											/>
+										)}
+									</SVGContainer>
+								</HStack>
+							</HStack>
+							<PrimaryButton
+								label={'수정 완료'}
+								width={widthPercentage(327)}
+								height={heightPercentage(60)}
+								onPress={
+									() => {
+										let copy = [...timetable];
+										let copy2 = timetable[open.day].map((item, idx) =>
+											idx == open.index ? {...item, takenTime: (timeValue + 1) * 60} : item,
+										);
+										copy[open.day] = copy2;
+										dispatch(travelSliceActions.changeTimetable(copy));
+										setTimeValue(0);
+										setModify(false);
+									}
+									// modifyEssential(
+									// 	essentialPlaces.filter(place => place.day === open.day + 1)?.[open.index],
+									// )
+								}
+								backgroundColor={colors.Gray5}
+								textColor={colors.backgroundWhite}></PrimaryButton>
+						</BottomContainer>
+					</ModalBottomSheet>
+				</ModalBackground>
+			</Modal>
 		</>
 	);
 }

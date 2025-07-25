@@ -3,7 +3,16 @@ import {Modal, FlatList, View, NativeSyntheticEvent, NativeScrollEvent} from 're
 import styled from 'styled-components/native';
 import RouteButton from '../route-button';
 
-export default function TimePickerModal({visible, onClose, onConfirm, navigation, minuteDivide, handleAllApply}) {
+export default function TimePickerModal({
+	visible,
+	onClose,
+	onConfirm,
+	navigation,
+	minuteDivide,
+	handleAllApply,
+	hour,
+	minute,
+}) {
 	const [ampmIndex, setAmpmIndex] = useState(0);
 	const [hourIndex, setHourIndex] = useState(8); // default: 9시
 	const [minuteIndex, setMinuteIndex] = useState(0);
@@ -36,12 +45,18 @@ export default function TimePickerModal({visible, onClose, onConfirm, navigation
 		minute: minutes[minuteIndex],
 	});
 	useEffect(() => {
+		setAmpmIndex(Math.floor(hour / 12));
+		setHourIndex((hour % 12) - 1);
+		setMinuteIndex(minute / 30);
+		console.log(minute);
+	}, []);
+	useEffect(() => {
 		if (visible) {
 			flatListRef.hour.current?.scrollToOffset({offset: hourIndex * ITEM_HEIGHT, animated: false});
 			flatListRef.minute.current?.scrollToOffset({offset: minuteIndex * ITEM_HEIGHT, animated: false});
 			flatListRef.ampm.current?.scrollToOffset({offset: ampmIndex * ITEM_HEIGHT, animated: false});
 		}
-	}, [visible]);
+	}, [visible, hourIndex, minuteIndex, ampmIndex]);
 
 	return (
 		<>
