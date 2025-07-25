@@ -14,10 +14,10 @@ const tendencyList = [
 		list: ['힐링', '활동적인', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
 	},
 	{
-		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '유적지', '박물관', '공원', '사찰', '성지'],
+		list: ['레저 스포츠', '산책', '드라이브', '이색체험', '쇼핑', '시티투어'],
 	},
 	{
-		list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+		list: ['바다', '산', '실내여행지', '문화시설', '사진 명소', '유적지', '박물관', '전통', '공원', '사찰', '성지'],
 	},
 ];
 const initialState: LiteState = {
@@ -706,13 +706,13 @@ export const travelSlice = createSlice({
 							lat: 0,
 							lng: 0,
 							name: '',
-							category: 0,
+							category: 6,
 							takenTime: 30,
 							photo: '',
 					  }
 					: {
 							...state[payload],
-							category: 0,
+							category: 6,
 							takenTime: 30,
 							photo: '',
 					  };
@@ -736,8 +736,9 @@ export const travelSlice = createSlice({
 			state.courseDetail = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
-			let updateItem = [[...Array(payload.data.resultData.length - 1)].map(() => [])];
-			payload.data.resultData.forEach((timeTable, tIndex) => {
+			console.log(payload.data.resultData);
+			let updateItem = [[...Array(payload.data?.resultData.length - 1)].map(() => [])];
+			payload.data?.resultData.forEach((timeTable, tIndex) => {
 				let copy: TimetableType[][] = [...Array(timeTable.length)].map(() => []);
 				timeTable.forEach((item, idx) => {
 					let time = 6;

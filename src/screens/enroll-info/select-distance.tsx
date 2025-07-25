@@ -3,12 +3,12 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import Slider from '@react-native-community/slider';
-import {BackgroundGray, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {BackgroundGray, BackgroundGrayScrollView, PretendardSemiBoldText} from '../../utill/layout/layout';
 import StepText from '../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {ButtonContainer} from './select-multi';
+import {ButtonContainer, MarginContainder} from './select-multi';
 import MapView, {Circle} from 'react-native-maps';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import Stepper from '../../utill/component/enroll-info/stepper';
@@ -42,7 +42,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 		handleGoogleAnalytics();
 	}, []);
 	return (
-		<BackgroundGray>
+		<BackgroundGrayScrollView>
 			<Stepper total={13} now={13}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
@@ -101,11 +101,10 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 					}}
 				/>
 			</DistanceCenter>
+			<MarginContainder></MarginContainder>
+
 			<RouteButton navigation={navigation} nextTitle={'FinalCheck'} goNext={goNext}></RouteButton>
-			{/* <ButtonContainer>
-				<CustomButton label='맞춤형 여행 코스를 확인해볼게요!' onPress={goNext}></CustomButton>
-			</ButtonContainer> */}
-		</BackgroundGray>
+		</BackgroundGrayScrollView>
 	);
 }
 

@@ -12,7 +12,7 @@ export default function Stepper({total, now}: {total: number; now: number}) {
 
 const StepperBar = styled.View`
 	width: ${widthPercentage(343)}px;
-	height: ${heightPercentage(10)}px;
+	height: ${heightPercentage(6)}px;
 	background-color: ${colors.Gray200};
 	align-items: start;
 	border-radius: 6px;
@@ -24,6 +24,6 @@ const NowBar = styled.View<{now: number}>`
 	border-radius: 6px;
 	z-index: 10;
 	width: ${props => props.now}%;
-	height: ${heightPercentage(10)}px;
+	height: ${heightPercentage(6)}px;
 	background-color: ${colors.Primary};
 `;

@@ -16,7 +16,7 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {openSettings} from 'react-native-permissions';
 import MapView, {Circle} from 'react-native-maps';
 import Stepper from '../../../utill/component/enroll-info/stepper';
-import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import PrimaryButton from '../../../utill/component/primary-button';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {SVGSearch} from '../../../utill/svg/svg';
@@ -80,7 +80,7 @@ export default function SelectDistance({navigation}: any) {
 				selectPopular: popularity,
 				recentPosition: {lat: geoInfo.lat, lng: geoInfo.lng},
 				distanceSensitivity: range,
-				version: 2,
+				version: 3,
 				country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 			};
 			const result = await dispatch(regionSearch(datas)).unwrap();
@@ -200,13 +200,13 @@ export default function SelectDistance({navigation}: any) {
 			<Stepper total={7} now={7}></Stepper>
 			<StepText
 				styleText='4.원하는 반경의 지역을 추천해드려요.'
-				mainText='현재 위치에서 추천받고자 하는 여행 반경을 선택해 주세요'
+				mainText={`현재 위치에서 추천받고자 하는\n여행 반경을 선택해 주세요`}
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 			<RegionTextInputContainer>
-				<SVGSearch />
+				<SVGSearch color={colors.Primary} />
 				<RegionTextInput
 					ref={regionSearchRef}
-					placeholder='다른 지역 기준으로 추천받기 (검색)'
+					placeholder='다른 위치를 원하시면 검색해 주세요'
 					value={regionText}
 					// onBlur={() => {
 					// 	setRegionSearchState(false);
@@ -307,7 +307,9 @@ export default function SelectDistance({navigation}: any) {
 			</>
 			<ButtonContainer>
 				<CustomButton
-					label='맞춤형 여행지를 확인해볼게요!'
+					bgColor={colors.Primary}
+					textColor={colors.Gray5}
+					label='맞춤형 여행지를 확인해볼게요'
 					onPress={checkToken}
 					marginBottom={12}></CustomButton>
 			</ButtonContainer>
@@ -337,6 +339,7 @@ export const RegionTextInput = styled.TextInput`
 	background-color: ${colors.backgroundWhite};
 	border-radius: 10px;
 	color: black;
+	font-size: ${fontPercentage(16)}px;
 `;
 export const RegionTextInputContainer = styled.View`
 	flex-direction: row;
@@ -346,6 +349,7 @@ export const RegionTextInputContainer = styled.View`
 	padding-horizontal: ${widthPercentage(10)}px;
 	border-width: 2px;
 	border-color: ${colors.Primary};
+	margin-vertical: ${widthPercentage(10)}px;
 `;
 export const SearchContainer = styled.View<{top?: number}>`
 	position: absolute;

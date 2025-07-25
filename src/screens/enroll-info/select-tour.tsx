@@ -72,6 +72,18 @@ export default function RecommendSelectTour({navigation}: any) {
 			});
 		});
 		accommodations.slice(1).forEach((item, index) => {
+			if (index != 0 && data[index - 1].at(-1)?.category == 4) {
+				data[index].push({
+					category: 4,
+					id: shortid(),
+					takenTime: 0,
+					x: 0,
+					y: 6,
+					lat: data[index - 1].at(-1)?.lat,
+					lng: data[index - 1].at(-1)?.lng,
+					name: data[index - 1].at(-1)?.name,
+				});
+			}
 			if (item?.name != '') {
 				data[index].push({
 					category: 4,
@@ -129,6 +141,6 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
-	margin-top: ${heightPercentage(134)}px;
+	margin-top: ${heightPercentage(74)}px;
 	gap: ${widthPercentage(8)}px;
 `;

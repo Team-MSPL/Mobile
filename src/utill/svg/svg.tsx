@@ -80,6 +80,8 @@ import CarIcon from '../../../public/carIcon.svg';
 import BagIcon from '../../../public/bagIcon.svg';
 import BuildingIcon from '../../../public/buildingIcon.svg';
 import SpoonIcon from '../../../public/spoonIcon.svg';
+
+import NoteListIcon from '../../../public/noteList.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -314,5 +316,8 @@ export const SvgBuildingIcon = styled(BuildingIcon)<{color?: string}>`
 `;
 
 export const SvgSpoonIcon = styled(SpoonIcon)<{color?: string}>`
+	color: color;
+`;
+export const SVGNoteListIcon = styled(NoteListIcon)<{color?: string}>`
 	color: color;
 `;

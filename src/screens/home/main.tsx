@@ -361,7 +361,7 @@ export default function Main({navigation}: any) {
 	const sheetRef = useRef<BottomSheet>(null);
 
 	// variables
-	const snapPoints: ReadonlyArray<string | number> = useMemo(() => [Platform.OS == 'ios' ? '50%' : '45%', '90%'], []);
+	const snapPoints: ReadonlyArray<string | number> = useMemo(() => [Platform.OS == 'ios' ? '50%' : '50%', '99%'], []);
 
 	// callbacks
 	const handleSheetChange = useCallback((index: number) => {
@@ -370,13 +370,21 @@ export default function Main({navigation}: any) {
 	const renderItem = useCallback(
 		() => (
 			<HomeBottomContainer>
-				<VStack gap={5} deco='padding:0px 12px;'>
-					<PretendardBoldText size={16} lineHeight={26.6} color={colors.Black}>
-						성향에 딱 맞는 여행, 다님 AI가 추천 해줘요
-					</PretendardBoldText>
-					<PretendardBoldText size={14} lineHeight={21.6} color={colors.PointYellow}>
-						다님 AI와 함께 단 1분이면 충분해요!
-					</PretendardBoldText>
+				<VStack gap={5}>
+					<PretendardSemiBoldText size={20} lineHeight={26.6} color={colors.Black}>
+						성향에 딱 맞는 여행,{' '}
+						<PretendardSemiBoldText
+							size={20}
+							lineHeight={26.6}
+							color={colors.Black}
+							deco={`background-color:${colors.Green1}`}>
+							다님 AI
+						</PretendardSemiBoldText>
+						가 추천 해줘요
+					</PretendardSemiBoldText>
+					<PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.PointYellow}>
+						1분 투자로 하루를 아껴보세요!
+					</PretendardSemiBoldText>
 				</VStack>
 				<VStack justifyContent='space-around'>
 					{buttonList.map(item => (
@@ -398,13 +406,13 @@ export default function Main({navigation}: any) {
 									justifyContent: 'flex-end',
 									gap: heightPercentage(15),
 								}}>
-								<PretendardVariableText
-									size={19}
+								<PretendardSemiBoldText
+									size={20}
 									lineHeight={25}
 									color={colors.backgroundWhite}
 									deco={'text-align:center'}>
 									{item.text}
-								</PretendardVariableText>
+								</PretendardSemiBoldText>
 								<StartButton onPress={item.onPress}>
 									<PretendardSemiBoldText
 										size={20}
@@ -502,19 +510,15 @@ export default function Main({navigation}: any) {
 					</>
 				)}
 				<CollectionContainer>
-					<PretendardSemiBoldText
-						size={18}
-						lineHeight={21.6}
-						color={colors.Gray5}
-						deco={`margin-left:${widthPercentage(6)}`}>
+					<PretendardSemiBoldText size={20} lineHeight={24.6} color={colors.Gray5}>
 						다님이 추천하는 여행지
 					</PretendardSemiBoldText>
 					<Carousel
 						style={{
 							marginTop: 18,
 							marginBottom: 50,
-							marginLeft: widthPercentage(6),
 						}}
+						enabled={false}
 						width={widthPercentage(375)}
 						height={widthPercentage(300)}
 						autoPlay={true}
@@ -586,6 +590,7 @@ export default function Main({navigation}: any) {
 					}
 					style={{
 						alignSelf: displayList.length == 1 ? 'center' : undefined,
+						marginBottom: widthPercentage(40),
 					}}
 					width={widthPercentage(337)}
 					height={widthPercentage(160)}
@@ -604,6 +609,7 @@ export default function Main({navigation}: any) {
 								}
 							}}>
 							<EventImage
+								resizeMode='contain'
 								source={
 									displayList[index]?.type == 'instagram'
 										? require('../../../public/main/instagram.png')
@@ -705,8 +711,8 @@ export default function Main({navigation}: any) {
 					</>
 				)}
 				<PretendardSemiBoldText
-					size={18}
-					lineHeight={21.6}
+					size={20}
+					lineHeight={24.6}
 					color={colors.Gray5}
 					deco={`margin-left:${widthPercentage(6)}`}>
 					다님 사용자들의 생생한 후기
@@ -754,8 +760,8 @@ export default function Main({navigation}: any) {
 				/>
 
 				<PretendardSemiBoldText
-					size={18}
-					lineHeight={21.6}
+					size={20}
+					lineHeight={24.6}
 					color={colors.Black}
 					deco={`margin-left:${widthPercentage(6)}`}>
 					{userName}님을 위한 혜택
@@ -830,7 +836,7 @@ const RecommendContainer = styled.Pressable`
 	width: ${widthPercentage(335)}px;
 	height: ${widthPercentage(152)}px;
 	background-color: ${colors.Gray1};
-	border-radius: 12px;
+	border-radius: 20px;
 	top: ${heightPercentage(18)}px;
 	margin: 0px 0px ${heightPercentage(9)}px 0px;
 	flex-direction: row;
@@ -853,8 +859,8 @@ const HomeContainer = styled.ScrollView`
 const HomeBottomContainer = styled.View`
 	width: 100%;
 	border-radius: 30px 30px 0px 0px;
-	background-color: ${colors.backgroundWhite};
-	padding: 0px ${widthPercentage(8)}px 0px ${widthPercentage(8)}px;
+	background-color: ${colors.backgroundGray};
+	padding: 0px ${widthPercentage(24)}px 0px ${widthPercentage(24)}px;
 `;
 const CollectionContainer = styled.View`
 	margin-top: ${widthPercentage(60)}px;
@@ -886,7 +892,6 @@ const VividReviewContainer = styled.View`
 	padding-top: ${widthPercentage(15)}px;
 	gap: ${widthPercentage(10)}px;
 	background-color: ${colors.backgroundWhite};
-	border-width: 1px;
 	border-radius: 12px;
 	border-color: #dddddd;
 `;
@@ -916,7 +921,7 @@ const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
 	height: ${widthPercentage(152)}px;
 	object-fit: fill;
-	background-color: red;
+	border-radius: 10px;
 `;
 const EventIndex = styled.View`
 	position: absolute;
@@ -931,7 +936,7 @@ const EventIndex = styled.View`
 `;
 const EventContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(337)}px;
-	height: ${widthPercentage(152)}px;
+	height: ${widthPercentage(160)}px;
 	border-radius: 10px;
 	overflow: hidden;
 `;

@@ -6,7 +6,7 @@ import {
 	VStack,
 } from '../../../utill/layout/layout';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
-import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {colors} from '../../../utill/colors';
 import {GOOGLE_API_KEY} from '@env';
@@ -373,6 +373,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 							color: 'black',
 							backgroundColor: colors.backgroundWhite,
 							flex: 0.9,
+							fontSize: fontPercentage(18),
 						},
 						description: {color: 'black'},
 					}}

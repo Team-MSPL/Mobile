@@ -61,7 +61,7 @@ export default function RecommendSelectBusy({navigation}: any) {
 	);
 }
 const SelectMoveContainer = styled.View`
-	flex: 1;
+	flex: 0.8;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-around;

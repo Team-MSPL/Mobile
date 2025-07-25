@@ -90,6 +90,7 @@ export default function Preset({navigation}: any) {
 								// },
 								modalTopText: '일정 선택하러 가기',
 								modalBottomText: '종료하기',
+								modalBottomFunctionUse: true,
 								modalBottomFunction: () => {
 									navigation.popToTop();
 								},

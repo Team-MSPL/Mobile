@@ -25,7 +25,7 @@ import {
 import {SelectContainer} from '../enroll-info/select-day';
 
 import {BottomContainer, SearchClearContainer} from '../enroll-info/search-place';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {ButtonContainer, DeleteContainer} from '../enroll-info/select-multi';
 import PrimaryButton from '../../utill/component/primary-button';
 import UseDatePicker from '../../utill/hooks/useDatePicker';
@@ -307,7 +307,12 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						alignItems: 'center',
 					},
 					listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
-					textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+					textInput: {
+						margin: 1,
+						fontSize: fontPercentage(18),
+						color: 'black',
+						backgroundColor: colors.backgroundWhite,
+					},
 					description: {color: 'black'},
 				}}
 				fetchDetails={true}

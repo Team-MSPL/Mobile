@@ -218,7 +218,7 @@ const DayRecommendContainer = styled.View`
 	height: ${heightPercentage(35)}px;
 	align-items: center;
 	justify-content: center;
-	background-color: ${colors.Gray1};
+	background-color: ${colors.backgroundGray};
 	border-radius: 12px 12px 0px 0px;
 	margin-bottom: ${widthPercentage(12)}px;
 	margin-top: ${widthPercentage(22)}px;

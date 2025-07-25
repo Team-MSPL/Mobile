@@ -38,7 +38,7 @@ function Timetable({
 }) {
 	const dispatch = useDispatch();
 	const {timetable, day, region} = useAppSelector(state => state.travelSlice);
-	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
 	const excludeNames = ['점심 추천', '저녁 추천', '숙소 추천'];
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const goSearchPlace = (data: {index: number; idx: number; category: string}) => {

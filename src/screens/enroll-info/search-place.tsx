@@ -16,7 +16,7 @@ import {
 } from '../../utill/layout/layout';
 import {Keyboard, Modal, Pressable, TouchableOpacity} from 'react-native';
 import {SVGMinus, SVGPlus, SvgLoginLogo, SVGSearch, SvgCancel} from '../../utill/svg/svg';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -201,6 +201,7 @@ export default function SearchPlace({navigation, route}: any) {
 							color: 'black',
 							backgroundColor: colors.backgroundWhite,
 							flex: 0.9,
+							fontSize: fontPercentage(18),
 						},
 						description: {color: 'black'},
 					}}

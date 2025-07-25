@@ -65,7 +65,7 @@ export default function SelectMulti({navigation}: any) {
 						mainText='미리 정해놓은 장소가 있나요?'
 						subTextSize={13}
 						subText={`숙소는 최대 1개, 여행지는 최대 3개까지 추가할 수 있어요.`}></StepText>
-					<VStack>
+					<VStack deco={`margin-top:${widthPercentage(24)}px;`}>
 						{[...Array(nDay + 1)].map((item, idx) => {
 							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
@@ -167,15 +167,20 @@ export default function SelectMulti({navigation}: any) {
 												))}
 											</FlexWrap>
 										)}
-										<ElementContainer color={colors.backgroundGray} height={widthPercentage(43)}>
+										<ElementContainer
+											color={colors.backgroundGray}
+											height={widthPercentage(43)}
+											onPress={() => {
+												goSearchPlace({idx: idx, index: 0});
+											}}>
 											<SVGContainer
 												disabled={filteredPlaces.length >= 3}
-												onPress={() => {
-													goSearchPlace({idx: idx, index: 0});
-												}}
 												color={
 													filteredPlaces.length >= 3 ? colors.Gray1 : colors.PrimarySecondary
-												}>
+												}
+												onPress={() => {
+													goSearchPlace({idx: idx, index: 0});
+												}}>
 												<SVGPlus
 													width={widthPercentage(16)}
 													height={widthPercentage(16)}
@@ -253,17 +258,20 @@ export default function SelectMulti({navigation}: any) {
 											)}
 											<ElementContainer
 												color={colors.backgroundGray}
-												height={widthPercentage(43)}>
+												height={widthPercentage(43)}
+												onPress={() => {
+													goSearchPlace({idx: idx, index: 1});
+												}}>
 												<SVGContainer
 													disabled={accommodations[idx + 1].name != ''}
-													onPress={() => {
-														goSearchPlace({idx: idx, index: 1});
-													}}
 													color={
 														accommodations[idx + 1].name
 															? colors.Gray1
 															: colors.PrimarySecondary
-													}>
+													}
+													onPress={() => {
+														goSearchPlace({idx: idx, index: 1});
+													}}>
 													<SVGPlus
 														width={widthPercentage(16)}
 														height={widthPercentage(16)}
@@ -406,7 +414,12 @@ export const SVGContainer = styled.TouchableOpacity<{color: string; width?: numb
 	align-items: center;
 	justify-content: center;
 `;
-export const ElementContainer = styled.View<{width?: string; color: string; height?: number; marginBottom?: number}>`
+export const ElementContainer = styled.Pressable<{
+	width?: string;
+	color: string;
+	height?: number;
+	marginBottom?: number;
+}>`
 	border-radius: 8px;
 	background-color: ${props => props.color};
 	align-items: center;

@@ -51,7 +51,7 @@ export default function SelectPopularity({navigation}: any) {
 						lng: cityViewList[country][1].sub[0].lng,
 					},
 					distanceSensitivity: 10,
-					version: 2,
+					version: 3,
 					country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 				};
 				const result = await dispatch(regionSearch(datas)).unwrap();
@@ -141,7 +141,7 @@ export default function SelectPopularity({navigation}: any) {
 				</SpaceHstack>
 				<SeoulContainer>
 					{textList.map((item, index) => (
-						<HStack justifyContent='space-between;'>
+						<HStack justifyContent={`space-between;`}>
 							<PretendardSemiBoldText size={13} lineHeight={18} color={colors.Gray4} style={{zIndex: 99}}>
 								{index + 1}.{country != 0 && index == 3 ? item.globalTitle : item.title}
 							</PretendardSemiBoldText>
@@ -150,7 +150,7 @@ export default function SelectPopularity({navigation}: any) {
 								lineHeight={18}
 								color={colors.Gray2}
 								style={{zIndex: 99}}
-								deco={`width:${widthPercentage(174)}px;`}>
+								deco={`width:${widthPercentage(174)}px;text-align:right;`}>
 								{country == 0 ? item.sub : item.global}
 							</PretendardSemiBoldText>
 						</HStack>
@@ -179,11 +179,11 @@ const SeoulContainer = styled.View`
 	border-radius: 12px;
 	align-self: center;
 	justify-content: center;
-	padding: ${widthPercentage(10)}px;
+	padding: ${widthPercentage(25)}px ${widthPercentage(24)}px;
 	bottom: 0;
 	border-width: 1px;
 	border-color: ${colors.Gray200};
-	gap: 5px;
+	gap: 10px;
 	margin-top: ${widthPercentage(40)}px;
 `;
 const ButtonContainer = styled.View`
@@ -221,7 +221,7 @@ export const SelectRail = styled.View`
 	border-radius: 6px;
 `;
 const BarContainer = styled.View`
-	width: ${widthPercentage(300)}px;
+	width: ${widthPercentage(327)}px;
 	align-self: center;
 	border-radius: 6px;
 	margin-vertical: ${heightPercentage(30)}px;

@@ -16,7 +16,7 @@ import {
 } from '../../utill/layout/layout';
 import {Keyboard, Pressable, TouchableOpacity} from 'react-native';
 import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -209,7 +209,12 @@ export default function SearchRecommend({navigation, route}: any) {
 							alignItems: 'center',
 						},
 						listView: {width: widthPercentage(327)},
-						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+						textInput: {
+							margin: 1,
+							color: 'black',
+							backgroundColor: colors.backgroundWhite,
+							fontSize: fontPercentage(18),
+						},
 						description: {color: 'black'},
 					}}
 					fetchDetails={true}

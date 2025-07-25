@@ -12,9 +12,9 @@ import TendencyButton from '../../utill/component/tendency-button';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {handleNearBySearch, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SelectButtonsContainer} from './region-recommend/select-who';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import RouteButton from '../../utill/component/route-button';
-import {SvgAirPort, SvgTrain} from '../../utill/svg/svg';
+import {SvgAirPort, SVGSearch, SvgTrain} from '../../utill/svg/svg';
 import {colors} from '../../utill/colors';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {GOOGLE_API_KEY} from '@env';
@@ -111,24 +111,34 @@ export default function SelectDeparture({navigation}: any) {
 						key: GOOGLE_API_KEY,
 						language: 'ko',
 					}}
+					renderLeftButton={() => {
+						return (
+							<SVGSearch
+								width={widthPercentage(20)}
+								height={widthPercentage(20)}
+								color={colors.Primary}
+							/>
+						);
+					}}
 					textInputProps={{placeholderTextColor: colors.Gray2}}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {
 							width: widthPercentage(327),
 							height: widthPercentage(52),
-							borderRadius: 22,
+							borderRadius: 99,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
 							borderWidth: 2,
 							borderColor: colors.Primary,
+							paddingLeft: 20,
 						},
-						listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
+						listView: {width: widthPercentage(327), maxHeight: heightPercentage(100), zIndex: 1000},
 						textInput: {
 							color: 'black',
 							backgroundColor: colors.backgroundWhite,
 							flex: 0.9,
-							marginLeft: 20,
+							fontSize: fontPercentage(18),
 						},
 						description: {color: 'black'},
 					}}

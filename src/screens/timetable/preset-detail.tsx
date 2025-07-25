@@ -273,7 +273,7 @@ export default function PresetDetail({navigation, route}: any) {
 								</PretendardSemiBoldText>
 							</HStack>
 						)}
-						{presetTendencyList[route.params.index].tendencyNameList.length > 4 && (
+						{/* {presetTendencyList[route.params.index].tendencyNameList.length > 4 && (
 							<TouchableOpacity
 								style={{height: 'auto', justifyContent: 'flex-end', marginLeft: 4}}
 								onPress={() => {
@@ -286,7 +286,7 @@ export default function PresetDetail({navigation, route}: any) {
 									transform={tendencyView ? 90 : 270}
 								/>
 							</TouchableOpacity>
-						)}
+						)} */}
 					</HStack>
 					<MapView
 						style={{

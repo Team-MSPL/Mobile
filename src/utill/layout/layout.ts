@@ -69,12 +69,16 @@ export const MainContainer = styled.ScrollView<{backgroundColor?: string}>`
 	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
 	width: 100%;
 `;
-export const MainText = styled.Text`
+export const MainText = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-size: 22px;
 	font-weight: bold;
 	color: black;
 `;
-export const SubText = styled.Text`
+export const SubText = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-size: 17px;
 	font-weight: bold;
 	color: black;
@@ -131,17 +135,25 @@ export const BackgroundGrayScrollView = styled.ScrollView<{
 	gap: ${props => props.gap ?? 0}px;
 `;
 
-export const PretendardVariable = styled.Text`
+export const PretendardVariable = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: PretendardVariable;
 `;
-export const PretendardBold = styled.Text`
+export const PretendardBold = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: Pretendard-Bold;
 `;
-export const PretendardSemiBold = styled.Text`
+export const PretendardSemiBold = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: Pretendard-SemiBold;
 `;
 
-export const PretendardVariableText = styled.Text<{
+export const PretendardVariableText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	lineHeight: number;
@@ -166,7 +178,9 @@ export const PretendardVariableText = styled.Text<{
 	text-decoration: ${props => props.decoration ?? null};
 	${props => props.deco}
 `;
-export const PretendardBoldText = styled.Text<{
+export const PretendardBoldText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	textAlign?: string;
@@ -183,7 +197,9 @@ export const PretendardBoldText = styled.Text<{
 	text-align: ${props => props.textAlign ?? 'auto'};
 	${props => props?.deco}
 `;
-export const PretendardSemiBoldText = styled.Text<{
+export const PretendardSemiBoldText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	lineHeight: number;

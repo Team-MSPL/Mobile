@@ -26,23 +26,38 @@ export default function DetailResult({navigation, route}: any) {
 		copy0.push(0);
 		copy[0] = copy0;
 		let copy2 = [...regionTendency[2]];
-		if (copy2[4] == 1) {
-			copy2.push(1);
-			copy2.push(0);
-			copy2.push(1);
-			copy2.push(1);
-		} else {
-			copy2.push(0);
-			copy2.push(0);
-			copy2.push(0);
-			copy2.push(0);
-		}
+		copy2.pop();
+		// if (copy2[6] == 1) {
+		// 	//역사 누르면
+		// 	copy2.push(1);
+		// 	copy2.push(0);
+		// 	copy2.push(1);
+		// 	copy2.push(1);
+		// } else {
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// }
 		copy[2] = copy2;
 		let copy3 = [...regionTendency[3]];
-		if (copy3[5] == 1) {
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		if (copy3[2] == 1) {
+			//자연경관 누르면
 			copy3[0] = 1;
 			copy3[1] = 1;
-			copy3[5] = 0;
+			copy3[2] = 0;
+		}
+		if (regionTendency[2][6] == 1) {
+			copy3[5] = 1;
+			copy3[6] = 1;
+			copy3[7] = 1;
+			copy3[9] = 1;
+			copy3[10] = 1;
 		}
 		copy[3] = copy3;
 		let selectEndDate = selectStartDate.clone().add(route.params.item.takenDay, 'days');

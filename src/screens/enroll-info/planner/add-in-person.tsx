@@ -12,7 +12,7 @@ export default function AddInPerson({navigation}: any) {
 	const [address, setAddress] = useState('');
 	const [category, setCategory] = useState('');
 	const [timeValue, setTimeValue] = useState(0);
-	const categoryList = ['관광지', '숙소', '식당/카페'];
+	const categoryList = ['여행지', '숙소', '식당/카페'];
 	// const handleSubmit = () => {
 	// 	let data={
 	// 		name: place,

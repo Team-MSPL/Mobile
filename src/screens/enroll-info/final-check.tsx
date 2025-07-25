@@ -179,7 +179,7 @@ export default function FinalCheck({navigation}: any) {
 						modalFunction: handleLogin,
 					}),
 			  )
-			: goNext(2);
+			: goNext(3);
 	};
 	const goNext = useCallback(
 		async (e: number) => {
@@ -205,30 +205,8 @@ export default function FinalCheck({navigation}: any) {
 						(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
 					);
 					a.shift();
-					// if (country != 0 && cityIndex == 1) {
-					// 	a = cityViewList[country]
-					// 		.slice(2, cityViewList[country].length)
-					// 		.map((value, index) =>
-					// 			value.sub
-					// 				.map((item, idx) => {
-					// 					if (idx != 0) {
-					// 						return cityViewList[country][index + 2].title + ' ' + item.subTitle;
-					// 					} else {
-					// 						return null;
-					// 					}
-					// 				})
-					// 				.filter(item => item !== null),
-					// 		)
-					// 		.join(',')
-					// 		.split(',');
-					// } else {
-					// 	a = cityViewList[country][cityIndex].sub.map(
-					// 		(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
-					// 	);
-					// 	a.shift();
-					// }
 				}
-				//["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+				// //["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
 				if (country == 0 && cityIndex == 2) {
 					a = [region[0] + ' 전체'];
 				}
@@ -257,13 +235,11 @@ export default function FinalCheck({navigation}: any) {
 						distanceSensitivity: distance,
 						bandwidth: bandwidth,
 						freeTicket: freeTicket,
-						version: e,
+						version: 3,
 						password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 					}),
 				).unwrap();
-				// result.data.resultData.map(item => {
-				// 	console.log(item);
-				// });
+
 				dispatch(travelSliceActions.selectRegion(a));
 				if (result) {
 					navigation.popToTop();
@@ -914,12 +890,15 @@ export default function FinalCheck({navigation}: any) {
 				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
 			</ButtonContainer>
 			<Modal animationType='fade' visible={tendencyModify.status} transparent={true}>
-				<InModalContainer onPress={() => {}}>
+				<InModalContainer
+					onPress={() => {
+						handleClose();
+					}}>
 					{tendencyModify.type == 'tendency' ? (
 						<InModal>
 							{tendencyModify.index != 4 ? (
 								<>
-									<CancelBox onPress={handleClose}>
+									<CancelBox onPress={() => handleClose()}>
 										<SvgCancel
 											style={{
 												position: 'absolute',
@@ -1154,7 +1133,7 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
-	margin-top: ${heightPercentage(104)}px;
+	margin-top: ${heightPercentage(84)}px;
 	gap: ${widthPercentage(8)}px;
 `;
 const InModal = styled.View`

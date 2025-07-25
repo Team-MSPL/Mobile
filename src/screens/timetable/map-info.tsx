@@ -102,7 +102,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 		}
 	};
 
-	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
 	// const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
 		for (let i = 0; i < timetable.length; i++) {

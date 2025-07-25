@@ -165,7 +165,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
+	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
 	function SheetContent() {
 		const {animatedIndex} = useBottomSheetInternal();
 
