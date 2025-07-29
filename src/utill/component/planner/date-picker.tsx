@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Modal, FlatList, View, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
+import {Modal, FlatList, View, NativeSyntheticEvent, NativeScrollEvent, InteractionManager} from 'react-native';
 import styled from 'styled-components/native';
 import RouteButton from '../route-button';
 
@@ -12,6 +12,10 @@ export default function TimePickerModal({
 	handleAllApply,
 	hour,
 	minute,
+	leftText,
+	leftFunction,
+	rightText,
+	rightFunction,
 }) {
 	const [ampmIndex, setAmpmIndex] = useState(0);
 	const [hourIndex, setHourIndex] = useState(8); // default: 9시
@@ -46,15 +50,18 @@ export default function TimePickerModal({
 	});
 	useEffect(() => {
 		setAmpmIndex(Math.floor(hour / 12));
-		setHourIndex((hour % 12) - 1);
-		setMinuteIndex(minute / 30);
-		console.log(minute);
+		setHourIndex(hour == 0 ? 11 : (hour - 1) % 12);
+		setMinuteIndex(minuteDivide ? minute / 30 : minute);
 	}, []);
 	useEffect(() => {
 		if (visible) {
-			flatListRef.hour.current?.scrollToOffset({offset: hourIndex * ITEM_HEIGHT, animated: false});
-			flatListRef.minute.current?.scrollToOffset({offset: minuteIndex * ITEM_HEIGHT, animated: false});
-			flatListRef.ampm.current?.scrollToOffset({offset: ampmIndex * ITEM_HEIGHT, animated: false});
+			InteractionManager.runAfterInteractions(() => {
+				setTimeout(() => {
+					flatListRef.hour.current?.scrollToOffset({offset: hourIndex * ITEM_HEIGHT, animated: false});
+					flatListRef.minute.current?.scrollToOffset({offset: minuteIndex * ITEM_HEIGHT, animated: false});
+					flatListRef.ampm.current?.scrollToOffset({offset: ampmIndex * ITEM_HEIGHT, animated: false});
+				}, 50);
+			});
 		}
 	}, [visible, hourIndex, minuteIndex, ampmIndex]);
 
@@ -87,6 +94,7 @@ export default function TimePickerModal({
 					decelerationRate='fast'
 					onMomentumScrollEnd={onScrollEnd('hour')}
 					contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
+					initialNumToRender={20}
 					renderItem={({item, index}) => (
 						<PickerItem height={ITEM_HEIGHT}>
 							<PickerText selected={index === hourIndex}>{item}</PickerText>
@@ -103,6 +111,7 @@ export default function TimePickerModal({
 					decelerationRate='fast'
 					onMomentumScrollEnd={onScrollEnd('minute')}
 					contentContainerStyle={{paddingVertical: ITEM_HEIGHT * 2}}
+					initialNumToRender={60}
 					renderItem={({item, index}) => (
 						<PickerItem height={ITEM_HEIGHT}>
 							<PickerText selected={index === minuteIndex}>{item}</PickerText>
@@ -113,23 +122,34 @@ export default function TimePickerModal({
 			<RouteButton
 				navigation={navigation}
 				type={'planner'}
-				leftText={'전체 일정에 적용하기'}
-				resize={true}
+				leftText={leftText || '전체 일정에 적용하기'}
 				LeftBtnFunction={() => {
-					handleAllApply({
-						ampm: ampmList[ampmIndex],
-						hour: hours[hourIndex],
-						minute: minutes[minuteIndex],
-					});
+					if (typeof leftFunction === 'function') {
+						leftFunction();
+					} else {
+						handleAllApply({
+							ampm: ampmList[ampmIndex],
+							hour: hours[hourIndex],
+							minute: minutes[minuteIndex],
+						});
+					}
 				}}
 				btnFunction={() => {
-					onConfirm({
-						ampm: ampmList[ampmIndex],
-						hour: hours[hourIndex],
-						minute: minutes[minuteIndex],
-					});
+					if (typeof leftFunction === 'function') {
+						rightFunction({
+							ampm: ampmList[ampmIndex],
+							hour: hours[hourIndex],
+							minute: minutes[minuteIndex],
+						});
+					} else {
+						onConfirm({
+							ampm: ampmList[ampmIndex],
+							hour: hours[hourIndex],
+							minute: minutes[minuteIndex],
+						});
+					}
 				}}
-				nextText={'완료'}></RouteButton>
+				nextText={rightText || '완료'}></RouteButton>
 		</>
 	);
 }

@@ -86,6 +86,40 @@ const initialState: LiteState = {
 	departureSelected: '',
 	recommendProducts: [],
 	hotProducts: [],
+	transitInfo: {
+		outbound: {
+			departureAirport: '', //출밢녀
+			departureTime: new Date(), //출발시간
+			arrivalAirport: '', //도착편
+			arrivalTime: new Date(), //도착시간
+			airline: '', //항공사혹은 기차번호
+			reservationNumber: '', //에약번호
+
+			departurHour: 6, //출발시각
+			arrivalHour: 8, //도착시각
+			Address: {
+				lat: 0,
+				lng: 0,
+			},
+			type: '',
+		},
+		inbound: {
+			departureAirport: '',
+			departureTime: new Date(),
+			arrivalAirport: '',
+			arrivalTime: new Date(),
+			airline: '',
+			reservationNumber: '',
+
+			departurHour: 6, //출발시각
+			arrivalHour: 8, //도착시각
+			Address: {
+				lat: 0,
+				lng: 0,
+			},
+			type: '',
+		},
+	},
 };
 
 export const axiosGoogle = axios.create({
@@ -267,7 +301,7 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 			`/place/textsearch/json?location=${data.lng}%2C${data.lat}&query=${data.name}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
-			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary%2Cgeometry&language=ko&key=${GOOGLE_API_KEY}`,
 		);
 		return a.data.result;
 	} catch (error: any) {
@@ -1000,6 +1034,42 @@ interface LiteState {
 	departureSelected: string;
 	recommendProducts: any;
 	hotProducts: any;
+	transitInfo: transitInfoType;
+}
+interface transitInfoType {
+	outbound: {
+		departureAirport: string; //출밢녀
+		departureTime: Date; //출발시간
+		arrivalAirport: string; //도착편
+		arrivalTime: Date; //도착시간
+		airline: string; //항공사혹은 기차번호
+		reservationNumber: string; //에약번호
+
+		departurHour: string; //출발시각
+		arrivalHour: string; //도착시각
+		Address: {
+			lat: number;
+			lng: number;
+		};
+
+		type: string;
+	};
+	inbound: {
+		departureAirport: string;
+		departureTime: Date;
+		arrivalAirport: string;
+		arrivalTime: Date;
+		airline: string;
+		reservationNumber: string;
+
+		departurHour: string; //출발시각
+		arrivalHour: string; //도착시각
+		Address: {
+			lat: number;
+			lng: number;
+		};
+		type: string;
+	};
 }
 interface aiListType {
 	_id: string;

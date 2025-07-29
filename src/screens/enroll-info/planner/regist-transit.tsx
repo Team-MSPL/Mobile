@@ -1,12 +1,16 @@
+import {async} from '@firebase/util';
 import moment from 'moment';
 import {useEffect, useRef, useState} from 'react';
 import {Modal, Platform, TouchableOpacity} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import LinearGradient from 'react-native-linear-gradient';
+import shortid from 'shortid';
 import {styled} from 'styled-components/native';
-import {useAppSelector} from '../../../redux';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {getPlaceInfo, googleKeywordApi, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../../utill/colors';
 import CustomButton from '../../../utill/component/custom-button';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 import TimePickerModal from '../../../utill/component/planner/date-picker';
 import RouteButton from '../../../utill/component/route-button';
 import TendencyButton from '../../../utill/component/tendency-button';
@@ -25,28 +29,41 @@ export default function RegistTransit({navigation, route}: any) {
 
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-	const {nDay, day} = useAppSelector(state => state.travelSlice);
+	const {nDay, day, timetable, transitInfo, region, cityIndex, country} = useAppSelector(state => state.travelSlice);
 
-	const [select, setSelect] = useState('outbound');
-	const [show, setShow] = useState(false);
+	const [select, setSelect] = useState(route?.params.type);
+	const [show, setShow] = useState({status: false, step: 0});
 	const indexRef = useRef(0);
+	const dispatch = useAppDispatch();
 	const [transportInfo, setTransportInfo] = useState({
-		outbound: {
-			departureAirport: '', //출밢녀
-			departureTime: new Date(day[0]), //출발시간
-			arrivalAirport: '', //도착편
-			arrivalTime: new Date(day[0]), //도착시간
-			airline: '', //항공사혹은 기차번호
-			reservationNumber: '', //에약번호
-		},
-		inbound: {
-			departureAirport: '',
-			departureTime: new Date(day[0]),
-			arrivalAirport: '',
-			arrivalTime: new Date(day[0]),
-			airline: '',
-			reservationNumber: '',
-		},
+		outbound:
+			transitInfo?.outbound?.departureAirport != ''
+				? {...transitInfo?.outbound}
+				: {
+						departureAirport: '', //출밢녀
+						departureTime: new Date(day[0]).setHours(9), //출발날짜
+						departurHour: 6, //출발시각
+						arrivalHour: 8, //도착시각
+						arrivalAirport: '', //도착편
+						arrivalTime: new Date(day[0]).setHours(10), //도착시간
+						airline: '', //항공사혹은 기차번호
+						reservationNumber: '', //에약번호
+						type: route.params.title, //airport,train
+				  },
+		inbound:
+			transitInfo?.inbound?.departureAirport != ''
+				? {...transitInfo?.inbound}
+				: {
+						departureAirport: '',
+						departureTime: new Date(day[0]).setHours(9),
+						departurHour: 6, //출발시각
+						arrivalHour: 8, //도착시각
+						arrivalAirport: '',
+						arrivalTime: new Date(day[0]).setHours(10),
+						airline: '',
+						reservationNumber: '',
+						type: route.params.title, //airport,train
+				  },
 	});
 	const handleFlightChange = (direction, field, value) => {
 		setTransportInfo(prev => ({
@@ -57,7 +74,82 @@ export default function RegistTransit({navigation, route}: any) {
 			},
 		}));
 	};
-	const allowedDates = ['2025-07-20', '2025-07-25', '2025-08-01'];
+	const handleRegist = async () => {
+		try {
+			let outboundInfo = {};
+			let inboundInfo = {};
+			if (transportInfo['outbound'].arrivalAirport != '') {
+				let outboundData = await dispatch(
+					googleKeywordApi({
+						name: transportInfo['outbound'].arrivalAirport,
+						lat: cityViewList[country][cityIndex].sub[0]?.lat,
+						lng: cityViewList[country][cityIndex].sub[0]?.lng,
+						region: region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
+					}),
+				).unwrap();
+				console.log(outboundData?.geometry?.location?.lat);
+				outboundInfo = {
+					lat: outboundData?.geometry?.location?.lat,
+					lng: outboundData?.geometry?.location?.lng,
+					name: outboundData?.name,
+				};
+			}
+			if (transportInfo['inbound'].departureAirport != '') {
+				let inboundData = await dispatch(
+					googleKeywordApi({
+						name: transportInfo['inbound'].departureAirport,
+						lat: cityViewList[country][cityIndex].sub[0]?.lat,
+						lng: cityViewList[country][cityIndex].sub[0]?.lng,
+						region: region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
+					}),
+				).unwrap();
+				inboundInfo = {
+					lat: inboundData?.geometry?.location?.lat,
+					lng: inboundData?.geometry?.location?.lng,
+					name: inboundData?.name,
+				};
+			}
+
+			const data = timetable?.map((item, idx) =>
+				item.map((value, index) =>
+					value.category == 6 ? {...value, ...(index == 0 ? outboundInfo : inboundInfo)} : value,
+				),
+			);
+			if (data[0].findIndex(item => item.category == 6) == -1) {
+				data[0].push({
+					category: 6,
+					id: shortid(),
+					takenTime: 0,
+					x: 0,
+					y: 6,
+					lat: outboundInfo?.lat,
+					lng: outboundInfo?.lng,
+					name: outboundInfo?.name,
+				});
+			}
+			if (data.at(-1)?.findIndex(item => item.category == 6) == -1) {
+				data.at(-1)?.push({
+					category: 6,
+					id: shortid(),
+					takenTime: 0,
+					x: 0,
+					y: 6,
+					lat: inboundInfo?.lat,
+					lng: inboundInfo?.lng,
+					name: inboundInfo?.name,
+				});
+			}
+			console.log(data);
+			dispatch(travelSliceActions.changeTimetable(data));
+			dispatch(travelSliceActions.updateFiled({field: 'transitInfo', value: transportInfo}));
+			navigation.pop(2);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+	// const handleDayRegist=()=>{
+
+	// }
 	return (
 		<BackgroundGrayScrollView backgroundColor={colors.backgroundWhite}>
 			<HStack gap={widthPercentage(30)} justifyContent='center' marginVertical={widthPercentage(30)}>
@@ -97,17 +189,22 @@ export default function RegistTransit({navigation, route}: any) {
 						gap={10}
 						onPress={() => {
 							indexRef.current = 0;
-							setShow(true);
+							setShow({status: true, step: 0});
 						}}>
 						<SvgCalendarIcon width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
 							{moment(new Date(transportInfo[select].departureTime)).format('YYYY.MM.DD')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
-					<TouchableHstack gap={10}>
+					<TouchableHstack
+						gap={10}
+						onPress={() => {
+							indexRef.current = 0;
+							setShow({status: true, step: 1});
+						}}>
 						<SVGClock width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-							오전 9:00
+							{moment(new Date(transportInfo[select].departureTime)).format('HH-mm')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
 				</HStack>
@@ -125,17 +222,22 @@ export default function RegistTransit({navigation, route}: any) {
 						gap={10}
 						onPress={() => {
 							indexRef.current = 1;
-							setShow(true);
+							setShow({status: true, step: 0});
 						}}>
 						<SvgCalendarIcon width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
 							{moment(new Date(transportInfo[select].arrivalTime)).format('YYYY.MM.DD')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
-					<TouchableHstack gap={10}>
+					<TouchableHstack
+						gap={10}
+						onPress={() => {
+							indexRef.current = 1;
+							setShow({status: true, step: 1});
+						}}>
 						<SVGClock width={widthPercentage(15)} height={widthPercentage(15)} />
 						<PretendardSemiBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-							오전 9:00{transportInfo[select].airline}
+							{moment(new Date(transportInfo[select].arrivalTime)).format('HH-mm')}
 						</PretendardSemiBoldText>
 					</TouchableHstack>
 				</HStack>
@@ -146,91 +248,137 @@ export default function RegistTransit({navigation, route}: any) {
 				</PretendardSemiBoldText>
 				<InputBox
 					placeholder={route.params.title == 'train' ? '기차 번호' : '항공사'}
-					placeholderTextColor={colors.Gray400}></InputBox>
+					placeholderTextColor={colors.Gray400}
+					value={transportInfo[select].airline}
+					onChangeText={e => handleFlightChange(select, 'airline', e)}></InputBox>
 				<InputBox
 					placeholder={route.params.title == 'train' ? '호차 번호' : '예약 번호'}
-					placeholderTextColor={colors.Gray400}></InputBox>
+					placeholderTextColor={colors.Gray400}
+					value={transportInfo[select].reservationNumber}
+					onChangeText={e => handleFlightChange(select, 'reservationNumber', e)}></InputBox>
 			</VStack>
 			<CustomButton
 				marginTop={20}
 				marginBottom={20}
 				label={'등록하기'}
-				onPress={() => {}}
+				onPress={() => {
+					handleRegist();
+				}}
 				bgColor={colors.Gray5}
 				textColor={colors.Gray200}></CustomButton>
 			<Modal
 				animationType={'fade'}
 				transparent={true}
-				visible={show}
+				visible={show.status}
 				onRequestClose={() => {
-					setShow(false);
+					setShow({status: false, step: 0});
 				}}>
-				<ModalBackground onPress={() => setShow(false)}>
+				<ModalBackground onPress={() => setShow({status: false, step: 0})}>
 					<ModalBottomSheet flex={0.7}>
-						<CalendarPicker
-							width={widthPercentage(Platform.isPad ? 300 : 375)}
-							weekdays={weekdays}
-							months={months}
-							minDate={new Date(day[0])}
-							maxDate={new Date(day[nDay])}
-							// disabledDates={date => {
-							// 	return !allowedDates.includes(date.format('YYYY-MM-DD'));
-							// }}
-							startFromMonday={false}
-							onDateChange={e => {
-								handleFlightChange(select, indexRef.current == 0 ? 'departureTime' : 'arrivalTime', e);
-							}}
-							customDatesStyles={[
-								{
-									date: new Date(
-										select == 'outbound'
-											? indexRef.current == 0
-												? transportInfo.outbound.departureTime
-												: transportInfo.outbound.arrivalTime
-											: indexRef.current == 0
-											? transportInfo.inbound.departureTime
-											: transportInfo.inbound.arrivalTime,
-									),
-									// Random colors
-									style: {
-										backgroundColor: colors.Primary,
+						{show.step == 0 ? (
+							<CalendarPicker
+								width={widthPercentage(Platform.isPad ? 300 : 375)}
+								weekdays={weekdays}
+								months={months}
+								minDate={new Date(day[0])}
+								maxDate={new Date(day[nDay])}
+								// disabledDates={date => {
+								// 	return !allowedDates.includes(date.format('YYYY-MM-DD'));
+								// }}
+								startFromMonday={false}
+								onDateChange={e => {
+									handleFlightChange(
+										select,
+										indexRef.current == 0 ? 'departureTime' : 'arrivalTime',
+										e,
+									);
+									setShow({status: true, step: 1});
+								}}
+								customDatesStyles={[
+									{
+										date: new Date(
+											select == 'outbound'
+												? indexRef.current == 0
+													? transportInfo.outbound.departureTime
+													: transportInfo.outbound.arrivalTime
+												: indexRef.current == 0
+												? transportInfo.inbound.departureTime
+												: transportInfo.inbound.arrivalTime,
+										),
+										// Random colors
+										style: {
+											backgroundColor: colors.Primary,
+										},
+										textStyle: {color: 'black'}, // sets the font color
+										containerStyle: [], // extra styling for day container
+										allowDisabled: true, // allow custom style to apply to disabled dates
 									},
-									textStyle: {color: 'black'}, // sets the font color
-									containerStyle: [], // extra styling for day container
-									allowDisabled: true, // allow custom style to apply to disabled dates
-								},
-							]}
-							showDayStragglers={false}
-							selectedDayColor={colors.Primary}
-							todayBackgroundColor={'#ffffff'}
-							// selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
-							// selectedEndDate={
-							// 	(selectedDateFlag || freeTicket) && selectEndDate != null
-							// 		? selectEndDate.toDate()
-							// 		: undefined
-							// }
-							previousTitle='이전'
-							nextTitle='다음'
-							previousTitleStyle={{color: 'black'}}
-							nextTitleStyle={{color: 'black'}}
-							allowBackwardRangeSelect={true}
-							selectYearTitle='년도 선택'
-						/>
-						{/* <PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
-							오전 9:00
-						</PretendardSemiBoldText>
-						<TimePickerModal
-							visible={show}
-							onClose={() => setShow(false)}
-							onConfirm={({ampm, hour, minute}) => {
-								console.log(`${ampm} ${hour}:${minute}`);
-							}}
-						/> */}
-						<RouteButton
-							navigation={navigation}
-							type={'planner'}
-							leftText={'완료'}
-							nextText={'다음으로'}></RouteButton>
+								]}
+								showDayStragglers={false}
+								selectedDayColor={colors.Primary}
+								todayBackgroundColor={'#ffffff'}
+								// selectedStartDate={selectedDateFlag || freeTicket ? selectStartDate.toDate() : undefined}
+								// selectedEndDate={
+								// 	(selectedDateFlag || freeTicket) && selectEndDate != null
+								// 		? selectEndDate.toDate()
+								// 		: undefined
+								// }
+								previousTitle='이전'
+								nextTitle='다음'
+								previousTitleStyle={{color: 'black'}}
+								nextTitleStyle={{color: 'black'}}
+								allowBackwardRangeSelect={true}
+								selectYearTitle='년도 선택'
+							/>
+						) : (
+							<TimePickerModal
+								visible={show}
+								onClose={() => setShow({status: false, step: 0})}
+								onConfirm={({ampm, hour, minute}) => {
+									console.log(`${ampm} ${hour}:${minute}`);
+								}}
+								hour={new Date(
+									transportInfo[select][indexRef.current == 0 ? 'departureTime' : 'arrivalTime'],
+								).getHours()}
+								minute={new Date(
+									transportInfo[select][indexRef.current == 0 ? 'departureTime' : 'arrivalTime'],
+								).getMinutes()}
+								leftText={'이전으로'}
+								leftFunction={() => {
+									setShow({status: true, step: 0});
+								}}
+								rightText={'완료'}
+								rightFunction={e => {
+									console.log((e?.ampm == '오전' ? 0 : 12) + Number(e?.hour), e?.minute);
+									const newDate = new Date(
+										transportInfo[select][indexRef.current == 0 ? 'departureTime' : 'arrivalTime'],
+									).setHours(
+										(e?.ampm == '오전' ? 0 : 12) +
+											(Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour)),
+										e?.minute,
+									);
+									handleFlightChange(
+										select,
+										indexRef.current == 0 ? 'departureTime' : 'arrivalTime',
+										newDate,
+									);
+									setShow({status: false, step: 0});
+								}}
+							/>
+						)}
+						{show.step == 0 && (
+							<RouteButton
+								navigation={navigation}
+								type={'planner'}
+								leftText={'완료'}
+								LeftBtnFunction={() => {
+									setShow({status: false, step: 0});
+								}}
+								btnFunction={() => {
+									setShow({status: true, step: 1});
+								}}
+								nextText={'다음으로'}></RouteButton>
+						)}
 					</ModalBottomSheet>
 				</ModalBackground>
 			</Modal>

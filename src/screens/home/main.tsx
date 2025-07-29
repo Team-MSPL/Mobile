@@ -793,6 +793,7 @@ export default function Main({navigation}: any) {
 			<ImageRecursion navigation={navigation} />
 			<BottomSheet
 				containerStyle={{zIndex: 10}}
+				handleStyle={{backgroundColor: colors.backgroundGray, borderRadius: 88}}
 				ref={sheetRef}
 				snapPoints={snapPoints}
 				enableDynamicSizing={false}

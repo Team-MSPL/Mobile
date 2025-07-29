@@ -13,11 +13,11 @@ import {
 } from '../../../utill/svg/svg';
 import {SelectButtonsContainer} from '../region-recommend/select-who';
 
-export default function ChoiceTransit({navigation}: any) {
+export default function ChoiceTransit({navigation, route}: any) {
 	const moveList = [
 		{
 			name: '항공',
-			function: () => navigation.navigate('RegistTransit', {title: 'airport'}),
+			function: () => navigation.navigate('RegistTransit', {title: 'airport', type: route.params.type}),
 			photo: (
 				<SvgAirplain
 					transform={90}
@@ -29,7 +29,7 @@ export default function ChoiceTransit({navigation}: any) {
 		},
 		{
 			name: '기차',
-			function: () => navigation.navigate('RegistTransit', {title: 'train'}),
+			function: () => navigation.navigate('RegistTransit', {title: 'train', type: route.params.type}),
 			photo: <SvgTrainIcon color={colors.Gray400} />,
 		},
 	];

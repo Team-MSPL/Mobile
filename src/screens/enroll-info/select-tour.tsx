@@ -41,7 +41,7 @@ export default function RecommendSelectTour({navigation}: any) {
 				departureInfo = departure;
 				break;
 		}
-		departureSelected != '' &&
+		if (departureSelected != '') {
 			data[0].push({
 				category: 6,
 				id: shortid(),
@@ -52,7 +52,56 @@ export default function RecommendSelectTour({navigation}: any) {
 				lng: departureInfo?.lng,
 				name: departureInfo?.name,
 			});
+			dispatch(
+				travelSliceActions.updateFiled({
+					field: 'transitInfo',
+					value: {
+						outbound: {
+							departureAirport: '', //출밢녀
+							departureTime: new Date(), //출발시간
+							arrivalAirport: departureInfo?.name, //도착편
+							arrivalTime: new Date(), //도착시간
+							airline: '', //항공사혹은 기차번호
+							reservationNumber: '', //에약번호
 
+							departurHour: 6, //출발시각
+							arrivalHour: 8, //도착시각
+							Address: {
+								lat: departureInfo?.lat,
+								lng: departureInfo?.lng,
+							},
+							type:
+								departureSelected == 'departureAirport'
+									? 'airport'
+									: departureSelected == 'departureTrain'
+									? 'train'
+									: 'none',
+						},
+						inbound: {
+							departureAirport: '',
+							departureTime: new Date(),
+							arrivalAirport: '',
+							arrivalTime: new Date(),
+							airline: '',
+							reservationNumber: '',
+
+							departurHour: 6, //출발시각
+							arrivalHour: 8, //도착시각
+							Address: {
+								lat: 0,
+								lng: 0,
+							},
+							type:
+								departureSelected == 'departureAirport'
+									? 'airport'
+									: departureSelected == 'departureTrain'
+									? 'train'
+									: 'none',
+						},
+					},
+				}),
+			);
+		}
 		essentialPlaces.forEach((item, index) => {
 			data[item?.day - 1].push({
 				category: 5,

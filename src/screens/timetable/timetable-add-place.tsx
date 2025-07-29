@@ -32,8 +32,10 @@ import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {TimePickerContainer} from './map-info';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 export default function TimetableAddPlace({navigation, route}: any) {
-	const {day, timetable, region, transit, distance, bandwidth, tendency, season} = useAppSelector(
+	const {day, timetable, region, transit, distance, bandwidth, tendency, season, country, cityIndex} = useAppSelector(
 		state => state.travelSlice,
 	);
 	const dispatch = useAppDispatch();
@@ -172,9 +174,39 @@ export default function TimetableAddPlace({navigation, route}: any) {
 		let copy = {...e, region: ''};
 		navigation.navigate('CourseDetail', {value: copy});
 	};
+	const {countryList} = useTendencyHandler();
 	const handleNearTravleSearch = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
+			let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
+			if (
+				(country == 0 && cityViewList[country][cityIndex].id >= 3 && region[0] == '전체') ||
+				(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+				(country != 0 && region[0] == '전체')
+			) {
+				a = cityViewList[country][cityIndex].sub.map(
+					(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+				);
+				a.shift();
+			}
+			if (country == 0 && cityIndex == 2) {
+				a = [region[0] + ' 전체'];
+			}
+			if (country != 0) {
+				a = a.map((item, idx) => {
+					return `해외/${countryList[country].en}/${item
+						.slice(
+							item.indexOf(cityViewList[country][cityIndex].title) +
+								cityViewList[country][cityIndex].title.length,
+						)
+						.trim()}`;
+				});
+			}
+			// if (a[0].includes('서울')) {
+			// 	a = ['서울 전체'];
+			// }
+
 			let lat =
 				timetable[route.params.x]?.reduce((item, current) => item + current?.lat, 0) /
 				timetable[route.params.x].length;
@@ -182,7 +214,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				timetable[route.params.x]?.reduce((item, current) => item + current?.lng, 0) /
 				timetable[route.params.x].length;
 			const data = {
-				regionList: region,
+				regionList: a,
 				selectList: [...tendency, season],
 				transit,
 				distanceSensitivity: distance,

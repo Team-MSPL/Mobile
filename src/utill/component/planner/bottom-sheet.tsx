@@ -18,6 +18,8 @@ import {
 	SVGMinus,
 	SVGPlus,
 	SVGRightAdd,
+	SVGTrainCardIcon,
+	SvgTrainIcon,
 	SvgTripleDot,
 } from '../../svg/svg';
 import {WhiteContainer} from '../../../screens/enroll-info/final-check';
@@ -43,8 +45,20 @@ import {ModalBackground, ModalBottomSheet} from '../../../screens/enroll-info/pl
 import {BottomContainer} from '../../../screens/enroll-info/search-place';
 import PrimaryButton from '../primary-button';
 function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose}: any) {
-	const {day, region, cityIndex, country, nDay, timetable, transit, tendency, travelName, travelId, regionInfo} =
-		useAppSelector(state => state.travelSlice);
+	const {
+		day,
+		region,
+		cityIndex,
+		country,
+		nDay,
+		timetable,
+		transit,
+		tendency,
+		travelName,
+		travelId,
+		regionInfo,
+		transitInfo,
+	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName} = useAppSelector(state => state.userSlice);
 	const {modalConfettiFlag} = useAppSelector(state => state.modalSlice);
 	const sheetRef = useRef<BottomSheet>(null);
@@ -199,102 +213,207 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	const transitScreen = () => {
 		return (
 			<>
-				<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black} deco='margin-bottom:10px;'>
+				<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black} deco='margin-bottom:15px;'>
 					{region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0]}까지 어떻게 가시나요?
 				</PretendardSemiBoldText>
-				{['가는', '오는'].map((item, index) => (
+				{['outbound', 'inbound'].map((item, index) => (
 					<>
 						<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
 							<HStack gap={3}>
 								<LeftBar color={colors.Blue1} />
 								<VStack>
-									<PretendardSemiBoldText size={19} lineHeight={23} color={colors.Black}>
-										{item}편
+									<PretendardSemiBoldText size={20} lineHeight={24} color={colors.Black}>
+										{index == 0 ? '가는' : '오는'}편
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={13} lineHeight={17} color={colors.PlannerGray}>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.PlannerGray}>
 										{moment(day[index == 0 ? index : nDay]).format('YYYY-MM-DD')}
 									</PretendardSemiBoldText>
 								</VStack>
 							</HStack>
-							{!(index == 0 && timetable[0]?.[0]?.category == 6) && (
+							{!(transitInfo[item].departureAirport != '' || transitInfo[item].arrivalAirport != '') && (
 								<RegistButton
 									color={colors.Blue1}
 									onPress={() => {
-										navigation.navigate('ChoiceTransit');
+										navigation.navigate('ChoiceTransit', {type: item});
 									}}>
-									<PretendardSemiBoldText size={13} lineHeight={18} color={colors.backgroundWhite}>
-										{item} 편 등록
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.backgroundWhite}>
+										{index == 0 ? '가는' : '오는'} 편 등록
 									</PretendardSemiBoldText>
 								</RegistButton>
 							)}
 						</HStack>
-						<TransitBox>
-							<HStack>
-								<IconContainer>
-									<SvgAirPortIcon />
-								</IconContainer>
-								<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
-									대한항공 /asldnsakl
-								</PretendardSemiBoldText>
-							</HStack>
-							<HStack justifyContent='space-between'>
-								<VStack>
-									<PretendardSemiBoldText size={32} lineHeight={36} color={colors.Black}>
-										ICN
+						{(transitInfo[item].departureAirport != '' || transitInfo[item].arrivalAirport != '') && (
+							<TransitBox>
+								<HStack gap={5}>
+									<IconContainer>
+										{transitInfo[item].type == 'airport' ? (
+											<SvgAirPortIcon />
+										) : (
+											<SVGTrainCardIcon
+												width={widthPercentage(18)}
+												height={widthPercentage(18)}
+												color={'white'}
+											/>
+										)}
+									</IconContainer>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
+										{transitInfo[item].airline}
+										{transitInfo[item].reservationNumber != '' &&
+											'+' + transitInfo[item].reservationNumber}
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-										인천 국제 공항
+									<VStack deco='z-index:1000; margin-left:auto;'>
+										<DotBox
+											deco='align-items:center; justify-content:center;'
+											onPress={() =>
+												setOpen({
+													status: !open.status,
+													index: index,
+													day: step - 2,
+													type: 'transit',
+												})
+											}>
+											<SvgTripleDot />
+										</DotBox>
+										{open.status &&
+											open.index == index &&
+											open.day == step - 2 &&
+											open.type == 'transit' && (
+												<Dropdown>
+													<DropdownElement
+														onPress={() => {
+															// setOpen({...open, status: false});
+															// setTimeValue(item?.takenTime / 60 - 1);
+															// setModify(true);
+															// openModal(item.x, idx);
+														}}>
+														<PretendardSemiBoldText
+															color={colors.Gray5}
+															size={14}
+															lineHeight={18}>
+															편집
+														</PretendardSemiBoldText>
+													</DropdownElement>
+													{/* <DropdownElement
+													onPress={() => {
+														// deleteEssential(data);
+													}}>
+													<PretendardSemiBoldText
+														color={colors.Gray5}
+														size={14}
+														lineHeight={18}>
+														삭제
+													</PretendardSemiBoldText>
+												</DropdownElement> */}
+												</Dropdown>
+											)}
+									</VStack>
+								</HStack>
+								<HStack justifyContent='space-between'>
+									<VStack width={widthPercentage(92)}>
+										<PretendardSemiBoldText size={32} lineHeight={36} color={colors.Black}>
+											{transitInfo[item]?.type == 'airport'
+												? '공항'
+												: transitInfo[item]?.type == 'train'
+												? '기차'
+												: '출발'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText
+											size={12}
+											lineHeight={16}
+											color={colors.Gray4}
+											numberOfLines={1}>
+											{transitInfo[item].departureAirport}
+										</PretendardSemiBoldText>
+									</VStack>
+									<VStack>
+										<HStack deco={`margin-top:-20px;`}>
+											<Dash></Dash>
+											{transitInfo[item].type == 'airport' ? (
+												<SvgAirPortIngIcon></SvgAirPortIngIcon>
+											) : (
+												<SVGTrainCardIcon
+													width={widthPercentage(18)}
+													height={widthPercentage(18)}
+													color={'black'}
+												/>
+											)}
+										</HStack>
+										<PretendardSemiBoldText
+											size={8}
+											lineHeight={12}
+											color={colors.Gray4}
+											deco={'text-align:center;'}>
+											{Math.floor(
+												moment(transitInfo[item].arrivalTime).diff(
+													transitInfo[item].departureTime,
+													'minutes',
+												) / 60,
+											) != 0 &&
+												Math.floor(
+													moment(transitInfo[item].arrivalTime).diff(
+														transitInfo[item].departureTime,
+														'minutes',
+													) / 60,
+												) + '시간'}
+											{moment(transitInfo[item].arrivalTime).diff(
+												transitInfo[item].departureTime,
+												'minutes',
+											) %
+												60 !=
+												0 &&
+												(moment(transitInfo[item].arrivalTime).diff(
+													transitInfo[item].departureTime,
+													'minutes',
+												) %
+													60) +
+													'분'}
+										</PretendardSemiBoldText>
+									</VStack>
+									<VStack width={widthPercentage(92)}>
+										<PretendardSemiBoldText
+											size={32}
+											lineHeight={36}
+											color={colors.Black}
+											deco={'text-align:right;'}>
+											{transitInfo[item]?.type == 'airport'
+												? '공항'
+												: transitInfo[item]?.type == 'train'
+												? '기차'
+												: '도착'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText
+											size={12}
+											lineHeight={16}
+											color={colors.Gray4}
+											deco={'text-align:right;'}>
+											{transitInfo[item].arrivalAirport}
+										</PretendardSemiBoldText>
+									</VStack>
+								</HStack>
+								<HStack gap={widthPercentage(13)}>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray4}>
+										출발 정보
 									</PretendardSemiBoldText>
-								</VStack>
-								<VStack>
-									<HStack deco={`margin-top:-20px;`}>
-										<Dash></Dash>
-										<SvgAirPortIngIcon></SvgAirPortIngIcon>
-									</HStack>
-									<PretendardSemiBoldText
-										size={8}
-										lineHeight={12}
-										color={colors.Gray4}
-										deco={'text-align:center;'}>
-										1시간
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
+										{moment(new Date(transitInfo[item]?.departureTime)).format('YYYY-MM-DD')}
 									</PretendardSemiBoldText>
-								</VStack>
-								<VStack>
-									<PretendardSemiBoldText
-										size={32}
-										lineHeight={36}
-										color={colors.Black}
-										deco={'text-align:right;'}>
-										HAN
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
+										{new Date(transitInfo[item]?.departureTime).getHours()}시
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-										노이 바이 국제 공항
+								</HStack>
+								<HStack gap={widthPercentage(13)}>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray4}>
+										도착 정보
 									</PretendardSemiBoldText>
-								</VStack>
-							</HStack>
-							<HStack gap={widthPercentage(13)}>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									출발 정보
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									{moment(day[index == 0 ? index : nDay]).format('YYYY-MM-DD')}
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									시간
-								</PretendardSemiBoldText>
-							</HStack>
-							<HStack gap={widthPercentage(13)}>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									도착 정보
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									{moment(day[index == 0 ? index : nDay]).format('YYYY-MM-DD')}
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={16} color={colors.Gray4}>
-									시간
-								</PretendardSemiBoldText>
-							</HStack>
-						</TransitBox>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
+										{moment(new Date(transitInfo[item]?.arrivalTime)).format('YYYY-MM-DD')}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Black}>
+										{new Date(transitInfo[item]?.arrivalTime).getHours()}시
+									</PretendardSemiBoldText>
+								</HStack>
+							</TransitBox>
+						)}
 					</>
 				))}
 			</>
@@ -701,7 +820,6 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				<ModalBackground
 					onPress={() => {
 						setModify(false);
-						console.log(timetable[open.day][open.index]);
 						// setPlaceState(null);
 						// clearInput();
 					}}>
@@ -715,7 +833,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 													open.index
 												]?.name
 											} */}
-										{timetable[open.day][open.index]?.name}
+										{timetable[open.day]?.[open.index]?.name}
 									</PretendardSemiBoldText>
 									<PretendardVariableText
 										size={12}
@@ -727,7 +845,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 													open.index
 												]?.formatted_address
 											} */}
-										{timetable[open.day][open.index]?.formatted_address}
+										{timetable[open.day]?.[open.index]?.formatted_address}
 									</PretendardVariableText>
 								</VStack>
 							</ElementContainer>
@@ -806,7 +924,7 @@ const TransitBox = styled.View`
 	height: ${widthPercentage(203)}px;
 	border-radius: 12px;
 	border-width: 1px;
-	border-color: ${colors.Gray2};
+	border-color: ${colors.Gray200};
 	padding: ${widthPercentage(17)}px ${widthPercentage(24)}px;
 	gap: ${widthPercentage(10)}px;
 	margin-bottom: ${widthPercentage(10)}px;
