@@ -1,6 +1,6 @@
 import BottomSheet, {BottomSheetScrollView, useBottomSheetInternal} from '@gorhom/bottom-sheet';
 import moment from 'moment';
-import {memo, useCallback, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {styled} from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {colors} from '../../colors';
@@ -40,7 +40,7 @@ import {saveTravel, travelSliceActions} from '../../../redux/travel-info/travel.
 import {logEvent} from '@react-native-firebase/analytics';
 import useKakaoShare from '../../hooks/useKakaoShare';
 import {useTendencyHandler} from '../../hooks/useTendencyHandler';
-import {Modal, Pressable} from 'react-native';
+import {Alert, Modal, Pressable} from 'react-native';
 import {ModalBackground, ModalBottomSheet} from '../../../screens/enroll-info/planner/regist-transit';
 import {BottomContainer} from '../../../screens/enroll-info/search-place';
 import PrimaryButton from '../primary-button';
@@ -72,7 +72,22 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	}, []);
 	const [timeValue, setTimeValue] = useState(0);
 	const [modify, setModify] = useState(false);
+	useEffect(() => {
+		const unsubscribe = navigation.addListener('beforeRemove', e => {
+			// 👇 여기서 뒤로 가려고 하는 상황을 감지함
+			e.preventDefault(); // 뒤로 가는 행동을 막고
+			// 사용자 확인 후 수동으로 pop() 등 호출
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '뒤로가시겠습니까?',
+					modalSubTitle: '뒤로갈시 저장되지않습니다',
+					modalFunction: () => navigation.dispatch(e.data.action),
+				}),
+			);
+		});
 
+		return unsubscribe;
+	}, [navigation]);
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
@@ -193,7 +208,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	// const handleCheck=()=>{
 
 	// }
-	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '출발지'];
+	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '여행 시작', '여행 종료'];
 	function SheetContent() {
 		const {animatedIndex} = useBottomSheetInternal();
 
@@ -285,6 +300,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 															// setTimeValue(item?.takenTime / 60 - 1);
 															// setModify(true);
 															// openModal(item.x, idx);
+															navigation.navigate('RegistTransit', {type: item});
 														}}>
 														<PretendardSemiBoldText
 															color={colors.Gray5}

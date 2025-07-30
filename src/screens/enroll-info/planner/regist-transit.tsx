@@ -78,7 +78,10 @@ export default function RegistTransit({navigation, route}: any) {
 		try {
 			let outboundInfo = {};
 			let inboundInfo = {};
-			if (transportInfo['outbound'].arrivalAirport != '') {
+			if (
+				transportInfo['outbound'].arrivalAirport != '' &&
+				timetable[0].find(item => item.category == 6)?.name != transportInfo['outbound'].arrivalAirport
+			) {
 				let outboundData = await dispatch(
 					googleKeywordApi({
 						name: transportInfo['outbound'].arrivalAirport,
@@ -87,14 +90,17 @@ export default function RegistTransit({navigation, route}: any) {
 						region: region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
 					}),
 				).unwrap();
-				console.log(outboundData?.geometry?.location?.lat);
+
 				outboundInfo = {
 					lat: outboundData?.geometry?.location?.lat,
 					lng: outboundData?.geometry?.location?.lng,
 					name: outboundData?.name,
 				};
 			}
-			if (transportInfo['inbound'].departureAirport != '') {
+			if (
+				transportInfo['inbound'].departureAirport != '' &&
+				timetable.at(-1).find(item => item.category == 7)?.name != transportInfo['inbound'].departureAirport
+			) {
 				let inboundData = await dispatch(
 					googleKeywordApi({
 						name: transportInfo['inbound'].departureAirport,
@@ -112,37 +118,72 @@ export default function RegistTransit({navigation, route}: any) {
 
 			const data = timetable?.map((item, idx) =>
 				item.map((value, index) =>
-					value.category == 6 ? {...value, ...(index == 0 ? outboundInfo : inboundInfo)} : value,
+					value.category == 6 || value.category == 7
+						? {
+								...value,
+								...(value.category == 6 ? outboundInfo : inboundInfo),
+								takenTime: moment(
+									transitInfo[value.category == 6 ? 'outbound' : 'inbound'].arrivalTime,
+								).diff(
+									transitInfo[value.category == 6 ? 'outbound' : 'inbound'].departureTime,
+									'minutes',
+								),
+								y:
+									(new Date(
+										transportInfo[value.category == 6 ? 'outbound' : 'inbound'].departureTime,
+									).getHours() *
+										60 -
+										360) /
+										30 +
+									new Date(
+										transportInfo[value.category == 6 ? 'outbound' : 'inbound'].departureTime,
+									).getMinutes() /
+										30,
+						  }
+						: value,
 				),
 			);
 			if (data[0].findIndex(item => item.category == 6) == -1) {
 				data[0].push({
 					category: 6,
 					id: shortid(),
-					takenTime: 0,
+					takenTime: moment(transitInfo['outbound'].arrivalTime).diff(
+						transitInfo['outbound'].departureTime,
+						'minutes',
+					),
 					x: 0,
-					y: 6,
+					y:
+						(new Date(transportInfo['outbound'].departureTime).getHours() * 60 - 360) / 30 +
+						new Date(transportInfo['outbound'].departureTime).getMinutes() / 30,
 					lat: outboundInfo?.lat,
 					lng: outboundInfo?.lng,
 					name: outboundInfo?.name,
 				});
 			}
-			if (data.at(-1)?.findIndex(item => item.category == 6) == -1) {
+			if (data.at(-1)?.findIndex(item => item.category == 7) == -1) {
 				data.at(-1)?.push({
-					category: 6,
+					category: 7,
 					id: shortid(),
-					takenTime: 0,
+					takenTime: moment(transitInfo['inbound'].arrivalTime).diff(
+						transitInfo['inbound'].departureTime,
+						'minutes',
+					),
 					x: 0,
-					y: 6,
+					y:
+						(new Date(transportInfo['inbound'].departureTime).getHours() * 60 - 360) / 30 +
+						new Date(transportInfo['inbound'].departureTime).getMinutes() / 30,
 					lat: inboundInfo?.lat,
 					lng: inboundInfo?.lng,
 					name: inboundInfo?.name,
 				});
 			}
-			console.log(data);
+			console.log(
+				moment(transitInfo['inbound'].arrivalTime).diff(transitInfo['inbound'].departureTime, 'minutes'),
+			);
 			dispatch(travelSliceActions.changeTimetable(data));
 			dispatch(travelSliceActions.updateFiled({field: 'transitInfo', value: transportInfo}));
-			navigation.pop(2);
+			// navigation.getState().routes.at(-1).name==
+			navigation.pop(navigation.getState().routes.at(-2).name == 'Planner' ? 1 : 2);
 		} catch (e) {
 			console.log(e);
 		}

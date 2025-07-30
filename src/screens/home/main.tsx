@@ -518,7 +518,6 @@ export default function Main({navigation}: any) {
 							marginTop: 18,
 							marginBottom: 50,
 						}}
-						enabled={false}
 						width={widthPercentage(375)}
 						height={widthPercentage(300)}
 						autoPlay={true}
