@@ -227,6 +227,7 @@ export default function Planner({navigation}: any) {
 				step={step}
 				setStep={setStep}
 				setShow={setShow}
+				show={show}
 				startTime={startTime}
 				handleClose={handleClose}
 			/>

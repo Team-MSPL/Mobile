@@ -9,7 +9,7 @@ import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {cityViewList} from '../enroll-info/city-list';
 import RouteButton from '../route-button';
 import {LeftBar, RegistButton} from './components';
-import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
+import {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
 import {
 	SvgAirPort,
 	SvgAirPortIcon,
@@ -40,11 +40,11 @@ import {saveTravel, travelSliceActions} from '../../../redux/travel-info/travel.
 import {logEvent} from '@react-native-firebase/analytics';
 import useKakaoShare from '../../hooks/useKakaoShare';
 import {useTendencyHandler} from '../../hooks/useTendencyHandler';
-import {Alert, Modal, Pressable} from 'react-native';
+import {Alert, Modal, Pressable, Animated} from 'react-native';
 import {ModalBackground, ModalBottomSheet} from '../../../screens/enroll-info/planner/regist-transit';
 import {BottomContainer} from '../../../screens/enroll-info/search-place';
 import PrimaryButton from '../primary-button';
-function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose}: any) {
+function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose, show}: any) {
 	const {
 		day,
 		region,
@@ -72,6 +72,26 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	}, []);
 	const [timeValue, setTimeValue] = useState(0);
 	const [modify, setModify] = useState(false);
+
+	const translateX = useRef(new Animated.Value(0)).current;
+	useEffect(() => {
+		const loopAnimation = Animated.loop(
+			Animated.sequence([
+				Animated.timing(translateX, {
+					toValue: 10, // 오른쪽으로 이동
+					duration: 1500,
+					useNativeDriver: true,
+				}),
+				Animated.timing(translateX, {
+					toValue: 0, // 다시 왼쪽으로
+					duration: 500,
+					useNativeDriver: true,
+				}),
+			]),
+		);
+
+		loopAnimation.start();
+	}, []);
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('beforeRemove', e => {
 			// 👇 여기서 뒤로 가려고 하는 상황을 감지함
@@ -224,6 +244,15 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 
 		return <></>;
 	}
+	const [addView, setAddView] = useState(true);
+	useEffect(() => {
+		if (step == 2 && addView && !show) {
+			const timer = setTimeout(() => {
+				setAddView(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [step, addView, show]);
 	const dispatch = useAppDispatch();
 	const transitScreen = () => {
 		return (
@@ -567,31 +596,35 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 													},
 												});
 											}}>
-											<SVGPlus color={colors.Gray400} />
+											<SVGPlus color={'#a3a1a1'} />
 										</PlusBox>
-										<PressBox>
-											<LeftTriangle />
-											<LinearGradient
-												start={{x: 0, y: 0}}
-												end={{x: 1, y: 0}}
-												colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
-												style={{
-													zIndex: 101,
-													position: 'absolute',
-													width: '100%',
-													height: '100%',
-													alignItems: 'center',
-													justifyContent: 'center',
-													borderRadius: 18,
-												}}>
-												<PretendardSemiBoldText
-													color={colors.backgroundWhite}
-													size={14}
-													lineHeight={18}>
-													버튼을 눌러 추가하세요
-												</PretendardSemiBoldText>
-											</LinearGradient>
-										</PressBox>
+										{addView && (
+											<Animated.View style={{transform: [{translateX}]}}>
+												<PressBox>
+													<LeftTriangle />
+													<LinearGradient
+														start={{x: 0, y: 0}}
+														end={{x: 1, y: 0}}
+														colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
+														style={{
+															zIndex: 101,
+															position: 'absolute',
+															width: '100%',
+															height: '100%',
+															alignItems: 'center',
+															justifyContent: 'center',
+															borderRadius: 18,
+														}}>
+														<PretendardSemiBoldText
+															color={colors.backgroundWhite}
+															size={14}
+															lineHeight={18}>
+															버튼을 눌러 추가하세요
+														</PretendardSemiBoldText>
+													</LinearGradient>
+												</PressBox>
+											</Animated.View>
+										)}
 									</HStack>
 								)}
 							<HStack>
@@ -715,7 +748,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 									</HStack>
 								</VStack>
 							</HStack>
-							{((timetable[step - 2].at(-1)?.category == 4 && timetable[step - 2].length - 2 == index) ||
+							{((timetable[step - 2].at(-1)?.category == 4 && timetable[step - 2].length - 1 == index) ||
 								(timetable[step - 2].at(-1)?.category == 4 && timetable[step - 2].at(-1)?.y == 6)) && (
 								<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
 									<PlusBox
@@ -728,8 +761,55 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 												},
 											});
 										}}>
-										<SVGPlus color={colors.Gray400} />
+										<SVGPlus color={'#a3a1a1'} />
 									</PlusBox>
+									{addView && (
+										<Animated.View style={{transform: [{translateX}]}}>
+											<PressBox>
+												<LeftTriangle />
+												<LinearGradient
+													start={{x: 0, y: 0}}
+													end={{x: 1, y: 0}}
+													colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
+													style={{
+														zIndex: 101,
+														position: 'absolute',
+														width: '100%',
+														height: '100%',
+														alignItems: 'center',
+														justifyContent: 'center',
+														borderRadius: 18,
+													}}>
+													<PretendardSemiBoldText
+														color={colors.backgroundWhite}
+														size={14}
+														lineHeight={18}>
+														버튼을 눌러 추가하세요
+													</PretendardSemiBoldText>
+												</LinearGradient>
+											</PressBox>
+										</Animated.View>
+									)}
+								</HStack>
+							)}
+						</>
+					))}
+					{timetable[step - 2].at(-1)?.category != 4 && (
+						<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
+							<PlusBox
+								onPress={() => {
+									navigation.navigate('AddCategory', {
+										info: {
+											day: step - 2,
+											index: timetable[step - 2].length,
+											startTime: startTime[step - 2]?.time,
+										},
+									});
+								}}>
+								<SVGPlus color={'#a3a1a1'} />
+							</PlusBox>
+							{addView && (
+								<Animated.View style={{transform: [{translateX}]}}>
 									<PressBox>
 										<LeftTriangle />
 										<LinearGradient
@@ -753,45 +833,8 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 											</PretendardSemiBoldText>
 										</LinearGradient>
 									</PressBox>
-								</HStack>
+								</Animated.View>
 							)}
-						</>
-					))}
-					{timetable[step - 2].at(-1)?.category != 4 && (
-						<HStack gap={20} marginHorizon={widthPercentage(30)} marginVertical={10}>
-							<PlusBox
-								onPress={() => {
-									navigation.navigate('AddCategory', {
-										info: {
-											day: step - 2,
-											index: timetable[step - 2].length,
-											startTime: startTime[step - 2]?.time,
-										},
-									});
-								}}>
-								<SVGPlus color={colors.Gray400} />
-							</PlusBox>
-
-							<PressBox>
-								<LeftTriangle />
-								<LinearGradient
-									start={{x: 0, y: 0}}
-									end={{x: 1, y: 0}}
-									colors={['#5350FF', 'rgba(83, 80, 255, 0.8) ']}
-									style={{
-										zIndex: 101,
-										position: 'absolute',
-										width: '100%',
-										height: '100%',
-										alignItems: 'center',
-										justifyContent: 'center',
-										borderRadius: 18,
-									}}>
-									<PretendardSemiBoldText color={colors.backgroundWhite} size={14} lineHeight={18}>
-										버튼을 눌러 추가하세요
-									</PretendardSemiBoldText>
-								</LinearGradient>
-							</PressBox>
 						</HStack>
 					)}
 				</WhiteContainer>

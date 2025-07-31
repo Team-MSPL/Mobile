@@ -115,7 +115,7 @@ export default function AccommodationDay({navigation, route}: any) {
 						</PretendardVariableText>
 					</VStack>
 					<CanCelBox>
-						<SvgCancel color='black' width={18} height={18} />
+						<SvgCancel color='black' width={11} height={11} />
 					</CanCelBox>
 				</HStack>
 			</InfoBox>
@@ -126,6 +126,7 @@ export default function AccommodationDay({navigation, route}: any) {
 				minDate={new Date(day[0])}
 				maxDate={new Date(day[nDay])}
 				startFromMonday={false}
+				initialDate={new Date(day[0])}
 				onDateChange={onDateChange}
 				showDayStragglers={false}
 				previousTitle='이전'
@@ -161,6 +162,8 @@ const InfoBox = styled.View`
 	height: ${widthPercentage(72)}px;
 	background-color: ${colors.backgroundGray};
 	border-radius: 12px;
+	align-items: center;
+	justify-content: center;
 `;
 const CanCelBox = styled.TouchableOpacity`
 	width: ${widthPercentage(41)}px;

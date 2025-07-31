@@ -436,16 +436,16 @@ function Timetable({
 																	onPress={() =>
 																		setOpen({
 																			status: !open.status,
-																			index: index,
-																			day: idx,
+																			index: idx,
+																			day: index,
 																			type: 'essential',
 																		})
 																	}>
 																	<SvgTripleDot />
 																</DotBox>
 																{open.status &&
-																	open.index == index &&
-																	open.day == idx &&
+																	open.index == idx &&
+																	open.day == index &&
 																	open.type == 'essential' && (
 																		<Dropdown>
 																			<DropdownElement
@@ -588,7 +588,13 @@ function Timetable({
 														</PretendardSemiBoldText>
 														<PlusBox
 															onPress={() => {
-																navigation.navigate('AddCategory');
+																navigation.navigate('AddCategory', {
+																	info: {
+																		day: index,
+																		index: idx + 1,
+																		startTime: 9,
+																	},
+																});
 															}}>
 															<SVGPlus color={colors.Gray400} />
 														</PlusBox>
@@ -674,9 +680,9 @@ const DragHstack = styled(HStack).attrs({as: Pressable})``;
 export const PlusBox = styled.TouchableOpacity`
 	width: ${widthPercentage(22)}px;
 	height: ${widthPercentage(22)}px;
-	border-radius: 8px;
+	border-radius: 7px;
 	background-color: ${colors.backgroundWhite};
-	border-color: ${colors.Gray400};
+	border-color: #a3a1a1;
 	border-width: 1px;
 	justify-content: center;
 	align-items: center;
