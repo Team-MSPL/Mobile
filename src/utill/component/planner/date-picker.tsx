@@ -135,7 +135,7 @@ export default function TimePickerModal({
 					}
 				}}
 				btnFunction={() => {
-					if (typeof leftFunction === 'function') {
+					if (typeof rightFunction === 'function') {
 						rightFunction({
 							ampm: ampmList[ampmIndex],
 							hour: hours[hourIndex],
@@ -153,18 +153,6 @@ export default function TimePickerModal({
 		</>
 	);
 }
-const Overlay = styled.Pressable`
-	flex: 1;
-	background-color: rgba(0, 0, 0, 0.4);
-	justify-content: flex-end;
-`;
-
-const BottomSheet = styled.Pressable`
-	background-color: white;
-	border-top-left-radius: 20px;
-	border-top-right-radius: 20px;
-	padding: 20px;
-`;
 
 const PickerContainer = styled.View`
 	flex-direction: row;
@@ -185,21 +173,10 @@ const PickerItem = styled.Pressable<{height: number}>`
 	align-items: center;
 `;
 
-const PickerText = styled.Text<{selected: boolean}>`
+const PickerText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{selected: boolean}>`
 	font-size: ${({selected}) => (selected ? '32px' : '28px')};
 	color: ${({selected}) => (selected ? '#000' : '#aaa')};
 	font-weight: ${({selected}) => (selected ? 'bold' : 'normal')};
-`;
-
-const ConfirmButton = styled.TouchableOpacity`
-	background-color: #5350ff;
-	padding: 12px;
-	border-radius: 10px;
-	align-items: center;
-`;
-
-const ConfirmText = styled.Text`
-	color: white;
-	font-size: 16px;
-	font-weight: bold;
 `;

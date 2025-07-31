@@ -5,18 +5,26 @@ import CalendarPicker from 'react-native-calendar-picker';
 import CustomButton from '../../utill/component/custom-button';
 import moment from 'moment';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {HStack, BackgroundGray, PretendardVariable, PretendardSemiBoldText} from '../../utill/layout/layout';
+import {
+	HStack,
+	BackgroundGray,
+	PretendardVariable,
+	PretendardSemiBoldText,
+	BackgroundGrayScrollView,
+} from '../../utill/layout/layout';
 import styled from 'styled-components/native';
 import {colors} from '../../utill/colors';
-import {Platform, Pressable, ScrollView} from 'react-native';
+import {Modal, Platform, Pressable, ScrollView} from 'react-native';
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {ButtonContainer} from './select-multi';
+import {ButtonContainer, MarginContainder} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
 import RouteButton from '../../utill/component/route-button';
+import TimePickerModal from '../../utill/component/planner/date-picker';
+import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -123,53 +131,26 @@ export default function SelectDay({navigation}: any) {
 					modalTextSize: 17,
 				}),
 			);
+		} else if (timeLimitArray[0] >= timeLimitArray[1]) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '종료 시간을 시작 시간 이후로는 설정하실 수 없습니다.',
+					modalSingleUse: true,
+					modalTextSize: 17,
+				}),
+			);
 		} else {
 			navigation.navigate('SelectDeparture');
 		}
 	};
-	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
-		// if (dateFlag.current == 0 && timeData.ampm == '오전' && parseInt(timeData.hour) < 6) {
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '시작 시간을 06시 이전으로 설정하실 수 없습니다.',
-		// 			modalSingleUse: true,
-		// 			modalTextSize: 17,
-		// 		}),
-		// 	);
-		// 	return false;
-		// } else if (dateFlag.current == 0 && timeData.ampm == '오후' && parseInt(timeData.hour) > 7) {
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '시작 시간을 20시 이후로는 설정하실 수 없습니다.',
-		// 			modalSingleUse: true,
-		// 			modalTextSize: 17,
-		// 		}),
-		// 	);
-		// 	return false;
-		// } else if (dateFlag.current == 1 && timeData.ampm == '오전') {
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '종료 시간을 오전으로 설정하실 수 없습니다.',
-		// 			modalSingleUse: true,
-		// 			modalTextSize: 17,
-		// 		}),
-		// 	);
-		// 	return false;
-		// } else {
-		// 	let timeCopy = [...timeLimitArray];
-		// 	let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
-		// 	timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
-		// 	let minuteCopy = [...minuteLimitArray];
-		// 	minuteCopy[dateFlag.current] = parseInt(timeData.minute);
-		// 	dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-		// 	return true;
-		// }
+	const goConfirm = (timeData: {hour: number; ampm: string; minute: string}) => {
 		let timeCopy = [...timeLimitArray];
 		let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
 		timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
 		let minuteCopy = [...minuteLimitArray];
 		minuteCopy[dateFlag.current] = parseInt(timeData.minute);
 		dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
+		setVisible(false);
 		return true;
 	};
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
@@ -193,8 +174,8 @@ export default function SelectDay({navigation}: any) {
 		return 0;
 	};
 	const DaySelectInfoList = [
-		{step: '여행 시작 시간', title: '여행 시작', day: selectStartDate},
-		{step: '여행 종료 시간', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
+		{step: '시작일', title: '여행 시작', day: selectStartDate},
+		{step: '종료일', title: '여행 종료', day: selectEndDate == null ? selectStartDate : selectEndDate},
 	];
 	const handleGoogleAnalytics = async () => {
 		socialloginProvider == 'anonymous'
@@ -205,67 +186,15 @@ export default function SelectDay({navigation}: any) {
 		handleGoogleAnalytics();
 	}, []);
 	return (
-		<DayBackground
-			onPress={() => {
-				setVisible(false);
-			}}>
-			<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 2 : 4}></Stepper>
-			<StepText
-				marginTop={heightPercentage(10)}
-				styleText='1.여행 계획을 알려주세요.'
-				mainText='언제 떠나시나요?'
-				subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
-			<TimeContainer zIndexs={Platform.OS == 'ios' ? true : false}>
-				{DaySelectInfoList.map((item, idx) => (
-					<TimeItemContainer key={idx} zIndexs={Platform.OS == 'ios' ? true : false}>
-						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.PointYellow}>
-							{item.step}
-						</PretendardSemiBoldText>
-						<SelectContainer backgroundColor={colors.backgroundGray}>
-							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-								{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
-							</PretendardSemiBoldText>
-						</SelectContainer>
-						<SelectContainer
-							onPress={() => {
-								onPressTime(idx);
-							}}>
-							<HStack justifyContent='space-between'>
-								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{timeLimitArray[idx] < 12 ? '오전' : '오후'}
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{String(timeLimitArray[idx]).padStart(2, '0')}
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									:
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									{String(minuteLimitArray[idx]).padStart(2, '0')}
-								</PretendardSemiBoldText>
-							</HStack>
-						</SelectContainer>
-						{dateFlag.current == idx && (
-							<SelectAbsolute>
-								<UseDatePicker
-									goConfirm={goConfirm}
-									minuteData={minuteLimitArray[dateFlag.current] / 30}
-									ampmData={timeLimitArray[dateFlag.current] < 12 ? 0 : 1}
-									hourData={
-										timeLimitArray[dateFlag.current] < 12
-											? timeLimitArray[dateFlag.current]
-											: timeLimitArray[dateFlag.current] - 12
-									}
-									visible={visible}
-									setVisible={setVisible}></UseDatePicker>
-							</SelectAbsolute>
-						)}
-					</TimeItemContainer>
-				))}
-			</TimeContainer>
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				style={{marginLeft: -widthPercentage(24), width: widthPercentage(375)}}>
+		<>
+			<BackgroundGrayScrollView>
+				<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 2 : 4}></Stepper>
+				<StepText
+					marginTop={heightPercentage(10)}
+					styleText='1.여행 계획을 알려주세요.'
+					mainText='언제 떠나시나요?'
+					subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
+
 				<CalendarContainer>
 					<CalendarPicker
 						width={widthPercentage(Platform.isPad ? 300 : 375)}
@@ -294,16 +223,97 @@ export default function SelectDay({navigation}: any) {
 						selectYearTitle='년도 선택'
 					/>
 				</CalendarContainer>
-				<MarginBottom></MarginBottom>
-			</ScrollView>
-			<RouteButton navigation={navigation} nextTitle='SelectDeparture' goNext={goNext}></RouteButton>
-		</DayBackground>
+				<TimeContainer zIndexs={Platform.OS == 'ios' ? true : false}>
+					{DaySelectInfoList.map((item, idx) => (
+						<TimeItemContainer key={idx} zIndexs={Platform.OS == 'ios' ? true : false}>
+							<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+								{item.step}
+							</PretendardSemiBoldText>
+							<TimeBox
+								onPress={() => {
+									onPressTime(idx);
+								}}>
+								<HStack gap={widthPercentage(11)}>
+									<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+										{item.day.format('YY.MM.DD')} ({weekdays[item.day.day()]})
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#E1F2BE'}>
+										|
+									</PretendardSemiBoldText>
+									<HStack gap={widthPercentage(17)}>
+										<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+											{timeLimitArray[idx] < 12 ? '오전' : '오후'}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+											{String(timeLimitArray[idx]).padStart(2, '0')}
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+											:
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+											{String(minuteLimitArray[idx]).padStart(2, '0')}
+										</PretendardSemiBoldText>
+									</HStack>
+								</HStack>
+							</TimeBox>
+						</TimeItemContainer>
+					))}
+				</TimeContainer>
+				<MarginContainder></MarginContainder>
+				<Modal
+					animationType={'fade'}
+					transparent={true}
+					visible={visible}
+					onRequestClose={() => {
+						setVisible(false);
+					}}>
+					<ModalBackground onPress={() => setVisible(false)}>
+						<ModalBottomSheet flex={0.7}>
+							<TimePickerModal
+								visible={visible}
+								onClose={() => setVisible(false)}
+								onConfirm={({ampm, hour, minute}) => {
+									console.log(`${ampm} ${hour}:${minute}`);
+								}}
+								minuteDivide={true}
+								hour={timeLimitArray[dateFlag.current]}
+								minute={minuteLimitArray[dateFlag.current] / 30}
+								// leftText={'완료'}
+								// leftFunction={() => {
+								// 	setShow({status: true, step: 0});
+								// }}
+								rightText={'완료'}
+								rightFunction={e => {
+									let timeData = {
+										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
+										minute: e?.minute,
+										ampm: e.ampm,
+									};
+									goConfirm(timeData);
+								}}
+							/>
+						</ModalBottomSheet>
+					</ModalBackground>
+				</Modal>
+			</BackgroundGrayScrollView>
+			<ButtonContainer>
+				<RouteButton navigation={navigation} nextTitle='SelectDeparture' goNext={goNext}></RouteButton>
+			</ButtonContainer>
+		</>
 	);
 }
 const CalendarContainer = styled.View`
 	justify-content: center;
 `;
-const DayBackground = styled(BackgroundGray).attrs({as: Pressable})``;
+const TimeBox = styled.Pressable`
+	width: ${widthPercentage(327)}px;
+	height: ${widthPercentage(81)}px;
+	background-color: ${colors.PrimarySecondary};
+	border-radius: 8px;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: ${widthPercentage(5)}px;
+`;
 const SelectAbsolute = styled.View`
 	z-index: 3;
 	position: absolute;
@@ -319,13 +329,12 @@ export const SelectContainer = styled.Pressable<{backgroundColor?: string}>`
 	margin-bottom: ${heightPercentage(6)}px;
 `;
 export const TimeContainer = styled.View<{zIndexs?: boolean}>`
-	flex-direction: row;
-	margin-top: ${heightPercentage(10)}px;
+	margin-top: ${heightPercentage(20)}px;
 	${props => props.zIndexs && 'z-index:4'};
 `;
 export const TimeItemContainer = styled.View<{zIndexs?: boolean}>`
 	width: 50%;
-	gap: ${heightPercentage(5)}px;
+	gap: ${heightPercentage(10)}px;
 	${props => props.zIndexs && 'z-index:4'};
 `;
 export const DayPressable = styled.Pressable`

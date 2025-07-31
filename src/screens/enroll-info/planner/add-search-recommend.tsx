@@ -314,7 +314,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 						key: GOOGLE_API_KEY,
 						language: 'ko',
 					}}
-					textInputProps={{placeholderTextColor: colors.Gray2}}
+					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 					renderRightButton={() => (
 						<AIBox
 							onPress={() => {

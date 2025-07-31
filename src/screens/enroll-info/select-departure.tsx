@@ -120,7 +120,7 @@ export default function SelectDeparture({navigation}: any) {
 							/>
 						);
 					}}
-					textInputProps={{placeholderTextColor: colors.Gray2}}
+					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {

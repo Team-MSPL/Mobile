@@ -328,7 +328,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					language: 'ko',
 				}}
 				ref={autocompleteRef}
-				textInputProps={{placeholderTextColor: colors.Gray2}}
+				textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 				styles={{
 					container: {paddingHorizontal: widthPercentage(24)},
 					textInputContainer: {

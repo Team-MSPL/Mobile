@@ -181,7 +181,7 @@ export default function SearchPlace({navigation, route}: any) {
 						key: GOOGLE_API_KEY,
 						language: 'ko',
 					}}
-					textInputProps={{placeholderTextColor: colors.Gray2}}
+					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 					renderLeftButton={() => <SVGSearch color={route.params.id == 0 ? colors.Primary : colors.Pink1} />}
 					styles={{
 						container: {alignItems: 'center'},

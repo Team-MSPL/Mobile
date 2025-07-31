@@ -198,7 +198,7 @@ export default function SearchRecommend({navigation, route}: any) {
 						key: GOOGLE_API_KEY,
 						language: 'ko',
 					}}
-					textInputProps={{placeholderTextColor: colors.Gray2}}
+					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {
