@@ -7,6 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import shortid from 'shortid';
 import {styled} from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {getPlaceInfo, googleKeywordApi, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../../utill/colors';
 import CustomButton from '../../../utill/component/custom-button';
@@ -37,7 +38,7 @@ export default function RegistTransit({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const [transportInfo, setTransportInfo] = useState({
 		outbound:
-			transitInfo?.outbound?.departureAirport != ''
+			transitInfo?.outbound?.departureAirport != '' || transitInfo?.outbound?.arrivalAirport != ''
 				? {...transitInfo?.outbound}
 				: {
 						departureAirport: '', //출밢녀
@@ -51,7 +52,7 @@ export default function RegistTransit({navigation, route}: any) {
 						type: route.params.title, //airport,train
 				  },
 		inbound:
-			transitInfo?.inbound?.departureAirport != ''
+			transitInfo?.inbound?.departureAirport != '' || transitInfo?.inbound?.arrivalAirport != ''
 				? {...transitInfo?.inbound}
 				: {
 						departureAirport: '',
@@ -74,6 +75,25 @@ export default function RegistTransit({navigation, route}: any) {
 			},
 		}));
 	};
+	const handleCheck = () => {
+		const outboundArrival = transportInfo['outbound']?.arrivalAirport;
+		const outboundDeparture = transportInfo['outbound']?.departureAirport;
+		const outbound = (outboundArrival && !outboundDeparture) || (!outboundArrival && outboundDeparture);
+
+		const inboundArrival = transportInfo['inbound']?.arrivalAirport;
+		const inboundDeparture = transportInfo['inbound']?.departureAirport;
+		const inbound = (inboundArrival && !inboundDeparture) || (!inboundArrival && inboundDeparture);
+		if (outbound || inbound) {
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '도착지 또는 출발지 중 하나만 입력되어 있습니다.',
+					modalSingleUse: true,
+				}),
+			);
+		} else {
+			handleRegist();
+		}
+	};
 	const handleRegist = async () => {
 		try {
 			let outboundInfo = {};
@@ -90,10 +110,9 @@ export default function RegistTransit({navigation, route}: any) {
 						region: region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
 					}),
 				).unwrap();
-
 				outboundInfo = {
-					lat: outboundData?.geometry?.location?.lat,
-					lng: outboundData?.geometry?.location?.lng,
+					lat: outboundData?.geometry?.location?.lat ?? cityViewList[country][cityIndex].sub[0]?.lat,
+					lng: outboundData?.geometry?.location?.lng ?? cityViewList[country][cityIndex].sub[0]?.lng,
 					name: outboundData?.name,
 				};
 			}
@@ -110,8 +129,8 @@ export default function RegistTransit({navigation, route}: any) {
 					}),
 				).unwrap();
 				inboundInfo = {
-					lat: inboundData?.geometry?.location?.lat,
-					lng: inboundData?.geometry?.location?.lng,
+					lat: inboundData?.geometry?.location?.lat ?? cityViewList[country][cityIndex].sub[0]?.lat,
+					lng: inboundData?.geometry?.location?.lng ?? cityViewList[country][cityIndex].sub[0]?.lng,
 					name: inboundData?.name,
 				};
 			}
@@ -177,12 +196,8 @@ export default function RegistTransit({navigation, route}: any) {
 					name: inboundInfo?.name,
 				});
 			}
-			console.log(
-				moment(transitInfo['inbound'].arrivalTime).diff(transitInfo['inbound'].departureTime, 'minutes'),
-			);
 			dispatch(travelSliceActions.changeTimetable(data));
 			dispatch(travelSliceActions.updateFiled({field: 'transitInfo', value: transportInfo}));
-			// navigation.getState().routes.at(-1).name==
 			navigation.pop(navigation.getState().routes.at(-2).name == 'Planner' ? 1 : 2);
 		} catch (e) {
 			console.log(e);
@@ -303,7 +318,7 @@ export default function RegistTransit({navigation, route}: any) {
 				marginBottom={20}
 				label={'등록하기'}
 				onPress={() => {
-					handleRegist();
+					handleCheck();
 				}}
 				bgColor={colors.Gray5}
 				textColor={colors.Gray200}></CustomButton>

@@ -23,7 +23,7 @@ import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {NestableScrollContainer} from 'react-native-draggable-flatlist';
@@ -37,6 +37,7 @@ import Timetable from '../../utill/component/timetable/timetable';
 import BottomSheet, {BottomSheetScrollView, useBottomSheetInternal} from '@gorhom/bottom-sheet';
 import RouteButton from '../../utill/component/route-button';
 import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
+import LinearGradient from 'react-native-linear-gradient';
 export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
 		state => state.travelSlice,
@@ -312,6 +313,13 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 
 		return <></>;
 	}
+	const [timeOutVisible, setTiemOutVisible] = useState(true);
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setTiemOutVisible(false);
+		}, 3000);
+		return () => clearTimeout(timer);
+	}, []);
 	return (
 		<MainAllContainer>
 			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
@@ -324,10 +332,10 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 			)}
 			<BottomSheet
 				ref={sheetRef}
-				snapPoints={snapPoints}
+				snapPoints={modify ? ['99%', '99%'] : ['10%', '60%', '90%']}
 				enableDynamicSizing={false}
 				onChange={handleSheetChange}
-				index={1}
+				index={modify ? 0 : 1}
 				style={{zIndex: 0}}>
 				<SheetContent />
 				<BottomSheetScrollView showsVerticalScrollIndicator={false} style={{zIndex: 0}}>
@@ -441,7 +449,36 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					<MarginContainer />
 				</BottomSheetScrollView>
 			</BottomSheet>
-			{btnVisible && modify && (
+			{btnVisible && !modify && (
+				<>
+					<ModifyPressable onPress={() => setModify(true)}>
+						<SVGPencil color='white' width={widthPercentage(24)} height={widthPercentage(24)} />
+					</ModifyPressable>
+					{timeOutVisible && (
+						<PressBox>
+							<LinearGradient
+								start={{x: 0, y: 0}}
+								end={{x: 1, y: 0}}
+								colors={['rgba(83, 80, 255, 0.8) ', '#5350FF']}
+								style={{
+									zIndex: 101,
+									position: 'absolute',
+									width: '100%',
+									height: '100%',
+									alignItems: 'center',
+									justifyContent: 'center',
+									borderRadius: 18,
+								}}>
+								<PretendardSemiBoldText color={colors.backgroundWhite} size={14} lineHeight={18}>
+									수정하려면 클릭하세요
+								</PretendardSemiBoldText>
+							</LinearGradient>
+							<LeftTriangle />
+						</PressBox>
+					)}
+				</>
+			)}
+			{modify && (
 				<RouteButton
 					navigation={navigation}
 					nextText='저장하기'
@@ -689,4 +726,40 @@ const Circle = styled.TouchableOpacity`
 	margin-bottom: 8px;
 	align-items: center;
 	justify-content: center;
+`;
+const ModifyPressable = styled.Pressable`
+	position: absolute;
+	width: ${widthPercentage(46)}px;
+	height: ${widthPercentage(46)}px;
+	left: ${widthPercentage(304)}px;
+	bottom: ${widthPercentage(30)}px;
+	border-radius: 24px;
+	background-color: rgba(0, 0, 0, 0.5);
+	align-items: center;
+	justify-content: center;
+`;
+
+const PressBox = styled.View`
+	width: ${widthPercentage(160)}px;
+	height: ${widthPercentage(30)}px;
+	left: ${widthPercentage(136)}px;
+	bottom: ${widthPercentage(38)}px;
+	position: absolute;
+	border-radius: 18px;
+	align-items: center;
+	justify-content: center;
+`;
+const LeftTriangle = styled.View`
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	border-style: solid;
+	border-left-width: ${widthPercentage(8)}px;
+	border-top-width: ${widthPercentage(4)}px;
+	border-bottom-width: ${widthPercentage(4)}px;
+	border-top-color: transparent;
+	border-bottom-color: transparent;
+	border-left-color: rgba(83, 80, 255, 1);
+	position: absolute;
+	right: -${widthPercentage(7)}px;
 `;

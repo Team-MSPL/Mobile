@@ -191,13 +191,14 @@ export default function SelectDay({navigation}: any) {
 				<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 2 : 4}></Stepper>
 				<StepText
 					marginTop={heightPercentage(10)}
+					marginBottom={heightPercentage(10)}
 					styleText='1.여행 계획을 알려주세요.'
 					mainText='언제 떠나시나요?'
 					subText='여행을 떠날 출발일과 도착일을 선택해주세요.'></StepText>
 
 				<CalendarContainer>
 					<CalendarPicker
-						width={widthPercentage(Platform.isPad ? 300 : 375)}
+						width={widthPercentage(Platform.isPad ? 300 : 327)}
 						weekdays={weekdays}
 						months={months}
 						minDate={new Date()}

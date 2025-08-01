@@ -354,6 +354,7 @@ export const BottomContainer = styled.View<{height: number; gap?: number}>`
 	background-color: ${colors.backgroundWhite};
 	padding: ${heightPercentage(14)}px ${widthPercentage(24)}px;
 	gap: ${props => props.gap ?? heightPercentage(15)}px;
+	border-radius: 99px;
 `;
 export const DefalutLogoContainer = styled.View`
 	width: 100px;

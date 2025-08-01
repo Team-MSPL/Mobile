@@ -58,9 +58,9 @@ export default function RecommendSelectTour({navigation}: any) {
 					value: {
 						outbound: {
 							departureAirport: '', //출밢녀
-							departureTime: new Date(), //출발시간
+							departureTime: new Date().setHours(9), //출발시간
 							arrivalAirport: departureInfo?.name, //도착편
-							arrivalTime: new Date(), //도착시간
+							arrivalTime: new Date().setHours(10), //도착시간
 							airline: '', //항공사혹은 기차번호
 							reservationNumber: '', //에약번호
 
@@ -79,9 +79,9 @@ export default function RecommendSelectTour({navigation}: any) {
 						},
 						inbound: {
 							departureAirport: '',
-							departureTime: new Date(),
+							departureTime: new Date().setHours(9),
 							arrivalAirport: '',
-							arrivalTime: new Date(),
+							arrivalTime: new Date().setHours(10),
 							airline: '',
 							reservationNumber: '',
 

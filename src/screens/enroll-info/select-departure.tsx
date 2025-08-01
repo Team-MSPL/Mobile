@@ -129,7 +129,7 @@ export default function SelectDeparture({navigation}: any) {
 							borderRadius: 99,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
-							borderWidth: 2,
+							borderWidth: 1,
 							borderColor: colors.Primary,
 							paddingLeft: 20,
 						},

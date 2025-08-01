@@ -19,7 +19,7 @@ import styled from 'styled-components/native';
 import InfoView from './info-view';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useAppSelector} from '../../../redux';
-import {SvgCarIcon, SVGPlus, SvgPolygon, SvgTripleDot} from '../../svg/svg';
+import {SvgCarIcon, SVGPencil, SVGPlus, SvgPolygon, SvgTripleDot} from '../../svg/svg';
 import {DotBox, Dropdown, DropdownElement} from '../../../screens/enroll-info/select-multi';
 function Timetable({
 	modify,
@@ -430,42 +430,43 @@ function Timetable({
 																	{item.name}
 																</PretendardSemiBoldText>
 															</VStack>
-															<VStack deco='z-index:1000;'>
-																<DotBox
-																	deco='align-items:center; justify-content:center;'
-																	onPress={() =>
-																		setOpen({
-																			status: !open.status,
-																			index: idx,
-																			day: index,
-																			type: 'essential',
-																		})
-																	}>
-																	<SvgTripleDot />
-																</DotBox>
-																{open.status &&
-																	open.index == idx &&
-																	open.day == index &&
-																	open.type == 'essential' && (
-																		<Dropdown>
-																			<DropdownElement
-																				onPress={() => {
-																					setOpen({
-																						day: 0,
-																						index: 0,
-																						status: false,
-																					});
-																					// setModify(true);
-																					openModal(item.x, idx);
-																				}}>
-																				<PretendardSemiBoldText
-																					color={colors.Gray5}
-																					size={14}
-																					lineHeight={18}>
-																					편집
-																				</PretendardSemiBoldText>
-																			</DropdownElement>
-																			{/* <DropdownElement
+															{modify && (
+																<VStack deco='z-index:1000;'>
+																	<DotBox
+																		deco='align-items:center; justify-content:center;'
+																		onPress={() =>
+																			setOpen({
+																				status: !open.status,
+																				index: idx,
+																				day: index,
+																				type: 'essential',
+																			})
+																		}>
+																		<SvgTripleDot />
+																	</DotBox>
+																	{open.status &&
+																		open.index == idx &&
+																		open.day == index &&
+																		open.type == 'essential' && (
+																			<Dropdown>
+																				<DropdownElement
+																					onPress={() => {
+																						setOpen({
+																							day: 0,
+																							index: 0,
+																							status: false,
+																						});
+																						// setModify(true);
+																						openModal(item.x, idx);
+																					}}>
+																					<PretendardSemiBoldText
+																						color={colors.Gray5}
+																						size={14}
+																						lineHeight={18}>
+																						편집
+																					</PretendardSemiBoldText>
+																				</DropdownElement>
+																				{/* <DropdownElement
 																			onPress={() => {
 																				// deleteEssential(data);
 																			}}>
@@ -476,9 +477,10 @@ function Timetable({
 																				삭제
 																			</PretendardSemiBoldText>
 																		</DropdownElement> */}
-																		</Dropdown>
-																	)}
-															</VStack>
+																			</Dropdown>
+																		)}
+																</VStack>
+															)}
 															{/* {idx != 0 &&
 															(item.category == 1 || item.category == 4 ? (
 																<VStack gap={5}>
@@ -574,18 +576,11 @@ function Timetable({
 														</HStack>
 													</InsideGrayContainer>
 												</HStack>
-												{modify && (
+												{modify ? (
 													<HStack
 														gap={20}
 														marginHorizon={widthPercentage(30)}
 														marginVertical={10}>
-														<SvgCarIcon />
-														<PretendardSemiBoldText
-															size={13}
-															lineHeight={19}
-															color={colors.Gray400}>
-															1시간
-														</PretendardSemiBoldText>
 														<PlusBox
 															onPress={() => {
 																navigation.navigate('AddCategory', {
@@ -599,6 +594,34 @@ function Timetable({
 															<SVGPlus color={colors.Gray400} />
 														</PlusBox>
 													</HStack>
+												) : (
+													idx != value.length - 1 && (
+														<HStack
+															gap={20}
+															marginHorizon={widthPercentage(30)}
+															marginVertical={10}>
+															<SvgCarIcon />
+															<PretendardSemiBoldText
+																size={13}
+																lineHeight={19}
+																color={colors.Gray400}>
+																{(() => {
+																	const next = value[idx + 1];
+																	const current = item?.y + item.takenTime / 30;
+
+																	if (!next || current == null) return null;
+
+																	const diff = (next.y - current) * 30;
+																	const hours = Math.floor(diff / 60);
+																	const minutes = Math.floor(diff % 60);
+
+																	return `${hours ? `${hours}시간 ` : ''}${
+																		minutes ? `${minutes}분` : ''
+																	}`;
+																})()}
+															</PretendardSemiBoldText>
+														</HStack>
+													)
 												)}
 											</VStack>
 										) : (
@@ -667,7 +690,7 @@ const DayScrollView = styled(NestableScrollContainer)`
 
 export const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`
 	width: ${widthPercentage(262)}px;
-	height: ${heightPercentage(66)}px;
+	height: ${heightPercentage(72)}px;
 	border-radius: 8px;
 	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
 	justify-content: center;
