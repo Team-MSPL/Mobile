@@ -57,7 +57,7 @@ export default function SelectMulti({navigation}: any) {
 	const [modify, setModify] = useState(false);
 	return (
 		<>
-			<MainContainer>
+			<MainContainer backgroundColor={colors.backgroundWhite}>
 				<BackgroundGray>
 					<Stepper total={13} now={6}></Stepper>
 					<StepText
@@ -396,7 +396,7 @@ export const MarginContainder = styled.View`
 export const DayViewContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	align-self: center;
-	border-radius: 12px;
+	border-radius: 8px;
 	background-color: ${colors.backgroundWhite};
 	padding: 15px;
 	gap: ${widthPercentage(8)}px;

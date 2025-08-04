@@ -25,6 +25,7 @@ import {logEvent} from '../../../firebaseAnalytice';
 import RouteButton from '../../utill/component/route-button';
 import TimePickerModal from '../../utill/component/planner/date-picker';
 import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
+import {SVGRightAdd} from '../../utill/svg/svg';
 export default function SelectDay({navigation}: any) {
 	const dateFlag = useRef(0);
 	const [visible, setVisible] = useState(false);
@@ -205,6 +206,14 @@ export default function SelectDay({navigation}: any) {
 						startFromMonday={false}
 						onDateChange={onDateChange}
 						showDayStragglers={false}
+						monthYearHeaderWrapperStyle={{
+							marginHorizontal: widthPercentage(30),
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+						headerWrapperStyle={{justifyContent: 'center', alignItems: 'center'}}
+						nextComponent={<SVGRightAdd color={colors.Gray5} />}
+						previousComponent={<SVGRightAdd color={colors.Gray400} transform={180} />}
 						allowRangeSelection={true}
 						selectedRangeStartStyle={{backgroundColor: colors.Primary}}
 						selectedRangeStyle={{backgroundColor: colors.PointGreen3}}
@@ -216,10 +225,6 @@ export default function SelectDay({navigation}: any) {
 								? selectEndDate.toDate()
 								: undefined
 						}
-						previousTitle='이전'
-						nextTitle='다음'
-						previousTitleStyle={{color: 'black'}}
-						nextTitleStyle={{color: 'black'}}
 						allowBackwardRangeSelect={true}
 						selectYearTitle='년도 선택'
 					/>

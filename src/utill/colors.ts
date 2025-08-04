@@ -25,7 +25,7 @@ export const colors = {
 	Green2: '#CAFB07',
 	Green3: '#C3F550',
 	Green4: '#B1E832',
-	Green5: '#B1E832',
+	Green500: '#B3F125',
 	Pink1: '#FF8B6D',
 	Blue1: '#93D5FF',
 	PlannerGray: '#BDBDBD',

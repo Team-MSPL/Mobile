@@ -52,6 +52,23 @@ function Timetable({
 		};
 		navigation.navigate('CourseDetail', {value: copy});
 	};
+	const handleColor = (e: number) => {
+		let color = colors.Green500;
+		switch (e) {
+			case 1:
+			case 3:
+				color = colors.Orange;
+				break;
+			case 4:
+				color = colors.Pink1;
+				break;
+			case 6:
+			case 7:
+				color = colors.Blue1;
+				break;
+		}
+		return color;
+	};
 	const restaurantRecommend = useCallback((e: {value: any; index: number; idx: number}) => {
 		CancelModify();
 		let lat = 0;
@@ -360,10 +377,7 @@ function Timetable({
 													key={idx}
 													marginVertical={widthPercentage(10)}>
 													<DashLineContainer justifyContent='start'>
-														<MarkerContainer
-															backgroundColor={
-																item.category == 4 ? colors.Pink1 : colors.Green5
-															}>
+														<MarkerContainer backgroundColor={handleColor(item?.category)}>
 															<PretendardSemiBoldText
 																size={13}
 																lineHeight={19}

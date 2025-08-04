@@ -117,24 +117,24 @@ export const mainViewList = [
 					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}} // 적절한 최대 폭
 				>
 					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						자연 속 여유
 					</PretendardSemiBoldText>
 					를 느끼고{'\n'}싶은 당신을 초대합니다
+					<SVGRightAdd
+						color='white'
+						width={heightPercentage(24)}
+						height={heightPercentage(24)}
+						style={{
+							transform: [{translateX: widthPercentage(10)}],
+						}}
+					/>
 				</PretendardSemiBoldText>
-
-				<SVGRightAdd
-					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
-					style={{
-						position: 'absolute',
-						right: -heightPercentage(38),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
-					}}
-				/>
 			</View>
 		),
 		subTitle: (
@@ -171,17 +171,15 @@ export const mainViewList = [
 						트렌드
 					</PretendardSemiBoldText>
 					가 살아 숨 쉬는{`\n`}공간으로 당신을 초대합니다
+					<SVGRightAdd
+						color='white'
+						width={heightPercentage(24)}
+						height={heightPercentage(24)}
+						style={{
+							transform: [{translateX: widthPercentage(10)}],
+						}}
+					/>
 				</PretendardSemiBoldText>
-				<SVGRightAdd
-					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
-					style={{
-						position: 'absolute',
-						right: -heightPercentage(38),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
-					}}
-				/>
 			</View>
 		),
 		subTitle: (
@@ -254,22 +252,23 @@ export const mainViewList = [
 					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}}>
 					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						열정
 					</PretendardSemiBoldText>
 					이 가득한 당신을{`\n`}이곳으로 초대합니다
+					<SVGRightAdd
+						color='white'
+						width={heightPercentage(24)}
+						height={heightPercentage(24)}
+						style={{
+							transform: [{translateX: widthPercentage(10)}],
+						}}
+					/>
 				</PretendardSemiBoldText>
-				<SVGRightAdd
-					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
-					style={{
-						position: 'absolute',
-						right: -heightPercentage(38),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
-					}}
-				/>
 			</View>
 		),
 		subTitle: (
@@ -297,7 +296,7 @@ const BrighnessBox = styled.View`
 
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
-	top: ${heightPercentage(39)}px;
+	top: ${heightPercentage(30)}px;
 	left: ${widthPercentage(305)}px;
 	width: ${widthPercentage(50)}px;
 	height: ${widthPercentage(50)}px;

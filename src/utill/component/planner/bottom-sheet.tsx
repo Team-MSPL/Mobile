@@ -94,20 +94,43 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	}, []);
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('beforeRemove', e => {
+			const {action} = e.data;
+			// 👉 POP인데 1개 이상 pop하면 모달 안 띄움 (poptopop 상황)
+			if (action.type === 'POP_TO_TOP') {
+				return;
+			}
+			console.log(e?.data.action);
 			// 👇 여기서 뒤로 가려고 하는 상황을 감지함
 			e.preventDefault(); // 뒤로 가는 행동을 막고
 			// 사용자 확인 후 수동으로 pop() 등 호출
 			dispatch(
 				modalSliceActions.setOpenModal({
-					modalTitle: '뒤로가시겠습니까?',
-					modalSubTitle: '뒤로갈시 저장되지않습니다',
-					modalFunction: () => navigation.dispatch(e.data.action),
+					modalTitle: '홈으로 이동하시겠습니까?',
+					modalSubTitle: '홈으로 이동시 저장되지않습니다',
+					modalFunction: () => navigation.dispatch({...e.data.action, type: 'POP_TO_TOP'}),
 				}),
 			);
 		});
 
 		return unsubscribe;
 	}, [navigation]);
+	const handleColor = (e: number) => {
+		let color = colors.Green500;
+		switch (e) {
+			case 1:
+			case 3:
+				color = colors.Orange;
+				break;
+			case 4:
+				color = colors.Pink1;
+				break;
+			case 6:
+			case 7:
+				color = colors.Blue1;
+				break;
+		}
+		return color;
+	};
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
@@ -472,12 +495,12 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				</PretendardSemiBoldText>
 				{nDay == 0 ? (
 					<PretendardSemiBoldText
-						size={20}
-						lineHeight={25}
-						color={colors.PointYellow}
+						size={18}
+						lineHeight={22}
+						color={colors.Title}
 						textAlign={'center'}
-						marginTop={70}>
-						당일치기는 숙소 등록이 불가합니다
+						marginTop={42}>
+						숙소는 1박 이상의 일정에서만 등록할 수 있어요
 					</PretendardSemiBoldText>
 				) : (
 					timetable.slice(0, timetable.length - 1).map((item, index) => (
@@ -631,8 +654,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 								<VStack deco='z-index:0;'>
 									<HStack gap={widthPercentage(10)} marginVertical={widthPercentage(10)}>
 										<DashLineContainer justifyContent='start'>
-											<MarkerContainer
-												backgroundColor={item.category == 4 ? colors.Pink1 : colors.Green5}>
+											<MarkerContainer backgroundColor={handleColor(item.category)}>
 												<PretendardSemiBoldText
 													size={13}
 													lineHeight={19}
@@ -848,11 +870,14 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				snapPoints={snapPoints}
 				enableDynamicSizing={false}
 				onChange={handleSheetChange}
+				handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+				handleStyle={{borderRadius: 30}}
+				backgroundStyle={{borderRadius: 30}}
 				index={1}>
 				<SheetContent />
 				<CustomBottomSheetScrollView
 					showsVerticalScrollIndicator={false}
-					style={{marginBottom: heightPercentage(100)}}>
+					style={{marginBottom: heightPercentage(100), marginTop: widthPercentage(20)}}>
 					{step == 0 ? transitScreen() : step == 1 ? accommodationScreen() : timeTableScreen()}
 				</CustomBottomSheetScrollView>
 			</BottomSheet>
@@ -860,7 +885,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				<RouteButton
 					navigation={navigation}
 					nextText={nDay + 2 == step ? '저장하기' : '다음으로'}
-					leftText='이전으로'
+					leftText={step == 0 ? '홈으로' : '이전으로'}
 					type={'planner'}
 					btnFunction={() => {
 						nDay + 2 == step ? firstSave() : setStep(step + 1);

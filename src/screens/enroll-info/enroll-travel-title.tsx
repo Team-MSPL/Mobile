@@ -81,10 +81,12 @@ export default function EnrollTravelTitle({navigation}: any) {
 	);
 }
 const InputAllContainter = styled(InputWrap)`
-	border-color: ${colors.backgroundWhite};
+	border-color: ${colors.Gray200};
 	background-color: ${colors.backgroundWhite};
 	height: ${heightPercentage(52)}px;
 	padding: 0px 0px 0px ${widthPercentage(10)}px;
+	border-width: 1px;
+	border-radius: 8px;
 `;
 
 const TravelTitleTextInput = styled.TextInput`

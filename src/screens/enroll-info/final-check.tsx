@@ -557,7 +557,7 @@ export default function FinalCheck({navigation}: any) {
 
 							<HStack marginHorizon={widthPercentage(10)} gap={10}>
 								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
-									여행지 인기도
+									여행지 반경
 								</PretendardSemiBoldText>
 								<TagContainer
 									backgroundColor={colors.backgroundGray}

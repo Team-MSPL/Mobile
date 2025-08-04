@@ -1,5 +1,8 @@
 import {useState} from 'react';
+import shortid from 'shortid';
 import {styled} from 'styled-components/native';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../../utill/colors';
 import PrimaryButton from '../../../utill/component/primary-button';
 import {BackgroundGray, BackgroundGrayScrollView, HStack, PretendardSemiBoldText} from '../../../utill/layout/layout';
@@ -7,12 +10,14 @@ import {heightPercentage, widthPercentage} from '../../../utill/layout/responsiv
 import {SVGMinus, SVGPlus} from '../../../utill/svg/svg';
 import {ButtonContainer, SVGContainer} from '../select-multi';
 
-export default function AddInPerson({navigation}: any) {
+export default function AddInPerson({navigation, route}: any) {
 	const [place, setPlace] = useState('');
 	const [address, setAddress] = useState('');
 	const [category, setCategory] = useState('');
 	const [timeValue, setTimeValue] = useState(0);
 	const categoryList = ['여행지', '숙소', '식당/카페'];
+	const {timetable} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
 	// const handleSubmit = () => {
 	// 	let data={
 	// 		name: place,
@@ -21,6 +26,35 @@ export default function AddInPerson({navigation}: any) {
 	// 		formatted_address: details?.formatted_address.replace('대한민국 ', ''),
 	// 		photo: '',
 	// 		region: details?.formatted_address.replace('대한민국 ', ''),
+	// 	}
+	// };
+	// const handleAdd = () => {
+	// 	try {
+	// 		let copy = [...timetable];
+	// 		let copy2 = [...timetable[route.params?.info?.day]];
+	// 		copy2.push({
+
+	// 			...placeState,
+	// 			category: handleCategoryIndex(route?.params?.title),
+	// 			x: route.params?.info?.day,
+	// 			y:
+	// 				isNaN(
+	// 					copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30,
+	// 				) || copy2[route.params?.info?.index - 1]?.y == 36
+	// 					? route.params?.info?.startTime
+	// 					: copy2[route.params?.info?.index - 1]?.y +
+	// 					  copy2[route.params?.info?.index - 1]?.takenTime / 30,
+	// 			id: shortid.generate(),
+	// 			takenTime: (timeValue + 1) * 60,
+	// 			lat: Number(placeState?.lat),
+	// 			lng: Number(placeState?.lng),
+	// 		});
+	// 		copy2 = copy2.sort((a, b) => a.y - b.y);
+	// 		copy[route.params?.info?.day] = copy2;
+	// 		dispatch(travelSliceActions.changeTimetable(copy));
+	// 		navigation.pop(2);
+	// 	} catch (e) {
+	// 	} finally {
 	// 	}
 	// };
 	return (
@@ -114,7 +148,9 @@ const InputBox = styled.TextInput`
 	border-width: 1px;
 	border-color: ${colors.Gray200};
 	margin-top: ${widthPercentage(5)}px;
-	padding: ${widthPercentage(17)}px ${widthPercentage(14)}px;
+	padding: ${widthPercentage(0)}px ${widthPercentage(14)}px;
+	align-items: center;
+	justify-content: center;
 `;
 const CategoryButton = styled.TouchableOpacity<{isActive: boolean}>`
 	min-width: ${widthPercentage(31)}px;

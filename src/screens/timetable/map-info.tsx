@@ -42,6 +42,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
 		state => state.travelSlice,
 	);
+	const {cooperationState} = useAppSelector(state => state.eventSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
@@ -315,11 +316,13 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	}
 	const [timeOutVisible, setTiemOutVisible] = useState(true);
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			setTiemOutVisible(false);
-		}, 3000);
-		return () => clearTimeout(timer);
-	}, []);
+		if (!cooperationState) {
+			const timer = setTimeout(() => {
+				setTiemOutVisible(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [cooperationState]);
 	return (
 		<MainAllContainer>
 			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
@@ -333,6 +336,9 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 			<BottomSheet
 				ref={sheetRef}
 				snapPoints={modify ? ['99%', '99%'] : ['10%', '60%', '90%']}
+				handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+				handleStyle={{borderRadius: 30}}
+				backgroundStyle={{borderRadius: 30}}
 				enableDynamicSizing={false}
 				onChange={handleSheetChange}
 				index={modify ? 0 : 1}
@@ -470,7 +476,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 									borderRadius: 18,
 								}}>
 								<PretendardSemiBoldText color={colors.backgroundWhite} size={14} lineHeight={18}>
-									수정하려면 클릭하세요
+									수정하시려면 클릭하세요
 								</PretendardSemiBoldText>
 							</LinearGradient>
 							<LeftTriangle />

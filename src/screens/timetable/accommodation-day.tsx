@@ -16,7 +16,7 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {widthPercentage} from '../../utill/layout/responsive-size';
-import {SvgCancel} from '../../utill/svg/svg';
+import {SvgCancel, SVGRightAdd} from '../../utill/svg/svg';
 
 export default function AccommodationDay({navigation, route}: any) {
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -123,6 +123,10 @@ export default function AccommodationDay({navigation, route}: any) {
 				width={widthPercentage(Platform.isPad ? 300 : 375)}
 				weekdays={weekdays}
 				months={months}
+				monthYearHeaderWrapperStyle={{marginHorizontal: widthPercentage(30)}}
+				headerWrapperStyle={{justifyContent: 'center'}}
+				nextComponent={<SVGRightAdd color={colors.Gray5} />}
+				previousComponent={<SVGRightAdd color={colors.Gray400} transform={180} />}
 				minDate={new Date(day[0])}
 				maxDate={new Date(day[nDay])}
 				startFromMonday={false}

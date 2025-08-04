@@ -1,10 +1,24 @@
+import {useEffect, useState} from 'react';
 import {styled} from 'styled-components/native';
+import {useAppDispatch, useAppSelector} from '../../../redux';
+import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {colors} from '../../../utill/colors';
 import {BackgroundGray, PretendardSemiBoldText} from '../../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {SvgBagIcon, SvgBuildingIcon, SVGPlus, SvgSpoonIcon} from '../../../utill/svg/svg';
 
 export default function AddCategory({navigation, route}: any) {
+	const dispatch = useAppDispatch();
+	const {timetable} = useAppSelector(state => state.travelSlice);
+	const [visible, setVisible] = useState(false);
+	useEffect(() => {
+		if (visible) {
+			const timer = setTimeout(() => {
+				setVisible(false);
+			}, 2000);
+			return () => clearTimeout(timer);
+		}
+	}, [visible]);
 	const moveList = [
 		{
 			name: '여행지',
@@ -14,7 +28,9 @@ export default function AddCategory({navigation, route}: any) {
 		{
 			name: '숙소',
 			function: () =>
-				navigation.navigate('AddSearchRecommend', {title: 'accommodation', info: route.params?.info}),
+				timetable.length == 1
+					? setVisible(true)
+					: navigation.navigate('AddSearchRecommend', {title: 'accommodation', info: route.params?.info}),
 			photo: <SvgBuildingIcon color={colors.Gray400} />,
 		},
 		{
@@ -24,7 +40,9 @@ export default function AddCategory({navigation, route}: any) {
 		},
 		{
 			name: '직접추가',
-			function: () => navigation.navigate('AddInPerson', {title: ''}),
+			// function: () => navigation.navigate('AddInPerson', {title: 'personal', info: route.params?.info}),
+			function: () =>
+				dispatch(modalSliceActions.setOpenModal({modalTitle: `아직 구현되지 않았어요!\n추후에 만나요!`})),
 			photo: <SVGPlus color={colors.Gray400} width={widthPercentage(55)} height={widthPercentage(55)} />,
 		},
 	];
@@ -47,6 +65,13 @@ export default function AddCategory({navigation, route}: any) {
 					</SelectButton>
 				))}
 			</SelectMoveContainer>
+			{visible && (
+				<AbsoluteAlert>
+					<PretendardSemiBoldText size={18} lineHeight={22} color={colors.backgroundWhite}>
+						숙소는 1박 이상의 일정에서만 등록 할 수 있어요
+					</PretendardSemiBoldText>
+				</AbsoluteAlert>
+			)}
 		</BackgroundGray>
 	);
 }
@@ -65,4 +90,15 @@ const SelectButton = styled.TouchableOpacity<{color: string}>`
 	justify-content: center;
 	padding-bottom: ${heightPercentage(5)}px;
 	gap: ${heightPercentage(10)}px;
+`;
+const AbsoluteAlert = styled.View`
+	width: ${widthPercentage(356)}px;
+	height: ${widthPercentage(61)}px;
+	background-color: ${colors.Gray5};
+	border-radius: 8px;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	align-self: center;
+	bottom: 20px;
 `;

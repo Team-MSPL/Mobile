@@ -742,13 +742,13 @@ export default function Main({navigation}: any) {
 									{vividList[index].name}
 								</PretendardSemiBoldText>
 							</HStack>
-							<PretendardSemiBoldText
+							<PretendardVariableText
 								deco='font-weight:600;margin-top:5px;'
 								size={16}
-								lineHeight={20}
+								lineHeight={23}
 								color={colors.Black}>
 								{vividList[index].title}
-							</PretendardSemiBoldText>
+							</PretendardVariableText>
 							<VividRegionBox>
 								<PretendardSemiBoldText size={14} lineHeight={19} color={colors.Gray3}>
 									{vividList[index].region}
@@ -770,10 +770,9 @@ export default function Main({navigation}: any) {
 					numColumns={2}
 					style={{
 						marginVertical: 20,
-						paddingHorizontal: widthPercentage(6),
 					}}
 					columnWrapperStyle={{
-						gap: widthPercentage(14),
+						gap: widthPercentage(5),
 						marginBottom: 10,
 					}} // 각 행의 아래 간격
 					renderItem={({item}) => {
@@ -792,7 +791,9 @@ export default function Main({navigation}: any) {
 			<ImageRecursion navigation={navigation} />
 			<BottomSheet
 				containerStyle={{zIndex: 10}}
-				handleStyle={{backgroundColor: colors.backgroundGray, borderRadius: 88}}
+				handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+				handleStyle={{borderRadius: 30}}
+				backgroundStyle={{borderRadius: 30}}
 				ref={sheetRef}
 				snapPoints={snapPoints}
 				enableDynamicSizing={false}
@@ -836,7 +837,7 @@ const RecommendContainer = styled.Pressable`
 	width: ${widthPercentage(335)}px;
 	height: ${widthPercentage(152)}px;
 	background-color: ${colors.Gray1};
-	border-radius: 20px;
+	border-radius: 8px;
 	top: ${heightPercentage(18)}px;
 	margin: 0px 0px ${heightPercentage(9)}px 0px;
 	flex-direction: row;
@@ -846,9 +847,9 @@ const RecommendContainer = styled.Pressable`
 	justify-content: center;
 `;
 const CooperationContainer = styled.TouchableOpacity`
-	width: ${widthPercentage(168)}px;
-	height: ${widthPercentage(181)}px;
-	border-radius: 10px;
+	width: ${widthPercentage(161)}px;
+	height: ${widthPercentage(176)}px;
+	border-radius: 8px;
 	overflow: hidden; /* ✅ 중요 */
 `;
 
@@ -875,7 +876,7 @@ const CollectionRecommendContentItemImage = styled.Image<{position?: boolean; wi
 	${props => !!props.position && 'position: absolute;'}
 	width: ${props => widthPercentage(props.width)}px;
 	height: ${props => widthPercentage(props.height)}px;
-	border-radius: 12px;
+	border-radius: 8px;
 	resize-mode: stretch;
 `;
 const ImageContainer = styled.View<{width: number; height: number}>`
@@ -892,7 +893,7 @@ const VividReviewContainer = styled.View`
 	padding-top: ${widthPercentage(15)}px;
 	gap: ${widthPercentage(10)}px;
 	background-color: ${colors.backgroundWhite};
-	border-radius: 12px;
+	border-radius: 8px;
 	border-color: #dddddd;
 `;
 const VividRegionBox = styled.View`
@@ -921,7 +922,7 @@ const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
 	height: ${widthPercentage(152)}px;
 	object-fit: fill;
-	border-radius: 10px;
+	border-radius: 8px;
 `;
 const EventIndex = styled.View`
 	position: absolute;
@@ -937,7 +938,7 @@ const EventIndex = styled.View`
 const EventContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(337)}px;
 	height: ${widthPercentage(160)}px;
-	border-radius: 10px;
+	border-radius: 8px;
 	overflow: hidden;
 `;
 const ImgContainer = styled.Image`
@@ -945,9 +946,9 @@ const ImgContainer = styled.Image`
 	height: 100%;
 `;
 const CooperationImage = styled.Image`
-	width: ${widthPercentage(168)}px;
-	height: ${widthPercentage(181)}px;
-	border-radius: 12px;
+	width: ${widthPercentage(161)}px;
+	height: ${widthPercentage(176)}px;
+	border-radius: 8px;
 `;
 const HotProductBox = styled.TouchableOpacity`
 	width: ${widthPercentage(335)}px;

@@ -88,7 +88,7 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 					</PretendardSemiBoldText>
 				</DistanceSpace>
 				<Slider
-					style={{width: '100%', height: 40}}
+					style={{width: widthPercentage(347), height: 40}}
 					minimumValue={1}
 					maximumValue={10}
 					minimumTrackTintColor={colors.Primary}
@@ -125,11 +125,12 @@ export const Qwe = styled.View`
 	overflow: hidden;
 `;
 export const DistanceSpace = styled.View`
-	width: 95%;
+	width: 100%;
 	flex-direction: row;
 	justify-content: space-between;
 `;
 export const DistanceCenter = styled.View`
 	align-items: center;
 	margin-top: ${heightPercentage(10)}px;
+	width: ${widthPercentage(327)}px;
 `;

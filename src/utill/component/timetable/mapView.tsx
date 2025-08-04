@@ -13,6 +13,23 @@ import {cityViewList} from '../enroll-info/city-list';
 function CustomMapView({select, onTouchStart, onTouchEnd}) {
 	// 메모리 최적화를 위해 useMemo 사
 	const {timetable, country, cityIndex} = useAppSelector(state => state.travelSlice);
+	const handleColor = (e: number) => {
+		let color = colors.Green500;
+		switch (e) {
+			case 1:
+			case 3:
+				color = colors.Orange;
+				break;
+			case 4:
+				color = colors.Pink1;
+				break;
+			case 6:
+			case 7:
+				color = colors.Blue1;
+				break;
+		}
+		return color;
+	};
 	const {imageList} = useMemo(() => {
 		let images = [];
 		let markerElements: ReactElement[] = [];
@@ -44,7 +61,7 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 								}}
 							/>
 						) : (
-							<MarkerContainer key={markerKey}>
+							<MarkerContainer key={markerKey} backgroundColor={handleColor(item?.category)}>
 								<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
 									{idx + 1}
 								</PretendardSemiBoldText>
@@ -133,7 +150,7 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 					<Polyline
 						key={`polyline_${index}`}
 						coordinates={polylineCoordinates}
-						strokeColor={index === select ? colors.PointYellow : colors.Gray5}
+						strokeColor={index === select ? colors.Green500 : colors.Gray5}
 						strokeWidth={Platform.isPad ? 5 : 2}
 					/>,
 				);

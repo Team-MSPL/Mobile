@@ -539,6 +539,7 @@ export default function Timetable({navigation, route}: any) {
 					modalSliceActions.setOpenModal({
 						modalTitle: '겹치는 시간',
 						modalSubTitle: '겹치는 시간이 있습니다. 시간을 수정해주세요.',
+						modalSingleUse: true,
 						modalFunction: () => {},
 					}),
 				);

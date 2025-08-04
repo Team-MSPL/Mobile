@@ -17,7 +17,7 @@ import RouteButton from '../../../utill/component/route-button';
 import TendencyButton from '../../../utill/component/tendency-button';
 import {BackgroundGrayScrollView, HStack, PretendardSemiBoldText, VStack} from '../../../utill/layout/layout';
 import {fontPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
-import {SvgCalendar, SvgCalendarIcon, SVGClock} from '../../../utill/svg/svg';
+import {SvgCalendar, SvgCalendarIcon, SVGClock, SVGRightAdd} from '../../../utill/svg/svg';
 
 export default function RegistTransit({navigation, route}: any) {
 	useEffect(() => {
@@ -334,6 +334,10 @@ export default function RegistTransit({navigation, route}: any) {
 						{show.step == 0 ? (
 							<CalendarPicker
 								width={widthPercentage(Platform.isPad ? 300 : 375)}
+								monthYearHeaderWrapperStyle={{marginHorizontal: widthPercentage(30)}}
+								headerWrapperStyle={{justifyContent: 'center'}}
+								nextComponent={<SVGRightAdd color={colors.Gray5} />}
+								previousComponent={<SVGRightAdd color={colors.Gray400} transform={180} />}
 								weekdays={weekdays}
 								months={months}
 								minDate={new Date(day[0])}
