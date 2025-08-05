@@ -591,7 +591,7 @@ export default function Main({navigation}: any) {
 						alignSelf: displayList.length == 1 ? 'center' : undefined,
 						marginBottom: widthPercentage(40),
 					}}
-					width={widthPercentage(337)}
+					width={widthPercentage(327)}
 					height={widthPercentage(160)}
 					data={displayList}
 					onSnapToItem={e => {}}
@@ -919,15 +919,15 @@ const StartButton = styled.TouchableOpacity`
 	background-color: rgba(255, 255, 255, 0.2);
 `;
 const EventImage = styled.Image`
-	width: ${widthPercentage(337)}px;
+	width: ${widthPercentage(327)}px;
 	height: ${widthPercentage(152)}px;
 	object-fit: fill;
 	border-radius: 8px;
 `;
 const EventIndex = styled.View`
 	position: absolute;
-	top: ${widthPercentage(123)}px;
-	left: ${widthPercentage(264)}px;
+	top: ${widthPercentage(118)}px;
+	left: ${widthPercentage(254)}px;
 	width: ${widthPercentage(52)}px;
 	height: ${widthPercentage(19)}px;
 	background-color: rgba(0, 0, 0, 0.5);
@@ -936,7 +936,7 @@ const EventIndex = styled.View`
 	justify-content: center;
 `;
 const EventContainer = styled.TouchableOpacity`
-	width: ${widthPercentage(337)}px;
+	width: ${widthPercentage(327)}px;
 	height: ${widthPercentage(160)}px;
 	border-radius: 8px;
 	overflow: hidden;

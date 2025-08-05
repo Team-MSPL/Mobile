@@ -190,30 +190,22 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	const [recommendList, setRcommendList] = useState([]);
 	const getRecommendList = async () => {
 		try {
-			console.log(
-				{
-					category: handleCategory(route.params.title),
-					lat: regionInfo.lat,
-					lng: regionInfo.lng,
-					radius: 10000,
-					name: region[0].split('/').at(-1),
-				},
-				region,
-			);
 			dispatch(LoadingSliceActions.onLoading());
 			let result = await dispatch(
 				country != 0
 					? recommendTripadvisor({
 							category: handleCategory(route.params.title),
-							lat: regionInfo.lat,
-							lng: regionInfo.lng,
+							lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
+							lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
 							radius: 10000,
-							name: region[0].split('/').at(-1),
+							name:
+								timetable[route.params.info.day][route.params.info.index - 1]?.name ??
+								region[0].split('/').at(-1),
 					  })
 					: recommendApi({
 							category: handleCategory(route.params.title),
-							lat: regionInfo.lat,
-							lng: regionInfo.lng,
+							lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
+							lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
 							radius: 1000,
 					  }),
 			).unwrap();
@@ -223,15 +215,23 @@ export default function AddSearchRecommend({navigation, route}: any) {
 					country != 0
 						? recommendTripadvisor({
 								category: handleCategory(route.params.title),
-								lat: regionInfo.lat,
-								lng: regionInfo.lng,
+								lat:
+									timetable[route.params.info.day][route.params.info.index - 1]?.lat ??
+									regionInfo.lat,
+								lng:
+									timetable[route.params.info.day][route.params.info.index - 1]?.lng ??
+									regionInfo.lng,
 								radius: 20000,
 								name: route.params.status.name,
 						  })
 						: recommendApi({
 								category: handleCategory(route.params.title),
-								lat: regionInfo.lat,
-								lng: regionInfo.lng,
+								lat:
+									timetable[route.params.info.day][route.params.info.index - 1]?.lat ??
+									regionInfo.lat,
+								lng:
+									timetable[route.params.info.day][route.params.info.index - 1]?.lng ??
+									regionInfo.lng,
 								radius: 20000,
 						  }),
 				).unwrap();
@@ -247,17 +247,8 @@ export default function AddSearchRecommend({navigation, route}: any) {
 					),
 					navigation.goBack());
 			}
-			console.log(result);
 			setRcommendList(result);
 		} catch (err) {
-			console.log({
-				category: handleCategory(route.params.title),
-				lat: regionInfo.lat,
-				lng: regionInfo.lng,
-				radius: 20000,
-				as: region,
-			});
-			console.log(err);
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '추천 아이템이 없습니다!',
@@ -437,7 +428,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 								numberOfLines={1}
 								color={colors.PointYellow}
 								deco={'margin-left:auto;'}>
-								이전 장소로부터{' '}
+								{timetable[route.params.info.day][route.params.info.index - 1]?.name ?? '중심지'}로 부터{' '}
 								{country != 0 ? Math.floor(Number(item?.distance) * 1000) : item?.distance}m
 							</PretendardVariableText>
 						</VStack>

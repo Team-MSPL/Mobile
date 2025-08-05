@@ -318,7 +318,7 @@ export default function PresetDetail({navigation, route}: any) {
 										size={14}
 										lineHeight={18.9}
 										color={select == idx ? colors.Gray5 : colors.Gray400}>
-										DAY{idx + 1}
+										DAY {idx + 1}
 									</PretendardSemiBoldText>
 								</DayTouchablOpacity>
 							))}

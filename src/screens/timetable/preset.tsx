@@ -219,29 +219,23 @@ export default function Preset({navigation}: any) {
 	const renderItem = ({item, index}) => {
 		return (
 			<>
-				<HStack
+				{/* <HStack
 					deco={`background-color:${colors.Green1};width:${widthPercentage(
 						130,
 					)}px;border-top-right-radius:8px;border-top-left-radius:8px;height:${widthPercentage(
 						48,
 					)}px;align-items:center;justify-content:center;`}>
-					{/* <IndexContainer>
-					<PretendardSemiBoldText size={14} lineHeight={16} color={colors.Gray5}>
-						{idx + 1}
-					</PretendardSemiBoldText>
-				</IndexContainer> */}
+		
 					<PretendardSemiBoldText size={18} lineHeight={22.6} color={colors.Gray5}>
 						{nDay == 0 ? '당일치기 ' : nDay + '박 ' + (nDay + 1) + '일 '}
 					</PretendardSemiBoldText>
-					{/* <PretendardSemiBoldText size={16} lineHeight={21.6} color={colors.Gray3}>
-					일정
-				</PretendardSemiBoldText> */}
-				</HStack>
+			
+				</HStack> */}
 				<WhiteContainer
 					key={index}
 					deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
 						20,
-					)}px ${widthPercentage(24)}px;`}>
+					)}px ${widthPercentage(24)}px;gap:0px;`}>
 					{presetTendencyList[index]?.tendencyNameList.length >= 1 && (
 						<>
 							{presetTendencyList[index]?.tendencyNameList.length >= 2 && presetDatas.length >= 2 && (
@@ -258,7 +252,7 @@ export default function Preset({navigation}: any) {
 							<HStack>
 								<FlexWrap
 									width={widthPercentage(250)}
-									gap={widthPercentage(10)}
+									gap={widthPercentage(5)}
 									marginBottom={10}
 									onPress={() => {
 										let copy = {...tendencyViewIndex};
@@ -327,13 +321,15 @@ export default function Preset({navigation}: any) {
 										) : (
 											<Circle
 												color={
-													value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
-														? colors.PointYellow
-														: colors.Gray5
+													// value[value[0].name == '숙소 추천' ? 1 : 0].category == 5
+													// 	? colors.PointYellow
+													// 	: colors.Gray5
+													colors.Title
 												}
 											/>
 										)}
 										<DashLine
+											dash={false}
 											status={idx == 0 ? 'start' : idx == item.length - 1 ? 'end' : 'center'}
 										/>
 									</DashLineContainer>
@@ -393,6 +389,10 @@ export default function Preset({navigation}: any) {
 				mainText={`${userName} 님, \n이런 여행 일정은 어떠신가요?`}
 				subText='점수가 낮은 일정은 간단한 동선을 우선시했어요!'
 			/>
+			<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Green500}>
+				{nDay == 0 ? '당일치기 ' : nDay + '박 ' + (nDay + 1) + '일 '} 코스예요!
+			</PretendardSemiBoldText>
+
 			{/* <SvgContainer>
 					<SVGCalendarRecommend
 						style={{zIndex: 0}}
@@ -506,8 +506,8 @@ export const DashLineContainer = styled.View<{justifyContent?: string}>`
 	height: 100%;
 `;
 export const Circle = styled.View<{color: string}>`
-	width: ${widthPercentage(10)}px;
-	height: ${widthPercentage(10)}px;
+	width: ${widthPercentage(9)}px;
+	height: ${widthPercentage(9)}px;
 	border-radius: 99px;
 	background-color: ${props => props.color};
 	z-index: 2;
@@ -522,12 +522,12 @@ export const Triangle = styled.View`
 	border-top-width: ${widthPercentage(16)}px;
 	border-left-color: transparent;
 	border-right-color: transparent;
-	border-top-color: black;
+	border-top-color: ${colors.Title};
 `;
 export const DashLine = styled.View<{status: string; dash?: boolean; color?: string}>`
 	width: 1px;
 	height: ${props => (props.status == 'center' ? '100%' : '50%')};
-	border: ${props => (props.dash ?? true ? 'dashed' : '')} ${props => props.color ?? colors.Gray5};
+	background-color: ${props => props.color ?? colors.Title};
 	position: absolute;
 	left: ${widthPercentage(9)}px;
 	bottom: 0;

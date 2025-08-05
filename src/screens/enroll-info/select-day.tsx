@@ -164,6 +164,11 @@ export default function SelectDay({navigation}: any) {
 		goConfirm(timeData);
 		setDateFlag(1);
 	};
+	const handleTimeAfter = async (timeData: {hour: number; ampm: string; minute: string}) => {
+		// goConfirm(timeData);
+		setDateFlag(0);
+	};
+
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
 	const onDateChange = (date: any, type: string) => {
 		!selectDateFlag && setSelectDateFlag(true);
@@ -285,6 +290,10 @@ export default function SelectDay({navigation}: any) {
 					}}>
 					<ModalBackground onPress={() => setVisible(false)}>
 						<ModalBottomSheet flex={0.7}>
+							<PretendardSemiBoldText size={18} lineHeight={22.32} color={'#717D58'}>
+								{DaySelectInfoList[dateFlag].day.format('YY.MM.DD')} (
+								{weekdays[DaySelectInfoList[dateFlag].day.day()]})
+							</PretendardSemiBoldText>
 							<TimePickerModal
 								visible={visible}
 								onClose={() => setVisible(false)}
@@ -293,28 +302,28 @@ export default function SelectDay({navigation}: any) {
 								}}
 								minuteDivide={true}
 								hour={timeLimitArray[dateFlag]}
-								minute={minuteLimitArray[dateFlag] / 30}
+								minute={minuteLimitArray[dateFlag]}
 								// leftText={'완료'}
 								// leftFunction={() => {
 								// 	setShow({status: true, step: 0});
 								// }}
-								rightText={'다음으로'}
-								leftFunction={e => {
-									let timeData = {
-										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
-										minute: e?.minute,
-										ampm: e?.ampm,
-									};
-									handleConfirm(timeData);
-								}}
-								leftText={'완료'}
+								rightText={dateFlag == 0 ? '다음으로' : '완료'}
 								rightFunction={e => {
 									let timeData = {
 										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
 										minute: e?.minute,
 										ampm: e.ampm,
 									};
-									handleTimeNext(timeData);
+									dateFlag == 0 ? handleTimeNext(timeData) : handleConfirm(timeData);
+								}}
+								leftText={dateFlag == 0 ? '완료' : '이전으로'}
+								leftFunction={e => {
+									let timeData = {
+										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
+										minute: e?.minute,
+										ampm: e?.ampm,
+									};
+									dateFlag == 0 ? handleConfirm(timeData) : handleTimeAfter(timeData);
 								}}
 							/>
 						</ModalBottomSheet>

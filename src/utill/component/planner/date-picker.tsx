@@ -52,7 +52,7 @@ export default function TimePickerModal({
 		setAmpmIndex(Math.floor(hour / 12));
 		setHourIndex(hour == 0 ? 11 : (hour - 1) % 12);
 		setMinuteIndex(minuteDivide ? minute / 30 : minute);
-	}, []);
+	}, [minute, hour]);
 	useEffect(() => {
 		if (visible) {
 			InteractionManager.runAfterInteractions(() => {

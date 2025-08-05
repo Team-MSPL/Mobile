@@ -182,7 +182,13 @@ export default function SearchPlace({navigation, route}: any) {
 						language: 'ko',
 					}}
 					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
-					renderLeftButton={() => <SVGSearch color={route.params.id == 0 ? colors.Primary : colors.Pink1} />}
+					renderLeftButton={() => (
+						<SVGSearch
+							width={widthPercentage(20)}
+							height={widthPercentage(20)}
+							color={route.params.id == 0 ? colors.Primary : colors.Pink1}
+						/>
+					)}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {
@@ -191,8 +197,7 @@ export default function SearchPlace({navigation, route}: any) {
 							borderRadius: 99,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
-							borderWidth: 2,
-							marginTop: 10,
+							borderWidth: 1,
 							borderColor: route.params.id == 0 ? colors.Primary : colors.Pink1,
 							paddingLeft: 20,
 						},

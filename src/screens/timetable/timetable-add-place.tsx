@@ -35,7 +35,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import RouteButton from '../../utill/component/route-button';
-import {SvgCancel} from '../../utill/svg/svg';
+import {SvgCancel, SVGSearch} from '../../utill/svg/svg';
 import {ModalBackground, ModalBottomSheet} from '../enroll-info/planner/regist-transit';
 export default function TimetableAddPlace({navigation, route}: any) {
 	const {day, timetable, region, transit, distance, bandwidth, tendency, season, country, cityIndex} = useAppSelector(
@@ -330,20 +330,28 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					key: GOOGLE_API_KEY,
 					language: 'ko',
 				}}
+				renderLeftButton={() => {
+					return (
+						<SVGSearch width={widthPercentage(20)} height={widthPercentage(20)} color={colors.Primary} />
+					);
+				}}
 				ref={autocompleteRef}
 				textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 				styles={{
-					container: {paddingHorizontal: widthPercentage(24)},
+					container: {alignItems: 'center'},
 					textInputContainer: {
 						width: widthPercentage(327),
-						height: heightPercentage(52),
-						borderRadius: 8,
+						height: widthPercentage(52),
+						borderRadius: 99,
 						backgroundColor: colors.backgroundWhite,
 						alignItems: 'center',
+						borderWidth: 1,
+						borderColor: colors.Primary,
+						paddingLeft: 20,
 					},
 					listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
 					textInput: {
-						margin: 1,
+						flex: 0.9,
 						fontSize: fontPercentage(18),
 						color: 'black',
 						backgroundColor: colors.backgroundWhite,
