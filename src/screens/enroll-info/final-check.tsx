@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
 	MainContainer,
 	VStack,
@@ -29,7 +29,16 @@ import {
 } from '../../utill/svg/svg';
 import LoadingTimetable from '../../utill/component/timetable/loading-timetable';
 
-import {ButtonContainer, DayViewContainer, DeleteContainer, ElementContainer, SVGContainer} from './select-multi';
+import {
+	ButtonContainer,
+	DayViewContainer,
+	DeleteContainer,
+	DotBox,
+	Dropdown,
+	DropdownElement,
+	ElementContainer,
+	SVGContainer,
+} from './select-multi';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {TagShopText} from '../home/main';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
@@ -50,6 +59,9 @@ import RouteButton from '../../utill/component/route-button';
 import {DistanceCenter, DistanceSpace, MapContainer, Qwe} from './select-distance';
 import MapView, {Circle} from 'react-native-maps';
 import Slider from '@react-native-community/slider';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
 	const {
@@ -298,10 +310,21 @@ export default function FinalCheck({navigation}: any) {
 		let copy = [...accommodations];
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
 		dispatch(travelSliceActions.enrollAccommodations(copy));
+		setOpen({
+			...open,
+			status: false,
+		});
 	};
 	const deleteEssential = (e: EssentialPlaceType) => {
-		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
+		const filteredPlaces = essentialPlaces.filter(place => place.day === open.day + 1);
+		const data = filteredPlaces.find((item, idx) => idx == open.index);
+
+		const updatedPlaces = essentialPlaces.filter(item => item.id !== data.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
+		setOpen({
+			...open,
+			status: false,
+		});
 	};
 	const handleAnonymousLogin = async () => {
 		await logEvent('anonymous_course_login', {});
@@ -333,15 +356,26 @@ export default function FinalCheck({navigation}: any) {
 		setModify(false);
 		setTimeValue(0);
 	};
-	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
 	const [timeValue, setTimeValue] = useState(0);
 	const [modify, setModify] = useState(false);
 	const [viewType, setViewType] = useState(0);
+	const dotRefs = useRef<Record<string, TouchableOpacity | null>>({});
+
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+
+	const totalTopHeight = headerHeight + statusBarHeight;
 	if (loading) return <LoadingTimetable navigation={navigation} />;
 	return (
 		<>
 			<BackgroundGray backgroundColor={colors.backgroundWhite}>
-				<MainContainer showsVerticalScrollIndicator={false} backgroundColor={colors.backgroundWhite}>
+				<MainContainer
+					onScroll={() => {
+						open.status && setOpen({...open, status: false});
+					}}
+					showsVerticalScrollIndicator={false}
+					backgroundColor={colors.backgroundWhite}>
 					<ImageContainer>
 						<BackgroundImage resizeMode='stretch' source={{uri: regionInfo.photo}}></BackgroundImage>
 						<LinearGradient
@@ -356,7 +390,7 @@ export default function FinalCheck({navigation}: any) {
 								paddingVertical: widthPercentage(20),
 								justifyContent: 'space-between',
 								height: '100%',
-								borderRadius: 12,
+								borderRadius: 8,
 							}}>
 							<ModifyTouchable
 								onPress={() => {
@@ -442,6 +476,7 @@ export default function FinalCheck({navigation}: any) {
 										key={idx}
 										select={idx == viewType}
 										onPress={() => {
+											open.status && setOpen({...open, status: false});
 											setViewType(idx);
 										}}>
 										<PretendardVariableText
@@ -596,81 +631,59 @@ export default function FinalCheck({navigation}: any) {
 													deco={`margin-left:${widthPercentage(20)}px;`}>
 													여행지
 												</PretendardSemiBoldText>
-												{filteredPlaces.map((data, index) => (
-													<ElementContainer color={colors.backgroundGray} key={index}>
-														<VStack width={widthPercentage(233)}>
-															<HStack gap={3}>
-																<PretendardSemiBoldText
-																	size={16}
-																	lineHeight={21.6}
-																	color={colors.Gray5}
-																	width={widthPercentage(200)}>
-																	{data.name}
-																</PretendardSemiBoldText>
-																<PretendardSemiBoldText
+												{filteredPlaces.map((data, index) => {
+													const refKey = `${viewType}_${index}_key`;
+													return (
+														<ElementContainer color={colors.backgroundGray} key={index}>
+															<VStack width={widthPercentage(233)}>
+																<HStack gap={3}>
+																	<PretendardSemiBoldText
+																		size={16}
+																		lineHeight={21.6}
+																		color={colors.Gray5}
+																		width={widthPercentage(200)}>
+																		{data.name}
+																	</PretendardSemiBoldText>
+																	<PretendardSemiBoldText
+																		size={12}
+																		lineHeight={16.2}
+																		color={colors.PointYellow}>
+																		{data.takenTime / 60}시간
+																	</PretendardSemiBoldText>
+																</HStack>
+																<PretendardVariableText
+																	color={colors.Gray2}
 																	size={12}
-																	lineHeight={16.2}
-																	color={colors.PointYellow}>
-																	{data.takenTime / 60}시간
-																</PretendardSemiBoldText>
-															</HStack>
-															<PretendardVariableText
-																color={colors.Gray2}
-																size={12}
-																lineHeight={18}>
-																{data.formatted_address}
-															</PretendardVariableText>
-														</VStack>
-														<VStack deco='z-index:1000'>
-															<DotBox
-																onPress={() =>
-																	setOpen({
-																		status: !open.status,
-																		index: index,
-																		day: viewType - 1,
-																		type: 'essential',
-																	})
-																}>
-																<SvgTripleDot />
-															</DotBox>
-															{open.status &&
-																open.index == index &&
-																open.day == viewType - 1 &&
-																open.type == 'essential' && (
-																	<Dropdown>
-																		<DropdownElement
-																			onPress={() => {
+																	lineHeight={18}
+																	numberOfLines={2}>
+																	{data.formatted_address}
+																</PretendardVariableText>
+															</VStack>
+															<VStack deco='z-index:1000'>
+																<DotBox
+																	ref={ref => {
+																		dotRefs.current[refKey] = ref;
+																	}}
+																	onPress={() =>
+																		dotRefs?.current[refKey]?.measure(
+																			(fx, fy, width, height, px, py) => {
 																				setOpen({
-																					day: viewType - 1,
+																					status: !open.status,
 																					index: index,
-																					status: false,
+																					day: viewType - 1,
 																					type: 'essential',
+																					x: px - width,
+																					y: py - height,
 																				});
-																				setModify(true);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				편집
-																			</PretendardSemiBoldText>
-																		</DropdownElement>
-																		<DropdownElement
-																			onPress={() => {
-																				checkDeleteEssential(data);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				삭제
-																			</PretendardSemiBoldText>
-																		</DropdownElement>
-																	</Dropdown>
-																)}
-														</VStack>
-													</ElementContainer>
-												))}
+																			},
+																		)
+																	}>
+																	<SvgTripleDot />
+																</DotBox>
+															</VStack>
+														</ElementContainer>
+													);
+												})}
 											</FlexWrap>
 										)}
 										<ElementContainer color={colors.backgroundGray} height={heightPercentage(43)}>
@@ -748,41 +761,31 @@ export default function FinalCheck({navigation}: any) {
 														<PretendardVariableText
 															color={colors.Gray2}
 															size={12}
-															lineHeight={18}>
+															lineHeight={18}
+															numberOfLines={2}>
 															{accommodations[viewType].formatted_address}
 														</PretendardVariableText>
 													</VStack>
 
 													<VStack deco='z-index:1000'>
 														<DotBox
+															ref={ref => (dotRefs.current[`acc_${viewType}`] = ref)}
 															onPress={() =>
-																setOpen({
-																	status: !open.status,
-																	index: viewType - 1,
-																	day: viewType - 1,
-																	type: 'accommodation',
-																})
+																dotRefs?.current[`acc_${viewType}`]?.measure(
+																	(fx, fy, width, height, px, py) => {
+																		setOpen({
+																			status: !open.status,
+																			index: viewType - 1,
+																			day: viewType - 1,
+																			type: 'accommodation',
+																			x: px - width,
+																			y: py - height,
+																		});
+																	},
+																)
 															}>
 															<SvgTripleDot />
 														</DotBox>
-														{open.status &&
-															open.index == viewType - 1 &&
-															open.day == viewType - 1 &&
-															open.type == 'accommodation' && (
-																<Dropdown>
-																	<DropdownElement
-																		onPress={() => {
-																			deleteAccommodation(viewType);
-																		}}>
-																		<PretendardSemiBoldText
-																			color={colors.Gray5}
-																			size={14}
-																			lineHeight={18}>
-																			삭제
-																		</PretendardSemiBoldText>
-																	</DropdownElement>
-																</Dropdown>
-															)}
 													</VStack>
 												</ElementContainer>
 											)}
@@ -1124,6 +1127,30 @@ export default function FinalCheck({navigation}: any) {
 					</InModal>
 				</InModalContainer>
 			</Modal> */}
+			{open.status && (
+				<Dropdown x={open.x} y={open.y - totalTopHeight}>
+					{open.type == 'essential' && (
+						<DropdownElement
+							onPress={() => {
+								setOpen({...open, status: false});
+								setModify(true);
+							}}>
+							<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+								편집
+							</PretendardSemiBoldText>
+						</DropdownElement>
+					)}
+					<DropdownElement
+						onPress={() => {
+							console.log(open, accommodations);
+							open.type == 'essential' ? checkDeleteEssential() : checkDeleteAccommodation(open.day + 1);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							삭제
+						</PretendardSemiBoldText>
+					</DropdownElement>
+				</Dropdown>
+			)}
 		</>
 	);
 }
@@ -1242,30 +1269,6 @@ const TendencyContainer = styled.View`
 	background-color: ${colors.backgroundWhite};
 `;
 
-const Dropdown = styled.View`
-	width: ${widthPercentage(52)}px;
-	border-width: 1px;
-	position: absolute;
-	left: -${widthPercentage(40)}px;
-	top: ${widthPercentage(10)}px;
-	border-radius: 12px;
-	border-color: ${colors.Gray200};
-	background-color: ${colors.backgroundWhite};
-	z-index: 1111;
-`;
-const DropdownElement = styled.TouchableOpacity`
-	width: 100%;
-	height: ${widthPercentage(48)}px;
-	align-items: center;
-	border-radius: 12px;
-	justify-content: center;
-	background-color: ${colors.backgroundWhite};
-	z-index: 1111;
-`;
-const DotBox = styled.TouchableOpacity`
-	width: ${widthPercentage(30)}px;
-	height: ${widthPercentage(30)}px;
-`;
 const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
 	align-items: center;

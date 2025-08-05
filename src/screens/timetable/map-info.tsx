@@ -22,7 +22,7 @@ import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
-import {SVGContainer} from '../enroll-info/select-multi';
+import {Dropdown, DropdownElement, SVGContainer} from '../enroll-info/select-multi';
 import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
@@ -38,6 +38,8 @@ import BottomSheet, {BottomSheetScrollView, useBottomSheetInternal} from '@gorho
 import RouteButton from '../../utill/component/route-button';
 import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
 	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
 		state => state.travelSlice,
@@ -323,6 +325,11 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 			return () => clearTimeout(timer);
 		}
 	}, [cooperationState]);
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+
+	const totalTopHeight = headerHeight + statusBarHeight;
 	return (
 		<MainAllContainer>
 			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
@@ -344,7 +351,12 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 				index={modify ? 0 : 1}
 				style={{zIndex: 0}}>
 				<SheetContent />
-				<BottomSheetScrollView showsVerticalScrollIndicator={false} style={{zIndex: 0}}>
+				<BottomSheetScrollView
+					onScroll={() => {
+						open.status && setOpen({...open, status: false});
+					}}
+					showsVerticalScrollIndicator={false}
+					style={{zIndex: 0}}>
 					<BackgroundGray modify={modify} viewMap={viewMap}>
 						{/* <PretendardSemiBoldText
 							size={14}
@@ -386,6 +398,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 												select={idx === select}
 												onPress={() => {
 													changeTouch(idx);
+													open.status && setOpen({...open, status: false});
 												}}>
 												<PretendardSemiBoldText
 													size={14}
@@ -450,6 +463,8 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 							setModify={setModify}
 							viewMap={viewMap}
 							select={select}
+							open={open}
+							setOpen={setOpen}
 						/>
 					</BackgroundGray>
 					<MarginContainer />
@@ -646,6 +661,31 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={modify ? 5 : 3} handleFunction={deleteMainViewPager} />
 			</Modal>
+			{open.status && (
+				<Dropdown x={open.x} y={open.y - totalTopHeight}>
+					<DropdownElement
+						onPress={() => {
+							setOpen({
+								...open,
+								status: false,
+							});
+							// setModify(true);
+							openModal(timetable[open.day][open.index].x, open.index);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							편집
+						</PretendardSemiBoldText>
+					</DropdownElement>
+					<DropdownElement
+						onPress={() => {
+							// deleteEssential(data);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							삭제
+						</PretendardSemiBoldText>
+					</DropdownElement>
+				</Dropdown>
+			)}
 		</MainAllContainer>
 	);
 }

@@ -791,7 +791,7 @@ export default function Main({navigation}: any) {
 			<ImageRecursion navigation={navigation} />
 			<BottomSheet
 				containerStyle={{zIndex: 10}}
-				handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+				handleIndicatorStyle={{backgroundColor: colors.backgroundGray, width: widthPercentage(61)}}
 				handleStyle={{borderRadius: 30}}
 				backgroundStyle={{borderRadius: 30}}
 				ref={sheetRef}

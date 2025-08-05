@@ -55,7 +55,7 @@ export default function RecommendSelectMove({navigation}: any) {
 					</SelectButton>
 				))}
 			</SelectMoveContainer>
-			<RouteButton marginBottom={12} navigation={navigation} nextTitle='RecommendSelectBusy'></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectBusy'></RouteButton>
 		</BackgroundGray>
 	);
 }

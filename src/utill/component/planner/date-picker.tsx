@@ -125,7 +125,11 @@ export default function TimePickerModal({
 				leftText={leftText || '전체 일정에 적용하기'}
 				LeftBtnFunction={() => {
 					if (typeof leftFunction === 'function') {
-						leftFunction();
+						leftFunction({
+							ampm: ampmList[ampmIndex],
+							hour: hours[hourIndex],
+							minute: minutes[minuteIndex],
+						});
 					} else {
 						handleAllApply({
 							ampm: ampmList[ampmIndex],

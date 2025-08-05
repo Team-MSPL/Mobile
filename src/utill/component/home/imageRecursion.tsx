@@ -4,7 +4,7 @@ import {HStack, PretendardSemiBoldText} from '../../layout/layout';
 import {Platform, Pressable, View} from 'react-native';
 import {SVGNoteList, SVGNoteListIcon, SVGRightAdd} from '../../svg/svg';
 import styled from 'styled-components/native';
-import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {NoteCount} from '../../../screens/more/more-info';
 import LinearGradient from 'react-native-linear-gradient';
@@ -126,15 +126,17 @@ export const mainViewList = [
 						자연 속 여유
 					</PretendardSemiBoldText>
 					를 느끼고{'\n'}싶은 당신을 초대합니다
-					<SVGRightAdd
-						color='white'
-						width={heightPercentage(24)}
-						height={heightPercentage(24)}
-						style={{
-							transform: [{translateX: widthPercentage(10)}],
-						}}
-					/>
 				</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
+					style={{
+						bottom: fontPercentage(7.5),
+						position: 'absolute',
+						right: -widthPercentage(25),
+					}}
+				/>
 			</View>
 		),
 		subTitle: (
@@ -171,15 +173,17 @@ export const mainViewList = [
 						트렌드
 					</PretendardSemiBoldText>
 					가 살아 숨 쉬는{`\n`}공간으로 당신을 초대합니다
-					<SVGRightAdd
-						color='white'
-						width={heightPercentage(24)}
-						height={heightPercentage(24)}
-						style={{
-							transform: [{translateX: widthPercentage(10)}],
-						}}
-					/>
 				</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
+					style={{
+						bottom: fontPercentage(7.5),
+						position: 'absolute',
+						right: -widthPercentage(15),
+					}}
+				/>
 			</View>
 		),
 		subTitle: (
@@ -220,8 +224,8 @@ export const mainViewList = [
 				</PretendardSemiBoldText>
 				<SVGRightAdd
 					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
+					width={heightPercentage(20)}
+					height={heightPercentage(20)}
 					style={{
 						position: 'absolute',
 						right: heightPercentage(98),
@@ -260,15 +264,17 @@ export const mainViewList = [
 						열정
 					</PretendardSemiBoldText>
 					이 가득한 당신을{`\n`}이곳으로 초대합니다
-					<SVGRightAdd
-						color='white'
-						width={heightPercentage(24)}
-						height={heightPercentage(24)}
-						style={{
-							transform: [{translateX: widthPercentage(10)}],
-						}}
-					/>
 				</PretendardSemiBoldText>
+				<SVGRightAdd
+					color='white'
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
+					style={{
+						bottom: fontPercentage(7.5),
+						position: 'absolute',
+						right: -widthPercentage(25),
+					}}
+				/>
 			</View>
 		),
 		subTitle: (

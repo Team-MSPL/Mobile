@@ -47,7 +47,7 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 						centerOffset={{x: 0, y: 0}}
 						anchor={{x: 0.5, y: 0.5}}
 						style={{zIndex: 4}}>
-						{item.category === 4 || item.category === 1 ? (
+						{/* {item.category === 4 || item.category === 1 ? (
 							<Image
 								source={
 									item.category === 4
@@ -66,7 +66,14 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 									{idx + 1}
 								</PretendardSemiBoldText>
 							</MarkerContainer>
-						)}
+						)} */}
+						{
+							<MarkerContainer key={markerKey} backgroundColor={handleColor(item?.category)}>
+								<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+									{idx + 1}
+								</PretendardSemiBoldText>
+							</MarkerContainer>
+						}
 					</Marker>,
 				);
 			}

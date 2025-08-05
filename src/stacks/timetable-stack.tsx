@@ -135,7 +135,6 @@ export default function TimetableStack() {
 				name='Timetable'
 				component={Timetable}
 				options={{
-					headerBackVisible: false,
 					title: '여행 코스',
 				}}
 			/>

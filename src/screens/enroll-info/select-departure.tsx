@@ -22,6 +22,7 @@ import {MutableRefObject, useEffect, useRef, useState} from 'react';
 import {Keyboard, Pressable} from 'react-native';
 import styled from 'styled-components/native';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
+import {ButtonContainer} from './select-multi';
 
 export default function SelectDeparture({navigation}: any) {
 	const {
@@ -91,126 +92,130 @@ export default function SelectDeparture({navigation}: any) {
 	];
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 	return (
-		<DepartureBackground
-			onPress={() => {
-				Keyboard.dismiss();
-			}}>
-			<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 3 : 5}></Stepper>
-			<StepText
-				marginTop={heightPercentage(10)}
-				styleText='1.여행 계획을 알려주세요.'
-				mainText='여행 출발지는 어디인가요?'
-				subText='선택하신 지역 근처의 공항과 기차역을 찾아봤어요.'></StepText>
-			<AutoContainer height={departure.name != ''}>
-				<GooglePlacesAutocomplete
-					placeholder='검색어를 입력하세요.'
-					disableScroll={false}
-					enablePoweredByContainer={false}
-					ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
-					query={{
-						key: GOOGLE_API_KEY,
-						language: 'ko',
-					}}
-					renderLeftButton={() => {
-						return (
-							<SVGSearch
-								width={widthPercentage(20)}
-								height={widthPercentage(20)}
-								color={colors.Primary}
-							/>
-						);
-					}}
-					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
-					styles={{
-						container: {alignItems: 'center'},
-						textInputContainer: {
-							width: widthPercentage(327),
-							height: widthPercentage(52),
-							borderRadius: 99,
-							backgroundColor: colors.backgroundWhite,
-							alignItems: 'center',
-							borderWidth: 1,
-							borderColor: colors.Primary,
-							paddingLeft: 20,
-						},
-						listView: {width: widthPercentage(327), maxHeight: heightPercentage(100), zIndex: 1000},
-						textInput: {
-							color: 'black',
-							backgroundColor: colors.backgroundWhite,
-							flex: 0.9,
-							fontSize: fontPercentage(18),
-						},
-						description: {color: 'black'},
-					}}
-					fetchDetails={true}
-					onPress={async (data, details) => {
-						dispatch(
-							travelSliceActions.setDeparture({
-								search: true,
-								name: details?.name,
-								lat: details?.geometry.location.lat,
-								lng: details?.geometry.location.lng,
-							}),
-						);
-						dispatch(
-							travelSliceActions.setDepartureSelected(
-								'departure' == departureSelected ? '' : 'departure',
-							),
-						);
-					}}
-					onFail={error => console.log(error)}
-					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
-				{departure.name != '' && (
-					<TendencyButton
-						marginBottom={10}
-						bgColor={'departure' == departureSelected}
-						label={departure.name}
-						onPress={() => {
+		<>
+			<DepartureBackground
+				onPress={() => {
+					Keyboard.dismiss();
+				}}>
+				<Stepper total={regionRecommendFlag ? 4 : 13} now={regionRecommendFlag ? 3 : 5}></Stepper>
+				<StepText
+					marginTop={heightPercentage(10)}
+					styleText='1.여행 계획을 알려주세요.'
+					mainText='여행 출발지는 어디인가요?'
+					subText='선택하신 지역 근처의 공항과 기차역을 찾아봤어요.'></StepText>
+				<AutoContainer height={departure.name != ''}>
+					<GooglePlacesAutocomplete
+						placeholder='검색어를 입력하세요.'
+						disableScroll={false}
+						enablePoweredByContainer={false}
+						ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
+						query={{
+							key: GOOGLE_API_KEY,
+							language: 'ko',
+						}}
+						renderLeftButton={() => {
+							return (
+								<SVGSearch
+									width={widthPercentage(20)}
+									height={widthPercentage(20)}
+									color={colors.Primary}
+								/>
+							);
+						}}
+						textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
+						styles={{
+							container: {alignItems: 'center'},
+							textInputContainer: {
+								width: widthPercentage(327),
+								height: widthPercentage(52),
+								borderRadius: 99,
+								backgroundColor: colors.backgroundWhite,
+								alignItems: 'center',
+								borderWidth: 1,
+								borderColor: colors.Primary,
+								paddingLeft: 20,
+							},
+							listView: {width: widthPercentage(327), maxHeight: heightPercentage(100), zIndex: 1000},
+							textInput: {
+								color: 'black',
+								backgroundColor: colors.backgroundWhite,
+								flex: 0.9,
+								fontSize: fontPercentage(18),
+							},
+							description: {color: 'black'},
+						}}
+						fetchDetails={true}
+						onPress={async (data, details) => {
+							dispatch(
+								travelSliceActions.setDeparture({
+									search: true,
+									name: details?.name,
+									lat: details?.geometry.location.lat,
+									lng: details?.geometry.location.lng,
+								}),
+							);
 							dispatch(
 								travelSliceActions.setDepartureSelected(
 									'departure' == departureSelected ? '' : 'departure',
 								),
 							);
-						}}></TendencyButton>
-				)}
-			</AutoContainer>
-			{moveList.map((item, index) => {
-				return (
-					<VStack gap={20} deco={`margin-bottom:${widthPercentage(10)}`}>
-						<HStack gap={10}>
-							{item.photo}
-							<PretendardSemiBoldText size={20} lineHeight={24} color={colors.Black}>
-								{item.name}
-							</PretendardSemiBoldText>
-						</HStack>
+						}}
+						onFail={error => console.log(error)}
+						onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+					{departure.name != '' && (
 						<TendencyButton
 							marginBottom={10}
-							bgColor={item.title == departureSelected}
-							label={
-								item.text.name == ''
-									? `선택하신 지역 근처에서${item.name}을 찾지 못했어요 `
-									: item.text.name
-							}
-							key={index}
-							disabled={item.text.name == ''}
+							bgColor={'departure' == departureSelected}
+							label={departure.name}
 							onPress={() => {
 								dispatch(
 									travelSliceActions.setDepartureSelected(
-										departureSelected == item.title ? '' : item.title,
+										'departure' == departureSelected ? '' : 'departure',
 									),
 								);
 							}}></TendencyButton>
-					</VStack>
-				);
-			})}
-			<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray2} deco={'margin-bottom:70px;'}>
-				* 검색에 오차가 있을 수 있어요
-			</PretendardSemiBoldText>
-			<RouteButton
-				nextText={departureSelected == '' ? '건너뛰기' : '다음'}
-				navigation={navigation}
-				nextTitle={regionRecommendFlag ? 'SelectDistance' : 'SelectMulti'}></RouteButton>
-		</DepartureBackground>
+					)}
+				</AutoContainer>
+				{moveList.map((item, index) => {
+					return (
+						<VStack gap={20} deco={`margin-bottom:${widthPercentage(10)}`}>
+							<HStack gap={10}>
+								{item.photo}
+								<PretendardSemiBoldText size={20} lineHeight={24} color={colors.Black}>
+									{item.name}
+								</PretendardSemiBoldText>
+							</HStack>
+							<TendencyButton
+								marginBottom={10}
+								bgColor={item.title == departureSelected}
+								label={
+									item.text.name == ''
+										? `선택하신 지역 근처에서${item.name}을 찾지 못했어요 `
+										: item.text.name
+								}
+								key={index}
+								disabled={item.text.name == ''}
+								onPress={() => {
+									dispatch(
+										travelSliceActions.setDepartureSelected(
+											departureSelected == item.title ? '' : item.title,
+										),
+									);
+								}}></TendencyButton>
+						</VStack>
+					);
+				})}
+				<PretendardSemiBoldText size={12} lineHeight={18} color={colors.Gray2} deco={'margin-bottom:70px;'}>
+					* 검색에 오차가 있을 수 있어요
+				</PretendardSemiBoldText>
+			</DepartureBackground>
+			<ButtonContainer>
+				<RouteButton
+					nextText={departureSelected == '' ? '건너뛰기' : '다음'}
+					navigation={navigation}
+					nextTitle={regionRecommendFlag ? 'SelectDistance' : 'SelectMulti'}></RouteButton>
+			</ButtonContainer>
+		</>
 	);
 }
 

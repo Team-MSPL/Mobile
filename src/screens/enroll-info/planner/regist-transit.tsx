@@ -49,7 +49,7 @@ export default function RegistTransit({navigation, route}: any) {
 						arrivalTime: new Date(day[0]).setHours(10), //도착시간
 						airline: '', //항공사혹은 기차번호
 						reservationNumber: '', //에약번호
-						type: route.params.title, //airport,train
+						type: route.params?.title ?? transitInfo?.outbound?.type ?? transitInfo?.inbound?.type, //airport,train
 				  },
 		inbound:
 			transitInfo?.inbound?.departureAirport != '' || transitInfo?.inbound?.arrivalAirport != ''
@@ -63,7 +63,7 @@ export default function RegistTransit({navigation, route}: any) {
 						arrivalTime: new Date(day[0]).setHours(10),
 						airline: '',
 						reservationNumber: '',
-						type: route.params.title, //airport,train
+						type: route.params?.title ?? transitInfo?.inbound?.type ?? transitInfo?.outbound?.type, //airport,train
 				  },
 	});
 	const handleFlightChange = (direction, field, value) => {
@@ -98,6 +98,7 @@ export default function RegistTransit({navigation, route}: any) {
 		try {
 			let outboundInfo = {};
 			let inboundInfo = {};
+			console.log(transportInfo['outbound'].arrivalAirport);
 			if (
 				transportInfo['outbound'].arrivalAirport != '' &&
 				timetable[0].find(item => item.category == 6)?.name != transportInfo['outbound'].arrivalAirport
@@ -162,7 +163,7 @@ export default function RegistTransit({navigation, route}: any) {
 						: value,
 				),
 			);
-			if (data[0].findIndex(item => item.category == 6) == -1) {
+			if (data[0].findIndex(item => item.category == 6) == -1 && outboundInfo != {}) {
 				data[0].push({
 					category: 6,
 					id: shortid(),
@@ -179,7 +180,7 @@ export default function RegistTransit({navigation, route}: any) {
 					name: outboundInfo?.name,
 				});
 			}
-			if (data.at(-1)?.findIndex(item => item.category == 7) == -1) {
+			if (data.at(-1)?.findIndex(item => item.category == 7) == -1 && inboundInfo != {}) {
 				data.at(-1)?.push({
 					category: 7,
 					id: shortid(),

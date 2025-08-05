@@ -17,13 +17,15 @@ import {SVGMinus, SVGPlus, SvgTripleDot} from '../../utill/svg/svg';
 import Stepper from '../../utill/component/enroll-info/stepper';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import RouteButton from '../../utill/component/route-button';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Modal} from 'react-native';
 import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
 import {BottomContainer} from './search-place';
 import PrimaryButton from '../../utill/component/primary-button';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function SelectMulti({navigation}: any) {
 	const {nDay, day, accommodations, essentialPlaces, regionRecommendFlag} = useAppSelector(
@@ -39,11 +41,20 @@ export default function SelectMulti({navigation}: any) {
 		let copy = [...accommodations];
 		copy[e] = {name: '', lat: 0, lng: 0, category: 4, takenTime: 30, photo: ''};
 		dispatch(travelSliceActions.enrollAccommodations(copy));
-		setOpen({day: 0, index: 0, status: false, type: ''});
+		setOpen({
+			...open,
+			status: false,
+		});
 	};
-	const deleteEssential = (e: EssentialPlaceType) => {
-		const updatedPlaces = essentialPlaces.filter(item => item.id !== e.id);
+	const deleteEssential = () => {
+		const filteredPlaces = essentialPlaces.filter(place => place.day === open.day + 1);
+		const data = filteredPlaces.find((item, idx) => idx == open.index);
+		const updatedPlaces = essentialPlaces.filter(item => item.id !== data?.id);
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
+		setOpen({
+			...open,
+			status: false,
+		});
 	};
 
 	const modifyEssential = (e: EssentialPlaceType) => {
@@ -52,12 +63,22 @@ export default function SelectMulti({navigation}: any) {
 		dispatch(travelSliceActions.enrollessentialPlaces(updatedPlaces));
 		setModify(false);
 	};
-	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
 	const [timeValue, setTimeValue] = useState(0);
 	const [modify, setModify] = useState(false);
+	const dotRefs = useRef<Record<string, TouchableOpacity | null>>({});
+
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+
+	const totalTopHeight = headerHeight + statusBarHeight;
 	return (
 		<>
-			<MainContainer backgroundColor={colors.backgroundWhite}>
+			<MainContainer
+				backgroundColor={colors.backgroundWhite}
+				onScroll={() => {
+					open.status && setOpen({...open, status: false});
+				}}>
 				<BackgroundGray>
 					<Stepper total={13} now={6}></Stepper>
 					<StepText
@@ -65,7 +86,7 @@ export default function SelectMulti({navigation}: any) {
 						mainText='미리 정해놓은 장소가 있나요?'
 						subTextSize={13}
 						subText={`숙소는 최대 1개, 여행지는 최대 3개까지 추가할 수 있어요.`}></StepText>
-					<VStack deco={`margin-top:${widthPercentage(24)}px;`}>
+					<VStack deco={`margin-top:${widthPercentage(24)}px;z-index:0;`}>
 						{[...Array(nDay + 1)].map((item, idx) => {
 							const filteredPlaces = essentialPlaces.filter(place => place.day === idx + 1);
 
@@ -90,81 +111,59 @@ export default function SelectMulti({navigation}: any) {
 													deco={`margin-left:${widthPercentage(20)}px;`}>
 													여행지
 												</PretendardSemiBoldText>
-												{filteredPlaces.map((data, index) => (
-													<ElementContainer color={colors.backgroundGray} key={index}>
-														<VStack width={widthPercentage(233)}>
-															<HStack gap={3}>
-																<PretendardSemiBoldText
-																	size={16}
-																	lineHeight={21.6}
-																	width={widthPercentage(200)}
-																	color={colors.Gray5}>
-																	{data.name}
-																</PretendardSemiBoldText>
-																<PretendardSemiBoldText
+												{filteredPlaces.map((data, index) => {
+													const refKey = `${idx}_${index}_key`;
+													return (
+														<ElementContainer color={colors.backgroundGray} key={index}>
+															<VStack width={widthPercentage(233)}>
+																<HStack gap={3}>
+																	<PretendardSemiBoldText
+																		size={16}
+																		lineHeight={21.6}
+																		width={widthPercentage(200)}
+																		color={colors.Gray5}>
+																		{data.name}
+																	</PretendardSemiBoldText>
+																	<PretendardSemiBoldText
+																		size={12}
+																		lineHeight={16.2}
+																		color={colors.PointYellow}>
+																		{data.takenTime / 60}시간
+																	</PretendardSemiBoldText>
+																</HStack>
+																<PretendardVariableText
+																	color={colors.Gray2}
 																	size={12}
-																	lineHeight={16.2}
-																	color={colors.PointYellow}>
-																	{data.takenTime / 60}시간
-																</PretendardSemiBoldText>
-															</HStack>
-															<PretendardVariableText
-																color={colors.Gray2}
-																size={12}
-																lineHeight={18}>
-																{data.formatted_address}
-															</PretendardVariableText>
-														</VStack>
+																	lineHeight={18}>
+																	{data.formatted_address}
+																</PretendardVariableText>
+															</VStack>
 
-														<VStack deco='z-index:1000'>
-															<DotBox
-																onPress={() =>
-																	setOpen({
-																		status: !open.status,
-																		index: index,
-																		day: idx,
-																		type: 'essential',
-																	})
-																}>
-																<SvgTripleDot />
-															</DotBox>
-															{open.status &&
-																open.index == index &&
-																open.day == idx &&
-																open.type == 'essential' && (
-																	<Dropdown>
-																		<DropdownElement
-																			onPress={() => {
+															<VStack deco='z-index:1000'>
+																<DotBox
+																	ref={ref => {
+																		dotRefs.current[refKey] = ref;
+																	}}
+																	onPress={() =>
+																		dotRefs?.current[refKey]?.measure(
+																			(fx, fy, width, height, px, py) => {
 																				setOpen({
-																					day: 0,
-																					index: 0,
-																					status: false,
+																					status: !open.status,
+																					index: index,
+																					day: idx,
+																					type: 'essential',
+																					x: px - width,
+																					y: py - height,
 																				});
-																				setModify(true);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				편집
-																			</PretendardSemiBoldText>
-																		</DropdownElement>
-																		<DropdownElement
-																			onPress={() => {
-																				deleteEssential(data);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				삭제
-																			</PretendardSemiBoldText>
-																		</DropdownElement>
-																	</Dropdown>
-																)}
-														</VStack>
-													</ElementContainer>
-												))}
+																			},
+																		)
+																	}>
+																	<SvgTripleDot />
+																</DotBox>
+															</VStack>
+														</ElementContainer>
+													);
+												})}
 											</FlexWrap>
 										)}
 										<ElementContainer
@@ -224,34 +223,23 @@ export default function SelectMulti({navigation}: any) {
 
 														<VStack deco='z-index:1000'>
 															<DotBox
+																ref={ref => (dotRefs.current[`acc_${idx}`] = ref)}
 																onPress={() =>
-																	setOpen({
-																		status: !open.status,
-																		index: idx,
-																		day: idx,
-																		type: 'accommodation',
-																	})
+																	dotRefs?.current[`acc_${idx}`]?.measure(
+																		(fx, fy, width, height, px, py) => {
+																			setOpen({
+																				status: !open.status,
+																				index: idx,
+																				day: idx,
+																				type: 'accommodation',
+																				x: px - width,
+																				y: py - height,
+																			});
+																		},
+																	)
 																}>
 																<SvgTripleDot />
 															</DotBox>
-															{open.status &&
-																open.index == idx &&
-																open.day == idx &&
-																open.type == 'accommodation' && (
-																	<Dropdown>
-																		<DropdownElement
-																			onPress={() => {
-																				deleteAccommodation(idx + 1);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				삭제
-																			</PretendardSemiBoldText>
-																		</DropdownElement>
-																	</Dropdown>
-																)}
 														</VStack>
 													</ElementContainer>
 												</>
@@ -385,7 +373,34 @@ export default function SelectMulti({navigation}: any) {
 				</Modal>
 				<MarginContainder></MarginContainder>
 			</MainContainer>
+
 			<RouteButton navigation={navigation} nextTitle='RecommendSelectWho'></RouteButton>
+			{open.status && (
+				<Dropdown x={open.x} y={open.y - totalTopHeight}>
+					{open.type == 'essential' && (
+						<DropdownElement
+							onPress={() => {
+								setOpen({
+									...open,
+									status: false,
+								});
+								setModify(true);
+							}}>
+							<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+								편집
+							</PretendardSemiBoldText>
+						</DropdownElement>
+					)}
+					<DropdownElement
+						onPress={() => {
+							open.type == 'essential' ? deleteEssential() : deleteAccommodation(open.day + 1);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							삭제
+						</PretendardSemiBoldText>
+					</DropdownElement>
+				</Dropdown>
+			)}
 		</>
 	);
 }
@@ -404,6 +419,7 @@ export const DayViewContainer = styled.View`
 	border-color: ${colors.Gray200};
 	margin-bottom: ${widthPercentage(10)}px;
 	z-index: 0;
+	position: relative;
 `;
 
 export const SVGContainer = styled.TouchableOpacity<{color: string; width?: number}>`
@@ -430,7 +446,8 @@ export const ElementContainer = styled.Pressable<{
 	margin-bottom: ${props => props.marginBottom ?? widthPercentage(5)}px;
 	width: ${props => widthPercentage(props?.width ?? 300)}px;
 	height: ${props => props.height + 'px' ?? 'auto'};
-	z-index: 0;
+	z-index: -100;
+	position: relative;
 `;
 const MultiAllContainer = styled.View<{marginBottom?: number; isActive: boolean}>`
 	width: ${widthPercentage(300)}px;
@@ -438,12 +455,15 @@ const MultiAllContainer = styled.View<{marginBottom?: number; isActive: boolean}
 	background-color: ${colors.backgroundGray};
 	gap: ${widthPercentage(3)}px;
 	${props => props.isActive && 'padding:20px 0px;'}
+	z-index:0;
+	position: relative;
 `;
 export const ButtonContainer = styled.View`
 	width: ${devicesWidth}px;
-	background-color: rgba(250, 250, 255, 0.8);
+	height: ${heightPercentage(90)}px;
+	background-color: ${colors.backgroundWhite};
 	position: absolute;
-	bottom: 10px;
+	bottom: 0px;
 `;
 export const DeleteContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(41)}px;
@@ -453,12 +473,12 @@ export const DeleteContainer = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 `;
-export const Dropdown = styled.View`
+export const Dropdown = styled.View<{x: number; y: number}>`
 	width: ${widthPercentage(52)}px;
 	border-width: 1px;
 	position: absolute;
-	left: -${widthPercentage(40)}px;
-	top: ${widthPercentage(10)}px;
+	left: ${props => widthPercentage((props.x ?? 0) - 40)}px;
+	top: ${props => widthPercentage((props.y ?? 0) + 15)}px;
 	border-radius: 12px;
 	border-color: ${colors.Gray200};
 	background-color: ${colors.backgroundWhite};

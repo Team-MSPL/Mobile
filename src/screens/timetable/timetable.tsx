@@ -449,42 +449,45 @@ export default function Timetable({navigation, route}: any) {
 			}),
 		);
 	};
+
 	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				userId == ''
-					? dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '앱 종료',
-								modalSubTitle: '앱을 종료하시겠습니까?',
-								modalFunction: exitApp,
-								modalLeft: true,
-							}),
-					  )
-					: dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로',
-								modalSubTitle: modifyCheck
-									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
-									: '홈으로 이동하시겠습니까?',
-								modalFunction: () => {
-									modifyCheck && goSave();
-								},
-								modalBottomFunctionUse: true,
-								modalBottomFunction: goHome,
-								modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
-								modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
-							}),
-					  );
-
-				return true;
+		const unsubscribe = navigation.addListener('beforeRemove', e => {
+			const {action} = e.data;
+			// 👉 POP인데 1개 이상 pop하면 모달 안 띄움 (poptopop 상황)
+			if (action.type === 'POP_TO_TOP') {
+				return;
 			}
-		};
+			// 👇 여기서 뒤로 가려고 하는 상황을 감지함
+			e.preventDefault(); // 뒤로 가는 행동을 막고
+			// 사용자 확인 후 수동으로 pop() 등 호출
 
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+			userId == ''
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '앱 종료',
+							modalSubTitle: '앱을 종료하시겠습니까?',
+							modalFunction: exitApp,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '홈으로 이동하시겠습니까?',
+							modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
+							modalFunction: () => {
+								modifyCheck && goSave();
+							},
+							modalBottomFunctionUse: true,
+							modalBottomFunction: goHome,
+							modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
+							modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+						}),
+				  );
+		});
 
-		return () => backHandler.remove();
-	}, [modifyCheck, userId]);
+		return unsubscribe;
+	}, [navigation, modifyCheck, userId]);
+
 	const firstSave = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -689,10 +692,20 @@ export default function Timetable({navigation, route}: any) {
 				}),
 			);
 	}, [makeMode, socialloginProvider]);
+
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackVisible: false,
+			headerBackVisible: true,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
+			headerLeft: () => {
+				return (
+					<PretendardSemiBoldText
+						size={12}
+						lineHeight={16}
+						color={colors.Gray4}
+						style={{textAlign: 'center'}}></PretendardSemiBoldText>
+				);
+			},
 			headerTitle: () => {
 				return (
 					<VStack>
@@ -721,31 +734,7 @@ export default function Timetable({navigation, route}: any) {
 					</VStack>
 				);
 			},
-			// headerRight: () => (
-			// 	<HeaderContianer>
-			// 		<>
-			// 			{socialloginProvider != 'anonymous' && (
-			// 				<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
-			// 					<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
-			// 						삭제
-			// 					</PretendardVariableText>
-			// 				</TouchableOpacity>
-			// 			)}
-			// 			<TouchableOpacity
-			// 				onPress={async () => {
-			// 					setModify(!modify);
-			// 					!modify &&
-			// 						(await logEvent('edit_course_start', {
-			// 							course: travelName,
-			// 						}));
-			// 				}}>
-			// 				<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-			// 					{modify ? '취소' : '편집'}
-			// 				</PretendardVariableText>
-			// 			</TouchableOpacity>
-			// 		</>
-			// 	</HeaderContianer>
-			// ),
+
 			headerRight: () =>
 				socialloginProvider != 'anonymous' && (
 					<>

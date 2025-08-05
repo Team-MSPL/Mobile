@@ -42,69 +42,72 @@ export default function SelectDistance({navigation, setViewComponent}: any) {
 		handleGoogleAnalytics();
 	}, []);
 	return (
-		<BackgroundGrayScrollView>
-			<Stepper total={13} now={13}></Stepper>
-			<StepText
-				marginTop={heightPercentage(10)}
-				styleText='3.여행 반경 스타일을 알아볼게요.'
-				mainText='선택하신 지역에서의 여행 반경을 설정해주세요'
-				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
+		<>
+			<BackgroundGrayScrollView>
+				<Stepper total={13} now={13}></Stepper>
+				<StepText
+					marginTop={heightPercentage(10)}
+					styleText='3.여행 반경 스타일을 알아볼게요.'
+					mainText='선택하신 지역에서의 여행 반경을 설정해주세요'
+					subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
 
-			<MapContainer>
-				<Qwe>
-					<MapView
-						//provider={PROVIDER_GOOGLE}
-						showsMyLocationButton={false}
-						showsUserLocation={false}
-						style={{
-							width: widthPercentage(327),
-							height: heightPercentage(240),
-							position: 'absolute',
-						}}
-						region={{
-							latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
-							longitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
-							latitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
-							longitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
-						}}>
-						<Circle
-							center={{
+				<MapContainer>
+					<Qwe>
+						<MapView
+							//provider={PROVIDER_GOOGLE}
+							showsMyLocationButton={false}
+							showsUserLocation={false}
+							style={{
+								width: widthPercentage(327),
+								height: heightPercentage(240),
+								position: 'absolute',
+							}}
+							region={{
 								latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
 								longitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
-							}}
-							style={{alignItems: 'center', justifyContent: 'center'}}
-							fillColor='rgba(38, 152, 251, 0.3);'
-							radius={range * (cityDistance[0] == 0 ? 5000 : 1500)}></Circle>
-					</MapView>
-				</Qwe>
-			</MapContainer>
-			<DistanceCenter>
-				<DistanceSpace>
-					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
-						내 근처
-					</PretendardSemiBoldText>
-					<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
-						전체
-					</PretendardSemiBoldText>
-				</DistanceSpace>
-				<Slider
-					style={{width: widthPercentage(347), height: 40}}
-					minimumValue={1}
-					maximumValue={10}
-					minimumTrackTintColor={colors.Primary}
-					maximumTrackTintColor={colors.Gray2}
-					thumbTintColor={colors.Primary}
-					value={range}
-					step={1}
-					onValueChange={item => {
-						setRange(item);
-					}}
-				/>
-			</DistanceCenter>
-			<MarginContainder></MarginContainder>
-
-			<RouteButton navigation={navigation} nextTitle={'FinalCheck'} goNext={goNext}></RouteButton>
-		</BackgroundGrayScrollView>
+								latitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
+								longitudeDelta: cityDistance[0] == 0 ? 0.8 : 0.2,
+							}}>
+							<Circle
+								center={{
+									latitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lat,
+									longitude: cityViewList[country][cityIndex].sub[cityDistance[0]].lng,
+								}}
+								style={{alignItems: 'center', justifyContent: 'center'}}
+								fillColor='rgba(38, 152, 251, 0.3);'
+								radius={range * (cityDistance[0] == 0 ? 5000 : 1500)}></Circle>
+						</MapView>
+					</Qwe>
+				</MapContainer>
+				<DistanceCenter>
+					<DistanceSpace>
+						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+							내 근처
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+							전체
+						</PretendardSemiBoldText>
+					</DistanceSpace>
+					<Slider
+						style={{width: widthPercentage(347), height: 40}}
+						minimumValue={1}
+						maximumValue={10}
+						minimumTrackTintColor={colors.Primary}
+						maximumTrackTintColor={colors.Gray2}
+						thumbTintColor={colors.Primary}
+						value={range}
+						step={1}
+						onValueChange={item => {
+							setRange(item);
+						}}
+					/>
+				</DistanceCenter>
+				<MarginContainder></MarginContainder>
+			</BackgroundGrayScrollView>
+			<ButtonContainer>
+				<RouteButton navigation={navigation} nextTitle={'FinalCheck'} goNext={goNext}></RouteButton>
+			</ButtonContainer>
+		</>
 	);
 }
 

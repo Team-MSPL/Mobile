@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 import {WhiteContainer} from '../../../screens/enroll-info/final-check';
 import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {HStack, PretendardSemiBoldText, PretendardVariableText, VStack} from '../../layout/layout';
@@ -21,6 +21,10 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {useAppSelector} from '../../../redux';
 import {SvgCarIcon, SVGPencil, SVGPlus, SvgPolygon, SvgTripleDot} from '../../svg/svg';
 import {DotBox, Dropdown, DropdownElement} from '../../../screens/enroll-info/select-multi';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {TouchableOpacity} from 'react-native';
+
 function Timetable({
 	modify,
 	scrollRef,
@@ -35,6 +39,8 @@ function Timetable({
 	setModify,
 	viewMap,
 	select,
+	open,
+	setOpen,
 }) {
 	const dispatch = useDispatch();
 	const {timetable, day, region} = useAppSelector(state => state.travelSlice);
@@ -208,10 +214,10 @@ function Timetable({
 			}
 		}
 	}, []);
-	useEffect(() => {
-		console.log('qwe');
-	}, []);
-	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+
+	// const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
+
+	const dotRefs = useRef<Record<string, TouchableOpacity | null>>({});
 
 	const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<Item>) => {
 		let idx = getIndex() ?? 0;
@@ -330,6 +336,7 @@ function Timetable({
 					onScroll={e => {
 						scrollhandle(e);
 						changeViewState(e);
+						open.status && setOpen({...open, status: false});
 					}}
 					// onMomentumScrollEnd={e => {
 					// 	console.log(e);
@@ -447,52 +454,28 @@ function Timetable({
 															{modify && (
 																<VStack deco='z-index:1000;'>
 																	<DotBox
+																		ref={ref => {
+																			dotRefs.current[`${index}_${idx}`] = ref;
+																		}}
 																		deco='align-items:center; justify-content:center;'
-																		onPress={() =>
-																			setOpen({
-																				status: !open.status,
-																				index: idx,
-																				day: index,
-																				type: 'essential',
-																			})
-																		}>
+																		onPress={() => {
+																			dotRefs?.current[
+																				`${index}_${idx}`
+																			]?.measure(
+																				(fx, fy, width, height, px, py) => {
+																					setOpen({
+																						status: !open.status,
+																						index: idx,
+																						day: index,
+																						type: 'essential',
+																						x: px - width,
+																						y: py - height,
+																					});
+																				},
+																			);
+																		}}>
 																		<SvgTripleDot />
 																	</DotBox>
-																	{open.status &&
-																		open.index == idx &&
-																		open.day == index &&
-																		open.type == 'essential' && (
-																			<Dropdown>
-																				<DropdownElement
-																					onPress={() => {
-																						setOpen({
-																							day: 0,
-																							index: 0,
-																							status: false,
-																						});
-																						// setModify(true);
-																						openModal(item.x, idx);
-																					}}>
-																					<PretendardSemiBoldText
-																						color={colors.Gray5}
-																						size={14}
-																						lineHeight={18}>
-																						편집
-																					</PretendardSemiBoldText>
-																				</DropdownElement>
-																				{/* <DropdownElement
-																			onPress={() => {
-																				// deleteEssential(data);
-																			}}>
-																			<PretendardSemiBoldText
-																				color={colors.Gray5}
-																				size={14}
-																				lineHeight={18}>
-																				삭제
-																			</PretendardSemiBoldText>
-																		</DropdownElement> */}
-																			</Dropdown>
-																		)}
 																</VStack>
 															)}
 															{/* {idx != 0 &&

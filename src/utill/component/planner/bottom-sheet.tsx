@@ -44,6 +44,10 @@ import {Alert, Modal, Pressable, Animated} from 'react-native';
 import {ModalBackground, ModalBottomSheet} from '../../../screens/enroll-info/planner/regist-transit';
 import {BottomContainer} from '../../../screens/enroll-info/search-place';
 import PrimaryButton from '../primary-button';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {TouchableOpacity} from 'react-native';
+
 function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, handleClose, show}: any) {
 	const {
 		day,
@@ -68,6 +72,8 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 	// callbacks
 	const handleSheetChange = useCallback((index: number) => {
 		handleClose();
+
+		setOpen({...open, status: false});
 		console.log('handleSheetChange', index);
 	}, []);
 	const [timeValue, setTimeValue] = useState(0);
@@ -106,7 +112,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '홈으로 이동하시겠습니까?',
-					modalSubTitle: '홈으로 이동시 저장되지않습니다',
+					modalSubTitle: '홈으로 이동 시 저장되지 않습니다',
 					modalFunction: () => navigation.dispatch({...e.data.action, type: 'POP_TO_TOP'}),
 				}),
 			);
@@ -131,7 +137,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 		}
 		return color;
 	};
-	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: ''});
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
 	const {kakaoShare} = useKakaoShare();
 	const goKakaoShare = async () => {
 		try {
@@ -177,7 +183,32 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 		navigation.popToTop();
 		navigation.navigate('Home');
 	};
+	const handleTransitDelete = (e: string) => {
+		copy = {...transitInfo};
+		copy[e] = {
+			departureAirport: '', //출밢녀
+			departureTime: new Date(), //출발시간
+			arrivalAirport: '', //도착편
+			arrivalTime: new Date(), //도착시간
+			airline: '', //항공사혹은 기차번호
+			reservationNumber: '', //에약번호
 
+			departurHour: 6, //출발시각
+			arrivalHour: 8, //도착시각
+			Address: {
+				lat: 0,
+				lng: 0,
+			},
+			type: '',
+		};
+		dispatch(
+			travelSliceActions.updateFiled({
+				field: 'transitInfo',
+				value: copy,
+			}),
+		);
+		setOpen({...open, status: false});
+	};
 	const {countryList} = useTendencyHandler();
 	const firstSave = async () => {
 		try {
@@ -277,6 +308,19 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 		}
 	}, [step, addView, show]);
 	const dispatch = useAppDispatch();
+	const handleDelete = () => {
+		let copy = [...timetable];
+		let copy2 = [...timetable[open.day]].filter((item, idx) => idx != open.index);
+		copy[open.day] = copy2;
+		dispatch(travelSliceActions.changeTimetable(copy));
+		setOpen({...open, status: false});
+	};
+	const dotRefs = useRef<Record<string, TouchableOpacity | null>>({});
+
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+
+	const totalTopHeight = headerHeight + statusBarHeight;
 	const transitScreen = () => {
 		return (
 			<>
@@ -285,7 +329,7 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				</PretendardSemiBoldText>
 				{['outbound', 'inbound'].map((item, index) => (
 					<>
-						<HStack justifyContent='space-between;' deco='margin-bottom:10px;'>
+						<HStack justifyContent='space-between;' deco={`margin-bottom:${heightPercentage(32)}px;`}>
 							<HStack gap={3}>
 								<LeftBar color={colors.Blue1} />
 								<VStack>
@@ -331,49 +375,25 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 									<VStack deco='z-index:1000; margin-left:auto;'>
 										<DotBox
 											deco='align-items:center; justify-content:center;'
-											onPress={() =>
-												setOpen({
-													status: !open.status,
-													index: index,
-													day: step - 2,
-													type: 'transit',
-												})
-											}>
+											ref={ref => {
+												dotRefs.current[`${step - 2}_transit_${index}`] = ref;
+											}}
+											onPress={() => {
+												dotRefs?.current[`${step - 2}_transit_${index}`]?.measure(
+													(fx, fy, width, height, px, py) => {
+														setOpen({
+															status: !open.status,
+															index: index,
+															day: step - 2,
+															type: 'transit',
+															x: px - width,
+															y: py - height,
+														});
+													},
+												);
+											}}>
 											<SvgTripleDot />
 										</DotBox>
-										{open.status &&
-											open.index == index &&
-											open.day == step - 2 &&
-											open.type == 'transit' && (
-												<Dropdown>
-													<DropdownElement
-														onPress={() => {
-															// setOpen({...open, status: false});
-															// setTimeValue(item?.takenTime / 60 - 1);
-															// setModify(true);
-															// openModal(item.x, idx);
-															navigation.navigate('RegistTransit', {type: item});
-														}}>
-														<PretendardSemiBoldText
-															color={colors.Gray5}
-															size={14}
-															lineHeight={18}>
-															편집
-														</PretendardSemiBoldText>
-													</DropdownElement>
-													{/* <DropdownElement
-													onPress={() => {
-														// deleteEssential(data);
-													}}>
-													<PretendardSemiBoldText
-														color={colors.Gray5}
-														size={14}
-														lineHeight={18}>
-														삭제
-													</PretendardSemiBoldText>
-												</DropdownElement> */}
-												</Dropdown>
-											)}
 									</VStack>
 								</HStack>
 								<HStack justifyContent='space-between'>
@@ -722,48 +742,25 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 												<VStack deco='z-index:1000;'>
 													<DotBox
 														deco='align-items:center; justify-content:center;'
+														ref={ref => {
+															dotRefs.current[`${step - 2}_${index}`] = ref;
+														}}
 														onPress={() =>
-															setOpen({
-																status: !open.status,
-																index: index,
-																day: step - 2,
-																type: 'essential',
-															})
+															dotRefs?.current[`${step - 2}_${index}`]?.measure(
+																(fx, fy, width, height, px, py) => {
+																	setOpen({
+																		status: !open.status,
+																		index: index,
+																		day: step - 2,
+																		type: 'essential',
+																		x: px - width,
+																		y: py - height,
+																	});
+																},
+															)
 														}>
 														<SvgTripleDot />
 													</DotBox>
-													{open.status &&
-														open.index == index &&
-														open.day == step - 2 &&
-														open.type == 'essential' && (
-															<Dropdown>
-																<DropdownElement
-																	onPress={() => {
-																		setOpen({...open, status: false});
-																		setTimeValue(item?.takenTime / 60 - 1);
-																		setModify(true);
-																		// openModal(item.x, idx);
-																	}}>
-																	<PretendardSemiBoldText
-																		color={colors.Gray5}
-																		size={14}
-																		lineHeight={18}>
-																		편집
-																	</PretendardSemiBoldText>
-																</DropdownElement>
-																<DropdownElement
-																	onPress={() => {
-																		// deleteEssential(data);
-																	}}>
-																	<PretendardSemiBoldText
-																		color={colors.Gray5}
-																		size={14}
-																		lineHeight={18}>
-																		삭제
-																	</PretendardSemiBoldText>
-																</DropdownElement>
-															</Dropdown>
-														)}
 												</VStack>
 											</HStack>
 										</InsideGrayContainer>
@@ -876,6 +873,9 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 				index={1}>
 				<SheetContent />
 				<CustomBottomSheetScrollView
+					onScroll={() => {
+						setOpen({...open, status: false});
+					}}
 					showsVerticalScrollIndicator={false}
 					style={{marginBottom: heightPercentage(100), marginTop: widthPercentage(20)}}>
 					{step == 0 ? transitScreen() : step == 1 ? accommodationScreen() : timeTableScreen()}
@@ -997,6 +997,39 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 					</ModalBottomSheet>
 				</ModalBackground>
 			</Modal>
+			{open.status && (
+				<Dropdown x={open.x} y={open.y - totalTopHeight}>
+					{(open.type == 'essential' && timetable[open.day][open.index].category != 4) ||
+						(open.type == 'transit' && (
+							<DropdownElement
+								onPress={() => {
+									open.type == 'essential'
+										? (setOpen({...open, status: false}),
+										  setTimeValue(timetable[open.day][open.index]?.takenTime / 60 - 1),
+										  setModify(true))
+										: navigation.navigate('RegistTransit', {
+												type: open.index == 0 ? 'outbound' : 'inbound',
+										  });
+									// openModal(item.x, idx);
+								}}>
+								<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+									편집
+								</PretendardSemiBoldText>
+							</DropdownElement>
+						))}
+					<DropdownElement
+						onPress={() => {
+							open.type == 'essential'
+								? handleDelete()
+								: handleTransitDelete(open.index == 0 ? 'outbound' : 'inbound');
+							// deleteEssential(data);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							삭제
+						</PretendardSemiBoldText>
+					</DropdownElement>
+				</Dropdown>
+			)}
 		</>
 	);
 }

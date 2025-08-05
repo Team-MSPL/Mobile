@@ -210,10 +210,13 @@ export default function Preset({navigation}: any) {
 		});
 	};
 	const onViewableItemsChanged = useRef(items => {
-		setViewType(items[0]?.index);
+		setViewType(items?.changed[0]?.index);
 	});
-
-	const renderItem = ({item, idx}) => {
+	const indexScroll = useRef();
+	useEffect(() => {
+		indexScroll?.current.scrollTo({x: viewType * widthPercentage(60)});
+	}, [viewType]);
+	const renderItem = ({item, index}) => {
 		return (
 			<>
 				<HStack
@@ -235,18 +238,18 @@ export default function Preset({navigation}: any) {
 				</PretendardSemiBoldText> */}
 				</HStack>
 				<WhiteContainer
-					key={idx}
+					key={index}
 					deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
 						20,
 					)}px ${widthPercentage(24)}px;`}>
-					{presetTendencyList[idx]?.tendencyNameList.length >= 1 && (
+					{presetTendencyList[index]?.tendencyNameList.length >= 1 && (
 						<>
-							{presetTendencyList[idx]?.tendencyNameList.length >= 2 && presetDatas.length >= 2 && (
+							{presetTendencyList[index]?.tendencyNameList.length >= 2 && presetDatas.length >= 2 && (
 								<HStack>
 									<PretendardSemiBoldText size={14} lineHeight={20.6} color={colors.Black}>
 										다른 코스에 비해{' '}
 										<PretendardSemiBoldText size={14} lineHeight={20.6} color={colors.PointYellow}>
-											[{calculateTendency(presetTendencyList[idx])}]
+											[{calculateTendency(presetTendencyList[index])}]
 										</PretendardSemiBoldText>{' '}
 										성향이 더 높아요
 									</PretendardSemiBoldText>
@@ -259,15 +262,15 @@ export default function Preset({navigation}: any) {
 									marginBottom={10}
 									onPress={() => {
 										let copy = {...tendencyViewIndex};
-										copy[idx] = !copy[idx];
+										copy[index] = !copy[index];
 										setTendencyViewIndex(copy);
 									}}>
-									{presetTendencyList[idx]?.tendencyNameList
+									{presetTendencyList[index]?.tendencyNameList
 										.slice(
 											0,
-											tendencyViewIndex[idx]
+											tendencyViewIndex[index]
 												? 4
-												: presetTendencyList[idx]?.tendencyNameList.length,
+												: presetTendencyList[index]?.tendencyNameList.length,
 										)
 										.map((item, index) => {
 											return (
@@ -285,13 +288,13 @@ export default function Preset({navigation}: any) {
 														size={14}
 														lineHeight={17}
 														color={colors.PointYellow}>
-														{presetTendencyList[idx].tendencyPointList[index]}점
+														{presetTendencyList[index].tendencyPointList[index]}점
 													</PretendardSemiBoldText>
 												</TagContainer>
 											);
 										})}
 								</FlexWrap>
-								{presetTendencyList[idx]?.tendencyNameList.length > 4 && (
+								{presetTendencyList[index]?.tendencyNameList.length > 4 && (
 									<TouchableOpacity
 										style={{
 											height: 'auto',
@@ -300,23 +303,23 @@ export default function Preset({navigation}: any) {
 										}}
 										onPress={() => {
 											let copy = {...tendencyViewIndex};
-											copy[idx] = !copy[idx];
+											copy[index] = !copy[index];
 											setTendencyViewIndex(copy);
 										}}>
 										<SVGRightAdd
 											width={widthPercentage(20)}
 											height={widthPercentage(20)}
 											color='black'
-											transform={tendencyViewIndex[idx] ? 90 : 270}
+											transform={tendencyViewIndex[index] ? 90 : 270}
 										/>
 									</TouchableOpacity>
 								)}
 							</HStack>
 						</>
 					)}
-					{item.map((value, index) => {
+					{item.map((value, idx) => {
 						return (
-							<HStack gap={widthPercentage(10)} key={index} deco={'width:100%;'}>
+							<HStack gap={widthPercentage(10)} key={idx} deco={'width:100%;'}>
 								<HStack deco='width:30%;'>
 									<DashLineContainer>
 										{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
@@ -331,11 +334,11 @@ export default function Preset({navigation}: any) {
 											/>
 										)}
 										<DashLine
-											status={index == 0 ? 'start' : index == item.length - 1 ? 'end' : 'center'}
+											status={idx == 0 ? 'start' : idx == item.length - 1 ? 'end' : 'center'}
 										/>
 									</DashLineContainer>
 									<PretendardVariableText size={14} lineHeight={17} color={colors.Title}>
-										{index + 1}일차
+										{idx + 1}일차
 									</PretendardVariableText>
 								</HStack>
 								<VStack deco='width:50%;' justifyContent='center'>
@@ -371,7 +374,7 @@ export default function Preset({navigation}: any) {
 						backgroundColor={colors.backgroundGray}
 						textColor={colors.PointYellow}
 						onPress={async () => {
-							goDetail(idx);
+							goDetail(index);
 							await logEvent('view_course_result_detail', {
 								place: item[0][0].name,
 							});
@@ -410,14 +413,14 @@ export default function Preset({navigation}: any) {
 						paddingHorizontal: widthPercentage(24),
 						justifyContent: 'center',
 						height: '100%',
-						borderRadius: 12,
+						borderRadius: 8,
 					}}>
 					<VStack>
 						<PretendardSemiBoldText size={22} lineHeight={26} color={colors.backgroundWhite}>
 							{region[0].split('/').at(-1)}
 							{region.length >= 2 ? ` 외 ${region.length - 1}지역` : ''}
 						</PretendardSemiBoldText>
-						<FlexWrap gap={widthPercentage(4)} marginBottom={0}>
+						<FlexWrap gap={widthPercentage(4)} marginBottom={0} margintop={5}>
 							{presetTendencyList[0]?.tendencyNameList.slice(0, 3).map((item, idx) => {
 								return (
 									<TagContainer backgroundColor={'rgba(195,245,80,0.3)'} key={idx}>
@@ -443,7 +446,8 @@ export default function Preset({navigation}: any) {
 				horizontal={true}
 				nestedScrollEnabled={true}
 				showsHorizontalScrollIndicator={false}
-				style={{marginVertical: widthPercentage(10)}}>
+				style={{marginVertical: widthPercentage(10)}}
+				ref={indexScroll}>
 				{[...Array.from({length: presetDatas.length}, (item, index) => index)].map((item, idx) => {
 					return (
 						<RegionItems

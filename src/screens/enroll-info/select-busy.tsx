@@ -48,12 +48,6 @@ export default function RecommendSelectBusy({navigation}: any) {
 							{item.name}
 						</PretendardSemiBoldText>
 					</SelectButton>
-					// <TendencyButton
-					// 	bgColor={bandwidth == Boolean(idx)}
-					// 	label={item.name}
-					// 	imageUrl={item.photo}
-					// 	key={idx}
-					// 	onPress={item.function}></TendencyButton>
 				))}
 			</SelectMoveContainer>
 			<RouteButton navigation={navigation} nextTitle='RecommendSelectConcept'></RouteButton>

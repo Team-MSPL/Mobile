@@ -27,7 +27,7 @@ import TimePickerModal from '../../utill/component/planner/date-picker';
 import {ModalBackground, ModalBottomSheet} from './planner/regist-transit';
 import {SVGRightAdd} from '../../utill/svg/svg';
 export default function SelectDay({navigation}: any) {
-	const dateFlag = useRef(0);
+	const [dateFlag, setDateFlag] = useState(0);
 	const [visible, setVisible] = useState(false);
 	const {
 		Place,
@@ -52,7 +52,7 @@ export default function SelectDay({navigation}: any) {
 		if (visible) {
 			setVisible(false);
 		} else {
-			dateFlag.current = e;
+			setDateFlag(e);
 			setVisible(true);
 		}
 	};
@@ -144,15 +144,25 @@ export default function SelectDay({navigation}: any) {
 			navigation.navigate('SelectDeparture');
 		}
 	};
+	const handleClose = () => {
+		setVisible(false);
+	};
 	const goConfirm = (timeData: {hour: number; ampm: string; minute: string}) => {
 		let timeCopy = [...timeLimitArray];
 		let ampmCheck = timeData.ampm == '오후' ? 12 : 0;
-		timeCopy[dateFlag.current] = parseInt(timeData.hour) + ampmCheck;
+		timeCopy[dateFlag] = parseInt(timeData.hour) + ampmCheck;
 		let minuteCopy = [...minuteLimitArray];
-		minuteCopy[dateFlag.current] = parseInt(timeData.minute);
+		minuteCopy[dateFlag] = parseInt(timeData.minute);
 		dispatch(travelSliceActions.setTimeAndMinute({time: timeCopy, minute: minuteCopy}));
-		setVisible(false);
 		return true;
+	};
+	const handleConfirm = (timeData: {hour: number; ampm: string; minute: string}) => {
+		goConfirm(timeData);
+		handleClose();
+	};
+	const handleTimeNext = async (timeData: {hour: number; ampm: string; minute: string}) => {
+		goConfirm(timeData);
+		setDateFlag(1);
 	};
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
 	const onDateChange = (date: any, type: string) => {
@@ -282,20 +292,29 @@ export default function SelectDay({navigation}: any) {
 									console.log(`${ampm} ${hour}:${minute}`);
 								}}
 								minuteDivide={true}
-								hour={timeLimitArray[dateFlag.current]}
-								minute={minuteLimitArray[dateFlag.current] / 30}
+								hour={timeLimitArray[dateFlag]}
+								minute={minuteLimitArray[dateFlag] / 30}
 								// leftText={'완료'}
 								// leftFunction={() => {
 								// 	setShow({status: true, step: 0});
 								// }}
-								rightText={'완료'}
+								rightText={'다음으로'}
+								leftFunction={e => {
+									let timeData = {
+										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
+										minute: e?.minute,
+										ampm: e?.ampm,
+									};
+									handleConfirm(timeData);
+								}}
+								leftText={'완료'}
 								rightFunction={e => {
 									let timeData = {
 										hour: Number(e?.hour) % 12 == 0 ? Number(e?.hour) / 12 - 1 : Number(e?.hour),
 										minute: e?.minute,
 										ampm: e.ampm,
 									};
-									goConfirm(timeData);
+									handleTimeNext(timeData);
 								}}
 							/>
 						</ModalBottomSheet>

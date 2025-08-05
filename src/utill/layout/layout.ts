@@ -32,6 +32,7 @@ export const VStack = styled.View<{
 	justifyContent?: string;
 	deco?: string;
 }>`
+	position: relative;
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: column;
@@ -55,6 +56,7 @@ export const FlexWrap = styled.Pressable<{
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
 	width: ${props => props.width ?? null}px;
+	position: relative;
 	${props => props?.deco}
 `;
 
@@ -69,6 +71,8 @@ export const MainContainer = styled.ScrollView<{backgroundColor?: string}>`
 	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
 	width: 100%;
 	flex: 1;
+	z-index: 0;
+	position: relative;
 `;
 export const MainText = styled.Text.attrs({
 	allowFontScaling: false,
@@ -122,6 +126,8 @@ export const BackgroundGray = styled.View<{
 	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
+	z-index: 0;
+	position: relative;
 `;
 export const BackgroundGrayScrollView = styled.ScrollView<{
 	paddingHorizental?: number;
