@@ -999,24 +999,24 @@ function PlannerBottomSheet({navigation, step, setStep, startTime, setShow, hand
 			</Modal>
 			{open.status && (
 				<Dropdown x={open.x} y={open.y - totalTopHeight}>
-					{(open.type == 'essential' && timetable[open.day][open.index].category != 4) ||
-						(open.type == 'transit' && (
-							<DropdownElement
-								onPress={() => {
-									open.type == 'essential'
-										? (setOpen({...open, status: false}),
-										  setTimeValue(timetable[open.day][open.index]?.takenTime / 60 - 1),
-										  setModify(true))
-										: navigation.navigate('RegistTransit', {
-												type: open.index == 0 ? 'outbound' : 'inbound',
-										  });
-									// openModal(item.x, idx);
-								}}>
-								<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
-									편집
-								</PretendardSemiBoldText>
-							</DropdownElement>
-						))}
+					{((open.type == 'essential' && timetable[open.day][open.index].category != 4) ||
+						open.type == 'transit') && (
+						<DropdownElement
+							onPress={() => {
+								open.type == 'essential'
+									? (setOpen({...open, status: false}),
+									  setTimeValue(timetable[open.day][open.index]?.takenTime / 60 - 1),
+									  setModify(true))
+									: navigation.navigate('RegistTransit', {
+											type: open.index == 0 ? 'outbound' : 'inbound',
+									  });
+								// openModal(item.x, idx);
+							}}>
+							<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+								편집
+							</PretendardSemiBoldText>
+						</DropdownElement>
+					)}
 					<DropdownElement
 						onPress={() => {
 							open.type == 'essential'

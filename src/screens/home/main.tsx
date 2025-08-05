@@ -405,6 +405,7 @@ export default function Main({navigation}: any) {
 									alignItems: 'center',
 									justifyContent: 'flex-end',
 									gap: heightPercentage(15),
+									paddingBottom: heightPercentage(10),
 								}}>
 								<PretendardSemiBoldText
 									size={20}
@@ -912,7 +913,7 @@ const VividImage = styled.Image`
 `;
 const StartButton = styled.TouchableOpacity`
 	width: ${widthPercentage(160)}px;
-	padding: ${heightPercentage(8)}px ${widthPercentage(23)}px;
+	height: ${heightPercentage(40)}px;
 	align-items: center;
 	justify-content: center;
 	border-radius: 20px;

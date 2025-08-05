@@ -695,10 +695,39 @@ export default function Timetable({navigation, route}: any) {
 
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackVisible: true,
+			headerBackVisible: Platform.OS != 'ios',
+			headerBackTitleVisible: false,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
 			headerLeft: () => {
-				return (
+				return Platform.OS == 'ios' ? (
+					<TouchableOpacity
+						onPress={() => {
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '홈으로 이동하시겠습니까?',
+									modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
+									modalFunction: () => {
+										modifyCheck && goSave();
+									},
+									modalBottomFunctionUse: true,
+									modalBottomFunction: goHome,
+									modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
+									modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+								}),
+							);
+						}}
+						style={{
+							justifyContent: 'center',
+							marginLeft: widthPercentage(4),
+							marginRight: widthPercentage(4),
+						}}>
+						<Image
+							resizeMode='contain'
+							source={require('../../../public/images/danim_logo_row.png')}
+							style={{height: heightPercentage(36), aspectRatio: 2.054}}
+						/>
+					</TouchableOpacity>
+				) : (
 					<PretendardSemiBoldText
 						size={12}
 						lineHeight={16}
@@ -753,7 +782,7 @@ export default function Timetable({navigation, route}: any) {
 			headerRight: () =>
 				socialloginProvider != 'anonymous' && (
 					<>
-						{Platform.OS != 'android' && (
+						{/* {Platform.OS != 'android' && (
 							<TouchableOpacity
 								onPress={() => {
 									dispatch(
@@ -781,7 +810,7 @@ export default function Timetable({navigation, route}: any) {
 									style={{height: heightPercentage(36), aspectRatio: 2.054}}
 								/>
 							</TouchableOpacity>
-						)}
+						)} */}
 						{shareViewWithStartFlag && (
 							<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
 								<PretendardBoldText size={16} lineHeight={24} color={colors.PointYellow}>

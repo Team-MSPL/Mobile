@@ -28,6 +28,7 @@ import {logEvent} from '../../../firebaseAnalytice';
 import LinearGradient from 'react-native-linear-gradient';
 import {FlatList} from 'react-native';
 import {FlatList as FlatListType} from 'react-native';
+import {Platform} from 'react-native';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -380,7 +381,7 @@ export default function Preset({navigation}: any) {
 		);
 	};
 	return (
-		<BackgroundGrayScrollView>
+		<BackgroundGray>
 			<StepText
 				mainTextSize={23}
 				styleTextColor={colors.Gray4}
@@ -483,7 +484,7 @@ export default function Preset({navigation}: any) {
 				showsVerticalScrollIndicator={false}
 				onViewableItemsChanged={onViewableItemsChanged.current}
 				viewabilityConfig={{
-					itemVisiblePercentThreshold: 50, // 50% 이상 보이면 감지
+					itemVisiblePercentThreshold: Platform.OS == 'ios' ? 100 : 50, // 50% 이상 보이면 감지
 				}}
 				renderItem={renderItem}></FlatList>
 
@@ -494,7 +495,7 @@ export default function Preset({navigation}: any) {
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={2} handleFunction={deleteMainViewPager} />
 			</Modal>
-		</BackgroundGrayScrollView>
+		</BackgroundGray>
 	);
 }
 const RegionTextContainer = styled(HStack).attrs({as: Pressable})``;
