@@ -354,7 +354,8 @@ export default function TimetableAddPlace({navigation, route}: any) {
 						flex: 0.9,
 						fontSize: fontPercentage(18),
 						color: 'black',
-						backgroundColor: colors.backgroundWhite,
+
+						backgroundColor: 'transparent',
 					},
 					description: {color: 'black'},
 				}}

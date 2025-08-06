@@ -229,7 +229,8 @@ export const mainViewList = [
 					style={{
 						position: 'absolute',
 						right: heightPercentage(98),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+						bottom: fontPercentage(7.5),
+						// 두 번째 줄 기준으로 붙음
 					}}
 				/>
 			</View>

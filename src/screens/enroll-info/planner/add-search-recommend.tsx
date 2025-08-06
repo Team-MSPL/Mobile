@@ -353,7 +353,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 							borderRadius: 99,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
-							borderWidth: 2,
+							borderWidth: 1,
 							marginTop: widthPercentage(30),
 							borderColor: handleColor(route.params.title),
 							paddingLeft: 20,
@@ -361,7 +361,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 						listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
 						textInput: {
 							color: 'black',
-							backgroundColor: colors.backgroundWhite,
+							backgroundColor: 'transparent',
 							flex: 0.9,
 							fontSize: fontPercentage(18),
 						},

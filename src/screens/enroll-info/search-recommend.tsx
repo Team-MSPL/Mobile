@@ -215,7 +215,7 @@ export default function SearchRecommend({navigation, route}: any) {
 						textInput: {
 							margin: 0.9,
 							color: 'black',
-							backgroundColor: colors.backgroundWhite,
+							backgroundColor: 'transparent',
 							fontSize: fontPercentage(18),
 						},
 						description: {color: 'black'},

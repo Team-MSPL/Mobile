@@ -139,7 +139,8 @@ export default function SelectDeparture({navigation}: any) {
 							listView: {width: widthPercentage(327), maxHeight: heightPercentage(100), zIndex: 1000},
 							textInput: {
 								color: 'black',
-								backgroundColor: colors.backgroundWhite,
+
+								backgroundColor: 'transparent',
 								flex: 0.9,
 								fontSize: fontPercentage(18),
 							},
