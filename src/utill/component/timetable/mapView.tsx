@@ -68,8 +68,11 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 							</MarkerContainer>
 						)} */}
 						{
-							<MarkerContainer key={markerKey} backgroundColor={handleColor(item?.category)}>
-								<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
+							<MarkerContainer
+								mapMarker={true}
+								key={markerKey}
+								backgroundColor={handleColor(item?.category)}>
+								<PretendardSemiBoldText size={13} lineHeight={19} color={colors.Black}>
 									{idx + 1}
 								</PretendardSemiBoldText>
 							</MarkerContainer>

@@ -27,6 +27,7 @@ export default function BaseModal() {
 		modalBottomFunction,
 		modalTextSize,
 		travleMedic,
+		modalBottomTextColor,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
@@ -121,7 +122,11 @@ export default function BaseModal() {
 										backgroundColor={
 											modalBottomText == '다님 AI 2호' ? colors.Primary : colors.backgroundWhite
 										}
-										textColor={modalBottomText == '다님 AI 2호' ? colors.Gray5 : colors.Gray400}
+										textColor={
+											modalBottomText == '다님 AI 2호'
+												? colors.Gray5
+												: modalBottomTextColor ?? colors.Gray400
+										}
 										onPress={modalBottomFunctionUse ? handleLeftFunction : close}
 										width={widthPercentage(327)}
 										height={heightPercentage(50)}

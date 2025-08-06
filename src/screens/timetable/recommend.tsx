@@ -70,6 +70,7 @@ export default function Recommend({navigation, route}: any) {
 						centerOffset={{x: 0, y: 0}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
+							mapMarker={true}
 							backgroundColor={
 								route.params.index == index ? colors.PointYellow : handleColor(value.category)
 							}

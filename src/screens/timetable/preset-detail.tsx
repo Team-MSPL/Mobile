@@ -21,7 +21,6 @@ export default function PresetDetail({navigation, route}: any) {
 	const {presetTendencyList, presetDatas, day, nDay, aiID, region} = useAppSelector(state => state.travelSlice);
 	const [select, setSelect] = useState(0);
 	const dispatch = useAppDispatch();
-	let markerCount = 0;
 	const checkNext = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -110,28 +109,40 @@ export default function PresetDetail({navigation, route}: any) {
 		| null
 		| undefined = [];
 	presetDatas[route.params.index].forEach((value, index) => {
-		const polylineCoordinates = value
-			.map(vvalue => {
-				if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
-					return {
-						latitude: vvalue.lat,
-						longitude: vvalue.lng,
-					};
-				} else {
-					return null;
-				}
-			})
-			.filter(vvvalue => vvvalue != null);
+		if (index == select) {
+			const polylineCoordinates = value
+				.map(vvalue => {
+					if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
+						return {
+							latitude: vvalue.lat,
+							longitude: vvalue.lng,
+						};
+					} else {
+						return null;
+					}
+				})
+				.filter(vvvalue => vvvalue != null);
+			polylines.push(
+				<Polyline
+					key={`polyline_${index}`}
+					coordinates={polylineCoordinates}
+					strokeColor={index == select ? colors.PointYellow : colors.Gray5}
+					strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
+				/>,
+			);
+		}
 		value.map(vvalue =>
 			positions.push({
 				latitude: vvalue.lat,
 				longitude: vvalue.lng,
 			}),
-		),
+		);
+		if (select == index) {
+			let markerCount = 0;
 			markers.push(
 				value
 					.map((vvalue, iindex) => {
-						markerCount += 1;
+						markerCount += vvalue.name?.includes('추천') ? 0 : 1;
 						if (vvalue.name != '점심 추천' && vvalue.name != '저녁 추천' && vvalue.name != '숙소 추천') {
 							return (
 								<Marker
@@ -159,12 +170,12 @@ export default function PresetDetail({navigation, route}: any) {
 													zIndex: 200,
 												}}></Image>
 										) : (
-											<MarkerContainer key={iindex}>
+											<MarkerContainer key={iindex} mapMarker={true}>
 												<PretendardSemiBoldText
 													size={13}
 													lineHeight={19}
 													color={colors.backgroundWhite}>
-													{iindex + 1}
+													{markerCount}
 												</PretendardSemiBoldText>
 											</MarkerContainer>
 										)
@@ -179,15 +190,7 @@ export default function PresetDetail({navigation, route}: any) {
 					})
 					.filter(vvvalue => vvvalue != null),
 			);
-
-		polylines.push(
-			<Polyline
-				key={`polyline_${index}`}
-				coordinates={polylineCoordinates}
-				strokeColor={index == select ? colors.PointYellow : colors.Gray5}
-				strokeWidth={Platform.isPad ? 5 : 2} // You can change the width of the line here
-			/>,
-		);
+		}
 	});
 	const minLatitude = Math.min(...positions.map(marker => marker.latitude));
 	const maxLatitude = Math.max(...positions.map(marker => marker.latitude));
@@ -441,7 +444,7 @@ export const DayTouchablOpacity = styled.TouchableOpacity<{select: boolean}>`
 	border-color: ${colors.Primary};
 	background-color: ${props => (props.select ? colors.PrimarySecondary : colors.backgroundWhite)};
 `;
-export const MarkerContainer = styled.View<{backgroundColor?: string}>`
+export const MarkerContainer = styled.View<{backgroundColor?: string; mapMarker?: boolean}>`
 	width: ${widthPercentage(Platform.isPad ? 20 : 24)}px;
 	height: ${widthPercentage(Platform.isPad ? 20 : 24)}px;
 	border-radius: 6px;
@@ -449,6 +452,8 @@ export const MarkerContainer = styled.View<{backgroundColor?: string}>`
 	justify-content: center;
 	background-color: ${props => props.backgroundColor ?? colors.PointYellow};
 	z-index: 3;
+	${props =>
+		props.mapMarker && 'border-bottom-width: 2px; border-left-width: 2px;border-color: rgba(64, 64, 64, 0.4);'}
 `;
 const InsideGray = styled.View`
 	width: ${widthPercentage(287)}px;

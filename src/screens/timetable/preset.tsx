@@ -18,7 +18,7 @@ import {SVGCalendarRecommend, SVGFlag, SvgHomeIcon, SVGRightAdd} from '../../uti
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {WhiteContainer} from '../enroll-info/final-check';
 import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
@@ -314,9 +314,9 @@ export default function Preset({navigation}: any) {
 					)}
 					{item.map((value, idx) => {
 						return (
-							<HStack gap={widthPercentage(10)} key={idx} deco={'width:100%;'}>
-								<HStack deco='width:30%;'>
-									<DashLineContainer>
+							<HStack gap={widthPercentage(10)} key={idx} deco={'width:100%;overflow:visible;'}>
+								<HStack deco='width:30%;align-items:flex-start;'>
+									<DashLineContainer justifyContent='flex-start'>
 										{value[value[0].name == '숙소 추천' ? 1 : 0].category == 4 ? (
 											<Triangle />
 										) : (
@@ -327,6 +327,7 @@ export default function Preset({navigation}: any) {
 													// 	: colors.Gray5
 													colors.Title
 												}
+												deco={`margin-top:${(fontPercentage(19) - widthPercentage(9)) / 2}px;`}
 											/>
 										)}
 										<DashLine
@@ -334,7 +335,7 @@ export default function Preset({navigation}: any) {
 											status={idx == 0 ? 'start' : idx == item.length - 1 ? 'end' : 'center'}
 										/>
 									</DashLineContainer>
-									<PretendardVariableText size={14} lineHeight={17} color={colors.Title}>
+									<PretendardVariableText size={14} lineHeight={19} color={colors.Title}>
 										{idx + 1}일차
 									</PretendardVariableText>
 								</HStack>
@@ -390,7 +391,7 @@ export default function Preset({navigation}: any) {
 				mainText={`${userName} 님, \n이런 여행 일정은 어떠신가요?`}
 				subText='점수가 낮은 일정은 간단한 동선을 우선시했어요!'
 			/>
-			<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Green500}>
+			<PretendardSemiBoldText size={16} lineHeight={20} color={colors.PointYellow} deco={'margin-top:5px;'}>
 				{nDay == 0 ? '당일치기 ' : nDay + '박 ' + (nDay + 1) + '일 '} 코스예요!
 			</PretendardSemiBoldText>
 
@@ -499,19 +500,21 @@ export default function Preset({navigation}: any) {
 	);
 }
 const RegionTextContainer = styled(HStack).attrs({as: Pressable})``;
-export const DashLineContainer = styled.View<{justifyContent?: string}>`
+export const DashLineContainer = styled.View<{justifyContent?: string; deco?: string}>`
 	width: ${widthPercentage(20)}px;
 	min-height: ${heightPercentage(46)}px;
 	justify-content: ${props => props.justifyContent ?? 'center'};
 	align-items: center;
 	height: 100%;
+	${props => props.deco}
 `;
-export const Circle = styled.View<{color: string}>`
+export const Circle = styled.View<{color: string; deco?: string}>`
 	width: ${widthPercentage(9)}px;
 	height: ${widthPercentage(9)}px;
 	border-radius: 99px;
 	background-color: ${props => props.color};
 	z-index: 2;
+	${props => props.deco}
 `;
 export const Triangle = styled.View`
 	width: 0;
@@ -525,14 +528,15 @@ export const Triangle = styled.View`
 	border-right-color: transparent;
 	border-top-color: ${colors.Title};
 `;
-export const DashLine = styled.View<{status: string; dash?: boolean; color?: string}>`
+export const DashLine = styled.View<{status: string; dash?: boolean; color?: string; deco?: string}>`
 	width: 1px;
-	height: ${props => (props.status == 'center' ? '100%' : '50%')};
+	height: ${props => (props.status == 'center' ? '100%' : props.status == 'end' ? '25%' : '80%')};
 	background-color: ${props => props.color ?? colors.Title};
 	position: absolute;
-	left: ${widthPercentage(9)}px;
+	left: ${widthPercentage(9.5)}px;
 	bottom: 0;
 	${props => (props.status == 'start' ? 'bottom:0' : props.status == 'end' ? 'top:0' : '')};
+	${props => props.deco}
 `;
 const IndexContainer = styled.View`
 	width: ${widthPercentage(24)}px;

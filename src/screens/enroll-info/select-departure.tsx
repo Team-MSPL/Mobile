@@ -35,6 +35,7 @@ export default function SelectDeparture({navigation}: any) {
 		departureAirport,
 		departureTrain,
 		regionRecommendFlag,
+		makeMode,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
 	const handleNearBySearchApi = async () => {
@@ -213,7 +214,13 @@ export default function SelectDeparture({navigation}: any) {
 				<RouteButton
 					nextText={departureSelected == '' ? '건너뛰기' : '다음'}
 					navigation={navigation}
-					nextTitle={regionRecommendFlag ? 'SelectDistance' : 'SelectMulti'}></RouteButton>
+					nextTitle={
+						regionRecommendFlag
+							? 'SelectDistance'
+							: makeMode == 'planner'
+							? 'RecommendSelectWho'
+							: 'SelectMulti'
+					}></RouteButton>
 			</ButtonContainer>
 		</>
 	);

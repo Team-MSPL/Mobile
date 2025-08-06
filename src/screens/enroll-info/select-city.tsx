@@ -255,7 +255,7 @@ export default function SelectCity({navigation}: any) {
 										<PretendardVariableText
 											size={14}
 											lineHeight={18.9}
-											color={cityIndex == item.id ? colors.backgroundWhite : colors.Title}>
+											color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
 											{item.title}
 										</PretendardVariableText>
 									</RegionItems>
