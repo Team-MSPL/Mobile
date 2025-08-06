@@ -13,6 +13,7 @@ export default function CustomButton({
 	divide,
 	textColor,
 	bgColor,
+	deco,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -23,7 +24,8 @@ export default function CustomButton({
 			bgColor={bgColor ?? undefined}
 			onPress={onPress}
 			width={width}
-			divide={divide}>
+			divide={divide}
+			deco={deco ?? ''}>
 			<PretendardSemiBoldText size={18} lineHeight={23.48} color={textColor ?? colors.Primary}>
 				{label}
 			</PretendardSemiBoldText>
@@ -41,6 +43,7 @@ type CustomButtonProps = {
 	divide?: boolean;
 	textColor?: string;
 	bgColor?: string;
+	deco?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{
@@ -50,6 +53,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	isDisabledOpacity: boolean;
 	divide?: boolean;
 	bgColor?: string;
+	deco?: string;
 }>`
 	opacity: ${props => (props.isDisabledOpacity ? '0.5' : '1')};
 	width: ${props => (props.divide ?? false ? widthPercentage(160) : props.width ?? widthPercentage(327))}px;
@@ -61,4 +65,5 @@ const ButtonContainer = styled.TouchableOpacity<{
 	background-color: ${props => props.bgColor ?? colors.Gray5};
 	margin-top: ${props => heightPercentage(props.marginTop)}px;
 	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
+	${props => props.deco}
 `;

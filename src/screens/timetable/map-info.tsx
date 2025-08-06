@@ -654,13 +654,13 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					</InfoModalContainer>
 				</ModalContainer>
 			</Modal>
-			<Modal
+			{/* <Modal
 				animationType={'fade'}
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={modify ? 5 : 3} handleFunction={deleteMainViewPager} />
-			</Modal>
+			</Modal> */}
 			{open.status && (
 				<Dropdown x={open.x} y={open.y - totalTopHeight}>
 					<DropdownElement

@@ -488,13 +488,13 @@ export default function Preset({navigation}: any) {
 				}}
 				renderItem={renderItem}></FlatList>
 
-			<Modal
+			{/* <Modal
 				animationType={'fade'}
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={2} handleFunction={deleteMainViewPager} />
-			</Modal>
+			</Modal> */}
 		</BackgroundGray>
 	);
 }

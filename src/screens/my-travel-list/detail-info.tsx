@@ -394,13 +394,13 @@ export default function DetailInfo({navigation}: any) {
 					text={text}
 					setEditing={setEditing}
 				/>
-				<Modal
+				{/* <Modal
 					animationType={'fade'}
 					transparent={true}
 					visible={viewPagerState}
 					onRequestClose={deleteMainViewPager}>
 					<ViewPager sliceNumber={4} handleFunction={deleteMainViewPager} />
-				</Modal>
+				</Modal> */}
 				<ButtonMarginBottom></ButtonMarginBottom>
 			</Scroll>
 			<ButtonContainer>

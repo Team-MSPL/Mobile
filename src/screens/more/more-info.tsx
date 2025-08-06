@@ -102,13 +102,13 @@ export default function MoreInfo({navigation}: any) {
 		<ScrollView>
 			<Test></Test>
 			<BackgroundGray>
-				<Modal
+				{/* <Modal
 					animationType={'fade'}
 					transparent={true}
 					visible={viewPagerView}
 					onRequestClose={() => setViewPagerView(false)}>
 					<ViewPager handleFunction={goBack} scrollState={true} />
-				</Modal>
+				</Modal> */}
 				<HStack justifyContent='space-between'>
 					<HStack gap={widthPercentage(5)}>
 						{userProfileImage == '' ? (

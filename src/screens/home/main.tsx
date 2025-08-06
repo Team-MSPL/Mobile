@@ -806,7 +806,7 @@ export default function Main({navigation}: any) {
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={1} handleFunction={deleteMainViewPager} />
+				<ViewPager sliceNumber={2} handleFunction={deleteMainViewPager} />
 			</Modal>
 		</>
 	);
