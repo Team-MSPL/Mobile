@@ -12,7 +12,6 @@ import {KAKAO_NATIVE_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import CodePush from 'react-native-code-push';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -259,14 +258,5 @@ function App(): JSX.Element {
 		</GestureHandlerRootView>
 	);
 }
-const codePushOptions = {
-	checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
-	updateDialog: {
-		title: '내부 업데이트가 존재합니다.',
-		optionalUpdateMessage: '보다 안정적인 서비스 사용을 위해 내부 업데이트 후 재실행 합니다.',
-		optionalInstallButtonLabel: '업데이트',
-		optionalIgnoreButtonLabel: '나중에',
-	},
-	installMode: CodePush.InstallMode.IMMEDIATE,
-};
-export default CodePush(codePushOptions)(App);
+
+export default App;

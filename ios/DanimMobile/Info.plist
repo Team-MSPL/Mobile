@@ -53,8 +53,6 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>CodePushDeploymentKey</key>
-	<string>${CODEPUSH_KEY}</string>
 	<key>GMSApiKey</key>
 	<string>70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com</string>
 	<key>KAKAO_APP_KEY</key>

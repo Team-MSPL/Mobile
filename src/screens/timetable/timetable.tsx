@@ -723,7 +723,7 @@ export default function Timetable({navigation, route}: any) {
 						}}>
 						<Image
 							resizeMode='contain'
-							source={require('../../../public/images/danim_logo_row.png')}
+							source={require('../../../assets/images/danim_logo_row.png')}
 							style={{height: heightPercentage(36), aspectRatio: 2.054}}
 						/>
 					</TouchableOpacity>

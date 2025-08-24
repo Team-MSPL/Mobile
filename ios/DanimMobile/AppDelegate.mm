@@ -8,7 +8,6 @@
 #import "RNSplashScreen.h"
 #import "DanimMobile-Swift.h"
 #import "RNFBMessagingModule.h"
-#import <CodePush/CodePush.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
@@ -70,8 +69,7 @@
 {
 #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
-#else
-  return [CodePush bundleURL];
+
 #endif
 }
 

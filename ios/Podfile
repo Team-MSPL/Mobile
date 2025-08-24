@@ -59,7 +59,7 @@ target 'DanimMobile' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-  platform :ios, '13.0'
+  platform :ios, '14.0'
   # React Native Maps dependencies
   # The following line is only needed if building on an Apple silicon Mac without rosetta.
   pod 'Google-Maps-iOS-Utils', :git => 'https://github.com/Simon-TechForm/google-maps-ios-utils.git', :branch => 'feat/support-apple-silicon'
