@@ -26,6 +26,8 @@ import {useRegionSearch} from '../../utill/hooks/useRegionSearch';
 import Carousel from 'react-native-reanimated-carousel';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
 import {ButtonContainer, MarginContainder} from './select-multi';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useHeaderHeight} from '@react-navigation/elements';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -141,6 +143,19 @@ export default function SelectCity({navigation}: any) {
 			});
 		}
 	}, [cityIndex]);
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+	const totalTopHeight = headerHeight + statusBarHeight;
+	const searchRef = useRef();
+	const [searchTop, setSearchTop] = useState(0);
+	useEffect(() => {
+		// 컴포넌트가 렌더링된 뒤 measure
+		setTimeout(() => {
+			searchRef.current?.measure((fx, fy, width, height, px, py) => {
+				setSearchTop(py + height); // py는 화면 기준 Y 위치
+			});
+		}, 0); // 또는 InteractionManager.runAfterInteractions()
+	}, []);
 	return (
 		<>
 			<BackgroundGrayPressable
@@ -153,7 +168,7 @@ export default function SelectCity({navigation}: any) {
 					marginTop={heightPercentage(10)}
 					styleText='1.여행 계획을 알려주세요.'
 					mainText='어디로 떠나시나요?'></StepText>
-				<RegionTextInputContainer>
+				<RegionTextInputContainer ref={searchRef}>
 					<SVGSearch width={widthPercentage(20)} height={widthPercentage(20)} color={colors.Primary} />
 					<RegionTextInput
 						ref={regionSearchRef}
@@ -171,7 +186,7 @@ export default function SelectCity({navigation}: any) {
 							handleRegionText(e);
 						}}></RegionTextInput>
 				</RegionTextInputContainer>
-				<SearchContainer top={heightPercentage(210)}>
+				<SearchContainer top={searchTop}>
 					<ScrollView style={{zIndex: 2}}>
 						{regionSearchState &&
 							regionMatchList.map((item, index) => {

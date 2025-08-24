@@ -175,7 +175,6 @@ export default function SearchPlace({navigation, route}: any) {
 			<SearchContainer height={route.params.id == 0 ? heightPercentage(450) : heightPercentage(497)}>
 				<GooglePlacesAutocomplete
 					placeholder='검색어를 입력하세요.'
-					disableScroll={true}
 					ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
 					query={{
 						key: GOOGLE_API_KEY,

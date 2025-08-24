@@ -108,6 +108,7 @@ export default function SelectDeparture({navigation}: any) {
 					<GooglePlacesAutocomplete
 						placeholder='검색어를 입력하세요.'
 						disableScroll={false}
+						keepResultsAfterBlur
 						enablePoweredByContainer={false}
 						ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
 						query={{

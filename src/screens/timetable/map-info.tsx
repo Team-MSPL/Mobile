@@ -119,8 +119,14 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 		}
 	}, []);
 	const goRemove = () => {
-		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
-		dispatch(travelSliceActions.changeTimetable(a));
+		if (Array.isArray(timetable) && Array.isArray(timetable[open.day]) && timetable[open.day][open.index]) {
+			const targetId = timetable[open.day][open.index].id;
+			const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
+			dispatch(travelSliceActions.changeTimetable(a));
+			if (open.status) {
+				setOpen({...open, status: false});
+			}
+		}
 	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
@@ -678,7 +684,8 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					</DropdownElement>
 					<DropdownElement
 						onPress={() => {
-							// deleteEssential(data);
+							console.log('aa');
+							goRemove();
 						}}>
 						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
 							삭제

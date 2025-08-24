@@ -77,7 +77,6 @@ target 'DanimMobile' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
 
      # Xcode 16 임시추가 부분
   installer.pods_project.targets.each do |target|

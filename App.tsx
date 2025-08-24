@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
@@ -239,21 +239,23 @@ function App(): JSX.Element {
 	return (
 		<GestureHandlerRootView style={{flex: 1}}>
 			<SafeAreaProvider>
-				<StatusBar
-					animated={true}
-					barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-					backgroundColor={backgroundStyle.backgroundColor}
-				/>
-				<NavigationContainer linking={linking}>
-					{<StackNavigator />}
-					{needVersionUpdate && <NeedVersionUpdate />}
-					{eventState && <Event />}
-					{cooperationState && <Cooperation />}
-					{!(networkConn && serverConn) && <Connection />}
-					{<BaseModal />}
-					{Boolean(isLoading) && <Loading />}
-					<Toast />
-				</NavigationContainer>
+				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
+					<StatusBar
+						animated={true}
+						barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+						backgroundColor={backgroundStyle.backgroundColor}
+					/>
+					<NavigationContainer linking={linking}>
+						{<StackNavigator />}
+						{needVersionUpdate && <NeedVersionUpdate />}
+						{eventState && <Event />}
+						{cooperationState && <Cooperation />}
+						{!(networkConn && serverConn) && <Connection />}
+						{<BaseModal />}
+						{Boolean(isLoading) && <Loading />}
+						<Toast />
+					</NavigationContainer>
+				</SafeAreaView>
 			</SafeAreaProvider>
 		</GestureHandlerRootView>
 	);

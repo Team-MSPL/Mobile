@@ -190,7 +190,16 @@ export default function SelectDistance({navigation}: any) {
 			}
 		});
 	};
-
+	const searchRef = useRef();
+	const [searchTop, setSearchTop] = useState(0);
+	useEffect(() => {
+		// 컴포넌트가 렌더링된 뒤 measure
+		setTimeout(() => {
+			searchRef.current?.measure((fx, fy, width, height, px, py) => {
+				setSearchTop(py); // py는 화면 기준 Y 위치
+			});
+		}, 0); // 또는 InteractionManager.runAfterInteractions()
+	}, []);
 	return (
 		<BackgroundGrayPressable
 			onPress={() => {
@@ -202,7 +211,7 @@ export default function SelectDistance({navigation}: any) {
 				styleText='4.원하는 반경의 지역을 추천해드려요.'
 				mainText={`현재 위치에서 추천받고자 하는\n여행 반경을 선택해 주세요`}
 				subText={`그림은 이해를 돕기 위함으로\n실제 결과와는 차이가 있을 수 있습니다.`}></StepText>
-			<RegionTextInputContainer>
+			<RegionTextInputContainer ref={searchRef}>
 				<SVGSearch color={colors.Primary} />
 				<RegionTextInput
 					ref={regionSearchRef}
@@ -219,7 +228,7 @@ export default function SelectDistance({navigation}: any) {
 						handleRegionText(e);
 					}}></RegionTextInput>
 			</RegionTextInputContainer>
-			<SearchContainer>
+			<SearchContainer top={searchTop}>
 				<ScrollView style={{zIndex: 2}}>
 					{regionSearchState &&
 						regionMatchList.map((item, index) => {
@@ -355,7 +364,7 @@ export const SearchContainer = styled.View<{top?: number}>`
 	position: absolute;
 	align-self: center;
 	z-index: 2;
-	top: ${props => heightPercentage(props.top ?? 237)}px;
+	top: ${props => props.top}px;
 	width: ${widthPercentage(327)}px;
 	max-height: ${heightPercentage(150)}px;
 	background-color: ${colors.backgroundWhite};

@@ -20,7 +20,6 @@ import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
 import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout/responsive-size';
 import Search from '../screens/home/search';
-import RecommendPlace from '../screens/home/recommendPlace';
 import RecommendPlaces from '../screens/home/recommendPlaces';
 import ProductsStack from './products-stack';
 import PlannerStack from './planner-stack';
@@ -86,8 +85,7 @@ function TabBar() {
 			initialRouteName='Home'
 			screenOptions={{
 				tabBarStyle: {
-					minHeight: heightPercentage(60) + insets.bottom,
-					backgroundColor: colors.main,
+					marginBottom: -insets.bottom,
 				},
 				tabBarItemStyle: {
 					paddingBottom: heightPercentage(10),
