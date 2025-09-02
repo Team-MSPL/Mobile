@@ -12,3 +12,18 @@
 -keep class * extends com.google.gson.TypeAdapter
 -keep class com.google.googlesignin.** { *; }
 -keep public class com.horcrux.svg.** {*;}
+
+# https://github.com/square/okhttp/pull/6792
+-dontwarn org.bouncycastle.jsse.**
+-dontwarn org.conscrypt.*
+-dontwarn org.openjsse.**
+
+# Kakao SDK
+-keep class com.kakao.** { *; }
+-dontwarn com.kakao.**
+
+# Retrofit 관련
+-keepattributes Signature
+-keepattributes Exceptions
+-keep class retrofit2.** { *; }
+-dontwarn retrofit2.**
