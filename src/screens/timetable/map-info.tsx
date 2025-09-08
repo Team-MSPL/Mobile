@@ -1,5 +1,14 @@
 import moment from 'moment';
-import {JSXElementConstructor, ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+	JSXElementConstructor,
+	MutableRefObject,
+	ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
@@ -20,10 +29,10 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/lay
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {Dropdown, DropdownElement, SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil, SVGSearch} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {NestableScrollContainer} from 'react-native-draggable-flatlist';
@@ -40,8 +49,10 @@ import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
+import {GOOGLE_API_KEY} from '@env';
 export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
+	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place} = useAppSelector(
 		state => state.travelSlice,
 	);
 	const {cooperationState} = useAppSelector(state => state.eventSlice);
@@ -206,7 +217,13 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					y: newY,
 					x: viewRef.current.index,
 					takenTime: (newEnd - newY) * 30,
+					...(placeState?.name && {
+						name: placeState.name,
+						lat: placeState.lat,
+						lng: placeState.lng,
+					}),
 				};
+
 				let deleteCopy = [...timetable[viewRef.current.index]];
 				deleteCopy.splice(viewRef.current.idx, 1);
 				changeCopy[viewRef.current.index] = deleteCopy;
@@ -298,7 +315,16 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	const [topbar, setTopBar] = useState(true);
 
 	const sheetRef = useRef<BottomSheet>(null);
-
+	const [placeState, setPlaceState] = useState<{
+		name: string | undefined;
+		lat: number | undefined;
+		lng: number | undefined;
+		photo: string;
+		category: number;
+		takenTime: number;
+		formatted_address: string | undefined;
+		region: string;
+	} | null>();
 	// variables
 	const snapPoints: ReadonlyArray<string | number> = useMemo(() => ['10%', '60%', '90%'], []);
 
@@ -334,6 +360,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
 	const headerHeight = useHeaderHeight();
 	const {top: statusBarHeight} = useSafeAreaInsets();
+	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 
 	const totalTopHeight = headerHeight + statusBarHeight;
 	return (
@@ -528,9 +555,71 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 				onRequestClose={() => setVisible(false)}>
 				<ModalContainer onPress={() => setVisible(false)}>
 					<InfoModalContainer>
+						<GooglePlacesAutocomplete
+							placeholder='검색어를 입력하세요.'
+							ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
+							query={{
+								key: GOOGLE_API_KEY,
+								language: 'ko',
+							}}
+							textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
+							renderLeftButton={() => (
+								<SVGSearch
+									width={widthPercentage(20)}
+									height={widthPercentage(20)}
+									color={colors.Primary}
+								/>
+							)}
+							styles={{
+								container: {alignItems: 'center'},
+								textInputContainer: {
+									width: widthPercentage(327),
+									height: widthPercentage(52),
+									borderRadius: 99,
+									backgroundColor: colors.backgroundWhite,
+									alignItems: 'center',
+									borderWidth: 1,
+									borderColor: colors.Primary,
+									paddingLeft: 20,
+								},
+								listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
+								textInput: {
+									color: 'black',
+									backgroundColor: 'transparent',
+									flex: 0.9,
+									fontSize: fontPercentage(18),
+								},
+								description: {color: 'black'},
+							}}
+							fetchDetails={true}
+							onPress={async (data, details) => {
+								const placeId = details?.place_id;
+								const response = await dispatch(googleDetailApi({placeId: placeId}));
+								let imageUrl;
+								if (response.payload.result.photos) {
+									const photoReference = response.payload.result?.photos[0]?.photo_reference;
+									imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_API_KEY}`;
+								} else {
+									imageUrl = null;
+								}
+								const datas = {
+									...Place,
+									name: details?.name,
+									lat: details?.geometry.location.lat,
+									lng: details?.geometry.location.lng,
+									formatted_address: details?.formatted_address.replace('대한민국 ', ''),
+									photo: imageUrl,
+									region: details?.formatted_address.replace('대한민국 ', ''),
+								};
+								setPlaceState(datas);
+								dispatch(travelSliceActions.enrollPlace(datas));
+							}}
+							onFail={error => console.log(error)}
+							onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+
 						<HStack gap={widthPercentage(10)}>
 							<PretendardSemiBoldText size={17.78} lineHeight={24} color={colors.Gray5}>
-								{viewRef.current.name}
+								{placeState?.name || viewRef.current.name}
 							</PretendardSemiBoldText>
 							<PretendardVariableText size={13.33} lineHeight={20} color={colors.Gray2}>
 								{categoryTitle[viewRef.current.category]}
@@ -677,6 +766,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 							});
 							// setModify(true);
 							openModal(timetable[open.day][open.index].x, open.index);
+							setPlaceState(null);
 						}}>
 						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
 							편집
@@ -734,7 +824,7 @@ export const InfoModalContainer = styled.View`
 	bottom: 0px;
 	background-color: ${colors.backgroundWhite};
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(409)}px;
+	height: ${heightPercentage(725)}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	padding: ${heightPercentage(23.22)}px ${widthPercentage(24)}px;

@@ -216,6 +216,12 @@ export default function TimetableAddPlace({navigation, route}: any) {
 			let lng =
 				timetable[route.params.x]?.reduce((item, current) => item + current?.lng, 0) /
 				timetable[route.params.x].length;
+			if (isNaN(lat)) {
+				lat = cityViewList[country][cityIndex].sub[0]?.lat;
+			}
+			if (isNaN(lng)) {
+				lng = cityViewList[country][cityIndex].sub[0]?.lng;
+			}
 			const data = {
 				regionList: a,
 				selectList: [...tendency, season],
@@ -225,8 +231,10 @@ export default function TimetableAddPlace({navigation, route}: any) {
 				lat,
 				lng,
 				password: '(주)나그네들_g5hb87r8765rt68i7ur78',
+				version: 3,
 			};
 			const result = await dispatch(recommendPlace(data)).unwrap();
+
 			setRecommendList(result.recommendedPlaces.slice(0, 4));
 		} catch {
 		} finally {
@@ -385,7 +393,7 @@ export default function TimetableAddPlace({navigation, route}: any) {
 					{recommendList.map((recommendItem, recommendIdx) => (
 						<ElementContainer
 							key={recommendIdx}
-							color={colors.backgroundGray}
+							color={colors.backgroundWhite}
 							onPress={() => moveRegion(recommendItem)}>
 							<VStack width={widthPercentage(243)}>
 								<PretendardSemiBoldText
@@ -782,6 +790,8 @@ const ElementContainer = styled.Pressable<{color: string}>`
 	flex-direction: row;
 	width: ${widthPercentage(326)}px;
 	height: ${heightPercentage(64)}px;
+	border-bottom-width: 1px;
+	border-bottom-color: ${colors.Gray2};
 `;
 const InsideScrollView = styled.ScrollView``;
 const DeleteBox = styled.TouchableOpacity`

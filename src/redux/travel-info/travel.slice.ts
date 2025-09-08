@@ -274,6 +274,7 @@ export const getRecommendPlace = createAsyncThunk(
 	'/getRecommendPlace',
 	async (data: travelAiType, {rejectWithValue}) => {
 		try {
+			console.log('안녕', data);
 			const response = await axiosAuth.post(`/ai/recommendPlace`, data, {timeout: 60000});
 			return response.data;
 		} catch (error: any) {
@@ -508,6 +509,7 @@ export const recommendPlace = createAsyncThunk(
 	'/ai/recommendPlace',
 	async (data: recommendPlaceType, {rejectWithValue}) => {
 		try {
+			console.log('바이', data);
 			const response = await axiosAuth.post(`/ai/recommendPlace`, data);
 			return response.data;
 		} catch (error: any) {

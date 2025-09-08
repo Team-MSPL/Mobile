@@ -42,7 +42,7 @@ target 'DanimMobile' do
   pod 'Firebase/Core', '~> 10.0'
   pod 'FirebaseAuth' 
   pod 'FirebaseFirestore'
-  pod 'Firebase/Messaging'
+  # pod 'Firebase/Messaging'
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
   flags = get_default_flags()
