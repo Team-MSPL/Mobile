@@ -2,7 +2,7 @@ import {Google_Signin_Key} from '@env';
 import {appleAuth, appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
-import * as KakaoLogin from '@react-native-seoul/kakao-login';
+import {login, me} from '@react-native-kakao/user';
 
 import jwtDecode from 'jwt-decode';
 import {useEffect} from 'react';
@@ -62,8 +62,9 @@ export default function LoginScreen({navigation}: any) {
 
 	const kakaoLogin = async () => {
 		try {
-			await KakaoLogin.login();
-			const userInfo = await KakaoLogin.getProfile();
+			await login();
+			const userInfo = await me();
+			console.log(userInfo);
 			const data = {
 				userName: userInfo.nickname,
 				userProfileImage: userInfo?.profileImageUrl ?? 'https://danim.me/square_logo.png',

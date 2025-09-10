@@ -35,8 +35,10 @@ import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
 import Cooperation from './src/utill/component/cooperation/cooperation';
+import {initializeKakaoSDK} from '@react-native-kakao/core';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
+	initializeKakaoSDK(`${KAKAO_NATIVE_KEY}`);
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);

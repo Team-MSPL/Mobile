@@ -15,7 +15,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        // maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
         maven { url 'https://maven.google.com' }
         maven { url "https://www.jitpack.io" }
     }
@@ -26,3 +25,9 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.6.0'
     }
 }
+    allprojects {
+    repositories {
+        maven {
+            url "https://devrepo.kakao.com/nexus/content/groups/public/"
+        }
+    }}

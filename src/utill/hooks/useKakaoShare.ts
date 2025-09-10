@@ -1,36 +1,41 @@
 import moment, {Moment} from 'moment';
-import KakaoShareLink from 'react-native-kakao-share-link';
+import {shareFeedTemplate} from '@react-native-kakao/share';
 import {useAppDispatch} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 const useKakaoShare = () => {
 	const dispatch = useAppDispatch();
 	const kakaoShare = async (e: KakaoType) => {
 		try {
-			const response = await KakaoShareLink.sendFeed({
-				content: {
-					title: e.travelName,
-					imageUrl: e?.photo ?? 'https://danim.me/square_logo.png',
-					link: {
-						webUrl: 'http://danim.me',
-						mobileWebUrl: 'http://danim.me',
-					},
-					description: moment(e.startDay).format('YY-MM-DD') + '~' + moment(e.endDay).format('YY-MM-DD'),
-				},
-				buttons: [
-					{
-						title: '앱에서 보기',
+			console.log(e);
+			const response = await shareFeedTemplate({
+				template: {
+					content: {
+						title: e.travelName,
+						imageUrl: e.photo && e.photo.trim() !== '' ? e.photo : 'https://danim.me/square_logo.png',
 						link: {
-							androidExecutionParams: [
-								{key: 'kakaolink', value: 'Timetable'},
-								{key: 'whatId', value: e.travelId},
-							],
-							iosExecutionParams: [
-								{key: 'kakaolink', value: 'Timetable'},
-								{key: 'whatId', value: e.travelId},
-							],
+							webUrl: 'http://danim.me',
+							mobileWebUrl: 'http://danim.me',
 						},
+						description: `${moment(e.startDay).format('YY-MM-DD')} ~ ${moment(e.endDay).format(
+							'YY-MM-DD',
+						)}`,
 					},
-				],
+					buttons: [
+						{
+							title: '앱에서 보기',
+							link: {
+								androidExecutionParams: {
+									kakaolink: 'Timetable',
+									whatId: e.travelId,
+								},
+								iosExecutionParams: {
+									kakaolink: 'Timetable',
+									whatId: e.travelId,
+								},
+							},
+						},
+					],
+				},
 			});
 		} catch (err) {
 			console.log(err);

@@ -3,7 +3,7 @@
 #import <React/RCTLinkingManager.h>
 
 #import <Firebase.h>
-#import <RNKakaoLogins.h>
+#import <RNCKakaoUser/RNCKakaoUserUtil.h>
 #import <GoogleMaps/GoogleMaps.h>
 #import "RNSplashScreen.h"
 #import "DanimMobile-Swift.h"
@@ -13,9 +13,9 @@
 - (BOOL)application:(UIApplication *)application
      openURL:(NSURL *)url
      options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
- if([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
-    return [RNKakaoLogins handleOpenUrl: url];
- }
+  if([RNCKakaoUserUtil isKakaoTalkLoginUrl:url]) {
+    return [RNCKakaoUserUtil handleOpenUrl:url];
+  }
   if ([RCTLinkingManager application:application openURL:url sourceApplication:nil annotation:nil]) {
      return YES;
    }
