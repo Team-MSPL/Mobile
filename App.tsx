@@ -36,6 +36,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
 import Cooperation from './src/utill/component/cooperation/cooperation';
 import {initializeKakaoSDK} from '@react-native-kakao/core';
+import {PaymentWidgetProvider} from '@tosspayments/widget-sdk-react-native';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
 	initializeKakaoSDK(`${KAKAO_NATIVE_KEY}`);
@@ -242,21 +243,25 @@ function App(): JSX.Element {
 		<GestureHandlerRootView style={{flex: 1}}>
 			<SafeAreaProvider>
 				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
-					<StatusBar
-						animated={true}
-						barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-						backgroundColor={backgroundStyle.backgroundColor}
-					/>
-					<NavigationContainer linking={linking}>
-						{<StackNavigator />}
-						{needVersionUpdate && <NeedVersionUpdate />}
-						{eventState && <Event />}
-						{cooperationState && <Cooperation />}
-						{!(networkConn && serverConn) && <Connection />}
-						{<BaseModal />}
-						{Boolean(isLoading) && <Loading />}
-						<Toast />
-					</NavigationContainer>
+					<PaymentWidgetProvider
+						clientKey={`test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm`}
+						customerKey={`CVkg1NgQih5CJceio0erA`}>
+						<StatusBar
+							animated={true}
+							barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+							backgroundColor={backgroundStyle.backgroundColor}
+						/>
+						<NavigationContainer linking={linking}>
+							{<StackNavigator />}
+							{needVersionUpdate && <NeedVersionUpdate />}
+							{eventState && <Event />}
+							{cooperationState && <Cooperation />}
+							{!(networkConn && serverConn) && <Connection />}
+							{<BaseModal />}
+							{Boolean(isLoading) && <Loading />}
+							<Toast />
+						</NavigationContainer>
+					</PaymentWidgetProvider>
 				</SafeAreaView>
 			</SafeAreaProvider>
 		</GestureHandlerRootView>

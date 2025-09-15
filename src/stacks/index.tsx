@@ -23,6 +23,7 @@ import Search from '../screens/home/search';
 import RecommendPlaces from '../screens/home/recommendPlaces';
 import ProductsStack from './products-stack';
 import PlannerStack from './planner-stack';
+import PaymentStack from './payment-stack';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -69,6 +70,7 @@ export default function StackNavigator() {
 			{HikingStack()}
 			{ProductsStack()}
 			{PlannerStack()}
+			{PaymentStack()}
 			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />
