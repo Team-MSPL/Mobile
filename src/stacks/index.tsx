@@ -1,7 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {Image, View} from 'react-native';
+import {Image, Platform, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import Main from '../screens/home/main';
@@ -87,6 +87,7 @@ function TabBar() {
 			initialRouteName='Home'
 			screenOptions={{
 				tabBarStyle: {
+					height: Platform?.isPad ? 150 : undefined,
 					marginBottom: -insets.bottom,
 				},
 				tabBarItemStyle: {

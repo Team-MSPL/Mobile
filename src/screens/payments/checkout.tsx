@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Alert} from 'react-native';
 import {
 	PaymentWidgetProvider,
@@ -14,12 +14,20 @@ import type {
 import {styled} from 'styled-components/native';
 // ...
 
-export default function CheckoutPage() {
+export default function CheckoutPage({navigation, route}: any) {
 	const paymentWidgetControl = usePaymentWidget();
 	const [paymentMethodWidgetControl, setPaymentMethodWidgetControl] = useState<PaymentMethodWidgetControl | null>(
 		null,
 	);
 	const [agreementWidgetControl, setAgreementWidgetControl] = useState<AgreementWidgetControl | null>(null);
+	const handleCheck = () => {
+		if (route.params?.info == undefined) {
+			navigation.goBack();
+		}
+	};
+	useEffect(() => {
+		handleCheck();
+	}, []);
 	return (
 		<BackgroundScrollView>
 			<PaymentMethodWidget
@@ -28,7 +36,7 @@ export default function CheckoutPage() {
 					paymentWidgetControl
 						.renderPaymentMethods(
 							'payment-methods',
-							{value: 50000},
+							{value: route.params?.info?.value},
 							{
 								variantKey: 'DEFAULT',
 							},
@@ -65,11 +73,12 @@ export default function CheckoutPage() {
 					paymentWidgetControl
 						.requestPayment?.({
 							orderId: 'MH_zqGYKBiE7lcDKHbJ2B',
-							orderName: '토스 티셔츠 외 2건',
+							orderName: route.params?.info?.name,
 						})
 						.then(result => {
 							if (result?.success) {
 								console.log(result);
+								navigation.replace('Success');
 								// 결제 성공 비즈니스 로직을 구현하세요.
 								// result.success에 있는 값을 서버로 전달해서 결제 승인을 호출하세요.
 							} else if (result?.fail) {
@@ -107,4 +116,6 @@ export default function CheckoutPage() {
 		</BackgroundScrollView>
 	);
 }
-const BackgroundScrollView = styled.ScrollView``;
+const BackgroundScrollView = styled.ScrollView`
+	flex: 1;
+`;

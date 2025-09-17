@@ -403,7 +403,7 @@ export default function Main({navigation}: any) {
 									paddingHorizontal: widthPercentage(10),
 									height: '100%',
 									alignItems: 'center',
-									justifyContent: 'flex-end',
+									justifyContent: Platform.isPad ? 'center' : 'flex-end',
 									gap: heightPercentage(15),
 									paddingBottom: heightPercentage(10),
 								}}>

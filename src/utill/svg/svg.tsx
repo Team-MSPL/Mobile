@@ -96,7 +96,7 @@ export const SvgCancel = styled(Cancel)<{color: string}>`
 	color: color;
 `;
 export const SvgCheck = styled(Check)<{color: string}>`
-	color: color;
+	color: ${props => props.color};
 `;
 export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
 	color: color;

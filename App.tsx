@@ -244,7 +244,7 @@ function App(): JSX.Element {
 			<SafeAreaProvider>
 				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
 					<PaymentWidgetProvider
-						clientKey={`test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm`}
+						clientKey={`test_gck_Z61JOxRQVEGgxnpdOZOR8W0X9bAq`}
 						customerKey={`CVkg1NgQih5CJceio0erA`}>
 						<StatusBar
 							animated={true}
