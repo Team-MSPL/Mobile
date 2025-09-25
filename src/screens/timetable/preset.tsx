@@ -267,23 +267,23 @@ export default function Preset({navigation}: any) {
 												? 4
 												: presetTendencyList[index]?.tendencyNameList.length,
 										)
-										.map((item, index) => {
+										.map((value, idx) => {
 											return (
 												<TagContainer
 													backgroundColor={colors.backgroundGray}
 													height={heightPercentage(28)}
-													key={index}>
+													key={idx}>
 													<PretendardSemiBoldText
 														size={14}
 														lineHeight={17}
 														color={colors.Gray4}>
-														{item + ' '}
+														{value + ' '}
 													</PretendardSemiBoldText>
 													<PretendardSemiBoldText
 														size={14}
 														lineHeight={17}
 														color={colors.PointYellow}>
-														{presetTendencyList[index].tendencyPointList[index]}점
+														{presetTendencyList[index]?.tendencyPointList[idx]}점
 													</PretendardSemiBoldText>
 												</TagContainer>
 											);

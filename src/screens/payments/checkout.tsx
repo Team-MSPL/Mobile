@@ -59,7 +59,7 @@ export default function CheckoutPage({navigation, route}: any) {
 				}}
 			/>
 			<Button
-				title='결제요청'
+				title={`${route.params?.info?.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}원 결제요청`}
 				onPress={async () => {
 					if (paymentWidgetControl == null || agreementWidgetControl == null) {
 						Alert.alert('주문 정보가 초기화되지 않았습니다.');
@@ -87,7 +87,7 @@ export default function CheckoutPage({navigation, route}: any) {
 						});
 				}}
 			/>
-			<Button
+			{/* <Button
 				title='선택된 결제수단'
 				onPress={async () => {
 					if (paymentMethodWidgetControl == null) {
@@ -112,7 +112,7 @@ export default function CheckoutPage({navigation, route}: any) {
 						Alert.alert('결제 금액이 100000원으로 변경되었습니다.');
 					});
 				}}
-			/>
+			/> */}
 		</BackgroundScrollView>
 	);
 }

@@ -87,7 +87,7 @@ function TabBar() {
 			initialRouteName='Home'
 			screenOptions={{
 				tabBarStyle: {
-					height: Platform?.isPad ? 150 : undefined,
+					...(Platform?.isPad && 'height:150'),
 					marginBottom: -insets.bottom,
 				},
 				tabBarItemStyle: {

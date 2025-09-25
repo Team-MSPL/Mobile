@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
-import {getSellingProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {getPassport, getSellingProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {getNoteList, userSliceActions} from '../../redux/user/user.slice';
 import {regionRecommendSliceActions} from '../../redux/travel-info/region-recommend.slice';
 import {eventSliceActions, getEventList} from '../../redux/event/event.slice';
@@ -62,6 +62,7 @@ export default function Main({navigation}: any) {
 		let index = Math.floor((selectStartDate.month() + 1) / 3) - 1;
 		index < 0 ? (season[3] = 1) : (season[index] = 1);
 		dispatch(travelSliceActions.setTravelStart({makeMode: e, season: season, globalFlag: false}));
+		// navigation.navigate('PaymentStack', {info: {name: '집', value: 300000}});
 		navigation.navigate('EnrollTravelTitle');
 
 		await logEvent(e, {});
@@ -174,6 +175,10 @@ export default function Main({navigation}: any) {
 		const result = await dispatch(getSellingProduct(type)).unwrap();
 		dispatch(travelSliceActions.enrollHotProducts(result.data.results));
 	};
+	const handleGetPassport = async () => {
+		const data = await dispatch(getPassport()).unwrap();
+		console.log(data);
+	};
 	useFocusEffect(
 		useCallback(() => {
 			getNoteListData();
@@ -185,6 +190,7 @@ export default function Main({navigation}: any) {
 		getFirstRegion();
 		handleProduct();
 		handleHotProduct();
+		// handleGetPassport();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');

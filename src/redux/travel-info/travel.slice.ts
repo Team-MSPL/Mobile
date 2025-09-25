@@ -120,6 +120,22 @@ const initialState: LiteState = {
 			type: '',
 		},
 	},
+	passport: [
+		{
+			korName: '이태운',
+			engFirstName: 'TAEUN',
+			engLastName: 'LEE',
+			country: 'KR',
+			passportNum: 'M43543543',
+			gender: 'M',
+			birthday: '19990128',
+			passportIssueDate: '20220201',
+			passportExpirationDate: '20260201',
+			passportCountry: 'KR',
+			passportImage: '이미지링크',
+			_id: '6870bf0b8fbbface6f30bd9b',
+		},
+	],
 };
 
 export const axiosGoogle = axios.create({
@@ -233,6 +249,26 @@ export const reviewAndPoint = createAsyncThunk(
 		}
 	},
 );
+
+//여권 업데이트
+export const udpatePassport = createAsyncThunk('/user/passportList', async (data: passportType, {rejectWithValue}) => {
+	try {
+		console.log({passportList: [data]});
+		const response = await axiosAuth.patch(`/user/passportList`, {passportList: [{data}]});
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+//여권 가져오기
+export const getPassport = createAsyncThunk('/user/passportList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/user/passportList`);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
@@ -517,6 +553,20 @@ export const recommendPlace = createAsyncThunk(
 		}
 	},
 );
+
+//추천 여행 상품 목록 가져오기
+export const recommendProduct = createAsyncThunk(
+	'/sellingProduct/recommend',
+	async (data: recommnedProductType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`sellingProduct/recommend`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -767,6 +817,10 @@ export const travelSlice = createSlice({
 				list.push(state.transit == 0 ? payload.duration : payload.duration * 1.5);
 			}
 			state.moveTimeList.push(list);
+		});
+
+		builder.addCase(getPassport.fulfilled, (state, {payload}) => {
+			state.passport = payload?.passportList[0];
 		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
@@ -1037,6 +1091,28 @@ interface LiteState {
 	recommendProducts: any;
 	hotProducts: any;
 	transitInfo: transitInfoType;
+	passport: passportType[];
+}
+interface passportType {
+	korName: string;
+	engFirstName: string; // 영문 이름
+	engLastName: string; // 영문 성
+	country: string;
+	passportNum: string;
+	gender: string;
+	birthday: string;
+	passportIssueDate: string;
+	passportExpirationDate: string;
+	passportCountry: string;
+	passportImage: string;
+	_id?: string;
+}
+interface recommnedProductType {
+	pathList: [[any]];
+	country: 'strng';
+	cityList: ['strng'];
+	selectList: [[number]];
+	topK: number;
 }
 interface transitInfoType {
 	outbound: {
