@@ -13,12 +13,15 @@ import {ButtonContainer} from '../enroll-info/select-multi';
 import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {deleteAI, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {deleteAI, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {SVGRightAdd} from '../../utill/svg/svg';
 import {Image} from 'react-native';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 
 export default function PresetDetail({navigation, route}: any) {
-	const {presetTendencyList, presetDatas, day, nDay, aiID, region} = useAppSelector(state => state.travelSlice);
+	const {presetTendencyList, presetDatas, day, nDay, aiID, region, tendency, season, country} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const [select, setSelect] = useState(0);
 	const dispatch = useAppDispatch();
 	const checkNext = () => {
@@ -58,20 +61,56 @@ export default function PresetDetail({navigation, route}: any) {
 			'aiId',
 		]);
 	};
+	const countryList = [
+		{ko: '한국'},
+		{ko: '일본'},
+		{ko: '중국'},
+		{ko: '베트남'},
+		{ko: '태국'},
+		{ko: '필리핀'},
+		{ko: '싱가포르'},
+	];
+	const handleProduct = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				pathList: [
+					presetDatas[route.params.index].map(item => {
+						return item
+							.filter(filterItem => !filterItem.name?.includes('추천'))
+							.map(value => {
+								return {name: value?.name};
+							});
+					}),
+				],
+				selectList: [...tendency, season],
+				country: countryList[country].ko, //TODO 홍콩 마카오 처리
+			};
+
+			const a = await dispatch(recommendProduct(data)).unwrap();
+			navigation.navigate('PresetProduct');
+			// console.log(a[0]);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	const goNext = (e: boolean) => {
 		try {
-			removeCache();
-			dispatch(deleteAI({aiId: aiID}));
-			let copy = [...presetDatas[route.params.index]];
-			if (presetDatas[route.params.index].length != nDay + 1) {
-				const check = nDay + 1 - presetDatas[route.params.index].length;
-				for (let i = 0; i < check; i++) {
-					copy.push([]);
-				}
-			}
-			dispatch(travelSliceActions.setAutoRecommendFlag(e));
-			dispatch(travelSliceActions.enrollTimetable(copy));
-			navigation.navigate('Timetable');
+			handleProduct();
+			// removeCache();
+			// dispatch(deleteAI({aiId: aiID}));
+			// let copy = [...presetDatas[route.params.index]];
+			// if (presetDatas[route.params.index].length != nDay + 1) {
+			// 	const check = nDay + 1 - presetDatas[route.params.index].length;
+			// 	for (let i = 0; i < check; i++) {
+			// 		copy.push([]);
+			// 	}
+			// }
+			// dispatch(travelSliceActions.setAutoRecommendFlag(e));
+			// dispatch(travelSliceActions.enrollTimetable(copy));
+			// navigation.navigate('Timetable');
 		} catch (err) {
 			console.log(err, '에러');
 		}

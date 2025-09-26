@@ -21,7 +21,6 @@ export default function Passport({navigation}: any) {
 	const handleSave = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log(form);
 			await dispatch(udpatePassport(form));
 			dispatch(
 				travelSliceActions.updateFiled({

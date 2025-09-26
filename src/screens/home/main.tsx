@@ -190,7 +190,7 @@ export default function Main({navigation}: any) {
 		getFirstRegion();
 		handleProduct();
 		handleHotProduct();
-		// handleGetPassport();
+		handleGetPassport();
 	}, []);
 	useEffect(() => {
 		shareLoginFlag && navigation.navigate('Timetable');

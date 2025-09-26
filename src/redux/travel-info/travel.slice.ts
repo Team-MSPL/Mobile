@@ -136,6 +136,7 @@ const initialState: LiteState = {
 			_id: '6870bf0b8fbbface6f30bd9b',
 		},
 	],
+	presetProducts: [],
 };
 
 export const axiosGoogle = axios.create({
@@ -251,15 +252,17 @@ export const reviewAndPoint = createAsyncThunk(
 );
 
 //여권 업데이트
-export const udpatePassport = createAsyncThunk('/user/passportList', async (data: passportType, {rejectWithValue}) => {
-	try {
-		console.log({passportList: [data]});
-		const response = await axiosAuth.patch(`/user/passportList`, {passportList: [{data}]});
-		return response.data;
-	} catch (error: any) {
-		throw rejectWithValue(error.code);
-	}
-});
+export const udpatePassport = createAsyncThunk(
+	'/user/passportList/update',
+	async (data: passportType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch(`/user/passportList`, {passportList: [data]});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
 //여권 가져오기
 export const getPassport = createAsyncThunk('/user/passportList', async (_, {rejectWithValue}) => {
 	try {
@@ -1016,6 +1019,11 @@ export const travelSlice = createSlice({
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
 			state.aiList = payload.data;
 		});
+
+		builder.addCase(recommendProduct.fulfilled, (state, {payload}) => {
+			console.log(payload);
+			state.presetProducts = payload;
+		});
 	},
 });
 
@@ -1092,6 +1100,7 @@ interface LiteState {
 	hotProducts: any;
 	transitInfo: transitInfoType;
 	passport: passportType[];
+	presetProducts: [Product[]];
 }
 interface passportType {
 	korName: string;
@@ -1149,6 +1158,55 @@ interface transitInfoType {
 		type: string;
 	};
 }
+
+interface Product {
+	_id: string;
+	prod_no: number;
+	avg_rating_star: number;
+	b2b_price: number;
+	b2c_price: number;
+	cities: string[];
+	countries: string[];
+	earliest_sale_date: string;
+	introduction: string;
+	isNationwide: boolean;
+	koreanGuide: string;
+	menuCode: string;
+	needLLM: boolean;
+	normalizedPlaces: string[];
+	order_count: number;
+	prod_currency: string;
+	prod_img_url: string;
+	prod_name: string;
+	prod_type: string;
+	productPlaces: string[];
+	rating_count: number;
+	recommend: string;
+	sellingProductCompany: string;
+	sellingProductContent: string;
+	sellingProductContentDetail: string;
+	sellingProductContentDetailHTML: string;
+	sellingProductCountry: string;
+	sellingProductCountryList: string[];
+	sellingProductHour: number;
+	sellingProductImage: string[];
+	sellingProductLink: string;
+	sellingProductLinkClickLog: any[];
+	sellingProductLinkList: string[];
+	sellingProductPeriod: number;
+	sellingProductPlaceList: string[];
+	sellingProductPrice: number;
+	sellingProductPriceDetail: Record<string, any>;
+	sellingProductRating: number;
+	sellingProductRegion: string[];
+	sellingProductReviewCount: number;
+	tendencyScores: Record<string, number>;
+	tourCode: string;
+	vectorScoreCourse: number;
+	avgPrefScore: number;
+	finalScore: number;
+}
+
 interface aiListType {
 	_id: string;
 	bestPointList: [[Object], [Object], [Object], [Object], [Object], [Object], [Object]];

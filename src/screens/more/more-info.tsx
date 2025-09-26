@@ -72,12 +72,12 @@ export default function MoreInfo({navigation}: any) {
 				goNavigation('Inquire');
 			},
 		},
-		// {
-		// 	title: '여권 등록/확인',
-		// 	function: () => {
-		// 		goNavigation('Passport');
-		// 	},
-		// },
+		{
+			title: '여권 등록/확인',
+			function: () => {
+				goNavigation('Passport');
+			},
+		},
 		{
 			title: '공지사항',
 			function: () => {
