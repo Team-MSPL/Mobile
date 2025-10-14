@@ -85,6 +85,12 @@ import NoteListIcon from '../../../public/noteList.svg';
 
 import TrainCardIcon from '../../../public/trainCardIcon.svg';
 import Global from '../../../public/global.svg';
+
+import StarSmile from '../../../public/starSmile.svg';
+
+import Filter from '../../../public/filter.svg';
+
+import Money from '../../../public/money.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -208,7 +214,7 @@ export const SVGDanimLogo = styled(DanimLogo)<{color?: string}>`
 	color: color;
 `;
 export const SVGHeart = styled(Heart)<{color?: string}>`
-	color: color;
+	color: ${props => props.color};
 `;
 export const SVGMessageSquare = styled(MessageSquare)<{color?: string}>`
 	color: color;
@@ -226,7 +232,7 @@ export const SVGTravlePencil = styled(TravlePencil)<{color?: string}>`
 	color: color;
 `;
 export const SVGEmptyHeart = styled(EmptyHeart)<{color?: string}>`
-	color: color;
+	color: ${props => props.color || '#70768E'};
 `;
 export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
 	color: color;
@@ -330,5 +336,16 @@ export const SVGTrainCardIcon = styled(TrainCardIcon)<{color?: string}>`
 `;
 
 export const SVGGlobal = styled(Global)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGStarSmile = styled(StarSmile)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGFilter = styled(Filter)<{color?: string}>`
+	color: color;
+`;
+export const SVGMoney = styled(Money)<{color?: string}>`
 	color: color;
 `;

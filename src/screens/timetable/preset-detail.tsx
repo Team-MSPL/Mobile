@@ -84,9 +84,12 @@ export default function PresetDetail({navigation, route}: any) {
 					}),
 				],
 				selectList: [...tendency, season],
-				country: countryList[country].ko, //TODO 홍콩 마카오 처리
+				country:
+					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
+						? '홍콩과 마카오'
+						: countryList[country].ko, //TODO 홍콩 마카오 처리
+				cityList: region,
 			};
-
 			const a = await dispatch(recommendProduct(data)).unwrap();
 			navigation.navigate('PresetProduct');
 			// console.log(a[0]);

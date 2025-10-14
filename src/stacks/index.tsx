@@ -57,7 +57,7 @@ export default function StackNavigator() {
 				name='RecommendPlaces'
 				component={RecommendPlaces}
 				options={{
-					title: '',
+					title: '다님의 추천 여행지',
 				}}
 			/>
 

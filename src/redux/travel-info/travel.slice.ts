@@ -272,6 +272,16 @@ export const getPassport = createAsyncThunk('/user/passportList', async (_, {rej
 		throw rejectWithValue(error.code);
 	}
 });
+
+//예약 목록 가져오기
+export const getBookingProduct = createAsyncThunk('/bookingProduct/list', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/bookingProduct/list`);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
@@ -569,6 +579,42 @@ export const recommendProduct = createAsyncThunk(
 		}
 	},
 );
+
+//프로덕트 가져오기
+export const getQueryProduct = createAsyncThunk(
+	'/kkday/Product/QueryProduct',
+	async (prod_no: number, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryProduct`, {prod_no: prod_no}, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//패키지 가져오기
+export const getQueryPackage = createAsyncThunk(
+	'/kkday/Product/QueryPackage',
+	async (data: {pkg_no: number; prod_no: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryPackage`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//부킹
+export const handleBooking = createAsyncThunk('/kkday/Booking', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/kkday/Booking`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 
 export const travelSlice = createSlice({
 	name: 'travel',
