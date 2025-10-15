@@ -62,13 +62,13 @@ export default function PresetDetail({navigation, route}: any) {
 		]);
 	};
 	const countryList = [
-		{ko: '한국'},
-		{ko: '일본'},
-		{ko: '중국'},
-		{ko: '베트남'},
-		{ko: '태국'},
-		{ko: '필리핀'},
-		{ko: '싱가포르'},
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
 	];
 	const handleProduct = async () => {
 		try {
@@ -87,6 +87,8 @@ export default function PresetDetail({navigation, route}: any) {
 				country:
 					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
 						? '홍콩과 마카오'
+						: region[0].includes('해외')
+						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
 						: countryList[country].ko, //TODO 홍콩 마카오 처리
 				cityList: region,
 			};

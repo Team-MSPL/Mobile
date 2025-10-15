@@ -86,6 +86,7 @@ const initialState: LiteState = {
 	departureSelected: '',
 	recommendProducts: [],
 	hotProducts: [],
+	tendencyUse: false,
 	transitInfo: {
 		outbound: {
 			departureAirport: '', //출밢녀
@@ -616,6 +617,29 @@ export const handleBooking = createAsyncThunk('/kkday/Booking', async (data: any
 	}
 });
 
+//여행 성향 수정
+export const handleTendency = createAsyncThunk(
+	'/user/recentSelectList',
+	async (recentSelectList: number[][], {rejectWithValue}) => {
+		try {
+			console.log('성향', recentSelectList);
+			const response = await axiosAuth.patch(`/user/recentSelectList`, {recentSelectList});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+//여행 성향 가져오기
+export const getTendency = createAsyncThunk('/user/recentSelectList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/user/recentSelectList`);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -684,6 +708,7 @@ export const travelSlice = createSlice({
 			state.freeTicket = false;
 			state.shareViewWithStartFlag = true;
 			state.globalFlag = payload.globalFlag;
+			state.tendencyUse = false;
 		},
 		setAutoRecommendFlag: (state, {payload}) => {
 			state.autoRecommendFlag = payload;
@@ -696,6 +721,7 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.freeTicket = false;
 			state.cityDistance = payload.cityDistance;
+			state.tendencyUse = false;
 		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
@@ -785,6 +811,7 @@ export const travelSlice = createSlice({
 			state.freeTicket = true;
 			state.cityDistance = payload.cityDistance;
 			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
+			state.tendencyUse = false;
 		},
 		setCountry: (state, {payload}) => {
 			state.country = payload;
@@ -816,6 +843,7 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 			state.regionRecommendFlag = true;
 			state.country = payload.country;
+			state.tendencyUse = false;
 		},
 		setShareLoginFlag: (state, {payload}) => {
 			state.shareLoginFlag = payload;
@@ -1147,6 +1175,7 @@ interface LiteState {
 	transitInfo: transitInfoType;
 	passport: passportType[];
 	presetProducts: [Product[]];
+	tendencyUse: boolean;
 }
 interface passportType {
 	korName: string;

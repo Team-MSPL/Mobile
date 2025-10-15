@@ -4,6 +4,8 @@ import PackageSelect from '../screens/product/packge-selete';
 import ProductDetail from '../screens/product/product-detail';
 import ProductSelectDay from '../screens/product/product-select-day';
 import Products from '../screens/product/products';
+import Reserve from '../screens/product/reserve';
+import ReserveList from '../screens/product/reserve-list';
 import PresetProduct from '../screens/timetable/preset-product';
 import Join1 from '../screens/user/join1';
 const Stack = createNativeStackNavigator();
@@ -43,6 +45,22 @@ export default function ProductsStack() {
 			<Stack.Screen
 				name='ProductSelectDay'
 				component={ProductSelectDay}
+				options={{
+					title: '',
+				}}
+			/>
+
+			<Stack.Screen
+				name='Reserve'
+				component={Reserve}
+				options={{
+					title: '',
+				}}
+			/>
+
+			<Stack.Screen
+				name='ReserveList'
+				component={ReserveList}
 				options={{
 					title: '',
 				}}

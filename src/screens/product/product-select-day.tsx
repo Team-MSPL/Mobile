@@ -28,7 +28,8 @@ import RouteButton from '../../utill/component/route-button';
 
 export default function ProductSelectDay({navigation}: any) {
 	const route = useRoute();
-	const {prod_no, pkg_no, go_date_setting}: {prod_no: number; pkg_no: number; go_date_setting: any} = route.params;
+	const {prod_no, pkg_no, go_date_setting, image, name}: {prod_no: number; pkg_no: number; go_date_setting: any} =
+		route.params;
 	const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 	const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 	const [selectDateFlag, setSelectDateFlag] = useState(false);
@@ -135,15 +136,15 @@ export default function ProductSelectDay({navigation}: any) {
 	};
 	const [daySetting, setDaySetting] = useState({});
 	const handleDaySetting = () => {
-		let data = {single: false, start: null, end: null};
+		let datas = {single: false, start: null, end: null};
 		if (go_date_setting?.type == '01') {
-			data['single'] = true;
+			datas['single'] = true;
 		} else if (!!go_date_setting?.days) {
-			data.start = go_date_setting?.days?.min;
-			data.end = go_date_setting?.days?.max;
+			datas.start = go_date_setting?.days?.min;
+			datas.end = go_date_setting?.days?.max;
 		}
 		console.log(data);
-		setDaySetting(data);
+		setDaySetting(datas);
 	};
 	useLayoutEffect(() => {
 		handlePkg();
@@ -164,11 +165,23 @@ export default function ProductSelectDay({navigation}: any) {
 		if (checkList.length == 1) {
 			status.product = true;
 		}
+		status.day =
+			!!checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]?.b2b_price
+				?.fullday;
+
 		setCanNext(status.day && status.product);
 	}, [dateInfo, daySetting, checkList]);
 	return (
 		<>
 			<BackgroundGrayScrollView>
+				<PretendardSemiBoldText
+					size={22}
+					lineHeight={26}
+					numberOfLines={2}
+					color={colors.Black}
+					deco={'margin-bottom:20px;'}>
+					{name}
+				</PretendardSemiBoldText>
 				<CalendarPicker
 					width={widthPercentage(Platform.isPad ? 300 : 327)}
 					weekdays={weekdays}
@@ -260,21 +273,8 @@ export default function ProductSelectDay({navigation}: any) {
 						</VStack>
 					))}
 				</FlexWrap>
-				{renderRefundPolicy(data.refund_policy_v2)}
 
-				{data?.item?.[0]?.specs?.length == Object.entries(selectedSpecs)?.length && (
-					<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
-						{(
-							Number(
-								checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]
-									?.b2b_price?.fullday,
-							) * count
-						).toLocaleString('ko-KR')}
-						원{/* {moment(dateInfo.selectStartDate).format('YYYY-MM-DD')} */}
-					</PretendardSemiBoldText>
-				)}
-
-				<HStack justifyContent='space-around' width={widthPercentage(182)}>
+				<HStack justifyContent='space-around' width={widthPercentage(182)} deco={'margin-bottom:10px;'}>
 					<SVGContainer
 						disabled={data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity >= count}
 						onPress={() => {
@@ -307,15 +307,124 @@ export default function ProductSelectDay({navigation}: any) {
 						<SVGPlus width={widthPercentage(25)} height={widthPercentage(25)} color={colors.Gray2} />
 					</SVGContainer>
 				</HStack>
+
+				{renderRefundPolicy(data.refund_policy_v2)}
+				{data?.item?.[0]?.specs?.length == Object.entries(selectedSpecs)?.length && (
+					<HStack deco='margin-top:15px;' justifyContent='space-between'>
+						<PretendardSemiBoldText size={24} lineHeight={28} numberOfLines={2} color={colors.Gray3}>
+							총 금액
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
+							{(
+								Number(
+									checkList[0]?.calendar_detail?.[
+										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+								) * count
+							).toLocaleString('ko-KR')}
+							원{/* {moment(dateInfo.selectStartDate).format('YYYY-MM-DD')} */}
+						</PretendardSemiBoldText>
+					</HStack>
+				)}
 				<MarginContainder />
 			</BackgroundGrayScrollView>
 			<RouteButton
 				navigation={navigation}
 				isDisabled={!canNext}
 				type={'planner'}
-				nextText={'예약하기'}
+				nextText={'다음으로'}
 				goNext={() => {
-					navigation.navigate('PackageSelect');
+					console.log({
+						guid: data?.guid,
+						partner_order_no: '1',
+						prod_no: prod_no,
+						pkg_no: pkg_no,
+						locale: 'ko',
+
+						state: 'KR',
+						buyer_first_name: 'Lee',
+						buyer_last_name: 'Yunju',
+						buyer_Email: 'wayfarers0814@gmail.com',
+						buyer_tel_country_code: 82,
+						buyer_tel_number: 1032223474,
+						buyer_country: 'KR',
+
+						s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
+						e_data: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
+						event_time: null,
+						guide_lang: null,
+						skus: [
+							{
+								sku_id: checkList[0]?.sku_id,
+								qty: count,
+								price: Number(
+									checkList[0]?.calendar_detail?.[
+										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+								),
+							},
+						],
+						mobile_device: {
+							mobile_model_no: null,
+							IMEI: null,
+							active_date: '2025-08-21',
+						},
+						order_note: '오더노트',
+						total_price:
+							Number(
+								checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]
+									?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+							) * count,
+						pay_type: '01',
+					});
+					navigation.navigate('Reserve', {
+						data: {
+							guid: data?.guid,
+							partner_order_no: '1',
+							prod_no: prod_no,
+							pkg_no: pkg_no,
+							locale: 'ko',
+
+							state: 'KR',
+							buyer_first_name: 'Lee',
+							buyer_last_name: 'Yunju',
+							buyer_Email: 'wayfarers0814@gmail.com',
+							buyer_tel_country_code: 82,
+							buyer_tel_number: 1032223474,
+							buyer_country: 'KR',
+
+							s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
+							e_data: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
+							event_time: null,
+							guide_lang: null,
+							skus: [
+								{
+									sku_id: checkList[0]?.sku_id,
+									qty: count,
+									price: Number(
+										checkList[0]?.calendar_detail?.[
+											moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+										]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+									),
+								},
+							],
+							mobile_device: {
+								mobile_model_no: null,
+								IMEI: null,
+								active_date: '2025-08-21',
+							},
+							order_note: '오더노트',
+							total_price:
+								Number(
+									checkList[0]?.calendar_detail?.[
+										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+								) * count,
+							pay_type: '01',
+							image: image,
+							name: name,
+						},
+					});
 				}}
 				nextTitle='RecommendSelectTour'></RouteButton>
 		</>

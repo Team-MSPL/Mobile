@@ -89,7 +89,6 @@ export default function ProductDetail({navigation}: any) {
 				</HStack> */}
 					<PretendardSemiBoldText size={24} lineHeight={29} numberOfLines={2} color={colors.Black}>
 						{productInfo?.prod?.prod_name}
-						{visible.status ? 'qwe' : 'asd'}
 					</PretendardSemiBoldText>
 					{productInfo?.prod?.b2c_min_price - productInfo?.prod?.b2b_min_price > 0 && (
 						<>
@@ -270,6 +269,7 @@ export default function ProductDetail({navigation}: any) {
 			/>
 			<RouteButton
 				navigation={navigation}
+				isDisabled={!(productInfo?.pkg?.length > 0)}
 				type={'planner'}
 				nextText={'예약하기'}
 				goNext={() => {

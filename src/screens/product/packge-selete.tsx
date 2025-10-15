@@ -19,10 +19,12 @@ export default function PackageSelect({navigation}: any) {
 	//         dispa
 	//     }
 	// }
-	const handleNext = (e: number) => {
+	const handleNext = (e: any) => {
 		navigation.navigate('ProductSelectDay', {
+			image: data?.prod?.img_list[0],
+			name: e?.pkg_name,
 			prod_no: data?.prod?.prod_no,
-			pkg_no: e,
+			pkg_no: e?.pkg_no,
 			go_date_setting: data?.prod?.go_date_setting,
 		});
 	};
@@ -39,7 +41,7 @@ export default function PackageSelect({navigation}: any) {
 			{data?.pkg?.map((item, idx) => (
 				<PackageBox
 					onPress={() => {
-						handleNext(item?.pkg_no);
+						handleNext(item);
 					}}>
 					<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
 						{item?.pkg_name}

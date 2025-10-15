@@ -91,6 +91,8 @@ import StarSmile from '../../../public/starSmile.svg';
 import Filter from '../../../public/filter.svg';
 
 import Money from '../../../public/money.svg';
+
+import People from '../../../public/people.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -347,5 +349,9 @@ export const SVGFilter = styled(Filter)<{color?: string}>`
 	color: color;
 `;
 export const SVGMoney = styled(Money)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGPeople = styled(People)<{color?: string}>`
 	color: color;
 `;

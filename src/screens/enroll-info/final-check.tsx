@@ -1,6 +1,11 @@
 import {BackHandler, Modal, TouchableOpacity} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux';
-import {EssentialPlaceType, getTravelAi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {
+	EssentialPlaceType,
+	getTravelAi,
+	handleTendency,
+	travelSliceActions,
+} from '../../redux/travel-info/travel.slice';
 import CustomButton from '../../utill/component/custom-button';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -234,6 +239,7 @@ export default function FinalCheck({navigation}: any) {
 							.trim()}`;
 					});
 				}
+				dispatch(handleTendency(tendency));
 				console.log(a);
 				const result = await dispatch(
 					getTravelAi({
