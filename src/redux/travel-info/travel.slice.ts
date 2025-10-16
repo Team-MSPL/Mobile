@@ -581,6 +581,19 @@ export const recommendProduct = createAsyncThunk(
 	},
 );
 
+//kkday search
+export const getKkdaySearch = createAsyncThunk(
+	'/kkday/Search',
+	async (data: {keywords: string; country_keys: string; city_keys: string[]}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Search`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
 //프로덕트 가져오기
 export const getQueryProduct = createAsyncThunk(
 	'/kkday/Product/QueryProduct',
@@ -634,6 +647,16 @@ export const handleTendency = createAsyncThunk(
 export const getTendency = createAsyncThunk('/user/recentSelectList', async (_, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(`/user/recentSelectList`);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//여행 성향 가져오기
+export const getReserveList = createAsyncThunk('/bookingProduct/list', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/bookingProduct/list`);
 		return response;
 	} catch (error: any) {
 		throw rejectWithValue(error.code);

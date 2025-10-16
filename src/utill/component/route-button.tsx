@@ -47,6 +47,7 @@ export default function RouteButton({
 			</ButtonContainer>
 			<ButtonContainer
 				disabled={isDisabled}
+				isActive={isDisabled}
 				marginTop={marginTop ?? 0}
 				marginBottom={marginBottom ?? 0}
 				onPress={handleNext}
@@ -86,6 +87,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	type: string;
 	before: boolean;
 	resize?: boolean;
+	isActive?: boolean;
 }>`
 	width: ${props => widthPercentage(props.resize ? (props.before ? 188 : 132) : 160)}px;
 	align-self: center;
@@ -94,7 +96,13 @@ const ButtonContainer = styled.TouchableOpacity<{
 	padding: 0px ${widthPercentage(0)}px;
 	border-radius: 8px;
 	background-color: ${props =>
-		props.type == 'planner' ? (props.before ? colors.Gray200 : colors.Gray5) : colors.Primary};
+		props.type == 'planner'
+			? props?.isActive
+				? 'rgba(0,0,0,0.2)'
+				: props.before
+				? colors.Gray200
+				: colors.Gray5
+			: colors.Primary};
 	margin-top: ${props => heightPercentage(props.marginTop)}px;
 	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
 	flex-direction: row;

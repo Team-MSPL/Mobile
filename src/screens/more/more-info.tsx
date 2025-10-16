@@ -73,6 +73,12 @@ export default function MoreInfo({navigation}: any) {
 			},
 		},
 		{
+			title: '예약 목록',
+			function: () => {
+				goNavigation('ReserveList');
+			},
+		},
+		{
 			title: '여권 등록/확인',
 			function: () => {
 				goNavigation('Passport');

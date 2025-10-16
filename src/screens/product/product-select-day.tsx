@@ -45,6 +45,7 @@ export default function ProductSelectDay({navigation}: any) {
 
 			setDateInfo({...dateInfo, selectStartDate: date});
 			setSelectDateFlag(true);
+			setEventTime(null);
 		}
 	};
 	const dispatch = useAppDispatch();
@@ -54,6 +55,7 @@ export default function ProductSelectDay({navigation}: any) {
 	};
 	const [selectedSpecs, setSelectedSpecs] = useState<SelectedSpecsState>({});
 	const handleSpecSelect = (specTitle: string, selectedName: string) => {
+		setEventTime(null);
 		setSelectedSpecs(prev => {
 			// 이미 선택된 값과 같으면 → 선택 해제
 			if (prev[specTitle] === selectedName) {
@@ -152,6 +154,7 @@ export default function ProductSelectDay({navigation}: any) {
 	}, []);
 	const [count, setCount] = useState(data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity ?? 1);
 	const [canNext, setCanNext] = useState(false);
+	const [eventTime, setEventTime] = useState(null);
 	useEffect(() => {
 		let status = {
 			day: false,
@@ -165,12 +168,16 @@ export default function ProductSelectDay({navigation}: any) {
 		if (checkList.length == 1) {
 			status.product = true;
 		}
-		status.day =
-			!!checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]?.b2b_price
-				?.fullday;
 
+		if (data?.item?.[0]?.sale_s_date_event != null && status.day) {
+			status.day = !!eventTime;
+		} else {
+			status.day =
+				!!checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]?.b2b_price
+					?.fullday;
+		}
 		setCanNext(status.day && status.product);
-	}, [dateInfo, daySetting, checkList]);
+	}, [dateInfo, daySetting, checkList, eventTime]);
 	return (
 		<>
 			<BackgroundGrayScrollView>
@@ -226,7 +233,6 @@ export default function ProductSelectDay({navigation}: any) {
 						</SpecBox>
 					));
 				})} */}
-
 					{data?.item?.[0]?.specs?.map(spec => (
 						<VStack>
 							<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
@@ -266,12 +272,65 @@ export default function ProductSelectDay({navigation}: any) {
 											}
 											deco={'text-align:center;'}>
 											{element?.name}
+											{!!element?.rule?.age_rule && (
+												<PretendardVariableText
+													size={16}
+													lineHeight={21}
+													numberOfLines={2}
+													color={colors.Gray3}>
+													{' '}
+													(
+													{'만 ' +
+														element?.rule?.age_rule?.min +
+														' ~ ' +
+														(!!element?.rule?.age_rule?.max
+															? '만 ' + element?.rule?.age_rule?.max + '세'
+															: '')}
+													)
+												</PretendardVariableText>
+											)}
 										</PretendardVariableText>
 									</SpecBox>
 								))}
 							</FlexWrap>
 						</VStack>
 					))}
+
+					{data?.item?.[0]?.sale_s_date_event != null &&
+						checkList?.length == 1 &&
+						!!dateInfo.selectStartDate && (
+							<VStack>
+								<PretendardSemiBoldText
+									size={22}
+									lineHeight={26}
+									numberOfLines={2}
+									color={colors.Black}>
+									시간
+								</PretendardSemiBoldText>
+								<FlexWrap gap={10}>
+									{!!checkList?.[0]?.calendar_detail?.[
+										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+									]?.b2b_price &&
+										Object?.entries(
+											checkList?.[0]?.calendar_detail?.[
+												moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+											]?.b2b_price,
+										).map(([key, value]) => (
+											<SpecBox
+												isActive={eventTime == key}
+												onPress={() => setEventTime(prev => (prev == key ? null : key))}>
+												<PretendardSemiBoldText
+													size={22}
+													lineHeight={26}
+													numberOfLines={2}
+													color={colors.Black}>
+													{key}
+												</PretendardSemiBoldText>
+											</SpecBox>
+										))}
+								</FlexWrap>
+							</VStack>
+						)}
 				</FlexWrap>
 
 				<HStack justifyContent='space-around' width={widthPercentage(182)} deco={'margin-bottom:10px;'}>
@@ -351,7 +410,7 @@ export default function ProductSelectDay({navigation}: any) {
 
 						s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
 						e_data: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
-						event_time: null,
+						event_time: eventTime,
 						guide_lang: null,
 						skus: [
 							{
@@ -430,7 +489,7 @@ export default function ProductSelectDay({navigation}: any) {
 		</>
 	);
 }
-const SpecBox = styled.TouchableOpacity<{isActive: boolean; disable: boolean}>`
+const SpecBox = styled.TouchableOpacity<{isActive: boolean; disable?: boolean}>`
 	min-width: ${widthPercentage(70)}px;
 	height: ${heightPercentage(52)}px;
 	border-radius: 12px;

@@ -242,6 +242,51 @@ export default function ProductDetail({navigation}: any) {
 							),
 						)}
 					</Section>
+					<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
+						{productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.module_title}
+					</PretendardSemiBoldText>
+
+					{/* 수수료 설명 */}
+					{productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties?.policy_type && (
+						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} style={{marginTop: 16}}>
+							{
+								productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties
+									?.policy_type?.title
+							}
+						</PretendardSemiBoldText>
+					)}
+					{productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties?.policy_type
+						?.desc && (
+						<PretendardSemiBoldText size={14} lineHeight={20} color={colors.Gray400} style={{marginTop: 4}}>
+							{
+								productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties
+									?.policy_type?.desc
+							}
+						</PretendardSemiBoldText>
+					)}
+
+					{/* 정책 내용 */}
+					{productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties?.policy_type
+						?.title && (
+						<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Black} style={{marginTop: 16}}>
+							{
+								productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties
+									?.partial_refund?.title
+							}
+						</PretendardSemiBoldText>
+					)}
+					{productInfo?.prod?.description_module?.PMDL_REFUND_POLICY?.content?.properties?.partial_refund?.list?.map(
+						(item, index) => (
+							<PretendardSemiBoldText
+								key={index}
+								size={14}
+								lineHeight={20}
+								color={colors.Gray400}
+								style={{marginTop: index === 0 ? 8 : 4}}>
+								• {item.desc}
+							</PretendardSemiBoldText>
+						),
+					)}
 					<MarginContainer />
 				</PaddingContainer>
 			</Container>

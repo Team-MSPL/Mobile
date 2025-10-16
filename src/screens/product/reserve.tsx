@@ -56,7 +56,7 @@ export default function Reserve({navigation}: any) {
 		// {key: 'country', label: '국가', placeholder: '대한민국'},
 
 		{key: 'email', label: '이메일', placeholder: 'asdasd@asd.com'},
-		{key: 'tel', label: '전화번호', placeholder: '010-1234-5678'},
+		{key: 'tel', label: '전화번호', placeholder: '01012345678', keyboardType: 'number-pad', max: 11},
 	];
 
 	return (
@@ -123,6 +123,7 @@ export default function Reserve({navigation}: any) {
 							placeholder={item?.placeholder}
 							keyboardType={item?.keyboardType || 'default'}
 							value={form[item.key]}
+							maxLength={item?.max || undefined}
 							onChangeText={text => handleChange(item.key, text)}></InputBox>
 					</VStack>
 				))}
