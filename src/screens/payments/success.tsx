@@ -6,6 +6,10 @@ import {widthPercentage} from '../../utill/layout/responsive-size';
 import {SvgCheck} from '../../utill/svg/svg';
 
 export default function Success({navigation}: any) {
+	const handleList = () => {
+		navigation.popToTop();
+		navigation.navigate('ReserveList');
+	};
 	return (
 		<BackgroundGray>
 			<Center>
@@ -51,7 +55,10 @@ export default function Success({navigation}: any) {
 				nextTitle={'SelectDay'}
 				nextText={'예약 확인하기'}
 				leftText={'홈으로 돌아가기'}
-				btnFunction={() => {}}
+				btnFunction={() => {
+					handleList();
+				}}
+				goNext={() => {}}
 				LeftBtnFunction={() => {
 					navigation.popToTop();
 				}}

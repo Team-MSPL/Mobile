@@ -502,7 +502,6 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		// console.log(regionName.split(''), regionName.length);
 		// console.log('해외/Japan/간토 (Kanto) !도쿄'.split(''), '해외/Japan/간토 (Kanto) !도쿄'.length);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
-		console.log(response.data, 'qwe');
 		return response.data;
 	} catch (error: any) {
 		console.log(error, 'cc');
@@ -626,9 +625,92 @@ export const handleBooking = createAsyncThunk('/kkday/Booking', async (data: any
 		const response = await axiosAuth.post(`/kkday/Booking`, data, {timeout: 60000});
 		return response.data;
 	} catch (error: any) {
+		console.log('aaa', error);
 		throw rejectWithValue(error.code);
 	}
 });
+//부킹 필요한거
+export const handleBookingField = createAsyncThunk(
+	'/kkday/Product/QueryBookingField',
+	async (data: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryBookingField`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			console.log('aaa', error);
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//예약 저장
+export const handleBookingSave = createAsyncThunk('/bookingProduct/save', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/bookingProduct/save`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		console.log('aaa', error);
+		throw rejectWithValue(error.code);
+	}
+});
+
+//부킹 취소
+export const bookingCancel = createAsyncThunk('/kkday/Order/Cancel', async (order_no: string, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/kkday/Order/Cancel`, {order_no: order_no}, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+//토스 환불
+export const tossCancel = createAsyncThunk(
+	'/toss/payments/cancel',
+	async (data: {paymentKey: string; cancelAmount?: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(
+				`/toss/payments/${data?.paymentKey}/cancel`,
+				{
+					cancelReason: '사용자 요청', // 필수
+					...(data?.cancelAmount !== undefined &&
+						data?.cancelAmount !== null && {
+							cancelAmount: data.cancelAmount,
+						}), // 선택, 유무에 따라 전체 / 부분 취소 결정됨
+				},
+				{timeout: 60000},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//예약 목록 디테일
+export const handleOrderDtl = createAsyncThunk(
+	'/kkday/Order/QueryOrderDtl',
+	async (order_no: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.get(`/kkday/Order/QueryOrderDtl/${order_no}`);
+			return response;
+		} catch (error: any) {
+			return rejectWithValue(error.code);
+		}
+	},
+);
+
+//예약 목록 디테일 정보
+export const handleOrderDtlInfo = createAsyncThunk(
+	'/kkday/Order/QueryOrderDtlInfo',
+	async (order_no: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.get(`/kkday/Order/QueryOrderDtlInfo/${order_no}`);
+			return response;
+		} catch (error: any) {
+			return rejectWithValue(error.code);
+		}
+	},
+);
 
 //여행 성향 수정
 export const handleTendency = createAsyncThunk(

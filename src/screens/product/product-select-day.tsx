@@ -393,51 +393,9 @@ export default function ProductSelectDay({navigation}: any) {
 				type={'planner'}
 				nextText={'다음으로'}
 				goNext={() => {
-					console.log({
-						guid: data?.guid,
-						partner_order_no: '1',
-						prod_no: prod_no,
-						pkg_no: pkg_no,
-						locale: 'ko',
-
-						state: 'KR',
-						buyer_first_name: 'Lee',
-						buyer_last_name: 'Yunju',
-						buyer_Email: 'wayfarers0814@gmail.com',
-						buyer_tel_country_code: 82,
-						buyer_tel_number: 1032223474,
-						buyer_country: 'KR',
-
-						s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
-						e_data: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
-						event_time: eventTime,
-						guide_lang: null,
-						skus: [
-							{
-								sku_id: checkList[0]?.sku_id,
-								qty: count,
-								price: Number(
-									checkList[0]?.calendar_detail?.[
-										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
-									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
-								),
-							},
-						],
-						mobile_device: {
-							mobile_model_no: null,
-							IMEI: null,
-							active_date: '2025-08-21',
-						},
-						order_note: '오더노트',
-						total_price:
-							Number(
-								checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]
-									?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
-							) * count,
-						pay_type: '01',
-					});
 					navigation.navigate('Reserve', {
 						data: {
+							item_no: data?.item?.[0]?.item_no,
 							guid: data?.guid,
 							partner_order_no: '1',
 							prod_no: prod_no,
@@ -448,13 +406,16 @@ export default function ProductSelectDay({navigation}: any) {
 							buyer_first_name: 'Lee',
 							buyer_last_name: 'Yunju',
 							buyer_Email: 'wayfarers0814@gmail.com',
-							buyer_tel_country_code: 82,
+							buyer_tel_country_code: '82',
 							buyer_tel_number: 1032223474,
 							buyer_country: 'KR',
 
 							s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
-							e_data: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
-							event_time: null,
+							e_date:
+								dateInfo.selectEndDate == null
+									? moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+									: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
+							event_time: eventTime,
 							guide_lang: null,
 							skus: [
 								{

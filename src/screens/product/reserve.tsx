@@ -4,7 +4,7 @@ import {styled} from 'styled-components/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {handleBookingField, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {colors} from '../../utill/colors';
 import {HStack, PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
@@ -15,6 +15,7 @@ import {SvgCalendar, SvgCalendarIcon, SVGCalendarRecommend, SVGClock, SVGPeople}
 export default function Reserve({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {passport} = useAppSelector(state => state.travelSlice);
+	const {userId} = useAppSelector(state => state.userSlice);
 	const [form, setForm] = useState({});
 	const route = useRoute();
 	const {data} = route.params;
@@ -50,15 +51,35 @@ export default function Reserve({navigation}: any) {
 		// }
 	};
 	const inputFields = [
-		{key: 'engLastName', label: '영문 이름', placeholder: 'gildong'},
-		{key: 'engFirstName', label: '영문 성', placeholder: 'hong'},
+		{key: 'buyer_last_name', label: '영문 이름', placeholder: 'gildong'},
+		{key: 'buyer_first_name', label: '영문 성', placeholder: 'hong'},
 
 		// {key: 'country', label: '국가', placeholder: '대한민국'},
 
-		{key: 'email', label: '이메일', placeholder: 'asdasd@asd.com'},
-		{key: 'tel', label: '전화번호', placeholder: '01012345678', keyboardType: 'number-pad', max: 11},
+		{key: 'buyer_Email', label: '이메일', placeholder: 'asdasd@asd.com'},
+		{key: 'buyer_tel_number', label: '전화번호', placeholder: '01012345678', keyboardType: 'number-pad', max: 11},
 	];
-
+	const langMap = {
+		native_first_name: '성',
+		native_last_name: '이름',
+	};
+	const [customType, setCustomType] = useState(null);
+	const handleField = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			console.log(data);
+			const a = await dispatch(handleBookingField(data)).unwrap();
+			setCustomType(a?.custom);
+			console.log('ady', a?.custom?.cus_type?.use);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		handleField();
+	}, []);
 	return (
 		<>
 			<KeyboardAwareScrollView
@@ -136,8 +157,28 @@ export default function Reserve({navigation}: any) {
 				disabled={inputFields.length != Object.entries(form).length}
 				isActive={inputFields.length != Object.entries(form).length}
 				onPress={() => {
-					navigation.navigate('PaymentStack', {info: {value: data?.total_price, name: 'asd'}});
-					console.log({...data, ...form});
+					console.log(customType?.cus_type?.use?.[0] == 'cus_01');
+					navigation.navigate('PaymentStack', {
+						info: {
+							value: data?.total_price,
+							name: data?.name,
+							productinfo: {
+								userId: userId,
+								...data,
+								...form,
+								buyer_tel_number: form?.buyer_tel_number?.substr(1),
+								...(customType?.cus_type?.use?.[0] == 'cus_01' && {
+									custom: [
+										{
+											cus_type: customType?.cus_type?.use?.[0],
+											native_first_name: form?.buyer_first_name,
+											native_last_name: form?.buyer_last_name,
+										},
+									],
+								}),
+							},
+						},
+					});
 				}}>
 				<PretendardSemiBoldText size={16} lineHeight={21} color={colors.backgroundWhite}>
 					{data?.total_price?.toLocaleString('ko')}원 결제하기

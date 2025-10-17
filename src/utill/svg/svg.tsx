@@ -301,7 +301,7 @@ export const SvgTrainIcon = styled(TrainIcon)<{color?: string}>`
 `;
 
 export const SVGClock = styled(Clock)<{color?: string}>`
-	color: color;
+	color: ${props => props?.color || '#5350FF'};
 `;
 
 export const SvgCalendarIcon = styled(CalendarIcon)<{color?: string}>`

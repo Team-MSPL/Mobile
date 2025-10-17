@@ -1,17 +1,28 @@
+import moment from 'moment';
 import {useLayoutEffect, useState} from 'react';
+import {styled} from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {getReserveList} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import {BackgroundGrayScrollView, Center, PretendardVariableText} from '../../utill/layout/layout';
+import {
+	BackgroundGrayScrollView,
+	Center,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {SvgCalendar, SVGPeople} from '../../utill/svg/svg';
 
-export default function ReserveList() {
+export default function ReserveList({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const [list, setList] = useState([]);
 	const handleList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const a = await dispatch(getReserveList()).unwrap();
+			console.log(a.data);
 			setList(a.data);
 		} catch (e) {
 			console.log(e);
@@ -38,5 +49,60 @@ export default function ReserveList() {
 				</PretendardVariableText>
 			</Center>
 		);
-	return <BackgroundGrayScrollView></BackgroundGrayScrollView>;
+	return (
+		<BackgroundGrayScrollView>
+			{list?.map((item, idx) => (
+				<ReserveBox
+					onPress={() => {
+						navigation.navigate('ReserveDetail', {order_no: item?.product?.data?.order_no});
+					}}>
+					<ImageBox resizeMode='cover' source={{uri: item?.product?.image}} />
+					<ImgPadding>
+						<PretendardSemiBoldText size={20} lineHeight={25} color={colors.Black}>
+							{item?.product?.name}
+						</PretendardSemiBoldText>
+						<HStack justifyContent='space-between'>
+							<HStack>
+								<SvgCalendar />
+								<PretendardSemiBoldText
+									size={16}
+									lineHeight={21}
+									color={colors.Black}
+									deco={'margin-top:10px;margin-bottom:10px;'}>
+									{moment(item?.s_date)?.format('YYYY-MM-DD')}
+								</PretendardSemiBoldText>
+							</HStack>
+							<HStack>
+								<SVGPeople />
+								<PretendardSemiBoldText
+									size={18}
+									lineHeight={23}
+									color={colors.Black}
+									deco={'margin-top:10px;margin-bottom:10px;'}>
+									갯수 {item?.skus[0]?.qty}
+								</PretendardSemiBoldText>
+							</HStack>
+						</HStack>
+					</ImgPadding>
+				</ReserveBox>
+			))}
+		</BackgroundGrayScrollView>
+	);
 }
+const ReserveBox = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+	min-height: ${heightPercentage(150)}px;
+	border-radius: 12px;
+	border-width: 1px;
+	border-color: ${colors.Gray1};
+`;
+const ImgPadding = styled.View`
+	width: ${widthPercentage(327)}px;
+	padding: 20px;
+`;
+const ImageBox = styled.Image`
+	width: ${widthPercentage(327)}px;
+	min-height: ${heightPercentage(125)}px;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+`;

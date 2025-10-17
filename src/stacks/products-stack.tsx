@@ -5,6 +5,7 @@ import ProductDetail from '../screens/product/product-detail';
 import ProductSelectDay from '../screens/product/product-select-day';
 import Products from '../screens/product/products';
 import Reserve from '../screens/product/reserve';
+import ReserveDetail from '../screens/product/reserve-detail';
 import ReserveList from '../screens/product/reserve-list';
 import PresetProduct from '../screens/timetable/preset-product';
 import Join1 from '../screens/user/join1';
@@ -63,6 +64,14 @@ export default function ProductsStack() {
 				component={ReserveList}
 				options={{
 					title: '내 예약',
+				}}
+			/>
+
+			<Stack.Screen
+				name='ReserveDetail'
+				component={ReserveDetail}
+				options={{
+					title: '예약 상세내역',
 				}}
 			/>
 		</Fragment>

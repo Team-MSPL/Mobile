@@ -12,6 +12,9 @@ import type {
 	AgreementStatus,
 } from '@tosspayments/widget-sdk-react-native';
 import {styled} from 'styled-components/native';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {useAppDispatch} from '../../redux';
+import {handleBooking, handleBookingSave, tossCancel} from '../../redux/travel-info/travel.slice';
 // ...
 
 export default function CheckoutPage({navigation, route}: any) {
@@ -28,6 +31,57 @@ export default function CheckoutPage({navigation, route}: any) {
 	useEffect(() => {
 		handleCheck();
 	}, []);
+	const dispatch = useAppDispatch();
+	const handleBookingFnt = async (e: any) => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let bookingData = {
+				...route?.params?.info?.productinfo,
+				booking_key: e?.paymentKey,
+			};
+			console.log({
+				...route?.params?.info?.productinfo,
+				booking_key: e?.paymentKey,
+			});
+			const q = await dispatch(
+				handleBooking({...route?.params?.info?.productinfo, booking_key: e?.paymentKey}),
+			).unwrap();
+			console.log('안녕', q);
+			if (!!q?.error) {
+				await dispatch(
+					tossCancel({
+						paymentKey: e?.paymentKey,
+						cancelAmount: route.params?.info?.value,
+					}),
+				);
+				navigation.replace('Fail');
+			} else {
+				await dispatch(
+					handleBookingSave({
+						...route?.params?.info?.productinfo,
+						booking_key: e?.paymentKey,
+						product: {
+							...route?.params?.info?.productinfo,
+							data: q?.data,
+						},
+					}),
+				);
+
+				navigation.replace('Success');
+			}
+		} catch (e) {
+			console.log('에러', e);
+			await dispatch(
+				tossCancel({
+					paymentKey: e?.paymentKey,
+					cancelAmount: route.params?.info?.value,
+				}),
+			);
+			navigation.replace('Fail');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	return (
 		<BackgroundScrollView>
 			<PaymentMethodWidget
@@ -77,11 +131,12 @@ export default function CheckoutPage({navigation, route}: any) {
 						})
 						.then(result => {
 							if (result?.success) {
-								console.log(result);
-								navigation.replace('Success');
+								handleBookingFnt(result?.success);
+
 								// 결제 성공 비즈니스 로직을 구현하세요.
 								// result.success에 있는 값을 서버로 전달해서 결제 승인을 호출하세요.
 							} else if (result?.fail) {
+								navigation.replace('Fail');
 								// 결제 실패 비즈니스 로직을 구현하세요.
 							}
 						});

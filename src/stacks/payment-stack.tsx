@@ -1,6 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
 import CheckoutPage from '../screens/payments/checkout';
+import Fail from '../screens/payments/fail';
 import Success from '../screens/payments/success';
 const Stack = createNativeStackNavigator();
 export default function PaymentStack() {
@@ -19,6 +20,15 @@ export default function PaymentStack() {
 				options={{
 					headerBackVisible: false,
 					headerTitle: '결제 완료',
+				}}
+			/>
+
+			<Stack.Screen
+				name='Fail'
+				component={Fail}
+				options={{
+					headerBackVisible: false,
+					headerTitle: '결제 실패',
 				}}
 			/>
 		</Fragment>

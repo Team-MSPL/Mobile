@@ -47,9 +47,12 @@ export default function Fail({navigation}: any) {
 			<RouteButton
 				navigation={navigation}
 				nextTitle={'SelectDay'}
-				nextText={'예약 확인하기'}
+				nextText={'이전으로'}
 				leftText={'홈으로 돌아가기'}
-				btnFunction={() => {}}
+				btnFunction={() => {
+					navigation.goBack();
+				}}
+				goNext={() => {}}
 				LeftBtnFunction={() => {
 					navigation.popToTop();
 				}}
