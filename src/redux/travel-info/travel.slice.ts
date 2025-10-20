@@ -657,9 +657,15 @@ export const handleBookingSave = createAsyncThunk('/bookingProduct/save', async 
 //부킹 취소
 export const bookingCancel = createAsyncThunk('/kkday/Order/Cancel', async (order_no: string, {rejectWithValue}) => {
 	try {
-		const response = await axiosAuth.post(`/kkday/Order/Cancel`, {order_no: order_no}, {timeout: 60000});
+		const response = await axiosAuth.post(
+			`/kkday/Order/Cancel`,
+			{order_no: order_no, cancel_type: 'MC004', cancel_desc: '개인사유'},
+			{timeout: 60000},
+		);
+
 		return response.data;
 	} catch (error: any) {
+		console.log(error);
 		throw rejectWithValue(error.code);
 	}
 });
@@ -711,6 +717,33 @@ export const handleOrderDtlInfo = createAsyncThunk(
 		}
 	},
 );
+
+//바우처 리스트
+export const voucherList = createAsyncThunk(
+	'/kkday/Voucher/QueryVoucherList',
+	async (order_no: string, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(
+				`/kkday/Voucher/QueryVoucherList`,
+				{order_no: order_no},
+				{timeout: 60000},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//바우처 다운로드
+export const voucherDownload = createAsyncThunk('/kkday/Voucher/Download', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/kkday/Voucher/Download`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 
 //여행 성향 수정
 export const handleTendency = createAsyncThunk(

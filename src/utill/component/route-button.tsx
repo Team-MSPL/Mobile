@@ -17,6 +17,7 @@ export default function RouteButton({
 	leftText,
 	type,
 	resize,
+	bgColor,
 }: RouteButtonProps) {
 	const handleBack = () => {
 		LeftBtnFunction ? LeftBtnFunction() : navigation.goBack();
@@ -28,7 +29,13 @@ export default function RouteButton({
 	return (
 		<HStack
 			justifyContent='space-between'
-			style={{position: 'absolute', alignSelf: 'center', bottom: 10, width: widthPercentage(328)}}>
+			style={{
+				position: 'absolute',
+				alignSelf: 'center',
+				bottom: 10,
+				width: widthPercentage(328),
+				backgroundColor: 'white',
+			}}>
 			<ButtonContainer
 				marginTop={marginTop ?? 0}
 				marginBottom={marginBottom ?? 0}
@@ -53,11 +60,12 @@ export default function RouteButton({
 				onPress={handleNext}
 				type={type ?? 'default'}
 				resize={resize ?? false}
-				before={false}>
+				before={false}
+				bgColor={bgColor ?? undefined}>
 				<PretendardSemiBoldText
 					size={18}
 					lineHeight={23.48}
-					color={type == 'planner' ? colors.backgroundWhite : colors.Gray5}>
+					color={bgColor ? colors.PointGreen1 : type == 'planner' ? colors.backgroundWhite : colors.Gray5}>
 					{nextText ?? '다음으로'}
 				</PretendardSemiBoldText>
 				{/* <SVGRightAdd style={{position: 'absolute', right: widthPercentage(16)}} color={colors.Primary} /> */}
@@ -79,6 +87,7 @@ type RouteButtonProps = {
 	leftText?: string;
 	type?: string;
 	resize?: boolean;
+	bgColor?: string;
 };
 
 const ButtonContainer = styled.TouchableOpacity<{
@@ -88,6 +97,7 @@ const ButtonContainer = styled.TouchableOpacity<{
 	before: boolean;
 	resize?: boolean;
 	isActive?: boolean;
+	bgColor?: string;
 }>`
 	width: ${props => widthPercentage(props.resize ? (props.before ? 188 : 132) : 160)}px;
 	align-self: center;
@@ -96,13 +106,14 @@ const ButtonContainer = styled.TouchableOpacity<{
 	padding: 0px ${widthPercentage(0)}px;
 	border-radius: 8px;
 	background-color: ${props =>
-		props.type == 'planner'
+		props?.bgColor ||
+		(props.type == 'planner'
 			? props?.isActive
 				? 'rgba(0,0,0,0.2)'
 				: props.before
 				? colors.Gray200
 				: colors.Gray5
-			: colors.Primary};
+			: colors.Primary)};
 	margin-top: ${props => heightPercentage(props.marginTop)}px;
 	margin-bottom: ${props => heightPercentage(props.marginBottom)}px;
 	flex-direction: row;

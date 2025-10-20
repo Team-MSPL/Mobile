@@ -1,5 +1,6 @@
+import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
-import {useLayoutEffect, useState} from 'react';
+import {useCallback, useLayoutEffect, useState} from 'react';
 import {styled} from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -30,9 +31,14 @@ export default function ReserveList({navigation}: any) {
 			dispatch(LoadingSliceActions.offLoading());
 		}
 	};
-	useLayoutEffect(() => {
-		handleList();
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			handleList();
+		}, []),
+	);
+	// useLayoutEffect(() => {
+	// 	handleList();
+	// }, []);
 	if (list.length == 0)
 		return (
 			<Center backgroundColor={colors.backgroundWhite}>
@@ -54,7 +60,10 @@ export default function ReserveList({navigation}: any) {
 			{list?.map((item, idx) => (
 				<ReserveBox
 					onPress={() => {
-						navigation.navigate('ReserveDetail', {order_no: item?.product?.data?.order_no});
+						navigation.navigate('ReserveDetail', {
+							order_no: item?.product?.data?.order_no,
+							tossKey: item?.product?.booking_key,
+						});
 					}}>
 					<ImageBox resizeMode='cover' source={{uri: item?.product?.image}} />
 					<ImgPadding>

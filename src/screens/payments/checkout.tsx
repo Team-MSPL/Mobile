@@ -59,10 +59,11 @@ export default function CheckoutPage({navigation, route}: any) {
 				await dispatch(
 					handleBookingSave({
 						...route?.params?.info?.productinfo,
-						booking_key: e?.paymentKey,
+
 						product: {
 							...route?.params?.info?.productinfo,
 							data: q?.data,
+							booking_key: e?.paymentKey,
 						},
 					}),
 				);

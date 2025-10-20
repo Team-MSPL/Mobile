@@ -103,18 +103,18 @@ export default function PresetDetail({navigation, route}: any) {
 	};
 	const goNext = (e: boolean) => {
 		try {
+			removeCache();
+			dispatch(deleteAI({aiId: aiID}));
+			let copy = [...presetDatas[route.params.index]];
+			if (presetDatas[route.params.index].length != nDay + 1) {
+				const check = nDay + 1 - presetDatas[route.params.index].length;
+				for (let i = 0; i < check; i++) {
+					copy.push([]);
+				}
+			}
+			dispatch(travelSliceActions.setAutoRecommendFlag(e));
+			dispatch(travelSliceActions.enrollTimetable(copy));
 			handleProduct();
-			// removeCache();
-			// dispatch(deleteAI({aiId: aiID}));
-			// let copy = [...presetDatas[route.params.index]];
-			// if (presetDatas[route.params.index].length != nDay + 1) {
-			// 	const check = nDay + 1 - presetDatas[route.params.index].length;
-			// 	for (let i = 0; i < check; i++) {
-			// 		copy.push([]);
-			// 	}
-			// }
-			// dispatch(travelSliceActions.setAutoRecommendFlag(e));
-			// dispatch(travelSliceActions.enrollTimetable(copy));
 			// navigation.navigate('Timetable');
 		} catch (err) {
 			console.log(err, '에러');
