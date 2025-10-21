@@ -213,7 +213,7 @@ export default function ProductDetail({navigation}: any) {
 													<TableHeader>요일</TableHeader>
 													<TableHeader>운영 시간</TableHeader>
 												</TableRow>
-												{station.active_time.list.map((time, timeIndex) => (
+												{station.active_time?.list?.map((time, timeIndex) => (
 													<TableRow key={timeIndex}>
 														<TableCell>{time.week_title.desc}</TableCell>
 														<TableCell>

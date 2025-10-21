@@ -36,6 +36,8 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageRecursion from '../../utill/component/home/imageRecursion';
 
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import {mainProductList} from '../../utill/mockdata';
+import {SvgStart} from '../../utill/svg/svg';
 
 export default function Main({navigation}: any) {
 	const {homeRegionImage, appLanguages} = useAppSelector(state => state.settingSlice);
@@ -148,19 +150,19 @@ export default function Main({navigation}: any) {
 		} finally {
 		}
 	};
-	const handleProduct = async () => {
-		const type = {
-			country: '베트남',
-			company: '(주)수호천사컴퍼니',
-			regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
-			type: 'package', //투어 : "tour", 패키지 : "package"
-			period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
-			places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
-			// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
-		};
-		const result = await dispatch(getSellingProduct(type)).unwrap();
-		dispatch(travelSliceActions.enrollRecommendProducts(result.data.results));
-	};
+	// const handleProduct = async () => {
+	// 	const type = {
+	// 		country: '베트남',
+	// 		company: '(주)수호천사컴퍼니',
+	// 		regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
+	// 		type: 'package', //투어 : "tour", 패키지 : "package"
+	// 		period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
+	// 		places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
+	// 		// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
+	// 	};
+	// 	const result = await dispatch(getSellingProduct(type)).unwrap();
+	// 	dispatch(travelSliceActions.enrollRecommendProducts(result.data.results));
+	// };
 	const handleHotProduct = async () => {
 		//TODO핫플레이스 변경하기
 		const type = {
@@ -188,8 +190,8 @@ export default function Main({navigation}: any) {
 		checkEvent();
 		getMainScreen();
 		getFirstRegion();
-		handleProduct();
-		handleHotProduct();
+		// handleProduct();
+		// handleHotProduct();
 		handleGetPassport();
 	}, []);
 	useEffect(() => {
@@ -363,7 +365,9 @@ export default function Main({navigation}: any) {
 				'https://firebasestorage.googleapis.com/v0/b/danim-image/o/event%2F%E1%84%83%E1%85%A1%E1%84%82%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%89%E1%85%B3%E1%84%90%E1%85%A1.png?alt=media&token=1fb05468-5a33-4737-acfb-e90be34dd378',
 		},
 	];
-
+	const handelDetail = item => {
+		navigation.navigate('ProductDetail', {item: item});
+	};
 	const sheetRef = useRef<BottomSheet>(null);
 
 	// variables
@@ -634,7 +638,7 @@ export default function Main({navigation}: any) {
 						</EventContainer>
 					)}
 				/>
-				{hotProducts.length > 0 && (
+				{mainProductList.length > 0 && (
 					<>
 						<VStack>
 							<LinearGradient
@@ -650,7 +654,7 @@ export default function Main({navigation}: any) {
 									justifyContent: 'flex-end',
 									borderRadius: 12,
 									paddingLeft: widthPercentage(20),
-									marginLeft: -widthPercentage(8),
+									marginLeft: -widthPercentage(24),
 								}}>
 								<PretendardSemiBoldText size={20} lineHeight={23.6} color={colors.Black}>
 									요즘 뜨는 여행 상품
@@ -662,45 +666,50 @@ export default function Main({navigation}: any) {
 									deco={`margin-bottom:${widthPercentage(5)}px;`}>
 									많은 사람들이 찾는 여행 상품이에요
 								</PretendardVariableText>
-								{hotProducts.slice(0, 3)?.map((item, index) => (
-									<HotProductBox>
+								{mainProductList.slice(0, 3)?.map((item, index) => (
+									<HotProductBox
+										onPress={() => {
+											handelDetail(item);
+										}}>
 										<HStack>
 											<CollectionRecommendContentItemImage
 												width={93}
 												height={93}
 												source={{
-													uri: item?.product?.sellingProductImage[0],
+													uri: item?.prod_img_url,
 												}}></CollectionRecommendContentItemImage>
 											<VStack flex={1} deco={`margin-left:${widthPercentage(15)}px;`}>
 												<VStack>
 													<PretendardSemiBoldText
-														size={20}
-														lineHeight={26}
+														size={18}
+														lineHeight={23}
 														numberOfLines={1}
 														color={colors.Black}>
-														{item?.product?.sellingProductName}
+														{item?.prod_name}
 													</PretendardSemiBoldText>
-													<PretendardVariableText
-														size={16}
-														lineHeight={20}
-														numberOfLines={1}
-														color={'#6F853D'}>
-														{item?.product?.sellingProductContent}
-													</PretendardVariableText>
 												</VStack>
-												<PretendardVariableText
-													size={18}
-													lineHeight={21}
+												<PretendardSemiBoldText
+													size={20}
+													lineHeight={25}
 													numberOfLines={1}
 													color={colors.Black}
 													deco={'margin-top:10px;'}>
-													{item?.product?.sellingProductPrice}원~
-												</PretendardVariableText>
+													{item?.b2b_price}원~
+												</PretendardSemiBoldText>
+												<HStack>
+													<SvgStart width={11} color={'#FFDE4C'} />
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={17}
+														color={colors.Gray4}>
+														{item?.avg_rating_star} ({item?.rating_count})
+													</PretendardSemiBoldText>
+												</HStack>
 											</VStack>
 										</HStack>
 									</HotProductBox>
 								))}
-								<HotMoreButton
+								{/* <HotMoreButton
 									onPress={() => {
 										navigation.navigate('Products');
 									}}>
@@ -711,7 +720,7 @@ export default function Main({navigation}: any) {
 										color={colors.Gray4}>
 										여행 상품 더보기
 									</PretendardSemiBoldText>
-								</HotMoreButton>
+								</HotMoreButton> */}
 							</LinearGradient>
 						</VStack>
 					</>

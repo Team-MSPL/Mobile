@@ -272,23 +272,45 @@ export default function ProductSelectDay({navigation}: any) {
 											}
 											deco={'text-align:center;'}>
 											{element?.name}
-											{!!element?.rule?.age_rule && (
-												<PretendardVariableText
-													size={16}
-													lineHeight={21}
-													numberOfLines={2}
-													color={colors.Gray3}>
-													{' '}
-													(
-													{'만 ' +
-														element?.rule?.age_rule?.min +
-														' ~ ' +
-														(!!element?.rule?.age_rule?.max
-															? '만 ' + element?.rule?.age_rule?.max + '세'
-															: '')}
-													)
-												</PretendardVariableText>
-											)}
+											{!!element?.rule?.age_rule &&
+												(!!element?.rule?.age_rule?.min || element?.rule?.age_rule?.max) && (
+													<PretendardVariableText
+														size={16}
+														lineHeight={21}
+														numberOfLines={2}
+														color={colors.Gray3}>
+														{' '}
+														(
+														{(!!element?.rule?.age_rule?.min
+															? '만 ' + element?.rule?.age_rule?.min + '세'
+															: '') +
+															' ~ ' +
+															(!!element?.rule?.age_rule?.max
+																? '만 ' + element?.rule?.age_rule?.max + '세'
+																: '')}
+														)
+													</PretendardVariableText>
+												)}
+											{!!element?.rule?.height_rule &&
+												(!!element?.rule?.height_rule?.min ||
+													element?.rule?.height_rule?.max) && (
+													<PretendardVariableText
+														size={16}
+														lineHeight={21}
+														numberOfLines={2}
+														color={colors.Gray3}>
+														{' '}
+														(
+														{(!!element?.rule?.height_rule?.min
+															? '신장 ' + element?.rule?.height_rule?.min
+															: '') +
+															' ~ ' +
+															(!!element?.rule?.height_rule?.max
+																? element?.rule?.height_rule?.max
+																: '')}
+														)
+													</PretendardVariableText>
+												)}
 										</PretendardVariableText>
 									</SpecBox>
 								))}

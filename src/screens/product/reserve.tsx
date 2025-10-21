@@ -12,6 +12,9 @@ import {MarginContainer} from '../timetable/preset-detail';
 import {useRoute} from '@react-navigation/native';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {SvgCalendar, SvgCalendarIcon, SVGCalendarRecommend, SVGClock, SVGPeople} from '../../utill/svg/svg';
+import DropDownPicker from 'react-native-dropdown-picker';
+import {View} from 'react-native';
+import {TextWall} from './reserve-detail';
 export default function Reserve({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {passport} = useAppSelector(state => state.travelSlice);
@@ -24,31 +27,25 @@ export default function Reserve({navigation}: any) {
 		console.log(data);
 		setForm({...form, [key]: value});
 	};
+	const [customData, setCustomData] = useState([]);
+	const handleCustomChange = (key, value, index) => {
+		setCustomData(prev => {
+			// 이전 상태를 복사
+			const updated = [...prev];
 
-	const handleSave = async () => {
-		// try {
-		// 	dispatch(LoadingSliceActions.onLoading());
-		// 	await dispatch(udpatePassport(form));
-		// 	dispatch(
-		// 		travelSliceActions.updateFiled({
-		// 			field: 'passport',
-		// 			value: form,
-		// 		}),
-		// 	);
-		// 	dispatch(
-		// 		modalSliceActions.setOpenModal({
-		// 			modalTitle: '저장되었습니다',
-		// 			modalFunction: () => {
-		// 				navigation.goBack();
-		// 			},
-		// 			modalSingleUse: true,
-		// 		}),
-		// 	);
-		// } catch (e) {
-		// 	console.log(e);
-		// } finally {
-		// 	dispatch(LoadingSliceActions.offLoading());
-		// }
+			// 해당 index에 객체가 없으면 초기화
+			if (!updated[index]) {
+				updated[index] = {};
+			}
+
+			// 키-값 업데이트
+			updated[index] = {
+				...updated[index],
+				[key]: value,
+			};
+
+			return updated;
+		});
 	};
 	const inputFields = [
 		{key: 'buyer_last_name', label: '영문 이름', placeholder: 'gildong'},
@@ -59,18 +56,15 @@ export default function Reserve({navigation}: any) {
 		{key: 'buyer_Email', label: '이메일', placeholder: 'asdasd@asd.com'},
 		{key: 'buyer_tel_number', label: '전화번호', placeholder: '01012345678', keyboardType: 'number-pad', max: 11},
 	];
-	const langMap = {
-		native_first_name: '성',
-		native_last_name: '이름',
-	};
 	const [customType, setCustomType] = useState(null);
 	const handleField = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			console.log(data);
 			const a = await dispatch(handleBookingField(data)).unwrap();
-			setCustomType(a?.custom);
-			console.log('ady', a?.custom?.cus_type?.use);
+			setCustomType(a);
+			// console.log('ady', a?.custom?.cus_type?.use);
+			console.log('ady', a?.traffic);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -80,6 +74,13 @@ export default function Reserve({navigation}: any) {
 	useEffect(() => {
 		handleField();
 	}, []);
+	const [open, setOpen] = useState({status: false, idx: 0, name: ''});
+	const [value, setValue] = useState(null);
+	const [items, setItems] = useState([
+		{label: 'Apple', value: 'apple'},
+		{label: 'Banana', value: 'banana'},
+		{label: 'Pear', value: 'pear'},
+	]);
 	return (
 		<>
 			<KeyboardAwareScrollView
@@ -96,13 +97,6 @@ export default function Reserve({navigation}: any) {
 				extraScrollHeight={Platform.OS === 'ios' ? 20 : 200}
 				enableAutomaticScroll={true}
 				showsVerticalScrollIndicator={false}>
-				<PretendardSemiBoldText
-					size={20}
-					lineHeight={27}
-					color={colors.Black}
-					deco={`text-align:center;margin-bottom:10px;`}>
-					예약자 정보
-				</PretendardSemiBoldText>
 				<InfoContainer>
 					<ImgBox source={{uri: data?.image}}></ImgBox>
 					<PretendardSemiBoldText
@@ -135,6 +129,13 @@ export default function Reserve({navigation}: any) {
 						</HStack>
 					</HStack>
 				</InfoContainer>
+				<HStack gap={5}>
+					<TextWall />
+					<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black} deco={`margin-bottom:10px;`}>
+						구매자 정보
+					</PretendardSemiBoldText>
+				</HStack>
+
 				{inputFields.map((item, idx) => (
 					<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
 						<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
@@ -148,16 +149,118 @@ export default function Reserve({navigation}: any) {
 							onChangeText={text => handleChange(item.key, text)}></InputBox>
 					</VStack>
 				))}
+				<HStack deco={'margin-top:30px;'} gap={5}>
+					<TextWall />
+					<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+						이용자 정보
+					</PretendardSemiBoldText>
+				</HStack>
+				{customType?.custom?.cus_type?.use?.includes('cus_02') &&
+					Array(data?.skus[0]?.qty)
+						?.fill('')
+						.map((datItem, dataIndex) => (
+							<CustomerBox>
+								<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+									여행자 {dataIndex + 1}
+								</PretendardSemiBoldText>
+								{Object.entries(customType?.custom)
+									?.filter(([key, value]) => !key.includes('cus_type'))
+									.map(
+										([item, value], idx) =>
+											value?.use?.includes('cus_02') && (
+												<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
+													<PretendardSemiBoldText
+														size={16}
+														lineHeight={21}
+														color={colors.Black}>
+														{fieldMap?.[item]?.ko}
+													</PretendardSemiBoldText>
+													{value?.type == 'list' ? (
+														<DropDownPicker
+															open={
+																open?.status &&
+																open?.idx == dataIndex &&
+																open?.name == item
+															}
+															value={customData[dataIndex]?.[item]}
+															items={value?.list_option?.map(item => ({
+																value: item?.code ?? item?.id,
+																label: item?.name,
+															}))}
+															setOpen={e => {
+																setOpen({
+																	status: !open.status,
+																	idx: dataIndex,
+																	name: item,
+																});
+															}}
+															dropDownDirection={'TOP'}
+															listMode={'SCROLLVIEW'}
+															setValue={callback => {
+																const nextValue = callback(value);
+																console.log(value);
+																handleCustomChange(item, nextValue, dataIndex);
+															}}
+															setItems={setItems}
+															placeholder={'선택'}
+														/>
+													) : (
+														<InputBox
+															placeholder={fieldMap?.[item]?.exam}
+															keyboardType={item?.keyboardType || 'default'}
+															value={customData[dataIndex]?.[item]}
+															maxLength={item?.max || undefined}
+															onChangeText={text =>
+																handleCustomChange(item, text, dataIndex)
+															}
+															// onChangeText={text => handleChange(item.key, text)}
+														></InputBox>
+													)}
+												</VStack>
+											),
+									)}
+							</CustomerBox>
+						))}
+				{customType?.guide_lang?.is_require && customType?.guide_lang?.is_visible && (
+					<View
+						style={{
+							flex: 1,
+							zIndex: 20,
+							marginVertical: 10,
+						}}>
+						<PretendardSemiBoldText
+							size={16}
+							lineHeight={21}
+							color={colors.Black}
+							deco={'margin-bottom:10px;'}>
+							가이드 언어
+						</PretendardSemiBoldText>
+						<DropDownPicker
+							open={open.status && open.name == 'lang'}
+							value={value}
+							items={customType?.guide_lang?.list_option?.map(item => ({
+								value: item?.code,
+								label: item?.name,
+							}))}
+							setOpen={() => {
+								setOpen({status: !open.status, idx: 0, name: 'lang'});
+							}}
+							setValue={setValue}
+							setItems={setItems}
+							placeholder={'안내 언어'}
+						/>
+					</View>
+				)}
 				<PretendardSemiBoldText size={14} lineHeight={18} color={colors.PointYellow}>
 					입력하신 이메일과 전화번호는 주문 내역 및 바우처 전달을 위해 사용됩니다.
 				</PretendardSemiBoldText>
+
 				<MarginContainer />
 			</KeyboardAwareScrollView>
 			<SaveButton
 				disabled={inputFields.length != Object.entries(form).length}
 				isActive={inputFields.length != Object.entries(form).length}
 				onPress={() => {
-					console.log(customType?.cus_type?.use?.[0] == 'cus_01');
 					navigation.navigate('PaymentStack', {
 						info: {
 							value: data?.total_price,
@@ -175,6 +278,9 @@ export default function Reserve({navigation}: any) {
 											native_last_name: form?.buyer_last_name,
 										},
 									],
+								}),
+								...(customType?.cus_type?.use?.[0] == 'cus_02' && {
+									custom: customData,
 								}),
 							},
 						},
@@ -199,7 +305,7 @@ const SaveButton = styled.TouchableOpacity<{isActive: boolean}>`
 	align-self: center;
 `;
 const InputBox = styled.TextInput`
-	width: ${widthPercentage(327)}px;
+	width: 100%;
 	height: ${heightPercentage(52)}px;
 	border-radius: 8px;
 	border-width: 1px;
@@ -219,3 +325,47 @@ const InfoContainer = styled.View`
 	border-radius: 8px;
 	background-color: ${colors.backgroundWhite};
 `;
+const CustomerBox = styled.View`
+	border-width: 1px;
+	border-color: ${colors.Gray1};
+	border-radius: 12px;
+	padding: 4px;
+	margin-top: 40px;
+`;
+const fieldMap = {
+	cus_type: {ko: '고객 유형', exam: '일반 / VIP'},
+	english_last_name: {ko: '여권상 영어 성', exam: 'Kim'},
+	english_first_name: {ko: '여권상 영어 이름', exam: 'Minji'},
+	gender: {ko: '성별', exam: '남 / 여'},
+	nationality: {ko: '국적', exam: '대한민국'},
+	mtp_no: {ko: 'MTP 번호', exam: '1234567890'},
+	id_no: {ko: '주민 번호', exam: '900101-1234567'},
+	passport_no: {ko: '여권 번호', exam: 'M12345678'},
+	passport_expdate: {ko: '여권 만료일', exam: '2030-12-31'},
+	birth: {ko: '생년월일', exam: '1990-01-01'},
+	native_last_name: {ko: '성', exam: '김'},
+	native_first_name: {ko: '이름', exam: '민지'},
+	tel_country_code: {ko: '전화 국가번호', exam: '+82'},
+	tel_number: {ko: '전화번호', exam: '01012345678'},
+	country_cities: {ko: '국가 및 도시', exam: '대한민국, 서울'},
+	zipcode: {ko: '우편번호', exam: '06236'},
+	address: {ko: '주소', exam: '서울특별시 강남구 테헤란로 123'},
+	hotel_name: {ko: '호텔 이름', exam: '롯데호텔 서울'},
+	hotel_tel_number: {ko: '호텔 전화번호', exam: '0212345678'},
+	booking_order_no: {ko: '예약 번호', exam: 'BK20251020001'},
+	check_in_date: {ko: '체크인 날짜', exam: '2025-10-25'},
+	check_out_date: {ko: '체크아웃 날짜', exam: '2025-10-30'},
+	contact_app: {ko: '연락 앱', exam: '카카오톡 / 위챗'},
+	contact_app_account: {ko: '연락 앱 계정', exam: 'minji_kim'},
+	have_app: {ko: '연락 앱 설치 여부', exam: '예 / 아니오'},
+	height: {ko: '키', exam: '165'},
+	height_unit: {ko: '키 단위', exam: 'cm'},
+	weight: {ko: '몸무게', exam: '55'},
+	weight_unit: {ko: '몸무게 단위', exam: 'kg'},
+	shoe: {ko: '신발 사이즈', exam: '240'},
+	shoe_unit: {ko: '신발 단위', exam: 'mm'},
+	shoe_type: {ko: '신발 종류', exam: '운동화 / 구두'},
+	glass_degree: {ko: '안경 도수', exam: '-2.50 / +1.75'},
+	meal: {ko: '식사 선호', exam: '일반식 / 채식'},
+	allergy_food: {ko: '알레르기 음식', exam: '견과류 / 해산물'},
+};

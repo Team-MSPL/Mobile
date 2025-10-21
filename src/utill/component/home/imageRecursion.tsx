@@ -64,7 +64,10 @@ export default function ImageRecursion({navigation}: any) {
 						<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
 							{mainViewList[index].photo(heightPercentage(400))}
 						</View>
-						<BrighnessBox>
+						<BrighnessBox
+							onPress={() => {
+								navigation.navigate('RecommendPlaces', {index: index});
+							}}>
 							{socialloginProvider != 'anonymous' && <TicketTouchable></TicketTouchable>}
 							<HomeTextContainer
 								heightFlag={socialloginProvider == 'anonymous'}
@@ -295,7 +298,7 @@ export const mainViewList = [
 	},
 ];
 
-const BrighnessBox = styled.View`
+const BrighnessBox = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.3);
 	top: -${heightPercentage(20)}px;
