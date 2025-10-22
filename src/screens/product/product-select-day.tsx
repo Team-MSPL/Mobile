@@ -425,11 +425,11 @@ export default function ProductSelectDay({navigation}: any) {
 							locale: 'ko',
 
 							state: 'KR',
-							buyer_first_name: 'Lee',
-							buyer_last_name: 'Yunju',
+							buyer_first_name: '',
+							buyer_last_name: '',
 							buyer_Email: 'wayfarers0814@gmail.com',
 							buyer_tel_country_code: '82',
-							buyer_tel_number: 1032223474,
+							buyer_tel_number: 0,
 							buyer_country: 'KR',
 
 							s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),

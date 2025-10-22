@@ -15,11 +15,12 @@ import {SvgCalendar, SvgCalendarIcon, SVGCalendarRecommend, SVGClock, SVGPeople}
 import DropDownPicker from 'react-native-dropdown-picker';
 import {View} from 'react-native';
 import {TextWall} from './reserve-detail';
+import {Keyboard} from 'react-native';
 export default function Reserve({navigation}: any) {
 	const dispatch = useAppDispatch();
 	const {passport} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
-	const [form, setForm] = useState({});
+	const [form, setForm] = useState({cus_type: 'cus_01'});
 	const route = useRoute();
 	const {data} = route.params;
 
@@ -27,6 +28,13 @@ export default function Reserve({navigation}: any) {
 		console.log(data);
 		setForm({...form, [key]: value});
 	};
+
+	const [contactData, setContactData] = useState({cus_type: 'contact'});
+	const handleChange1 = (key, value) => {
+		console.log(data);
+		setContactData({...contactData, [key]: value});
+	};
+
 	const [customData, setCustomData] = useState([]);
 	const handleCustomChange = (key, value, index) => {
 		setCustomData(prev => {
@@ -48,8 +56,8 @@ export default function Reserve({navigation}: any) {
 		});
 	};
 	const inputFields = [
-		{key: 'buyer_last_name', label: '영문 이름', placeholder: 'gildong'},
-		{key: 'buyer_first_name', label: '영문 성', placeholder: 'hong'},
+		{key: 'native_first_name', label: '영문 이름', placeholder: 'gildong'},
+		{key: 'native_last_name', label: '영문 성', placeholder: 'hong'},
 
 		// {key: 'country', label: '국가', placeholder: '대한민국'},
 
@@ -63,8 +71,17 @@ export default function Reserve({navigation}: any) {
 			console.log(data);
 			const a = await dispatch(handleBookingField(data)).unwrap();
 			setCustomType(a);
-			// console.log('ady', a?.custom?.cus_type?.use);
-			console.log('ady', a?.traffic);
+			if (a?.result_msg != 'OK' || a?.traffics?.length != 0) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '해당 패키지가 판매를 중단하였습니다',
+						modalSingleUse: true,
+						modalTopText: '확인',
+					}),
+				);
+				navigation.goBack();
+			}
+			console.log(a);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -76,6 +93,7 @@ export default function Reserve({navigation}: any) {
 	}, []);
 	const [open, setOpen] = useState({status: false, idx: 0, name: ''});
 	const [value, setValue] = useState(null);
+	const [haveApp, setHaveapp] = useState(false);
 	const [items, setItems] = useState([
 		{label: 'Apple', value: 'apple'},
 		{label: 'Banana', value: 'banana'},
@@ -129,12 +147,90 @@ export default function Reserve({navigation}: any) {
 						</HStack>
 					</HStack>
 				</InfoContainer>
-				<HStack gap={5}>
-					<TextWall />
-					<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black} deco={`margin-bottom:10px;`}>
-						구매자 정보
-					</PretendardSemiBoldText>
-				</HStack>
+
+				{customType?.custom?.cus_type?.use?.includes('cus_01') && (
+					<HStack deco={'margin-top:30px;'} gap={5}>
+						<TextWall />
+						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+							구매자 정보
+						</PretendardSemiBoldText>
+					</HStack>
+				)}
+
+				{customType?.custom?.cus_type?.use?.includes('contact') &&
+					Object.entries(customType?.custom)
+						?.filter(([key, value]) => !key.includes('cus_type'))
+						.map(
+							([item, value], idx) =>
+								value?.use?.includes('cus_01') && (
+									<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
+										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+											{fieldMap?.[item]?.ko}
+										</PretendardSemiBoldText>
+										{value?.type == 'list' ? (
+											<DropDownPicker
+												open={open?.status && open?.name == item}
+												value={form?.[item]}
+												items={value?.list_option
+													?.filter(filItem => filItem?.supported ?? true)
+													?.map(item => ({
+														value: item?.code ?? item?.app_type,
+														label: item?.name ?? item?.info ?? item?.app_name,
+													}))}
+												setOpen={e => {
+													console.log(value?.list_option);
+													Keyboard.dismiss();
+													setOpen({
+														status: !open.status,
+														idx: 0,
+														name: item,
+													});
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleChange1(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : value?.type == 'bool' ? (
+											<DropDownPicker
+												open={haveApp}
+												value={form?.[item]}
+												items={[
+													{label: '있음', value: true},
+													{label: '없음', value: false},
+												]}
+												setOpen={e => {
+													Keyboard.dismiss();
+													setHaveapp(!haveApp);
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleChange(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : (
+											<InputBox
+												placeholder={fieldMap?.[item]?.exam}
+												keyboardType={item?.keyboardType || 'default'}
+												value={form?.[item]}
+												maxLength={item?.max || undefined}
+												onChangeText={text => handleChange(item, text)}
+												// onChangeText={text => handleChange(item.key, text)}
+											></InputBox>
+										)}
+									</VStack>
+								),
+						)}
 
 				{inputFields.map((item, idx) => (
 					<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
@@ -149,12 +245,15 @@ export default function Reserve({navigation}: any) {
 							onChangeText={text => handleChange(item.key, text)}></InputBox>
 					</VStack>
 				))}
-				<HStack deco={'margin-top:30px;'} gap={5}>
-					<TextWall />
-					<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
-						이용자 정보
-					</PretendardSemiBoldText>
-				</HStack>
+
+				{customType?.custom?.cus_type?.use?.includes('cus_02') && (
+					<HStack deco={'margin-top:30px;'} gap={5}>
+						<TextWall />
+						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+							이용자 정보
+						</PretendardSemiBoldText>
+					</HStack>
+				)}
 				{customType?.custom?.cus_type?.use?.includes('cus_02') &&
 					Array(data?.skus[0]?.qty)
 						?.fill('')
@@ -188,6 +287,7 @@ export default function Reserve({navigation}: any) {
 																label: item?.name,
 															}))}
 															setOpen={e => {
+																Keyboard.dismiss();
 																setOpen({
 																	status: !open.status,
 																	idx: dataIndex,
@@ -221,6 +321,99 @@ export default function Reserve({navigation}: any) {
 									)}
 							</CustomerBox>
 						))}
+				{customType?.custom?.cus_type?.use?.includes('contact') && (
+					<HStack deco={'margin-top:30px;'} gap={5}>
+						<TextWall />
+						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+							여행 중 연락수단
+						</PretendardSemiBoldText>
+					</HStack>
+				)}
+				{customType?.custom?.cus_type?.use?.includes('contact') &&
+					Object.entries(customType?.custom)
+						?.filter(([key, value]) => !key.includes('cus_type'))
+						?.filter(([key, value]) =>
+							contactData?.['have_app'] ? true : !['contact_app_account', 'contact_app'].includes(key),
+						)
+						.map(
+							([item, value], idx) =>
+								value?.use?.includes('contact') && (
+									<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
+										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+											{fieldMap?.[item]?.ko}
+										</PretendardSemiBoldText>
+										{value?.type == 'list' ? (
+											<DropDownPicker
+												open={open?.status && open?.name == item}
+												value={contactData?.[item]}
+												items={value?.list_option
+													?.filter(filItem => filItem?.supported ?? true)
+													?.map(item => ({
+														value: item?.code ?? item?.app_type,
+														label: item?.name ?? item?.info ?? item?.app_name,
+													}))}
+												setOpen={e => {
+													console.log(value?.list_option);
+													Keyboard.dismiss();
+													setOpen({
+														status: !open.status,
+														idx: 0,
+														name: item,
+													});
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleChange1(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : value?.type == 'bool' ? (
+											<DropDownPicker
+												open={haveApp}
+												value={contactData?.[item]}
+												items={[
+													{label: '있음', value: true},
+													{label: '없음', value: false},
+												]}
+												setOpen={e => {
+													Keyboard.dismiss();
+													setHaveapp(!haveApp);
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleChange1(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : (
+											<InputBox
+												placeholder={fieldMap?.[item]?.exam}
+												keyboardType={item?.keyboardType || 'default'}
+												value={contactData?.[item]}
+												maxLength={item?.max || undefined}
+												onChangeText={text => handleChange1(item, text)}
+												// onChangeText={text => handleChange(item.key, text)}
+											></InputBox>
+										)}
+									</VStack>
+								),
+						)}
+				{customType?.custom?.cus_type?.use?.includes('traffics') && (
+					<HStack deco={'margin-top:30px;'} gap={5}>
+						<TextWall />
+						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
+							픽업 정보
+						</PretendardSemiBoldText>
+					</HStack>
+				)}
 				{customType?.guide_lang?.is_require && customType?.guide_lang?.is_visible && (
 					<View
 						style={{
@@ -258,30 +451,27 @@ export default function Reserve({navigation}: any) {
 				<MarginContainer />
 			</KeyboardAwareScrollView>
 			<SaveButton
-				disabled={inputFields.length != Object.entries(form).length}
-				isActive={inputFields.length != Object.entries(form).length}
+				disabled={false}
+				isActive={false}
 				onPress={() => {
 					navigation.navigate('PaymentStack', {
 						info: {
 							value: data?.total_price,
+							guide_lang: value,
 							name: data?.name,
 							productinfo: {
 								userId: userId,
 								...data,
 								...form,
 								buyer_tel_number: form?.buyer_tel_number?.substr(1),
-								...(customType?.cus_type?.use?.[0] == 'cus_01' && {
-									custom: [
-										{
-											cus_type: customType?.cus_type?.use?.[0],
-											native_first_name: form?.buyer_first_name,
-											native_last_name: form?.buyer_last_name,
-										},
-									],
-								}),
-								...(customType?.cus_type?.use?.[0] == 'cus_02' && {
-									custom: customData,
-								}),
+								guide_lang: value,
+								custom: [
+									customType?.custom?.cus_type?.use?.includes('cus_01') ? form : null,
+									...(customType?.custom?.cus_type?.use?.includes('cus_02')
+										? customData?.map(item => ({...item, cus_type: 'cus_02'}))
+										: []),
+									customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
+								].filter(item => item != null && item?.length != 0),
 							},
 						},
 					});

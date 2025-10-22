@@ -638,6 +638,19 @@ export const handleBookingField = createAsyncThunk(
 			return response.data;
 		} catch (error: any) {
 			console.log('aaa', error);
+			return rejectWithValue(error.code);
+		}
+	},
+);
+
+//토스 결제 승인
+export const handleTossConfirm = createAsyncThunk(
+	'/toss/payments/confirm',
+	async (data: {paymentKey: string; orderId: string; amount: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/toss/payments/confirm`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
 			throw rejectWithValue(error.code);
 		}
 	},

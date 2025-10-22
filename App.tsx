@@ -8,7 +8,7 @@
 import React, {useEffect, useLayoutEffect} from 'react';
 import {BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
 
-import {KAKAO_NATIVE_KEY} from '@env';
+import {KAKAO_NATIVE_KEY, TossPayment_Live_Key, TossPayment_Test_Key} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
@@ -244,7 +244,7 @@ function App(): JSX.Element {
 			<SafeAreaProvider>
 				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
 					<PaymentWidgetProvider
-						clientKey={`test_gck_Z61JOxRQVEGgxnpdOZOR8W0X9bAq`}
+						clientKey={__DEV__ ? TossPayment_Test_Key : TossPayment_Live_Key}
 						customerKey={`CVkg1NgQih5CJceio0erA`}>
 						<StatusBar
 							animated={true}

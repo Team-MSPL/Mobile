@@ -14,7 +14,8 @@ import type {
 import {styled} from 'styled-components/native';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {useAppDispatch} from '../../redux';
-import {handleBooking, handleBookingSave, tossCancel} from '../../redux/travel-info/travel.slice';
+import {handleBooking, handleBookingSave, handleTossConfirm, tossCancel} from '../../redux/travel-info/travel.slice';
+import shortid from 'shortid';
 // ...
 
 export default function CheckoutPage({navigation, route}: any) {
@@ -39,10 +40,19 @@ export default function CheckoutPage({navigation, route}: any) {
 				...route?.params?.info?.productinfo,
 				booking_key: e?.paymentKey,
 			};
-			console.log({
-				...route?.params?.info?.productinfo,
-				booking_key: e?.paymentKey,
+			console.log(e, {
+				paymentKey: e?.paymentKey,
+				orderId: e?.orderId,
+				amount: e?.amount,
 			});
+			const a = await dispatch(
+				handleTossConfirm({
+					paymentKey: e?.paymentKey,
+					orderId: e?.orderId,
+					amount: e?.amount,
+				}),
+			).unwrap();
+			console.log('자네', a);
 			const q = await dispatch(
 				handleBooking({...route?.params?.info?.productinfo, booking_key: e?.paymentKey}),
 			).unwrap();
@@ -70,8 +80,8 @@ export default function CheckoutPage({navigation, route}: any) {
 
 				navigation.replace('Success');
 			}
-		} catch (e) {
-			console.log('에러', e);
+		} catch (error) {
+			console.log('에러', error);
 			await dispatch(
 				tossCancel({
 					paymentKey: e?.paymentKey,
@@ -127,7 +137,7 @@ export default function CheckoutPage({navigation, route}: any) {
 					}
 					paymentWidgetControl
 						.requestPayment?.({
-							orderId: 'MH_zqGYKBiE7lcDKHbJ2B',
+							orderId: shortid.generate(),
 							orderName: route.params?.info?.name,
 						})
 						.then(result => {

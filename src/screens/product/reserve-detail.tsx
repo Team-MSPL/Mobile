@@ -62,7 +62,7 @@ export default function ReserveDetail({navigation}: any) {
 
 	const requestStoragePermission = async () => {
 		try {
-			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, {
+			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES, {
 				title: '저장 공간 접근 권한',
 				message: '바우처를 저장하기 위해 접근 권한이 필요합니다.',
 				buttonNeutral: '나중에',
