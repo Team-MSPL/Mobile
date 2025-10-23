@@ -253,6 +253,16 @@ export default function MoreInfo({navigation}: any) {
 					marginBottom={heightPercentage(10)}>
 					앱 버전 {nowVersion} (최신{latestVersion})
 				</PretendardSemiBoldText>
+
+				<PretendardSemiBoldText
+					size={14}
+					lineHeight={30}
+					color={colors.Black}
+					marginBottom={heightPercentage(10)}>
+					(주)나그네들 대표이사 : 이태운 {`\n`}사업자 등록번호 : 622-87-02814 {`\n`}통신판매번호 :
+					2025-대전서구-0996 대전광역시 서구 둔산로 137번길 21 8050호{`\n`}회사 문의 | 010-3222-3474 {`\n`}
+					wayfarers0814@gmail.com
+				</PretendardSemiBoldText>
 			</BackgroundGray>
 		</ScrollView>
 	);

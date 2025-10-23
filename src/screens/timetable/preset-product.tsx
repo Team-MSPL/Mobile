@@ -1,10 +1,12 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Modal, TouchableOpacity} from 'react-native';
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {useAppSelector} from '../../redux';
 import {colors} from '../../utill/colors';
 import StepText from '../../utill/component/enroll-info/step-text';
 import PrimaryButton from '../../utill/component/primary-button';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGrayScrollView,
 	HStack,
@@ -39,6 +41,15 @@ export default function PresetProduct({navigation}: any) {
 	const [products, setProducts] = useState(presetProducts.flat() || []);
 	const [categoryVisible, setCategoryVisible] = useState(false);
 	const [categoryValue, setCategoryValue] = useState('추천순');
+
+	const handleGoogleAnalyticsProduct = async () => {
+		await logEvent(`presetProductList`, {});
+	};
+
+	useEffect(() => {
+		handleGoogleAnalyticsProduct();
+	}, []);
+	useBackHandler({type: 'product'});
 	const handleCategory = (e: string) => {
 		let copy = [...products];
 		products.map(item => console.log(item.avgPrefScore));

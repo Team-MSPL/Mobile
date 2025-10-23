@@ -24,6 +24,7 @@ import RenderHtml from 'react-native-render-html';
 import {Image} from 'react-native';
 import AutoSizedImage from '../../utill/component/product/auto-size-image';
 import {ImageViewFooterComponent} from '../timetable/course-detail';
+import {logEvent} from '../../../firebaseAnalytice';
 
 export default function ProductDetail({navigation}: any) {
 	const route = useRoute();
@@ -48,6 +49,11 @@ export default function ProductDetail({navigation}: any) {
 	const handleDetailImage = (e: number) => {
 		setVisible({status: true, index: e});
 	};
+	const goNext = async () => {
+		await logEvent(`PackageSelectList`, {title: productInfo?.prod?.prod_name});
+		navigation.navigate('PackageSelect', {data: productInfo});
+	};
+
 	return (
 		<>
 			<Container>
@@ -318,7 +324,7 @@ export default function ProductDetail({navigation}: any) {
 				type={'planner'}
 				nextText={'예약하기'}
 				goNext={() => {
-					navigation.navigate('PackageSelect', {data: productInfo});
+					goNext();
 				}}
 				nextTitle='RecommendSelectTour'></RouteButton>
 		</>

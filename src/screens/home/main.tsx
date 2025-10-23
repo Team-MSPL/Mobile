@@ -125,6 +125,10 @@ export default function Main({navigation}: any) {
 	const getFirstRegion = async () => {
 		await dispatch(getHomeRegionInfo({region: '경북 경주시'}));
 	};
+
+	const handleGoogleAnalyticsProduct = async e => {
+		await logEvent(`main_product_click`, {title: e});
+	};
 	const handleGoogleAnalytics = async () => {
 		if (socialloginProvider == 'anonymous') {
 			await logEvent('anonymous_login', {});
@@ -150,33 +154,6 @@ export default function Main({navigation}: any) {
 		} finally {
 		}
 	};
-	// const handleProduct = async () => {
-	// 	const type = {
-	// 		country: '베트남',
-	// 		company: '(주)수호천사컴퍼니',
-	// 		regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
-	// 		type: 'package', //투어 : "tour", 패키지 : "package"
-	// 		period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
-	// 		places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
-	// 		// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
-	// 	};
-	// 	const result = await dispatch(getSellingProduct(type)).unwrap();
-	// 	dispatch(travelSliceActions.enrollRecommendProducts(result.data.results));
-	// };
-	const handleHotProduct = async () => {
-		//TODO핫플레이스 변경하기
-		const type = {
-			country: '베트남',
-			company: '(주)수호천사컴퍼니',
-			regions: '나트랑,다낭', // 예) regions=나트랑,다낭 <- 이런식으로 ,로 구분해서
-			type: 'package', //투어 : "tour", 패키지 : "package"
-			period: 3, // 여행 기간, 예) 3 -> 2박 3일 (투어 상품일 경우 필요x)
-			places: '쩐꾸옥 사원, 공항', // AI 실행 결과 중 숙소 제외하고
-			// 예) places=쩐꾸옥 사원, 공항 <- 이런식으로 ,로 구분해서 string으로 주면 됨
-		};
-		const result = await dispatch(getSellingProduct(type)).unwrap();
-		dispatch(travelSliceActions.enrollHotProducts(result.data.results));
-	};
 	const handleGetPassport = async () => {
 		const data = await dispatch(getPassport()).unwrap();
 		console.log(data);
@@ -190,8 +167,6 @@ export default function Main({navigation}: any) {
 		checkEvent();
 		getMainScreen();
 		getFirstRegion();
-		// handleProduct();
-		// handleHotProduct();
 		handleGetPassport();
 	}, []);
 	useEffect(() => {
@@ -366,6 +341,7 @@ export default function Main({navigation}: any) {
 		},
 	];
 	const handelDetail = item => {
+		handleGoogleAnalyticsProduct(item?.prod_name);
 		navigation.navigate('ProductDetail', {item: item});
 	};
 	const sheetRef = useRef<BottomSheet>(null);
@@ -638,7 +614,7 @@ export default function Main({navigation}: any) {
 						</EventContainer>
 					)}
 				/>
-				{mainProductList.length > 0 && (
+				{mainProductList.length > 0 && socialloginProvider != 'anonymous' && (
 					<>
 						<VStack>
 							<LinearGradient
@@ -694,7 +670,7 @@ export default function Main({navigation}: any) {
 													numberOfLines={1}
 													color={colors.Black}
 													deco={'margin-top:10px;'}>
-													{item?.b2b_price}원~
+													{item?.b2b_price?.toLocaleString('ko')}원~
 												</PretendardSemiBoldText>
 												<HStack>
 													<SvgStart width={11} color={'#FFDE4C'} />

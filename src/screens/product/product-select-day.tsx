@@ -25,6 +25,7 @@ import {
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGMinus, SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
 import RouteButton from '../../utill/component/route-button';
+import {logEvent} from '../../../firebaseAnalytice';
 
 export default function ProductSelectDay({navigation}: any) {
 	const route = useRoute();
@@ -414,7 +415,9 @@ export default function ProductSelectDay({navigation}: any) {
 				isDisabled={!canNext}
 				type={'planner'}
 				nextText={'다음으로'}
-				goNext={() => {
+				goNext={async () => {
+					await logEvent(`goReserve`, {pkgName: name});
+
 					navigation.navigate('Reserve', {
 						data: {
 							item_no: data?.item?.[0]?.item_no,

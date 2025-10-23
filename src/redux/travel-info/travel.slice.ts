@@ -183,8 +183,10 @@ export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data,
 export const getSellingProduct = createAsyncThunk('/sellingProduct/list', async (data: any, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.get(`/sellingProduct/list`, {params: data});
+		console.log('a', response);
 		return response;
 	} catch (error: any) {
+		console.log('z', error);
 		throw rejectWithValue(error.code);
 	}
 });
@@ -619,14 +621,17 @@ export const getQueryPackage = createAsyncThunk(
 	},
 );
 
-//부킹
-export const handleBooking = createAsyncThunk('/kkday/Booking', async (data: any, {rejectWithValue}) => {
+export const handleBooking = createAsyncThunk('/kkday/Booking', async (data, {rejectWithValue}) => {
 	try {
 		const response = await axiosAuth.post(`/kkday/Booking`, data, {timeout: 60000});
 		return response.data;
 	} catch (error: any) {
-		console.log('aaa', error);
-		throw rejectWithValue(error.code);
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
 	}
 });
 //부킹 필요한거

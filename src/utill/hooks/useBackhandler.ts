@@ -12,11 +12,23 @@ export const useBackHandler = ({type, propsFunction}: BackHandlerType) => {
 	const goPopToTop = () => {
 		navigation.popToTop?.();
 	};
+	const handleSkip = () => {
+		navigation.navigate('Timetable');
+	};
 	const notFunction = () => {};
 	const goBack = () => {
 		navigation.goBack();
 	};
 	const typeList = {
+		product: {
+			title: '상품 추천 종료',
+			subTitle: '추천된 일정으로 넘어가기',
+			handleFunction: handleSkip,
+			modalTopText: '일정보기',
+			modalBottomText: '상품 둘러보기',
+			modalBottomFunctionUse: false,
+			modalBottomFunction: () => {},
+		},
 		exit: {
 			title: '앱 종료',
 			subTitle: '앱을 종료하시겠습니까?',
@@ -91,6 +103,6 @@ export const useBackHandler = ({type, propsFunction}: BackHandlerType) => {
 	}, [type, propsFunction]);
 };
 interface BackHandlerType {
-	type: 'exit' | 'popToTop' | 'stop' | 'communityExit' | 'listBackHandle';
+	type: 'exit' | 'popToTop' | 'stop' | 'communityExit' | 'listBackHandle' | 'product';
 	propsFunction?: () => void;
 }

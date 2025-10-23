@@ -1,6 +1,7 @@
 import {useRoute} from '@react-navigation/native';
 import RenderHTML from 'react-native-render-html';
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
@@ -19,7 +20,8 @@ export default function PackageSelect({navigation}: any) {
 	//         dispa
 	//     }
 	// }
-	const handleNext = (e: any) => {
+	const handleNext = async (e: any) => {
+		await logEvent(`PackageDetail`, {title: data?.prod?.prod_name, pkgName: e?.pkg_name});
 		navigation.navigate('ProductSelectDay', {
 			image: data?.prod?.img_list[0],
 			name: e?.pkg_name,

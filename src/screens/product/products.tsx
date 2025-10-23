@@ -1,8 +1,11 @@
+import {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {useAppSelector} from '../../redux';
 import {colors} from '../../utill/colors';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGray,
 	BackgroundGrayScrollView,
@@ -17,9 +20,17 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 export default function Products({navigation}: any) {
 	const {userName} = useAppSelector(state => state.userSlice);
 	const {recommendProducts} = useAppSelector(state => state.travelSlice);
-	const handleNext = (item: any) => {
+	const handleNext = async (item: any) => {
+		await logEvent(`productList`, {title: item?.product?.sellingProductContent});
 		navigation.navigate('ProductDetail', {item});
 	};
+	const handleGoogleAnalyticsProduct = async () => {
+		await logEvent(`productList`, {});
+	};
+
+	useEffect(() => {
+		handleGoogleAnalyticsProduct();
+	}, []);
 	return (
 		<BackgroundGray>
 			<FlatList
