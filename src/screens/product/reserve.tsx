@@ -478,30 +478,30 @@ export default function Reserve({navigation}: any) {
 							].filter(item => item != null && item?.length != 0),
 						},
 					});
-					// navigation.navigate('PaymentStack', {
-					// 	info: {
-					// 		value: data?.total_price,
-					// 		guide_lang: value,
-					// 		name: data?.name,
-					// 		productinfo: {
-					// 			...form,
-					// 			userId: userId,
-					// 			...data,
-					// 			buyer_first_name: form?.native_first_name,
-					// 			buyer_last_name: form?.native_last_name,
-					// 			buyer_Email: form?.buyer_Email,
-					// 			buyer_tel_number: form?.buyer_tel_number?.substr(1),
-					// 			guide_lang: value,
-					// 			custom: [
-					// 				customType?.custom?.cus_type?.use?.includes('cus_01') ? form : null,
-					// 				...(customType?.custom?.cus_type?.use?.includes('cus_02')
-					// 					? customData?.map(item => ({...item, cus_type: 'cus_02'}))
-					// 					: []),
-					// 				customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
-					// 			].filter(item => item != null && item?.length != 0),
-					// 		},
-					// 	},
-					// });
+					navigation.navigate('PaymentStack', {
+						info: {
+							value: data?.total_price,
+							guide_lang: value,
+							name: data?.name,
+							productinfo: {
+								...form,
+								userId: userId,
+								...data,
+								buyer_first_name: form?.native_first_name,
+								buyer_last_name: form?.native_last_name,
+								buyer_Email: form?.buyer_Email,
+								buyer_tel_number: form?.buyer_tel_number?.substr(1),
+								guide_lang: value,
+								custom: [
+									customType?.custom?.cus_type?.use?.includes('cus_01') ? form : null,
+									...(customType?.custom?.cus_type?.use?.includes('cus_02')
+										? customData?.map(item => ({...item, cus_type: 'cus_02'}))
+										: []),
+									customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
+								].filter(item => item != null && item?.length != 0),
+							},
+						},
+					});
 				}}>
 				<PretendardSemiBoldText size={16} lineHeight={21} color={colors.backgroundWhite}>
 					{data?.total_price?.toLocaleString('ko')}원 결제하기

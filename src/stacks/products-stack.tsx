@@ -1,5 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Fragment} from 'react';
+import HomeProductList from '../screens/home/home-product-list';
+import HomeProductCountry from '../screens/home/select-product-country';
 import PackageSelect from '../screens/product/packge-selete';
 import ProductDetail from '../screens/product/product-detail';
 import ProductSelectDay from '../screens/product/product-select-day';
@@ -81,6 +83,22 @@ export default function ProductsStack() {
 				component={ReserveCancel}
 				options={{
 					title: '예약 상세내역',
+				}}
+			/>
+
+			<Stack.Screen
+				name='HomeProductCountry'
+				component={HomeProductCountry}
+				options={{
+					title: '나라선택',
+				}}
+			/>
+
+			<Stack.Screen
+				name='HomeProductList'
+				component={HomeProductList}
+				options={{
+					title: '상품리스트',
 				}}
 			/>
 		</Fragment>

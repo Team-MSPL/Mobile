@@ -138,6 +138,7 @@ const initialState: LiteState = {
 		},
 	],
 	presetProducts: [],
+	homeProductListMemo: {},
 };
 
 export const axiosGoogle = axios.create({
@@ -1332,6 +1333,7 @@ interface LiteState {
 	passport: passportType[];
 	presetProducts: [Product[]];
 	tendencyUse: boolean;
+	homeProductListMemo: any;
 }
 interface passportType {
 	korName: string;

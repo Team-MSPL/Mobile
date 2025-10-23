@@ -685,9 +685,9 @@ export default function Main({navigation}: any) {
 										</HStack>
 									</HotProductBox>
 								))}
-								{/* <HotMoreButton
+								<HotMoreButton
 									onPress={() => {
-										navigation.navigate('Products');
+										navigation.navigate('HomeProductCountry');
 									}}>
 									<PretendardSemiBoldText
 										size={20}
@@ -696,7 +696,7 @@ export default function Main({navigation}: any) {
 										color={colors.Gray4}>
 										여행 상품 더보기
 									</PretendardSemiBoldText>
-								</HotMoreButton> */}
+								</HotMoreButton>
 							</LinearGradient>
 						</VStack>
 					</>

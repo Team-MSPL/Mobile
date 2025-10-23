@@ -2,10 +2,11 @@ import {useEffect, useState} from 'react';
 import {Modal, TouchableOpacity} from 'react-native';
 import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
-import {useAppSelector} from '../../redux';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {getKkdaySearch, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import StepText from '../../utill/component/enroll-info/step-text';
-import PrimaryButton from '../../utill/component/primary-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGrayScrollView,
@@ -15,30 +16,17 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {
-	SVGDanimLogo,
-	SVGEmptyHeart,
-	SVGFilter,
-	SVGHeart,
-	SVGRightAdd,
-	SVGStarSmile,
-	SvgStart,
-} from '../../utill/svg/svg';
+import {SVGDanimLogo, SVGFilter, SVGRightAdd, SVGStarSmile, SvgStart} from '../../utill/svg/svg';
 import {ModalBackground, ModalBottomSheet} from '../enroll-info/planner/regist-transit';
-import {BottomContainer} from '../enroll-info/search-place';
-import {ElementContainer, SVGContainer} from '../enroll-info/select-multi';
-import {MarginContainer} from './preset-detail';
+import {MarginContainer} from '../timetable/preset-detail';
 
-export default function PresetProduct({navigation}: any) {
-	const {presetProducts} = useAppSelector(state => state.travelSlice);
+export default function HomeProductList({navigation}: any) {
+	const {country, homeProductListMemo} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
-	const handleSkip = () => {
-		navigation.navigate('Timetable');
-	};
 	const handelDetail = item => {
 		navigation.navigate('ProductDetail', {item: item});
 	};
-	const [products, setProducts] = useState(presetProducts.flat() || []);
+	const [products, setProducts] = useState([]);
 	const [categoryVisible, setCategoryVisible] = useState(false);
 	const [categoryValue, setCategoryValue] = useState('추천순');
 
@@ -49,16 +37,14 @@ export default function PresetProduct({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalyticsProduct();
 	}, []);
-	useBackHandler({type: 'product'});
 	const handleCategory = (e: string) => {
 		let copy = [...products];
-		products.map(item => console.log(item.avgPrefScore));
 		switch (e) {
 			case '추천순':
 				copy = copy.sort((a, b) => {
-					if (b.avgPrefScore === undefined) return -1;
-					if (a.avgPrefScore === undefined) return 1;
-					return b.avgPrefScore - a.avgPrefScore;
+					if (b.rating_count === undefined) return -1;
+					if (a.rating_count === undefined) return 1;
+					return b.rating_count - a.rating_count;
 				});
 				break;
 			case '낮은 가격순':
@@ -78,6 +64,48 @@ export default function PresetProduct({navigation}: any) {
 		setCategoryValue(e);
 		setCategoryVisible(false);
 	};
+	const dispatch = useAppDispatch();
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
+	const handleGetProduct = async () => {
+		try {
+			let country_keys = country == 0 ? '한국' : countryList[country].ko;
+			dispatch(LoadingSliceActions.onLoading());
+			if (homeProductListMemo?.[country_keys]) {
+				setProducts(homeProductListMemo?.[country_keys]);
+			} else {
+				const value = await dispatch(
+					getKkdaySearch({
+						keywords: '',
+						country_keys: country_keys,
+						city_keys: [''],
+					}),
+				).unwrap();
+				setProducts(value?.prods);
+				let copy = {...homeProductListMemo, [country_keys]: value?.prods};
+				dispatch(
+					travelSliceActions.updateFiled({
+						field: 'homeProductListMemo',
+						value: copy,
+					}),
+				);
+			}
+		} catch (e) {
+			console.log('e');
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		handleGetProduct();
+	}, []);
 	const viewCategoryList = ['추천순', '높은 가격순', '낮은 가격순', '높은 평점순', '낮은 평점순'];
 	return (
 		<>
@@ -98,7 +126,7 @@ export default function PresetProduct({navigation}: any) {
 				</LowPriceBox>
 				<HStack justifyContent='space-between' deco='margin-bottom:20px;padding:5px;'>
 					<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Gray5}>
-						총 {presetProducts.flat().length}개
+						총 {products?.length}개
 					</PretendardSemiBoldText>
 					<HStack gap={10}>
 						<TouchableOpacity
@@ -210,7 +238,7 @@ export default function PresetProduct({navigation}: any) {
 				))}
 				<MarginContainer />
 			</BackgroundGrayScrollView>
-			<SkipButton onPress={handleSkip}>
+			{/* <SkipButton onPress={handleSkip}>
 				<PretendardSemiBoldText
 					size={16}
 					lineHeight={21}
@@ -219,7 +247,7 @@ export default function PresetProduct({navigation}: any) {
 					deco={'text-align:center;'}>
 					건너뛰기
 				</PretendardSemiBoldText>
-			</SkipButton>
+			</SkipButton> */}
 			<Modal
 				animationType={'fade'}
 				transparent={true}

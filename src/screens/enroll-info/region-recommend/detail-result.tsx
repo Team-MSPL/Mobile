@@ -1,5 +1,5 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {getKkdaySearch, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {getKkdaySearch, recommendProduct, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
@@ -119,7 +119,16 @@ export default function DetailResult({navigation, route}: any) {
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const {countryList} = useTendencyHandler();
+	// const {countryList} = useTendencyHandler();
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
 	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
@@ -139,20 +148,66 @@ export default function DetailResult({navigation, route}: any) {
 	};
 	const [visible, setVisible] = useState(false);
 	const [products, setProducts] = useState([]);
-	const handelDetail = item => {
+	const handelDetail = async item => {
+		await logEvent(`regionProduct`, {title: item?.prod_name});
 		navigation.navigate('ProductDetail', {item: item});
 	};
 	const handleSearch = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const value = await dispatch(
-				getKkdaySearch({
-					keywords: '',
-					country_keys: country == 0 ? '한국' : countryList[country].ko,
-					city_keys: [country == 0 ? route.params.item.name?.split(' ')[0] : route.params.item.name],
-				}),
-			).unwrap();
-			setProducts(value);
+			let copy = [...regionTendency];
+			let copy0 = [...regionTendency[0]];
+			copy0.push(0);
+			copy[0] = copy0;
+			let copy2 = [...regionTendency[2]];
+			copy2.pop();
+			// if (copy2[6] == 1) {
+			// 	//역사 누르면
+			// 	copy2.push(1);
+			// 	copy2.push(0);
+			// 	copy2.push(1);
+			// 	copy2.push(1);
+			// } else {
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// }
+			copy[2] = copy2;
+			let copy3 = [...regionTendency[3]];
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			if (copy3[2] == 1) {
+				//자연경관 누르면
+				copy3[0] = 1;
+				copy3[1] = 1;
+				copy3[2] = 0;
+			}
+			if (regionTendency[2][6] == 1) {
+				copy3[5] = 1;
+				copy3[6] = 1;
+				copy3[7] = 1;
+				copy3[9] = 1;
+				copy3[10] = 1;
+			}
+			copy[3] = copy3;
+			const data = {
+				pathList: [[route.params.item.topPopularPlaceList?.map(item => ({name: item?.name}))]],
+				selectList: copy,
+				country:
+					route.params.item.name == '홍콩' || route.params.item.name == '마카오'
+						? '홍콩과 마카오'
+						: countryList[country].ko,
+				cityList: [route.params.item.name],
+			};
+			const a = await dispatch(recommendProduct(data)).unwrap();
+
+			console.log(a?.[0]);
+
+			setProducts(a?.[0]);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -256,7 +311,7 @@ export default function DetailResult({navigation, route}: any) {
 						marginBottom={14}
 					/>
 					<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						{products?.prods?.map((item, idx) => (
+						{products?.map((item, idx) => (
 							<ProductBox
 								key={idx}
 								onPress={() => {
