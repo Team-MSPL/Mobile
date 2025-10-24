@@ -335,7 +335,7 @@ export default function DetailResult({navigation, route}: any) {
 													size={18}
 													lineHeight={22}
 													color={colors.PointYellow}>
-													{item?.finalScore * 100}%
+													{Math.floor(item?.finalScore * 100)}%
 												</PretendardSemiBoldText>
 											</HStack>
 										) : (

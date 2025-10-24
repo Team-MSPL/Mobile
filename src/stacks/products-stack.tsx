@@ -35,7 +35,8 @@ export default function ProductsStack() {
 				name='PresetProduct'
 				component={PresetProduct}
 				options={{
-					title: '',
+					headerBackVisible: false,
+					headerTitle: '상품',
 				}}
 			/>
 			<Stack.Screen

@@ -22,6 +22,7 @@ export default function Reserve({navigation}: any) {
 	const {passport} = useAppSelector(state => state.travelSlice);
 	const {userId} = useAppSelector(state => state.userSlice);
 	const [form, setForm] = useState({cus_type: 'cus_01'});
+	const [sendForm, setSendForm] = useState({cus_type: 'send'});
 	const route = useRoute();
 	const {data} = route.params;
 
@@ -29,7 +30,10 @@ export default function Reserve({navigation}: any) {
 		console.log(data);
 		setForm({...form, [key]: value});
 	};
-
+	const handleSendChange = (key, value) => {
+		console.log(data);
+		setSendForm({...sendForm, [key]: value});
+	};
 	const [contactData, setContactData] = useState({cus_type: 'contact'});
 	const handleChange1 = (key, value) => {
 		console.log(data);
@@ -71,6 +75,7 @@ export default function Reserve({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			console.log(data);
 			const a = await dispatch(handleBookingField(data)).unwrap();
+			console.log(a?.traffics);
 			setCustomType(a);
 			if (a?.result_msg != 'OK' || a?.traffics?.length != 0) {
 				dispatch(
@@ -82,7 +87,7 @@ export default function Reserve({navigation}: any) {
 				);
 				navigation.goBack();
 			}
-			console.log(a);
+			console.log(a?.custom?.cus_type);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -246,7 +251,104 @@ export default function Reserve({navigation}: any) {
 							onChangeText={text => handleChange(item.key, text)}></InputBox>
 					</VStack>
 				))}
-
+				{customType?.custom?.cus_type?.use?.includes('cus_01') &&
+					Object.entries(customType?.custom)
+						?.filter(([key, value]) => !key.includes('cus_type'))
+						.map(
+							([item, value], idx) =>
+								value?.use?.includes('cus_01') && (
+									<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
+										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+											{fieldMap?.[item]?.ko}
+										</PretendardSemiBoldText>
+										{value?.type == 'list' ? (
+											<DropDownPicker
+												open={open?.status && open?.name == item}
+												value={form?.[item]}
+												items={value?.list_option?.map(item => ({
+													value: item?.code ?? item?.id,
+													label: item?.name,
+												}))}
+												setOpen={e => {
+													Keyboard.dismiss();
+													setOpen({
+														status: !open.status,
+														idx: 0,
+														name: item,
+													});
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleChange(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : (
+											<InputBox
+												placeholder={fieldMap?.[item]?.exam}
+												keyboardType={item?.keyboardType || 'default'}
+												value={form?.[item]}
+												maxLength={item?.max || undefined}
+												onChangeText={text => handleChange(item, text)}
+												// onChangeText={text => handleChange(item.key, text)}
+											></InputBox>
+										)}
+									</VStack>
+								),
+						)}
+				{customType?.custom?.cus_type?.use?.includes('send') &&
+					Object.entries(customType?.custom)
+						?.filter(([key, value]) => !key.includes('cus_type'))
+						.map(
+							([item, value], idx) =>
+								value?.use?.includes('send') && (
+									<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
+										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+											{fieldMap?.[item]?.ko}
+										</PretendardSemiBoldText>
+										{value?.type == 'list' ? (
+											<DropDownPicker
+												open={open?.status && open?.name == item}
+												value={sendForm?.[item]}
+												items={value?.list_option?.map(item => ({
+													value: item?.code ?? item?.id,
+													label: item?.name,
+												}))}
+												setOpen={e => {
+													Keyboard.dismiss();
+													setOpen({
+														status: !open.status,
+														idx: 0,
+														name: item,
+													});
+												}}
+												dropDownDirection={'TOP'}
+												listMode={'SCROLLVIEW'}
+												setValue={callback => {
+													const nextValue = callback(value);
+													console.log(value);
+													handleSendChange(item, nextValue);
+												}}
+												setItems={setItems}
+												placeholder={'선택'}
+											/>
+										) : (
+											<InputBox
+												placeholder={fieldMap?.[item]?.exam}
+												keyboardType={item?.keyboardType || 'default'}
+												value={sendForm?.[item]}
+												maxLength={item?.max || undefined}
+												onChangeText={text => handleSendChange(item, text)}
+												// onChangeText={text => handleChange(item.key, text)}
+											></InputBox>
+										)}
+									</VStack>
+								),
+						)}
 				{customType?.custom?.cus_type?.use?.includes('cus_02') && (
 					<HStack deco={'margin-top:30px;'} gap={5}>
 						<TextWall />
@@ -498,6 +600,7 @@ export default function Reserve({navigation}: any) {
 										? customData?.map(item => ({...item, cus_type: 'cus_02'}))
 										: []),
 									customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
+									customType?.custom?.cus_type?.use?.includes('send') ? sendForm : null,
 								].filter(item => item != null && item?.length != 0),
 							},
 						},

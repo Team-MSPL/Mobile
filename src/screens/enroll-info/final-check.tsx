@@ -416,7 +416,9 @@ export default function FinalCheck({navigation}: any) {
 										lineHeight={30}
 										color={colors.backgroundWhite}
 										width={widthPercentage(150)}>
-										{cityViewList[country][cityIndex].title + ' ' + region}
+										{cityViewList[country][cityIndex].title == '광역시'
+											? region + ' 전체'
+											: cityViewList[country][cityIndex].title + ' ' + region}
 									</PretendardSemiBoldText>
 								</HStack>
 							</VStack>

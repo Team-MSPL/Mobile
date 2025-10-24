@@ -24,6 +24,7 @@ export default function HomeProductList({navigation}: any) {
 	const {country, homeProductListMemo} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
 	const handelDetail = item => {
+		logEvent(`mainProductListSelect`, {title: item?.prod_name});
 		navigation.navigate('ProductDetail', {item: item});
 	};
 	const [products, setProducts] = useState([]);
@@ -77,6 +78,7 @@ export default function HomeProductList({navigation}: any) {
 	const handleGetProduct = async () => {
 		try {
 			let country_keys = country == 0 ? '한국' : countryList[country].ko;
+			logEvent(`mainProductCountry`, {title: country_keys});
 			dispatch(LoadingSliceActions.onLoading());
 			if (homeProductListMemo?.[country_keys]) {
 				setProducts(homeProductListMemo?.[country_keys]);
@@ -168,7 +170,7 @@ export default function HomeProductList({navigation}: any) {
 											유사도
 										</PretendardSemiBoldText>
 										<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
-											{item?.finalScore * 100}%
+											{Math.floor(item?.finalScore * 100)}%
 										</PretendardSemiBoldText>
 									</HStack>
 								) : (

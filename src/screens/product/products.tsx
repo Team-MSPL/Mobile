@@ -81,7 +81,7 @@ export default function Products({navigation}: any) {
 										유사도
 										{!isNaN(item?.product?.similarity) && (
 											<PretendardBoldText size={15} lineHeight={19} color={colors.PointYellow}>
-												{item?.product?.similarity * 100}%
+												{Math.floor(item?.product?.similarity * 100)}%
 											</PretendardBoldText>
 										)}
 									</PretendardBoldText>

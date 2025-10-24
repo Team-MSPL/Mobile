@@ -26,6 +26,7 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {SVGMinus, SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
 import RouteButton from '../../utill/component/route-button';
 import {logEvent} from '../../../firebaseAnalytice';
+import {modalSliceActions} from '../../redux/modal/modalSlice';
 
 export default function ProductSelectDay({navigation}: any) {
 	const route = useRoute();
@@ -156,6 +157,18 @@ export default function ProductSelectDay({navigation}: any) {
 	const [count, setCount] = useState(data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity ?? 1);
 	const [canNext, setCanNext] = useState(false);
 	const [eventTime, setEventTime] = useState(null);
+	// useEffect(() => {
+	// 	if (checkList[0]?.calendar_detail?.length != 0) {
+	// 		dispatch(
+	// 			modalSliceActions.setOpenModal({
+	// 				modalTitle: '해당 패키지가 판매를 중단하였습니다',
+	// 				modalSingleUse: true,
+	// 				modalTopText: '확인',
+	// 			}),
+	// 		);
+	// 		navigation.goBack();
+	// 	}
+	// }, []);
 	useEffect(() => {
 		let status = {
 			day: false,
