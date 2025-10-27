@@ -27,17 +27,27 @@ export default function Reserve({navigation}: any) {
 	const {data} = route.params;
 
 	const handleChange = (key, value) => {
-		console.log(data);
 		setForm({...form, [key]: value});
 	};
 	const handleSendChange = (key, value) => {
-		console.log(data);
 		setSendForm({...sendForm, [key]: value});
 	};
 	const [contactData, setContactData] = useState({cus_type: 'contact'});
 	const handleChange1 = (key, value) => {
-		console.log(data);
 		setContactData({...contactData, [key]: value});
+	};
+
+	const [trafficsData, setTrafficsData] = useState({});
+	const handleChange2 = (key, InsideKey, value) => {
+		setTrafficsData(prev => {
+			const updated = {...prev};
+			if (!updated[key]) {
+				updated[key] = {traffic_type: key};
+			}
+			updated[key] = {...updated[key], [InsideKey]: value};
+			return updated;
+		});
+		// setTrafficsData({...trafficsData, [key]: value});
 	};
 
 	const [customData, setCustomData] = useState([]);
@@ -73,21 +83,21 @@ export default function Reserve({navigation}: any) {
 	const handleField = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log(data);
+			// console.log(data);
 			const a = await dispatch(handleBookingField(data)).unwrap();
-			console.log(a?.traffics);
+			console.log(a?.traffics[2]?.arrival_airport?.list_option, 'ㅁㅁㅁㅁ');
 			setCustomType(a);
-			if (a?.result_msg != 'OK' || a?.traffics?.length != 0) {
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '해당 패키지가 판매를 중단하였습니다',
-						modalSingleUse: true,
-						modalTopText: '확인',
-					}),
-				);
-				navigation.goBack();
-			}
-			console.log(a?.custom?.cus_type);
+			// if (a?.result_msg != 'OK' || a?.traffics?.length != 0) {
+			// 	dispatch(
+			// 		modalSliceActions.setOpenModal({
+			// 			modalTitle: '해당 패키지가 판매를 중단하였습니다',
+			// 			modalSingleUse: true,
+			// 			modalTopText: '확인',
+			// 		}),
+			// 	);
+			// 	navigation.goBack();
+			// }
+			// console.log(a?.custom?.cus_type);
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -509,7 +519,7 @@ export default function Reserve({navigation}: any) {
 									</VStack>
 								),
 						)}
-				{customType?.custom?.cus_type?.use?.includes('traffics') && (
+				{customType?.traffics?.length != 0 && (
 					<HStack deco={'margin-top:30px;'} gap={5}>
 						<TextWall />
 						<PretendardSemiBoldText size={20} lineHeight={27} color={colors.Black}>
@@ -517,6 +527,55 @@ export default function Reserve({navigation}: any) {
 						</PretendardSemiBoldText>
 					</HStack>
 				)}
+
+				{customType?.traffics?.length != 0 &&
+					customType?.traffics?.map((trafficItems, idx) =>
+						Object.entries(trafficItems)
+							?.filter(([filItem, filIdx]) => filItem != 'traffic_type')
+							?.map(([item, value], index) => (
+								<VStack deco='margin-vertical:10px;gap:10px;' key={index}>
+									<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+										{fieldMap?.[item]?.ko}
+									</PretendardSemiBoldText>
+									{value?.list_option ? (
+										<DropDownPicker
+											open={open?.status && open?.name == item}
+											value={trafficsData?.[value?.use?.[0]]?.[item]}
+											items={value?.list_option?.map(item => ({
+												value: item?.code ?? item?.id,
+												label: item?.name,
+											}))}
+											setOpen={e => {
+												Keyboard.dismiss();
+												setOpen({
+													status: !open.status,
+													idx: 0,
+													name: item,
+												});
+											}}
+											dropDownDirection={'TOP'}
+											listMode={'SCROLLVIEW'}
+											setValue={callback => {
+												const nextValue = callback(value);
+												handleChange2(value?.use?.[0], item, nextValue);
+											}}
+											setItems={setItems}
+											placeholder={'선택'}
+										/>
+									) : (
+										<InputBox
+											placeholder={fieldMap?.[item]?.exam}
+											keyboardType={fieldMap?.[item]?.keyboardType || 'default'}
+											value={trafficsData?.[value?.use?.[0]]?.[item]}
+											maxLength={item?.max || undefined}
+											onChangeText={text => handleChange2(value?.use?.[0], item, text)}
+											// onChangeText={text => handleChange(item.key, text)}
+										></InputBox>
+									)}
+								</VStack>
+							)),
+					)}
+
 				{customType?.guide_lang?.is_require && customType?.guide_lang?.is_visible && (
 					<View
 						style={{
@@ -558,28 +617,28 @@ export default function Reserve({navigation}: any) {
 				isActive={false}
 				onPress={async () => {
 					await logEvent(`goPayment`, {pkgName: data?.name});
-					console.log({
-						value: data?.total_price,
-						guide_lang: value,
-						name: data?.name,
-						productinfo: {
-							...form,
-							userId: userId,
-							...data,
-							buyer_first_name: form?.native_first_name,
-							buyer_last_name: form?.native_last_name,
-							buyer_Email: form?.buyer_Email,
-							buyer_tel_number: form?.buyer_tel_number?.substr(1),
-							guide_lang: value,
-							custom: [
-								customType?.custom?.cus_type?.use?.includes('cus_01') ? form : null,
-								...(customType?.custom?.cus_type?.use?.includes('cus_02')
-									? customData?.map(item => ({...item, cus_type: 'cus_02'}))
-									: []),
-								customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
-							].filter(item => item != null && item?.length != 0),
-						},
-					});
+					// console.log({
+					// 	value: data?.total_price,
+					// 	guide_lang: value,
+					// 	name: data?.name,
+					// 	productinfo: {
+					// 		...form,
+					// 		userId: userId,
+					// 		...data,
+					// 		buyer_first_name: form?.native_first_name,
+					// 		buyer_last_name: form?.native_last_name,
+					// 		buyer_Email: form?.buyer_Email,
+					// 		buyer_tel_number: form?.buyer_tel_number?.substr(1),
+					// 		guide_lang: value,
+					// 		custom: [
+					// 			customType?.custom?.cus_type?.use?.includes('cus_01') ? form : null,
+					// 			...(customType?.custom?.cus_type?.use?.includes('cus_02')
+					// 				? customData?.map(item => ({...item, cus_type: 'cus_02'}))
+					// 				: []),
+					// 			customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
+					// 		].filter(item => item != null && item?.length != 0),
+					// 	},
+					// });
 					navigation.navigate('PaymentStack', {
 						info: {
 							value: data?.total_price,
@@ -602,6 +661,7 @@ export default function Reserve({navigation}: any) {
 									customType?.custom?.cus_type?.use?.includes('contact') ? contactData : null,
 									customType?.custom?.cus_type?.use?.includes('send') ? sendForm : null,
 								].filter(item => item != null && item?.length != 0),
+								traffic: Object.entries(trafficsData).map(([key, value]) => value),
 							},
 						},
 					});
@@ -688,4 +748,41 @@ const fieldMap = {
 	glass_degree: {ko: '안경 도수', exam: '-2.50 / +1.75'},
 	meal: {ko: '식사 선호', exam: '일반식 / 채식'},
 	allergy_food: {ko: '알레르기 음식', exam: '견과류 / 해산물'},
+
+	arrival_flightType: {ko: '도착편 비행 유형', exam: '국제선 / 국내선'},
+	arrival_airport: {ko: '도착 공항', exam: '인천국제공항'},
+	arrival_airlineName: {ko: '도착 항공사명', exam: '대한항공'},
+	arrival_flightNo: {ko: '도착 항공편 번호', exam: 'KE123'},
+	arrival_terminalNo: {ko: '도착 터미널 번호', exam: 'T1'},
+	arrival_visa: {ko: '비자 여부', exam: '필요 / 불필요'},
+	arrival_date: {ko: '도착일', exam: '2025-10-27'},
+	arrival_time: {ko: '도착 시각', exam: '14:30'},
+
+	departure_flightType: {ko: '출발편 비행 유형', exam: '국제선 / 국내선'},
+	departure_airport: {ko: '출발 공항', exam: '김포공항'},
+	departure_airlineName: {ko: '출발 항공사명', exam: '아시아나항공'},
+	departure_flightNo: {ko: '출발 항공편 번호', exam: 'OZ345'},
+	departure_terminalNo: {ko: '출발 터미널 번호', exam: 'T2'},
+	departure_haveBeenInCountry: {ko: '입국 이력 여부', exam: '있음 / 없음'},
+	departure_date: {ko: '출발일', exam: '2025-10-30'},
+	departure_time: {ko: '출발 시각', exam: '09:45'},
+
+	carpsg_adult: {ko: '성인 승객 수', exam: '2', keyboardType: 'number-pad'},
+	carpsg_child: {ko: '어린이 승객 수', exam: '1', keyboardType: 'number-pad'},
+	carpsg_infant: {ko: '유아 승객 수', exam: '1', keyboardType: 'number-pad'},
+	safetyseat_sup_child: {ko: '어린이용 안전좌석(제공)', exam: '1', keyboardType: 'number-pad'},
+	safetyseat_self_child: {ko: '어린이용 안전좌석(개인 소지)', exam: '0', keyboardType: 'number-pad'},
+	safetyseat_sup_infant: {ko: '유아용 안전좌석(제공)', exam: '1', keyboardType: 'number-pad'},
+	safetyseat_self_infant: {ko: '유아용 안전좌석(개인 소지)', exam: '0', keyboardType: 'number-pad'},
+	luggage_carry: {ko: '기내 휴대 수하물', exam: '2', keyboardType: 'number-pad'},
+	luggage_check: {ko: '위탁 수하물', exam: '1', keyboardType: 'number-pad'},
+
+	s_location: {ko: '픽업 위치', exam: '서울역 / 인천공항 / 호텔 등'},
+	e_location: {ko: '반납 위치', exam: '부산역 / 공항 / 항구 등'},
+	s_date: {ko: '픽업 날짜', exam: '2025-10-28'},
+	s_time: {ko: '픽업 시각', exam: '08:00'},
+	e_date: {ko: '반납 날짜', exam: '2025-10-28'},
+	e_time: {ko: '반납 시각', exam: '11:00'},
+
+	is_rent_customize: {ko: '맞춤 렌트 여부', exam: '예 / 아니오'},
 };
