@@ -247,6 +247,7 @@ export default function AddSearchRecommend({navigation, route}: any) {
 					),
 					navigation.goBack());
 			}
+			console.log(result);
 			setRcommendList(result);
 		} catch (err) {
 			dispatch(

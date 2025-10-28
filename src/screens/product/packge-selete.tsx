@@ -54,11 +54,11 @@ export default function PackageSelect({navigation}: any) {
 								size={16}
 								lineHeight={20}
 								color={colors.PointGreen1}
-								deco={'text-align:right'}>
+								deco={'text-align:right;margin-top:15px;'}>
 								{(item?.b2c_min_price - item?.b2b_min_price).toLocaleString('ko-KR')}원 할인
 							</PretendardSemiBoldText>
 							<PretendardSemiBoldText
-								size={20}
+								size={18}
 								lineHeight={24}
 								color={colors.Gray2}
 								deco={'text-align:right;text-decoration:line-through;'}>
@@ -67,7 +67,7 @@ export default function PackageSelect({navigation}: any) {
 						</>
 					)}
 					<PretendardSemiBoldText
-						size={24}
+						size={23}
 						lineHeight={29}
 						numberOfLines={2}
 						color={colors.Black}

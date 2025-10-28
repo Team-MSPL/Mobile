@@ -581,7 +581,8 @@ export default function Reserve({navigation}: any) {
 						style={{
 							flex: 1,
 							zIndex: 20,
-							marginVertical: 10,
+							marginTop: 10,
+							marginBottom: 30,
 						}}>
 						<PretendardSemiBoldText
 							size={16}

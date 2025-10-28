@@ -104,14 +104,26 @@ export default function ProductSelectDay({navigation}: any) {
 			const {fee_type, display_rule} = rule;
 
 			if (fee_type === 'FULL_REFUND') {
-				return <Text key={index}>✔️ 출발일 기준 {display_rule?.day_min}일 전까지 전액 환불 가능</Text>;
+				return (
+					<Text key={index} style={{color: colors.Gray3}}>
+						✔️ 출발일 기준 {display_rule?.day_min}일 전까지 전액 환불 가능
+					</Text>
+				);
 			}
 
 			if (fee_type === 'NON_REFUNDABLE') {
 				if (display_rule?.day_max !== undefined) {
-					return <Text key={index}>❌ 출발일 기준 {display_rule?.day_max}일 전부터는 환불 불가</Text>;
+					return (
+						<Text key={index} style={{color: colors.Gray3}}>
+							❌ 출발일 기준 {display_rule?.day_max}일 전부터는 환불 불가
+						</Text>
+					);
 				} else {
-					return <Text key={index}>❌ 환불 불가</Text>;
+					return (
+						<Text key={index} style={{color: colors.Gray3}}>
+							❌ 환불 불가
+						</Text>
+					);
 				}
 			}
 
@@ -130,8 +142,20 @@ export default function ProductSelectDay({navigation}: any) {
 					pkg_no,
 				}),
 			).unwrap();
-			setData(value);
+			if (!value?.item) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '해당 패키지가 판매를 중단하였습니다',
+						modalSingleUse: true,
+						modalTopText: '확인',
+					}),
+				);
+				navigation.goBack();
+			} else {
+				setData(value);
+			}
 			console.log(value?.item?.[0]?.unit_quantity_rule?.total_rule);
+			console.log(value?.item, 'ㅋ');
 		} catch (e) {
 			console.log('e');
 		} finally {
@@ -406,19 +430,42 @@ export default function ProductSelectDay({navigation}: any) {
 				{renderRefundPolicy(data.refund_policy_v2)}
 				{data?.item?.[0]?.specs?.length == Object.entries(selectedSpecs)?.length && (
 					<HStack deco='margin-top:15px;' justifyContent='space-between'>
-						<PretendardSemiBoldText size={24} lineHeight={28} numberOfLines={2} color={colors.Gray3}>
-							총 금액
-						</PretendardSemiBoldText>
-						<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
-							{(
-								Number(
-									checkList[0]?.calendar_detail?.[
-										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
-									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
-								) * count
-							).toLocaleString('ko-KR')}
-							원{/* {moment(dateInfo.selectStartDate).format('YYYY-MM-DD')} */}
-						</PretendardSemiBoldText>
+						{Number(
+							checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]
+								?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+						) == 0 ? (
+							<PretendardSemiBoldText
+								size={24}
+								lineHeight={28}
+								numberOfLines={2}
+								color={colors.PointGreen1}>
+								선택한 옵션의 상품이 품절되었습니다
+							</PretendardSemiBoldText>
+						) : (
+							<>
+								<PretendardSemiBoldText
+									size={24}
+									lineHeight={28}
+									numberOfLines={2}
+									color={colors.Gray3}>
+									총 금액
+								</PretendardSemiBoldText>
+								<PretendardSemiBoldText
+									size={22}
+									lineHeight={26}
+									numberOfLines={2}
+									color={colors.Black}>
+									{(
+										Number(
+											checkList[0]?.calendar_detail?.[
+												moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+											]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+										) * count
+									).toLocaleString('ko-KR')}
+									원{/* {moment(dateInfo.selectStartDate).format('YYYY-MM-DD')} */}
+								</PretendardSemiBoldText>
+							</>
+						)}
 					</HStack>
 				)}
 				<MarginContainder />

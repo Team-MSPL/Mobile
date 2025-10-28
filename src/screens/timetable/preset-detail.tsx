@@ -93,6 +93,7 @@ export default function PresetDetail({navigation, route}: any) {
 				cityList: region,
 			};
 			const a = await dispatch(recommendProduct(data)).unwrap();
+			navigation.navigate('Timetable');
 			navigation.navigate('PresetProduct');
 			// console.log(a[0]);
 		} catch (e) {

@@ -154,11 +154,16 @@ export default function ProductDetail({navigation}: any) {
 					{/* <PretendardVariableText size={18} lineHeight={23} color={colors.Black}>
 						{productInfo?.prod?.introduction}
 					</PretendardVariableText> */}
-					<RenderHtml contentWidth={widthPercentage(327)} source={{html: productInfo?.prod?.introduction}} />
+					<RenderHtml
+						contentWidth={widthPercentage(327)}
+						baseStyle={{color: colors.Black}}
+						source={{html: productInfo?.prod?.introduction}}
+					/>
 					<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
 						{productInfo?.prod?.description_module?.PMDL_INTRODUCE_SUMMARY?.module_title}
 					</PretendardSemiBoldText>
 					<RenderHtml
+						baseStyle={{color: colors.Black}}
 						contentWidth={widthPercentage(327)}
 						source={{html: productInfo?.prod?.description_module?.PMDL_INTRODUCE_SUMMARY?.content?.desc}}
 					/>
@@ -166,6 +171,7 @@ export default function ProductDetail({navigation}: any) {
 						{productInfo?.prod?.description_module?.PMDL_EXPERIENCE_LOCATION?.module_title}
 					</PretendardSemiBoldText>
 					<RenderHtml
+						baseStyle={{color: colors.Black}}
 						contentWidth={widthPercentage(327)}
 						source={{
 							html: productInfo?.prod?.description_module?.PMDL_EXPERIENCE_LOCATION?.content?.list[0]
@@ -173,6 +179,7 @@ export default function ProductDetail({navigation}: any) {
 						}}
 					/>
 					<RenderHtml
+						baseStyle={{color: colors.Black}}
 						contentWidth={widthPercentage(327)}
 						source={{
 							html: productInfo?.prod?.description_module?.PMDL_EXPERIENCE_LOCATION?.content?.list[0]
@@ -182,6 +189,7 @@ export default function ProductDetail({navigation}: any) {
 					{productInfo?.prod?.description_module?.PMDL_NOTICE?.content?.properties?.cust_reminds?.list?.map(
 						(noticeItem, noticeIndex) => (
 							<RenderHtml
+								baseStyle={{color: colors.Black}}
 								contentWidth={widthPercentage(327)}
 								source={{
 									html: noticeItem,
@@ -193,6 +201,7 @@ export default function ProductDetail({navigation}: any) {
 						{productInfo?.prod?.description_module?.PMDL_PURCHASE_SUMMARY?.module_title}
 					</PretendardSemiBoldText>
 					<RenderHtml
+						baseStyle={{color: colors.Black}}
 						contentWidth={widthPercentage(327)}
 						source={{html: productInfo?.prod?.description_module?.PMDL_PURCHASE_SUMMARY?.content?.desc}}
 					/>
@@ -233,6 +242,7 @@ export default function ProductDetail({navigation}: any) {
 
 											{station.active_time_desc && (
 												<RenderHtml
+													baseStyle={{color: colors.Black}}
 													contentWidth={widthPercentage(327)}
 													source={{html: station.active_time_desc.desc}}
 												/>

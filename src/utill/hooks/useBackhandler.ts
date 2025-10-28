@@ -13,7 +13,7 @@ export const useBackHandler = ({type, propsFunction}: BackHandlerType) => {
 		navigation.popToTop?.();
 	};
 	const handleSkip = () => {
-		navigation.navigate('Timetable');
+		goBack();
 	};
 	const notFunction = () => {};
 	const goBack = () => {

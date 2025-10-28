@@ -33,7 +33,8 @@ export default function PresetProduct({navigation}: any) {
 	const {presetProducts} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
 	const handleSkip = () => {
-		navigation.navigate('Timetable');
+		// navigation.navigate('Timetable');
+		navigation.goBack();
 	};
 	const handelDetail = item => {
 		navigation.navigate('ProductDetail', {item: item});
