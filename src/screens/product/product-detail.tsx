@@ -303,6 +303,11 @@ export default function ProductDetail({navigation}: any) {
 							</PretendardSemiBoldText>
 						),
 					)}
+					{!(productInfo?.pkg?.length > 0) && (
+						<PretendardSemiBoldText size={24} lineHeight={28} numberOfLines={2} color={colors.PointGreen1}>
+							해당 여행 상품은 현재 판매가 종료되었습니다.
+						</PretendardSemiBoldText>
+					)}
 					<MarginContainer />
 				</PaddingContainer>
 			</Container>

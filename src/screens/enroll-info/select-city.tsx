@@ -410,7 +410,7 @@ const WrapContainer = styled.View`
 	gap: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(20)}px;
 `;
-const RegionItems = styled.TouchableOpacity<{select: boolean}>`
+export const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
 	align-items: center;
 	padding: ${heightPercentage(8)}px ${widthPercentage(16)}px;

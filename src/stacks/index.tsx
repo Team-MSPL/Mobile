@@ -88,6 +88,7 @@ function TabBar() {
 			screenOptions={{
 				tabBarStyle: {
 					...(Platform?.isPad && 'height:150'),
+					height: heightPercentage(100),
 					marginBottom: -insets.bottom,
 				},
 				tabBarItemStyle: {

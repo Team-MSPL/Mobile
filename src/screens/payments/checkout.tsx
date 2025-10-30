@@ -58,6 +58,7 @@ export default function CheckoutPage({navigation, route}: any) {
 			).unwrap();
 			console.log('안녕', q);
 			if (!!q?.error) {
+				console.log('에러21', q?.error);
 				await dispatch(
 					tossCancel({
 						paymentKey: e?.paymentKey,

@@ -71,8 +71,8 @@ export default function Reserve({navigation}: any) {
 		});
 	};
 	const inputFields = [
-		{key: 'native_first_name', label: '영문 이름', placeholder: 'gildong'},
-		{key: 'native_last_name', label: '영문 성', placeholder: 'hong'},
+		{key: 'english_first_name', label: '영문 이름', placeholder: 'gildong'},
+		{key: 'english_last_name', label: '영문 성', placeholder: 'hong'},
 
 		// {key: 'country', label: '국가', placeholder: '대한민국'},
 
@@ -84,8 +84,9 @@ export default function Reserve({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			// console.log(data);
+			console.log(data, 'z');
 			const a = await dispatch(handleBookingField(data)).unwrap();
-			console.log(a?.traffics[2]?.arrival_airport?.list_option, 'ㅁㅁㅁㅁ');
+			// console.log(a?.custom);
 			setCustomType(a);
 			// if (a?.result_msg != 'OK' || a?.traffics?.length != 0) {
 			// 	dispatch(
@@ -99,7 +100,15 @@ export default function Reserve({navigation}: any) {
 			// }
 			// console.log(a?.custom?.cus_type);
 		} catch (e) {
-			console.log(e);
+			console.log(e, 'ㅁ');
+			dispatch(
+				modalSliceActions.setOpenModal({
+					modalTitle: '현재 해당 여행 상품의 판매가 중단되었습니다.',
+					modalSingleUse: true,
+					modalTopText: '확인',
+				}),
+			);
+			navigation.goBack();
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
@@ -178,7 +187,7 @@ export default function Reserve({navigation}: any) {
 						?.filter(([key, value]) => !key.includes('cus_type'))
 						.map(
 							([item, value], idx) =>
-								value?.use?.includes('cus_01') && (
+								value?.use?.includes('cus_type') && (
 									<VStack deco='margin-vertical:10px;gap:10px;' key={idx}>
 										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
 											{fieldMap?.[item]?.ko}

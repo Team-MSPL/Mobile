@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '../../../redux';
 import {colors} from '../../../utill/colors';
 import {GOOGLE_API_KEY} from '@env';
 import {
+	getRecommendPlace,
 	googleDetailApi,
 	recommendApi,
 	recommendTripadvisor,
@@ -30,11 +31,15 @@ import {modalSliceActions} from '../../../redux/modal/modalSlice';
 import {ScrollView} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import shortid from 'shortid';
+import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 
 export default function AddSearchRecommend({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
-	const {region, regionInfo, timetable, country} = useAppSelector(state => state.travelSlice);
+	const {region, regionInfo, timetable, country, tendency, season, cityIndex} = useAppSelector(
+		state => state.travelSlice,
+	);
 	const handleColor = (e: string) => {
 		let color = '';
 		switch (e) {
@@ -69,13 +74,13 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		let title = '';
 		switch (e) {
 			case 'travle':
-				title = country != 0 ? 'attractions' : 'AT4';
+				title = 'attractions';
 				break;
 			case 'accommodation':
-				title = country != 0 ? 'hotels' : 'AD5';
+				title = 'hotels';
 				break;
 			case 'cafe':
-				title = country != 0 ? 'restaurants' : 'FD6';
+				title = 'restaurants';
 				break;
 		}
 		return title;
@@ -188,56 +193,89 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	const [timeValue, setTimeValue] = useState(0);
 	const [view, setView] = useState(true);
 	const [recommendList, setRcommendList] = useState([]);
+	const {countryList} = useTendencyHandler();
+	const handleRegion = () => {
+		let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
+		if (
+			(country == 0 && cityViewList[country][cityIndex].id >= 3 && region[0] == '전체') ||
+			(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
+			(country != 0 && region[0] == '전체')
+		) {
+			a = cityViewList[country][cityIndex].sub.map(
+				(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
+			);
+			a.shift();
+		}
+		// //["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
+		if (country == 0 && cityIndex == 2) {
+			a = [region[0] + ' 전체'];
+		}
+		if (country != 0) {
+			a = a.map((item, idx) => {
+				return `해외/${countryList[country].en}/${item
+					.slice(
+						item.indexOf(cityViewList[country][cityIndex].title) +
+							cityViewList[country][cityIndex].title.length,
+					)
+					.trim()}`;
+			});
+		}
+		return [a[0]];
+	};
+	const getTravelRecommendList = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				regionList: handleRegion(),
+				selectList: [...tendency, season],
+				transit: 1,
+				version: 3, // 없으면 2로 취급
+				distanceSensitivity: 5,
+				popularSensitivity: 5, // 250604추가 - 기본값 5
+				bandwidth: true,
+				lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
+				lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
+				page: 1, // 250430 추가
+				page_for_place: 10, // 250430 추가
+				password: '(주)나그네들_g5hb87r8765rt68i7ur78',
+			};
+			const a = await dispatch(getRecommendPlace(data)).unwrap();
+			setRcommendList(a?.recommendedPlaces);
+			console.log(a);
+		} catch (e) {
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	const getRecommendList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
 			let result = await dispatch(
-				country != 0
-					? recommendTripadvisor({
-							category: handleCategory(route.params.title),
-							lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
-							lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
-							radius: 10000,
-							name:
-								timetable[route.params.info.day][route.params.info.index - 1]?.name ??
-								region[0].split('/').at(-1),
-					  })
-					: recommendApi({
-							category: handleCategory(route.params.title),
-							lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
-							lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
-							radius: 1000,
-					  }),
+				recommendTripadvisor({
+					category: handleCategory(route.params.title),
+					lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
+					lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
+					radius: 10000,
+					name:
+						timetable[route.params.info.day][route.params.info.index - 1]?.name ??
+						region[0].split('/').at(-1),
+				}),
 			).unwrap();
-			result = country != 0 ? result.data : result;
+			result = result.data;
 			if (result.length == 0) {
 				result = await dispatch(
-					country != 0
-						? recommendTripadvisor({
-								category: handleCategory(route.params.title),
-								lat:
-									timetable[route.params.info.day][route.params.info.index - 1]?.lat ??
-									regionInfo.lat,
-								lng:
-									timetable[route.params.info.day][route.params.info.index - 1]?.lng ??
-									regionInfo.lng,
-								radius: 20000,
-								name: route.params.status.name,
-						  })
-						: recommendApi({
-								category: handleCategory(route.params.title),
-								lat:
-									timetable[route.params.info.day][route.params.info.index - 1]?.lat ??
-									regionInfo.lat,
-								lng:
-									timetable[route.params.info.day][route.params.info.index - 1]?.lng ??
-									regionInfo.lng,
-								radius: 20000,
-						  }),
+					recommendTripadvisor({
+						category: handleCategory(route.params.title),
+						lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
+						lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
+						radius: 20000,
+						name: route.params.status.name,
+					}),
 				).unwrap();
 				// departure.current.lat = route.params.lat;
 				// departure.current.lng = route.params.lng;
-				result = country != 0 ? result.data : result;
+				result = result.data;
 				result.length == 0 &&
 					(dispatch(
 						modalSliceActions.setOpenModal({
@@ -293,7 +331,13 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		return () => clearTimeout(timer);
 	}, []);
 	const handleAiRecommmend = async () => {
-		getRecommendList();
+		navigation.navigate('AiRecommned', {info: route.params?.info, title: route.params?.title});
+		console.log(route.params);
+		// if (route?.params?.title == 'travle') {
+		// 	getTravelRecommendList();
+		// } else {
+		// 	getRecommendList();
+		// }
 	};
 	return (
 		<BackgroundGray>
@@ -414,9 +458,11 @@ export default function AddSearchRecommend({navigation, route}: any) {
 						key={idx}
 						deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
 							10,
-						)}px ${widthPercentage(10)}px;border-radius:12px;margin-bottom:10px;gap:5px;`}>
-						<ImageBox source={handleImage(route.params?.title)} resizeMode={'contain'}></ImageBox>
-						<VStack width={widthPercentage(240)}>
+						)}px ${widthPercentage(10)}px;border-radius:12px;margin-bottom:10px;gap:15px;`}>
+						<ImageBox
+							source={item?.photo ? {uri: item?.photo} : handleImage(route.params?.title)}
+							resizeMode={'cover'}></ImageBox>
+						<VStack width={widthPercentage(230)}>
 							<PretendardSemiBoldText size={16} lineHeight={22} numberOfLines={1} color={colors.Black}>
 								{item?.place_name ?? item?.name}
 							</PretendardSemiBoldText>
@@ -424,13 +470,12 @@ export default function AddSearchRecommend({navigation, route}: any) {
 								{item?.address_name ?? item?.address_obj?.address_string}
 							</PretendardVariableText>
 							<PretendardVariableText
-								size={12}
-								lineHeight={17}
+								size={14}
+								lineHeight={19}
 								numberOfLines={1}
-								color={colors.PointYellow}
-								deco={'margin-left:auto;'}>
+								color={colors.PointYellow}>
 								{timetable[route.params.info.day][route.params.info.index - 1]?.name ?? '중심지'}로 부터{' '}
-								{country != 0 ? Math.floor(Number(item?.distance) * 1000) : item?.distance}m
+								{Math.floor(Number(item?.distance) * 1000)}m
 							</PretendardVariableText>
 						</VStack>
 					</ItemPressBox>
@@ -570,7 +615,8 @@ const Triangle = styled.View`
 	left: ${widthPercentage(107)}px;
 `;
 const ImageBox = styled.Image`
-	width: ${widthPercentage(59)}px;
-	height: ${widthPercentage(53)}px;
+	width: ${widthPercentage(80)}px;
+	height: ${widthPercentage(80)}px;
+	border-radius: 8px;
 `;
 const ItemPressBox = styled(HStack).attrs({as: TouchableOpacity})``;

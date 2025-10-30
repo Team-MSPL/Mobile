@@ -145,7 +145,7 @@ export default function ProductSelectDay({navigation}: any) {
 			if (!value?.item) {
 				dispatch(
 					modalSliceActions.setOpenModal({
-						modalTitle: '해당 패키지가 판매를 중단하였습니다',
+						modalTitle: '현재 해당 여행 상품의 판매가 중단되었습니다.',
 						modalSingleUse: true,
 						modalTopText: '확인',
 					}),
@@ -439,7 +439,8 @@ export default function ProductSelectDay({navigation}: any) {
 								lineHeight={28}
 								numberOfLines={2}
 								color={colors.PointGreen1}>
-								선택한 옵션의 상품이 품절되었습니다
+								선택하신 날짜의 해당 옵션이 품절되었습니다.{`\n`}
+								다른 날짜나 옵션을 선택해주세요.
 							</PretendardSemiBoldText>
 						) : (
 							<>
