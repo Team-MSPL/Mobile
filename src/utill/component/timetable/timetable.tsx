@@ -296,7 +296,7 @@ function Timetable({
 	};
 	return (
 		<>
-			{modify == 'ㅂㅈㄷ' ? (
+			{modify ? (
 				<DayScrollView
 					ref={modify ? scrollRef : null}
 					onMomentumScrollEnd={e => {
@@ -396,17 +396,17 @@ function Timetable({
 														status={idx == value.length - 1 ? 'end' : 'center'}></DashLine> */}
 													</DashLineContainer>
 													<InsideGrayContainer
-														// onLongPress={() => {
-														// 	dispatch(
-														// 		modalSliceActions.setOpenModal({
-														// 			modalTitle:
-														// 				'편집 모드에서 여행 일정을 편집하시겠어요?',
-														// 			modalFunction: () => {
-														// 				setModify(true);
-														// 			},
-														// 		}),
-														// 	);
-														// }}
+														onLongPress={() => {
+															dispatch(
+																modalSliceActions.setOpenModal({
+																	modalTitle:
+																		'편집 모드에서 여행 일정을 편집하시겠어요?',
+																	modalFunction: () => {
+																		setModify(true);
+																	},
+																}),
+															);
+														}}
 														onPress={() => {
 															moveRegion(idx, index);
 														}}>

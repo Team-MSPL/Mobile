@@ -52,7 +52,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {GOOGLE_API_KEY} from '@env';
 export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place} = useAppSelector(
+	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place, beforeTimetable} = useAppSelector(
 		state => state.travelSlice,
 	);
 	const {cooperationState} = useAppSelector(state => state.eventSlice);
@@ -373,34 +373,18 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					// onTouchEnd={() => setTopBar(true)}
 				/>
 			)}
-			<BottomSheet
-				ref={sheetRef}
-				snapPoints={modify ? ['99%', '99%'] : ['10%', '60%', '90%']}
-				handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
-				handleStyle={{borderRadius: 30}}
-				backgroundStyle={{borderRadius: 30}}
-				enableDynamicSizing={false}
-				onChange={handleSheetChange}
-				index={modify ? 0 : 1}
-				style={{zIndex: 0}}>
-				<SheetContent />
-				<BottomSheetScrollView
-					onScroll={() => {
-						open.status && setOpen({...open, status: false});
-					}}
-					showsVerticalScrollIndicator={false}
-					style={{zIndex: 0}}>
-					<BackgroundGray modify={modify} viewMap={viewMap}>
-						{/* <PretendardSemiBoldText
+			{modify ? (
+				<BackgroundGray modify={modify} viewMap={viewMap}>
+					{/* <PretendardSemiBoldText
 							size={14}
 							lineHeight={19}
 							color={colors.Gray3}
 							deco={'text-align:center;'}>
 							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
 						</PretendardSemiBoldText> */}
-						<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-							<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
-								{/* {['항공', '숙소', ...timetable].map(
+					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
+							{/* {['항공', '숙소', ...timetable].map(
 									(item, idx) =>
 										item.length != 0 && (
 											<VStack>
@@ -423,28 +407,28 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 											</VStack>
 										),
 								)} */}
-								{timetable.map(
-									(item, idx) =>
-										item.length != 0 && (
-											<DayTouchablOpacity
-												key={idx}
-												select={idx === select}
-												onPress={() => {
-													changeTouch(idx);
-													open.status && setOpen({...open, status: false});
-												}}>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={19}
-													color={select == idx ? colors.Gray5 : colors.Gray3}>
-													{'DAY' + (idx + 1)}
-												</PretendardSemiBoldText>
-											</DayTouchablOpacity>
-										),
-								)}
-							</FlexWrap>
-						</DayContainer>
-						{/* <HStack justifyContent='space-between'>
+							{timetable.map(
+								(item, idx) =>
+									item.length != 0 && (
+										<DayTouchablOpacity
+											key={idx}
+											select={idx === select}
+											onPress={() => {
+												changeTouch(idx);
+												open.status && setOpen({...open, status: false});
+											}}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={19}
+												color={select == idx ? colors.Gray5 : colors.Gray3}>
+												{'DAY' + (idx + 1)}
+											</PretendardSemiBoldText>
+										</DayTouchablOpacity>
+									),
+							)}
+						</FlexWrap>
+					</DayContainer>
+					{/* <HStack justifyContent='space-between'>
 							<WhiteContainer width={widthPercentage(160)}>
 								<HStack justifyContent='space-between' width={widthPercentage(140)}>
 									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
@@ -482,27 +466,156 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 								</HStack>
 							</WhiteContainer>
 						</HStack> */}
-						<Timetable
-							modify={modify}
-							scrollRef={scrollRef}
-							changeViewState={changeViewState}
-							scrollhandle={scrollhandle}
-							changeLocation={changeLocation}
-							changeLocationRef={changeLocationRef}
-							openModal={openModal}
-							CancelModify={CancelModify}
-							navigation={navigation}
-							goNavigation={goNavigation}
-							setModify={setModify}
-							viewMap={viewMap}
-							select={select}
-							open={open}
-							setOpen={setOpen}
-						/>
-					</BackgroundGray>
-					<MarginContainer />
-				</BottomSheetScrollView>
-			</BottomSheet>
+					<Timetable
+						modify={modify}
+						scrollRef={scrollRef}
+						changeViewState={changeViewState}
+						scrollhandle={scrollhandle}
+						changeLocation={changeLocation}
+						changeLocationRef={changeLocationRef}
+						openModal={openModal}
+						CancelModify={CancelModify}
+						navigation={navigation}
+						goNavigation={goNavigation}
+						setModify={setModify}
+						viewMap={viewMap}
+						select={select}
+						open={open}
+						setOpen={setOpen}
+					/>
+				</BackgroundGray>
+			) : (
+				<BottomSheet
+					ref={sheetRef}
+					snapPoints={modify ? ['99%', '99%'] : ['10%', '60%', '90%']}
+					handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+					handleStyle={{borderRadius: 30}}
+					backgroundStyle={{borderRadius: 30}}
+					enableDynamicSizing={false}
+					onChange={handleSheetChange}
+					index={modify ? 0 : 1}
+					style={{zIndex: 0}}>
+					<SheetContent />
+					<BottomSheetScrollView
+						onScroll={() => {
+							open.status && setOpen({...open, status: false});
+						}}
+						showsVerticalScrollIndicator={false}
+						style={{zIndex: 0}}>
+						<BackgroundGray modify={modify} viewMap={viewMap}>
+							{/* <PretendardSemiBoldText
+							size={14}
+							lineHeight={19}
+							color={colors.Gray3}
+							deco={'text-align:center;'}>
+							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
+						</PretendardSemiBoldText> */}
+							<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+								<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
+									{/* {['항공', '숙소', ...timetable].map(
+									(item, idx) =>
+										item.length != 0 && (
+											<VStack>
+												<Circle
+													color={getStepColor(item, idx, select)}
+													flag={idx}
+													onPress={() => {
+														changeTouch(idx);
+													}}>
+													{idx <= select && (
+														<SvgCheck color='white' width={widthPercentage(15)} />
+													)}
+												</Circle>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={19}
+													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
+													{idx <= 1 ? item : moment(day[idx - 2]).format('MM월DD일')}
+												</PretendardSemiBoldText>
+											</VStack>
+										),
+								)} */}
+									{timetable.map(
+										(item, idx) =>
+											item.length != 0 && (
+												<DayTouchablOpacity
+													key={idx}
+													select={idx === select}
+													onPress={() => {
+														changeTouch(idx);
+														open.status && setOpen({...open, status: false});
+													}}>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={19}
+														color={select == idx ? colors.Gray5 : colors.Gray3}>
+														{'DAY' + (idx + 1)}
+													</PretendardSemiBoldText>
+												</DayTouchablOpacity>
+											),
+									)}
+								</FlexWrap>
+							</DayContainer>
+							{/* <HStack justifyContent='space-between'>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										여행지
+									</PretendardSemiBoldText>
+									<SVGContainer
+										color={colors.PointYellow}
+										onPress={() => {
+											navigation.navigate('TimetableAddPlace', {
+												x: select,
+												y: [],
+												status: 'travle',
+											});
+										}}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										숙소
+									</PretendardSemiBoldText>
+									<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+						</HStack> */}
+							<Timetable
+								modify={modify}
+								scrollRef={scrollRef}
+								changeViewState={changeViewState}
+								scrollhandle={scrollhandle}
+								changeLocation={changeLocation}
+								changeLocationRef={changeLocationRef}
+								openModal={openModal}
+								CancelModify={CancelModify}
+								navigation={navigation}
+								goNavigation={goNavigation}
+								setModify={setModify}
+								viewMap={viewMap}
+								select={select}
+								open={open}
+								setOpen={setOpen}
+							/>
+						</BackgroundGray>
+						<MarginContainer />
+					</BottomSheetScrollView>
+				</BottomSheet>
+			)}
 			{btnVisible && !modify && (
 				<>
 					<ModifyPressable onPress={() => setModify(true)}>
@@ -535,7 +648,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 			{modify && (
 				<RouteButton
 					navigation={navigation}
-					nextText='저장하기'
+					nextText='적용하기'
 					leftText='취소'
 					type={'planner'}
 					btnFunction={() => {
@@ -544,6 +657,8 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 					}}
 					LeftBtnFunction={() => {
 						setModify(false);
+						console.log('asdasd');
+						dispatch(travelSliceActions.changeTimetable(beforeTimetable));
 						// setStep(step + 1);
 					}}></RouteButton>
 			)}

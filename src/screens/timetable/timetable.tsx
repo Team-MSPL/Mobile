@@ -441,7 +441,7 @@ export default function Timetable({navigation, route}: any) {
 	const checkSave = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
-				modalTitle: '일정을 저장하시겠습니까?',
+				modalTitle: '변동사항을 적용하시겠습니까?',
 				modalFunction: goSave,
 				modalTopText: '네',
 				modalBottomText: '아니오',
@@ -473,14 +473,11 @@ export default function Timetable({navigation, route}: any) {
 				: dispatch(
 						modalSliceActions.setOpenModal({
 							modalTitle: '홈으로 이동하시겠습니까?',
-							modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
 							modalFunction: () => {
-								modifyCheck && goSave();
+								goHome();
 							},
-							modalBottomFunctionUse: true,
-							modalBottomFunction: goHome,
-							modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
-							modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+							modalTopText: '나가기',
+							modalBottomText: '둘러보기',
 						}),
 				  );
 		});
@@ -549,19 +546,20 @@ export default function Timetable({navigation, route}: any) {
 			} else {
 				const data = {travelId: travelId, timetable: timetable};
 				await dispatch(updateTravelCourse(data));
-				dispatch(
-					modalSliceActions.setOpenModal({
-						modalTitle: '일정이 저장되었습니다',
-						modalTopText: '일정 확인하러 가기',
-						modalBottomText: '홈으로 돌아가기',
-						modalFunction: goMyTravelList,
-						modalBottomFunctionUse: true,
-						modalBottomFunction: hanldeHome,
-					}),
-				);
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '일정이 저장되었습니다',
+				// 		modalTopText: '일정 확인하러 가기',
+				// 		modalBottomText: '홈으로 돌아가기',
+				// 		modalFunction: goMyTravelList,
+				// 		modalBottomFunctionUse: true,
+				// 		modalBottomFunction: hanldeHome,
+				// 	}),
+				// );
 				await logEvent('edit_course_save', {
 					course: travelName,
 				});
+				setModify(false);
 			}
 		} catch (err) {
 			dispatch(
@@ -666,6 +664,10 @@ export default function Timetable({navigation, route}: any) {
 	};
 	const [modify, setModify] = useState(false);
 	useEffect(() => {
+		console.log('zxc', modify);
+		if (modify) dispatch(travelSliceActions.updateFiled({field: 'beforeTimetable', value: timetable}));
+	}, [modify]);
+	useEffect(() => {
 		shareLoginFlag && isLogin && addSharedList();
 	}, [isLogin]);
 	useEffect(() => {
@@ -702,19 +704,20 @@ export default function Timetable({navigation, route}: any) {
 				return Platform.OS == 'ios' ? (
 					<TouchableOpacity
 						onPress={() => {
-							dispatch(
-								modalSliceActions.setOpenModal({
-									modalTitle: '홈으로 이동하시겠습니까?',
-									modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
-									modalFunction: () => {
-										modifyCheck && goSave();
-									},
-									modalBottomFunctionUse: true,
-									modalBottomFunction: goHome,
-									modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
-									modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
-								}),
-							);
+							// dispatch(
+							// 	modalSliceActions.setOpenModal({
+							// 		modalTitle: '홈으로 이동하시겠습니까?',
+							// 		modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
+							// 		modalFunction: () => {
+							// 			modifyCheck && goSave();
+							// 		},
+							// 		modalBottomFunctionUse: true,
+							// 		modalBottomFunction: goHome,
+							// 		modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
+							// 		modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+							// 	}),
+							// );
+							goHome();
 						}}
 						style={{
 							justifyContent: 'center',

@@ -139,6 +139,7 @@ const initialState: LiteState = {
 	],
 	presetProducts: [],
 	homeProductListMemo: {},
+	beforeTimetable: [[]],
 };
 
 export const axiosGoogle = axios.create({
@@ -1013,6 +1014,7 @@ export const travelSlice = createSlice({
 		},
 		updateFiled: (state, {payload}) => {
 			const {field, value} = payload;
+			console.log(field, value);
 			if (state.hasOwnProperty(field)) {
 				state[field] = value;
 			}
@@ -1277,6 +1279,7 @@ interface LiteState {
 	season: number[];
 	presetDatas: TimetableType[][][];
 	timetable: TimetableType[][];
+	beforeTimetable: TimetableType[][];
 	moveTimeList: number[][] | [];
 	courseDetail: CourseDetailType;
 	makeMode: MakeModeType;
