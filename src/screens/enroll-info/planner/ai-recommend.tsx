@@ -1,14 +1,21 @@
 import {useRoute} from '@react-navigation/native';
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {Platform} from 'react-native';
+import {Modal, Platform} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import shortid from 'shortid';
 import {styled} from 'styled-components/native';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {getRecommendPlace, recommendTripadvisor} from '../../../redux/travel-info/travel.slice';
+import {
+	detailTripadvisor,
+	getRecommendPlace,
+	recommendTripadvisor,
+	travelSliceActions,
+} from '../../../redux/travel-info/travel.slice';
 import {colors} from '../../../utill/colors';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
+import PrimaryButton from '../../../utill/component/primary-button';
 import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 import {
 	BackgroundGray,
@@ -17,17 +24,34 @@ import {
 	HStack,
 	PretendardSemiBoldText,
 	PretendardVariableText,
+	VStack,
 } from '../../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
+import {SvgCancel, SVGMinus, SVGPlus} from '../../../utill/svg/svg';
+import {BottomContainer} from '../search-place';
 import {RegionItems} from '../select-city';
+import {ElementContainer, SVGContainer} from '../select-multi';
+import {DeleteBox} from './add-search-recommend';
+import {ModalBackground, ModalBottomSheet} from './regist-transit';
 
 export default function AiRecommned({navigation}: any) {
 	const route = useRoute();
 	const {info, title} = route.params;
 	const dispatch = useAppDispatch();
-	const {tendency, season, timetable, regionInfo, region, country, cityIndex} = useAppSelector(
+	const {tendency, season, timetable, regionInfo, region, country, cityIndex, Place} = useAppSelector(
 		state => state.travelSlice,
 	);
+	const [placeState, setPlaceState] = useState<{
+		name: string | undefined;
+		lat: number | undefined;
+		lng: number | undefined;
+		photo: string;
+		category: number;
+		takenTime: number;
+		formatted_address: string | undefined;
+		region: string;
+	} | null>();
+	const [timeValue, setTimeValue] = useState(0);
 	const {userName} = useAppSelector(state => state.userSlice);
 	const [recommendList, setRcommendList] = useState([]);
 	const {countryList} = useTendencyHandler();
@@ -75,6 +99,44 @@ export default function AiRecommned({navigation}: any) {
 		}
 		return [a[0]];
 	};
+
+	const handleCategoryIndex = (e: string) => {
+		let title = 0;
+		switch (e) {
+			case 'travle':
+				title = 0;
+				break;
+			case 'accommodation':
+				title = 4;
+				break;
+			case 'cafe':
+				title = 1;
+				break;
+		}
+		return title;
+	};
+	const handleAdd = () => {
+		let copy = [...timetable];
+		let copy2 = [...timetable[route.params?.info?.day]];
+		copy2.push({
+			...placeState,
+			category: handleCategoryIndex(route?.params?.title),
+			x: route.params?.info?.day,
+			y:
+				isNaN(copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30) ||
+				copy2[route.params?.info?.index - 1]?.y == 36
+					? route.params?.info?.startTime
+					: copy2[route.params?.info?.index - 1]?.y + copy2[route.params?.info?.index - 1]?.takenTime / 30,
+			id: shortid.generate(),
+			takenTime: (timeValue + 1) * 60,
+			lat: Number(placeState?.lat),
+			lng: Number(placeState?.lng),
+		});
+		copy2 = copy2.sort((a, b) => a.y - b.y);
+		copy[route.params?.info?.day] = copy2;
+		dispatch(travelSliceActions.changeTimetable(copy));
+		navigation.pop(3);
+	};
 	const getTravelRecommendList = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -93,12 +155,27 @@ export default function AiRecommned({navigation}: any) {
 				password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 			};
 			const a = await dispatch(getRecommendPlace(data)).unwrap();
-			setRcommendList(a?.recommendedPlaces);
+			setRcommendList(a?.recommendedPlaces.sort((a, b) => b?.popular - a?.popular));
 			console.log(a);
 		} catch (e) {
 		} finally {
 			dispatch(LoadingSliceActions.offLoading());
 		}
+	};
+	const handleTitle = (e: string) => {
+		let title = '';
+		switch (e) {
+			case 'travle':
+				title = '여행지';
+				break;
+			case 'accommodation':
+				title = '숙소';
+				break;
+			case 'cafe':
+				title = '식당/카페';
+				break;
+		}
+		return title;
 	};
 	const handleCategory = (e: string) => {
 		let title = '';
@@ -165,6 +242,19 @@ export default function AiRecommned({navigation}: any) {
 		}
 	};
 	const handleSort = (e: string) => {
+		let copy = [...recommendList];
+		switch (e) {
+			case '추천순':
+				copy = copy.sort((a, b) => b?.popular - a?.popular);
+				break;
+			case '거리순':
+				copy = copy.sort((a, b) => a?.distance - b?.distance);
+				break;
+			case '성향점수순':
+				copy = copy.sort((a, b) => b?.score - a?.score);
+				break;
+		}
+		setRcommendList(copy);
 		setSortStatus(e);
 	};
 	useLayoutEffect(() => {
@@ -174,71 +264,193 @@ export default function AiRecommned({navigation}: any) {
 			getRecommendList();
 		}
 	}, []);
-	const sortTitleList = ['추천순', '거리순', '추천점수순'];
+	const sortTitleList = ['추천순', '거리순', '성향점수순'];
 	if (recommendList.length == 0) return <></>;
 	return (
-		<BackgroundGray>
-			<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black} deco={'text-align:center'}>
-				{userName}님의 성향을 고려한 {region}추천 여행지
-			</PretendardSemiBoldText>
-			<HStack justifyContent='center' gap={20} marginVertical={20}>
-				{sortTitleList.map(item => (
-					<RegionItems
-						select={sortStatus == item}
-						onPress={() => {
-							handleSort(item);
-						}}>
-						<PretendardVariableText
-							size={14}
-							lineHeight={18.9}
-							color={sortStatus == item ? colors.backgroundWhite : colors.Gray5}>
-							{item}
-						</PretendardVariableText>
-					</RegionItems>
-				))}
-			</HStack>
-			<ListScrollView>
-				<FlexWrap gap={10}>
-					{recommendList.map((item, index) => (
-						<RecommendItemBox>
-							<RecommendItemImg
-								source={item?.photo ? {uri: item?.photo} : handleImage(route.params?.title)}
-								resizeMode={'stretch'}
-							/>
-							<LinearGradient
-								start={{x: 0, y: 0.3}}
-								end={{x: 0, y: 1}}
-								colors={['rgba(255,255,255,0)', 'black']}
-								style={{
-									zIndex: 101,
-									position: 'absolute',
-									width: '100%',
-									paddingHorizontal: widthPercentage(10),
-									height: '100%',
-									justifyContent: Platform.isPad ? 'center' : 'flex-end',
-									paddingBottom: heightPercentage(10),
-									borderRadius: 8,
+		<>
+			<BackgroundGray>
+				<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black} deco={'text-align:center'}>
+					{userName}님의 성향을 고려한{' '}
+					{region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0]} 추천 {handleTitle(title)}
+				</PretendardSemiBoldText>
+				{title == 'travle' && (
+					<HStack justifyContent='center' gap={20} marginVertical={20}>
+						{sortTitleList.map(item => (
+							<RegionItems
+								select={sortStatus == item}
+								onPress={() => {
+									handleSort(item);
 								}}>
-								<PretendardSemiBoldText size={16} lineHeight={21} color={colors.backgroundWhite}>
-									{item?.name}
-								</PretendardSemiBoldText>
-								<HStack justifyContent='space-between'>
-									<PretendardSemiBoldText size={13} lineHeight={21} color={colors.backgroundWhite}>
-										<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Primary}>
-											{item?.score}
-										</PretendardSemiBoldText>
-										/100
+								<PretendardVariableText
+									size={14}
+									lineHeight={18.9}
+									color={sortStatus == item ? colors.backgroundWhite : colors.Gray5}>
+									{item}
+								</PretendardVariableText>
+							</RegionItems>
+						))}
+					</HStack>
+				)}
+				<ListScrollView>
+					<FlexWrap gap={10}>
+						{recommendList.map((item, index) => (
+							<RecommendItemBox
+								onPress={async () => {
+									console.log(item);
+									let tripData = null;
+									if (title != 'travle')
+										tripData = await dispatch(detailTripadvisor({id: item?.location_id})).unwrap();
+									const datas = {
+										...Place,
+										name: item?.name,
+										lat: tripData?.latitude ?? item?.lat,
+										lng: tripData?.longitude ?? item?.lng,
+										formatted_address: '',
+										photo: '',
+										region:
+											region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
+									};
+									setPlaceState(datas);
+									dispatch(travelSliceActions.enrollPlace(datas));
+								}}>
+								<RecommendItemImg
+									source={item?.photo ? {uri: item?.photo} : handleImage(route.params?.title)}
+									resizeMode={'stretch'}
+								/>
+								<LinearGradient
+									start={{x: 0, y: 0.3}}
+									end={{x: 0, y: 1}}
+									colors={['rgba(255,255,255,0)', 'black']}
+									style={{
+										zIndex: 101,
+										position: 'absolute',
+										width: '100%',
+										paddingHorizontal: widthPercentage(10),
+										height: '100%',
+										justifyContent: Platform.isPad ? 'center' : 'flex-end',
+										paddingBottom: heightPercentage(10),
+										borderRadius: 8,
+									}}>
+									<PretendardSemiBoldText size={16} lineHeight={21} color={colors.backgroundWhite}>
+										{item?.name}
 									</PretendardSemiBoldText>
-									<PretendardVariableText size={14} lineHeight={19} color={colors.backgroundWhite}>
-										~{Math.floor(item?.distance * 10)}km
+									<HStack justifyContent='space-between'>
+										{title == 'travle' && (
+											<PretendardSemiBoldText
+												size={13}
+												lineHeight={21}
+												color={colors.backgroundWhite}>
+												<PretendardSemiBoldText
+													size={16}
+													lineHeight={21}
+													color={colors.Primary}>
+													{item?.score}
+												</PretendardSemiBoldText>
+												/100
+											</PretendardSemiBoldText>
+										)}
+										<PretendardVariableText
+											size={14}
+											lineHeight={19}
+											color={colors.backgroundWhite}>
+											~{Math.floor(item?.distance * 10)}km
+										</PretendardVariableText>
+									</HStack>
+								</LinearGradient>
+							</RecommendItemBox>
+						))}
+					</FlexWrap>
+				</ListScrollView>
+			</BackgroundGray>
+
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={placeState?.name != undefined}
+				onRequestClose={() => {
+					// setShow(false);
+				}}>
+				<ModalBackground
+					onPress={() => {
+						setPlaceState(null);
+					}}>
+					<ModalBottomSheet flex={route.params?.title == 'accommodation' ? 0.4 : 0.4}>
+						<BottomContainer height={heightPercentage(230)} gap={20}>
+							<ElementContainer width='327' color={colors.backgroundGray} height={widthPercentage(75)}>
+								<VStack width={widthPercentage(267)}>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
+										{placeState?.name}
+									</PretendardSemiBoldText>
+									<PretendardVariableText
+										size={12}
+										lineHeight={18}
+										color={colors.Gray2}
+										numberOfLines={1}>
+										{placeState?.formatted_address}
 									</PretendardVariableText>
+								</VStack>
+								<DeleteBox
+									onPress={() => {
+										setPlaceState(null);
+									}}>
+									<SvgCancel width={widthPercentage(12)} height={widthPercentage(12)} color='black' />
+								</DeleteBox>
+							</ElementContainer>
+							{title != 'accommodation' && (
+								<HStack justifyContent='space-around'>
+									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={24}>
+										머무를 시간
+									</PretendardSemiBoldText>
+									<HStack justifyContent='space-around' width={widthPercentage(182)}>
+										<SVGContainer
+											disabled={timeValue < 1}
+											onPress={() => {
+												setTimeValue(timeValue - 1);
+											}}
+											color={timeValue < 1 ? colors.backgroundWhite : colors.Gray1}>
+											{timeValue >= 1 && (
+												<SVGMinus
+													width={widthPercentage(23)}
+													height={widthPercentage(23)}
+													color={colors.Gray2}
+												/>
+											)}
+										</SVGContainer>
+
+										<PretendardSemiBoldText size={16} color={colors.PointYellow} lineHeight={21.6}>
+											{timeValue + 1}시간
+										</PretendardSemiBoldText>
+										<SVGContainer
+											disabled={timeValue > 1}
+											onPress={() => {
+												setTimeValue(timeValue + 1);
+											}}
+											color={timeValue > 1 ? colors.backgroundWhite : colors.Gray5}>
+											{timeValue <= 1 && (
+												<SVGPlus
+													width={widthPercentage(25)}
+													height={widthPercentage(25)}
+													color={colors.Primary}
+												/>
+											)}
+										</SVGContainer>
+									</HStack>
 								</HStack>
-							</LinearGradient>
-						</RecommendItemBox>
-					))}
-				</FlexWrap>
-			</ListScrollView>
-		</BackgroundGray>
+							)}
+							<PrimaryButton
+								label={handleTitle(title) + ' 추가'}
+								width={widthPercentage(327)}
+								height={heightPercentage(60)}
+								onPress={() => {
+									handleAdd();
+								}}
+								backgroundColor={colors.Gray5}
+								textColor={colors.backgroundWhite}></PrimaryButton>
+						</BottomContainer>
+					</ModalBottomSheet>
+				</ModalBackground>
+			</Modal>
+		</>
 	);
 }
 const ListScrollView = styled.ScrollView``;

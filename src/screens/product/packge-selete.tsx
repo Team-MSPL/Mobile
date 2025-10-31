@@ -75,7 +75,11 @@ export default function PackageSelect({navigation}: any) {
 						{item?.b2b_min_price.toLocaleString('ko-KR')}원~
 					</PretendardSemiBoldText>
 					{item?.description_module?.PMDL_PACKAGE_DESC?.content?.list?.map((explainItem, explainIndex) => (
-						<RenderHTML contentWidth={widthPercentage(327)} source={{html: explainItem?.desc}} />
+						<RenderHTML
+							baseStyle={{color: colors.Black}}
+							contentWidth={widthPercentage(327)}
+							source={{html: explainItem?.desc}}
+						/>
 					))}
 				</PackageBox>
 			))}

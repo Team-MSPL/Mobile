@@ -65,6 +65,15 @@ export default function CheckoutPage({navigation, route}: any) {
 						cancelAmount: route.params?.info?.value,
 					}),
 				);
+				await dispatch(
+					handleBookingSave({
+						...route?.params?.info?.productinfo,
+						isActive: false,
+						product: {
+							...route?.params?.info?.productinfo,
+						},
+					}),
+				);
 				navigation.replace('Fail');
 			} else {
 				await dispatch(
@@ -87,6 +96,16 @@ export default function CheckoutPage({navigation, route}: any) {
 				tossCancel({
 					paymentKey: e?.paymentKey,
 					cancelAmount: route.params?.info?.value,
+				}),
+			);
+			await dispatch(
+				handleBookingSave({
+					...route?.params?.info?.productinfo,
+					isActive: false,
+					product: {
+						...route?.params?.info?.productinfo,
+						reason: error?.result_msg,
+					},
 				}),
 			);
 			navigation.replace('Fail');

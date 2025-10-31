@@ -153,9 +153,12 @@ export default function ProductSelectDay({navigation}: any) {
 				navigation.goBack();
 			} else {
 				setData(value);
+				setCount(value?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity ?? 1);
 			}
 			console.log(value?.item?.[0]?.unit_quantity_rule?.total_rule);
-			console.log(value?.item, 'ㅋ');
+			console.log(value?.item?.[0]?.unit_quantity_rule?.ticket_rule);
+
+			// console.log(value?.item, 'ㅋ');
 		} catch (e) {
 			console.log('e');
 		} finally {
@@ -434,11 +437,7 @@ export default function ProductSelectDay({navigation}: any) {
 							checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]
 								?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
 						) == 0 ? (
-							<PretendardSemiBoldText
-								size={24}
-								lineHeight={28}
-								numberOfLines={2}
-								color={colors.PointGreen1}>
+							<PretendardSemiBoldText size={24} lineHeight={28} color={colors.PointGreen1}>
 								선택하신 날짜의 해당 옵션이 품절되었습니다.{`\n`}
 								다른 날짜나 옵션을 선택해주세요.
 							</PretendardSemiBoldText>

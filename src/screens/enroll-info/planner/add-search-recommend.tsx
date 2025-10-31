@@ -26,20 +26,11 @@ import {ModalBackground, ModalBottomSheet} from './regist-transit';
 import {BottomContainer} from '../search-place';
 import {ElementContainer, SVGContainer} from '../select-multi';
 import PrimaryButton from '../../../utill/component/primary-button';
-import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
-import {modalSliceActions} from '../../../redux/modal/modalSlice';
-import {ScrollView} from 'react-native';
-import {TouchableOpacity} from 'react-native';
-import shortid from 'shortid';
-import {cityViewList} from '../../../utill/component/enroll-info/city-list';
-import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
 
 export default function AddSearchRecommend({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
-	const {region, regionInfo, timetable, country, tendency, season, cityIndex} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {timetable} = useAppSelector(state => state.travelSlice);
 	const handleColor = (e: string) => {
 		let color = '';
 		switch (e) {
@@ -70,36 +61,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		}
 		return title;
 	};
-	const handleCategory = (e: string) => {
-		let title = '';
-		switch (e) {
-			case 'travle':
-				title = 'attractions';
-				break;
-			case 'accommodation':
-				title = 'hotels';
-				break;
-			case 'cafe':
-				title = 'restaurants';
-				break;
-		}
-		return title;
-	};
-	const handleImage = (e: string) => {
-		let title = '';
-		switch (e) {
-			case 'travle':
-				title = require('../../../../public/images/defalutAccomodation.png');
-				break;
-			case 'accommodation':
-				title = require('../../../../public/images/hotel.png');
-				break;
-			case 'cafe':
-				title = require('../../../../public/images/defalutFood.png');
-				break;
-		}
-		return title;
-	};
 	const handleCategoryIndex = (e: string) => {
 		let title = 0;
 		switch (e) {
@@ -117,60 +78,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	};
 	const [select, setSelect] = useState(false);
 	const {Place} = useAppSelector(state => state.travelSlice);
-	const regionOneList = {
-		서울특별시: '서울',
-		부산광역시: '부산',
-		대구광역시: '대구',
-		인천광역시: '인천',
-		광주광역시: '광주',
-		대전광역시: '대전',
-		울산광역시: '울산',
-		세종특별시: '세종',
-		경기도: '경기',
-		강원도: '강원',
-		충청북도: '충북',
-		충청남도: '충남',
-		전라북도: '전북',
-		전라남도: '전남',
-		경상북도: '경북',
-		경상남도: '경남',
-		제주도: '제주',
-	};
-	const regionList = {
-		부산광역시: '전체',
-		대구광역시: '전체',
-		인천광역시: '전체',
-		광주광역시: '전체',
-		대전광역시: '전체',
-		울산광역시: '전체',
-		세종특별시: '전체',
-	};
-	const cityList = {
-		종로구: '도심권',
-		중구: '도심권',
-		용산구: '도심권',
-		강남구: '동남권',
-		서초구: '동남권',
-		송파구: '동남권',
-		강북구: '동북권',
-		도봉구: '동북권',
-		노원구: '동북권',
-		성북구: '동북권',
-		동대문구: '동북권',
-		중랑구: '동북권',
-		성동구: '동북권',
-		광진구: '동북권',
-		강서구: '서남권',
-		양천구: '서남권',
-		구로구: '서남권',
-		영등포구: '서남권',
-		동작구: '서남권',
-		관악구: '서남권',
-		금천구: '서남권',
-		은평구: '서북권',
-		서대문구: '서북권',
-		마포구: '서북권',
-	};
 	const [placeState, setPlaceState] = useState<{
 		name: string | undefined;
 		lat: number | undefined;
@@ -192,112 +99,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	};
 	const [timeValue, setTimeValue] = useState(0);
 	const [view, setView] = useState(true);
-	const [recommendList, setRcommendList] = useState([]);
-	const {countryList} = useTendencyHandler();
-	const handleRegion = () => {
-		let a = region.map(item => cityViewList[country][cityIndex].title + ' ' + item);
-		if (
-			(country == 0 && cityViewList[country][cityIndex].id >= 3 && region[0] == '전체') ||
-			(country == 0 && cityViewList[country][cityIndex].id == 1 && region[0] == '전체') ||
-			(country != 0 && region[0] == '전체')
-		) {
-			a = cityViewList[country][cityIndex].sub.map(
-				(value, idx) => cityViewList[country][cityIndex].title + ' ' + value.subTitle,
-			);
-			a.shift();
-		}
-		// //["해외/Vietnam/나트랑", "해외/Vietnam/다낭"]
-		if (country == 0 && cityIndex == 2) {
-			a = [region[0] + ' 전체'];
-		}
-		if (country != 0) {
-			a = a.map((item, idx) => {
-				return `해외/${countryList[country].en}/${item
-					.slice(
-						item.indexOf(cityViewList[country][cityIndex].title) +
-							cityViewList[country][cityIndex].title.length,
-					)
-					.trim()}`;
-			});
-		}
-		return [a[0]];
-	};
-	const getTravelRecommendList = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			const data = {
-				regionList: handleRegion(),
-				selectList: [...tendency, season],
-				transit: 1,
-				version: 3, // 없으면 2로 취급
-				distanceSensitivity: 5,
-				popularSensitivity: 5, // 250604추가 - 기본값 5
-				bandwidth: true,
-				lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
-				lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
-				page: 1, // 250430 추가
-				page_for_place: 10, // 250430 추가
-				password: '(주)나그네들_g5hb87r8765rt68i7ur78',
-			};
-			const a = await dispatch(getRecommendPlace(data)).unwrap();
-			setRcommendList(a?.recommendedPlaces);
-			console.log(a);
-		} catch (e) {
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
-	const getRecommendList = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-
-			let result = await dispatch(
-				recommendTripadvisor({
-					category: handleCategory(route.params.title),
-					lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
-					lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
-					radius: 10000,
-					name:
-						timetable[route.params.info.day][route.params.info.index - 1]?.name ??
-						region[0].split('/').at(-1),
-				}),
-			).unwrap();
-			result = result.data;
-			if (result.length == 0) {
-				result = await dispatch(
-					recommendTripadvisor({
-						category: handleCategory(route.params.title),
-						lat: timetable[route.params.info.day][route.params.info.index - 1]?.lat ?? regionInfo.lat,
-						lng: timetable[route.params.info.day][route.params.info.index - 1]?.lng ?? regionInfo.lng,
-						radius: 20000,
-						name: route.params.status.name,
-					}),
-				).unwrap();
-				// departure.current.lat = route.params.lat;
-				// departure.current.lng = route.params.lng;
-				result = result.data;
-				result.length == 0 &&
-					(dispatch(
-						modalSliceActions.setOpenModal({
-							modalSingleUse: true,
-							modalTitle: '동선 상에 추천할 수 있는 장소가 없습니다 ㅠㅠ',
-						}),
-					),
-					navigation.goBack());
-			}
-			console.log(result);
-			setRcommendList(result);
-		} catch (err) {
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '추천 아이템이 없습니다!',
-				}),
-			);
-			navigation.goBack();
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
-	};
 	const handleAdd = () => {
 		let copy = [...timetable];
 		let copy2 = [...timetable[route.params?.info?.day]];
@@ -321,9 +122,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 		navigation.pop(2);
 	};
 
-	// useLayoutEffect(() => {
-	// 	getRecommendList();
-	// }, []);
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setView(false);
@@ -332,12 +130,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 	}, []);
 	const handleAiRecommmend = async () => {
 		navigation.navigate('AiRecommned', {info: route.params?.info, title: route.params?.title});
-		console.log(route.params);
-		// if (route?.params?.title == 'travle') {
-		// 	getTravelRecommendList();
-		// } else {
-		// 	getRecommendList();
-		// }
 	};
 	return (
 		<BackgroundGray>
@@ -439,48 +231,6 @@ export default function AddSearchRecommend({navigation, route}: any) {
 					onFail={error => console.log(error)}
 					onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
 			</SearchContainer>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				{recommendList.map((item, idx) => (
-					<ItemPressBox
-						onPress={() => {
-							const datas = {
-								...Place,
-								name: item?.place_name ?? item?.name,
-								lat: item?.y ?? item?.lat,
-								lng: item?.x ?? item?.lng,
-								formatted_address: item?.address_name ?? item?.address_obj?.address_string,
-								photo: '',
-								region: item?.address_name ?? item?.address_obj?.address_string,
-							};
-							setPlaceState(datas);
-							dispatch(travelSliceActions.enrollPlace(datas));
-						}}
-						key={idx}
-						deco={`border-width:1px;border-color:${colors.Gray200};padding:${widthPercentage(
-							10,
-						)}px ${widthPercentage(10)}px;border-radius:12px;margin-bottom:10px;gap:15px;`}>
-						<ImageBox
-							source={item?.photo ? {uri: item?.photo} : handleImage(route.params?.title)}
-							resizeMode={'cover'}></ImageBox>
-						<VStack width={widthPercentage(230)}>
-							<PretendardSemiBoldText size={16} lineHeight={22} numberOfLines={1} color={colors.Black}>
-								{item?.place_name ?? item?.name}
-							</PretendardSemiBoldText>
-							<PretendardVariableText size={12} lineHeight={17} numberOfLines={1} color={colors.Title}>
-								{item?.address_name ?? item?.address_obj?.address_string}
-							</PretendardVariableText>
-							<PretendardVariableText
-								size={14}
-								lineHeight={19}
-								numberOfLines={1}
-								color={colors.PointYellow}>
-								{timetable[route.params.info.day][route.params.info.index - 1]?.name ?? '중심지'}로 부터{' '}
-								{Math.floor(Number(item?.distance) * 1000)}m
-							</PretendardVariableText>
-						</VStack>
-					</ItemPressBox>
-				))}
-			</ScrollView>
 			<Modal
 				animationType={'fade'}
 				transparent={true}
@@ -584,7 +334,7 @@ const AIBox = styled.Pressable`
 	justify-content: center;
 `;
 
-const DeleteBox = styled.TouchableOpacity`
+export const DeleteBox = styled.TouchableOpacity`
 	width: ${widthPercentage(20)}px;
 	height: ${widthPercentage(20)}px;
 `;
@@ -614,9 +364,3 @@ const Triangle = styled.View`
 	bottom: -${widthPercentage(8)}px;
 	left: ${widthPercentage(107)}px;
 `;
-const ImageBox = styled.Image`
-	width: ${widthPercentage(80)}px;
-	height: ${widthPercentage(80)}px;
-	border-radius: 8px;
-`;
-const ItemPressBox = styled(HStack).attrs({as: TouchableOpacity})``;
