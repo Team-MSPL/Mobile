@@ -40,6 +40,7 @@ export default function ViewPager({
 	};
 	const handleScroll = (e: number) => {
 		scrollRef?.current?.scrollTo({x: (viewIndex + e) * widthPercentage(375)});
+		setViewIndex(viewIndex + e);
 	};
 	const scrollRef = useRef(null);
 	useEffect(() => {
@@ -61,7 +62,7 @@ export default function ViewPager({
 				scrollEventThrottle={200}
 				decelerationRate={'fast'}
 				disableIntervalMomentum={true}
-				onScroll={e => {
+				onMomentumScrollEnd={e => {
 					newPage(e);
 				}}
 				horizontal={true}
