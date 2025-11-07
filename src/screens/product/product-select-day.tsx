@@ -1,12 +1,11 @@
 import {useRoute} from '@react-navigation/native';
 import moment from 'moment';
-import {useEffect, useLayoutEffect, useState} from 'react';
-import {Text} from 'react-native';
+import {useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {View} from 'react-native';
 import {Platform} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import RenderHTML from 'react-native-render-html';
-import styles from 'rn-range-slider/styles';
 import {styled} from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
@@ -27,6 +26,7 @@ import {SVGMinus, SVGPlus, SVGRightAdd} from '../../utill/svg/svg';
 import RouteButton from '../../utill/component/route-button';
 import {logEvent} from '../../../firebaseAnalytice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
 
 export default function ProductSelectDay({navigation}: any) {
 	const route = useRoute();
@@ -90,7 +90,7 @@ export default function ProductSelectDay({navigation}: any) {
 						return Object?.entries(e)?.every(([key, val]) => item?.spec[key] === val);
 				  })
 				: [];
-		console.log(filteredData);
+		// console.log(filteredData);
 
 		setCheckList(filteredData);
 	};
@@ -131,7 +131,154 @@ export default function ProductSelectDay({navigation}: any) {
 			return null;
 		});
 	};
+	const [ticketStatus, setTicketStatus] = useState<any[]>([]);
+	const deriveTicketLabelFromSku = (value: any) => {
+		const exactTicketSpec =
+			value?.item?.[0]?.specs?.find(s => {
+				if (!s?.spec_title) return false;
+				return String(s.spec_title).trim().toLowerCase() === '티켓 종류';
+			}) ?? null;
+		if (exactTicketSpec && Array.isArray(exactTicketSpec?.spec_items)) {
+			const mapped: any[] = [];
 
+			for (const si of exactTicketSpec.spec_items) {
+				const oid = si?.spec_item_oid ?? si?.spec_item_id ?? String(si?.name ?? '');
+				const label = si?.name ?? si?.spec_item_title ?? oid;
+
+				let copy = value?.item?.[0]?.unit_quantity_rule?.ticket_rule?.rulesets?.find(findItem =>
+					findItem.spec_items.includes(oid),
+				);
+
+				mapped.push({
+					id: oid,
+					label,
+					max: copy?.max_quantity ?? Infinity,
+					min: copy?.min_quantity ?? 0,
+					count: copy?.min_quantity ?? 0,
+				});
+
+				// 	const candidates = skus.filter((sku: any) => {
+				// 	  if (!Array.isArray(sku?.specs_ref)) return false;
+				// 	  return sku.specs_ref.some((r: any) =>
+				// 		String(r.spec_item_id) === String(oid) || String(r.spec_value_id) === String(oid)
+				// 	  );
+				// 	});
+				// 	if (!candidates.length) continue;
+
+				// 	// Prefer the first candidate SKU's price for the selectedDate
+				// 	const firstCandidate = candidates[0];
+				// 	const unit = Number(unitForSkuOnDate(firstCandidate, selectedDate) ?? Math.min(...candidates.map(s => unitForSkuOnDate(s, selectedDate) ?? 0)));
+
+				// 	const ageLabel = si?.rule ? (() => {
+				// 	  const ar = si.rule?.age_rule ?? si.rule;
+				// 	  const min = ar?.min ?? ar?.min_age; const max = ar?.max ?? ar?.max_age;
+				// 	  if (min != null && max != null) return `(만 ${min}세 이상 ~ ${max}세 미만)`;
+				// 	  if (min != null) return `(만 ${min}세 이상)`;
+				// 	  if (max != null) return `(만 ${max}세 미만)`;
+				// 	  return '';
+				// 	})() : (candidates[0]?.spec_desc ?? '');
+				// 	const rawQty = label.toLowerCase().includes('성인') ? (Number(params?.adult ?? 1) || 1) : (Number(params?.child ?? 0) || 0);
+				// 	const qtyInit = totalRule.isMultipleLimit ? Math.max(totalRule.multiple, rawQty) : Math.max(0, Math.floor(rawQty));
+				// 	mapped.push({
+				// 	  id: oid,
+				// 	  label,
+				// 	  ageLabel,
+				// 	  subLabel: (candidates[0]?.spec && typeof candidates[0].spec === 'object') ? Object.entries(candidates[0].spec).filter(([k]) => k !== '티켓 종류').map(([_, v]) => String(v)) : [],
+				// 	  skus: candidates,
+				// 	  unit: unit ?? (toNumber(item?.b2b_min_price ?? item?.b2c_min_price) ?? 0),
+				// 	  qty: qtyInit,
+				// 	});
+				//   }
+			}
+			setTicketStatus(mapped);
+			console.log('zz', mapped);
+		}
+	};
+	const ticketSpec = useMemo(() => {
+		return (
+			data?.item?.[0]?.specs.find(s => {
+				if (!s?.spec_title) return false;
+				const title = String(s.spec_title).trim().toLowerCase();
+				return title === '티켓 종류';
+			}) ?? null
+		);
+	}, [data]);
+	const [selectedMap, setSelectedMap] = useState<Record<string, string>>(() => {
+		const pre = {};
+		return {...pre};
+	});
+	const specs = Array.isArray(data?.item?.[0]?.specs) ? data?.item?.[0]?.specs : [];
+	const skus = Array.isArray(data?.item?.[0]?.skus) ? data?.item?.[0]?.skus : [];
+	const matchedSkuIndex = useMemo(() => {
+		const selectedEntries = Object.entries(selectedMap);
+		if (selectedEntries.length === 0) return null;
+
+		for (let i = 0; i < skus.length; i++) {
+			const sku = skus[i];
+			const refs: Array<{spec_item_id?: string; spec_value_id?: string}> = sku?.specs_ref ?? [];
+			const ok = selectedEntries.every(([spec_oid, spec_item_oid]) => {
+				return refs.some(
+					r =>
+						String(r.spec_item_id) === String(spec_oid) &&
+						String(r.spec_value_id) === String(spec_item_oid),
+				);
+			});
+			if (ok) return i;
+		}
+		return null;
+	}, [selectedMap, skus]);
+
+	const toggleSelect = (spec_oid: string, spec_item_oid: string) => {
+		setSelectedMap(prev => {
+			const cur = prev[spec_oid];
+			if (cur === spec_item_oid) {
+				const next = {...prev};
+				delete next[spec_oid];
+				return next;
+			}
+			return {...prev, [spec_oid]: spec_item_oid};
+		});
+	};
+
+	// Helper: find SKU index for a given selection map
+	const findSkuIndexForSelection = (selection: Record<string, string>) => {
+		const entries = Object.entries(selection);
+		if (entries.length === 0) return null;
+		for (let i = 0; i < skus.length; i++) {
+			const sku = skus[i];
+			const refs: Array<{spec_item_id?: string; spec_value_id?: string}> = sku?.specs_ref ?? [];
+			const ok = entries.every(([spec_oid, spec_item_oid]) =>
+				refs.some(
+					r =>
+						String(r.spec_item_id) === String(spec_oid) &&
+						String(r.spec_value_id) === String(spec_item_oid),
+				),
+			);
+			if (ok) return i;
+		}
+		return null;
+	};
+	useEffect(() => {
+		console.log('z', ticketSpec);
+	}, [ticketSpec]);
+	const handleSpcesList = value => {
+		// if (value?.) {
+		// }
+	};
+
+	const isOptionEnabled = (spec_oid: string, spec_item_oid: string) => {
+		if (selectedMap[spec_oid] === spec_item_oid) return true;
+
+		const hypothetical: Record<string, string> = {...(selectedMap ?? {}), [spec_oid]: spec_item_oid};
+		const entries = Object.entries(hypothetical);
+
+		return skus.some((sku: any) => {
+			const refs: Array<{spec_item_id?: string; spec_value_id?: string}> = sku?.specs_ref ?? [];
+			return entries.every(([soid, soidVal]) =>
+				refs.some(r => String(r.spec_item_id) === String(soid) && String(r.spec_value_id) === String(soidVal)),
+			);
+		});
+	};
 	const handlePkg = async () => {
 		try {
 			console.log(prod_no, pkg_no, go_date_setting);
@@ -152,11 +299,18 @@ export default function ProductSelectDay({navigation}: any) {
 				);
 				navigation.goBack();
 			} else {
+				// if(value.item[0]?.last_spec_multi){
+
+				// }
+				handleSpcesList(value?.item?.[0]);
 				setData(value);
 				setCount(value?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity ?? 1);
+				deriveTicketLabelFromSku(value);
+				// let copy = value?.item?.[0]?.unit_quantity_rule?.ticket_rule?.rulesets;
+				// setTicketStatus(copy?.map(copyItem => ({...copyItem, count: copyItem?.min_quantity})) ?? []);
 			}
-			console.log(value?.item?.[0]?.unit_quantity_rule?.total_rule);
-			console.log(value?.item?.[0]?.unit_quantity_rule?.ticket_rule);
+			// console.log(value?.item?.[0]?.unit_quantity_rule?.total_rule);
+			// console.log(value?.item?.[0]?.unit_quantity_rule?.ticket_rule?.rulesets ?? [], 'ㅋㅋㅋ');
 
 			// console.log(value?.item, 'ㅋ');
 		} catch (e) {
@@ -174,13 +328,132 @@ export default function ProductSelectDay({navigation}: any) {
 			datas.start = go_date_setting?.days?.min;
 			datas.end = go_date_setting?.days?.max;
 		}
-		console.log(data);
+		// console.log(data);
 		setDaySetting(datas);
 	};
 	useLayoutEffect(() => {
 		handlePkg();
 		handleDaySetting();
 	}, []);
+	const onConfirm = () => {
+		// 1) Build required-spec list EXCLUDING ticketSpec (if ticketSpec exists, user shouldn't pick it)
+		const requiredSpecs = specs.filter(s => {
+			if (!s?.spec_oid) return false;
+			// exclude ticketSpec from required set
+			if (ticketSpec && s.spec_oid === ticketSpec.spec_oid) return false;
+			return true;
+		});
+
+		// 2) Check missing among requiredSpecs only
+		const missing = requiredSpecs.filter(s => !selectedMap[s.spec_oid]);
+		if (missing.length > 0) {
+			Toast.show({
+				type: 'error',
+				text1: `${missing.map(s => s.spec_title).join(', ')} 항목을 선택해 주세요.`,
+				position: 'bottom',
+			});
+
+			return;
+		}
+
+		// 3) If ticketSpec exists, auto-expand ticket items for the chosen other specs:
+		if (ticketSpec) {
+			const combos: Array<{selectedSpecs: Record<string, string>; matchedSkuIndex: number; matchedSku: any}> = [];
+
+			for (const ticketItem of ticketSpec.spec_items) {
+				const hypot: Record<string, string> = {
+					...(selectedMap ?? {}),
+					[ticketSpec.spec_oid]: ticketItem.spec_item_oid,
+				};
+
+				const skuIndex = findSkuIndexForSelection(hypot);
+				if (skuIndex != null) {
+					combos.push({
+						selectedSpecs: hypot,
+						matchedSkuIndex: skuIndex,
+						matchedSku: skus[skuIndex],
+					});
+				}
+			}
+
+			if (combos.length === 0) {
+				Toast.show({
+					type: 'error',
+					text1: '선택하신 옵션 조합에 해당하는 상품이 없습니다. 다른 조합을 선택해주세요.',
+					position: 'bottom',
+				});
+
+				return;
+			}
+
+			// If the only selectable spec(s) were ticketSpec (i.e. requiredSpecs.length === 0),
+			// auto-navigate immediately because user had nothing to pick here.
+			if (requiredSpecs.length === 0) {
+				// navigation.navigate('/product/reservation', {
+				//   prod_no: params?.prod_no ?? pkgData?.prod_no,
+				//   pkg_no: params?.pkg_no ?? (pkgData?.pkg && pkgData.pkg[0]?.pkg_no) ?? pkgData?.pkg_no,
+				//   pkgData,
+				//   date_setting: params?.date_setting ?? null,
+				//   max_date: params?.max_date ?? null,
+				//   min_date: params?.min_date ?? null,
+				//   has_ticket_combinations: true,
+				//   ticket_combinations: combos.map(c => ({
+				// 	selectedSpecs: c.selectedSpecs,
+				// 	matchedSkuIndex: c.matchedSkuIndex,
+				// 	matchedSku: c.matchedSku,
+				//   })),
+				//   item_unit: params?.item_unit ?? null,
+				// });
+				return;
+			}
+
+			// Otherwise navigate with combos
+			//   navigation.navigate('/product/reservation', {
+			// 	prod_no: params?.prod_no ?? pkgData?.prod_no,
+			// 	pkg_no: params?.pkg_no ?? (pkgData?.pkg && pkgData.pkg[0]?.pkg_no) ?? pkgData?.pkg_no,
+			// 	pkgData,
+			// 	date_setting: params?.date_setting ?? null,
+			// 	max_date: params?.max_date ?? null,
+			// 	min_date: params?.min_date ?? null,
+			// 	has_ticket_combinations: true,
+			// 	ticket_combinations: combos.map(c => ({
+			// 	  selectedSpecs: c.selectedSpecs,
+			// 	  matchedSkuIndex: c.matchedSkuIndex,
+			// 	  matchedSku: c.matchedSku,
+			// 	})),
+			// 	item_unit: params?.item_unit ?? null,
+			//   });
+
+			return;
+		}
+
+		// 4) Default (no ticketSpec): require all specs; matchedSkuIndex must exist
+		if (matchedSkuIndex == null) {
+			Toast.show({
+				type: 'error',
+				text1: '선택하신 옵션 조합에 해당하는 상품이 없습니다. 다른 조합을 선택해주세요.',
+				position: 'bottom',
+			});
+
+			return;
+		}
+
+		const sku = skus[matchedSkuIndex];
+
+		// navigation.navigate('/product/reservation', {
+		//   prod_no: params?.prod_no ?? pkgData?.prod_no,
+		//   pkg_no: params?.pkg_no ?? (pkgData?.pkg && pkgData.pkg[0]?.pkg_no) ?? pkgData?.pkg_no,
+		//   pkgData,
+		//   date_setting: params?.date_setting ?? null,
+		//   max_date: params?.max_date ?? null,
+		//   min_date: params?.min_date ?? null,
+		//   has_ticket_combinations: false,
+		//   selectedSpecs: selectedMap,
+		//   selectedSkuIndex: matchedSkuIndex,
+		//   selectedSku: sku,
+		//   item_unit: params?.item_unit ?? null,
+		// });
+	};
 	const [count, setCount] = useState(data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity ?? 1);
 	const [canNext, setCanNext] = useState(false);
 	const [eventTime, setEventTime] = useState(null);
@@ -196,6 +469,22 @@ export default function ProductSelectDay({navigation}: any) {
 	// 		navigation.goBack();
 	// 	}
 	// }, []);
+
+	const totalCount = useMemo(() => ticketStatus?.reduce((acc, c) => acc + c.count, 0), [ticketStatus]);
+	const totalMoney = useMemo(() => {
+		console.log(checkList);
+		// ticketStatus.map((item)=>{
+		// 	if(item?.count!=0){
+		// 		data?.item?.[0]?.skus?.map((skuItem)=>{
+		// 			skuItem?.specs_ref?.find((refItem)=>refItem?.spec_value_id==item?.id)
+		// 		})
+		// 	}
+		// })
+		// ?.calendar_detail?.[
+		// 	moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+		// ]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+		// return 0;
+	}, [ticketStatus, checkList]);
 	useEffect(() => {
 		let status = {
 			day: false,
@@ -217,8 +506,79 @@ export default function ProductSelectDay({navigation}: any) {
 				!!checkList[0]?.calendar_detail?.[moment(dateInfo.selectStartDate).format('YYYY-MM-DD')]?.b2b_price
 					?.fullday;
 		}
+		if (data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < totalCount) {
+			console.log('zz');
+			status.product == false;
+		}
 		setCanNext(status.day && status.product);
-	}, [dateInfo, daySetting, checkList, eventTime]);
+	}, [dateInfo, daySetting, checkList, eventTime, totalCount]);
+	const handleTicketCount = (sign, item) => {
+		if (item) {
+			let index = ticketStatus.findIndex(findItem => findItem.id == item);
+			let copy = [...ticketStatus];
+			copy[index] = {...copy[index], count: sign == '+' ? copy[index]?.count + 1 : copy[index]?.count - 1};
+			setTicketStatus(copy);
+		}
+		setCount(sign == '+' ? count + 1 : count - 1);
+		// if (item?.[count]) {
+		// 	item?.count += 1;
+		// } else {
+		// 	item['count'] = item;
+		// }
+	};
+
+	const renderSpecGroup = spec => {
+		const selectedValue = selectedMap[spec.spec_oid];
+
+		// Hide the ticketSpec entirely from UI (do not render)
+		if (ticketSpec && spec.spec_oid === ticketSpec.spec_oid) {
+			return null;
+		}
+
+		return (
+			<View key={spec.spec_oid} style={{marginBottom: 20}}>
+				<PretendardSemiBoldText
+					size={22}
+					lineHeight={26}
+					numberOfLines={2}
+					color={colors.Black}
+					deco={'margin-bottom:10px;'}>
+					{spec.spec_title}
+				</PretendardSemiBoldText>
+				<View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+					{spec.spec_items.map(item => {
+						const isSelected = selectedValue === item.spec_item_oid;
+						const enabled = isOptionEnabled(spec.spec_oid, item.spec_item_oid);
+
+						const baseStyle = styles.optionBase;
+						const selectedStyle = isSelected ? styles.optionSelected : null;
+						const disabledStyle = !enabled ? styles.optionDisabled : null;
+
+						return (
+							<TouchableOpacity
+								key={item.spec_item_oid}
+								onPress={() => {
+									if (!enabled) return;
+									toggleSelect(spec.spec_oid, item.spec_item_oid);
+								}}
+								activeOpacity={enabled ? 0.8 : 1}
+								style={[baseStyle, isSelected && selectedStyle, !enabled && disabledStyle]}
+								accessibilityState={{disabled: !enabled, selected: isSelected}}>
+								<PretendardSemiBoldText
+									size={20}
+									lineHeight={24}
+									numberOfLines={2}
+									color={isSelected ? colors.Black : enabled ? colors.grey800 : colors.grey300}>
+									{item.name}
+								</PretendardSemiBoldText>
+							</TouchableOpacity>
+						);
+					})}
+				</View>
+			</View>
+		);
+	};
+
 	return (
 		<>
 			<BackgroundGrayScrollView>
@@ -265,99 +625,219 @@ export default function ProductSelectDay({navigation}: any) {
 					selectYearTitle='년도 선택'
 				/>
 				<FlexWrap>
-					{/* {data?.item?.[0]?.skus.map(sku => {
-					return sku?.specs?.map(spec => (
-						<SpecBox>
-							<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
-								{spec?.spec_title}
-							</PretendardSemiBoldText>
-						</SpecBox>
-					));
-				})} */}
-					{data?.item?.[0]?.specs?.map(spec => (
-						<VStack>
-							<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
-								{spec?.spec_title}
-							</PretendardSemiBoldText>
-							<FlexWrap gap={10}>
-								{spec?.spec_items?.map(element => (
-									<SpecBox
-										disable={
-											checkList?.length == 0
-												? false
-												: !!!checkList?.find(
-														item => item?.spec?.[spec?.spec_title] == element?.name,
-												  )
-										}
-										disabled={
-											checkList?.length == 0
-												? false
-												: !!!checkList?.find(
-														item => item?.spec?.[spec?.spec_title] == element?.name,
-												  )
-										}
-										isActive={selectedSpecs[spec?.spec_title] == element?.name}
-										onPress={() => handleSpecSelect(spec?.spec_title, element?.name)}>
-										<PretendardVariableText
-											size={18}
-											lineHeight={22}
-											numberOfLines={2}
-											color={
-												checkList?.length == 0
-													? colors.Black
-													: !!!checkList?.find(
-															item => item?.spec?.[spec?.spec_title] == element?.name,
-													  )
-													? colors.Gray400
-													: colors.Black
-											}
-											deco={'text-align:center;'}>
-											{element?.name}
-											{!!element?.rule?.age_rule &&
-												(!!element?.rule?.age_rule?.min || element?.rule?.age_rule?.max) && (
+					{specs.length === 0 ? <Text>선택 가능한 옵션이 없습니다.</Text> : specs.map(renderSpecGroup)}
+
+					{/* {data?.item?.[0]?.specs?.map(spec => {
+						return (
+							<VStack>
+								<PretendardSemiBoldText
+									size={22}
+									lineHeight={26}
+									numberOfLines={2}
+									color={colors.Black}>
+									{spec?.spec_title}
+								</PretendardSemiBoldText>
+								<FlexWrap gap={10}>
+									{spec?.spec_items?.map(element => {
+										const rulesetsItem = ticketStatus?.find(
+											filItem => filItem?.id == element?.spec_item_oid,
+										);
+										if (spec?.spec_title == '티켓 종류' || rulesetsItem) {
+											return (
+												<TicketBox>
+													<PretendardSemiBoldText
+														size={20}
+														lineHeight={24}
+														color={colors.Black}>
+														{element?.name}
+														{!!element?.rule?.age_rule &&
+															(!!element?.rule?.age_rule?.min ||
+																element?.rule?.age_rule?.max) && (
+																<PretendardVariableText
+																	size={16}
+																	lineHeight={21}
+																	numberOfLines={2}
+																	color={colors.Gray3}>
+																	{' '}
+																	(
+																	{(!!element?.rule?.age_rule?.min
+																		? '만 ' + element?.rule?.age_rule?.min + '세'
+																		: '') +
+																		' ~ ' +
+																		(!!element?.rule?.age_rule?.max
+																			? '만 ' +
+																			  element?.rule?.age_rule?.max +
+																			  '세'
+																			: '')}
+																	)
+																</PretendardVariableText>
+															)}
+														{!!element?.rule?.height_rule &&
+															(!!element?.rule?.height_rule?.min ||
+																element?.rule?.height_rule?.max) && (
+																<PretendardVariableText
+																	size={16}
+																	lineHeight={21}
+																	numberOfLines={2}
+																	color={colors.Gray3}>
+																	{' '}
+																	(
+																	{(!!element?.rule?.height_rule?.min
+																		? '신장 ' + element?.rule?.height_rule?.min
+																		: '') +
+																		' ~ ' +
+																		(!!element?.rule?.height_rule?.max
+																			? element?.rule?.height_rule?.max
+																			: '')}
+																	)
+																</PretendardVariableText>
+															)}
+													</PretendardSemiBoldText>
+													<HStack
+														justifyContent='space-around'
+														width={widthPercentage(182)}
+														deco={'margin-bottom:10px;'}>
+														<SVGContainer
+															disabled={(rulesetsItem?.min ?? 0) >= rulesetsItem?.count}
+															onPress={() => {
+																handleTicketCount('-', rulesetsItem?.id);
+																console.log(element);
+																// setCount(count - 1);
+															}}
+															color={
+																(rulesetsItem?.min ?? 0) >= rulesetsItem?.count
+																	? colors.Gray1
+																	: colors.Primary
+															}>
+															<SVGMinus
+																width={widthPercentage(23)}
+																height={widthPercentage(23)}
+																color={colors.Gray2}
+															/>
+														</SVGContainer>
+
+														<PretendardSemiBoldText
+															size={16}
+															color={colors.Black}
+															lineHeight={21.6}>
+															{rulesetsItem?.count}
+															{data?.item?.[0]?.unit}
+														</PretendardSemiBoldText>
+														<SVGContainer
+															disabled={
+																(rulesetsItem?.max ?? Infinity) <
+																rulesetsItem?.count + 1
+															}
+															onPress={() => {
+																handleTicketCount('+', rulesetsItem?.id);
+															}}
+															color={
+																(rulesetsItem?.max ?? Infinity) <
+																rulesetsItem?.count + 1
+																	? colors.Gray1
+																	: colors.Primary
+															}>
+															<SVGPlus
+																width={widthPercentage(25)}
+																height={widthPercentage(25)}
+																color={colors.Gray2}
+															/>
+														</SVGContainer>
+													</HStack>
+												</TicketBox>
+											);
+										} else {
+											return (
+												<SpecBox
+													disable={
+														checkList?.length == 0
+															? false
+															: !!!checkList?.find(
+																	item =>
+																		item?.spec?.[spec?.spec_title] == element?.name,
+															  )
+													}
+													disabled={
+														checkList?.length == 0
+															? false
+															: !!!checkList?.find(
+																	item =>
+																		item?.spec?.[spec?.spec_title] == element?.name,
+															  )
+													}
+													isActive={selectedSpecs[spec?.spec_title] == element?.name}
+													onPress={() => handleSpecSelect(spec?.spec_title, element?.name)}>
 													<PretendardVariableText
-														size={16}
-														lineHeight={21}
+														size={18}
+														lineHeight={22}
 														numberOfLines={2}
-														color={colors.Gray3}>
-														{' '}
-														(
-														{(!!element?.rule?.age_rule?.min
-															? '만 ' + element?.rule?.age_rule?.min + '세'
-															: '') +
-															' ~ ' +
-															(!!element?.rule?.age_rule?.max
-																? '만 ' + element?.rule?.age_rule?.max + '세'
-																: '')}
-														)
+														color={
+															checkList?.length == 0
+																? colors.Black
+																: !!!checkList?.find(
+																		item =>
+																			item?.spec?.[spec?.spec_title] ==
+																			element?.name,
+																  )
+																? colors.Gray400
+																: colors.Black
+														}
+														deco={'text-align:center;'}>
+														{element?.name}
+														{!!element?.rule?.age_rule &&
+															(!!element?.rule?.age_rule?.min ||
+																element?.rule?.age_rule?.max) && (
+																<PretendardVariableText
+																	size={16}
+																	lineHeight={21}
+																	numberOfLines={2}
+																	color={colors.Gray3}>
+																	{' '}
+																	(
+																	{(!!element?.rule?.age_rule?.min
+																		? '만 ' + element?.rule?.age_rule?.min + '세'
+																		: '') +
+																		' ~ ' +
+																		(!!element?.rule?.age_rule?.max
+																			? '만 ' +
+																			  element?.rule?.age_rule?.max +
+																			  '세'
+																			: '')}
+																	)
+																</PretendardVariableText>
+															)}
+														{!!element?.rule?.height_rule &&
+															(!!element?.rule?.height_rule?.min ||
+																element?.rule?.height_rule?.max) && (
+																<PretendardVariableText
+																	size={16}
+																	lineHeight={21}
+																	numberOfLines={2}
+																	color={colors.Gray3}>
+																	{' '}
+																	(
+																	{(!!element?.rule?.height_rule?.min
+																		? '신장 ' + element?.rule?.height_rule?.min
+																		: '') +
+																		' ~ ' +
+																		(!!element?.rule?.height_rule?.max
+																			? element?.rule?.height_rule?.max
+																			: '')}
+																	)
+																</PretendardVariableText>
+															)}
 													</PretendardVariableText>
-												)}
-											{!!element?.rule?.height_rule &&
-												(!!element?.rule?.height_rule?.min ||
-													element?.rule?.height_rule?.max) && (
-													<PretendardVariableText
-														size={16}
-														lineHeight={21}
-														numberOfLines={2}
-														color={colors.Gray3}>
-														{' '}
-														(
-														{(!!element?.rule?.height_rule?.min
-															? '신장 ' + element?.rule?.height_rule?.min
-															: '') +
-															' ~ ' +
-															(!!element?.rule?.height_rule?.max
-																? element?.rule?.height_rule?.max
-																: '')}
-														)
-													</PretendardVariableText>
-												)}
-										</PretendardVariableText>
-									</SpecBox>
-								))}
-							</FlexWrap>
-						</VStack>
-					))}
+												</SpecBox>
+											);
+										}
+									})}
+								</FlexWrap>
+							</VStack>
+						);
+					})} */}
+					<PretendardVariableText size={16} lineHeight={21} numberOfLines={2} color={colors.Gray3}>
+						{totalCount}
+					</PretendardVariableText>
 
 					{data?.item?.[0]?.sale_s_date_event != null &&
 						checkList?.length == 1 &&
@@ -395,40 +875,45 @@ export default function ProductSelectDay({navigation}: any) {
 							</VStack>
 						)}
 				</FlexWrap>
+				{ticketStatus.length == 0 && (
+					<HStack justifyContent='space-around' width={widthPercentage(182)} deco={'margin-bottom:10px;'}>
+						<SVGContainer
+							disabled={data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity >= count}
+							onPress={() => {
+								setCount(count - 1);
+							}}
+							color={
+								data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity >= count
+									? colors.Gray1
+									: colors.Primary
+							}>
+							{count >= 1 && (
+								<SVGMinus
+									width={widthPercentage(23)}
+									height={widthPercentage(23)}
+									color={colors.Gray2}
+								/>
+							)}
+						</SVGContainer>
 
-				<HStack justifyContent='space-around' width={widthPercentage(182)} deco={'margin-bottom:10px;'}>
-					<SVGContainer
-						disabled={data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity >= count}
-						onPress={() => {
-							setCount(count - 1);
-						}}
-						color={
-							data?.item?.[0]?.unit_quantity_rule?.total_rule?.min_quantity >= count
-								? colors.Gray1
-								: colors.Primary
-						}>
-						{count >= 1 && (
-							<SVGMinus width={widthPercentage(23)} height={widthPercentage(23)} color={colors.Gray2} />
-						)}
-					</SVGContainer>
-
-					<PretendardSemiBoldText size={16} color={colors.Black} lineHeight={21.6}>
-						{count}
-						{data?.item?.[0]?.unit}
-					</PretendardSemiBoldText>
-					<SVGContainer
-						disabled={data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < count + 1}
-						onPress={() => {
-							setCount(count + 1);
-						}}
-						color={
-							data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < count + 1
-								? colors.Gray1
-								: colors.Primary
-						}>
-						<SVGPlus width={widthPercentage(25)} height={widthPercentage(25)} color={colors.Gray2} />
-					</SVGContainer>
-				</HStack>
+						<PretendardSemiBoldText size={16} color={colors.Black} lineHeight={21.6}>
+							{count}
+							{data?.item?.[0]?.unit}
+						</PretendardSemiBoldText>
+						<SVGContainer
+							disabled={data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < count + 1}
+							onPress={() => {
+								setCount(count + 1);
+							}}
+							color={
+								data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < count + 1
+									? colors.Gray1
+									: colors.Primary
+							}>
+							<SVGPlus width={widthPercentage(25)} height={widthPercentage(25)} color={colors.Gray2} />
+						</SVGContainer>
+					</HStack>
+				)}
 
 				{renderRefundPolicy(data.refund_policy_v2)}
 				{data?.item?.[0]?.specs?.length == Object.entries(selectedSpecs)?.length && (
@@ -472,65 +957,66 @@ export default function ProductSelectDay({navigation}: any) {
 			</BackgroundGrayScrollView>
 			<RouteButton
 				navigation={navigation}
-				isDisabled={!canNext}
+				// isDisabled={!canNext}
 				type={'planner'}
 				nextText={'다음으로'}
-				goNext={async () => {
-					await logEvent(`goReserve`, {pkgName: name});
+				goNext={onConfirm}
+				// goNext={async () => {
+				// 	await logEvent(`goReserve`, {pkgName: name});
 
-					navigation.navigate('Reserve', {
-						data: {
-							item_no: data?.item?.[0]?.item_no,
-							guid: data?.guid,
-							partner_order_no: '1',
-							prod_no: prod_no,
-							pkg_no: pkg_no,
-							locale: 'ko',
+				// 	navigation.navigate('Reserve', {
+				// 		data: {
+				// 			item_no: data?.item?.[0]?.item_no,
+				// 			guid: data?.guid,
+				// 			partner_order_no: '1',
+				// 			prod_no: prod_no,
+				// 			pkg_no: pkg_no,
+				// 			locale: 'ko',
 
-							state: 'KR',
-							buyer_first_name: '',
-							buyer_last_name: '',
-							buyer_Email: 'wayfarers0814@gmail.com',
-							buyer_tel_country_code: '82',
-							buyer_tel_number: 0,
-							buyer_country: 'KR',
+				// 			state: 'KR',
+				// 			buyer_first_name: '',
+				// 			buyer_last_name: '',
+				// 			buyer_Email: 'wayfarers0814@gmail.com',
+				// 			buyer_tel_country_code: '82',
+				// 			buyer_tel_number: 0,
+				// 			buyer_country: 'KR',
 
-							s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
-							e_date:
-								dateInfo.selectEndDate == null
-									? moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
-									: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
-							event_time: eventTime,
-							guide_lang: null,
-							skus: [
-								{
-									sku_id: checkList[0]?.sku_id,
-									qty: count,
-									price: Number(
-										checkList[0]?.calendar_detail?.[
-											moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
-										]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
-									),
-								},
-							],
-							mobile_device: {
-								mobile_model_no: null,
-								IMEI: null,
-								active_date: '2025-08-21',
-							},
-							order_note: '오더노트',
-							total_price:
-								Number(
-									checkList[0]?.calendar_detail?.[
-										moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
-									]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
-								) * count,
-							pay_type: '01',
-							image: image,
-							name: name,
-						},
-					});
-				}}
+				// 			s_date: moment(dateInfo.selectStartDate).format('YYYY-MM-DD'),
+				// 			e_date:
+				// 				dateInfo.selectEndDate == null
+				// 					? moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+				// 					: moment(dateInfo.selectEndDate).format('YYYY-MM-DD'),
+				// 			event_time: eventTime,
+				// 			guide_lang: null,
+				// 			skus: [
+				// 				{
+				// 					sku_id: checkList[0]?.sku_id,
+				// 					qty: count,
+				// 					price: Number(
+				// 						checkList[0]?.calendar_detail?.[
+				// 							moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+				// 						]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+				// 					),
+				// 				},
+				// 			],
+				// 			mobile_device: {
+				// 				mobile_model_no: null,
+				// 				IMEI: null,
+				// 				active_date: '2025-08-21',
+				// 			},
+				// 			order_note: '오더노트',
+				// 			total_price:
+				// 				Number(
+				// 					checkList[0]?.calendar_detail?.[
+				// 						moment(dateInfo.selectStartDate).format('YYYY-MM-DD')
+				// 					]?.b2b_price?.fullday ?? checkList[0]?.b2b_price,
+				// 				) * count,
+				// 			pay_type: '01',
+				// 			image: image,
+				// 			name: name,
+				// 		},
+				// 	});
+				// }}
 				nextTitle='RecommendSelectTour'></RouteButton>
 		</>
 	);
@@ -546,3 +1032,34 @@ const SpecBox = styled.TouchableOpacity<{isActive: boolean; disable?: boolean}>`
 	padding: 5px 10px;
 	background-color: ${props => (props.isActive ? colors.Primary : colors.backgroundWhite)};
 `;
+const TicketBox = styled.View`
+	width: ${widthPercentage(327)}px;
+	min-height: ${heightPercentage(126)}px;
+	border-radius: 8px;
+	background-color: ${colors.backgroundGray};
+	padding: ${widthPercentage(20)}px;
+`;
+const styles = StyleSheet.create({
+	optionBase: {
+		paddingVertical: 10,
+		paddingHorizontal: 16,
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: colors.grey200,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#fff',
+		marginRight: 10,
+		marginBottom: 10,
+		minWidth: widthPercentage(70),
+		minHeight: heightPercentage(52),
+	},
+	optionSelected: {
+		borderColor: colors.Primary,
+		backgroundColor: colors.Primary,
+	},
+	optionDisabled: {
+		borderColor: colors.grey100,
+		backgroundColor: '#fafafa',
+	},
+});

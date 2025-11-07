@@ -243,25 +243,21 @@ function App(): JSX.Element {
 		<GestureHandlerRootView style={{flex: 1}}>
 			<SafeAreaProvider>
 				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
-					<PaymentWidgetProvider
-						clientKey={__DEV__ ? TossPayment_Test_Key : TossPayment_Live_Key}
-						customerKey={`CVkg1NgQih5CJceio0erA`}>
-						<StatusBar
-							animated={true}
-							barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-							backgroundColor={backgroundStyle.backgroundColor}
-						/>
-						<NavigationContainer linking={linking}>
-							{<StackNavigator />}
-							{needVersionUpdate && <NeedVersionUpdate />}
-							{eventState && <Event />}
-							{cooperationState && <Cooperation />}
-							{!(networkConn && serverConn) && <Connection />}
-							{<BaseModal />}
-							{Boolean(isLoading) && <Loading />}
-							<Toast />
-						</NavigationContainer>
-					</PaymentWidgetProvider>
+					<StatusBar
+						animated={true}
+						barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+						backgroundColor={backgroundStyle.backgroundColor}
+					/>
+					<NavigationContainer linking={linking}>
+						{<StackNavigator />}
+						{needVersionUpdate && <NeedVersionUpdate />}
+						{eventState && <Event />}
+						{cooperationState && <Cooperation />}
+						{!(networkConn && serverConn) && <Connection />}
+						{<BaseModal />}
+						{Boolean(isLoading) && <Loading />}
+						<Toast />
+					</NavigationContainer>
 				</SafeAreaView>
 			</SafeAreaProvider>
 		</GestureHandlerRootView>

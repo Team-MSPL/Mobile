@@ -23,7 +23,6 @@ export default function ReserveList({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const a = await dispatch(getReserveList()).unwrap();
-			console.log(a.data);
 			setList(a.data);
 		} catch (e) {
 			console.log(e);
@@ -60,6 +59,10 @@ export default function ReserveList({navigation}: any) {
 			{list?.map((item, idx) => (
 				<ReserveBox
 					onPress={() => {
+						console.log({
+							order_no: item?.product?.data?.order_no,
+							tossKey: item?.product?.booking_key,
+						});
 						navigation.navigate('ReserveDetail', {
 							order_no: item?.product?.data?.order_no,
 							tossKey: item?.product?.booking_key,
@@ -104,6 +107,7 @@ const ReserveBox = styled.TouchableOpacity`
 	border-radius: 12px;
 	border-width: 1px;
 	border-color: ${colors.Gray1};
+	margin-bottom: 20px;
 `;
 const ImgPadding = styled.View`
 	width: ${widthPercentage(327)}px;

@@ -84,7 +84,6 @@ export default function Reserve({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			// console.log(data);
-			console.log(data, 'z');
 			const a = await dispatch(handleBookingField(data)).unwrap();
 			// console.log(a?.custom);
 			setCustomType(a);
@@ -100,7 +99,6 @@ export default function Reserve({navigation}: any) {
 			// }
 			// console.log(a?.custom?.cus_type);
 		} catch (e) {
-			console.log(e, 'ㅁ');
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '현재 해당 여행 상품의 판매가 중단되었습니다.',
@@ -203,7 +201,6 @@ export default function Reserve({navigation}: any) {
 														label: item?.name ?? item?.info ?? item?.app_name,
 													}))}
 												setOpen={e => {
-													console.log(value?.list_option);
 													Keyboard.dismiss();
 													setOpen({
 														status: !open.status,
@@ -215,7 +212,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleChange1(item, nextValue);
 												}}
 												setItems={setItems}
@@ -237,7 +233,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleChange(item, nextValue);
 												}}
 												setItems={setItems}
@@ -300,7 +295,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleChange(item, nextValue);
 												}}
 												setItems={setItems}
@@ -349,7 +343,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleSendChange(item, nextValue);
 												}}
 												setItems={setItems}
@@ -420,7 +413,6 @@ export default function Reserve({navigation}: any) {
 															listMode={'SCROLLVIEW'}
 															setValue={callback => {
 																const nextValue = callback(value);
-																console.log(value);
 																handleCustomChange(item, nextValue, dataIndex);
 															}}
 															setItems={setItems}
@@ -475,7 +467,6 @@ export default function Reserve({navigation}: any) {
 														label: item?.name ?? item?.info ?? item?.app_name,
 													}))}
 												setOpen={e => {
-													console.log(value?.list_option);
 													Keyboard.dismiss();
 													setOpen({
 														status: !open.status,
@@ -487,7 +478,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleChange1(item, nextValue);
 												}}
 												setItems={setItems}
@@ -509,7 +499,6 @@ export default function Reserve({navigation}: any) {
 												listMode={'SCROLLVIEW'}
 												setValue={callback => {
 													const nextValue = callback(value);
-													console.log(value);
 													handleChange1(item, nextValue);
 												}}
 												setItems={setItems}

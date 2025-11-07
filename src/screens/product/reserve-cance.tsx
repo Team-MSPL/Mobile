@@ -28,12 +28,13 @@ export default function ReserveCancel({navigation}: any) {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const a = await dispatch(bookingCancel(info?.order_no)).unwrap();
-			await dispatch(
+			const q = await dispatch(
 				tossCancel({
 					paymentKey: tossKey,
 					cancelAmount: info?.total_price - info?.cancel_fee,
 				}),
-			);
+			).unwrap();
+			console.log(q);
 			navigation.goBack();
 			navigation.goBack();
 		} catch (e) {

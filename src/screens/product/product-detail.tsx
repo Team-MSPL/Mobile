@@ -3,7 +3,7 @@ import {useEffect, useLayoutEffect, useState} from 'react';
 import {styled} from 'styled-components/native';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {getQueryProduct} from '../../redux/travel-info/travel.slice';
+import {getQueryProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import RouteButton from '../../utill/component/route-button';
 import ImageView from 'react-native-image-viewing';
@@ -21,7 +21,7 @@ import {widthPercentage} from '../../utill/layout/responsive-size';
 import {SVGGlobal, SVGHeart, SVGMoney, SvgRight, SVGRightAdd, SvgShare, SvgShare1} from '../../utill/svg/svg';
 import {MarginContainer} from '../timetable/preset-detail';
 import RenderHtml from 'react-native-render-html';
-import {Image} from 'react-native';
+import {Alert, Image} from 'react-native';
 import AutoSizedImage from '../../utill/component/product/auto-size-image';
 import {ImageViewFooterComponent} from '../timetable/course-detail';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -31,10 +31,23 @@ export default function ProductDetail({navigation}: any) {
 	const {item}: any = route.params;
 	const [productInfo, setProductInfo] = useState(null);
 	const dispatch = useAppDispatch();
+
 	const handleDetail = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			const data = await dispatch(getQueryProduct(item?.prod_no)).unwrap();
+
+			if (data && data.prod && data.pkg) {
+				const merged = {...data.prod, detail_loaded: true};
+
+				try {
+					dispatch(travelSliceActions.updateFiled({field: 'pdt', value: merged}));
+				} catch (e) {
+					/* ignore */
+				}
+			} else {
+				console.warn('[ProductGoodProduct] QueryProduct unexpected response', data);
+			}
 			setProductInfo(data);
 		} catch (e) {
 			console.log(e);

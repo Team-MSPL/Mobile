@@ -6,8 +6,13 @@ import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {colors} from '../../utill/colors';
 import RouteButton from '../../utill/component/route-button';
-import {BackgroundGrayScrollView, PretendardSemiBoldText} from '../../utill/layout/layout';
-import {widthPercentage} from '../../utill/layout/responsive-size';
+import {
+	BackgroundGrayScrollView,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+} from '../../utill/layout/layout';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {MarginContainer} from '../timetable/preset-detail';
 
 export default function PackageSelect({navigation}: any) {
@@ -22,7 +27,7 @@ export default function PackageSelect({navigation}: any) {
 	// }
 	const handleNext = async (e: any) => {
 		await logEvent(`PackageDetail`, {title: data?.prod?.prod_name, pkgName: e?.pkg_name});
-		navigation.navigate('ProductSelectDay', {
+		navigation.navigate('ProductSelectSpec', {
 			image: data?.prod?.img_list[0],
 			name: e?.pkg_name,
 			prod_no: data?.prod?.prod_no,
@@ -32,55 +37,48 @@ export default function PackageSelect({navigation}: any) {
 	};
 	return (
 		<BackgroundGrayScrollView>
-			<PretendardSemiBoldText
-				size={22}
-				lineHeight={26}
-				numberOfLines={2}
-				color={colors.Black}
-				deco={'margin-bottom:20px;margin-top:10px;'}>
-				옵션선택
-			</PretendardSemiBoldText>
+			<HStack deco={'margin-bottom:20px;margin-top:10px;'}>
+				<PretendardSemiBoldText size={24} lineHeight={28} numberOfLines={2} color={colors.Black}>
+					옵션선택
+				</PretendardSemiBoldText>
+				<PretendardVariableText size={14} lineHeight={18} numberOfLines={2} color={colors.PointGreen1}>
+					{' '}
+					(필수)
+				</PretendardVariableText>
+			</HStack>
 			{data?.pkg?.map((item, idx) => (
 				<PackageBox
 					onPress={() => {
 						handleNext(item);
 					}}>
-					<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
+					<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={1} color={colors.Black}>
 						{item?.pkg_name}
-					</PretendardSemiBoldText>
-					{item?.b2c_min_price - item?.b2b_min_price > 0 && (
-						<>
-							<PretendardSemiBoldText
-								size={16}
-								lineHeight={20}
-								color={colors.PointGreen1}
-								deco={'text-align:right;margin-top:15px;'}>
-								{(item?.b2c_min_price - item?.b2b_min_price).toLocaleString('ko-KR')}원 할인
-							</PretendardSemiBoldText>
-							<PretendardSemiBoldText
-								size={18}
-								lineHeight={24}
-								color={colors.Gray2}
-								deco={'text-align:right;text-decoration:line-through;'}>
-								{item?.b2c_min_price.toLocaleString('ko-KR')}원~
-							</PretendardSemiBoldText>
-						</>
-					)}
-					<PretendardSemiBoldText
-						size={23}
-						lineHeight={29}
-						numberOfLines={2}
-						color={colors.Black}
-						deco={'text-align:right;'}>
-						{item?.b2b_min_price.toLocaleString('ko-KR')}원~
 					</PretendardSemiBoldText>
 					{item?.description_module?.PMDL_PACKAGE_DESC?.content?.list?.map((explainItem, explainIndex) => (
 						<RenderHTML
-							baseStyle={{color: colors.Black}}
+							baseStyle={{color: colors.Gray3, fontSize: fontPercentage(16)}}
 							contentWidth={widthPercentage(327)}
 							source={{html: explainItem?.desc}}
 						/>
 					))}
+					<HStack justifyContent='space-between'>
+						<PretendardSemiBoldText
+							size={22}
+							lineHeight={26}
+							numberOfLines={2}
+							color={colors.Black}
+							deco={'text-align:right;'}>
+							{item?.b2b_min_price.toLocaleString('ko-KR')}원
+						</PretendardSemiBoldText>
+						<ChoiceButton
+							onPress={() => {
+								handleNext(item);
+							}}>
+							<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Gray5}>
+								선택하기
+							</PretendardSemiBoldText>
+						</ChoiceButton>
+					</HStack>
 				</PackageBox>
 			))}
 		</BackgroundGrayScrollView>
@@ -88,9 +86,16 @@ export default function PackageSelect({navigation}: any) {
 }
 const PackageBox = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
-	border-width: 1px;
-	border-color: ${colors.Gray200};
+	background-color: ${colors.backgroundGray};
 	border-radius: 12px;
-	padding: 10px 15px;
+	padding: 20px 15px;
 	margin-bottom: 10px;
+`;
+const ChoiceButton = styled.Pressable`
+	width: ${widthPercentage(100)}px;
+	height: ${heightPercentage(40)}px;
+	border-radius: 8px;
+	background-color: ${colors.PrimarySecondary};
+	align-items: center;
+	justify-content: center;
 `;

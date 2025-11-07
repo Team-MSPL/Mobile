@@ -25,6 +25,8 @@ const initialState: LiteState = {
 	cityIndex: 0, //지역이름 ex)경남
 	day: [], //타임테이블 용날짜 리스트
 	nDay: 0, // 몇박인지 5박6일이면 5
+	s_date: null,
+	e_date: null,
 	Place: {
 		name: '',
 		lat: 0,
@@ -53,6 +55,7 @@ const initialState: LiteState = {
 	myTravelList: [],
 	travelId: '',
 	postList: [],
+	pdt: null,
 	diary: '',
 	picture: [],
 	reviewCheck: false,
@@ -653,12 +656,18 @@ export const handleBookingField = createAsyncThunk(
 //토스 결제 승인
 export const handleTossConfirm = createAsyncThunk(
 	'/toss/payments/confirm',
-	async (data: {paymentKey: string; orderId: string; amount: number}, {rejectWithValue}) => {
+	async (data: {paymentKey: string; orderId: string; amount: number; version: string}, {rejectWithValue}) => {
 		try {
 			const response = await axiosAuth.post(`/toss/payments/confirm`, data, {timeout: 60000});
+			console.log(response);
 			return response.data;
 		} catch (error: any) {
-			throw rejectWithValue(error.code);
+			if (error.response) {
+				console.log('서버 응답 에러:', error.response.data);
+				return rejectWithValue(error.response.data);
+			}
+			console.log('네트워크 에러:', error);
+			return rejectWithValue({error: '네트워크 오류 발생'});
 		}
 	},
 );
@@ -669,8 +678,12 @@ export const handleBookingSave = createAsyncThunk('/bookingProduct/save', async 
 		const response = await axiosAuth.post(`/bookingProduct/save`, data, {timeout: 60000});
 		return response.data;
 	} catch (error: any) {
-		console.log('aaa', error);
-		throw rejectWithValue(error.code);
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
 	}
 });
 
@@ -685,8 +698,12 @@ export const bookingCancel = createAsyncThunk('/kkday/Order/Cancel', async (orde
 
 		return response.data;
 	} catch (error: any) {
-		console.log(error);
-		throw rejectWithValue(error.code);
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
 	}
 });
 //토스 환불
@@ -698,6 +715,7 @@ export const tossCancel = createAsyncThunk(
 				`/toss/payments/${data?.paymentKey}/cancel`,
 				{
 					cancelReason: '사용자 요청', // 필수
+					version: 'live',
 					...(data?.cancelAmount !== undefined &&
 						data?.cancelAmount !== null && {
 							cancelAmount: data.cancelAmount,
@@ -707,7 +725,12 @@ export const tossCancel = createAsyncThunk(
 			);
 			return response.data;
 		} catch (error: any) {
-			throw rejectWithValue(error.code);
+			if (error.response) {
+				console.log('서버 응답 에러:', error.response.data);
+				return rejectWithValue(error.response.data);
+			}
+			console.log('네트워크 에러:', error);
+			return rejectWithValue({error: '네트워크 오류 발생'});
 		}
 	},
 );
@@ -1291,6 +1314,9 @@ interface LiteState {
 	picture: string[];
 	reviewCheck: boolean;
 	tableShowFlag: boolean;
+	pdt: any;
+	s_date: any;
+	e_date: any;
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
 	travelName: string;

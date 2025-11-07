@@ -3,13 +3,18 @@ import React, {Fragment} from 'react';
 import HomeProductList from '../screens/home/home-product-list';
 import HomeProductCountry from '../screens/home/select-product-country';
 import PackageSelect from '../screens/product/packge-selete';
+import ProductPay from '../screens/product/pay';
+import ProductPeople from '../screens/product/people';
 import ProductDetail from '../screens/product/product-detail';
 import ProductSelectDay from '../screens/product/product-select-day';
 import Products from '../screens/product/products';
+import ProductReservation from '../screens/product/reservation';
 import Reserve from '../screens/product/reserve';
 import ReserveCancel from '../screens/product/reserve-cance';
 import ReserveDetail from '../screens/product/reserve-detail';
 import ReserveList from '../screens/product/reserve-list';
+import ProductSelectSpec from '../screens/product/select-spec';
+import ProductGoodProduct from '../screens/product/test';
 import PresetProduct from '../screens/timetable/preset-product';
 import Join1 from '../screens/user/join1';
 const Stack = createNativeStackNavigator();
@@ -43,7 +48,7 @@ export default function ProductsStack() {
 				name='PackageSelect'
 				component={PackageSelect}
 				options={{
-					title: '',
+					title: '예약하기',
 				}}
 			/>
 
@@ -100,6 +105,42 @@ export default function ProductsStack() {
 				component={HomeProductList}
 				options={{
 					title: '상품리스트',
+				}}
+			/>
+
+			<Stack.Screen
+				name='ProductGoodProduct'
+				component={ProductGoodProduct}
+				options={{
+					title: '상품예약',
+				}}
+			/>
+			<Stack.Screen
+				name='ProductSelectSpec'
+				component={ProductSelectSpec}
+				options={{
+					title: '상품예약',
+				}}
+			/>
+			<Stack.Screen
+				name='ProductReservation'
+				component={ProductReservation}
+				options={{
+					title: '상품예약',
+				}}
+			/>
+			<Stack.Screen
+				name='ProductPeople'
+				component={ProductPeople}
+				options={{
+					title: '상품예약',
+				}}
+			/>
+			<Stack.Screen
+				name='ProductPay'
+				component={ProductPay}
+				options={{
+					title: '상품예약',
 				}}
 			/>
 		</Fragment>

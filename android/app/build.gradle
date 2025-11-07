@@ -79,8 +79,8 @@ buildToolsVersion rootProject.ext.buildToolsVersion
         applicationId "com.danimmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 81
-        versionName "3.8.1"
+        versionCode 82
+        versionName "3.9.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         missingDimensionStrategy 'store', 'play'

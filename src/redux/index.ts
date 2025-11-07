@@ -13,6 +13,7 @@ import networkSliceReducer from './network/networkSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import eventSliceReducer from './event/event.slice';
 import hikingSliceReducer from './travel-info/hiking.slice';
+import bookingSliceReducer from './product/bookingSlice';
 
 const persistConfig = {
 	key: 'root',
@@ -31,6 +32,7 @@ const appReducer = combineReducers({
 	networkSlice: networkSliceReducer,
 	eventSlice: eventSliceReducer,
 	hikingSlice: hikingSliceReducer,
+	bookingSlice: bookingSliceReducer,
 });
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
