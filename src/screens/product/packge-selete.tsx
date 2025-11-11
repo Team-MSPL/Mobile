@@ -4,6 +4,7 @@ import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {resetAll} from '../../redux/product/bookingSlice';
 import {colors} from '../../utill/colors';
 import RouteButton from '../../utill/component/route-button';
 import {
@@ -25,7 +26,9 @@ export default function PackageSelect({navigation}: any) {
 	//         dispa
 	//     }
 	// }
+	const dispatch = useAppDispatch();
 	const handleNext = async (e: any) => {
+		dispatch(resetAll());
 		await logEvent(`PackageDetail`, {title: data?.prod?.prod_name, pkgName: e?.pkg_name});
 		navigation.navigate('ProductSelectSpec', {
 			image: data?.prod?.img_list[0],

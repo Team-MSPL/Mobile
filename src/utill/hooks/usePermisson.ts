@@ -15,7 +15,7 @@ const usePermission = () => {
 	const dispatch = useAppDispatch();
 	// OS별 필수 권한
 	const androidPermissions = [
-		PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, //33버전 이후부터는 얘만
+		//33버전 이후부터는 얘만
 		PERMISSIONS.ANDROID.RECEIVE_WAP_PUSH,
 		PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
 		PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // 그 전 버전들은 아래 애들
@@ -30,8 +30,8 @@ const usePermission = () => {
 	const needPermission =
 		Platform.OS === 'android'
 			? androidSDKVersion >= 33
-				? androidPermissions.splice(0, 3)
-				: androidPermissions.splice(1, 4)
+				? androidPermissions.splice(0, 2)
+				: androidPermissions.splice(0, 3)
 			: iosPermissions;
 
 	// 앱 실행했을 때 혹은 로그아웃 이후 권한 체크

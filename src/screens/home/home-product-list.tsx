@@ -162,80 +162,74 @@ export default function HomeProductList({navigation}: any) {
 							}}>
 							<SVGEmptyHeart width={25} height={25} color={'white'} />
 						</AbsoluteHeart> */}
-						<VStack deco='padding:10px;' gap={5}>
-							<HStack justifyContent='space-between'>
-								{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
-									<HStack gap={3}>
-										<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-											유사도
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
-											{Math.floor(item?.finalScore * 100)}%
-										</PretendardSemiBoldText>
-									</HStack>
-								) : (
-									<HStack gap={3}>
-										<SVGDanimLogo width={15} />
-										<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-											다님
-										</PretendardSemiBoldText>
-									</HStack>
-								)}
-
-								<HStack>
-									<SvgStart width={11} color={'#FFDE4C'} />
+						<HStack justifyContent='space-between'>
+							{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
+								<HStack gap={3}>
 									<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-										{item?.avg_rating_star}
+										유사도
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
+										{Math.floor(item?.finalScore * 100)}%
 									</PretendardSemiBoldText>
 								</HStack>
-							</HStack>
-							<PretendardSemiBoldText
-								size={24}
-								lineHeight={29}
-								numberOfLines={2}
-								color={colors.Black}
-								deco={'margin-bottom:10px;'}>
-								{item?.prod_name}
-							</PretendardSemiBoldText>
-							{item?.b2c_price - item?.b2b_price > 0 && (
-								<>
-									<PretendardSemiBoldText
-										size={16}
-										lineHeight={20}
-										color={colors.PointGreen1}
-										deco={'text-align:right'}>
-										{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
+							) : (
+								<HStack gap={3}>
+									<SVGDanimLogo width={15} />
+									<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+										다님
 									</PretendardSemiBoldText>
-									<PretendardSemiBoldText
-										size={20}
-										lineHeight={24}
-										color={colors.Gray2}
-										deco={'text-align:right;text-decoration:line-through;'}>
-										{item?.b2c_price.toLocaleString('ko-KR')}원~
-									</PretendardSemiBoldText>
-								</>
+								</HStack>
 							)}
-							<HStack deco='align-self:flex-end' gap={4}>
-								<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
-									최저가
+
+							<HStack>
+								<SvgStart width={11} color={'#FFDE4C'} />
+								<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+									{item?.avg_rating_star}
+								</PretendardSemiBoldText>
+							</HStack>
+						</HStack>
+						<PretendardSemiBoldText
+							size={24}
+							lineHeight={29}
+							numberOfLines={2}
+							color={colors.Black}
+							deco={'margin-bottom:10px;'}>
+							{item?.prod_name}
+						</PretendardSemiBoldText>
+						{item?.b2c_price - item?.b2b_price > 0 && (
+							<>
+								<PretendardSemiBoldText
+									size={16}
+									lineHeight={20}
+									color={colors.PointGreen1}
+									deco={'text-align:right'}>
+									{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
 								</PretendardSemiBoldText>
 								<PretendardSemiBoldText
-									size={24}
-									lineHeight={29}
-									numberOfLines={2}
-									color={colors.Black}>
-									{item?.b2b_price.toLocaleString('ko-KR')}원~
+									size={20}
+									lineHeight={24}
+									color={colors.Gray2}
+									deco={'text-align:right;text-decoration:line-through;'}>
+									{item?.b2c_price.toLocaleString('ko-KR')}원~
 								</PretendardSemiBoldText>
-							</HStack>
-							<PretendardSemiBoldText
-								size={16}
-								lineHeight={21}
-								numberOfLines={2}
-								color={colors.PointYellow}
-								deco={'text-align:center;margin-top:10px;'}>
-								상품 자세히 보기 {'>'}
+							</>
+						)}
+						<HStack deco='align-self:flex-end' gap={4}>
+							<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
+								최저가
 							</PretendardSemiBoldText>
-						</VStack>
+							<PretendardSemiBoldText size={24} lineHeight={29} numberOfLines={2} color={colors.Black}>
+								{item?.b2b_price.toLocaleString('ko-KR')}원~
+							</PretendardSemiBoldText>
+						</HStack>
+						<PretendardSemiBoldText
+							size={16}
+							lineHeight={21}
+							numberOfLines={2}
+							color={colors.PointYellow}
+							deco={'text-align:center;margin-top:10px;'}>
+							상품 자세히 보기 {'>'}
+						</PretendardSemiBoldText>
 					</ProductContainer>
 				))}
 				<MarginContainer />

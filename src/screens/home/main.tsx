@@ -199,14 +199,14 @@ export default function Main({navigation}: any) {
 			onPress: regionRecommend,
 			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/region.png')}></ImgContainer>,
 			text: `여행은 가고 싶은데,${`\n`}어디로 가야 할지 모르겠다면? `,
-			title: '여행 지역 추천',
+			title: '여행 지역 추천 AI',
 		},
 		{
 			id: 2,
 			onPress: () => goEnroll('recommend'),
 			image: <ImgContainer resizeMode='cover' source={require('../../../public/main/course.png')}></ImgContainer>,
 			text: `여행지는 정했는데,${`\n`}계획 세우기 귀찮다면?`,
-			title: '여행 코스 추천',
+			title: '여행 코스 추천 AI',
 		},
 		{
 			id: 3,
@@ -225,7 +225,7 @@ export default function Main({navigation}: any) {
 					modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
 					modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
 					modalFunction: async () => {
-						await logEvent('home ' + e?.title, {});
+						await logEvent('home_' + e?.title, {});
 						Linking.openURL(e.link);
 					},
 					travleMedic: true,
@@ -233,7 +233,7 @@ export default function Main({navigation}: any) {
 				}),
 			);
 		} else {
-			await logEvent('home ' + e?.title, {});
+			await logEvent('home_' + e?.title, {});
 			Linking.openURL(e.link);
 		}
 	};

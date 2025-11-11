@@ -78,14 +78,14 @@ export default function ReserveDetail({navigation}: any) {
 
 	const downloadVoucher = async (value: any) => {
 		// 1. Android인 경우 권한 확인 및 요청
-		if (Platform.OS === 'android') {
-			const hasPermission = await requestStoragePermission();
-			if (!hasPermission) {
-				// Alert.alert('권한 거부', '파일을 저장하기 위한 권한이 거부되었습니다.');
-				await openSettings();
-				return;
-			}
-		}
+		// if (Platform.OS === 'android') {
+		// 	const hasPermission = await requestStoragePermission();
+		// 	if (!hasPermission) {
+		// 		// Alert.alert('권한 거부', '파일을 저장하기 위한 권한이 거부되었습니다.');
+		// 		await openSettings();
+		// 		return;
+		// 	}
+		// }
 		const voucherDown = await dispatch(
 			voucherDownload({order_no: order_no, order_file_id: value?.order_file_id, is_swipe: true}),
 		).unwrap();
