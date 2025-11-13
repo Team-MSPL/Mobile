@@ -54,7 +54,7 @@ export default function PackageSelect({navigation}: any) {
 					onPress={() => {
 						handleNext(item);
 					}}>
-					<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={1} color={colors.Black}>
+					<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Black}>
 						{item?.pkg_name}
 					</PretendardSemiBoldText>
 					{item?.description_module?.PMDL_PACKAGE_DESC?.content?.list?.map((explainItem, explainIndex) => (
