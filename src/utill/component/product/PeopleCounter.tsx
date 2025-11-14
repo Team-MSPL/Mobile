@@ -1,6 +1,10 @@
 import {Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {colors} from '../../colors';
+import {widthPercentage} from '../../layout/responsive-size';
+import {SVGContainer} from '../../../screens/enroll-info/select-multi';
+import {SVGMinus, SVGPlus} from '../../svg/svg';
+import {HStack, PretendardBoldText, PretendardSemiBoldText} from '../../layout/layout';
 
 export function formatPrice(n?: number | null) {
 	if (n === null || n === undefined) return '';
@@ -133,7 +137,20 @@ export default function Counter({
 					alignItems: 'center',
 					justifyContent: 'center',
 				}}>
-				<View
+				<HStack justifyContent='space-around' width={widthPercentage(182)}>
+					<SVGContainer disabled={value <= min || disabled} onPress={onMinus} color={colors.Gray1}>
+						<SVGMinus width={widthPercentage(23)} height={widthPercentage(23)} color={colors.Gray2} />
+					</SVGContainer>
+
+					<PretendardBoldText size={20} color={colors.Black} lineHeight={21.6}>
+						{value}
+					</PretendardBoldText>
+					<SVGContainer disabled={value >= max || disabled} onPress={onPlus} color={colors.Primary}>
+						<SVGPlus width={widthPercentage(25)} height={widthPercentage(25)} color={colors.Primary} />
+					</SVGContainer>
+				</HStack>
+
+				{/* <View
 					style={{
 						flexDirection: 'row',
 						alignItems: 'center',
@@ -188,7 +205,7 @@ export default function Counter({
 							+
 						</Text>
 					</TouchableOpacity>
-				</View>
+				</View> */}
 			</View>
 		</View>
 	);

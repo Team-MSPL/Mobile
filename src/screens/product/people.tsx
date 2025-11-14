@@ -14,6 +14,7 @@ import {colors} from '../../utill/colors';
 import {styled} from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
 
 /**
  * ProductPeople
@@ -491,7 +492,7 @@ function ProductPeople({navigation}: any) {
 			<View style={{flex: 1, backgroundColor: '#fff'}}>
 				<View style={{paddingHorizontal: 24, paddingTop: 24}}>
 					<View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 24}}>
-						<Text style={{marginLeft: 8, color: colors.red400, fontSize: 15, fontWeight: 'bold'}}>
+						<Text style={{marginLeft: 8, color: colors.Black, fontSize: 21, fontWeight: 'bold'}}>
 							여행 인원
 						</Text>
 						<Text style={{marginLeft: 8, color: colors.red400, fontSize: 15}}>(필수)</Text>
@@ -525,20 +526,33 @@ function ProductPeople({navigation}: any) {
 					)}
 
 					<View style={{marginTop: 12}}>
-						<Text style={{color: colors.grey800, fontWeight: 'bold', fontSize: 16, marginBottom: 8}}>
+						{/* <Text style={{color: colors.grey800, fontWeight: 'bold', fontSize: 16, marginBottom: 8}}>
 							요금 내역
-						</Text>
+						</Text> */}
 						{categories.map((c: any) => (
-							<View
-								key={String(c.id)}
-								style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6}}>
-								<Text style={{color: colors.grey400}}>
-									{formatPrice(Number(c.unit || 0))}원 X {c.qty || 0}명
-								</Text>
-								<Text style={{color: colors.grey800, fontWeight: 'bold'}}>
-									{formatPrice(Number((c.unit || 0) * (c.qty || 0)))}원
-								</Text>
-							</View>
+							<VStack>
+								<PretendardSemiBoldText
+									size={16}
+									color={colors.grey800}
+									lineHeight={21.6}
+									deco={'margin-bottom:4px;'}>
+									{c.label ?? '티켓'}
+								</PretendardSemiBoldText>
+								<View
+									key={String(c.id)}
+									style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6}}>
+									<PretendardSemiBoldText
+										size={18}
+										color={colors.grey600}
+										lineHeight={21.6}
+										deco={'margin-bottom:4px;'}>
+										{formatPrice(Number(c.unit || 0))}원 X {c.qty || 0}명
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} color={colors.grey800} lineHeight={21.6}>
+										{formatPrice(Number((c.unit || 0) * (c.qty || 0)))}원
+									</PretendardSemiBoldText>
+								</View>
+							</VStack>
 						))}
 
 						<View
@@ -552,19 +566,19 @@ function ProductPeople({navigation}: any) {
 								justifyContent: 'space-between',
 								alignItems: 'center',
 							}}>
-							<Text style={{color: colors.grey300, fontSize: 17, fontWeight: 'bold'}}>총 금액</Text>
-							<Text style={{color: colors.grey400, fontSize: 22, fontWeight: 'bold'}}>
+							<PretendardVariableText size={18} color={colors.grey600} lineHeight={21.6}>
+								총 금액
+							</PretendardVariableText>
+							<PretendardSemiBoldText size={20} color={colors.Black} lineHeight={21.6}>
 								{formatPrice(Number(total))}원
-							</Text>
+							</PretendardSemiBoldText>
 						</View>
 					</View>
 				</View>
 
 				<View style={{padding: 24}}>
 					<Button height={54} disabled={violatesMultiple} onPress={onNext}>
-						<Text style={{marginLeft: 8, color: colors.red400, fontSize: 15, fontWeight: 'bold'}}>
-							다음으로
-						</Text>
+						<Text style={{color: colors.backgroundWhite, fontSize: 20, fontWeight: 'bold'}}>다음으로</Text>
 					</Button>
 				</View>
 			</View>
