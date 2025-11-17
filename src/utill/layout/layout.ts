@@ -60,11 +60,12 @@ export const FlexWrap = styled.Pressable<{
 	${props => props?.deco}
 `;
 
-export const Divider = styled.View<{width?: number; color?: string; height: number}>`
+export const Divider = styled.View<{width?: number; color?: string; height: number; left?: number}>`
 	width: ${props => props.width + 'px' ?? '100%'};
 	height: ${props => props.height ?? 2}px;
 	background-color: ${props => props.color ?? 'black'};
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0px 10px ${props => props.left ?? 0}px;
+	border-radius: 12px;
 `;
 
 export const MainContainer = styled.ScrollView<{backgroundColor?: string}>`

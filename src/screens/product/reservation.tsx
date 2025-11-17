@@ -562,7 +562,7 @@ function ProductReservation({navigation}: any) {
 					: priceInfo.display ?? null;
 
 			const baseSkus = resolvedSelectedSku ? [resolvedSelectedSku] : pkgData?.item?.[0]?.skus ?? [];
-			await logEvent(`goCalendar`, {pkgName: pkgData?.pkg_name});
+			await logEvent(`goPeople`, {pkgName: pkgData?.pkg_name});
 			navigation.navigate('ProductPeople', {
 				prod_no: params.prod_no ?? prod_no,
 				prod_name: pkgData?.prod_name ?? params.prod_name,
@@ -602,7 +602,7 @@ function ProductReservation({navigation}: any) {
 
 		dispatch(travelSliceActions.updateFiled({field: 's_date', value: selected}));
 		dispatch(travelSliceActions.updateFiled({field: 'e_date', value: selected}));
-		await logEvent(`goCalendar`, {pkgName: pkgData?.pkg_name});
+		await logEvent(`goPeople`, {pkgName: pkgData?.pkg_name});
 		navigation.navigate('ProductPeople', {
 			prod_no: params.prod_no ?? prod_no,
 			prod_name: pkgData?.prod_name ?? params.prod_name,

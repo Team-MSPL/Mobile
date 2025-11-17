@@ -1,4 +1,5 @@
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {colors} from '../../utill/colors';
 import RouteButton from '../../utill/component/route-button';
 import {BackgroundGray, Center, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
@@ -49,11 +50,13 @@ export default function Fail({navigation}: any) {
 				nextTitle={'SelectDay'}
 				nextText={'이전으로'}
 				leftText={'홈으로 돌아가기'}
-				btnFunction={() => {
+				btnFunction={async () => {
+					await logEvent(`payment_fail_after_back`, {});
 					navigation.goBack();
 				}}
 				goNext={() => {}}
-				LeftBtnFunction={() => {
+				LeftBtnFunction={async () => {
+					await logEvent(`payment_fail_after_home`, {});
 					navigation.popToTop();
 				}}
 				type={'planner'}></RouteButton>

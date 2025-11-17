@@ -32,7 +32,8 @@ import {MarginContainer} from './preset-detail';
 export default function PresetProduct({navigation}: any) {
 	const {presetProducts} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
-	const handleSkip = () => {
+	const handleSkip = async () => {
+		await logEvent(`presetProductSkip`, {});
 		// navigation.navigate('Timetable');
 		navigation.goBack();
 	};
@@ -97,7 +98,7 @@ export default function PresetProduct({navigation}: any) {
 						</PretendardSemiBoldText>
 					</HStack>
 				</LowPriceBox>
-				<HStack justifyContent='space-between' deco='margin-bottom:20px;padding:5px;'>
+				<HStack justifyContent='space-between' deco='margin-bottom:10px;padding:5px;'>
 					<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Gray5}>
 						총 {presetProducts.flat().length}개
 					</PretendardSemiBoldText>
@@ -133,7 +134,7 @@ export default function PresetProduct({navigation}: any) {
 							}}>
 							<SVGEmptyHeart width={25} height={25} color={'white'} />
 						</AbsoluteHeart> */}
-						<VStack deco='padding:10px;' gap={5}>
+						<VStack deco='padding:10px 20px;'>
 							<HStack justifyContent='space-between'>
 								{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
 									<HStack gap={3}>
@@ -186,7 +187,7 @@ export default function PresetProduct({navigation}: any) {
 									</PretendardSemiBoldText>
 								</>
 							)}
-							<HStack deco='align-self:flex-end' gap={4}>
+							<HStack deco='align-self:flex-end; margin-top:6px;' gap={4}>
 								<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
 									최저가
 								</PretendardSemiBoldText>
@@ -198,14 +199,14 @@ export default function PresetProduct({navigation}: any) {
 									{item?.b2b_price.toLocaleString('ko-KR')}원~
 								</PretendardSemiBoldText>
 							</HStack>
-							<PretendardSemiBoldText
+							{/* <PretendardSemiBoldText
 								size={16}
 								lineHeight={21}
 								numberOfLines={2}
 								color={colors.PointYellow}
 								deco={'text-align:center;margin-top:10px;'}>
 								상품 자세히 보기 {'>'}
-							</PretendardSemiBoldText>
+							</PretendardSemiBoldText> */}
 						</VStack>
 					</ProductContainer>
 				))}

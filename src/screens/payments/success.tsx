@@ -1,4 +1,5 @@
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {colors} from '../../utill/colors';
 import RouteButton from '../../utill/component/route-button';
 import {BackgroundGray, Center, PretendardSemiBoldText, PretendardVariableText} from '../../utill/layout/layout';
@@ -6,7 +7,8 @@ import {widthPercentage} from '../../utill/layout/responsive-size';
 import {SvgCheck} from '../../utill/svg/svg';
 
 export default function Success({navigation}: any) {
-	const handleList = () => {
+	const handleList = async () => {
+		await logEvent(`payment_after_list`, {});
 		navigation.popToTop();
 		navigation.navigate('ReserveList');
 	};
@@ -59,7 +61,8 @@ export default function Success({navigation}: any) {
 					handleList();
 				}}
 				goNext={() => {}}
-				LeftBtnFunction={() => {
+				LeftBtnFunction={async () => {
+					await logEvent(`payment_after_home`, {});
 					navigation.popToTop();
 				}}
 				type={'planner'}></RouteButton>

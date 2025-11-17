@@ -6,6 +6,7 @@ import {widthPercentage} from '../../layout/responsive-size';
 const StyledImage = styled.Image<{height: number}>`
 	width: ${widthPercentage(327)}px;
 	height: ${props => props.height}px;
+	margin-top: 10px;
 `;
 
 const AutoSizedImage = ({

@@ -1,4 +1,5 @@
 import {useRoute} from '@react-navigation/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
@@ -27,6 +28,8 @@ export default function ReserveCancel({navigation}: any) {
 	const handleCancel = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+
+			await logEvent(`handleReserveCancel`, {title: detailInfo?.product_summary?.prod_name});
 			const a = await dispatch(bookingCancel(info?.order_no)).unwrap();
 			const q = await dispatch(
 				tossCancel({

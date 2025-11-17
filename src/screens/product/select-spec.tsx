@@ -386,7 +386,11 @@ export default function ProductSelectSpec({navigation}: any) {
 			</View>
 		);
 	};
-
+	useEffect(() => {
+		if (ticketSpec && specs.length === 1 && specs[0].spec_oid === ticketSpec.spec_oid) {
+			onConfirm();
+		}
+	}, [ticketSpec, specs]);
 	return (
 		<>
 			<BackgroundGrayScrollView>
@@ -399,7 +403,14 @@ export default function ProductSelectSpec({navigation}: any) {
 					옵션 선택
 				</PretendardSemiBoldText>
 				<FlexWrap>
-					{specs.length === 0 ? <Text>선택 가능한 옵션이 없습니다.</Text> : specs.map(renderSpecGroup)}
+					{specs.length === 0 ||
+					(ticketSpec && specs.length === 1 && specs[0].spec_oid === ticketSpec.spec_oid) ? (
+						<PretendardSemiBoldText size={20} lineHeight={24} numberOfLines={2} color={colors.PointGreen1}>
+							옵션 선택이 필요없습니다
+						</PretendardSemiBoldText>
+					) : (
+						specs.map(renderSpecGroup)
+					)}
 				</FlexWrap>
 
 				{renderRefundPolicy(data?.refund_policy_v2)}

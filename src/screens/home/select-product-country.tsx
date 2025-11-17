@@ -10,6 +10,7 @@ import {SvgChina, SvgJapan, SvgKorea, SvgPhilippine, SvgSingapore, SvgTailiand, 
 import {useFocusEffect} from '@react-navigation/native';
 import {useCallback} from 'react';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {logEvent} from '../../../firebaseAnalytice';
 
 export default function HomeProductCountry({navigation}: any) {
 	const {country} = useAppSelector(state => state.travelSlice);
@@ -31,6 +32,10 @@ export default function HomeProductCountry({navigation}: any) {
 			dispatch(travelSliceActions.selectRegion([]));
 		}, []),
 	);
+	const btnNext = async idx => {
+		await logEvent(`main_product_country_select`, {title: countryList[idx].en});
+		navigation.navigate('HomeProductList');
+	};
 	return (
 		<BackgroundGray>
 			<StepText
@@ -46,12 +51,13 @@ export default function HomeProductCountry({navigation}: any) {
 						divide={true}
 						width={widthPercentage(158)}
 						imageSvg={imageList[idx]}
-						onPress={() => {
+						onPress={async () => {
+							await logEvent(`main_product_country_select`, {idx});
 							handleCountryClick(idx);
 						}}></TendencyButton>
 				))}
 			</FlexWrap>
-			<RouteButton navigation={navigation} nextTitle={'HomeProductList'} btnFunction={undefined}></RouteButton>
+			<RouteButton navigation={navigation} nextTitle={'HomeProductList'} btnFunction={btnNext}></RouteButton>
 		</BackgroundGray>
 	);
 }

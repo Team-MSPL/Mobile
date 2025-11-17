@@ -19,6 +19,7 @@ import {SvgCalendar, SVGClock, SVGPeople} from '../../utill/svg/svg';
 import RNFS from 'react-native-fs';
 import {openSettings} from 'react-native-permissions';
 import {modalSliceActions} from '../../redux/modal/modalSlice';
+import {logEvent} from '../../../firebaseAnalytice';
 
 export default function ReserveDetail({navigation}: any) {
 	const dispatch = useAppDispatch();
@@ -123,6 +124,7 @@ export default function ReserveDetail({navigation}: any) {
 	// }
 	const handelCancel = async () => {
 		try {
+			await logEvent(`goReserveCancel`, {title: detailInfo?.product_summary?.prod_name});
 			navigation.navigate('ReserveCancel', {info: info, detailInfo: detailInfo, tossKey: tossKey});
 			// dispatch(LoadingSliceActions.onLoading());
 			// const a = await dispatch(bookingCancel(order_no)).unwrap();

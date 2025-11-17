@@ -2,6 +2,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {styled} from 'styled-components/native';
+import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {getReserveList} from '../../redux/travel-info/travel.slice';
@@ -58,11 +59,13 @@ export default function ReserveList({navigation}: any) {
 		<BackgroundGrayScrollView>
 			{list?.map((item, idx) => (
 				<ReserveBox
-					onPress={() => {
+					onPress={async () => {
 						console.log({
 							order_no: item?.product?.data?.order_no,
 							tossKey: item?.product?.booking_key,
 						});
+
+						await logEvent(`goReserveDetail`, {order_no: item?.product?.data?.order_no});
 						navigation.navigate('ReserveDetail', {
 							order_no: item?.product?.data?.order_no,
 							tossKey: item?.product?.booking_key,

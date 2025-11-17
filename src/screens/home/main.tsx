@@ -90,6 +90,7 @@ export default function Main({navigation}: any) {
 	const checkEvent = async () => {
 		if (eventState == null) {
 			const eventExist = await dispatch(getEventList()).unwrap();
+			console.log(eventExist);
 			const state = await AsyncStorage.getItem('eventState');
 			if (state != moment().format('DD').toString() && eventExist.eventList.length != 0) {
 				dispatch(eventSliceActions.setEventState(true));
@@ -686,7 +687,8 @@ export default function Main({navigation}: any) {
 									</HotProductBox>
 								))}
 								<HotMoreButton
-									onPress={() => {
+									onPress={async () => {
+										await logEvent(`main_product_more_click`, {});
 										navigation.navigate('HomeProductCountry');
 									}}>
 									<PretendardSemiBoldText

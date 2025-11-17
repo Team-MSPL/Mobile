@@ -13,6 +13,7 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {handleBooking, handleBookingSave, handleTossConfirm, tossCancel} from '../../redux/travel-info/travel.slice';
 import shortid from 'shortid';
 import {TossPayment_Live_Key} from '@env';
+import {logEvent} from '../../../firebaseAnalytice';
 
 const BackgroundScrollView = styled.ScrollView`
 	flex: 1;
@@ -187,6 +188,7 @@ function CheckoutInner({navigation, route}: any) {
 						return;
 					}
 
+					await logEvent(`payment_handle_click`, {title: route.params?.info?.name});
 					paymentWidgetControl
 						.requestPayment?.({
 							orderId: shortid.generate(),

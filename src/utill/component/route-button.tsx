@@ -34,7 +34,6 @@ export default function RouteButton({
 				alignSelf: 'center',
 				bottom: 10,
 				width: widthPercentage(328),
-				backgroundColor: 'white',
 			}}>
 			<ButtonContainer
 				marginTop={marginTop ?? 0}

@@ -15,6 +15,7 @@ import {styled} from 'styled-components/native';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
+import {logEvent} from '../../../firebaseAnalytice';
 
 /**
  * ProductPeople
@@ -426,7 +427,7 @@ function ProductPeople({navigation}: any) {
 		return result;
 	};
 
-	const onNext = () => {
+	const onNext = async () => {
 		const {min, max, isMultipleLimit, multiple} = getTotalRule();
 
 		if (totalCount < min) {
@@ -444,6 +445,7 @@ function ProductPeople({navigation}: any) {
 
 		const skusForPayload = resolveSkusForNavigationFromCategories();
 
+		await logEvent(`productPay`, {title: pkgData?.prod_name ?? params?.prod_name});
 		navigation.navigate('ProductPay', {
 			prod_no: params?.prod_no ?? prod_no,
 			prod_name: pkgData?.prod_name ?? params?.prod_name,

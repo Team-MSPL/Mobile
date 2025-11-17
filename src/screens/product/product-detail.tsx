@@ -106,7 +106,12 @@ export default function ProductDetail({navigation}: any) {
 						<SvgShare1 width={widthPercentage(26)} height={widthPercentage(26)} />
 					</HStack>
 				</HStack> */}
-					<PretendardSemiBoldText size={24} lineHeight={29} numberOfLines={2} color={colors.Black}>
+					<PretendardSemiBoldText
+						size={24}
+						lineHeight={29}
+						numberOfLines={2}
+						color={colors.Black}
+						deco={'margin-bottom:10px;'}>
 						{productInfo?.prod?.prod_name}
 					</PretendardSemiBoldText>
 					{productInfo?.prod?.b2c_min_price - productInfo?.prod?.b2b_min_price > 0 && (
@@ -130,7 +135,7 @@ export default function ProductDetail({navigation}: any) {
 							</PretendardSemiBoldText>
 						</>
 					)}
-					<HStack deco='align-self:flex-end' gap={4}>
+					<HStack deco='align-self:flex-end;margin-bottom:10px;' gap={4}>
 						<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
 							최저가
 						</PretendardSemiBoldText>
@@ -139,30 +144,32 @@ export default function ProductDetail({navigation}: any) {
 						</PretendardSemiBoldText>
 					</HStack>
 					{productInfo?.prod?.have_translate ? (
-						<HStack gap={3}>
-							<SVGGlobal />
+						<HStack gap={10} marginVertical={5}>
+							<SVGGlobal width={20} />
 							<PretendardSemiBoldText size={16} lineHeight={21} numberOfLines={2} color={colors.Black}>
 								한국어 지원 {!productInfo?.prod?.have_translate ? '불가' : '가능'}
 							</PretendardSemiBoldText>
 						</HStack>
 					) : null}
-					<HStack gap={3}>
-						<SVGMoney />
+					<HStack gap={10} marginVertical={10}>
+						<SVGMoney width={20} />
 						<PretendardSemiBoldText size={16} lineHeight={21} numberOfLines={2} color={colors.Black}>
 							{productInfo?.prod?.is_cancel_free ? '무료 취소' : '취소 불가'}
 						</PretendardSemiBoldText>
 					</HStack>
-					<Divider color={colors.Gray200} height={2} />
+					<Divider color={colors.Gray200} height={10} width={1000} left={-widthPercentage(17)} />
 
 					<PretendardSemiBoldText size={18} lineHeight={22} color={colors.Black}>
 						{productInfo?.prod?.description_module?.PMDL_GRAPHIC?.module_title}
 					</PretendardSemiBoldText>
-					{productInfo?.prod?.description_module?.PMDL_GRAPHIC?.content?.list?.map((item, imgIdx) => (
-						<AutoSizedImage
-							imgIdx={imgIdx}
-							uri={item.media[0]?.source_content}
-							handleDetailImage={handleDetailImage}></AutoSizedImage>
-					))}
+					{productInfo?.prod?.description_module?.PMDL_GRAPHIC?.content?.list?.map((item, imgIdx) =>
+						item.media[0]?.source_content ? (
+							<AutoSizedImage
+								imgIdx={imgIdx}
+								uri={item.media[0]?.source_content}
+								handleDetailImage={handleDetailImage}></AutoSizedImage>
+						) : undefined,
+					)}
 
 					{/* <PretendardVariableText size={18} lineHeight={23} color={colors.Black}>
 						{productInfo?.prod?.introduction}
@@ -363,7 +370,6 @@ const Container = styled.ScrollView`
 `;
 const PaddingContainer = styled.View`
 	padding: ${widthPercentage(20)}px ${widthPercentage(17)}px;
-	gap: ${widthPercentage(10)}px;
 `;
 const Section = styled.View`
 	margin-bottom: 24px;
