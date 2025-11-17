@@ -223,74 +223,62 @@ function Timetable({
 		let idx = getIndex() ?? 0;
 		return (
 			<ScaleDecorator>
-				{!excludeNames.includes(item.name) ? (
-					<DragHstack
-						gap={widthPercentage(10)}
+				<DragHstack
+					gap={widthPercentage(10)}
+					onLongPress={() => {
+						if (item.category != 4) {
+							changeLocationRef.current.before = idx;
+							drag();
+						}
+					}}>
+					{/* <VStack gap={8} style={{opacity: item.category == 4 ? 0 : 1}}>
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
+							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
+						</VStack> */}
+
+					<InsideGrayContainer
 						onLongPress={() => {
 							if (item.category != 4) {
 								changeLocationRef.current.before = idx;
 								drag();
 							}
+						}}
+						onPress={() => {
+							// moveRegion(idx);
 						}}>
-						{/* <VStack gap={8} style={{opacity: item.category == 4 ? 0 : 1}}>
-							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} />
-							<SvgPolygon width={widthPercentage(20)} height={heightPercentage(15)} transform={180} />
-						</VStack> */}
-
-						<InsideGrayContainer
-							onLongPress={() => {
-								if (item.category != 4) {
-									changeLocationRef.current.before = idx;
-									drag();
-								}
-							}}
-							onPress={() => {
-								// moveRegion(idx);
-							}}>
-							<HStack justifyContent='space-between'>
-								<VStack>
-									<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
-										{categoryTitle[item.category]} {Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
-										{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
-										{Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) < 25 &&
-											Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) +
-												':' +
-												String(
-													(((item.y ?? 0) + item.takenTime / 30) * 30 + 360) % 60,
-												).padStart(2, '0')}
-									</PretendardVariableText>
-									<PretendardSemiBoldText
-										maxWidth={widthPercentage(200)}
-										numberOfLines={2}
-										size={14}
-										lineHeight={18.9}
-										color={colors.Gray5}>
-										{item.name}
-									</PretendardSemiBoldText>
-								</VStack>
-								<Pressable
-									onPress={() => {
-										openModal(item.x, idx);
-									}}>
-									<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.PointYellow}>
-										편집
-									</PretendardSemiBoldText>
-								</Pressable>
-							</HStack>
-						</InsideGrayContainer>
-					</DragHstack>
-				) : (
-					<HStack>
-						<InfoView
-							navigation={navigation}
-							test={item}
-							index={idx}
-							idx={item.x}
-							modify={false}
-							CancelModify={CancelModify}
-						/>
-					</HStack>
-				)}
+						<HStack justifyContent='space-between'>
+							<VStack>
+								<PretendardVariableText size={12} lineHeight={18} color={colors.Gray2}>
+									{categoryTitle[item.category]} {Math.floor(((item.y ?? 0) * 30 + 360) / 60)}:
+									{String(((item.y ?? 0) * 30 + 360) % 60).padStart(2, '0')} ~{' '}
+									{Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) < 25 &&
+										Math.floor((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) / 60) +
+											':' +
+											String((((item.y ?? 0) + item.takenTime / 30) * 30 + 360) % 60).padStart(
+												2,
+												'0',
+											)}
+								</PretendardVariableText>
+								<PretendardSemiBoldText
+									maxWidth={widthPercentage(200)}
+									numberOfLines={2}
+									size={14}
+									lineHeight={18.9}
+									color={colors.Gray5}>
+									{item.name}
+								</PretendardSemiBoldText>
+							</VStack>
+							<Pressable
+								onPress={() => {
+									openModal(item.x, idx);
+								}}>
+								<PretendardSemiBoldText size={14} lineHeight={18.9} color={colors.PointYellow}>
+									편집
+								</PretendardSemiBoldText>
+							</Pressable>
+						</HStack>
+					</InsideGrayContainer>
+				</DragHstack>
 			</ScaleDecorator>
 		);
 	};

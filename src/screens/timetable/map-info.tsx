@@ -130,14 +130,23 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 		}
 	}, []);
 	const goRemove = () => {
-		if (Array.isArray(timetable) && Array.isArray(timetable[open.day]) && timetable[open.day][open.index]) {
-			const targetId = timetable[open.day][open.index].id;
+		console.log('asd', open, viewRef.current);
+		if (Array.isArray(timetable) && timetable[viewRef.current.index][viewRef.current.idx]) {
+			const targetId = timetable[viewRef.current.index][viewRef.current.idx].id;
 			const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
 			dispatch(travelSliceActions.changeTimetable(a));
 			if (open.status) {
 				setOpen({...open, status: false});
 			}
 		}
+		// if (Array.isArray(timetable) && Array.isArray(timetable[open.day]) && timetable[open.day][open.index]) {
+		// 	const targetId = timetable[open.day][open.index].id;
+		// 	const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
+		// 	dispatch(travelSliceActions.changeTimetable(a));
+		// 	if (open.status) {
+		// 		setOpen({...open, status: false});
+		// 	}
+		// }
 	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {

@@ -26,6 +26,7 @@ import {ModalBackground, ModalBottomSheet} from './regist-transit';
 import {BottomContainer} from '../search-place';
 import {ElementContainer, SVGContainer} from '../select-multi';
 import PrimaryButton from '../../../utill/component/primary-button';
+import shortid from 'shortid';
 
 export default function AddSearchRecommend({navigation, route}: any) {
 	const dispatch = useAppDispatch();
