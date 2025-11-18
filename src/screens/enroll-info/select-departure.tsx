@@ -23,6 +23,8 @@ import {Keyboard, Pressable} from 'react-native';
 import styled from 'styled-components/native';
 import {cityViewList} from '../../utill/component/enroll-info/city-list';
 import {ButtonContainer} from './select-multi';
+import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import {useDistance} from '../../utill/hooks/useDistance';
 
 export default function SelectDeparture({navigation}: any) {
 	const {
@@ -38,39 +40,68 @@ export default function SelectDeparture({navigation}: any) {
 		makeMode,
 	} = useAppSelector(state => state.travelSlice);
 	const dispatch = useAppDispatch();
+	const {countryList} = useTendencyHandler();
 	const handleNearBySearchApi = async () => {
 		const e = await dispatch(
 			handleNearBySearch({
-				region: cityViewList[country][cityIndex].title + region[0],
+				region:
+					(country == 0 ? cityViewList[country][cityIndex].title : `해외/${countryList[country].en}/`) +
+					(region[0] == '전체' ? cityViewList[country][cityIndex].sub?.[1]?.subTitle : region[0]),
 				name: '공항',
 			}),
 		).unwrap();
-		dispatch(
-			travelSliceActions.updateFiled({
-				field: 'departureAirport',
-				value: {
-					name: e.data?.name,
-					lat: e.data?.geometry.location.lat,
-					lng: e.data?.geometry.location.lng,
-				},
-			}),
-		);
+		const check = useDistance({
+			departure: {
+				lat: cityViewList[country][cityIndex].sub[0]?.lat,
+				lng: cityViewList[country][cityIndex].sub[0]?.lng,
+			},
+			arrival: {
+				lat: e.data?.geometry.location.lat,
+				lng: e.data?.geometry.location.lng,
+			},
+		});
+		if (check < 1000) {
+			dispatch(
+				travelSliceActions.updateFiled({
+					field: 'departureAirport',
+					value: {
+						name: e.data?.name,
+						lat: e.data?.geometry.location.lat,
+						lng: e.data?.geometry.location.lng,
+					},
+				}),
+			);
+		}
 		const e2 = await dispatch(
 			handleNearBySearch({
-				region: cityViewList[country][cityIndex].title + region[0],
-				name: '고속철도',
+				region:
+					(country == 0 ? cityViewList[country][cityIndex].title : `해외/${countryList[country].en}/`) +
+					(region[0] == '전체' ? cityViewList[country][cityIndex].sub?.[1]?.subTitle : region[0]),
+				name: '역',
 			}),
 		).unwrap();
-		dispatch(
-			travelSliceActions.updateFiled({
-				field: 'departureTrain',
-				value: {
-					name: e2.data?.name,
-					lat: e2.data?.geometry.location.lat,
-					lng: e2.data?.geometry.location.lng,
-				},
-			}),
-		);
+		const check2 = useDistance({
+			departure: {
+				lat: cityViewList[country][cityIndex].sub[0]?.lat,
+				lng: cityViewList[country][cityIndex].sub[0]?.lng,
+			},
+			arrival: {
+				lat: e2.data?.geometry.location.lat,
+				lng: e2.data?.geometry.location.lng,
+			},
+		});
+		if (check2 < 1000) {
+			dispatch(
+				travelSliceActions.updateFiled({
+					field: 'departureTrain',
+					value: {
+						name: e2.data?.name,
+						lat: e2.data?.geometry.location.lat,
+						lng: e2.data?.geometry.location.lng,
+					},
+				}),
+			);
+		}
 	};
 	useEffect(() => {
 		handleNearBySearchApi();

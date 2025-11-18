@@ -670,7 +670,7 @@ const DayScrollViews = styled.View<{viewMap: boolean}>`
 `;
 const DayScrollView = styled(NestableScrollContainer)`
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(500)}px;
+	height: ${heightPercentage(360)}px;
 `;
 
 export const InsideGrayContainer = styled.TouchableOpacity<{backgroundColor?: string}>`

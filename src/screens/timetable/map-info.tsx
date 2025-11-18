@@ -375,13 +375,18 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	return (
 		<MainAllContainer>
 			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
-			{!modify && viewMap && (
+			{/* {!modify && viewMap && (
 				<CustomMapView
 					select={select}
 					// onTouchStart={() => setTopBar(false)}
 					// onTouchEnd={() => setTopBar(true)}
 				/>
-			)}
+			)} */}
+			<CustomMapView
+				select={select}
+				// onTouchStart={() => setTopBar(false)}
+				// onTouchEnd={() => setTopBar(true)}
+			/>
 			{modify ? (
 				<BackgroundGray modify={modify} viewMap={viewMap}>
 					{/* <PretendardSemiBoldText
@@ -392,7 +397,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
 						</PretendardSemiBoldText> */}
 					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
+						<FlexWrap width={widthPercentage(375)} gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
 							{/* {['항공', '숙소', ...timetable].map(
 									(item, idx) =>
 										item.length != 0 && (
@@ -967,6 +972,8 @@ const BackgroundGray = styled.View<{modify: boolean; viewMap: boolean}>`
 	background-color: ${colors.backgroundWhite};
 	padding: ${heightPercentage(0)}px ${widthPercentage(23)}px;
 	z-index: 0;
+	position: ${props => (props.modify ? 'absolute' : undefined)};
+	bottom: 0px;
 `;
 const ViewMapTouchable = styled.TouchableOpacity`
 	flex: 0.03;
