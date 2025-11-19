@@ -29,10 +29,10 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/lay
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
-import {googleDetailApi, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {Dropdown, DropdownElement, SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil, SVGSearch} from '../../utill/svg/svg';
+import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil, SVGSearch, SvgCalendar} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {NestableScrollContainer} from 'react-native-draggable-flatlist';
@@ -51,10 +51,10 @@ import {useHeaderHeight} from '@react-navigation/elements';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
 import {GOOGLE_API_KEY} from '@env';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place, beforeTimetable} = useAppSelector(
-		state => state.travelSlice,
-	);
+	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place, beforeTimetable, tendency, season} =
+		useAppSelector(state => state.travelSlice);
 	const {cooperationState} = useAppSelector(state => state.eventSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
@@ -372,6 +372,46 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
 
 	const totalTopHeight = headerHeight + statusBarHeight;
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
+	const handleProduct = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				pathList: [
+					timetable.map(item => {
+						return item
+							.filter(filterItem => !filterItem.name?.includes('추천'))
+							.map(value => {
+								return {name: value?.name};
+							});
+					}),
+				],
+				selectList: [...tendency, season],
+				country:
+					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
+						? '홍콩과 마카오'
+						: region[0].includes('해외')
+						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
+						: countryList[country].ko, //TODO 홍콩 마카오 처리
+				cityList: region,
+			};
+			const a = await dispatch(recommendProduct(data)).unwrap();
+			navigation.navigate('PresetProduct', {trigger: 'map'});
+			// console.log(a[0]);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
 	return (
 		<MainAllContainer>
 			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
@@ -387,6 +427,11 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 				// onTouchStart={() => setTopBar(false)}
 				// onTouchEnd={() => setTopBar(true)}
 			/>
+			{!modify && (
+				<ProductPressable onPress={handleProduct}>
+					<SvgCalendar color='white' width={widthPercentage(22)} height={widthPercentage(22)} />
+				</ProductPressable>
+			)}
 			{modify ? (
 				<BackgroundGray modify={modify} viewMap={viewMap}>
 					{/* <PretendardSemiBoldText
@@ -1012,7 +1057,17 @@ const ModifyPressable = styled.Pressable`
 	align-items: center;
 	justify-content: center;
 `;
-
+const ProductPressable = styled.Pressable`
+	position: absolute;
+	width: ${widthPercentage(46)}px;
+	height: ${widthPercentage(46)}px;
+	left: ${widthPercentage(15)}px;
+	top: ${widthPercentage(30)}px;
+	border-radius: 24px;
+	background-color: rgba(0, 0, 0, 0.5);
+	align-items: center;
+	justify-content: center;
+`;
 const PressBox = styled.View`
 	width: ${widthPercentage(160)}px;
 	height: ${widthPercentage(30)}px;

@@ -1,3 +1,4 @@
+import {useRoute} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {Modal, TouchableOpacity} from 'react-native';
 import {styled} from 'styled-components/native';
@@ -32,6 +33,7 @@ import {MarginContainer} from './preset-detail';
 export default function PresetProduct({navigation}: any) {
 	const {presetProducts} = useAppSelector(state => state.travelSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
+	const route = useRoute();
 	const handleSkip = async () => {
 		await logEvent(`presetProductSkip`, {});
 		// navigation.navigate('Timetable');
@@ -51,7 +53,7 @@ export default function PresetProduct({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalyticsProduct();
 	}, []);
-	useBackHandler({type: 'product'});
+	(!!!route.params?.trigger ?? false) && useBackHandler({type: 'product'});
 	const handleCategory = (e: string) => {
 		let copy = [...products];
 		products.map(item => console.log(item.avgPrefScore));
@@ -87,9 +89,9 @@ export default function PresetProduct({navigation}: any) {
 				<StepText
 					marginTop={heightPercentage(10)}
 					marginBottom={heightPercentage(10)}
-					styleText='상품 추천'
-					mainText={`${userName}님을 위한 맞춤 여행 상품`}
-					subText='내 여정과 어울리는 여행 상품을 추천해드려요'></StepText>
+					mainText={
+						(route.params?.trigger ? `` : `잠깐!\n`) + `선택하신 코스에 꼭 맞는 상품을 모아봤어요`
+					}></StepText>
 				<LowPriceBox>
 					<HStack gap={10}>
 						<SVGStarSmile />

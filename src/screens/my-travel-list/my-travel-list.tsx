@@ -54,7 +54,7 @@ export default function MyTravelList({navigation}: any) {
 			Japan: 1,
 			China: 2,
 			Vietnam: 3,
-			Tailand: 4,
+			Thailand: 4,
 			Philippines: 5,
 			Singapore: 6,
 		};
@@ -78,6 +78,11 @@ export default function MyTravelList({navigation}: any) {
 			dispatch(LoadingSliceActions.onLoading());
 			const whenDday = dDayCalculate({startDay: e.day[0], endDay: e.day[e.nDay - 1]});
 			const data = await dispatch(getOneTravelCourse({travelId: e._id})).unwrap();
+			console.log(
+				data?.region[0].includes('해외')
+					? findCityFromPath(data?.region[0])
+					: data.region[0].replace(/도심권| 동남권| 동북권|서남권|서북권|서귀포시|제주시'/g, '전체'),
+			);
 			dispatch(
 				getRegionInfo({
 					region: data?.region[0].includes('해외')

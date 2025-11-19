@@ -116,7 +116,7 @@ export const SvgAirplain = styled(AirPlain)<{color?: string; transform?: number}
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SvgCalendar = styled(Calendar)<{color?: string}>`
-	color: color;
+	color: ${props => props.color};
 `;
 export const SvgCommunity = styled(Community)<{color?: string}>`
 	color: color;
