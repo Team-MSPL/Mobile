@@ -12,7 +12,7 @@ import {cityViewList} from '../enroll-info/city-list';
 
 function CustomMapView({select, onTouchStart, onTouchEnd}) {
 	// 메모리 최적화를 위해 useMemo 사
-	const {timetable, country, cityIndex} = useAppSelector(state => state.travelSlice);
+	const {timetable, country, cityIndex, regionInfo} = useAppSelector(state => state.travelSlice);
 	const handleColor = (e: number) => {
 		let color = colors.Green500;
 		switch (e) {
@@ -34,10 +34,9 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 		let images = [];
 		let markerElements: ReactElement[] = [];
 		timetable[select]?.forEach((item, idx) => {
-			if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
+			if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천' && !!item?.name) {
 				// 고유한 key 생성 (index와 item.lat, item.lng을 조합)
 				const markerKey = `marker_${item.lat}_${item.lng}`;
-
 				markerElements.push(
 					<Marker
 						key={markerKey} // 고유한 key 사용
@@ -70,7 +69,7 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 		let polylineElements: ReactElement[] = [];
 
 		timetable?.forEach((value, index) => {
-			if (index == select) {
+			if (index == select && value.length != 0) {
 				const polylineCoordinates = value
 					.map(item => {
 						if (item.name !== '점심 추천' && item.name !== '저녁 추천' && item.name !== '숙소 추천') {
@@ -109,7 +108,24 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			longitudeDelta: deltaLongitude + deltaLongitude + 0.04,
 		};
 	}, [timetable, select]);
-
+	useEffect(() => {
+		// console.log(
+		// 	'dddddddd',
+		// 	centerLatitude,
+		// 	cityViewList[country][cityIndex].sub[0].lat,
+		// 	country,
+		// 	cityIndex,
+		// 	centerLongitude,
+		// 	cityViewList[country][cityIndex].sub[0].lng,
+		// 	{
+		// 		latitude: (isNaN(centerLatitude) ? cityViewList[country][cityIndex].sub[0].lat : centerLatitude) - 0.03,
+		// 		longitude: isNaN(centerLongitude) ? cityViewList[country][cityIndex].sub[0].lng : centerLongitude,
+		// 		latitudeDelta: latitudeDelta <= 0 ? 0.13 : latitudeDelta,
+		// 		longitudeDelta: longitudeDelta <= 0 ? 0.13 : longitudeDelta,
+		// 	},
+		// );
+		console.log(regionInfo);
+	}, [timetable, regionInfo]);
 	return (
 		<MapView
 			showsMyLocationButton={true}
@@ -118,8 +134,16 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			onTouchStart={onTouchStart ?? null}
 			onTouchEnd={onTouchEnd ?? null}
 			region={{
-				latitude: (isNaN(centerLatitude) ? cityViewList[country][cityIndex].sub[0].lat : centerLatitude) - 0.03,
-				longitude: isNaN(centerLongitude) ? cityViewList[country][cityIndex].sub[0].lng : centerLongitude,
+				latitude: (() => {
+					const v =
+						(Number.isFinite(centerLatitude)
+							? centerLatitude
+							: cityViewList[country][cityIndex].sub[0].lat) - 0.03;
+					return Number.isFinite(v) ? v : regionInfo?.lat;
+				})(),
+				longitude:
+					(isNaN(centerLongitude) ? cityViewList[country][cityIndex].sub[0].lng : centerLongitude) ??
+					regionInfo.lng,
 				latitudeDelta: latitudeDelta <= 0 ? 0.13 : latitudeDelta,
 				longitudeDelta: longitudeDelta <= 0 ? 0.13 : longitudeDelta,
 			}}>

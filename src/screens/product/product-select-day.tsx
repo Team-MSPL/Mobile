@@ -191,7 +191,6 @@ export default function ProductSelectDay({navigation}: any) {
 				//   }
 			}
 			setTicketStatus(mapped);
-			console.log('zz', mapped);
 		}
 	};
 	const ticketSpec = useMemo(() => {
@@ -507,7 +506,6 @@ export default function ProductSelectDay({navigation}: any) {
 					?.fullday;
 		}
 		if (data?.item?.[0]?.unit_quantity_rule?.total_rule?.max_quantity < totalCount) {
-			console.log('zz');
 			status.product == false;
 		}
 		setCanNext(status.day && status.product);

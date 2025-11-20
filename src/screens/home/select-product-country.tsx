@@ -11,10 +11,12 @@ import {useFocusEffect} from '@react-navigation/native';
 import {useCallback} from 'react';
 import {travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {logEvent} from '../../../firebaseAnalytice';
+import {useBackHandler} from '../../utill/hooks/useBackhandler';
 
 export default function HomeProductCountry({navigation}: any) {
 	const {country} = useAppSelector(state => state.travelSlice);
 
+	useBackHandler({type: 'exit'});
 	const {countryList, handleCountryClick} = useTendencyHandler();
 	const imageList = [
 		<SvgKorea width={30} height={20} />,

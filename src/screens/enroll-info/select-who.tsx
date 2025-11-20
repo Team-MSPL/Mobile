@@ -54,7 +54,8 @@ export default function RecommendSelectWho({navigation}: any) {
 				modalTopText: '네, 최근 선택대로 추천해주세요',
 				modalBottomText: '아니요, 다시 선택할게요',
 				modalFunction: () => {
-					dispatch(travelSliceActions.enrollTendency(tendency));
+					dispatch(travelSliceActions.enrollRecentTendency(tendency));
+					navigation.navigate('FinalCheck');
 				},
 			}),
 		);

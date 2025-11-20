@@ -32,7 +32,16 @@ import {SelectContainer} from '../enroll-info/select-day';
 import {googleDetailApi, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
 import {Dropdown, DropdownElement, SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd, SvgPolygon, SvgCheck, SVGPencil, SVGSearch, SvgCalendar} from '../../utill/svg/svg';
+import {
+	SVGPlus,
+	SVGRightAdd,
+	SvgPolygon,
+	SvgCheck,
+	SVGPencil,
+	SVGSearch,
+	SvgCalendar,
+	SVGProduct,
+} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {NestableScrollContainer} from 'react-native-draggable-flatlist';
@@ -62,8 +71,8 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 	const a = useRef(false);
 	const viewRef = useRef({
 		...timetable[0][0],
-		endHours: Math.floor((((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) / 60),
-		endMinute: (((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) % 60,
+		endHours: Math.floor((((timetable[0][0]?.y ?? 0) + timetable[0][0]?.takenTime / 30) * 30 + 360) / 60),
+		endMinute: (((timetable[0][0]?.y ?? 0) + timetable[0][0]?.takenTime / 30) * 30 + 360) % 60,
 		index: 0,
 		idx: 0,
 	});
@@ -133,7 +142,9 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 		console.log('asd', open, viewRef.current);
 		if (Array.isArray(timetable) && timetable[viewRef.current.index][viewRef.current.idx]) {
 			const targetId = timetable[viewRef.current.index][viewRef.current.idx].id;
+			console.log(timetable);
 			const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
+			console.log(a);
 			dispatch(travelSliceActions.changeTimetable(a));
 			if (open.status) {
 				setOpen({...open, status: false});
@@ -429,7 +440,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 			/>
 			{!modify && (
 				<ProductPressable onPress={handleProduct}>
-					<SvgCalendar color='white' width={widthPercentage(22)} height={widthPercentage(22)} />
+					<SVGProduct color='white' width={widthPercentage(22)} height={widthPercentage(22)} />
 				</ProductPressable>
 			)}
 			{modify ? (
@@ -441,52 +452,34 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 							deco={'text-align:center;'}>
 							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
 						</PretendardSemiBoldText> */}
-					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap width={widthPercentage(375)} gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
-							{/* {['항공', '숙소', ...timetable].map(
-									(item, idx) =>
-										item.length != 0 && (
-											<VStack>
-												<Circle
-													color={getStepColor(item, idx, select)}
-													flag={idx}
-													onPress={() => {
-														changeTouch(idx);
-													}}>
-													{idx <= select && (
-														<SvgCheck color='white' width={widthPercentage(15)} />
-													)}
-												</Circle>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={19}
-													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
-													{idx <= 1 ? item : moment(day[idx - 2]).format('MM월DD일')}
-												</PretendardSemiBoldText>
-											</VStack>
-										),
-								)} */}
-							{timetable.map(
-								(item, idx) =>
-									item.length != 0 && (
-										<DayTouchablOpacity
-											key={idx}
-											select={idx === select}
-											onPress={() => {
-												changeTouch(idx);
-												open.status && setOpen({...open, status: false});
-											}}>
-											<PretendardSemiBoldText
-												size={14}
-												lineHeight={19}
-												color={select == idx ? colors.Gray5 : colors.Gray3}>
-												{'DAY' + (idx + 1)}
-											</PretendardSemiBoldText>
-										</DayTouchablOpacity>
-									),
-							)}
-						</FlexWrap>
-					</DayContainer>
+					<View style={{marginVertical: 10, flex: 1}}>
+						<DayContainer
+							scrollEnabled={timetable.length > 4}
+							horizontal
+							nestedScrollEnabled={true}
+							showsHorizontalScrollIndicator={false}
+							onScroll={e => {
+								console.log(e.nativeEvent.contentOffset.x);
+							}}>
+							{timetable.map((item, idx) => (
+								<DayTouchablOpacity
+									key={idx}
+									select={idx === select}
+									style={{marginRight: 10}}
+									onPress={() => {
+										changeTouch(idx);
+										open.status && setOpen({...open, status: false});
+									}}>
+									<PretendardSemiBoldText
+										size={14}
+										lineHeight={19}
+										color={select == idx ? colors.Gray5 : colors.Gray3}>
+										{'DAY' + (idx + 1)}
+									</PretendardSemiBoldText>
+								</DayTouchablOpacity>
+							))}
+						</DayContainer>
+					</View>
 					{/* <HStack justifyContent='space-between'>
 							<WhiteContainer width={widthPercentage(160)}>
 								<HStack justifyContent='space-between' width={widthPercentage(140)}>
@@ -542,6 +535,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 						open={open}
 						setOpen={setOpen}
 					/>
+					<MarginContainer />
 				</BackgroundGray>
 			) : (
 				<BottomSheet
@@ -569,51 +563,27 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 							deco={'text-align:center;'}>
 							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
 						</PretendardSemiBoldText> */}
-							<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-								<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
-									{/* {['항공', '숙소', ...timetable].map(
-									(item, idx) =>
-										item.length != 0 && (
-											<VStack>
-												<Circle
-													color={getStepColor(item, idx, select)}
-													flag={idx}
-													onPress={() => {
-														changeTouch(idx);
-													}}>
-													{idx <= select && (
-														<SvgCheck color='white' width={widthPercentage(15)} />
-													)}
-												</Circle>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={19}
-													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
-													{idx <= 1 ? item : moment(day[idx - 2]).format('MM월DD일')}
-												</PretendardSemiBoldText>
-											</VStack>
-										),
-								)} */}
-									{timetable.map(
-										(item, idx) =>
-											item.length != 0 && (
-												<DayTouchablOpacity
-													key={idx}
-													select={idx === select}
-													onPress={() => {
-														changeTouch(idx);
-														open.status && setOpen({...open, status: false});
-													}}>
-													<PretendardSemiBoldText
-														size={14}
-														lineHeight={19}
-														color={select == idx ? colors.Gray5 : colors.Gray3}>
-														{'DAY' + (idx + 1)}
-													</PretendardSemiBoldText>
-												</DayTouchablOpacity>
-											),
-									)}
-								</FlexWrap>
+							<DayContainer
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								nestedScrollEnabled={true}>
+								{timetable.map((item, idx) => (
+									<DayTouchablOpacity
+										key={idx}
+										style={{marginRight: 10}}
+										select={idx === select}
+										onPress={() => {
+											changeTouch(idx);
+											open.status && setOpen({...open, status: false});
+										}}>
+										<PretendardSemiBoldText
+											size={14}
+											lineHeight={19}
+											color={select == idx ? colors.Gray5 : colors.Gray3}>
+											{'DAY' + (idx + 1)}
+										</PretendardSemiBoldText>
+									</DayTouchablOpacity>
+								))}
 							</DayContainer>
 							{/* <HStack justifyContent='space-between'>
 							<WhiteContainer width={widthPercentage(160)}>

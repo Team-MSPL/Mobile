@@ -865,6 +865,12 @@ export const travelSlice = createSlice({
 		enrollTendency: (state, {payload}) => {
 			state.tendency = payload;
 		},
+		enrollRecentTendency: (state, {payload}) => {
+			state.tendency = payload?.slice(0, -1);
+			state.transit = payload?.at(-1)?.[0];
+			state.distance = payload?.at(-1)?.[1];
+			state.bandwidth = payload?.at(-1)?.[2];
+		},
 		enrollTimeLimitArray: (state, {payload}) => {
 			state.timeLimitArray = payload;
 		},

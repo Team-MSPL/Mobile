@@ -290,33 +290,29 @@ function Timetable({
 					onMomentumScrollEnd={e => {
 						changeViewState(e), scrollhandle(e);
 					}}>
-					{timetable.map(
-						(value, index) =>
-							value.length != 0 && (
-								<WhiteContainer width={widthPercentage(327)} key={index} alignItems='center'>
-									<PretendardSemiBoldText
-										style={{alignSelf: 'flex-start'}}
-										marginBottom={heightPercentage(10)}
-										size={14}
-										lineHeight={16.71}
-										color={colors.Gray5}>
-										{moment(day[index]).format('YY.MM.DD')} ({weekdays[moment(day[index]).day()]})
-									</PretendardSemiBoldText>
+					{timetable.map((value, index) => (
+						<WhiteContainer width={widthPercentage(327)} key={index} alignItems='center'>
+							<PretendardSemiBoldText
+								style={{alignSelf: 'flex-start'}}
+								marginBottom={heightPercentage(10)}
+								size={14}
+								lineHeight={16.71}
+								color={colors.Gray5}>
+								{moment(day[index]).format('YY.MM.DD')} ({weekdays[moment(day[index]).day()]})
+							</PretendardSemiBoldText>
 
-									<NestableDraggableFlatList
-										onPlaceholderIndexChange={qwe => (changeLocationRef.current.after = qwe)}
-										containerStyle={{
-											height:
-												heightPercentage(76) * value.length + widthPercentage(3) * value.length,
-										}}
-										data={value}
-										onDragEnd={({data}) => changeLocation(data)}
-										keyExtractor={item => item.id}
-										renderItem={renderItem}
-									/>
-								</WhiteContainer>
-							),
-					)}
+							<NestableDraggableFlatList
+								onPlaceholderIndexChange={qwe => (changeLocationRef.current.after = qwe)}
+								containerStyle={{
+									height: heightPercentage(76) * value.length + widthPercentage(3) * value.length,
+								}}
+								data={value}
+								onDragEnd={({data}) => changeLocation(data)}
+								keyExtractor={item => item.id}
+								renderItem={renderItem}
+							/>
+						</WhiteContainer>
+					))}
 				</DayScrollView>
 			) : (
 				<DayScrollViews
@@ -338,7 +334,6 @@ function Timetable({
 					viewMap={viewMap}>
 					{timetable.map(
 						(value, index) =>
-							value.length != 0 &&
 							index == select && (
 								<WhiteContainer
 									width={widthPercentage(327)}

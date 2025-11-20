@@ -239,7 +239,8 @@ export default function FinalCheck({navigation}: any) {
 							.trim()}`;
 					});
 				}
-				dispatch(handleTendency(tendency));
+				console.log([...tendency, [transit, distance, bandwidth]]);
+				dispatch(handleTendency([...tendency, [transit, distance, bandwidth]]));
 				console.log(a);
 				const result = await dispatch(
 					getTravelAi({

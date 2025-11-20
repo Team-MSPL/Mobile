@@ -93,6 +93,7 @@ import Filter from '../../../public/filter.svg';
 import Money from '../../../public/money.svg';
 
 import People from '../../../public/people.svg';
+import Product from '../../../public/product.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -116,7 +117,7 @@ export const SvgAirplain = styled(AirPlain)<{color?: string; transform?: number}
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SvgCalendar = styled(Calendar)<{color?: string}>`
-	color: ${props => props.color};
+	color: ${props => props.color ?? 'black'};
 `;
 export const SvgCommunity = styled(Community)<{color?: string}>`
 	color: color;
@@ -354,4 +355,7 @@ export const SVGMoney = styled(Money)<{color?: string}>`
 
 export const SVGPeople = styled(People)<{color?: string}>`
 	color: color;
+`;
+export const SVGProduct = styled(Product)<{color?: string}>`
+	color: ${props => props.color};
 `;
