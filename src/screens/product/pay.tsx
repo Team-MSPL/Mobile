@@ -219,6 +219,21 @@ function ProductPay({navigation}: any) {
 			Alert.alert('입력 오류', '예약자 정보(필수)를 입력해주세요.');
 			return;
 		}
+		if (uses.includes('cus_02') && !customArray.some(c => c.cus_type === 'cus_02')) {
+			await logEvent(`customValidate`, {pkgName: pdt?.prod_name});
+			Alert.alert('입력 오류', '예약자 정보(필수)를 입력해주세요.');
+			return;
+		}
+		if (hasContact && !completedSections[5]) {
+			await logEvent(`customValidate`, {pkgName: pdt?.prod_name});
+			Alert.alert('입력 오류', '연락수단을 입력해주세요.');
+			return;
+		}
+		if (uses.includes('send') && !customArray.some(c => c.cus_type === 'send')) {
+			await logEvent(`customValidate`, {pkgName: pdt?.prod_name});
+			Alert.alert('입력 오류', '예약자 정보(필수)를 입력해주세요.');
+			return;
+		}
 		const sendGroup = store.customMap?.['send'] ?? {};
 		if (sendGroup?.check_in_date && sendGroup?.check_out_date) {
 			const inT = new Date(sendGroup.check_in_date).getTime();
@@ -234,7 +249,6 @@ function ProductPay({navigation}: any) {
 		const payload = buildReservationPayload({params, pkgData, pdt, s_date, orderNote});
 		// console.debug('[ProductPay] onPay - payload:', payload);
 		// console.log(store);
-		console.log(payload);
 		await logEvent(`goPayMent`, {pkgName: pdt?.prod_name});
 		navigation.navigate('PaymentStack', {
 			info: {
@@ -1821,7 +1835,7 @@ function ProductPay({navigation}: any) {
 				{/* <FixedBottomCTA onPress={onPay} disabled={bookingLoading}>
 					{bookingLoading ? '결제중입니다...' : '결제하기'}
 				</FixedBottomCTA> */}
-				<Button onPress={onPay} height={70}>
+				<Button onPress={onPay} height={70} width={327}>
 					<Text style={{fontSize: 24, color: colors.backgroundWhite}}>주문하기</Text>
 				</Button>
 			</ScrollView>
@@ -2017,7 +2031,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.blue500,
 	},
 });
-const Button = styled.TouchableOpacity<{height: number}>`
+const Button = styled.TouchableOpacity<{height: number; width?: number}>`
 	min-width: ${widthPercentage(64)}px;
 	height: ${props => heightPercentage(props.height)}px;
 	border-radius: 10px;
