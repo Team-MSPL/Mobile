@@ -353,24 +353,25 @@ export default function PresetDetail({navigation, route}: any) {
 						{markers}
 						{polylines}
 					</MapView>
-					<ScrollView horizontal style={{paddingHorizontal: widthPercentage(24)}}>
-						<FlexWrap gap={10}>
-							{presetDatas[route.params.index].map((item, idx) => (
-								<DayTouchablOpacity
-									key={idx}
-									select={select == idx}
-									onPress={() => {
-										changeTouch(idx);
-									}}>
-									<PretendardSemiBoldText
-										size={14}
-										lineHeight={18.9}
-										color={select == idx ? colors.Gray5 : colors.Gray400}>
-										DAY {idx + 1}
-									</PretendardSemiBoldText>
-								</DayTouchablOpacity>
-							))}
-						</FlexWrap>
+					<ScrollView
+						horizontal
+						style={{paddingHorizontal: widthPercentage(24)}}
+						scrollEnabled={presetDatas[route.params.index].length > 4}>
+						{presetDatas[route.params.index].map((item, idx) => (
+							<DayTouchablOpacity
+								key={idx}
+								select={select == idx}
+								onPress={() => {
+									changeTouch(idx);
+								}}>
+								<PretendardSemiBoldText
+									size={14}
+									lineHeight={18.9}
+									color={select == idx ? colors.Gray5 : colors.Gray400}>
+									DAY {idx + 1}
+								</PretendardSemiBoldText>
+							</DayTouchablOpacity>
+						))}
 					</ScrollView>
 				</TopFixContainer>
 				<ScrollView

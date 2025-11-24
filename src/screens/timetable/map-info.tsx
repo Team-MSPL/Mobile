@@ -413,6 +413,10 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
 						: countryList[country].ko, //TODO 홍콩 마카오 처리
 				cityList: region,
+				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
+				keyword: '', // prod_name 검색 - 목록 모드 전용
+				page: 1, // 페이지 번호 - 목록 모드 전용
+				limit: 20, // 페이지당 개수 - 목록 모드 전용
 			};
 			const a = await dispatch(recommendProduct(data)).unwrap();
 			navigation.navigate('PresetProduct', {trigger: 'map'});

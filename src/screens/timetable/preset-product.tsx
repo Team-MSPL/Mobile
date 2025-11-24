@@ -54,6 +54,11 @@ export default function PresetProduct({navigation}: any) {
 		handleGoogleAnalyticsProduct();
 	}, []);
 	(!!!route.params?.trigger ?? false) && useBackHandler({type: 'product'});
+	useEffect(() => {
+		navigation.setOptions({
+			headerBackVisible: !!route.params?.trigger,
+		});
+	}, []);
 	const handleCategory = (e: string) => {
 		let copy = [...products];
 		products.map(item => console.log(item.avgPrefScore));
