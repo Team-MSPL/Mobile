@@ -1283,7 +1283,7 @@ export const travelSlice = createSlice({
 		});
 
 		builder.addCase(recommendProduct.fulfilled, (state, {payload}) => {
-			console.log(payload);
+			console.log(!!payload?.page);
 			state.presetProducts = !!payload?.page ? payload?.products : payload;
 		});
 	},

@@ -73,26 +73,26 @@ export default function PresetDetail({navigation, route}: any) {
 	const handleProduct = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {
-				pathList: [
-					presetDatas[route.params.index].map(item => {
-						return item
-							.filter(filterItem => !filterItem.name?.includes('추천'))
-							.map(value => {
-								return {name: value?.name};
-							});
-					}),
-				],
-				selectList: [...tendency, season],
-				country:
-					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
-						? '홍콩과 마카오'
-						: region[0].includes('해외')
-						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
-						: countryList[country].ko, //TODO 홍콩 마카오 처리
-				cityList: region,
-			};
-			const a = await dispatch(recommendProduct(data)).unwrap();
+			// const data = {
+			// 	pathList: [
+			// 		presetDatas[route.params.index].map(item => {
+			// 			return item
+			// 				.filter(filterItem => !filterItem.name?.includes('추천'))
+			// 				.map(value => {
+			// 					return {name: value?.name};
+			// 				});
+			// 		}),
+			// 	],
+			// 	selectList: [...tendency, season],
+			// 	country:
+			// 		region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
+			// 			? '홍콩과 마카오'
+			// 			: region[0].includes('해외')
+			// 			? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
+			// 			: countryList[country].ko, //TODO 홍콩 마카오 처리
+			// 	cityList: region,
+			// };
+			// const a = await dispatch(recommendProduct(data)).unwrap();
 			navigation.navigate('Timetable');
 			navigation.navigate('PresetProduct');
 			// console.log(a[0]);

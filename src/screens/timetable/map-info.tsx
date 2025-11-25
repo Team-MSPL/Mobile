@@ -393,39 +393,7 @@ export default function MapInfo({navigation, modify, setModify, checkSave}: any)
 		{ko: '싱가포르', en: 'Singapore'},
 	];
 	const handleProduct = async () => {
-		try {
-			dispatch(LoadingSliceActions.onLoading());
-			const data = {
-				pathList: [
-					timetable.map(item => {
-						return item
-							.filter(filterItem => !filterItem.name?.includes('추천'))
-							.map(value => {
-								return {name: value?.name};
-							});
-					}),
-				],
-				selectList: [...tendency, season],
-				country:
-					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
-						? '홍콩과 마카오'
-						: region[0].includes('해외')
-						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
-						: countryList[country].ko, //TODO 홍콩 마카오 처리
-				cityList: region,
-				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
-				keyword: '', // prod_name 검색 - 목록 모드 전용
-				page: 1, // 페이지 번호 - 목록 모드 전용
-				limit: 20, // 페이지당 개수 - 목록 모드 전용
-			};
-			const a = await dispatch(recommendProduct(data)).unwrap();
-			navigation.navigate('PresetProduct', {trigger: 'map'});
-			// console.log(a[0]);
-		} catch (e) {
-			console.log(e);
-		} finally {
-			dispatch(LoadingSliceActions.offLoading());
-		}
+		navigation.navigate('PresetProduct', {trigger: 'map'});
 	};
 	return (
 		<MainAllContainer>
