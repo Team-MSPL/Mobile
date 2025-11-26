@@ -13,6 +13,7 @@ import Reserve from '../screens/product/reserve';
 import ReserveCancel from '../screens/product/reserve-cance';
 import ReserveDetail from '../screens/product/reserve-detail';
 import ReserveList from '../screens/product/reserve-list';
+import SearchProductList from '../screens/product/search-product-list';
 import ProductSelectSpec from '../screens/product/select-spec';
 import ProductGoodProduct from '../screens/product/test';
 import PresetProduct from '../screens/timetable/preset-product';
@@ -141,6 +142,14 @@ export default function ProductsStack() {
 				component={ProductPay}
 				options={{
 					title: '상품예약',
+				}}
+			/>
+			<Stack.Screen
+				name='SearchProductList'
+				component={SearchProductList}
+				options={{
+					headerBackVisible: true,
+					title: '상품검색',
 				}}
 			/>
 		</Fragment>

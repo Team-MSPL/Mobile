@@ -1,14 +1,13 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {Modal, TouchableOpacity, FlatList, TextInput} from 'react-native';
+import {Modal, TouchableOpacity, FlatList} from 'react-native';
 import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
-import {recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {recommendProduct} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import StepText from '../../utill/component/enroll-info/step-text';
-import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGray,
 	HStack,
@@ -17,21 +16,14 @@ import {
 	VStack,
 } from '../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
-import {SVGDanimLogo, SVGFilter, SvgRight, SVGRightAdd, SVGSearch, SVGStarSmile, SvgStart} from '../../utill/svg/svg';
+import {SVGDanimLogo, SVGFilter, SvgRight, SVGRightAdd, SvgStart} from '../../utill/svg/svg';
 import {ModalBackground, ModalBottomSheet} from '../enroll-info/planner/regist-transit';
-import {RegionTextInput, RegionTextInputContainer} from '../enroll-info/region-recommend/select-distance';
-import {MarginContainer} from './preset-detail';
 
-export default function PresetProduct({navigation}: any) {
-	const {timetable, tendency, season, region, country} = useAppSelector(state => state.travelSlice);
+export default function SearchProductList({navigation}: any) {
+	const {tendency, season, region, country} = useAppSelector(state => state.travelSlice);
 	const route = useRoute();
-	const handleSkip = async () => {
-		await logEvent(`presetProductSkip`, {});
-		// navigation.navigate('Timetable');
-		navigation.goBack();
-	};
 	const handelDetail = async item => {
-		await logEvent(`${route.params?.trigger ?? 'preset'}_ProductDetail`, {item: item});
+		await logEvent(`search_${route.params?.trigger ?? 'preset'}_ProductDetail`, {item: item});
 		navigation.navigate('ProductDetail', {item: item});
 	};
 	const [products, setProducts] = useState([]);
@@ -39,7 +31,7 @@ export default function PresetProduct({navigation}: any) {
 	const [categoryValue, setCategoryValue] = useState('추천순');
 
 	const handleGoogleAnalyticsProduct = async () => {
-		await logEvent(`presetProductList`, {});
+		await logEvent(`searchProductList`, {title: route?.params?.title, country: country});
 	};
 	const countryList = [
 		{ko: '한국', en: 'Korea'},
@@ -67,7 +59,7 @@ export default function PresetProduct({navigation}: any) {
 						: countryList[country].ko, //TODO 홍콩 마카오 처리
 				cityList: region,
 				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
-				keyword: '', // prod_name 검색 - 목록 모드 전용
+				keyword: route?.params?.title ?? '', // prod_name 검색 - 목록 모드 전용
 				page: productCountRef.current, // 페이지 번호 - 목록 모드 전용
 				limit: 20, // 페이지당 개수 - 목록 모드 전용
 				sortOption: sortRef.current.sortOption, // order_count, b2b_price, avg_rating_star
@@ -99,34 +91,28 @@ export default function PresetProduct({navigation}: any) {
 	useEffect(() => {
 		handleGoogleAnalyticsProduct();
 	}, []);
-	(!!!route.params?.trigger ?? false) && useBackHandler({type: 'product'});
-	useEffect(() => {
-		navigation.setOptions({
-			headerBackVisible: !!route.params?.trigger,
-		});
-	}, []);
 	const flatListRef = useRef(null);
 	const handleCategory = (e: string) => {
 		switch (e) {
 			case '추천순':
 				sortRef.current = {sortOption: 'order_count', sortOrder: 'desc'};
-				logEvent('order_count_desc', {});
+				logEvent('search_order_count_desc', {});
 				break;
 			case '낮은 가격순':
 				sortRef.current = {sortOption: 'b2b_price', sortOrder: 'asc'};
-				logEvent('b2b_price_asc', {});
+				logEvent('search_b2b_price_asc', {});
 				break;
 			case '높은 가격순':
 				sortRef.current = {sortOption: 'b2b_price', sortOrder: 'desc'};
-				logEvent('b2b_price_desc', {});
+				logEvent('search_b2b_price_desc', {});
 				break;
 			case '낮은 평점순':
 				sortRef.current = {sortOption: 'avg_rating_star', sortOrder: 'asc'};
-				logEvent('avg_rating_star_asc', {});
+				logEvent('search_avg_rating_star_asc', {});
 				break;
 			case '높은 평점순':
 				sortRef.current = {sortOption: 'avg_rating_star', sortOrder: 'desc'};
-				logEvent('avg_rating_star_desc', {});
+				logEvent('search_avg_rating_star_desc', {});
 				break;
 		}
 		productCountRef.current = 1;
@@ -210,25 +196,13 @@ export default function PresetProduct({navigation}: any) {
 	});
 	const renderItem = useCallback(({item}) => <RenderItem item={item} />, []);
 	const [goToTopBtnVisible, setGoToTopBtnVisible] = useState(false);
-	const regionSearchRef = useRef<TextInput | null>(null);
-	const [regionText, setRegionText] = useState('');
 	const ListHeader = () => {
 		return (
 			<>
 				<StepText
 					marginTop={heightPercentage(10)}
 					marginBottom={heightPercentage(10)}
-					mainText={
-						(route.params?.trigger ? `` : `잠깐!\n`) + `선택하신 코스에 꼭 맞는 상품을 모아봤어요`
-					}></StepText>
-				<LowPriceBox>
-					<HStack gap={10}>
-						<SVGStarSmile />
-						<PretendardSemiBoldText size={16} lineHeight={21} color={colors.PointGreen1}>
-							최저가로 즐기는 특별한 여행!
-						</PretendardSemiBoldText>
-					</HStack>
-				</LowPriceBox>
+					mainText={'"' + route.params?.title + `" 검색 결과입니다.`}></StepText>
 				<HStack justifyContent='space-between' deco='margin-bottom:10px;padding:5px;'>
 					<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Gray5}></PretendardSemiBoldText>
 					<HStack gap={10}>
@@ -256,25 +230,6 @@ export default function PresetProduct({navigation}: any) {
 	return (
 		<>
 			<BackgroundGray>
-				<RegionTextInputContainer borderColor={colors.backgroundWhite} backgroundColor={colors.backgroundGray}>
-					<SVGSearch width={widthPercentage(20)} height={widthPercentage(20)} color={colors.grey500} />
-					<RegionTextInput
-						ref={regionSearchRef}
-						returnKeyType={'search'}
-						placeholder='검색어를 입력해보세요'
-						value={regionText}
-						backgroundColor={colors.backgroundGray}
-						// onBlur={() => {
-						// 	setRegionSearchState(false);
-						// }}
-						onSubmitEditing={() => {
-							navigation.navigate('SearchProductList', {title: regionText});
-						}}
-						placeholderTextColor={colors.Gray3}
-						onChangeText={e => {
-							setRegionText(e);
-						}}></RegionTextInput>
-				</RegionTextInputContainer>
 				<FlatList
 					ref={flatListRef}
 					onScroll={e => {
@@ -288,20 +243,7 @@ export default function PresetProduct({navigation}: any) {
 					onEndReached={() => {
 						products.length > 0 && handleProduct();
 					}}></FlatList>
-				{(!!!route.params?.trigger ?? false) && <MarginContainer />}
 			</BackgroundGray>
-			{(!!!route.params?.trigger ?? false) && (
-				<SkipButton onPress={handleSkip}>
-					<PretendardSemiBoldText
-						size={16}
-						lineHeight={21}
-						numberOfLines={2}
-						color={colors.backgroundWhite}
-						deco={'text-align:center;'}>
-						건너뛰기
-					</PretendardSemiBoldText>
-				</SkipButton>
-			)}
 			{goToTopBtnVisible && (
 				<AbsoluteUpButton
 					onPress={() => {
@@ -373,26 +315,6 @@ const ProductImage = styled.Image`
 	height: ${heightPercentage(162)}px;
 	border-top-left-radius: 20px;
 	border-top-right-radius: 20px;
-`;
-const SkipButton = styled.TouchableOpacity`
-	position: absolute;
-	width: ${widthPercentage(327)}px;
-	height: ${heightPercentage(60)}px;
-	border-radius: 8px;
-	background-color: ${colors.Gray5};
-	align-self: center;
-	align-items: center;
-	justify-content: center;
-	bottom: 10px;
-`;
-const LowPriceBox = styled.View`
-	width: ${widthPercentage(240)}px;
-	height: ${heightPercentage(44)}px;
-	border-radius: 20px;
-	background-color: rgba(255, 90, 77, 0.1);
-	align-items: center;
-	justify-content: center;
-	margin-vertical: 20px;
 `;
 const FilterBox = styled(HStack).attrs({as: TouchableOpacity})``;
 

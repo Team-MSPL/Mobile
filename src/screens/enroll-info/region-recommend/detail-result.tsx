@@ -1,5 +1,5 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {getKkdaySearch, recommendProduct, travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {recommendProduct, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';

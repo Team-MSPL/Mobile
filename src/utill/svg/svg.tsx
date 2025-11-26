@@ -109,7 +109,7 @@ export const SvgCheck = styled(Check)<{color: string}>`
 	color: ${props => props.color};
 `;
 export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
-	color: color;
+	color: ${props => props.color};
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SvgAirplain = styled(AirPlain)<{color?: string; transform?: number}>`

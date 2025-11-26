@@ -342,22 +342,22 @@ const ButtonContainer = styled.View`
 	justify-content: flex-end;
 	margin-bottom: 2px;
 `;
-export const RegionTextInput = styled.TextInput`
+export const RegionTextInput = styled.TextInput<{backgroundColor?: string}>`
 	width: ${widthPercentage(287)}px;
 	height: ${heightPercentage(50)}px;
-	background-color: ${colors.backgroundWhite};
+	background-color: ${props => props.backgroundColor ?? colors.backgroundWhite};
 	border-radius: 10px;
 	color: black;
 	font-size: ${fontPercentage(16)}px;
 `;
-export const RegionTextInputContainer = styled.View`
+export const RegionTextInputContainer = styled.View<{borderColor?: string; backgroundColor?: string}>`
 	flex-direction: row;
 	align-items: center;
-	background-color: ${colors.backgroundWhite};
+	background-color: ${props => props.backgroundColor ?? colors.backgroundWhite};
 	border-radius: 22px;
 	padding-horizontal: ${widthPercentage(10)}px;
 	border-width: 2px;
-	border-color: ${colors.Primary};
+	border-color: ${props => props.borderColor ?? colors.Primary};
 	margin-vertical: ${widthPercentage(10)}px;
 `;
 export const SearchContainer = styled.View<{top?: number}>`

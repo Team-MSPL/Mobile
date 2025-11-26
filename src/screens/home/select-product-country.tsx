@@ -34,9 +34,9 @@ export default function HomeProductCountry({navigation}: any) {
 			dispatch(travelSliceActions.selectRegion([]));
 		}, []),
 	);
-	const btnNext = async idx => {
-		await logEvent(`main_product_country_select`, {title: countryList[idx].en});
-		navigation.navigate('HomeProductList');
+	const btnNext = async () => {
+		await logEvent(`main_product_country_select`, {title: countryList[country].en});
+		navigation.navigate('PresetProduct', {trigger: 'home'});
 	};
 	return (
 		<BackgroundGray>
@@ -59,7 +59,7 @@ export default function HomeProductCountry({navigation}: any) {
 						}}></TendencyButton>
 				))}
 			</FlexWrap>
-			<RouteButton navigation={navigation} nextTitle={'HomeProductList'} btnFunction={btnNext}></RouteButton>
+			<RouteButton navigation={navigation} btnFunction={btnNext}></RouteButton>
 		</BackgroundGray>
 	);
 }
