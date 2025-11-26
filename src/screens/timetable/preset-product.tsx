@@ -49,35 +49,21 @@ export default function PresetProduct({navigation}: any) {
 		{ko: '싱가포르', en: 'Singapore'},
 	];
 	const productCountRef = useRef(1);
+	const sortRef = useRef({sortOption: 'order_count', sortOrder: 'desc'});
 	const dispatch = useAppDispatch();
 	const handleProduct = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {
-				pathList: [
-					timetable.map(item => {
-						return item
-							.filter(filterItem => !filterItem.name?.includes('추천'))
-							.map(value => {
-								return {name: value?.name};
-							});
-					}),
-				],
-				selectList: [...tendency, season],
-				country:
-					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
-						? '홍콩과 마카오'
-						: region[0].includes('해외')
-						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
-						: countryList[country].ko, //TODO 홍콩 마카오 처리
-				cityList: region,
-				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
-				keyword: '', // prod_name 검색 - 목록 모드 전용
-				page: productCountRef.current, // 페이지 번호 - 목록 모드 전용
-				limit: 20, // 페이지당 개수 - 목록 모드 전용
-			};
 			// const data = {
-			// 	pathList: [],
+			// 	pathList: [
+			// 		timetable.map(item => {
+			// 			return item
+			// 				.filter(filterItem => !filterItem.name?.includes('추천'))
+			// 				.map(value => {
+			// 					return {name: value?.name};
+			// 				});
+			// 		}),
+			// 	],
 			// 	selectList: [...tendency, season],
 			// 	country:
 			// 		region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
@@ -90,9 +76,24 @@ export default function PresetProduct({navigation}: any) {
 			// 	keyword: '', // prod_name 검색 - 목록 모드 전용
 			// 	page: productCountRef.current, // 페이지 번호 - 목록 모드 전용
 			// 	limit: 20, // 페이지당 개수 - 목록 모드 전용
-			// 	sortOption: 'order_count', // order_count, b2b_price, avg_rating_star
-			// 	sortOrder: 'desc', // asc, desc
 			// };
+			const data = {
+				pathList: [],
+				selectList: [...tendency, season],
+				country:
+					region.some(r => r.includes('홍콩')) || region.some(r => r.includes('마카오'))
+						? '홍콩과 마카오'
+						: region[0].includes('해외')
+						? countryList.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
+						: countryList[country].ko, //TODO 홍콩 마카오 처리
+				cityList: region,
+				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
+				keyword: '', // prod_name 검색 - 목록 모드 전용
+				page: productCountRef.current, // 페이지 번호 - 목록 모드 전용
+				limit: 20, // 페이지당 개수 - 목록 모드 전용
+				sortOption: sortRef.current.sortOption, // order_count, b2b_price, avg_rating_star
+				sortOrder: sortRef.current.sortOrder, // asc, desc
+			};
 			const a = await dispatch(recommendProduct(data)).unwrap();
 			//!!payload?.page ? payload?.products :
 			handleArray(!!a?.page ? a?.products : a);
@@ -105,9 +106,12 @@ export default function PresetProduct({navigation}: any) {
 		}
 	};
 	const handleArray = productList => {
+		if (productCountRef.current == 1) {
+			setProducts(productList);
+			return;
+		}
 		const map = new Map();
 		[...products, ...productList].forEach(p => map.set(p._id, p));
-		console.log(products.length, productList.length, productCountRef.current);
 		setProducts([...map.values()]);
 	};
 	useLayoutEffect(() => {
@@ -124,30 +128,25 @@ export default function PresetProduct({navigation}: any) {
 		});
 	}, []);
 	const handleCategory = (e: string) => {
-		let copy = [...products];
-		products.map(item => console.log(item.avgPrefScore));
 		switch (e) {
 			case '추천순':
-				copy = copy.sort((a, b) => {
-					if (b.avgPrefScore === undefined) return -1;
-					if (a.avgPrefScore === undefined) return 1;
-					return b.avgPrefScore - a.avgPrefScore;
-				});
+				sortRef.current = {sortOption: 'order_count', sortOrder: 'desc'};
 				break;
 			case '낮은 가격순':
-				copy = copy.sort((a, b) => a.b2b_price - b.b2b_price);
+				sortRef.current = {sortOption: 'b2b_price', sortOrder: 'asc'};
 				break;
 			case '높은 가격순':
-				copy = copy.sort((a, b) => b.b2b_price - a.b2b_price);
+				sortRef.current = {sortOption: 'b2b_price', sortOrder: 'desc'};
 				break;
 			case '낮은 평점순':
-				copy = copy.sort((a, b) => a.avg_rating_star - b.avg_rating_star);
+				sortRef.current = {sortOption: 'avg_rating_star', sortOrder: 'asc'};
 				break;
 			case '높은 평점순':
-				copy = copy.sort((a, b) => b.avg_rating_star - a.avg_rating_star);
+				sortRef.current = {sortOption: 'avg_rating_star', sortOrder: 'desc'};
 				break;
 		}
-		setProducts(copy);
+		productCountRef.current = 1;
+		handleProduct();
 		setCategoryValue(e);
 		setCategoryVisible(false);
 	};
