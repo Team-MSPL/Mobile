@@ -1,6 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {Modal, TouchableOpacity, FlatList, TextInput} from 'react-native';
+import {Modal, TouchableOpacity, FlatList, TextInput, Keyboard} from 'react-native';
 import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
 import {useAppDispatch, useAppSelector} from '../../redux';
@@ -278,6 +278,7 @@ export default function PresetProduct({navigation}: any) {
 				<FlatList
 					ref={flatListRef}
 					onScroll={e => {
+						Keyboard.dismiss();
 						setGoToTopBtnVisible(e?.nativeEvent.contentOffset.y > 100);
 					}}
 					ListHeaderComponent={<ListHeader />}
