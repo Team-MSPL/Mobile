@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {View, TextInput, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	cusType: string; // "send"
 	initialValue?: string;
@@ -33,12 +34,12 @@ export default function AddressInput({cusType, initialValue = '', required = fal
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				주소 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
+				deco={'height:80px;'}
 				placeholder='예) No.88, Sec.2, Zhongshan N. Rd.'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={[styles.input, {height: 80}]}
 				multiline
 				accessibilityLabel={`${cusType}-address`}
 			/>

@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setTrafficField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	trafficType: string;
 	label?: string;
@@ -46,12 +47,11 @@ export default function ArrivalTimeInput({
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				{label} {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder={placeholder}
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				accessibilityLabel={`arrival-time-${trafficType}`}
 			/>
 		</View>

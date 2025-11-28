@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	cusType: string; // "send"
 	initialValue?: string;
@@ -33,12 +34,11 @@ export default function HotelTelNumberInput({cusType, initialValue = '', require
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				호텔 연락처 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) +886 2 1234 5678'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				keyboardType='phone-pad'
 				accessibilityLabel={`${cusType}-hotel-tel-number`}
 			/>

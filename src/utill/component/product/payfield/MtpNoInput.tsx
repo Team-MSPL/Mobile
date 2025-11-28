@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	cusType: string; // "cus_01" | "cus_02"
 	initialValue?: string;
@@ -33,12 +34,11 @@ export default function MtpNoInput({cusType, initialValue = '', required = false
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				MTP 번호 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) MTP123456'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				accessibilityLabel={`${cusType}-mtp-no`}
 			/>
 		</View>

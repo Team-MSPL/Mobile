@@ -125,7 +125,7 @@ export default function Counter({
 					) : null}
 				</View>
 
-				<Text style={{fontSize: 22, fontWeight: 'bold', marginTop: 8}}>
+				<Text style={{fontSize: 22, fontWeight: 'bold', marginTop: 8, color: 'black'}}>
 					{price ? `${formatPrice(price)}원` : '-'}
 				</Text>
 			</View>

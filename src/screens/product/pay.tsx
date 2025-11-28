@@ -84,6 +84,16 @@ import {useBuildReservationPayload} from '../../utill/component/product/booking/
 import useBookingApi from '../../utill/hooks/useBookingApi';
 import {useValidationHelpers} from '../../utill/component/product/booking/validationHelpers';
 import {logEvent} from '../../../firebaseAnalytice';
+import {
+	FlexWrap,
+	HStack,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	ProductInfoInput,
+	VStack,
+} from '../../utill/layout/layout';
+import {SvgCalendar, SVGClock, SVGPeople} from '../../utill/svg/svg';
+import moment from 'moment';
 
 type PaymentMethod = 'toss' | 'naver' | 'kakao' | 'card' | null;
 
@@ -158,7 +168,7 @@ function ProductPay({navigation}: any) {
 
 	function markCompleteAndNext(sectionIndex: number) {
 		setCompletedSections(prev => ({...prev, [sectionIndex]: true}));
-		setOpenSections(prev => ({...prev, [sectionIndex + 1]: true}));
+		setOpenSections(prev => ({...prev, [sectionIndex]: false, [sectionIndex + 1]: true}));
 		// const store = useBookingStore.getState();
 		// console.log('[BookingStore] guideLangCode:', store.guideLangCode);
 		// console.log('[BookingStore] customMap:', store.customMap);
@@ -423,20 +433,62 @@ function ProductPay({navigation}: any) {
 	}
 
 	return (
-		<View style={{flex: 1, backgroundColor: '#fff'}}>
+		<View style={{flex: 1, backgroundColor: colors.backgroundGray}}>
 			<ScrollView>
-				<View style={styles.container}>
+				{/* <View style={styles.container}>
 					<Text style={{color: colors.grey800}}>예약/결제하기</Text>
-				</View>
+				</View> */}
+				<VStack
+					deco={`align-self:center;border-width:1px; border-radius:12px;border-color:${
+						colors.grey200
+					};background-color:${colors.backgroundWhite};padding:36px ${widthPercentage(
+						24,
+					)}px;margin-top:20px;`}
+					gap={20}
+					width={widthPercentage(337)}>
+					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Black}>
+						투어 정보
+					</PretendardSemiBoldText>
+					<Image source={{uri: thumbnail}} style={styles.tourImage} resizeMode='cover' />
+					<PretendardVariableText size={20} lineHeight={24} color={colors.Black}>
+						{title}
+					</PretendardVariableText>
+					<FlexWrap margintop={10}>
+						<HStack gap={10} width={widthPercentage(140)}>
+							<SvgCalendar />
+							<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Black}>
+								{moment(params?.selected_date)?.format('YYYY-MM-DD')}
+							</PretendardSemiBoldText>
+						</HStack>
+						{!!params?.selected_time && (
+							<HStack gap={10} width={widthPercentage(140)}>
+								<SVGClock color='black' />
+								<PretendardSemiBoldText size={18} lineHeight={23} color={colors.Black}>
+									{params?.selected_time}
+								</PretendardSemiBoldText>
+							</HStack>
+						)}
+						<HStack
+							gap={10}
+							width={widthPercentage(140)}
+							deco={`${!!params?.selected_time && 'margin-top:10px;'}`}>
+							<SVGPeople />
+							<PretendardSemiBoldText size={18} lineHeight={23} color={colors.Black}>
+								{params?.skus?.[0]?.qty}
+								{params?.categories?.[0]?.label}
+							</PretendardSemiBoldText>
+						</HStack>
+					</FlexWrap>
+				</VStack>
 
-				<CollapsibleSection
+				{/* <CollapsibleSection
 					title='투어 정보'
 					open={!!openSections[0]}
 					onToggle={() => toggleSection(0)}
 					completed={!!completedSections[0]}>
 					<Text style={{color: colors.Black, fontWeight: 'bold', marginBottom: 12}}>{title}</Text>
 					<Image source={{uri: thumbnail}} style={styles.tourImage} resizeMode='cover' />
-				</CollapsibleSection>
+				</CollapsibleSection> */}
 
 				<CollapsibleSection
 					title='구매자 정보'
@@ -1367,7 +1419,7 @@ function ProductPay({navigation}: any) {
 
 				{hasPsgQty && (
 					<CollapsibleSection
-						title='탑승자 수 (psg_qty)'
+						title='탑승자 수'
 						open={!!openSections[8]}
 						onToggle={() => toggleSection(8)}
 						completed={!!completedSections[8]}>
@@ -1733,12 +1785,11 @@ function ProductPay({navigation}: any) {
 					open={!!openSections[12]}
 					onToggle={() => toggleSection(12)}
 					completed={!!completedSections[12]}>
-					<TextInput
+					<ProductInfoInput
 						placeholder='요청사항을 입력하세요'
 						placeholderTextColor={colors.grey400}
 						value={orderNote}
 						onChangeText={setOrderNote}
-						style={[styles.input]}
 						multiline
 					/>
 					<View style={{height: 12}} />
@@ -1747,7 +1798,38 @@ function ProductPay({navigation}: any) {
 					</Button>
 				</CollapsibleSection>
 
-				<CollapsibleSection
+				<VStack
+					deco={`align-self:center;border-width:1px; border-radius:12px;border-color:${
+						colors.grey200
+					};background-color:${colors.backgroundWhite};padding:36px ${widthPercentage(
+						24,
+					)}px;margin-top:20px;`}
+					gap={20}
+					width={widthPercentage(337)}>
+					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Black}>
+						결제 세부 내역
+					</PretendardSemiBoldText>
+					<Image source={{uri: thumbnail}} style={styles.tourImage} resizeMode='cover' />
+					<PretendardVariableText size={20} lineHeight={24} color={colors.Black}>
+						{title}
+					</PretendardVariableText>
+					<Dash />
+					<HStack justifyContent='space-between;'>
+						<PretendardSemiBoldText size={20} lineHeight={24} color={colors.grey700}>
+							총 결제 금액
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText size={24} lineHeight={28} color={colors.PointYellow}>
+							{formatPrice(productAmount)}원
+						</PretendardSemiBoldText>
+					</HStack>
+					<Button onPress={onPay} height={heightPercentage(50)}>
+						<PretendardSemiBoldText size={24} lineHeight={28} color={colors.backgroundWhite}>
+							결제하기
+						</PretendardSemiBoldText>
+					</Button>
+				</VStack>
+
+				{/* <CollapsibleSection
 					title='결제 세부 내역'
 					open={!!openSections[13]}
 					onToggle={() => toggleSection(13)}
@@ -1766,7 +1848,7 @@ function ProductPay({navigation}: any) {
 							<Text style={{color: colors.Black}}>{formatPrice(productAmount)}원</Text>
 						</View>
 					</View>
-				</CollapsibleSection>
+				</CollapsibleSection> */}
 
 				<View style={{height: 12, backgroundColor: colors.grey100, marginTop: 8}} />
 
@@ -1835,14 +1917,16 @@ function ProductPay({navigation}: any) {
 				{/* <FixedBottomCTA onPress={onPay} disabled={bookingLoading}>
 					{bookingLoading ? '결제중입니다...' : '결제하기'}
 				</FixedBottomCTA> */}
-				<Button onPress={onPay} height={70} width={327}>
-					<Text style={{fontSize: 24, color: colors.backgroundWhite}}>주문하기</Text>
-				</Button>
 			</ScrollView>
 		</View>
 	);
 }
-
+const Dash = styled.View`
+	width: 100%;
+	height: 1px;
+	border-bottom-width: 1px;
+	border-style: dashed;
+`;
 const styles = StyleSheet.create({
 	container: {
 		paddingHorizontal: 20,

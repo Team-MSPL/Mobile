@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	cusType: string; // "cus_01" | "cus_02" | "contact" | "send"
 	initialValue?: string;
@@ -34,12 +35,11 @@ export default function NativeLastNameInput({cusType, initialValue = '', require
 				성(현지어) {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
 
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) 홍'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				accessibilityLabel={`${cusType}-native-last-name`}
 			/>
 		</View>

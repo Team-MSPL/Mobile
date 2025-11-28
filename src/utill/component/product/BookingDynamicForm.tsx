@@ -1,5 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert} from 'react-native';
+import {ProductInfoInput} from '../../layout/layout';
 import {FieldSpec} from './bookingFieldParser';
 
 type Values = Record<string, any>;
@@ -70,9 +71,8 @@ export function BookingDynamicForm({
 
 		if (spec.type === 'date') {
 			return (
-				<TextInput
+				<ProductInfoInput
 					key={pathKey}
-					style={styles.input}
 					placeholder='YYYY-MM-DD'
 					value={val}
 					onChangeText={t => setValue(pathKey, t)}
@@ -82,9 +82,8 @@ export function BookingDynamicForm({
 
 		if (spec.type === 'time') {
 			return (
-				<TextInput
+				<ProductInfoInput
 					key={pathKey}
-					style={styles.input}
 					placeholder='HH:MM'
 					value={val}
 					onChangeText={t => setValue(pathKey, t)}
@@ -102,9 +101,8 @@ export function BookingDynamicForm({
 
 		// default: text / int / textarea
 		return (
-			<TextInput
+			<ProductInfoInput
 				key={pathKey}
-				style={styles.input}
 				placeholder={spec.label}
 				value={String(val)}
 				onChangeText={t => setValue(pathKey, t)}

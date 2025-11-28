@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 
 type Props = {
 	cusType: string; // "contact"
@@ -38,12 +39,11 @@ export default function ContactAppAccountInput({cusType, initialValue = '', requ
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				연락 앱 계정 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) my_line_id'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				accessibilityLabel={`${cusType}-contact-app-account`}
 			/>
 		</View>

@@ -3,6 +3,7 @@ import {View, TouchableOpacity, ScrollView, StyleSheet, TextInput, Text} from 'r
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setTrafficField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type LocationOption = {id?: string; code?: string; name?: string; address?: string; [k: string]: any};
 
 type Props = {
@@ -149,12 +150,11 @@ export default function RentcarLocationSelector({
 					{label ?? (field === 's_location' ? '픽업' : '하차')}{' '}
 					{required ? <Text style={{color: colors.red400}}>*</Text> : null}
 				</Text>
-				<TextInput
+				<ProductInfoInput
 					placeholder='주소를 입력하세요'
 					placeholderTextColor={colors.grey400}
 					value={customAddress}
 					onChangeText={setCustomAddress}
-					style={[styles.input]}
 				/>
 			</View>
 		);
@@ -214,12 +214,11 @@ export default function RentcarLocationSelector({
 			)}
 
 			{allowCustomizeOption && selectedId === 'customize' && (
-				<TextInput
+				<ProductInfoInput
 					placeholder='주소를 입력하세요'
 					placeholderTextColor={colors.grey400}
 					value={customAddress}
 					onChangeText={setCustomAddress}
-					style={[styles.input, {marginTop: 8}]}
 				/>
 			)}
 		</View>

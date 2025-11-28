@@ -75,6 +75,16 @@ export default function ProductDetail({navigation}: any) {
 					height={widthPercentage(282)}
 					source={{uri: productInfo?.prod?.img_list[0]}}></ImageBox>
 				<PaddingContainer>
+					{!(productInfo?.pkg?.length > 0) && (
+						<PretendardSemiBoldText
+							size={24}
+							lineHeight={28}
+							numberOfLines={2}
+							color={colors.PointGreen1}
+							deco={'text-align:center;margin-bottom:10px;'}>
+							해당 여행 상품은{`\n`}판매가 종료되었습니다.
+						</PretendardSemiBoldText>
+					)}
 					{/* {productInfo?.pkg?.map((item, idx) => (
 						<PackageBox>
 							<PretendardSemiBoldText size={22} lineHeight={26} numberOfLines={2} color={colors.Black}>
@@ -323,11 +333,7 @@ export default function ProductDetail({navigation}: any) {
 							</PretendardSemiBoldText>
 						),
 					)}
-					{!(productInfo?.pkg?.length > 0) && (
-						<PretendardSemiBoldText size={24} lineHeight={28} numberOfLines={2} color={colors.PointGreen1}>
-							해당 여행 상품은 현재 판매가 종료되었습니다.
-						</PretendardSemiBoldText>
-					)}
+
 					<MarginContainer />
 				</PaddingContainer>
 			</Container>

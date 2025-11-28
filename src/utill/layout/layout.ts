@@ -251,3 +251,17 @@ export const ImageBox = styled.Image<{width: number; height: number; deco?: stri
 	object-fit: fill;
 	${props => props?.deco}
 `;
+export const ProductInfoInput = styled.TextInput<{deco?: string}>`
+	flex: 1;
+	height: ${heightPercentage(54)}px;
+	border-radius: 12px;
+	border-width: 1px;
+	border-color: ${colors.grey200};
+	background-color: ${colors.backgroundWhite};
+	color: ${colors.grey800};
+	padding: 0px 10px;
+	font-size: ${fontPercentage(16)};
+	margin-top: 10px;
+	margin-bottom: 20px;
+	${props => props?.deco}
+`;

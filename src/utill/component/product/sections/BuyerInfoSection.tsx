@@ -12,7 +12,8 @@ import {
 	setCustomField,
 } from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
-import {heightPercentage, widthPercentage} from '../../../layout/responsive-size';
+import {ProductInfoInput} from '../../../layout/layout';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../../layout/responsive-size';
 import CountrySelector from '../payfield/CountrySelector';
 
 export default function BuyerInfoSection({onComplete}: {onComplete?: () => void}) {
@@ -23,36 +24,33 @@ export default function BuyerInfoSection({onComplete}: {onComplete?: () => void}
 	return (
 		<View style={styles.container}>
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>구매자 성</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='Last name'
 				placeholderTextColor={colors.grey400}
 				value={buyer_last_name}
 				onChangeText={e => {
 					dispatch(setBuyerLastName(e));
 				}}
-				style={styles.input}
 			/>
 
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24, marginTop: 8}}>구매자 이름</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='First name'
 				placeholderTextColor={colors.grey400}
 				value={buyer_first_name}
 				onChangeText={e => {
 					dispatch(setBuyerFirstName(e));
 				}}
-				style={styles.input}
 			/>
 
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24, marginTop: 8}}>이메일</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='email@example.com'
 				placeholderTextColor={colors.grey400}
 				value={buyer_Email}
 				onChangeText={e => {
 					dispatch(setBuyerEmail(e));
 				}}
-				style={styles.input}
 				keyboardType='email-address'
 				autoCapitalize='none'
 			/>
@@ -76,14 +74,13 @@ export default function BuyerInfoSection({onComplete}: {onComplete?: () => void}
 
 				<View style={{width: 12}} />
 
-				<TextInput
+				<ProductInfoInput
 					placeholder='01012345678'
 					placeholderTextColor={colors.grey400}
 					value={String(buyer_tel_number ?? '')}
 					onChangeText={e => {
 						dispatch(setBuyerTelNumber(e));
 					}}
-					style={[styles.input, {flex: 1}]}
 					keyboardType='phone-pad'
 				/>
 			</View>

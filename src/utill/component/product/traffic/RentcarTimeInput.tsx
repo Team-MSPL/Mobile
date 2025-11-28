@@ -3,6 +3,7 @@ import {View, TouchableOpacity, ScrollView, StyleSheet, TextInput, Text} from 'r
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setTrafficField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	trafficType: string;
 	field: 's_time' | 'e_time';
@@ -140,12 +141,11 @@ export default function RentcarTimeInput({
 						</ScrollView>
 					</View>
 				)}
-				<TextInput
+				<ProductInfoInput
 					placeholder='직접 입력 (HH:mm)'
 					placeholderTextColor={colors.grey400}
 					value={value}
 					onChangeText={t => setValue(normalize(t))}
-					style={[styles.input, {marginTop: 8}]}
 				/>
 			</View>
 		);
@@ -157,12 +157,11 @@ export default function RentcarTimeInput({
 				{label ?? (field === 's_time' ? '픽업' : '하차')}{' '}
 				{required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='HH:mm'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={t => setValue(normalize(t))}
-				style={styles.input}
 			/>
 		</View>
 	);

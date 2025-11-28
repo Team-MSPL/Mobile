@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 
 type Props = {
 	cusType: string;
@@ -33,12 +34,11 @@ export default function WeightInput({cusType, required = false, onValueChange}: 
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				체중 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) 70'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				keyboardType='default'
 				accessibilityLabel={`${cusType}-weight`}
 			/>

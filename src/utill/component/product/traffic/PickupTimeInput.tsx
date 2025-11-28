@@ -3,6 +3,7 @@ import {View, TouchableOpacity, ScrollView, StyleSheet, TextInput, Text} from 'r
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setTrafficField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 type Props = {
 	trafficType: string;
 	field: 's_time' | 'e_time';
@@ -169,12 +170,11 @@ export default function PickupTimeInput({
 				)}
 
 				{/* allow manual input fallback - keep a small input below */}
-				<TextInput
+				<ProductInfoInput
 					placeholder='직접 입력 (HH:mm)'
 					placeholderTextColor={colors.grey400}
 					value={value}
 					onChangeText={t => setValue(normalizeTime(t))}
-					style={[styles.input, {marginTop: 8}]}
 				/>
 			</View>
 		);
@@ -188,12 +188,11 @@ export default function PickupTimeInput({
 				{required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
 
-			<TextInput
+			<ProductInfoInput
 				placeholder='HH:mm'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={t => setValue(normalizeTime(t))}
-				style={styles.input}
 			/>
 		</View>
 	);

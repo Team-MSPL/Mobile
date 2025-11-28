@@ -3,6 +3,7 @@ import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../../../redux';
 import {setCustomField} from '../../../../redux/product/bookingSlice';
 import {colors} from '../../../colors';
+import {ProductInfoInput} from '../../../layout/layout';
 
 type Props = {
 	cusType: string; // "send"
@@ -34,12 +35,11 @@ export default function BookingOrderNoInput({cusType, initialValue = '', require
 			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
 				예약 번호 {required ? <Text style={{color: colors.red400}}>*</Text> : null}
 			</Text>
-			<TextInput
+			<ProductInfoInput
 				placeholder='예) ORD-20231001-1234'
 				placeholderTextColor={colors.grey400}
 				value={value}
 				onChangeText={setValue}
-				style={styles.input}
 				accessibilityLabel={`${cusType}-booking-order-no`}
 			/>
 		</View>
