@@ -8,7 +8,16 @@ import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
-import {SvgAirplain, SvgCalendar, SvgCommunity, SVGProduct, SvgProfile} from '../utill/svg/svg';
+import {
+	SvgAirplain,
+	SvgCalendar,
+	SvgCommunity,
+	SVGNoteList,
+	SVGNoteListIcon,
+	SVGProduct,
+	SvgProfile,
+	SVGReserveList,
+} from '../utill/svg/svg';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -25,6 +34,7 @@ import ProductsStack from './products-stack';
 import PlannerStack from './planner-stack';
 import PaymentStack from './payment-stack';
 import HomeProductCountry from '../screens/home/select-product-country';
+import ReserveList from '../screens/product/reserve-list';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -177,6 +187,33 @@ function TabBar() {
 					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => (
 						<SVGProduct width={widthPercentage(18)} height={widthPercentage(18)} color={'black'} />
+					),
+				}}
+			/>
+
+			<Tab.Screen
+				name='ReserveList'
+				component={ReserveList}
+				options={{
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', marginLeft: heightPercentage(24)}}>
+							<Image
+								resizeMode='contain'
+								source={require('../../assets/images/danim_logo_row.png')}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '예약 목록',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
+					headerStyle: {backgroundColor: colors.main},
+					tabBarLabelPosition: 'below-icon',
+					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
+					tabBarIcon: ({color}) => (
+						<SVGReserveList width={widthPercentage(18)} height={widthPercentage(18)} color={'black'} />
 					),
 				}}
 			/>

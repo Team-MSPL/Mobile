@@ -688,8 +688,10 @@ export default function Main({navigation}: any) {
 								))}
 								<HotMoreButton
 									onPress={async () => {
-										await logEvent(`main_product_more_click`, {});
-										navigation.navigate('HomeProductCountry');
+										if (socialloginProvider != 'anonymous') {
+											await logEvent(`main_product_more_click`, {});
+											navigation.navigate('HomeProductCountry');
+										}
 									}}>
 									<PretendardSemiBoldText
 										size={20}

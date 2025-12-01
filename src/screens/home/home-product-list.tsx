@@ -7,6 +7,7 @@ import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {getKkdaySearch, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
 import StepText from '../../utill/component/enroll-info/step-text';
+import NeedLogin from '../../utill/component/login/need-login';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGrayScrollView,
@@ -22,6 +23,7 @@ import {MarginContainer} from '../timetable/preset-detail';
 
 export default function HomeProductList({navigation}: any) {
 	const {country, homeProductListMemo} = useAppSelector(state => state.travelSlice);
+	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const {userName} = useAppSelector(state => state.userSlice);
 	const handelDetail = item => {
 		logEvent(`home_productListSelect`, {title: item?.prod_name});
@@ -109,6 +111,9 @@ export default function HomeProductList({navigation}: any) {
 		handleGetProduct();
 	}, []);
 	const viewCategoryList = ['추천순', '높은 가격순', '낮은 가격순', '높은 평점순', '낮은 평점순'];
+	if (socialloginProvider == 'anonymous') {
+		return <NeedLogin navigation={navigation} />;
+	}
 	return (
 		<>
 			<BackgroundGrayScrollView>

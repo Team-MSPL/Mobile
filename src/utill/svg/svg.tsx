@@ -94,6 +94,7 @@ import Money from '../../../public/money.svg';
 
 import People from '../../../public/people.svg';
 import Product from '../../../public/product.svg';
+import ReserveList from '../../../public/reserve-list.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -357,5 +358,8 @@ export const SVGPeople = styled(People)<{color?: string}>`
 	color: color;
 `;
 export const SVGProduct = styled(Product)<{color?: string}>`
+	color: ${props => props.color};
+`;
+export const SVGReserveList = styled(ReserveList)<{color?: string}>`
 	color: ${props => props.color};
 `;

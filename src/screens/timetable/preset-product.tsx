@@ -215,20 +215,22 @@ export default function PresetProduct({navigation}: any) {
 	const ListHeader = () => {
 		return (
 			<>
-				<StepText
-					marginTop={heightPercentage(10)}
-					marginBottom={heightPercentage(10)}
-					mainText={
-						(route.params?.trigger ? `` : `잠깐!\n`) + `선택하신 코스에 꼭 맞는 상품을 모아봤어요`
-					}></StepText>
-				<LowPriceBox>
+				<PretendardSemiBoldText size={23} lineHeight={27} color={colors.Black} deco={'margin-bottom:5px;'}>
+					{route.params?.trigger == 'home' ? `` : `잠깐!\n`}선택하신 코스에{' '}
+					<PretendardSemiBoldText size={23} lineHeight={27} color={colors.PointYellow}>
+						꼭 맞는 상품
+					</PretendardSemiBoldText>
+					을{`\n`}모아봤어요
+				</PretendardSemiBoldText>
+
+				{/* <LowPriceBox>
 					<HStack gap={10}>
 						<SVGStarSmile />
 						<PretendardSemiBoldText size={16} lineHeight={21} color={colors.PointGreen1}>
 							최저가로 즐기는 특별한 여행!
 						</PretendardSemiBoldText>
 					</HStack>
-				</LowPriceBox>
+				</LowPriceBox> */}
 				<HStack justifyContent='space-between' deco='margin-bottom:10px;padding:5px;'>
 					<PretendardSemiBoldText size={16} lineHeight={21} color={colors.Gray5}></PretendardSemiBoldText>
 					<HStack gap={10}>
