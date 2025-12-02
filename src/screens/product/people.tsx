@@ -488,7 +488,10 @@ function ProductPeople({navigation}: any) {
 			</View>
 		);
 	}
-
+	const labellist = {
+		명: {title: '인원 수', count: '명'},
+		장: {title: '갯수', count: '장'},
+	};
 	return (
 		<ScrollView style={{flex: 1, backgroundColor: colors.backgroundWhite}}>
 			<View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -514,7 +517,7 @@ function ProductPeople({navigation}: any) {
 						categories.map((c: any) => (
 							<Counter
 								key={String(c.id)}
-								label={c.label ?? '티켓'}
+								label={labellist[c?.label]?.title ?? '티켓'}
 								ageLabel={c.ageLabel ?? ''}
 								subLabel={c.subLabel ?? []}
 								price={c.unit}
@@ -534,11 +537,14 @@ function ProductPeople({navigation}: any) {
 						{categories.map((c: any) => (
 							<VStack>
 								<PretendardSemiBoldText
+									onPress={() => {
+										console.log(c);
+									}}
 									size={16}
 									color={colors.grey800}
 									lineHeight={21.6}
 									deco={'margin-bottom:4px;'}>
-									{c.label ?? '티켓'}
+									{labellist[c?.label]?.title ?? '티켓'}
 								</PretendardSemiBoldText>
 								<View
 									key={String(c.id)}
@@ -548,7 +554,8 @@ function ProductPeople({navigation}: any) {
 										color={colors.grey600}
 										lineHeight={21.6}
 										deco={'margin-bottom:4px;'}>
-										{formatPrice(Number(c.unit || 0))}원 X {c.qty || 0}명
+										{formatPrice(Number(c.unit || 0))}원 X {c.qty || 0}
+										{labellist[c?.label]?.count}
 									</PretendardSemiBoldText>
 									<PretendardSemiBoldText size={18} color={colors.grey800} lineHeight={21.6}>
 										{formatPrice(Number((c.unit || 0) * (c.qty || 0)))}원

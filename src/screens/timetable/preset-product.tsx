@@ -1,5 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {ActivityIndicator} from 'react-native';
 import {Modal, TouchableOpacity, FlatList, TextInput, Keyboard} from 'react-native';
 import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -56,6 +57,7 @@ export default function PresetProduct({navigation}: any) {
 	const handleProduct = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
+			console.log('콘투라ㅣ', country);
 			const data = {
 				pathList: [],
 				selectList: [...tendency, season],
@@ -284,6 +286,7 @@ export default function PresetProduct({navigation}: any) {
 						setGoToTopBtnVisible(e?.nativeEvent.contentOffset.y > 100);
 					}}
 					ListHeaderComponent={<ListHeader />}
+					ListFooterComponent={<ActivityIndicator size={'large'} />}
 					data={products}
 					renderItem={renderItem}
 					keyExtractor={(item, index) => item._id ?? String(index)}
