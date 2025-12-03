@@ -94,7 +94,7 @@ import Money from '../../../public/money.svg';
 
 import People from '../../../public/people.svg';
 import Product from '../../../public/product.svg';
-import ReserveList from '../../../public/reserve-list.svg';
+import ReserveList from '../../../public/productList.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
