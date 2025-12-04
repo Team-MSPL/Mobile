@@ -133,6 +133,10 @@ function CustomMapView({select, onTouchStart, onTouchEnd}) {
 			showsUserLocation={true}
 			onTouchStart={onTouchStart ?? null}
 			onTouchEnd={onTouchEnd ?? null}
+			onPoiClick={e => {
+				const poi = e.nativeEvent;
+				console.log('POI 클릭:', poi);
+			}}
 			region={{
 				latitude: (() => {
 					const v =

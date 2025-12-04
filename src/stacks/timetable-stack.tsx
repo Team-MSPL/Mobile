@@ -27,6 +27,7 @@ import RecommendSelectCountry from '../screens/enroll-info/select-country';
 import SelectCountry from '../screens/enroll-info/region-recommend/select-country';
 import SelectDeparture from '../screens/enroll-info/select-departure';
 import AccommodationDay from '../screens/timetable/accommodation-day';
+import SelectPopularity from '../screens/enroll-info/select-popularity';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -222,6 +223,14 @@ export default function TimetableStack() {
 					title: '여행 코스 추천',
 				}}
 			/>
+			<Stack.Screen
+				name='SelectPopularity'
+				component={SelectPopularity}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+
 			<Stack.Screen
 				name='PresetDetail'
 				component={PresetDetail}

@@ -40,6 +40,7 @@ const initialState: LiteState = {
 	essentialPlaces: [], //필수여행지 리스트
 	distance: 5, //여행반경
 	transit: 0, //교통수단 0= 자차 1=대중교통
+	popularSensitivity: 5, //인기도
 	tendency: tendencyList.map(item => {
 		return Array(item.list.length).fill(0);
 	}), //성향
@@ -870,6 +871,7 @@ export const travelSlice = createSlice({
 			state.transit = payload?.at(-1)?.[0];
 			state.distance = payload?.at(-1)?.[1];
 			state.bandwidth = payload?.at(-1)?.[2];
+			state.popularSensitivity = payload?.at(-1)?.[3];
 		},
 		enrollTimeLimitArray: (state, {payload}) => {
 			state.timeLimitArray = payload;
@@ -1304,6 +1306,7 @@ interface LiteState {
 	transit: number;
 	tendency: number[][];
 	timeLimitArray: number[];
+	popularSensitivity: number;
 	minuteLimitArray: number[];
 	season: number[];
 	presetDatas: TimetableType[][][];

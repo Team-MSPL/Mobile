@@ -147,7 +147,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			}
 		});
 		makeMode == 'planner' && dispatch(travelSliceActions.changeTimetable(data));
-		navigation.navigate(makeMode == 'planner' ? 'Planner' : 'SelectDistance');
+		navigation.navigate(makeMode == 'planner' ? 'Planner' : 'SelectPopularity');
 	};
 	return (
 		<BackgroundGray>
@@ -178,7 +178,7 @@ export default function RecommendSelectTour({navigation}: any) {
 			</ButtonsContainer>
 			<RouteButton
 				navigation={navigation}
-				nextTitle={makeMode == 'planner' ? 'Planner' : 'SelectDistance'}
+				nextTitle={makeMode == 'planner' ? 'Planner' : 'SelectPopularity'}
 				goNext={goNext}
 				isDisabled={tendency[0][tendency[0].length - 1] == 1 && tendency[3][5] == 1}></RouteButton>
 		</BackgroundGray>

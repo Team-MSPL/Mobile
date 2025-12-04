@@ -66,6 +66,7 @@ import MapView, {Circle} from 'react-native-maps';
 import Slider from '@react-native-community/slider';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {PopularityImageBox, popularityImagelist} from './select-popularity';
 
 export default function FinalCheck({navigation}: any) {
 	const {handleButtonClick, tendencyList, countryList} = useTendencyHandler();
@@ -87,6 +88,7 @@ export default function FinalCheck({navigation}: any) {
 		travelName,
 		country,
 		cityDistance,
+		popularSensitivity,
 	} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const [loading, setLoading] = useState(false);
@@ -167,7 +169,7 @@ export default function FinalCheck({navigation}: any) {
 			if (tendencyModify.type == 'tendency') {
 				tendencyModify.index == 0
 					? handleTendencyModify(0, 'binary')
-					: tendencyModify.index == 4
+					: tendencyModify.index == 5
 					? handleClose()
 					: handleTendencyModify(tendencyModify.index + 1, 'tendency');
 			} else {
@@ -240,7 +242,7 @@ export default function FinalCheck({navigation}: any) {
 					});
 				}
 				console.log([...tendency, [transit, distance, bandwidth]]);
-				dispatch(handleTendency([...tendency, [transit, distance, bandwidth]]));
+				dispatch(handleTendency([...tendency, [transit, distance, bandwidth, popularSensitivity]]));
 				console.log(a);
 				const result = await dispatch(
 					getTravelAi({
@@ -255,6 +257,7 @@ export default function FinalCheck({navigation}: any) {
 						bandwidth: bandwidth,
 						freeTicket: freeTicket,
 						version: 3,
+						popularSensitivity: popularSensitivity,
 						password: '(주)나그네들_g5hb87r8765rt68i7ur78',
 					}),
 				).unwrap();
@@ -601,6 +604,19 @@ export default function FinalCheck({navigation}: any) {
 
 							<HStack marginHorizon={widthPercentage(10)} gap={10}>
 								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
+									여행지 인기도
+								</PretendardSemiBoldText>
+								<TagContainer
+									backgroundColor={colors.backgroundGray}
+									padding={widthPercentage(3)}
+									height={heightPercentage(27)}>
+									<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray5}>
+										{popularSensitivity}
+									</PretendardSemiBoldText>
+								</TagContainer>
+							</HStack>
+							<HStack marginHorizon={widthPercentage(10)} gap={10}>
+								<PretendardSemiBoldText size={16} lineHeight={20.32} color={colors.Gray4}>
 									여행지 반경
 								</PretendardSemiBoldText>
 								<TagContainer
@@ -908,7 +924,7 @@ export default function FinalCheck({navigation}: any) {
 					}}>
 					{tendencyModify.type == 'tendency' ? (
 						<InModal>
-							{tendencyModify.index != 4 ? (
+							{tendencyModify.index < 4 ? (
 								<>
 									<CancelBox onPress={() => handleClose()}>
 										<SvgCancel
@@ -941,6 +957,57 @@ export default function FinalCheck({navigation}: any) {
 												}}></TendencyButton>
 										))}
 									</ButtonsContainer>
+								</>
+							) : tendencyModify.index == 4 ? (
+								<>
+									<CancelBox onPress={handleClose}>
+										<SvgCancel
+											style={{
+												position: 'absolute',
+												left: widthPercentage(301),
+												top: widthPercentage(13),
+											}}
+											color={colors.Gray5}
+											width={widthPercentage(18)}
+											height={widthPercentage(18)}
+										/>
+									</CancelBox>
+									<StepText
+										mainText={'여행지의 인기도를 선택해주세요'}
+										subText={`사람들이 자주 찾는 명소,${`\n`}얼마나 포함할까요?`}></StepText>
+
+									<PopularityImageBox
+										source={
+											popularityImagelist[Math.round(popularSensitivity / 2) - 1]
+										}></PopularityImageBox>
+									<DistanceCenter>
+										<DistanceSpace>
+											<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+												가장 덜 알려진
+											</PretendardSemiBoldText>
+											<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray3}>
+												가장 유명한
+											</PretendardSemiBoldText>
+										</DistanceSpace>
+										<Slider
+											style={{width: '100%', height: 40}}
+											minimumValue={1}
+											maximumValue={10}
+											minimumTrackTintColor={colors.Primary}
+											maximumTrackTintColor={colors.Gray2}
+											thumbTintColor={colors.Primary}
+											value={popularSensitivity}
+											step={1}
+											onValueChange={item => {
+												dispatch(
+													travelSliceActions.updateFiled({
+														field: 'popularSensitivity',
+														value: item,
+													}),
+												);
+											}}
+										/>
+									</DistanceCenter>
 								</>
 							) : (
 								<>
@@ -1031,7 +1098,7 @@ export default function FinalCheck({navigation}: any) {
 								<RouteButton
 									navigation={navigation}
 									nextTitle='RecommendSelectMove'
-									nextText={tendencyModify.index == 4 ? '완료' : undefined}
+									nextText={tendencyModify.index == 5 ? '완료' : undefined}
 									LeftBtnFunction={handleModifyModalBackFunction}
 									goNext={handleModifyModalFunction}></RouteButton>
 							)}
