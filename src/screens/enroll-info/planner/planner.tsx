@@ -19,7 +19,7 @@ import {SvgCheck, SvgRight, SVGRightAdd} from '../../../utill/svg/svg';
 import {ModalBackground, ModalBottomSheet} from './regist-transit';
 import TimePickerModal from '../../../utill/component/planner/date-picker';
 import RouteButton from '../../../utill/component/route-button';
-import {Modal} from 'react-native';
+import {Modal, Pressable} from 'react-native';
 import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {View} from 'react-native';
 
@@ -132,6 +132,7 @@ export default function Planner({navigation}: any) {
 	const handleClose = () => {
 		setPopUpIsActive(false);
 	};
+	const stepList = ['교통', '숙소', ...Array(nDay + 1).fill('1')];
 	return (
 		<View style={{flex: 1, zIndex: 0}}>
 			<StepPopUp
@@ -139,83 +140,38 @@ export default function Planner({navigation}: any) {
 				onPress={() => {
 					setPopUpIsActive(!popUpIsActive);
 				}}>
-				{popUpIsActive ? (
-					<>
-						<FlexWrapScrollView horizontal>
-							<HorizontalBar
-								nDay={nDay}
-								a={
-									nDay == 0
-										? widthPercentage(46)
-										: nDay == 1
-										? widthPercentage(31)
-										: widthPercentage(22)
-								}
-							/>
-							{['항공', '숙소', ...Array(nDay + 1).fill('1')].map(
-								(item, idx) =>
-									item.length != 0 && (
-										<VStack
-											alignItems='center;'
-											width={widthPercentage(60)}
-											deco={`margin:${widthPercentage(25)}px ${
-												nDay == 0
-													? widthPercentage(31)
-													: nDay == 1
-													? widthPercentage(16)
-													: widthPercentage(7)
-											}px`}>
-											<Circle
-												color={colorReturn(idx, step)}
-												borderColor={radiusColorReturn(idx, step)}
-												onPress={() => {
-													setStep(idx);
-													// changeTouch(idx);
-												}}>
-												<SvgCheck color={colors.backgroundWhite}></SvgCheck>
-											</Circle>
-											<PretendardSemiBoldText
-												size={13}
-												lineHeight={18}
-												color={colors.backgroundWhite}
-												deco={'text-align:center;'}
-												numberOfLines={1}>
-												{idx <= 1 ? item : moment(day[idx - 2]).format('MM월DD일')}
-											</PretendardSemiBoldText>
-										</VStack>
-									),
-							)}
-						</FlexWrapScrollView>
-
-						<ArrowBox
-							onPress={() => {
-								setPopUpIsActive(!popUpIsActive);
-							}}>
-							<SVGRightAdd
-								width={widthPercentage(15)}
-								height={widthPercentage(15)}
-								color='white'
-								transform={270}
-							/>
-						</ArrowBox>
-					</>
-				) : (
-					<HStack justifyContent='center'>
-						<PretendardSemiBoldText
-							size={18}
-							lineHeight={22}
-							color={colors.backgroundWhite}
-							deco={'text-align:center;'}>
-							진행 상황{' '}
-						</PretendardSemiBoldText>
-						<SVGRightAdd
-							width={widthPercentage(15)}
-							height={widthPercentage(15)}
-							color='white'
-							transform={90}
-						/>
-					</HStack>
-				)}
+				<FlexWrapScrollView>
+					{stepList.map(
+						(item, idx) =>
+							item.length != 0 && (
+								<StepTouchable
+									disabled={!popUpIsActive}
+									onPress={() => {
+										setStep(idx);
+									}}>
+									<PretendardSemiBoldText
+										size={18}
+										lineHeight={23}
+										color={idx == step ? colors.Black : colors.backgroundWhite}
+										deco={'margin-right:15px;'}
+										numberOfLines={1}>
+										{idx <= 1 ? item : idx - 1 + ' 일차'}
+									</PretendardSemiBoldText>
+									{idx == 0 && (
+										<Pressable
+											onPress={() => {
+												setPopUpIsActive(!popUpIsActive);
+											}}>
+											<SVGRightAdd
+												transform={popUpIsActive ? -90 : 90}
+												color={'rgba(0,0,0,0.3)'}
+											/>
+										</Pressable>
+									)}
+								</StepTouchable>
+							),
+					)}
+				</FlexWrapScrollView>
 			</StepPopUp>
 			<CustomMapView
 				select={step - balanceIndex < 0 ? '' : step - balanceIndex}
@@ -268,20 +224,18 @@ export default function Planner({navigation}: any) {
 	);
 }
 const StepPopUp = styled.TouchableOpacity<{isActive: boolean}>`
-	width: ${props => widthPercentage(props.isActive ? 369 : 119)}px;
-	height: ${props => widthPercentage(props.isActive ? 91 : 46)}px;
+	width: ${props => widthPercentage(100)}px;
+	max-height: ${props => widthPercentage(props.isActive ? 200 : 46)}px;
 	border-radius: 22px;
-	background-color: rgba(0, 0, 0, 0.7);
+	background-color: rgba(255, 255, 255, 0.5);
 	position: absolute;
-	${props =>
-		!props.isActive &&
-		`left: ${widthPercentage(248)}px;
-	top: ${widthPercentage(8)}px;`}
+	left: ${widthPercentage(268)}px;
+	top: ${widthPercentage(8)}px;
 
 	z-index: 102;
 	align-item: center;
 	justify-content: center;
-	align-self: center;
+	align-self: flex-end;
 `;
 const Circle = styled.TouchableOpacity<{color: string; borderColor: string}>`
 	width: ${widthPercentage(30)}px;
@@ -309,9 +263,12 @@ const ArrowBox = styled.Pressable`
 	left: ${widthPercentage(344)}px;
 `;
 const FlexWrapScrollView = styled.ScrollView`
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	width: ${widthPercentage(369)}px;
-	height: ${widthPercentage(91)}px;
+	max-height: ${widthPercentage(190)}px;
+`;
+const StepTouchable = styled(HStack).attrs({as: Pressable})`
+	width: ${widthPercentage(100)}px;
+	align-items: center;
+	padding: 0px 0px 0px ${widthPercentage(25)}px;
+	margin-top: 15px;
+	margin-bottom: 10px;
 `;

@@ -28,6 +28,7 @@ import {
 } from '../../../utill/layout/layout';
 import {heightPercentage, widthPercentage} from '../../../utill/layout/responsive-size';
 import {SvgCancel, SVGMinus, SVGPlus} from '../../../utill/svg/svg';
+import {metropolitanCheckList} from '../../home/main';
 import {BottomContainer} from '../search-place';
 import {RegionItems} from '../select-city';
 import {ElementContainer, SVGContainer} from '../select-multi';
@@ -264,6 +265,7 @@ export default function AiRecommned({navigation}: any) {
 			getRecommendList();
 		}
 	}, []);
+	const [modalActive, setModalActive] = useState(false);
 	const sortTitleList = ['추천순', '거리순', '성향점수순'];
 	if (recommendList.length == 0) return <></>;
 	return (
@@ -311,6 +313,7 @@ export default function AiRecommned({navigation}: any) {
 											region[0] == '전체' ? cityViewList[country][cityIndex].title : region[0],
 									};
 									setPlaceState(datas);
+									setModalActive(true);
 									dispatch(travelSliceActions.enrollPlace(datas));
 								}}>
 								<RecommendItemImg
@@ -366,18 +369,19 @@ export default function AiRecommned({navigation}: any) {
 			<Modal
 				animationType={'fade'}
 				transparent={true}
-				visible={placeState?.name != undefined}
+				visible={modalActive}
 				onRequestClose={() => {
 					// setShow(false);
 				}}>
 				<ModalBackground
 					onPress={() => {
-						setPlaceState(null);
+						// setPlaceState(null);
+						setModalActive(false);
 					}}>
 					<ModalBottomSheet flex={route.params?.title == 'accommodation' ? 0.4 : 0.4}>
 						<BottomContainer height={heightPercentage(230)} gap={20}>
 							<ElementContainer width='327' color={colors.backgroundGray} height={widthPercentage(75)}>
-								<VStack width={widthPercentage(267)}>
+								<VStack width={widthPercentage(191)}>
 									<PretendardSemiBoldText size={16} color={colors.Gray5} lineHeight={21.6}>
 										{placeState?.name}
 									</PretendardSemiBoldText>
@@ -389,9 +393,33 @@ export default function AiRecommned({navigation}: any) {
 										{placeState?.formatted_address}
 									</PretendardVariableText>
 								</VStack>
+								<MoreButton
+									onPress={() => {
+										let metropolitanStatus = metropolitanCheckList.includes(placeState?.region);
+										const data = {
+											name: placeState?.name,
+											lat: placeState?.lat,
+											lng: placeState?.lng,
+											region: placeState?.region,
+											metropolitan: metropolitanStatus,
+											mainFlag: true,
+											photo: '',
+										};
+										setModalActive(false);
+										navigation.navigate('CourseDetail', {value: data, trigger: 'airecommend'});
+									}}>
+									<PretendardVariableText
+										size={14}
+										lineHeight={18}
+										color={colors.Black}
+										numberOfLines={1}>
+										상세 정보
+									</PretendardVariableText>
+								</MoreButton>
 								<DeleteBox
 									onPress={() => {
 										setPlaceState(null);
+										setModalActive(false);
 									}}>
 									<SvgCancel width={widthPercentage(12)} height={widthPercentage(12)} color='black' />
 								</DeleteBox>
@@ -464,4 +492,12 @@ const RecommendItemImg = styled.Image`
 	width: ${widthPercentage(158)}px;
 	height: ${widthPercentage(158)}px;
 	border-radius: 8px;
+`;
+const MoreButton = styled.TouchableOpacity`
+	width: ${widthPercentage(76)}px;
+	height: ${heightPercentage(37)}px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+	background-color: ${colors.Primary};
 `;

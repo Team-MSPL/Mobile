@@ -362,7 +362,7 @@ export default function CourseDetail({navigation, route}: any) {
 								textColor={colors.Gray5}></PrimaryButton>
 						)}
 						<HStack justifyContent='space-between'>
-							<PretendardSemiBoldText size={22} lineHeight={22} color={colors.Gray5}>
+							<PretendardSemiBoldText size={22} lineHeight={26} color={colors.Gray5}>
 								{courseDetail.name}
 							</PretendardSemiBoldText>
 							{courseDetail.rating && (
@@ -573,9 +573,17 @@ export default function CourseDetail({navigation, route}: any) {
 				</DetailContainer>
 				{(route.params.value?.mainFlag ?? false) && (
 					<ButtonContainer>
-						<CustomButton
-							label={'이 지역의 여행 코스 추천 받기'}
-							onPress={goIncludeRecommend}></CustomButton>
+						{route.params?.trigger ? (
+							<CustomButton
+								label={'뒤로가기'}
+								onPress={() => {
+									navigation.goBack();
+								}}></CustomButton>
+						) : (
+							<CustomButton
+								label={'이 지역의 여행 코스 추천 받기'}
+								onPress={goIncludeRecommend}></CustomButton>
+						)}
 					</ButtonContainer>
 				)}
 			</>

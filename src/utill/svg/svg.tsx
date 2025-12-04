@@ -160,7 +160,7 @@ export const SvgShare = styled(Share)<{color?: string}>`
 	color: color;
 `;
 export const SVGRightAdd = styled(RightAdd)<{color?: string; transform?: number}>`
-	color: color;
+	color: ${props => props?.color};
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string; transform?: boolean}>`
