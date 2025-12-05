@@ -915,7 +915,11 @@ export default function FinalCheck({navigation}: any) {
 				</Modal>
 			</BackgroundGray>
 			<ButtonContainer>
-				<CustomButton label='추천일정 조회' onPress={checkToken}></CustomButton>
+				<CustomButton
+					label='맞춤형 일정 확인하기'
+					onPress={checkToken}
+					bgColor={colors.Primary}
+					textColor={colors.Black}></CustomButton>
 			</ButtonContainer>
 			<Modal animationType='fade' visible={tendencyModify.status} transparent={true}>
 				<InModalContainer
