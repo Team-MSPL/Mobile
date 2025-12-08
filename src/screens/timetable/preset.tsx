@@ -13,8 +13,17 @@ import {
 	PretendardVariableText,
 	VStack,
 	BackgroundGrayScrollView,
+	PretendardBoldText,
 } from '../../utill/layout/layout';
-import {SVGCalendarRecommend, SVGFlag, SvgHomeIcon, SVGRightAdd} from '../../utill/svg/svg';
+import {
+	SVGCalendarRecommend,
+	SVGDanimLogo,
+	SVGFlag,
+	SvgHomeIcon,
+	SvgLoginLogo,
+	SVGRightAdd,
+	SvgStart,
+} from '../../utill/svg/svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import StepText from '../../utill/component/enroll-info/step-text';
@@ -22,13 +31,14 @@ import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/lay
 import {WhiteContainer} from '../enroll-info/final-check';
 import PrimaryButton from '../../utill/component/primary-button';
 import {useViewPager} from '../../utill/hooks/useViewPager';
-import ViewPager from '../../utill/view-pager';
-import {deleteAI, saveAI} from '../../redux/travel-info/travel.slice';
+import {deleteAI, recommendProduct, saveAI} from '../../redux/travel-info/travel.slice';
 import {logEvent} from '../../../firebaseAnalytice';
 import LinearGradient from 'react-native-linear-gradient';
 import {FlatList} from 'react-native';
 import {FlatList as FlatListType} from 'react-native';
 import {Platform} from 'react-native';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+import {ModalBackground, ModalBottomSheet} from '../enroll-info/planner/regist-transit';
 export default function Preset({navigation}: any) {
 	const {
 		enoughPlace,
@@ -44,12 +54,61 @@ export default function Preset({navigation}: any) {
 		aiFlag,
 		aiID,
 		regionInfo,
+		season,
+		country,
 	} = useAppSelector(state => state.travelSlice);
 	const {userName, socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const goDetail = (e: number) => {
 		navigation.navigate('PresetDetail', {index: e});
 	};
+
+	const [products, setProducts] = useState([]);
+	const [productsModalView, setProductsModalView] = useState(false);
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
+	const handleProduct = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			const data = {
+				pathList: [],
+				selectList: [...tendency, season],
+				country:
+					region?.some(r => r?.includes('홍콩')) || region?.some(r => r?.includes('마카오'))
+						? '홍콩과 마카오'
+						: region[0]?.includes('해외')
+						? countryList?.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
+						: countryList[country].ko, //TODO 홍콩 마카오 처리
+				cityList: region,
+				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
+				keyword: '', // prod_name 검색 - 목록 모드 전용
+				page: 1, // 페이지 번호 - 목록 모드 전용
+				limit: 20, // 페이지당 개수 - 목록 모드 전용
+				sortOption: 'order_count', // order_count, b2b_price, avg_rating_star
+				sortOrder: 'desc', // asc, desc
+			};
+			const a = await dispatch(recommendProduct(data)).unwrap();
+			setProductsModalView(true);
+			setProducts(a?.products);
+			// handleArray(!!a?.page ? a?.products : a);
+			// console.log(a[0]);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useEffect(() => {
+		handleProduct();
+	}, []);
+
 	const checkDelete = () => {
 		dispatch(
 			modalSliceActions.setOpenModal({
@@ -162,6 +221,11 @@ export default function Preset({navigation}: any) {
 		handleGoogleAnalytics();
 	}, []);
 	const {getMainViewPager, deleteMainViewPager, viewPagerState} = useViewPager({title: 'presetViewPager'});
+	const handelDetail = async item => {
+		setProductsModalView(false);
+		await logEvent(`presetBeforeProduct`, {title: item?.prod_name});
+		navigation.navigate('ProductDetail', {item: item});
+	};
 	useEffect(() => {
 		getMainViewPager();
 	}, []);
@@ -488,17 +552,128 @@ export default function Preset({navigation}: any) {
 				}}
 				renderItem={renderItem}></FlatList>
 
-			{/* <Modal
+			<Modal
 				animationType={'fade'}
 				transparent={true}
-				visible={viewPagerState}
-				onRequestClose={deleteMainViewPager}>
-				<ViewPager sliceNumber={2} handleFunction={deleteMainViewPager} />
-			</Modal> */}
+				visible={productsModalView}
+				onRequestClose={() => {
+					// setShow(false);
+				}}>
+				<ModalBackground
+					onPress={() => {
+						setProductsModalView(false);
+						// setPlaceState(null);
+						// clearInput();
+					}}>
+					<ModalBottomSheets flex={0.6}>
+						<PretendardBoldText size={20} lineHeight={24} color={colors.Black} deco={'margin-bottom:10px;'}>
+							지역
+							<PretendardBoldText size={20} lineHeight={24} color={colors.PointYellow}>
+								여행 상품
+							</PretendardBoldText>
+							모아보기
+						</PretendardBoldText>
+						<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+							{products?.map((item, idx) => (
+								<ProductBox
+									key={idx}
+									onPress={() => {
+										handelDetail(item);
+									}}>
+									{item?.prod_img_url != '' ? (
+										<ProductImg source={{uri: item?.prod_img_url}}></ProductImg>
+									) : (
+										<LogoCOntainer>
+											<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
+										</LogoCOntainer>
+									)}
+									<ProductinfoBox>
+										<HStack justifyContent='space-between'>
+											{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
+												<HStack gap={3}>
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={17}
+														color={colors.Gray4}>
+														유사도
+													</PretendardSemiBoldText>
+													<PretendardSemiBoldText
+														size={18}
+														lineHeight={22}
+														color={colors.PointYellow}>
+														{Math.floor(item?.finalScore * 100)}%
+													</PretendardSemiBoldText>
+												</HStack>
+											) : (
+												<HStack gap={3}>
+													<SVGDanimLogo width={15} />
+													<PretendardSemiBoldText
+														size={14}
+														lineHeight={17}
+														color={colors.Gray4}>
+														다님
+													</PretendardSemiBoldText>
+												</HStack>
+											)}
+
+											<HStack>
+												<SvgStart width={11} color={'#FFDE4C'} />
+												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+													{item?.avg_rating_star}
+												</PretendardSemiBoldText>
+											</HStack>
+										</HStack>
+										<PretendardSemiBoldText
+											size={24}
+											lineHeight={29}
+											numberOfLines={2}
+											color={colors.Black}
+											deco={'margin-bottom:10px;'}>
+											{item?.prod_name}
+										</PretendardSemiBoldText>
+										{item?.b2c_price - item?.b2b_price > 0 && (
+											<>
+												<PretendardSemiBoldText
+													size={16}
+													lineHeight={20}
+													color={colors.PointGreen1}
+													deco={'text-align:right'}>
+													{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
+												</PretendardSemiBoldText>
+												<PretendardSemiBoldText
+													size={20}
+													lineHeight={24}
+													color={colors.Gray2}
+													deco={'text-align:right;text-decoration:line-through;'}>
+													{item?.b2c_price.toLocaleString('ko-KR')}원~
+												</PretendardSemiBoldText>
+											</>
+										)}
+										<HStack deco='align-self:flex-end' gap={4}>
+											<PretendardSemiBoldText
+												size={18}
+												lineHeight={22}
+												color={colors.PointYellow}>
+												최저가
+											</PretendardSemiBoldText>
+											<PretendardSemiBoldText
+												size={24}
+												lineHeight={29}
+												numberOfLines={2}
+												color={colors.Black}>
+												{item?.b2b_price.toLocaleString('ko-KR')}원~
+											</PretendardSemiBoldText>
+										</HStack>
+									</ProductinfoBox>
+								</ProductBox>
+							))}
+						</RecommendAllContainer>
+					</ModalBottomSheets>
+				</ModalBackground>
+			</Modal>
 		</BackgroundGray>
 	);
 }
-const RegionTextContainer = styled(HStack).attrs({as: Pressable})``;
 export const DashLineContainer = styled.View<{justifyContent?: string; deco?: string}>`
 	width: ${widthPercentage(20)}px;
 	min-height: ${heightPercentage(46)}px;
@@ -537,25 +712,6 @@ export const DashLine = styled.View<{status: string; dash?: boolean; color?: str
 	${props => (props.status == 'start' ? 'bottom:0' : props.status == 'end' ? 'top:0' : '')};
 	${props => props.deco}
 `;
-const IndexContainer = styled.View`
-	width: ${widthPercentage(24)}px;
-	height: ${widthPercentage(24)}px;
-	border-radius: 6px;
-	background-color: ${colors.Primary};
-	align-items: center;
-	justify-content: center;
-	margin-right: ${widthPercentage(10)}px;
-`;
-const SvgContainer = styled.View`
-	z-index: 0;
-	position: absolute;
-	width: ${widthPercentage(329.19)}px;
-	height: ${heightPercentage(204.14)}px;
-	align-items: center;
-	justify-content: center;
-	left: ${widthPercentage(122)}px;
-	top: ${heightPercentage(51)}px;
-`;
 const BackgroundImage = styled.Image`
 	position: absolute;
 	width: ${widthPercentage(327)}px;
@@ -577,4 +733,40 @@ const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundWhite)};
 	border-radius: 99px;
 	margin-right: ${widthPercentage(12)}px;
+`;
+const RecommendAllContainer = styled.ScrollView``;
+const ProductBox = styled.TouchableOpacity`
+	width: ${widthPercentage(257)}px;
+	height: ${heightPercentage(327)}px;
+	border-radius: 8px;
+	margin-right: 25px;
+	border-color: ${colors.Gray1};
+	border-width: 1px;
+`;
+const ProductImg = styled.Image`
+	width: ${widthPercentage(257)}px;
+	height: ${heightPercentage(125)}px;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+`;
+const ProductinfoBox = styled.View`
+	width: 100%;
+	padding: ${widthPercentage(10)}px;
+`;
+const LogoCOntainer = styled.View`
+	width: 50px;
+	height: 50px;
+	align-items: center;
+	border-radius: 10px;
+	justify-content: center;
+	background-color: ${colors.regionNormal};
+	margin: 0px 10px 0px 0px;
+`;
+const ModalBottomSheets = styled.Pressable<{flex?: number}>`
+	flex: ${props => props.flex ?? '0.6'};
+	background-color: ${colors.backgroundWhite};
+	border-top-right-radius: 30px;
+	border-top-left-radius: 30px;
+	justify-content: center;
+	padding: ${widthPercentage(51)}px ${widthPercentage(21)}px;
 `;

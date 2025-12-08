@@ -57,9 +57,9 @@ export default function PresetProduct({navigation}: any) {
 	const handleProduct = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			console.log('콘투라ㅣ', country);
+			console.log('콘투라ㅣ', region);
 			const data = {
-				pathList: [],
+				pathList: timetable,
 				selectList: [...tendency, season],
 				country:
 					region?.some(r => r?.includes('홍콩')) || region?.some(r => r?.includes('마카오'))

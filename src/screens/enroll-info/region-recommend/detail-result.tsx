@@ -194,7 +194,6 @@ export default function DetailResult({navigation, route}: any) {
 				copy3[10] = 1;
 			}
 			copy[3] = copy3;
-			console.log(copy);
 			const data = {
 				pathList: [[route.params.item.topPopularPlaceList?.map(item => ({name: item?.name}))]],
 				selectList: copy,
