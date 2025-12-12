@@ -150,6 +150,7 @@ export default function PresetProduct({navigation}: any) {
 		setCountryInfo({...temporaryCountryInfo});
 		setCountryIsActive(false);
 		handleProduct(temporaryCountryInfo);
+		logEvent(`countryChange`, {before: countryInfo.region.flat(), after: temporaryCountryInfo.region.flat()});
 	};
 	const viewCategoryList = ['추천순', '높은 가격순', '낮은 가격순', '높은 평점순', '낮은 평점순'];
 	const RenderItem = React.memo(value => {
@@ -160,65 +161,48 @@ export default function PresetProduct({navigation}: any) {
 					handelDetail(item);
 				}}>
 				<ProductImage source={{uri: item?.prod_img_url}}></ProductImage>
-				<VStack deco='padding:10px 20px;'>
-					<HStack justifyContent='space-between'>
-						{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
-							<HStack gap={3}>
-								<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-									유사도
-								</PretendardSemiBoldText>
-								<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
-									{Math.floor(item?.finalScore * 100)}%
-								</PretendardSemiBoldText>
-							</HStack>
-						) : (
-							<HStack gap={3}>
-								<SVGDanimLogo width={15} />
-								<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-									다님
-								</PretendardSemiBoldText>
-							</HStack>
-						)}
-
-						<HStack>
-							<SvgStart width={11} color={'#FFDE4C'} />
-							<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
-								{item?.avg_rating_star}
-							</PretendardSemiBoldText>
-						</HStack>
-					</HStack>
+				<VStack width={widthPercentage(211)}>
 					<PretendardSemiBoldText
-						size={24}
-						lineHeight={29}
+						size={14}
+						lineHeight={19}
 						numberOfLines={2}
 						color={colors.Black}
-						deco={'margin-bottom:10px;'}>
+						deco={'margin-bottom:2px;'}>
 						{item?.prod_name}
 					</PretendardSemiBoldText>
-					{item?.b2c_price - item?.b2b_price > 0 && (
-						<>
-							<PretendardSemiBoldText
-								size={16}
-								lineHeight={20}
-								color={colors.PointGreen1}
-								deco={'text-align:right'}>
-								{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
-							</PretendardSemiBoldText>
-							<PretendardSemiBoldText
-								size={20}
-								lineHeight={24}
-								color={colors.Gray2}
-								deco={'text-align:right;text-decoration:line-through;'}>
-								{item?.b2c_price.toLocaleString('ko-KR')}원~
-							</PretendardSemiBoldText>
-						</>
-					)}
-					<HStack deco='align-self:flex-end; margin-top:6px;' gap={4}>
-						<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
+					<HStack deco='align-self:flex-start; ' gap={4}>
+						{/* <PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
 							최저가
+						</PretendardSemiBoldText> */}
+						<PretendardSemiBoldText size={18} lineHeight={29} numberOfLines={2} color={colors.PointGreen1}>
+							{Math.floor((item?.b2b_price / item?.b2c_price) * 100)}%
 						</PretendardSemiBoldText>
-						<PretendardSemiBoldText size={24} lineHeight={29} numberOfLines={2} color={colors.Black}>
+						<PretendardSemiBoldText size={18} lineHeight={29} numberOfLines={2} color={colors.Black}>
 							{item?.b2b_price.toLocaleString('ko-KR')}원~
+						</PretendardSemiBoldText>
+						{item?.b2c_price - item?.b2b_price > 0 && (
+							<>
+								{/* <PretendardSemiBoldText
+									size={16}
+									lineHeight={20}
+									color={colors.PointGreen1}
+									deco={'text-align:right'}>
+									{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
+								</PretendardSemiBoldText> */}
+								<PretendardSemiBoldText
+									size={14}
+									lineHeight={24}
+									color={colors.grey200}
+									deco={'text-align:right;text-decoration:line-through;'}>
+									{item?.b2c_price.toLocaleString('ko-KR')}원
+								</PretendardSemiBoldText>
+							</>
+						)}
+					</HStack>
+					<HStack>
+						<SvgStart width={11} color={'#FFDE4C'} />
+						<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+							{item?.avg_rating_star}
 						</PretendardSemiBoldText>
 					</HStack>
 				</VStack>
@@ -297,24 +281,26 @@ export default function PresetProduct({navigation}: any) {
 							setRegionText(e);
 						}}></RegionTextInput>
 				</RegionTextInputContainer>
-				<CountryButton
-					onPress={() => {
-						setTemporaryCountryInfo({...countryInfo});
-						setCountryIsActive(true);
-					}}>
-					<PretendardSemiBoldText
-						size={18}
-						lineHeight={22}
-						color={colors.grey700}
-						deco={'text-align:center;'}>
-						{countryList[countryInfo?.active].ko}{' '}
-						{cityViewList[countryInfo?.active][0]?.sub.length == countryInfo.region.length
-							? '전체'
-							: countryInfo.region[0] +
-							  (countryInfo.region.length > 1 ? ' + ' + (countryInfo.region.length - 1) : '')}
-					</PretendardSemiBoldText>
-					<SVGRightAdd transform={90} />
-				</CountryButton>
+				{route.params?.trigger == 'home' && (
+					<CountryButton
+						onPress={() => {
+							setTemporaryCountryInfo({...countryInfo});
+							setCountryIsActive(true);
+						}}>
+						<PretendardSemiBoldText
+							size={18}
+							lineHeight={22}
+							color={colors.grey700}
+							deco={'text-align:center;'}>
+							{countryList[countryInfo?.active].ko}{' '}
+							{cityViewList[countryInfo?.active][0]?.sub.length == countryInfo.region.length
+								? '전체'
+								: countryInfo.region[0] +
+								  (countryInfo.region.length > 1 ? ' + ' + (countryInfo.region.length - 1) : '')}
+						</PretendardSemiBoldText>
+						<SVGRightAdd transform={90} />
+					</CountryButton>
+				)}
 				<FlatList
 					ref={flatListRef}
 					onScroll={e => {
@@ -508,18 +494,16 @@ export default function PresetProduct({navigation}: any) {
 }
 const ProductContainer = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
-	min-height: ${heightPercentage(345)}px;
 	border-radius: 20px;
-	border-color: ${colors.Gray200};
-	border-width: 1px;
 	background-color: ${colors.backgroundWhite};
-	margin-bottom: ${heightPercentage(10)}px;
+	margin-bottom: ${heightPercentage(15)}px;
+	flex-direction: row;
+	justify-content: space-between;
 `;
 const ProductImage = styled.Image`
-	width: ${widthPercentage(327)}px;
-	height: ${heightPercentage(162)}px;
-	border-top-left-radius: 20px;
-	border-top-right-radius: 20px;
+	width: ${widthPercentage(104)}px;
+	height: ${widthPercentage(104)}px;
+	border-radius: 20px;
 `;
 const SkipButton = styled.TouchableOpacity`
 	position: absolute;
