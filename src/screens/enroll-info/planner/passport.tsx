@@ -90,6 +90,7 @@ export default function Passport({navigation}: any) {
 						</PretendardSemiBoldText>
 						<InputBox
 							placeholder={item?.placeholder}
+							style={{color: colors.Black}}
 							keyboardType={item?.keyboardType || 'default'}
 							value={form[item.key]}
 							onChangeText={text => handleChange(item.key, text)}></InputBox>

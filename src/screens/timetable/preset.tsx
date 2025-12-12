@@ -333,19 +333,34 @@ export default function Preset({navigation}: any) {
 										.map((value, idx) => {
 											return (
 												<TagContainer
-													backgroundColor={colors.backgroundGray}
+													backgroundColor={
+														Math.max(...presetTendencyList[index]?.tendencyPointList) ==
+														presetTendencyList[index]?.tendencyPointList[idx]
+															? colors.blue100
+															: colors.backgroundGray
+													}
 													height={heightPercentage(28)}
 													key={idx}>
 													<PretendardSemiBoldText
 														size={14}
 														lineHeight={17}
-														color={colors.Gray4}>
+														color={
+															Math.max(...presetTendencyList[index]?.tendencyPointList) ==
+															presetTendencyList[index]?.tendencyPointList[idx]
+																? colors.PointYellow
+																: colors.Gray4
+														}>
 														{value + ' '}
 													</PretendardSemiBoldText>
 													<PretendardSemiBoldText
 														size={14}
 														lineHeight={17}
-														color={colors.PointYellow}>
+														color={
+															Math.max(...presetTendencyList[index]?.tendencyPointList) ==
+															presetTendencyList[index]?.tendencyPointList[idx]
+																? colors.PointYellow
+																: colors.Gray4
+														}>
 														{presetTendencyList[index]?.tendencyPointList[idx]}점
 													</PretendardSemiBoldText>
 												</TagContainer>
