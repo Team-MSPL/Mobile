@@ -403,7 +403,7 @@ const SeoulInsideContainer = styled.View<{width: number}>`
 const Container = styled.View`
 	gap: ${heightPercentage(20)}px;
 `;
-const WrapContainer = styled.View`
+export const WrapContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	flex-direction: row;
 	flex-wrap: wrap;
@@ -417,7 +417,7 @@ export const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundWhite)};
 	border-radius: 99px;
 `;
-const CityItems = styled(RegionItems)`
+export const CityItems = styled(RegionItems)`
 	background-color: ${props => (props.select ? colors.Primary : colors.backgroundWhite)};
 	border-width: 1px;
 	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray300)};

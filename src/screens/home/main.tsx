@@ -427,9 +427,9 @@ export default function Main({navigation}: any) {
 							<PretendardSemiBoldText size={20} lineHeight={23.6} color={colors.Black}>
 								맞춤 여행 상품
 							</PretendardSemiBoldText>
-							<PretendardVariableText size={16} lineHeight={20} color={colors.Gray4}>
+							<PretendardSemiBoldText size={16} lineHeight={20} color={colors.Gray4}>
 								선택하신 일정과 관련된 여행 상품을 모아봤어요!
-							</PretendardVariableText>
+							</PretendardSemiBoldText>
 							<Carousel
 								style={{
 									marginTop: 18,

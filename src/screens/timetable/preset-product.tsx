@@ -1,6 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, ScrollView} from 'react-native';
 import {Modal, TouchableOpacity, FlatList, TextInput, Keyboard} from 'react-native';
 import {styled} from 'styled-components/native';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -8,7 +8,9 @@ import {useAppDispatch, useAppSelector} from '../../redux';
 import {LoadingSliceActions} from '../../redux/loading/loading.slice';
 import {recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 import StepText from '../../utill/component/enroll-info/step-text';
+import RouteButton from '../../utill/component/route-button';
 import {useBackHandler} from '../../utill/hooks/useBackhandler';
 import {
 	BackgroundGray,
@@ -21,6 +23,7 @@ import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-s
 import {SVGDanimLogo, SVGFilter, SvgRight, SVGRightAdd, SVGSearch, SVGStarSmile, SvgStart} from '../../utill/svg/svg';
 import {ModalBackground, ModalBottomSheet} from '../enroll-info/planner/regist-transit';
 import {RegionTextInput, RegionTextInputContainer} from '../enroll-info/region-recommend/select-distance';
+import {CityItems, WrapContainer} from '../enroll-info/select-city';
 import {MarginContainer} from './preset-detail';
 
 export default function PresetProduct({navigation}: any) {
@@ -38,7 +41,12 @@ export default function PresetProduct({navigation}: any) {
 	const [products, setProducts] = useState([]);
 	const [categoryVisible, setCategoryVisible] = useState(false);
 	const [categoryValue, setCategoryValue] = useState('추천순');
-
+	const [countryIsActive, setCountryIsActive] = useState(false);
+	const [countryInfo, setCountryInfo] = useState({
+		region: cityViewList[country][0]?.sub.map(allItem => allItem.subTitle),
+		active: country,
+	});
+	const [temporaryCountryInfo, setTemporaryCountryInfo] = useState({region: [], active: null});
 	const handleGoogleAnalyticsProduct = async () => {
 		await logEvent(`presetProductList`, {});
 	};
@@ -54,7 +62,7 @@ export default function PresetProduct({navigation}: any) {
 	const productCountRef = useRef(1);
 	const sortRef = useRef({sortOption: 'order_count', sortOrder: 'desc'});
 	const dispatch = useAppDispatch();
-	const handleProduct = async () => {
+	const handleProduct = async (e?: any) => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
 			console.log('콘투라ㅣ', region);
@@ -66,8 +74,8 @@ export default function PresetProduct({navigation}: any) {
 						? '홍콩과 마카오'
 						: region[0]?.includes('해외')
 						? countryList?.find((check, iidx) => check.en == region[0]?.split('/')[1])?.ko
-						: countryList[country].ko, //TODO 홍콩 마카오 처리
-				cityList: region,
+						: countryList[e?.active ?? country].ko, //TODO 홍콩 마카오 처리
+				cityList: e?.region ?? countryInfo?.region,
 				mode: 'list', // 추천/목록 모드, 기본값 : 'recommend'
 				keyword: '', // prod_name 검색 - 목록 모드 전용
 				page: productCountRef.current, // 페이지 번호 - 목록 모드 전용
@@ -75,6 +83,7 @@ export default function PresetProduct({navigation}: any) {
 				sortOption: sortRef.current.sortOption, // order_count, b2b_price, avg_rating_star
 				sortOrder: sortRef.current.sortOrder, // asc, desc
 			};
+			console.log(data);
 			const a = await dispatch(recommendProduct(data)).unwrap();
 			//!!payload?.page ? payload?.products :
 			handleArray(!!a?.page ? a?.products : a);
@@ -135,6 +144,12 @@ export default function PresetProduct({navigation}: any) {
 		handleProduct();
 		setCategoryValue(e);
 		setCategoryVisible(false);
+	};
+	const handleCountry = () => {
+		productCountRef.current = 1;
+		setCountryInfo({...temporaryCountryInfo});
+		setCountryIsActive(false);
+		handleProduct(temporaryCountryInfo);
 	};
 	const viewCategoryList = ['추천순', '높은 가격순', '낮은 가격순', '높은 평점순', '낮은 평점순'];
 	const RenderItem = React.memo(value => {
@@ -218,7 +233,10 @@ export default function PresetProduct({navigation}: any) {
 		return (
 			<>
 				<PretendardSemiBoldText size={23} lineHeight={27} color={colors.Black} deco={'margin-bottom:5px;'}>
-					{route.params?.trigger == 'home' ? `` : `잠깐!\n`}선택하신 코스에{' '}
+					<PretendardSemiBoldText size={16} lineHeight={27} color={colors.grey600}>
+						{route.params?.trigger == 'home' ? `` : `잠깐!\n`}
+					</PretendardSemiBoldText>
+					선택하신 코스에{' '}
 					<PretendardSemiBoldText size={23} lineHeight={27} color={colors.PointYellow}>
 						꼭 맞는 상품
 					</PretendardSemiBoldText>
@@ -279,6 +297,24 @@ export default function PresetProduct({navigation}: any) {
 							setRegionText(e);
 						}}></RegionTextInput>
 				</RegionTextInputContainer>
+				<CountryButton
+					onPress={() => {
+						setTemporaryCountryInfo({...countryInfo});
+						setCountryIsActive(true);
+					}}>
+					<PretendardSemiBoldText
+						size={18}
+						lineHeight={22}
+						color={colors.grey700}
+						deco={'text-align:center;'}>
+						{countryList[countryInfo?.active].ko}{' '}
+						{cityViewList[countryInfo?.active][0]?.sub.length == countryInfo.region.length
+							? '전체'
+							: countryInfo.region[0] +
+							  (countryInfo.region.length > 1 ? ' + ' + (countryInfo.region.length - 1) : '')}
+					</PretendardSemiBoldText>
+					<SVGRightAdd transform={90} />
+				</CountryButton>
 				<FlatList
 					ref={flatListRef}
 					onScroll={e => {
@@ -316,6 +352,111 @@ export default function PresetProduct({navigation}: any) {
 					<SvgRight transform={-90} color={colors.grey500} />
 				</AbsoluteUpButton>
 			)}
+			<Modal
+				animationType={'fade'}
+				transparent={true}
+				visible={countryIsActive}
+				onRequestClose={() => {
+					setCountryIsActive(false);
+					// setShow(false);
+				}}>
+				<ModalBackground
+					onPress={() => {
+						setCountryIsActive(false);
+						// setPlaceState(null);
+						// clearInput();
+					}}>
+					<ModalBottomSheet flex={0.7}>
+						<ScrollView>
+							{countryList.map((item, index) => (
+								<VStack>
+									<CountrySelectButton
+										onPress={() => {
+											setTemporaryCountryInfo({
+												region: [],
+												active: temporaryCountryInfo.active == index ? null : index,
+											});
+										}}>
+										<PretendardSemiBoldText size={20} lineHeight={24} color={colors.grey800}>
+											{item.ko}
+										</PretendardSemiBoldText>
+										<SVGRightAdd transform={90} />
+									</CountrySelectButton>
+									{temporaryCountryInfo.active == index && (
+										<WrapContainer>
+											<CityItems
+												select={
+													temporaryCountryInfo.region.length ==
+													cityViewList[index][0]?.sub.length
+												}
+												onPress={() => {
+													setTemporaryCountryInfo(prev => ({
+														...prev,
+														region:
+															temporaryCountryInfo.region.length ==
+															cityViewList[index][0]?.sub.length
+																? []
+																: cityViewList[index][0]?.sub.map(
+																		allItem => allItem.subTitle,
+																  ),
+													}));
+												}}>
+												<PretendardSemiBoldText
+													size={14}
+													lineHeight={18.9}
+													color={
+														temporaryCountryInfo.region.length ==
+														cityViewList[index][0]?.sub.length
+															? colors.Gray5
+															: colors.Gray400
+													}>
+													전체
+												</PretendardSemiBoldText>
+											</CityItems>
+											{cityViewList[index][0]?.sub.map((item, idx) => {
+												return (
+													<CityItems
+														key={idx}
+														select={temporaryCountryInfo.region.includes(item.subTitle)}
+														onPress={() => {
+															setTemporaryCountryInfo(prev => ({
+																...prev,
+																region: prev.region.includes(item.subTitle)
+																	? prev.region.filter(
+																			filItem => filItem != item.subTitle,
+																	  )
+																	: [...prev.region, item.subTitle],
+															}));
+														}}>
+														<PretendardSemiBoldText
+															size={14}
+															lineHeight={18.9}
+															color={
+																temporaryCountryInfo.region.includes(item.subTitle)
+																	? colors.Gray5
+																	: colors.Gray400
+															}>
+															{item.subTitle}
+														</PretendardSemiBoldText>
+													</CityItems>
+												);
+											})}
+										</WrapContainer>
+									)}
+								</VStack>
+							))}
+						</ScrollView>
+						<RouteButton
+							navigation={navigation}
+							nextText='선택 완료'
+							leftText='닫기'
+							btnFunction={handleCountry}
+							LeftBtnFunction={() => {
+								setCountryIsActive(false);
+							}}></RouteButton>
+					</ModalBottomSheet>
+				</ModalBackground>
+			</Modal>
 			<Modal
 				animationType={'fade'}
 				transparent={true}
@@ -416,4 +557,24 @@ const AbsoluteUpButton = styled.TouchableOpacity`
 	align-items: center;
 	justify-content: center;
 	border-color: ${colors.grey500};
+`;
+const CountryButton = styled.TouchableOpacity`
+	max-width: ${widthPercentage(182)}px;
+	height: ${widthPercentage(40)}px;
+	border-radius: 12px;
+	background-color: ${colors.backgroundGray};
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: 10px 0px 20px 0px;
+`;
+const CountrySelectButton = styled.TouchableOpacity`
+	width: ${widthPercentage(327)}px;
+	align-self: center;
+	justify-content: space-between;
+	height: ${heightPercentage(68)}px;
+	align-items: center;
+	flex-direction: row;
+	padding: 0px 15px 0px 15px;
 `;
