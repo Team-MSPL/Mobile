@@ -14,10 +14,10 @@ const tendencyList = [
 		list: ['힐링', '활동적인', '배움이 있는', '맛있는', '교통이 편한', '알뜰한'],
 	},
 	{
-		list: ['레저 스포츠', '문화시설', '사진 명소', '이색체험', '유적지', '박물관', '공원', '사찰', '성지'],
+		list: ['레저 스포츠', '산책', '드라이브', '이색체험', '쇼핑', '시티투어'],
 	},
 	{
-		list: ['바다', '산', '드라이브', '산책', '쇼핑', '실내여행지', '시티투어', '전통한옥'],
+		list: ['바다', '산', '실내여행지', '문화시설', '사진 명소', '유적지', '박물관', '전통', '공원', '사찰', '성지'],
 	},
 ];
 const initialState: LiteState = {
@@ -25,6 +25,8 @@ const initialState: LiteState = {
 	cityIndex: 0, //지역이름 ex)경남
 	day: [], //타임테이블 용날짜 리스트
 	nDay: 0, // 몇박인지 5박6일이면 5
+	s_date: null,
+	e_date: null,
 	Place: {
 		name: '',
 		lat: 0,
@@ -38,6 +40,7 @@ const initialState: LiteState = {
 	essentialPlaces: [], //필수여행지 리스트
 	distance: 5, //여행반경
 	transit: 0, //교통수단 0= 자차 1=대중교통
+	popularSensitivity: 5, //인기도
 	tendency: tendencyList.map(item => {
 		return Array(item.list.length).fill(0);
 	}), //성향
@@ -53,6 +56,7 @@ const initialState: LiteState = {
 	myTravelList: [],
 	travelId: '',
 	postList: [],
+	pdt: null,
 	diary: '',
 	picture: [],
 	reviewCheck: false,
@@ -84,6 +88,62 @@ const initialState: LiteState = {
 	departureAirport: {lat: 0, lng: 0, name: ''},
 	departureTrain: {lat: 0, lng: 0, name: ''},
 	departureSelected: '',
+	recommendProducts: [],
+	hotProducts: [],
+	tendencyUse: false,
+	transitInfo: {
+		outbound: {
+			departureAirport: '', //출밢녀
+			departureTime: new Date(), //출발시간
+			arrivalAirport: '', //도착편
+			arrivalTime: new Date(), //도착시간
+			airline: '', //항공사혹은 기차번호
+			reservationNumber: '', //에약번호
+
+			departurHour: 6, //출발시각
+			arrivalHour: 8, //도착시각
+			Address: {
+				lat: 0,
+				lng: 0,
+			},
+			type: '',
+		},
+		inbound: {
+			departureAirport: '',
+			departureTime: new Date(),
+			arrivalAirport: '',
+			arrivalTime: new Date(),
+			airline: '',
+			reservationNumber: '',
+
+			departurHour: 6, //출발시각
+			arrivalHour: 8, //도착시각
+			Address: {
+				lat: 0,
+				lng: 0,
+			},
+			type: '',
+		},
+	},
+	passport: [
+		{
+			korName: '이태운',
+			engFirstName: 'TAEUN',
+			engLastName: 'LEE',
+			country: 'KR',
+			passportNum: 'M43543543',
+			gender: 'M',
+			birthday: '19990128',
+			passportIssueDate: '20220201',
+			passportExpirationDate: '20260201',
+			passportCountry: 'KR',
+			passportImage: '이미지링크',
+			_id: '6870bf0b8fbbface6f30bd9b',
+		},
+	],
+	presetProducts: [],
+	homeProductListMemo: {},
+	beforeTimetable: [[]],
 };
 
 export const axiosGoogle = axios.create({
@@ -125,6 +185,18 @@ export const getMyTravelList = createAsyncThunk('/getMyTravelList', async (data,
 		throw thunkAPI.rejectWithValue(error.code);
 	}
 });
+//여행 상품 가져오기
+export const getSellingProduct = createAsyncThunk('/sellingProduct/list', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/sellingProduct/list`, {params: data});
+		console.log('a', response);
+		return response;
+	} catch (error: any) {
+		console.log('z', error);
+		throw rejectWithValue(error.code);
+	}
+});
+
 //여행 코스 하나 가져오기
 export const getOneTravelCourse = createAsyncThunk(
 	'/getOneTravelCourse',
@@ -187,6 +259,38 @@ export const reviewAndPoint = createAsyncThunk(
 		}
 	},
 );
+
+//여권 업데이트
+export const udpatePassport = createAsyncThunk(
+	'/user/passportList/update',
+	async (data: passportType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.patch(`/user/passportList`, {passportList: [data]});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+//여권 가져오기
+export const getPassport = createAsyncThunk('/user/passportList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/user/passportList`);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//예약 목록 가져오기
+export const getBookingProduct = createAsyncThunk('/bookingProduct/list', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/bookingProduct/list`);
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
 //-------------------------------------------------------------
 
 //여행 코스 추천 ai
@@ -228,6 +332,7 @@ export const getRecommendPlace = createAsyncThunk(
 	'/getRecommendPlace',
 	async (data: travelAiType, {rejectWithValue}) => {
 		try {
+			console.log('안녕', data);
 			const response = await axiosAuth.post(`/ai/recommendPlace`, data, {timeout: 60000});
 			return response.data;
 		} catch (error: any) {
@@ -255,7 +360,7 @@ export const googleKeywordApi = createAsyncThunk('/googleKeywordApi', async (dat
 			`/place/textsearch/json?location=${data.lng}%2C${data.lat}&query=${data.name}&language=ko&radius=10000&key=${GOOGLE_API_KEY}`,
 		);
 		const a = await axiosGoogle.get(
-			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary&language=ko&key=${GOOGLE_API_KEY}`,
+			`/place/details/json?place_id=${response.data.results[0].place_id}&fields=photos%2Cname%2Crating%2Cformatted_address%2Creviews%2Cformatted_phone_number%2Copening_hours%2Ceditorial_summary%2Cgeometry&language=ko&key=${GOOGLE_API_KEY}`,
 		);
 		return a.data.result;
 	} catch (error: any) {
@@ -397,11 +502,14 @@ export const getRegionInfo = createAsyncThunk('/place/regionInfo', async (data: 
 		} else {
 			regionName = data.region;
 		}
+		if (regionName.includes('제주')) {
+			regionName = '제주 전체';
+		}
+		console.log(regionName, data);
 		// regionName = '해외/Japan/간토 (Kanto) !도쿄';
 		// console.log(regionName.split(''), regionName.length);
 		// console.log('해외/Japan/간토 (Kanto) !도쿄'.split(''), '해외/Japan/간토 (Kanto) !도쿄'.length);
 		const response = await axiosAuth.get(`/place/regionInfo?region=${regionName}`, data);
-		console.log(response.data, 'qwe');
 		return response.data;
 	} catch (error: any) {
 		console.log(error, 'cc');
@@ -458,6 +566,7 @@ export const recommendPlace = createAsyncThunk(
 	'/ai/recommendPlace',
 	async (data: recommendPlaceType, {rejectWithValue}) => {
 		try {
+			console.log('바이', data);
 			const response = await axiosAuth.post(`/ai/recommendPlace`, data);
 			return response.data;
 		} catch (error: any) {
@@ -465,6 +574,254 @@ export const recommendPlace = createAsyncThunk(
 		}
 	},
 );
+
+//추천 여행 상품 목록 가져오기
+export const recommendProduct = createAsyncThunk(
+	'/sellingProduct/recommend',
+	async (data: recommnedProductType, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`sellingProduct/recommend`, data);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//kkday search
+export const getKkdaySearch = createAsyncThunk(
+	'/kkday/Search',
+	async (data: {keywords: string; country_keys: string; city_keys: string[]}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Search`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//프로덕트 가져오기
+export const getQueryProduct = createAsyncThunk(
+	'/kkday/Product/QueryProduct',
+	async (prod_no: number, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryProduct`, {prod_no: prod_no}, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//패키지 가져오기
+export const getQueryPackage = createAsyncThunk(
+	'/kkday/Product/QueryPackage',
+	async (data: {pkg_no: number; prod_no: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryPackage`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+export const handleBooking = createAsyncThunk('/kkday/Booking', async (data, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/kkday/Booking`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
+	}
+});
+//부킹 필요한거
+export const handleBookingField = createAsyncThunk(
+	'/kkday/Product/QueryBookingField',
+	async (data: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/kkday/Product/QueryBookingField`, data, {timeout: 60000});
+			return response.data;
+		} catch (error: any) {
+			console.log('aaa', error);
+			return rejectWithValue(error.code);
+		}
+	},
+);
+
+//토스 결제 승인
+export const handleTossConfirm = createAsyncThunk(
+	'/toss/payments/confirm',
+	async (data: {paymentKey: string; orderId: string; amount: number; version: string}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(`/toss/payments/confirm`, data, {timeout: 60000});
+			console.log(response);
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				console.log('서버 응답 에러:', error.response.data);
+				return rejectWithValue(error.response.data);
+			}
+			console.log('네트워크 에러:', error);
+			return rejectWithValue({error: '네트워크 오류 발생'});
+		}
+	},
+);
+
+//예약 저장
+export const handleBookingSave = createAsyncThunk('/bookingProduct/save', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/bookingProduct/save`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
+	}
+});
+
+//부킹 취소
+export const bookingCancel = createAsyncThunk('/kkday/Order/Cancel', async (order_no: string, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(
+			`/kkday/Order/Cancel`,
+			{order_no: order_no, cancel_type: 'MC004', cancel_desc: '개인사유'},
+			{timeout: 60000},
+		);
+
+		return response.data;
+	} catch (error: any) {
+		if (error.response) {
+			console.log('서버 응답 에러:', error.response.data);
+			return rejectWithValue(error.response.data);
+		}
+		console.log('네트워크 에러:', error);
+		return rejectWithValue({error: '네트워크 오류 발생'});
+	}
+});
+//토스 환불
+export const tossCancel = createAsyncThunk(
+	'/toss/payments/cancel',
+	async (data: {paymentKey: string; cancelAmount?: number}, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(
+				`/toss/payments/${data?.paymentKey}/cancel`,
+				{
+					cancelReason: '사용자 요청', // 필수
+					version: 'live',
+					...(data?.cancelAmount !== undefined &&
+						data?.cancelAmount !== null && {
+							cancelAmount: data.cancelAmount,
+						}), // 선택, 유무에 따라 전체 / 부분 취소 결정됨
+				},
+				{timeout: 60000},
+			);
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				console.log('서버 응답 에러:', error.response.data);
+				return rejectWithValue(error.response.data);
+			}
+			console.log('네트워크 에러:', error);
+			return rejectWithValue({error: '네트워크 오류 발생'});
+		}
+	},
+);
+
+//예약 목록 디테일
+export const handleOrderDtl = createAsyncThunk(
+	'/kkday/Order/QueryOrderDtl',
+	async (order_no: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.get(`/kkday/Order/QueryOrderDtl/${order_no}`);
+			return response;
+		} catch (error: any) {
+			return rejectWithValue(error.code);
+		}
+	},
+);
+
+//예약 목록 디테일 정보
+export const handleOrderDtlInfo = createAsyncThunk(
+	'/kkday/Order/QueryOrderDtlInfo',
+	async (order_no: any, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.get(`/kkday/Order/QueryOrderDtlInfo/${order_no}`);
+			return response;
+		} catch (error: any) {
+			return rejectWithValue(error.code);
+		}
+	},
+);
+
+//바우처 리스트
+export const voucherList = createAsyncThunk(
+	'/kkday/Voucher/QueryVoucherList',
+	async (order_no: string, {rejectWithValue}) => {
+		try {
+			const response = await axiosAuth.post(
+				`/kkday/Voucher/QueryVoucherList`,
+				{order_no: order_no},
+				{timeout: 60000},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+
+//바우처 다운로드
+export const voucherDownload = createAsyncThunk('/kkday/Voucher/Download', async (data: any, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.post(`/kkday/Voucher/Download`, data, {timeout: 60000});
+		return response.data;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//여행 성향 수정
+export const handleTendency = createAsyncThunk(
+	'/user/recentSelectList',
+	async (recentSelectList: number[][], {rejectWithValue}) => {
+		try {
+			console.log('성향', recentSelectList);
+			const response = await axiosAuth.patch(`/user/recentSelectList`, {recentSelectList});
+			return response.data;
+		} catch (error: any) {
+			throw rejectWithValue(error.code);
+		}
+	},
+);
+//여행 성향 가져오기
+export const getTendency = createAsyncThunk('/user/recentSelectList', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/user/recentSelectList`);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
+//여행 성향 가져오기
+export const getReserveList = createAsyncThunk('/bookingProduct/list', async (_, {rejectWithValue}) => {
+	try {
+		const response = await axiosAuth.get(`/bookingProduct/list`);
+		return response;
+	} catch (error: any) {
+		throw rejectWithValue(error.code);
+	}
+});
+
 export const travelSlice = createSlice({
 	name: 'travel',
 	initialState,
@@ -509,6 +866,13 @@ export const travelSlice = createSlice({
 		enrollTendency: (state, {payload}) => {
 			state.tendency = payload;
 		},
+		enrollRecentTendency: (state, {payload}) => {
+			state.tendency = payload?.slice(0, -1);
+			state.transit = payload?.at(-1)?.[0];
+			state.distance = payload?.at(-1)?.[1];
+			state.bandwidth = payload?.at(-1)?.[2];
+			state.popularSensitivity = payload?.at(-1)?.[3];
+		},
 		enrollTimeLimitArray: (state, {payload}) => {
 			state.timeLimitArray = payload;
 		},
@@ -533,6 +897,7 @@ export const travelSlice = createSlice({
 			state.freeTicket = false;
 			state.shareViewWithStartFlag = true;
 			state.globalFlag = payload.globalFlag;
+			state.tendencyUse = false;
 		},
 		setAutoRecommendFlag: (state, {payload}) => {
 			state.autoRecommendFlag = payload;
@@ -545,6 +910,7 @@ export const travelSlice = createSlice({
 			state.region = payload.region;
 			state.freeTicket = false;
 			state.cityDistance = payload.cityDistance;
+			state.tendencyUse = false;
 		},
 		enrollTravelName: (state, {payload}) => {
 			state.travelName = payload;
@@ -597,6 +963,12 @@ export const travelSlice = createSlice({
 			state.saveFlag = true;
 			state.tableShowFlag = true;
 		},
+		enrollRecommendProducts: (state, {payload}) => {
+			state.recommendProducts = payload;
+		},
+		enrollHotProducts: (state, {payload}) => {
+			state.hotProducts = payload;
+		},
 		changeModify: (state, {payload}) => {
 			state.modifyCheck = payload;
 		},
@@ -615,6 +987,7 @@ export const travelSlice = createSlice({
 		},
 		setRecommendRegion: (state, {payload}) => {
 			Object.assign(state, initialState);
+			state.regionInfo = payload.regionInfo;
 			state.cityIndex = payload.cityIndex;
 			state.region = payload.region;
 			state.makeMode = 'recommend';
@@ -627,6 +1000,7 @@ export const travelSlice = createSlice({
 			state.freeTicket = true;
 			state.cityDistance = payload.cityDistance;
 			state.shareViewWithStartFlag = payload.shareViewWithStartFlag;
+			state.tendencyUse = false;
 		},
 		setCountry: (state, {payload}) => {
 			state.country = payload;
@@ -658,6 +1032,7 @@ export const travelSlice = createSlice({
 			state.season = payload.season;
 			state.regionRecommendFlag = true;
 			state.country = payload.country;
+			state.tendencyUse = false;
 		},
 		setShareLoginFlag: (state, {payload}) => {
 			state.shareLoginFlag = payload;
@@ -670,6 +1045,7 @@ export const travelSlice = createSlice({
 		},
 		updateFiled: (state, {payload}) => {
 			const {field, value} = payload;
+			console.log(field, value);
 			if (state.hasOwnProperty(field)) {
 				state[field] = value;
 			}
@@ -683,13 +1059,13 @@ export const travelSlice = createSlice({
 							lat: 0,
 							lng: 0,
 							name: '',
-							category: 0,
+							category: 6,
 							takenTime: 30,
 							photo: '',
 					  }
 					: {
 							...state[payload],
-							category: 0,
+							category: 6,
 							takenTime: 30,
 							photo: '',
 					  };
@@ -709,12 +1085,17 @@ export const travelSlice = createSlice({
 			}
 			state.moveTimeList.push(list);
 		});
+
+		builder.addCase(getPassport.fulfilled, (state, {payload}) => {
+			state.passport = payload?.passportList[0];
+		});
 		builder.addCase(googleKeywordApi.fulfilled, (state, {payload}) => {
 			state.courseDetail = payload;
 		});
 		builder.addCase(getTravelAi.fulfilled, (state, {payload}) => {
-			let updateItem = [[...Array(payload.data.resultData.length - 1)].map(() => [])];
-			payload.data.resultData.forEach((timeTable, tIndex) => {
+			console.log(payload.data.resultData);
+			let updateItem = [[...Array(payload.data?.resultData.length - 1)].map(() => [])];
+			payload.data?.resultData.forEach((timeTable, tIndex) => {
 				let copy: TimetableType[][] = [...Array(timeTable.length)].map(() => []);
 				timeTable.forEach((item, idx) => {
 					let time = 6;
@@ -896,9 +1277,16 @@ export const travelSlice = createSlice({
 		builder.addCase(getRegionInfo.fulfilled, (state, {payload}) => {
 			state.regionInfo.name = payload.name;
 			state.regionInfo.photo = Array.isArray(payload.photo) ? payload.photo[0] : payload.photo;
+			state.regionInfo.lat = payload.latitude;
+			state.regionInfo.lng = payload.longitude;
 		});
 		builder.addCase(getAiList.fulfilled, (state, {payload}) => {
 			state.aiList = payload.data;
+		});
+
+		builder.addCase(recommendProduct.fulfilled, (state, {payload}) => {
+			console.log(!!payload?.page);
+			state.presetProducts = !!payload?.page ? payload?.products : payload;
 		});
 	},
 });
@@ -918,10 +1306,12 @@ interface LiteState {
 	transit: number;
 	tendency: number[][];
 	timeLimitArray: number[];
+	popularSensitivity: number;
 	minuteLimitArray: number[];
 	season: number[];
 	presetDatas: TimetableType[][][];
 	timetable: TimetableType[][];
+	beforeTimetable: TimetableType[][];
 	moveTimeList: number[][] | [];
 	courseDetail: CourseDetailType;
 	makeMode: MakeModeType;
@@ -933,6 +1323,9 @@ interface LiteState {
 	picture: string[];
 	reviewCheck: boolean;
 	tableShowFlag: boolean;
+	pdt: any;
+	s_date: any;
+	e_date: any;
 	selectStartDate: Moment;
 	selectEndDate: Moment | null;
 	travelName: string;
@@ -972,7 +1365,119 @@ interface LiteState {
 		name: string;
 	};
 	departureSelected: string;
+	recommendProducts: any;
+	hotProducts: any;
+	transitInfo: transitInfoType;
+	passport: passportType[];
+	presetProducts: [Product[]];
+	tendencyUse: boolean;
+	homeProductListMemo: any;
 }
+interface passportType {
+	korName: string;
+	engFirstName: string; // 영문 이름
+	engLastName: string; // 영문 성
+	country: string;
+	passportNum: string;
+	gender: string;
+	birthday: string;
+	passportIssueDate: string;
+	passportExpirationDate: string;
+	passportCountry: string;
+	passportImage: string;
+	_id?: string;
+}
+interface recommnedProductType {
+	pathList: [[any]];
+	country: 'strng';
+	cityList: ['strng'];
+	selectList: [[number]];
+	topK: number;
+}
+interface transitInfoType {
+	outbound: {
+		departureAirport: string; //출밢녀
+		departureTime: Date; //출발시간
+		arrivalAirport: string; //도착편
+		arrivalTime: Date; //도착시간
+		airline: string; //항공사혹은 기차번호
+		reservationNumber: string; //에약번호
+
+		departurHour: string; //출발시각
+		arrivalHour: string; //도착시각
+		Address: {
+			lat: number;
+			lng: number;
+		};
+
+		type: string;
+	};
+	inbound: {
+		departureAirport: string;
+		departureTime: Date;
+		arrivalAirport: string;
+		arrivalTime: Date;
+		airline: string;
+		reservationNumber: string;
+
+		departurHour: string; //출발시각
+		arrivalHour: string; //도착시각
+		Address: {
+			lat: number;
+			lng: number;
+		};
+		type: string;
+	};
+}
+
+interface Product {
+	_id: string;
+	prod_no: number;
+	avg_rating_star: number;
+	b2b_price: number;
+	b2c_price: number;
+	cities: string[];
+	countries: string[];
+	earliest_sale_date: string;
+	introduction: string;
+	isNationwide: boolean;
+	koreanGuide: string;
+	menuCode: string;
+	needLLM: boolean;
+	normalizedPlaces: string[];
+	order_count: number;
+	prod_currency: string;
+	prod_img_url: string;
+	prod_name: string;
+	prod_type: string;
+	productPlaces: string[];
+	rating_count: number;
+	recommend: string;
+	sellingProductCompany: string;
+	sellingProductContent: string;
+	sellingProductContentDetail: string;
+	sellingProductContentDetailHTML: string;
+	sellingProductCountry: string;
+	sellingProductCountryList: string[];
+	sellingProductHour: number;
+	sellingProductImage: string[];
+	sellingProductLink: string;
+	sellingProductLinkClickLog: any[];
+	sellingProductLinkList: string[];
+	sellingProductPeriod: number;
+	sellingProductPlaceList: string[];
+	sellingProductPrice: number;
+	sellingProductPriceDetail: Record<string, any>;
+	sellingProductRating: number;
+	sellingProductRegion: string[];
+	sellingProductReviewCount: number;
+	tendencyScores: Record<string, number>;
+	tourCode: string;
+	vectorScoreCourse: number;
+	avgPrefScore: number;
+	finalScore: number;
+}
+
 interface aiListType {
 	_id: string;
 	bestPointList: [[Object], [Object], [Object], [Object], [Object], [Object], [Object]];
@@ -988,6 +1493,8 @@ interface aiListType {
 interface regionInfoType {
 	name: string;
 	photo: string;
+	lat: number;
+	lng: number;
 }
 export interface presetTendencyListType {
 	tendencyNameList: string[];
@@ -995,7 +1502,7 @@ export interface presetTendencyListType {
 	tendencyRanking: number[];
 }
 
-type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share';
+type MakeModeType = 'recommend' | 'solo' | 'modify' | 'share' | 'planner';
 export interface PlaceType {
 	name: string | undefined;
 	lat: number | undefined;

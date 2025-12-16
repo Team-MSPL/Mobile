@@ -53,8 +53,6 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>CodePushDeploymentKey</key>
-	<string>${CODEPUSH_KEY}</string>
 	<key>GMSApiKey</key>
 	<string>70367155908-li7to5i4bq75mpog69prtpmo7t7hnq5e.apps.googleusercontent.com</string>
 	<key>KAKAO_APP_KEY</key>
@@ -71,15 +69,8 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>NSExceptionAllowsInsecureHTTPLoads</key>
-			<true/>
-			<key>NSIncludesSubDomains</key>
-			<true/>
-			<key>http://3.37.54.226</key>
-			<dict/>
-		</dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Apple Music 앱에서 음악을 재생하려고 합니다.</string>

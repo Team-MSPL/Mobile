@@ -21,6 +21,7 @@ export const usePhoto = () => {
 		saveCheck?: any;
 		setSaveCheck?: any;
 	}) => {
+		console.log('a');
 		ImageCropPicker.openPicker({
 			width: 300,
 			height: 400,
@@ -34,6 +35,7 @@ export const usePhoto = () => {
 			//includeBase64: true,
 		})
 			.then(response => {
+				console.log('cc');
 				if (response.length + photoData.length <= 5) {
 					let temporaryList = [];
 					for (let i = 0; i < response.length; i++) {
@@ -50,6 +52,7 @@ export const usePhoto = () => {
 				}
 			})
 			.catch(re => {
+				console.log('l', re);
 				re == 'Error: User did not grant library permission.' &&
 					dispatch(
 						modalSliceActions.setOpenModal({

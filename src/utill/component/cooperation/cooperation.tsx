@@ -29,7 +29,7 @@ export default function Cooperation() {
 					modalTitle: '다님 이용자만을 위한 할인쿠폰이에요!',
 					modalTopText: '쿠폰 사용하러 가기 (홈페이지 이동)',
 					modalFunction: async () => {
-						await logEvent(e?.title, {});
+						await logEvent('timetable ' + e?.title, {});
 						Linking.openURL(e.link);
 					},
 					travleMedic: true,
@@ -37,7 +37,7 @@ export default function Cooperation() {
 				}),
 			);
 		} else {
-			await logEvent(e?.title, {});
+			await logEvent('timetable ' + e?.title, {});
 			Linking.openURL(e.link);
 		}
 	};
@@ -48,7 +48,7 @@ export default function Cooperation() {
 				<Carousel
 					loop
 					style={{
-						height: heightPercentage(427),
+						height: heightPercentage(389),
 					}}
 					width={widthPercentage(337)}
 					autoPlay={true}
@@ -61,7 +61,7 @@ export default function Cooperation() {
 							onPress={() => {
 								hanldeCooperation(item);
 							}}>
-							<EventImage resizeMode='cover' source={item.photo}></EventImage>
+							<EventImage resizeMode='contain' source={item.photo}></EventImage>
 						</EventTouable>
 					)}
 				/>
@@ -97,12 +97,12 @@ const Container = styled.View`
 `;
 const EventImage = styled.Image`
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(427)}px;
+	height: ${heightPercentage(389)}px;
 `;
 const ViewContaniner = styled.View`
 	background-color: white;
 	width: ${widthPercentage(337)}px;
-	height: ${heightPercentage(487)}px;
+	height: ${heightPercentage(449)}px;
 	border-radius: 5px;
 `;
 const EventHStack = styled(HStack)`

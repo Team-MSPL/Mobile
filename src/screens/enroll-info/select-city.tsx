@@ -25,6 +25,9 @@ import {
 import {useRegionSearch} from '../../utill/hooks/useRegionSearch';
 import Carousel from 'react-native-reanimated-carousel';
 import {useTendencyHandler} from '../../utill/hooks/useTendencyHandler';
+import {ButtonContainer, MarginContainder} from './select-multi';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useHeaderHeight} from '@react-navigation/elements';
 export default function SelectCity({navigation}: any) {
 	const {region, cityIndex, cityDistance, country} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
@@ -140,146 +143,161 @@ export default function SelectCity({navigation}: any) {
 			});
 		}
 	}, [cityIndex]);
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+	const totalTopHeight = headerHeight + statusBarHeight;
+	const searchRef = useRef();
+	const [searchTop, setSearchTop] = useState(0);
+	useEffect(() => {
+		// 컴포넌트가 렌더링된 뒤 measure
+		setTimeout(() => {
+			searchRef.current?.measure((fx, fy, width, height, px, py) => {
+				setSearchTop(py + height); // py는 화면 기준 Y 위치
+			});
+		}, 0); // 또는 InteractionManager.runAfterInteractions()
+	}, []);
 	return (
-		<BackgroundGrayPressable
-			onPress={() => {
-				regionSearchRef.current?.blur();
-				setRegionSearchState(false);
-			}}>
-			<Stepper total={13} now={3}></Stepper>
-			<StepText
-				marginTop={heightPercentage(10)}
-				styleText='1.여행 계획을 알려주세요.'
-				mainText='어디로 떠나시나요?'></StepText>
-			<RegionTextInputContainer>
-				<SVGSearch />
-				<RegionTextInput
-					ref={regionSearchRef}
-					placeholder='지역을 검색해보세요'
-					value={regionText}
-					// onBlur={() => {
-					// 	setRegionSearchState(false);
-					// }}
-					onFocus={() => {
-						setRegionSearchState(true);
-					}}
-					placeholderTextColor={colors.Gray3}
-					onChangeText={e => {
-						setRegionSearchState(true);
-						handleRegionText(e);
-					}}></RegionTextInput>
-			</RegionTextInputContainer>
-			<SearchContainer top={heightPercentage(210)}>
-				<ScrollView style={{zIndex: 2}}>
-					{regionSearchState &&
-						regionMatchList.map((item, index) => {
-							return (
-								<SearchElements
-									key={index}
-									onPress={() => {
-										dispatch(
-											travelSliceActions.selectPopularity({
-												region: cityViewList[country].filter(
-													asd => asd.title == item.subTitle,
-												)[0]?.id
-													? ['전체']
-													: [item.subTitle],
-												cityIndex:
-													cityViewList[country]
-														.slice(1)
-														.filter(
-															asd =>
-																asd.sub.filter(qqq => qqq.subTitle == item.subTitle)
-																	.length >= 1,
-														)[0]?.id ??
-													cityViewList[country].filter(asd => asd.title == item.subTitle)[0]
-														?.id,
-												cityDistance: [item.id],
-											}),
-										);
-										regionSearchRef.current?.blur();
-										setRegionText(item.subTitle);
-										setRegionSearchState(false);
-									}}>
-									<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
-										{item.subTitle}
-									</PretendardSemiBoldText>
-								</SearchElements>
-							);
-						})}
-				</ScrollView>
-			</SearchContainer>
-			<ScrollView
-				style={{marginBottom: widthPercentage(70), marginTop: heightPercentage(20)}}
-				showsVerticalScrollIndicator={false}>
-				<Container>
-					<SelectAllContainer>
-						<SelectListContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-							{region?.map((item, regionIndex) => {
+		<>
+			<BackgroundGrayPressable
+				onPress={() => {
+					regionSearchRef.current?.blur();
+					setRegionSearchState(false);
+				}}>
+				<Stepper total={13} now={3}></Stepper>
+				<StepText
+					marginTop={heightPercentage(10)}
+					styleText='1.여행 계획을 알려주세요.'
+					mainText='어디로 떠나시나요?'></StepText>
+				<RegionTextInputContainer ref={searchRef}>
+					<SVGSearch width={widthPercentage(20)} height={widthPercentage(20)} color={colors.Primary} />
+					<RegionTextInput
+						ref={regionSearchRef}
+						placeholder='지역을 검색해보세요'
+						value={regionText}
+						// onBlur={() => {
+						// 	setRegionSearchState(false);
+						// }}
+						onFocus={() => {
+							setRegionSearchState(true);
+						}}
+						placeholderTextColor={colors.Gray3}
+						onChangeText={e => {
+							setRegionSearchState(e.length == 0 && regionText.length >= 1 ? false : true);
+							handleRegionText(e);
+						}}></RegionTextInput>
+				</RegionTextInputContainer>
+				<SearchContainer top={searchTop}>
+					<ScrollView style={{zIndex: 2}}>
+						{regionSearchState &&
+							regionMatchList.map((item, index) => {
 								return (
-									<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
+									<SearchElements
+										key={index}
+										onPress={() => {
+											dispatch(
+												travelSliceActions.selectPopularity({
+													region: cityViewList[country].filter(
+														asd => asd.title == item.subTitle,
+													)[0]?.id
+														? ['전체']
+														: [item.subTitle],
+													cityIndex:
+														cityViewList[country]
+															.slice(1)
+															.filter(
+																asd =>
+																	asd.sub.filter(qqq => qqq.subTitle == item.subTitle)
+																		.length >= 1,
+															)[0]?.id ??
+														cityViewList[country].filter(
+															asd => asd.title == item.subTitle,
+														)[0]?.id,
+													cityDistance: [item.id],
+												}),
+											);
+											regionSearchRef.current?.blur();
+											setRegionText(item.subTitle);
+											setRegionSearchState(false);
+										}}>
+										<PretendardSemiBoldText size={12} lineHeight={15} color={colors.Gray3}>
+											{item.subTitle}
+										</PretendardSemiBoldText>
+									</SearchElements>
+								);
+							})}
+					</ScrollView>
+				</SearchContainer>
+				<ScrollView
+					style={{marginBottom: widthPercentage(70), marginTop: heightPercentage(20)}}
+					showsVerticalScrollIndicator={false}>
+					<Container>
+						<SelectAllContainer>
+							<SelectListContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+								{region?.map((item, regionIndex) => {
+									return (
+										<RegionElementContainer key={regionIndex} onPress={() => deleteRegion(item)}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={18.9}
+												color={colors.backgroundWhite}>
+												{item == '전체'
+													? cityViewList[country][cityIndex].title + ' ' + item
+													: item}
+											</PretendardSemiBoldText>
+											<SvgCancel
+												width={widthPercentage(12)}
+												height={widthPercentage(12)}
+												color={colors.Primary}
+											/>
+										</RegionElementContainer>
+									);
+								})}
+							</SelectListContainer>
+						</SelectAllContainer>
+						<ScrollView
+							ref={cityScrollRef}
+							horizontal={true}
+							nestedScrollEnabled={true}
+							showsHorizontalScrollIndicator={false}>
+							{cityViewList[country].map((item, idx) => {
+								return (
+									<RegionItems
+										key={idx}
+										select={cityIndex == item.id}
+										onPress={() => {
+											selectCity(item.id);
+										}}>
+										<PretendardVariableText
+											size={14}
+											lineHeight={18.9}
+											color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
+											{item.title}
+										</PretendardVariableText>
+									</RegionItems>
+								);
+							})}
+						</ScrollView>
+						<WrapContainer>
+							{cityViewList[country][cityIndex]?.sub.map((item, idx) => {
+								return (
+									<CityItems
+										key={idx}
+										select={region.includes(item.subTitle)}
+										onPress={() => {
+											console.log(region);
+											cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
+										}}>
 										<PretendardSemiBoldText
 											size={14}
 											lineHeight={18.9}
-											color={colors.backgroundWhite}>
-											{item == '전체'
-												? cityViewList[country][cityIndex].title + ' ' + item
-												: item}
+											color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray400}>
+											{item.subTitle}
 										</PretendardSemiBoldText>
-										<SvgCancel
-											width={widthPercentage(12)}
-											height={widthPercentage(12)}
-											color={colors.Primary}
-										/>
-									</RegionElementContainer>
+									</CityItems>
 								);
 							})}
-						</SelectListContainer>
-					</SelectAllContainer>
-					<ScrollView
-						ref={cityScrollRef}
-						horizontal={true}
-						nestedScrollEnabled={true}
-						showsHorizontalScrollIndicator={false}>
-						{cityViewList[country].map((item, idx) => {
-							return (
-								<RegionItems
-									key={idx}
-									select={cityIndex == item.id}
-									onPress={() => {
-										selectCity(item.id);
-									}}>
-									<PretendardSemiBoldText
-										size={14}
-										lineHeight={18.9}
-										color={cityIndex == item.id ? colors.backgroundWhite : colors.Gray5}>
-										{item.title}
-									</PretendardSemiBoldText>
-								</RegionItems>
-							);
-						})}
-					</ScrollView>
-					<WrapContainer>
-						{cityViewList[country][cityIndex]?.sub.map((item, idx) => {
-							return (
-								<CityItems
-									key={idx}
-									select={region.includes(item.subTitle)}
-									onPress={() => {
-										console.log(region);
-										cityIndex == 0 ? selectPopularity(item) : selectRegion(item);
-									}}>
-									<PretendardSemiBoldText
-										size={14}
-										lineHeight={18.9}
-										color={region.includes(item.subTitle) ? colors.Gray5 : colors.Gray3}>
-										{item.subTitle}
-									</PretendardSemiBoldText>
-								</CityItems>
-							);
-						})}
-					</WrapContainer>
-					{/* <Carousel
+						</WrapContainer>
+						{/* <Carousel
 						loop={false}
 						style={{
 							marginTop: 18,
@@ -318,37 +336,50 @@ export default function SelectCity({navigation}: any) {
 							</WrapContainer>
 						)}
 					/> */}
-				</Container>
-				{country == 0 && cityIndex == 1 && (
-					<FlexContainer>
-						<SeoulContainer>
-							{cityViewList[country][1].sub.map((item, idx) => {
-								return idx != 0 ? (
-									<SeoulInsideAllContainer key={idx}>
-										<SeoulInsideContainer width={widthPercentage(125)}>
-											<PretendardVariableText size={12} lineHeight={16.2} color={colors.Gray4}>
-												{item.subTitle}
-											</PretendardVariableText>
-										</SeoulInsideContainer>
-										<SeoulInsideContainer width={widthPercentage(181)}>
-											<PretendardVariableText size={12} lineHeight={16.2} color={colors.Gray2}>
-												{item.example}
-											</PretendardVariableText>
-										</SeoulInsideContainer>
-									</SeoulInsideAllContainer>
-								) : null;
-							})}
-						</SeoulContainer>
-					</FlexContainer>
-				)}
-			</ScrollView>
-			<RouteButton navigation={navigation} nextTitle='SelectMulti' goNext={goNext}></RouteButton>
-		</BackgroundGrayPressable>
+					</Container>
+					{country == 0 && cityIndex == 1 && (
+						<FlexContainer>
+							<SeoulContainer>
+								{cityViewList[country][1].sub.map((item, idx) => {
+									return idx != 0 ? (
+										<SeoulInsideAllContainer key={idx}>
+											<SeoulInsideContainer width={widthPercentage(125)}>
+												<PretendardVariableText
+													size={12}
+													lineHeight={16.2}
+													color={colors.Gray4}>
+													{item.subTitle}
+												</PretendardVariableText>
+											</SeoulInsideContainer>
+											<SeoulInsideContainer width={widthPercentage(181)}>
+												<PretendardVariableText
+													size={12}
+													lineHeight={16.2}
+													color={colors.Gray2}>
+													{item.example}
+												</PretendardVariableText>
+											</SeoulInsideContainer>
+										</SeoulInsideAllContainer>
+									) : null;
+								})}
+							</SeoulContainer>
+						</FlexContainer>
+					)}
+				</ScrollView>
+				<MarginContainder></MarginContainder>
+			</BackgroundGrayPressable>
+			<ButtonContainer>
+				<RouteButton navigation={navigation} nextTitle='SelectMulti' goNext={goNext}></RouteButton>
+			</ButtonContainer>
+		</>
 	);
 }
 const FlexContainer = styled.View`
 	flex: 1;
 	justify-content: center;
+	border-width: 1px;
+	border-radius: 12px;
+	border-color: ${colors.Gray200};
 `;
 const SeoulContainer = styled.View`
 	width: ${widthPercentage(326)}px;
@@ -372,30 +403,30 @@ const SeoulInsideContainer = styled.View<{width: number}>`
 const Container = styled.View`
 	gap: ${heightPercentage(20)}px;
 `;
-const WrapContainer = styled.View`
+export const WrapContainer = styled.View`
 	width: ${widthPercentage(327)}px;
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: ${widthPercentage(10)}px;
 	margin-bottom: ${heightPercentage(20)}px;
 `;
-const RegionItems = styled.TouchableOpacity<{select: boolean}>`
+export const RegionItems = styled.TouchableOpacity<{select: boolean}>`
 	justify-content: center;
 	align-items: center;
-	padding: ${heightPercentage(5)}px ${widthPercentage(8)}px;
-	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundGray)};
+	padding: ${heightPercentage(8)}px ${widthPercentage(16)}px;
+	background-color: ${props => (props.select ? colors.Gray5 : colors.backgroundWhite)};
 	border-radius: 99px;
 `;
-const CityItems = styled(RegionItems)`
+export const CityItems = styled(RegionItems)`
 	background-color: ${props => (props.select ? colors.Primary : colors.backgroundWhite)};
 	border-width: 1px;
-	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray3)};
+	border-color: ${props => (props.select ? colors.backgroundWhite : colors.Gray300)};
 	flex-direction: row;
 `;
 const RegionElementContainer = styled.TouchableOpacity`
 	background-color: ${colors.Gray5};
 	border-radius: 99px;
-	padding: ${heightPercentage(5)}px ${widthPercentage(8)}px;
+	padding: ${heightPercentage(8)}px ${widthPercentage(16)}px;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
@@ -407,6 +438,5 @@ const SelectListContainer = styled.ScrollView`
 `;
 const SelectAllContainer = styled.View`
 	width: 100%;
-	height: ${heightPercentage(30)}px;
 `;
 const BackgroundGrayPressable = styled(BackgroundGray).attrs({as: ScrollView})``;

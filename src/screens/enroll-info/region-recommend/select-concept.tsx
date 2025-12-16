@@ -28,6 +28,7 @@ export default function SelectConcept({navigation}: any) {
 						bgColor={regionTendency[1][idx] == 1}
 						label={item}
 						key={idx}
+						divide={true}
 						imageUrl={regionTendencyList[1]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);

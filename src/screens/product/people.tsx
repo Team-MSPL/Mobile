@@ -1,0 +1,608 @@
+import React, {useEffect, useMemo, useState} from 'react';
+import {View, ActivityIndicator, Text, ScrollView} from 'react-native';
+import axios from 'axios';
+import Counter, {
+	safeNum,
+	toNumber,
+	formatPrice,
+	lowestPriceFromEntry,
+} from '../../utill/component/product/PeopleCounter';
+import {useRoute} from '@react-navigation/native';
+import {useAppDispatch, useAppSelector} from '../../redux';
+import {getQueryPackage, travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {colors} from '../../utill/colors';
+import {styled} from 'styled-components/native';
+import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {PretendardSemiBoldText, PretendardVariableText, VStack} from '../../utill/layout/layout';
+import {logEvent} from '../../../firebaseAnalytice';
+
+/**
+ * ProductPeople
+ * - Ensures unit price calculation uses the selected date (params.selected_date or store s_date)
+ * - When multiple SKUs are present for a category, prefer the first SKU's calendar entry for the selected date
+ *   (so price calculation matches ProductReservation's preference).
+ * - If no exact "티켓 종류" exists and params.item_unit is provided, label uses params.item_unit but unit (price)
+ *   is derived from SKUs (first-SKU/date-based) to avoid changing totals unexpectedly.
+ *
+ * - This variant sends navigation.params.skus entries with shape: { sku_id, qty, price }
+ *   where price is the per-unit price (formerly unit_price).
+ */
+
+function ProductPeople({navigation}: any) {
+	const route = useRoute();
+	const params = route.params;
+
+	const incomingPkgData = params?.pkgData ?? null;
+	const incomingBaseSkus = Array.isArray(params?.baseSkus) ? params.baseSkus : incomingPkgData?.item?.[0]?.skus ?? [];
+	const incomingSelectedSku = params?.selectedSku ?? null;
+	const {s_date, e_date} = useAppSelector(state => state.travelSlice);
+	const dispatch = useAppDispatch();
+
+	const [pkgData, setPkgData] = useState<any | null>(incomingPkgData ?? null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [quantityRule, setQuantityRule] = useState<any | null>(null);
+
+	useEffect(() => {
+		// If reservation store doesn't yet have selected_date, use incoming param to set it
+		if (params?.selected_date && !s_date) {
+			dispatch(travelSliceActions.updateFiled({field: 's_date', value: params.selected_date}));
+			dispatch(travelSliceActions.updateFiled({field: 'e_date', value: params.selected_date}));
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params?.selected_date]);
+
+	useEffect(() => {
+		if (pkgData) {
+			const firstItem = pkgData?.item?.[0] ?? null;
+			setQuantityRule(firstItem?.unit_quantity_rule ?? pkgData?.unit_quantity_rule ?? null);
+			return;
+		}
+
+		const prod = params?.prod_no;
+		const pkg = params?.pkg_no;
+		if (!prod || !pkg) {
+			setError('패키지 식별자가 누락되었습니다.');
+			return;
+		}
+
+		let mounted = true;
+		setLoading(true);
+
+		dispatch(
+			getQueryPackage({
+				prod_no: params.prod_no,
+				pkg_no: params.pkg_no,
+			}),
+		)
+			.then(res => {
+				if (!mounted) return;
+				const data = res.data ?? {};
+				setPkgData(data);
+				const firstItem = data?.item?.[0] ?? null;
+				setQuantityRule(firstItem?.unit_quantity_rule ?? data?.unit_quantity_rule ?? null);
+			})
+			.catch(e => {
+				if (!mounted) return;
+				console.error('[ProductPeople] fetch err', e);
+				setError('패키지 정보를 불러오는 데 실패했습니다.');
+			})
+			.finally(() => {
+				if (!mounted) return;
+				setLoading(false);
+			});
+
+		return () => {
+			mounted = false;
+		};
+	}, [pkgData, params?.prod_no, params?.pkg_no]);
+
+	// selected date: prefer incoming param, else store s_date
+	const selectedDate = params?.selected_date ?? s_date ?? null;
+
+	// base skus: either passed from previous screen or pkgData.item[0].skus
+	const basisSkus = useMemo(() => {
+		if (Array.isArray(incomingBaseSkus) && incomingBaseSkus.length > 0) return incomingBaseSkus;
+		const itemSkus = pkgData?.item?.[0]?.skus;
+		return Array.isArray(itemSkus) ? itemSkus : [];
+	}, [incomingBaseSkus, pkgData]);
+
+	const deriveTicketLabelFromSku = (sku: any) => {
+		try {
+			if (!sku?.spec || typeof sku.spec !== 'object') return '';
+			if (Object.prototype.hasOwnProperty.call(sku.spec, '티켓 종류') && sku.spec['티켓 종류']) {
+				return String(sku.spec['티켓 종류']).trim();
+			}
+			const maybeKey = Object.keys(sku.spec).find(
+				k =>
+					String(k).toLowerCase().includes('티켓') ||
+					String(k).toLowerCase().includes('ticket') ||
+					String(k).toLowerCase().includes('종류'),
+			);
+			if (maybeKey && sku.spec[maybeKey]) return String(sku.spec[maybeKey]).trim();
+			const first = Object.values(sku.spec)[0];
+			return first ? String(first).trim() : '';
+		} catch {
+			return '';
+		}
+	};
+
+	// Prefer price for a SKU for the given date (if SKU has date-specific calendar/time prices use them)
+	const unitForSkuOnDate = (sku: any, dateStr: string | null) => {
+		if (!sku) return undefined;
+		const item = pkgData?.item?.[0] ?? null;
+		// SKU-level calendar first
+		const cal =
+			sku?.calendar_detail ??
+			sku?.calendar ??
+			item?.calendar_detail ??
+			pkgData?.calendar_detail_merged ??
+			pkgData?.calendar_detail ??
+			null;
+		if (dateStr && cal && cal[dateStr]) {
+			const entry = cal[dateStr];
+			const low = lowestPriceFromEntry(entry);
+			if (low !== undefined) return low;
+		}
+		// if no date-specific price, try SKU b2b/b2c fields
+		const skuNum = safeNum(
+			sku?.b2b_price ?? sku?.b2c_price ?? sku?.price ?? sku?.official_price ?? sku?.filled_price,
+		);
+		if (skuNum !== undefined) return skuNum;
+		// fallback to item-level min price
+		return safeNum(item?.b2b_min_price ?? item?.b2c_min_price) ?? 0;
+	};
+
+	const [categories, setCategories] = useState<any[]>([]);
+
+	const getTotalRule = () => {
+		const tr = quantityRule?.total_rule ?? {};
+		let multipleFromRuleset: number | null = null;
+		const rulesets = quantityRule?.ticket_rule?.rulesets ?? [];
+		if (Array.isArray(rulesets)) {
+			for (const r of rulesets) {
+				const candidates = [
+					r?.multiple,
+					r?.multiple_of,
+					r?.step,
+					r?.quantity_multiple,
+					r?.quantity_step,
+					r?.value,
+				];
+				for (const c of candidates) {
+					const n = Number(c);
+					if (Number.isFinite(n) && n > 0 && Math.floor(n) === n) {
+						multipleFromRuleset = n;
+						break;
+					}
+				}
+				if (multipleFromRuleset) break;
+			}
+		}
+		return {
+			min: Number(tr?.min_quantity ?? tr?.min ?? 1),
+			max: Number(tr?.max_quantity ?? tr?.max ?? Infinity),
+			isMultipleLimit: Boolean(tr?.is_multiple_limit ?? false),
+			multiple: multipleFromRuleset ?? 2,
+			rulesets,
+		};
+	};
+
+	useEffect(() => {
+		const item = pkgData?.item?.[0] ?? null;
+		const skus = basisSkus ?? [];
+		const specs = Array.isArray(item?.specs) ? item.specs : [];
+
+		if (!item || !Array.isArray(skus) || skus.length === 0) {
+			setCategories([]);
+			return;
+		}
+
+		const totalRule = getTotalRule();
+
+		// Detect exact "티켓 종류" spec (case-insensitive trimmed)
+		const exactTicketSpec =
+			specs.find(s => {
+				if (!s?.spec_title) return false;
+				return String(s.spec_title).trim().toLowerCase() === '티켓 종류';
+			}) ?? null;
+
+		// If there's no exact "티켓 종류" and params.item_unit is provided -> single Counter using item_unit label,
+		// but derive unit(price) from SKUs using the selectedDate preference (prefer first SKU for date)
+		if (!exactTicketSpec && params?.item_unit != null) {
+			const provided = params.item_unit;
+			const qtyDefault = Number(params?.adult ?? 1) || 1;
+
+			// derive numeric unit (price) from SKUs using date preference: prefer first SKU's price for selectedDate
+			let numericUnitFromSkus = 0;
+			if (Array.isArray(skus) && skus.length > 0) {
+				numericUnitFromSkus = Number(unitForSkuOnDate(skus[0], selectedDate) ?? 0);
+			}
+
+			const numericUnit = Number.isFinite(Number(numericUnitFromSkus)) ? Number(numericUnitFromSkus) : 0;
+
+			setCategories([
+				{
+					id: 'item_unit_single',
+					label: String(provided),
+					ageLabel: '',
+					subLabel: [],
+					skus: skus,
+					unit: numericUnit,
+					qty: qtyDefault,
+				},
+			]);
+			return;
+		}
+
+		// If there's exactly 1 sku — original behavior
+		if (skus.length === 1) {
+			const sku = skus[0];
+			const label = deriveTicketLabelFromSku(sku) || sku.spec_desc || '티켓';
+			const ageLabel = sku?.spec_desc
+				? sku.spec_desc
+				: sku?.spec_rule
+				? (() => {
+						const min = sku.spec_rule?.min_age ?? sku.spec_rule?.min;
+						const max = sku.spec_rule?.max_age ?? sku.spec_rule?.max;
+						if (min != null && max != null) return `(만 ${min}세 이상 ~ ${max}세 미만)`;
+						if (min != null) return `(만 ${min}세 이상)`;
+						if (max != null) return `(만 ${max}세 미만)`;
+						return '';
+				  })()
+				: '';
+			const subLabel: string[] = [];
+			if (sku?.spec && typeof sku.spec === 'object') {
+				for (const [k, v] of Object.entries(sku.spec)) {
+					if (String(k) === '티켓 종류') continue;
+					if (v) subLabel.push(String(v));
+				}
+			}
+			// Use SKU price for the selected date if available
+			const unit = unitForSkuOnDate(sku, selectedDate) ?? 0;
+			const qtyDefault = totalRule.isMultipleLimit
+				? Math.max(totalRule.multiple, Number(params?.adult ?? 1) || 1)
+				: Number(params?.adult ?? 1) || 1;
+			setCategories([
+				{
+					id: sku.sku_id ?? sku.id ?? label,
+					label,
+					ageLabel,
+					subLabel,
+					skus: [sku],
+					unit,
+					qty: qtyDefault,
+				},
+			]);
+			return;
+		}
+
+		// If exactTicketSpec exists, group by its items (one category per ticket item).
+		// For each candidate group, prefer the first-SKU's date price when multiple candidate SKUs exist.
+		if (exactTicketSpec && Array.isArray(exactTicketSpec.spec_items)) {
+			const mapped: any[] = [];
+			for (const si of exactTicketSpec.spec_items) {
+				const oid = si?.spec_item_oid ?? si?.spec_item_id ?? String(si?.name ?? '');
+				const label = si?.name ?? si?.spec_item_title ?? oid;
+				const candidates = skus.filter((sku: any) => {
+					if (!Array.isArray(sku?.specs_ref)) return false;
+					return sku.specs_ref.some(
+						(r: any) => String(r.spec_item_id) === String(oid) || String(r.spec_value_id) === String(oid),
+					);
+				});
+				if (!candidates.length) continue;
+
+				// Prefer the first candidate SKU's price for the selectedDate
+				const firstCandidate = candidates[0];
+				const unit = Number(
+					unitForSkuOnDate(firstCandidate, selectedDate) ??
+						Math.min(...candidates.map(s => unitForSkuOnDate(s, selectedDate) ?? 0)),
+				);
+
+				const ageLabel = si?.rule
+					? (() => {
+							const ar = si.rule?.age_rule ?? si.rule;
+							const min = ar?.min ?? ar?.min_age;
+							const max = ar?.max ?? ar?.max_age;
+							if (min != null && max != null) return `(만 ${min}세 이상 ~ ${max}세 미만)`;
+							if (min != null) return `(만 ${min}세 이상)`;
+							if (max != null) return `(만 ${max}세 미만)`;
+							return '';
+					  })()
+					: candidates[0]?.spec_desc ?? '';
+				const rawQty = label.toLowerCase().includes('성인')
+					? Number(params?.adult ?? 1) || 1
+					: Number(params?.child ?? 0) || 0;
+				const qtyInit = totalRule.isMultipleLimit
+					? Math.max(totalRule.multiple, rawQty)
+					: Math.max(0, Math.floor(rawQty));
+				mapped.push({
+					id: oid,
+					label,
+					ageLabel,
+					subLabel:
+						candidates[0]?.spec && typeof candidates[0].spec === 'object'
+							? Object.entries(candidates[0].spec)
+									.filter(([k]) => k !== '티켓 종류')
+									.map(([_, v]) => String(v))
+							: [],
+					skus: candidates,
+					unit: unit ?? toNumber(item?.b2b_min_price ?? item?.b2c_min_price) ?? 0,
+					qty: qtyInit,
+				});
+			}
+
+			if (mapped.length > 0) {
+				setCategories(mapped);
+				return;
+			}
+		}
+
+		// Fallback grouping by derived label; when choosing unit price use first SKU's date price among candidates
+		const groups = new Map<string, any[]>();
+		for (const sku of skus) {
+			const label = deriveTicketLabelFromSku(sku) || sku.spec_desc || sku.sku_id || '기타';
+			if (!groups.has(label)) groups.set(label, []);
+			groups.get(label)!.push(sku);
+		}
+		const fallback: any[] = [];
+		for (const [label, candidates] of groups.entries()) {
+			const unit = Number(
+				unitForSkuOnDate(candidates[0], selectedDate) ??
+					Math.min(...candidates.map(s => unitForSkuOnDate(s, selectedDate) ?? 0)),
+			);
+			const rawQty = label.toLowerCase().includes('성인')
+				? Number(params?.adult ?? 1) || 1
+				: Number(params?.child ?? 0) || 0;
+			const qtyInit = totalRule.isMultipleLimit
+				? Math.max(totalRule.multiple, rawQty)
+				: Math.max(0, Math.floor(rawQty));
+			fallback.push({
+				id: label,
+				label,
+				ageLabel: candidates[0]?.spec_desc ?? '',
+				subLabel:
+					candidates[0]?.spec && typeof candidates[0].spec === 'object'
+						? Object.entries(candidates[0].spec)
+								.filter(([k]) => k !== '티켓 종류')
+								.map(([_, v]) => String(v))
+						: [],
+				skus: candidates,
+				unit: unit ?? toNumber(item?.b2b_min_price ?? item?.b2c_min_price) ?? 0,
+				qty: qtyInit,
+			});
+		}
+		setCategories(fallback);
+	}, [pkgData, basisSkus, selectedDate, params?.adult, params?.child, quantityRule, params?.item_unit]);
+
+	const total = useMemo(
+		() => categories.reduce((acc, c) => acc + Number(c.unit || 0) * Number(c.qty || 0), 0),
+		[categories],
+	);
+	const totalCount = useMemo(() => categories.reduce((acc, c) => acc + Number(c.qty || 0), 0), [categories]);
+
+	const setCategoryQty = (id: string, qty: number) => {
+		setCategories(prev => {
+			const prevTotal = prev.reduce((s, p) => s + Number(p.qty || 0), 0);
+			const found = prev.find(p => p.id === id);
+			const old = found ? Number(found.qty || 0) : 0;
+			let requestedQty = Math.max(0, Math.floor(Number(qty || 0)));
+
+			const {max} = getTotalRule();
+
+			const nextTotal = prevTotal - old + requestedQty;
+
+			if (Number.isFinite(max) && nextTotal > max) {
+				// keep previous and optionally show alert (user said no warning, so we skip alert)
+				return prev;
+			}
+
+			return prev.map(c => (c.id === id ? {...c, qty: requestedQty} : c));
+		});
+	};
+
+	// NEW: resolve SKUs for navigation and include price (per-unit) explicitly as `price`
+	const resolveSkusForNavigationFromCategories = () => {
+		const result: Array<{sku_id: any; qty: number; price: number; chosenSku?: any}> = [];
+		for (const cat of categories) {
+			const qty = Number(cat.qty || 0);
+			if (qty <= 0) continue;
+			const candidates: any[] = Array.isArray(cat.skus) ? cat.skus : [];
+			if (candidates.length === 0) continue;
+
+			// Choose the SKU to use (prefer first candidate)
+			const chosen = candidates[0];
+
+			// Compute per-unit price using selectedDate preference
+			const unit = Number(unitForSkuOnDate(chosen, selectedDate) ?? Number(cat.unit || 0));
+
+			result.push({
+				sku_id: chosen?.sku_id ?? null,
+				qty,
+				price: Number(unit),
+				chosenSku: chosen,
+			});
+		}
+		return result;
+	};
+
+	const onNext = async () => {
+		const {min, max, isMultipleLimit, multiple} = getTotalRule();
+
+		if (totalCount < min) {
+			Toast.show({text1: '수량을 선택해주세요', type: 'error', position: 'bottom'});
+			return;
+		}
+		if (Number.isFinite(max) && totalCount > max) {
+			Toast.show({text1: '선택 가능한 수량이 초과되었습니다', type: 'error', position: 'bottom'});
+			return;
+		}
+		if (isMultipleLimit && totalCount % multiple !== 0) {
+			Toast.show({text1: '2배수의 수량만 구매가능합니다', type: 'error', position: 'bottom'});
+			return;
+		}
+
+		const skusForPayload = resolveSkusForNavigationFromCategories();
+
+		await logEvent(`productPay`, {title: pkgData?.prod_name ?? params?.prod_name});
+		navigation.navigate('ProductPay', {
+			prod_no: params?.prod_no ?? prod_no,
+			prod_name: pkgData?.prod_name ?? params?.prod_name,
+			pkg_no: params.pkg_no ?? pkg_no,
+			selected_date: selectedDate,
+			categories: categories.map(c => ({
+				id: c.id,
+				label: c.label,
+				qty: c.qty,
+				unit: c.unit,
+				ageLabel: c.ageLabel,
+				subLabel: c.subLabel,
+			})),
+			// Pass simplified skus: sku_id, qty, price (price is per-unit)
+			skus: skusForPayload.map(s => ({sku_id: s.sku_id, qty: s.qty, price: s.price})),
+			total: Number(total),
+			pkgData,
+			baseSkus: basisSkus,
+			selectedSku: incomingSelectedSku ?? null,
+			selected_time: params?.selected_time ?? null,
+		});
+	};
+
+	const {isMultipleLimit, multiple} = getTotalRule();
+	const violatesMultiple = isMultipleLimit && totalCount % multiple !== 0;
+
+	if (loading) {
+		return (
+			<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+				<ActivityIndicator />
+				<Text style={{marginTop: 12}}>패키지 정보를 불러오는 중입니다...</Text>
+			</View>
+		);
+	}
+
+	if (error) {
+		return (
+			<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+				<Text style={{color: colors.red400}}>{error}</Text>
+			</View>
+		);
+	}
+	const labellist = {
+		명: {title: '인원 수', count: '명'},
+		장: {title: '갯수', count: '장'},
+	};
+	return (
+		<ScrollView style={{flex: 1, backgroundColor: colors.backgroundWhite}}>
+			<View style={{flex: 1, backgroundColor: '#fff'}}>
+				<View style={{paddingHorizontal: 24, paddingTop: 24}}>
+					<View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 24}}>
+						<Text style={{marginLeft: 8, color: colors.Black, fontSize: 21, fontWeight: 'bold'}}>
+							여행 인원
+						</Text>
+						<Text style={{marginLeft: 8, color: colors.red400, fontSize: 15}}>(필수)</Text>
+					</View>
+
+					{categories.length === 0 ? (
+						<Counter
+							label='성인'
+							ageLabel='(만 12세 이상)'
+							subLabel={[]}
+							price={0}
+							value={1}
+							setValue={() => {}}
+							disabled
+						/>
+					) : (
+						categories.map((c: any) => (
+							<Counter
+								key={String(c.id)}
+								label={labellist[c?.label]?.title ?? '티켓'}
+								ageLabel={c.ageLabel ?? ''}
+								subLabel={c.subLabel ?? []}
+								price={c.unit}
+								value={Number(c.qty ?? 0)}
+								setValue={(v: number) => setCategoryQty(c.id, v)}
+								min={0}
+								max={99}
+								disabled={!selectedDate}
+							/>
+						))
+					)}
+
+					<View style={{marginTop: 12}}>
+						{/* <Text style={{color: colors.grey800, fontWeight: 'bold', fontSize: 16, marginBottom: 8}}>
+							요금 내역
+						</Text> */}
+						{categories.map((c: any) => (
+							<VStack>
+								<PretendardSemiBoldText
+									onPress={() => {
+										console.log(c);
+									}}
+									size={16}
+									color={colors.grey800}
+									lineHeight={21.6}
+									deco={'margin-bottom:4px;'}>
+									{labellist[c?.label]?.title ?? '티켓'}
+								</PretendardSemiBoldText>
+								<View
+									key={String(c.id)}
+									style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6}}>
+									<PretendardSemiBoldText
+										size={18}
+										color={colors.grey600}
+										lineHeight={21.6}
+										deco={'margin-bottom:4px;'}>
+										{formatPrice(Number(c.unit || 0))}원 X {c.qty || 0}
+										{labellist[c?.label]?.count}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={18} color={colors.grey800} lineHeight={21.6}>
+										{formatPrice(Number((c.unit || 0) * (c.qty || 0)))}원
+									</PretendardSemiBoldText>
+								</View>
+							</VStack>
+						))}
+
+						<View
+							style={{
+								borderTopWidth: 1,
+								borderColor: colors.grey100,
+								marginTop: 12,
+								marginBottom: 12,
+								paddingTop: 12,
+								flexDirection: 'row',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+							}}>
+							<PretendardVariableText size={18} color={colors.grey600} lineHeight={21.6}>
+								총 금액
+							</PretendardVariableText>
+							<PretendardSemiBoldText size={20} color={colors.Black} lineHeight={21.6}>
+								{formatPrice(Number(total))}원
+							</PretendardSemiBoldText>
+						</View>
+					</View>
+				</View>
+
+				<View style={{padding: 24}}>
+					<Button height={54} disabled={violatesMultiple} onPress={onNext}>
+						<Text style={{color: colors.backgroundWhite, fontSize: 20, fontWeight: 'bold'}}>다음으로</Text>
+					</Button>
+				</View>
+			</View>
+		</ScrollView>
+	);
+}
+
+const Button = styled.TouchableOpacity<{height: number}>`
+	min-width: ${widthPercentage(64)}px;
+	height: ${props => heightPercentage(props.height)}px;
+	border-radius: 10px;
+	padding: 7.5px 19px;
+	gpa: 10px;
+	background-color: ${colors.Gray5};
+	align-items: center;
+	justify-content: center;
+`;
+export default ProductPeople;

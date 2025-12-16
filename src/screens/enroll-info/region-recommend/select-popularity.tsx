@@ -1,6 +1,6 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {regionRecommendSliceActions, regionSearch} from '../../../redux/travel-info/region-recommend.slice';
-import {BackgroundGray, MainContainer, PretendardSemiBoldText} from '../../../utill/layout/layout';
+import {BackgroundGray, HStack, MainContainer, PretendardSemiBoldText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import {colors} from '../../../utill/colors';
 import styled from 'styled-components/native';
@@ -51,7 +51,7 @@ export default function SelectPopularity({navigation}: any) {
 						lng: cityViewList[country][1].sub[0].lng,
 					},
 					distanceSensitivity: 10,
-					version: 2,
+					version: 3,
 					country: countryList[country].en, //241129 추가 - 디폴트는 Korea
 				};
 				const result = await dispatch(regionSearch(datas)).unwrap();
@@ -81,6 +81,31 @@ export default function SelectPopularity({navigation}: any) {
 		}
 	};
 	const rangeRef = useRef({low: 1, hight: 5});
+	const textList = [
+		{
+			title: '가장 이색적인',
+			sub: '경남 함안군 등 37개 지역',
+			global: '관광객이 적어 독특하고 매력적인 분위기를 느낄 수 있는 곳',
+		},
+		{
+			title: '이색적인',
+			sub: '경북 청송군 등 53개 지역',
+			global: '잘 알려지지 않았지만 흥미로운 요소가 가득한 장소',
+		},
+		{
+			title: '매력적인',
+			sub: '강원 화천시 등 32 지역',
+			global: '서서히 알려지기 시작하며 방문할 가치가 있는 특별한 장소',
+		},
+		{
+			title: '유명한',
+			globalTitle: '떠오르는',
+			sub: '강원 강릉시 등 30개 지역',
+			global: '트렌디하고 인기가 급상승 중인 장소로, 활기찬 분위기가 특징',
+		},
+		{title: '가장 유명한', sub: '서울, 제주 등 10개 지역', global: '많은 사람들이 방문하는 대표적인 관광지'},
+	];
+
 	if (isLoading) return <MainContainer></MainContainer>;
 	return (
 		<BackgroundGray>
@@ -107,36 +132,30 @@ export default function SelectPopularity({navigation}: any) {
 					}}
 					renderRailSelected={() => <SelectRail />}></RangeSlider>
 				<SpaceHstack>
-					<PretendardSemiBoldText size={12} lineHeight={14.4} color={colors.Gray4}>
+					<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray4}>
 						가장 이색적인
 					</PretendardSemiBoldText>
-					<PretendardSemiBoldText size={12} lineHeight={14.4} color={colors.Gray4}>
+					<PretendardSemiBoldText size={14} lineHeight={18} color={colors.Gray4}>
 						가장 유명한
 					</PretendardSemiBoldText>
 				</SpaceHstack>
-				{country == 0 ? (
-					<PretendardSemiBoldText
-						size={11}
-						lineHeight={18}
-						color={colors.Gray2}
-						style={{zIndex: 99, marginTop: 20}}>
-						1. 가장 이색적인 : 경남 함안군 등 37개 지역 {`\n`}2. 이색적인 : 경북 청송군 등 53개 지역 {`\n`}
-						3. 매력적인 : 강원 화천시 등 32개 지역 {`\n`}4. 유명한 : 강원 강릉시 등 30개 지역 {`\n`}5. 가장
-						유명한 : 서울, 제주 등 10개 지역
-					</PretendardSemiBoldText>
-				) : (
-					<PretendardSemiBoldText
-						size={11}
-						lineHeight={18}
-						color={colors.Gray2}
-						style={{zIndex: 99, marginTop: 20}}>
-						1. 가장 이색적인 : 관광객이 적어 독특하고 매력적인 분위기를 느낄 수 있는 곳 {`\n`}2. 이색적인 :
-						잘 알려지지 않았지만 흥미로운 요소가 가득한 장소 {`\n`}
-						3. 매력적인 : 서서히 알려지기 시작하며 방문할 가치가 있는 특별한 장소 {`\n`}4. 떠오르는 :
-						트렌디하고 인기가 급상승 중인 장소로, 활기찬 분위기가 특징 {`\n`}5. 가장 유명한 : 많은 사람들이
-						방문하는 대표적인 관광지
-					</PretendardSemiBoldText>
-				)}
+				<SeoulContainer>
+					{textList.map((item, index) => (
+						<HStack justifyContent={`space-between;`}>
+							<PretendardSemiBoldText size={13} lineHeight={18} color={colors.Gray4} style={{zIndex: 99}}>
+								{index + 1}.{country != 0 && index == 3 ? item.globalTitle : item.title}
+							</PretendardSemiBoldText>
+							<PretendardSemiBoldText
+								size={13}
+								lineHeight={18}
+								color={colors.Gray2}
+								style={{zIndex: 99}}
+								deco={`width:${widthPercentage(174)}px;text-align:right;`}>
+								{country == 0 ? item.sub : item.global}
+							</PretendardSemiBoldText>
+						</HStack>
+					))}
+				</SeoulContainer>
 			</BarContainer>
 			{country == 0 ? (
 				<RouteButton navigation={navigation} nextTitle='RegionSelectPopularity' goNext={goNext}></RouteButton>
@@ -144,6 +163,8 @@ export default function SelectPopularity({navigation}: any) {
 				<ButtonContainer>
 					<CustomButton
 						label='맞춤형 여행지를 확인해볼게요!'
+						bgColor={colors.Primary}
+						textColor={colors.Gray5}
 						onPress={goNext}
 						marginBottom={12}></CustomButton>
 				</ButtonContainer>
@@ -151,6 +172,20 @@ export default function SelectPopularity({navigation}: any) {
 		</BackgroundGray>
 	);
 }
+const SeoulContainer = styled.View`
+	width: ${widthPercentage(326)}px;
+	height: ${heightPercentage(199)}px;
+	background-color: ${colors.backgroundWhite};
+	border-radius: 12px;
+	align-self: center;
+	justify-content: center;
+	padding: ${widthPercentage(25)}px ${widthPercentage(24)}px;
+	bottom: 0;
+	border-width: 1px;
+	border-color: ${colors.Gray200};
+	gap: 10px;
+	margin-top: ${widthPercentage(40)}px;
+`;
 const ButtonContainer = styled.View`
 	flex: 1;
 	align-items: center;
@@ -186,7 +221,7 @@ export const SelectRail = styled.View`
 	border-radius: 6px;
 `;
 const BarContainer = styled.View`
-	width: ${widthPercentage(300)}px;
+	width: ${widthPercentage(327)}px;
 	align-self: center;
 	border-radius: 6px;
 	margin-vertical: ${heightPercentage(30)}px;

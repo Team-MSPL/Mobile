@@ -26,6 +26,7 @@ export default function RecommendSelectConcept({navigation}: any) {
 			<SelectButtonsContainer>
 				{tendencyList[1]?.list.map((item, idx) => (
 					<TendencyButton
+						marginBottom={0}
 						bgColor={tendency[1][idx] == 1}
 						label={item}
 						key={idx}

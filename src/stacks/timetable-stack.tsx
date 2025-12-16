@@ -26,6 +26,8 @@ import SearchRecommend from '../screens/enroll-info/search-recommend';
 import RecommendSelectCountry from '../screens/enroll-info/select-country';
 import SelectCountry from '../screens/enroll-info/region-recommend/select-country';
 import SelectDeparture from '../screens/enroll-info/select-departure';
+import AccommodationDay from '../screens/timetable/accommodation-day';
+import SelectPopularity from '../screens/enroll-info/select-popularity';
 const Stack = createNativeStackNavigator();
 export default function TimetableStack() {
 	return (
@@ -35,7 +37,7 @@ export default function TimetableStack() {
 				component={SelectCity}
 				options={{
 					title: '여행 일정 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -45,7 +47,7 @@ export default function TimetableStack() {
 				component={RecommendSelectCountry}
 				options={{
 					title: '여행 일정 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -54,7 +56,7 @@ export default function TimetableStack() {
 				component={SelectCountry}
 				options={{
 					title: '여행 지역 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -63,7 +65,7 @@ export default function TimetableStack() {
 				component={SelectDay}
 				options={{
 					title: '여행 일정 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -72,7 +74,7 @@ export default function TimetableStack() {
 				component={SelectDeparture}
 				options={{
 					title: '여행 일정 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -81,7 +83,7 @@ export default function TimetableStack() {
 				component={SelectMulti}
 				options={{
 					title: '여행 일정 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -90,7 +92,7 @@ export default function TimetableStack() {
 				component={SearchPlace}
 				options={{
 					title: '요소 추가하기',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 					headerTitleAlign: 'center',
 				}}
@@ -100,7 +102,7 @@ export default function TimetableStack() {
 				component={SearchRecommend}
 				options={{
 					title: '요소 추가하기',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 					headerTitleAlign: 'center',
 				}}
@@ -110,7 +112,7 @@ export default function TimetableStack() {
 				component={SelectDistance}
 				options={{
 					title: '여행 코스 추천',
-					headerStyle: {backgroundColor: colors.main},
+					headerStyle: {backgroundColor: colors.backgroundWhite},
 					headerShadowVisible: false,
 				}}
 			/>
@@ -134,7 +136,6 @@ export default function TimetableStack() {
 				name='Timetable'
 				component={Timetable}
 				options={{
-					headerBackVisible: false,
 					title: '여행 코스',
 				}}
 			/>
@@ -223,10 +224,25 @@ export default function TimetableStack() {
 				}}
 			/>
 			<Stack.Screen
+				name='SelectPopularity'
+				component={SelectPopularity}
+				options={{
+					title: '여행 코스 추천',
+				}}
+			/>
+
+			<Stack.Screen
 				name='PresetDetail'
 				component={PresetDetail}
 				options={{
 					title: '일정 자세히 보기',
+				}}
+			/>
+			<Stack.Screen
+				name='AccommodationDay'
+				component={AccommodationDay}
+				options={{
+					title: '숙소 추가',
 				}}
 			/>
 		</Fragment>

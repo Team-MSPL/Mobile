@@ -4,10 +4,10 @@ buildscript {
     ext {
         buildToolsVersion = "34.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 34
-        targetSdkVersion = 34
+        compileSdkVersion = 35
+        targetSdkVersion = 35
         // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
-        ndkVersion = "23.1.7779620"
+        ndkVersion = "25.1.8937393"
         kotlin_version = '1.8.22'
         androidXAnnotation = "1.1.0"
         androidXBrowser = "1.0.0"
@@ -15,15 +15,19 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
         maven { url 'https://maven.google.com' }
         maven { url "https://www.jitpack.io" }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
         classpath 'com.google.gms:google-services:4.3.15'
-        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath 'com.android.tools.build:gradle:8.6.0'
     }
 }
+    allprojects {
+    repositories {
+        maven {
+            url "https://devrepo.kakao.com/nexus/content/groups/public/"
+        }
+    }}

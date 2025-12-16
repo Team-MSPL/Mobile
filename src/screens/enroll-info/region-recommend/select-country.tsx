@@ -37,7 +37,7 @@ export default function SelectCountry({navigation}: any) {
 				marginTop={heightPercentage(10)}
 				styleText='1.여행 계획을 알려주세요.'
 				mainText='어디로 떠나시나요?'></StepText>
-			<FlexWrap gap={10}>
+			<FlexWrap gap={10} margintop={widthPercentage(130)}>
 				{countryList.map(
 					(item, idx) =>
 						idx != countryList.length - 1 && (

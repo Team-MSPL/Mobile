@@ -15,7 +15,14 @@ import {
 	updateTravelCourse,
 } from '../../redux/travel-info/travel.slice';
 import {colors} from '../../utill/colors';
-import {HeaderContianer, PretendardBold, PretendardBoldText, PretendardVariableText} from '../../utill/layout/layout';
+import {
+	HeaderContianer,
+	PretendardBold,
+	PretendardBoldText,
+	PretendardSemiBoldText,
+	PretendardVariableText,
+	VStack,
+} from '../../utill/layout/layout';
 import shortId from 'shortid';
 import Skeleton from '../../utill/component/skeleton/skeleton';
 import MapInfo from './map-info';
@@ -27,6 +34,7 @@ import {DistanceType, useDistance} from '../../utill/hooks/useDistance';
 import moment from 'moment';
 import {eventSliceActions} from '../../redux/event/event.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {cityViewList} from '../../utill/component/enroll-info/city-list';
 export default function Timetable({navigation, route}: any) {
 	const {
 		timetable,
@@ -47,6 +55,7 @@ export default function Timetable({navigation, route}: any) {
 		regionInfo,
 		autoRecommendFlag,
 		country,
+		cityIndex,
 	} = useAppSelector(state => state.travelSlice);
 	const {userId, userName, isLogin, socialloginProvider} = useAppSelector(state => state.userSlice);
 
@@ -383,6 +392,10 @@ export default function Timetable({navigation, route}: any) {
 		}
 	}, [moveTimeErrorIndex]);
 	const timeRef = useRef(null);
+	const hanldeHome = () => {
+		navigation.popToTop();
+		navigation.navigate('Home');
+	};
 	const goMyTravelList = () => {
 		navigation.popToTop();
 		navigation.navigate('MyTravelListStack');
@@ -406,6 +419,7 @@ export default function Timetable({navigation, route}: any) {
 	const handleCooper = async () => {
 		let cooperType = await AsyncStorage.getItem(country == 0 ? 'inbound' : 'outbound');
 		if (cooperType != moment().format('DD').toString()) {
+			await logEvent('showTimetableCooperation', {});
 			dispatch(
 				eventSliceActions.setCooperationState({
 					status: true,
@@ -424,42 +438,53 @@ export default function Timetable({navigation, route}: any) {
 	const exitApp = () => {
 		BackHandler.exitApp();
 	};
+	const checkSave = () => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: '변동사항을 적용하시겠습니까?',
+				modalFunction: goSave,
+				modalTopText: '네',
+				modalBottomText: '아니오',
+				modalLeft: true,
+			}),
+		);
+	};
+
 	useEffect(() => {
-		const backAction = () => {
-			if (navigation.isFocused()) {
-				userId == ''
-					? dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '앱 종료',
-								modalSubTitle: '앱을 종료하시겠습니까?',
-								modalFunction: exitApp,
-								modalLeft: true,
-							}),
-					  )
-					: dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '홈으로',
-								modalSubTitle: modifyCheck
-									? '수정 사항이 있습니다.\n저장하지않고 나가시겠습니까?'
-									: '홈으로 이동하시겠습니까?',
-								modalFunction: () => {
-									modifyCheck && goSave();
-								},
-								modalBottomFunctionUse: true,
-								modalBottomFunction: goHome,
-								modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
-								modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
-							}),
-					  );
-
-				return true;
+		const unsubscribe = navigation.addListener('beforeRemove', e => {
+			const {action} = e.data;
+			// 👉 POP인데 1개 이상 pop하면 모달 안 띄움 (poptopop 상황)
+			if (action.type === 'POP_TO_TOP') {
+				return;
 			}
-		};
+			// 👇 여기서 뒤로 가려고 하는 상황을 감지함
+			e.preventDefault(); // 뒤로 가는 행동을 막고
+			// 사용자 확인 후 수동으로 pop() 등 호출
 
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+			userId == ''
+				? dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '앱 종료',
+							modalSubTitle: '앱을 종료하시겠습니까?',
+							modalFunction: exitApp,
+							modalLeft: true,
+						}),
+				  )
+				: dispatch(
+						modalSliceActions.setOpenModal({
+							modalTitle: '홈으로 이동하시겠습니까?',
+							modalFunction: () => {
+								goHome();
+							},
+							modalTopText: '나가기',
+							modalBottomText: '둘러보기',
+						}),
+				  );
+		});
 
-		return () => backHandler.remove();
-	}, [modifyCheck, userId]);
+		return unsubscribe;
+	}, [navigation, modifyCheck, userId]);
+
 	const firstSave = async () => {
 		try {
 			dispatch(LoadingSliceActions.onLoading());
@@ -482,22 +507,60 @@ export default function Timetable({navigation, route}: any) {
 		}
 	};
 
+	const hasOverlap = timetableList => {
+		const timeBlocks = timetableList.map(item => {
+			const start = item.y;
+			const end = item.y + item.takenTime / 30; // y 단위가 30분이면 takenTime/30을 더함
+			return {start, end};
+		});
+
+		// 시작시간 기준으로 정렬
+		timeBlocks.sort((a, b) => a.start - b.start);
+
+		for (let i = 1; i < timeBlocks.length; i++) {
+			const prev = timeBlocks[i - 1];
+			const current = timeBlocks[i];
+
+			if (current.start < prev.end) {
+				// 겹침 발생
+				return true;
+			}
+		}
+
+		return false; // 겹치는 시간 없음
+	};
 	const goSave = async () => {
 		// 저장 누를시 백엔드에 보내줄 아이들,.
 		try {
 			dispatch(LoadingSliceActions.onLoading());
-			const data = {travelId: travelId, timetable: timetable};
-			await dispatch(updateTravelCourse(data));
-			dispatch(
-				modalSliceActions.setOpenModal({
-					modalTitle: '수정 완료',
-					modalSubTitle: '내 여행 리스트로 이동합니다.',
-					modalFunction: goMyTravelList,
-				}),
-			);
-			await logEvent('edit_course_save', {
-				course: travelName,
-			});
+			const checkList = timetable.map(item => hasOverlap(item));
+			if (checkList.includes(true)) {
+				dispatch(
+					modalSliceActions.setOpenModal({
+						modalTitle: '겹치는 시간',
+						modalSubTitle: '겹치는 시간이 있습니다. 시간을 수정해주세요.',
+						modalSingleUse: true,
+						modalFunction: () => {},
+					}),
+				);
+			} else {
+				const data = {travelId: travelId, timetable: timetable};
+				await dispatch(updateTravelCourse(data));
+				// dispatch(
+				// 	modalSliceActions.setOpenModal({
+				// 		modalTitle: '일정이 저장되었습니다',
+				// 		modalTopText: '일정 확인하러 가기',
+				// 		modalBottomText: '홈으로 돌아가기',
+				// 		modalFunction: goMyTravelList,
+				// 		modalBottomFunctionUse: true,
+				// 		modalBottomFunction: hanldeHome,
+				// 	}),
+				// );
+				await logEvent('edit_course_save', {
+					course: travelName,
+				});
+				setModify(false);
+			}
 		} catch (err) {
 			dispatch(
 				modalSliceActions.setOpenModal({
@@ -583,7 +646,7 @@ export default function Timetable({navigation, route}: any) {
 					point: 5,
 					tendencyPoint: tendency,
 				};
-				dispatch(reviewAndPoint(data));
+				if (!!travelId) dispatch(reviewAndPoint(data));
 			}
 			//await firebaseImageRemove({pictureList: picture, id: travelId, category: 'diary'}); TODO 공유자때문에 공유자가 아무도없을때 백에서 삭제하는로직으로 바꿔야함
 			await dispatch(deleteTravelCourse({travelId: travelId}));
@@ -600,6 +663,10 @@ export default function Timetable({navigation, route}: any) {
 		}
 	};
 	const [modify, setModify] = useState(false);
+	useEffect(() => {
+		console.log('zxc', modify);
+		if (modify) dispatch(travelSliceActions.updateFiled({field: 'beforeTimetable', value: timetable}));
+	}, [modify]);
 	useEffect(() => {
 		shareLoginFlag && isLogin && addSharedList();
 	}, [isLogin]);
@@ -627,39 +694,98 @@ export default function Timetable({navigation, route}: any) {
 				}),
 			);
 	}, [makeMode, socialloginProvider]);
+
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackVisible: false,
+			headerBackVisible: Platform.OS != 'ios',
+			headerBackTitleVisible: false,
 			gestureEnabled: makeMode == 'recommend' ? false : true,
-			headerRight: () => (
-				<HeaderContianer>
-					<>
-						{socialloginProvider != 'anonymous' && (
-							<TouchableOpacity onPress={removeCheck} style={{marginRight: 10}}>
-								<PretendardVariableText size={16} lineHeight={24} color={colors.PointGreen1}>
-									삭제
-								</PretendardVariableText>
-							</TouchableOpacity>
-						)}
-						<TouchableOpacity
-							onPress={async () => {
-								setModify(!modify);
-								!modify &&
-									(await logEvent('edit_course_start', {
-										course: travelName,
-									}));
-							}}>
-							<PretendardVariableText size={16} lineHeight={24} color={colors.PointYellow}>
-								{modify ? '취소' : '편집'}
-							</PretendardVariableText>
-						</TouchableOpacity>
-					</>
-				</HeaderContianer>
-			),
-			headerLeft: () =>
+			headerLeft: () => {
+				return Platform.OS == 'ios' ? (
+					<TouchableOpacity
+						onPress={() => {
+							// dispatch(
+							// 	modalSliceActions.setOpenModal({
+							// 		modalTitle: '홈으로 이동하시겠습니까?',
+							// 		modalSubTitle: modifyCheck ? '홈으로 이동 시 저장되지 않습니다' : '',
+							// 		modalFunction: () => {
+							// 			modifyCheck && goSave();
+							// 		},
+							// 		modalBottomFunctionUse: true,
+							// 		modalBottomFunction: goHome,
+							// 		modalTopText: modifyCheck ? '저장하고 나가기' : '둘러보기',
+							// 		modalBottomText: modifyCheck ? '그냥 나가기' : '나가기',
+							// 	}),
+							// );
+							goHome();
+						}}
+						style={{
+							justifyContent: 'center',
+							marginLeft: widthPercentage(4),
+							marginRight: widthPercentage(4),
+						}}>
+						<Image
+							resizeMode='contain'
+							source={require('../../../assets/images/danim_logo_row.png')}
+							style={{height: heightPercentage(36), aspectRatio: 2.054}}
+						/>
+					</TouchableOpacity>
+				) : (
+					<PretendardSemiBoldText
+						size={12}
+						lineHeight={16}
+						color={colors.Gray4}
+						style={{textAlign: 'center'}}></PretendardSemiBoldText>
+				);
+			},
+			headerTitle: () => {
+				return (
+					<VStack>
+						<PretendardSemiBoldText
+							size={16}
+							lineHeight={20}
+							color={colors.Black}
+							style={{textAlign: 'center'}}>
+							{(
+								(region[0] == '전체'
+									? cityViewList[country][cityIndex].title
+									: region[0].startsWith('해외')
+									? region[0].split('/').at(-1)
+									: region[0]) +
+								' ' +
+								(nDay == 0 ? '당일치기' : nDay + '박' + (nDay + 1) + '일') +
+								' ' +
+								travelName
+							).slice(0, 20) +
+								((
+									(region[0] == '전체'
+										? cityViewList[country][cityIndex].title
+										: region[0].startsWith('해외')
+										? region[0].split('/').at(-1)
+										: region[0]) +
+									' ' +
+									(nDay == 0 ? '당일치기' : nDay + '박' + (nDay + 1) + '일') +
+									' ' +
+									travelName
+								).length >= 20
+									? '...'
+									: '')}
+						</PretendardSemiBoldText>
+						<PretendardSemiBoldText
+							size={12}
+							lineHeight={16}
+							color={colors.Gray4}
+							style={{textAlign: 'center'}}>
+							{moment(day[0]).format('YYYY/MM/DD') + ' ~ ' + moment(day[nDay]).format('YYYY/MM/DD')}
+						</PretendardSemiBoldText>
+					</VStack>
+				);
+			},
+
+			headerRight: () =>
 				socialloginProvider != 'anonymous' && (
 					<>
-						{Platform.OS != 'android' && (
+						{/* {Platform.OS != 'android' && (
 							<TouchableOpacity
 								onPress={() => {
 									dispatch(
@@ -687,10 +813,10 @@ export default function Timetable({navigation, route}: any) {
 									style={{height: heightPercentage(36), aspectRatio: 2.054}}
 								/>
 							</TouchableOpacity>
-						)}
+						)} */}
 						{shareViewWithStartFlag && (
 							<TouchableOpacity style={{marginLeft: widthPercentage(5)}} onPress={goKakaoShare}>
-								<PretendardBoldText size={18} lineHeight={24} color={colors.PointYellow}>
+								<PretendardBoldText size={16} lineHeight={24} color={colors.PointYellow}>
 									공유
 								</PretendardBoldText>
 							</TouchableOpacity>
@@ -710,8 +836,12 @@ export default function Timetable({navigation, route}: any) {
 		modifyView,
 		modify,
 		socialloginProvider,
+		travelName,
+		nDay,
+		day,
+		cityIndex,
 	]);
 	// if (true) return <></>;
 	if (!tableShowFlag) return <Skeleton></Skeleton>;
-	return <MapInfo navigation={navigation} goSave={goSave} modify={modify} setModify={setModify}></MapInfo>;
+	return <MapInfo navigation={navigation} checkSave={checkSave} modify={modify} setModify={setModify}></MapInfo>;
 }

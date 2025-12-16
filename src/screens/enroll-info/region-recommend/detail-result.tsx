@@ -1,12 +1,12 @@
 import {useAppDispatch, useAppSelector} from '../../../redux';
-import {travelSliceActions} from '../../../redux/travel-info/travel.slice';
+import {recommendProduct, travelSliceActions} from '../../../redux/travel-info/travel.slice';
 import {Divider, HStack, PretendardSemiBoldText, PretendardVariableText} from '../../../utill/layout/layout';
 import StepText from '../../../utill/component/enroll-info/step-text';
 import styled from 'styled-components/native';
 import {colors} from '../../../utill/colors';
-import {SvgLoginLogo} from '../../../utill/svg/svg';
+import {SVGDanimLogo, SvgLoginLogo, SvgStart} from '../../../utill/svg/svg';
 import ImageView from 'react-native-image-viewing';
-import {useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import {ImageViewFooterComponent} from '../../timetable/course-detail';
 import {TagElement, metropolitanCheckList} from '../../home/main';
 import CustomButton from '../../../utill/component/custom-button';
@@ -16,6 +16,7 @@ import {Platform} from 'react-native';
 import {logEvent} from '../../../../firebaseAnalytice';
 import {cityViewList} from '../../../utill/component/enroll-info/city-list';
 import {useTendencyHandler} from '../../../utill/hooks/useTendencyHandler';
+import {LoadingSliceActions} from '../../../redux/loading/loading.slice';
 export default function DetailResult({navigation, route}: any) {
 	const dispatch = useAppDispatch();
 	const {selectStartDate, country} = useAppSelector(state => state.travelSlice);
@@ -26,23 +27,38 @@ export default function DetailResult({navigation, route}: any) {
 		copy0.push(0);
 		copy[0] = copy0;
 		let copy2 = [...regionTendency[2]];
-		if (copy2[4] == 1) {
-			copy2.push(1);
-			copy2.push(0);
-			copy2.push(1);
-			copy2.push(1);
-		} else {
-			copy2.push(0);
-			copy2.push(0);
-			copy2.push(0);
-			copy2.push(0);
-		}
+		copy2.pop();
+		// if (copy2[6] == 1) {
+		// 	//역사 누르면
+		// 	copy2.push(1);
+		// 	copy2.push(0);
+		// 	copy2.push(1);
+		// 	copy2.push(1);
+		// } else {
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// 	copy2.push(0);
+		// }
 		copy[2] = copy2;
 		let copy3 = [...regionTendency[3]];
-		if (copy3[5] == 1) {
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		copy3.push(0);
+		if (copy3[2] == 1) {
+			//자연경관 누르면
 			copy3[0] = 1;
 			copy3[1] = 1;
-			copy3[5] = 0;
+			copy3[2] = 0;
+		}
+		if (regionTendency[2][6] == 1) {
+			copy3[5] = 1;
+			copy3[6] = 1;
+			copy3[7] = 1;
+			copy3[9] = 1;
+			copy3[10] = 1;
 		}
 		copy[3] = copy3;
 		let selectEndDate = selectStartDate.clone().add(route.params.item.takenDay, 'days');
@@ -95,11 +111,24 @@ export default function DetailResult({navigation, route}: any) {
 			selectEndDate: selectEndDate,
 			shareViewWithStartFlag: true,
 			country: country,
+			regionInfo: {
+				name: route.params.item.name,
+				photo: Array.isArray(route.params.item.photo) ? route.params.item.photo[0] : route.params.item.photo,
+			},
 		};
 		dispatch(travelSliceActions.setRecommendRegion(data));
 		navigation.navigate('EnrollTravelTitle');
 	};
-	const {countryList} = useTendencyHandler();
+	// const {countryList} = useTendencyHandler();
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
 	const goDetail = async (e: {name: string; lat: number; lng: number}) => {
 		const metropolitanStatus = metropolitanCheckList.includes(route.params.item.name);
 		const data = {
@@ -118,6 +147,76 @@ export default function DetailResult({navigation, route}: any) {
 		});
 	};
 	const [visible, setVisible] = useState(false);
+	const [products, setProducts] = useState([]);
+	const handelDetail = async item => {
+		await logEvent(`regionProduct`, {title: item?.prod_name});
+		navigation.navigate('ProductDetail', {item: item});
+	};
+	const handleSearch = async () => {
+		try {
+			dispatch(LoadingSliceActions.onLoading());
+			let copy = [...regionTendency];
+			let copy0 = [...regionTendency[0]];
+			copy0.push(0);
+			copy[0] = copy0;
+			let copy2 = [...regionTendency[2]];
+			copy2.pop();
+			// if (copy2[6] == 1) {
+			// 	//역사 누르면
+			// 	copy2.push(1);
+			// 	copy2.push(0);
+			// 	copy2.push(1);
+			// 	copy2.push(1);
+			// } else {
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// 	copy2.push(0);
+			// }
+			copy[2] = copy2;
+			let copy3 = [...regionTendency[3]];
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			copy3.push(0);
+			if (copy3[2] == 1) {
+				//자연경관 누르면
+				copy3[0] = 1;
+				copy3[1] = 1;
+				copy3[2] = 0;
+			}
+			if (regionTendency[2][6] == 1) {
+				copy3[5] = 1;
+				copy3[6] = 1;
+				copy3[7] = 1;
+				copy3[9] = 1;
+				copy3[10] = 1;
+			}
+			copy[3] = copy3;
+			const data = {
+				pathList: [[route.params.item.topPopularPlaceList?.map(item => ({name: item?.name}))]],
+				selectList: copy,
+				country:
+					route.params.item.name == '홍콩' || route.params.item.name == '마카오'
+						? '홍콩과 마카오'
+						: countryList[country].ko,
+				cityList: [route.params.item.name],
+			};
+			const a = await dispatch(recommendProduct(data)).unwrap();
+
+			console.log(a?.[0]);
+
+			setProducts(a?.[0]);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			dispatch(LoadingSliceActions.offLoading());
+		}
+	};
+	useLayoutEffect(() => {
+		handleSearch();
+	}, []);
 	return (
 		<>
 			<MainContainer>
@@ -142,7 +241,7 @@ export default function DetailResult({navigation, route}: any) {
 					<PretendardSemiBoldText size={24} lineHeight={28} color={colors.Gray5}>
 						{route.params.item.name}
 					</PretendardSemiBoldText>
-					<Divider color={colors.Gray2} height={0.5}></Divider>
+					<Divider color={colors.Gray200} height={0.5}></Divider>
 					<TagContainer>
 						{route.params.item.tendency.map((tendency, index) => (
 							<TagElement
@@ -165,8 +264,8 @@ export default function DetailResult({navigation, route}: any) {
 					<StepText
 						mainText='인기 관광지 Top 5'
 						subText='해당 지역의 인기 관광지를 확인하세요'
-						mainTextSize={18}
-						subTextSize={12}
+						mainTextSize={20}
+						subTextSize={16}
 						marginLeft={0}
 						marginTop={0}
 						marginBottom={14}
@@ -202,7 +301,103 @@ export default function DetailResult({navigation, route}: any) {
 							</PopularityContainer>
 						))}
 					</RecommendAllContainer>
+					<StepText
+						mainText='여행 상품 추천'
+						subText={`현재 ${route.params.item.name}에서 인기 있는 여행 상품이에요`}
+						mainTextSize={20}
+						subTextSize={16}
+						marginLeft={0}
+						marginTop={0}
+						marginBottom={14}
+					/>
+					<RecommendAllContainer horizontal={true} showsHorizontalScrollIndicator={false}>
+						{products?.map((item, idx) => (
+							<ProductBox
+								key={idx}
+								onPress={() => {
+									handelDetail(item);
+								}}>
+								{item?.prod_img_url != '' ? (
+									<ProductImg source={{uri: item?.prod_img_url}}></ProductImg>
+								) : (
+									<LogoCOntainer>
+										<SvgLoginLogo color={'white'} width={widthPercentage(20)} />
+									</LogoCOntainer>
+								)}
+								<ProductinfoBox>
+									<HStack justifyContent='space-between'>
+										{!isNaN(item?.finalScore) && item?.finalScore != 0 ? (
+											<HStack gap={3}>
+												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+													유사도
+												</PretendardSemiBoldText>
+												<PretendardSemiBoldText
+													size={18}
+													lineHeight={22}
+													color={colors.PointYellow}>
+													{Math.floor(item?.finalScore * 100)}%
+												</PretendardSemiBoldText>
+											</HStack>
+										) : (
+											<HStack gap={3}>
+												<SVGDanimLogo width={15} />
+												<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+													다님
+												</PretendardSemiBoldText>
+											</HStack>
+										)}
+
+										<HStack>
+											<SvgStart width={11} color={'#FFDE4C'} />
+											<PretendardSemiBoldText size={14} lineHeight={17} color={colors.Gray4}>
+												{item?.avg_rating_star}
+											</PretendardSemiBoldText>
+										</HStack>
+									</HStack>
+									<PretendardSemiBoldText
+										size={24}
+										lineHeight={29}
+										numberOfLines={2}
+										color={colors.Black}
+										deco={'margin-bottom:10px;'}>
+										{item?.prod_name}
+									</PretendardSemiBoldText>
+									{item?.b2c_price - item?.b2b_price > 0 && (
+										<>
+											<PretendardSemiBoldText
+												size={16}
+												lineHeight={20}
+												color={colors.PointGreen1}
+												deco={'text-align:right'}>
+												{(item?.b2c_price - item?.b2b_price).toLocaleString('ko-KR')}원 할인
+											</PretendardSemiBoldText>
+											<PretendardSemiBoldText
+												size={20}
+												lineHeight={24}
+												color={colors.Gray2}
+												deco={'text-align:right;text-decoration:line-through;'}>
+												{item?.b2c_price.toLocaleString('ko-KR')}원~
+											</PretendardSemiBoldText>
+										</>
+									)}
+									<HStack deco='align-self:flex-end' gap={4}>
+										<PretendardSemiBoldText size={18} lineHeight={22} color={colors.PointYellow}>
+											최저가
+										</PretendardSemiBoldText>
+										<PretendardSemiBoldText
+											size={24}
+											lineHeight={29}
+											numberOfLines={2}
+											color={colors.Black}>
+											{item?.b2b_price.toLocaleString('ko-KR')}원~
+										</PretendardSemiBoldText>
+									</HStack>
+								</ProductinfoBox>
+							</ProductBox>
+						))}
+					</RecommendAllContainer>
 				</RecommendBorderContainer>
+
 				<MarginBottom></MarginBottom>
 			</MainContainer>
 			<ButtonContainer>
@@ -227,13 +422,23 @@ export default function DetailResult({navigation, route}: any) {
 		</>
 	);
 }
-const PopularityInfoTitleTextContainer = styled.View`
-	width: 80%;
-	position: absolute;
-	z-index: 1;
-	align-self: flex-end;
-	left: ${widthPercentage(12)}px;
-	bottom: ${widthPercentage(12)}px;
+const ProductBox = styled.TouchableOpacity`
+	width: ${widthPercentage(257)}px;
+	height: ${heightPercentage(327)}px;
+	border-radius: 8px;
+	margin-right: 25px;
+	border-color: ${colors.Gray1};
+	border-width: 1px;
+`;
+const ProductImg = styled.Image`
+	width: ${widthPercentage(257)}px;
+	height: ${heightPercentage(125)}px;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+`;
+const ProductinfoBox = styled.View`
+	width: 100%;
+	padding: ${widthPercentage(10)}px;
 `;
 const IndexContainer = styled.View`
 	width: ${widthPercentage(24)}px;

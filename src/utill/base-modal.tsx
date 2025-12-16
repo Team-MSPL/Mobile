@@ -27,6 +27,7 @@ export default function BaseModal() {
 		modalBottomFunction,
 		modalTextSize,
 		travleMedic,
+		modalBottomTextColor,
 	} = useAppSelector(state => state.modalSlice);
 	const dispatch = useAppDispatch();
 	const handleModalFunction = () => {
@@ -110,8 +111,8 @@ export default function BaseModal() {
 							)}
 							<ButtonContainer>
 								<PrimaryButton
-									backgroundColor={colors.Primary}
-									textColor={colors.Gray5}
+									backgroundColor={colors.Gray5}
+									textColor={colors.backgroundWhite}
 									onPress={handleModalFunction}
 									width={widthPercentage(327)}
 									height={heightPercentage(50)}
@@ -119,13 +120,18 @@ export default function BaseModal() {
 								{!modalSingleUse && (
 									<PrimaryButton
 										backgroundColor={
-											modalBottomText == '다님 AI 2호' ? colors.Primary : colors.Gray1
+											modalBottomText == '다님 AI 2호' ? colors.Primary : colors.backgroundWhite
 										}
-										textColor={modalBottomText == '다님 AI 2호' ? colors.Gray5 : colors.Gray4}
+										textColor={
+											modalBottomText == '다님 AI 2호'
+												? colors.Gray5
+												: modalBottomTextColor ?? colors.Gray400
+										}
 										onPress={modalBottomFunctionUse ? handleLeftFunction : close}
 										width={widthPercentage(327)}
 										height={heightPercentage(50)}
-										label={modalBottomText}></PrimaryButton>
+										label={modalBottomText}
+										deco={`border-width:1px; border-color:${colors.Gray200};`}></PrimaryButton>
 								)}
 							</ButtonContainer>
 						</ViewContaniner>

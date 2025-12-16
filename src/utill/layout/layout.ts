@@ -21,6 +21,7 @@ export const HStack = styled.View<{
 	justify-content: ${props => props.justifyContent ?? null};
 	gap: ${props => props.gap ?? 0}px;
 	margin: ${props => props.marginVertical ?? 0}px ${props => props.marginHorizon ?? 0}px;
+	z-index: 0;
 	${props => props.deco};
 `;
 export const VStack = styled.View<{
@@ -31,42 +32,59 @@ export const VStack = styled.View<{
 	justifyContent?: string;
 	deco?: string;
 }>`
+	position: relative;
 	width: ${props => props.width ?? null}px;
 	display: inline-block;
 	flex-direction: column;
 	justify-content: ${props => props.alignItems ?? 'center'};
 	align-items: ${props => props.alignItems ?? null};
 	gap: ${props => props.gap ?? 0}px;
-	${props => (props.flex != undefined ? `flex:${props.flex}` : '')}
+	${props => (props.flex != undefined ? `flex:${props.flex};` : '')}
 	${props => props.deco}
 `;
-export const FlexWrap = styled.Pressable<{gap?: number; marginBottom?: number; margintop?: number; width?: number}>`
+export const FlexWrap = styled.Pressable<{
+	gap?: number;
+	marginBottom?: number;
+	margintop?: number;
+	width?: number;
+	deco?: string;
+}>`
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin-top: ${props => props.marginBottom ?? 15}px;
+	margin-top: ${props => props.margintop ?? 15}px;
 	margin-bottom: ${props => props.marginBottom ?? 15}px;
 	gap: ${props => props.gap ?? 0}px;
 	width: ${props => props.width ?? null}px;
+	position: relative;
+	${props => props?.deco}
 `;
 
-export const Divider = styled.View<{width?: number; color?: string; height: number}>`
+export const Divider = styled.View<{width?: number; color?: string; height: number; left?: number}>`
 	width: ${props => props.width + 'px' ?? '100%'};
 	height: ${props => props.height ?? 2}px;
 	background-color: ${props => props.color ?? 'black'};
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0px 10px ${props => props.left ?? 0}px;
+	border-radius: 12px;
 `;
 
-export const MainContainer = styled.ScrollView`
-	background-color: ${colors.backgroundGray};
+export const MainContainer = styled.ScrollView<{backgroundColor?: string}>`
+	background-color: ${props => props.backgroundColor ?? colors.backgroundGray};
 	width: 100%;
+	flex: 1;
+	z-index: 0;
+	position: relative;
 `;
-export const MainText = styled.Text`
+export const MainText = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-size: 22px;
 	font-weight: bold;
 	color: black;
 `;
-export const SubText = styled.Text`
+export const SubText = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-size: 17px;
 	font-weight: bold;
 	color: black;
@@ -98,36 +116,52 @@ export const ClearTouchableOpacity = styled.TouchableOpacity`
 	justify-content: center;
 `;
 
-export const BackgroundGray = styled.View<{paddingHorizental?: number; gap?: number; marginTop?: number}>`
+export const BackgroundGray = styled.View<{
+	paddingHorizental?: number;
+	gap?: number;
+	marginTop?: number;
+	backgroundColor?: string;
+}>`
 	flex: 1;
-	background-color: ${colors.backgroundGray};
+	background-color: ${props => props.backgroundColor || colors.backgroundWhite};
 	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
+	z-index: 0;
+	position: relative;
 `;
 export const BackgroundGrayScrollView = styled.ScrollView<{
 	paddingHorizental?: number;
 	gap?: number;
 	marginTop?: number;
+	backgroundColor?: string;
 }>`
 	flex: 1;
-	background-color: ${colors.backgroundGray};
+	background-color: ${props => props.backgroundColor || colors.backgroundWhite};
 	padding: ${props => props.marginTop ?? 0}px ${props => props.paddingHorizental ?? widthPercentage(24)}px
 		${heightPercentage(10)}px ${props => props.paddingHorizental ?? widthPercentage(24)}px;
 	gap: ${props => props.gap ?? 0}px;
 `;
 
-export const PretendardVariable = styled.Text`
+export const PretendardVariable = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: PretendardVariable;
 `;
-export const PretendardBold = styled.Text`
+export const PretendardBold = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: Pretendard-Bold;
 `;
-export const PretendardSemiBold = styled.Text`
+export const PretendardSemiBold = styled.Text.attrs({
+	allowFontScaling: false,
+})`
 	font-family: Pretendard-SemiBold;
 `;
 
-export const PretendardVariableText = styled.Text<{
+export const PretendardVariableText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	lineHeight: number;
@@ -137,6 +171,7 @@ export const PretendardVariableText = styled.Text<{
 	maxWidth?: number;
 	marginBottom?: number;
 	decoration?: string;
+	deco?: string;
 }>`
 	font-family: PretendardVariable;
 	color: ${props => props.color};
@@ -149,13 +184,17 @@ export const PretendardVariableText = styled.Text<{
 	max-width: ${props => props.maxWidth + 'px' ?? 'auto'};
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	text-decoration: ${props => props.decoration ?? null};
+	${props => props.deco}
 `;
-export const PretendardBoldText = styled.Text<{
+export const PretendardBoldText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	textAlign?: string;
 	lineHeight: number;
 	marginBottom?: number;
+	deco?: string;
 }>`
 	font-family: Pretendard-Bold;
 	color: ${props => props.color ?? colors.Black};
@@ -164,8 +203,11 @@ export const PretendardBoldText = styled.Text<{
 	font-weight: 700;
 	margin-bottom: ${props => props.marginBottom ?? 0}px;
 	text-align: ${props => props.textAlign ?? 'auto'};
+	${props => props?.deco}
 `;
-export const PretendardSemiBoldText = styled.Text<{
+export const PretendardSemiBoldText = styled.Text.attrs({
+	allowFontScaling: false,
+})<{
 	color: string;
 	size: number;
 	lineHeight: number;
@@ -201,4 +243,25 @@ export const TagContainer = styled.View<{backgroundColor: string; width?: number
 	height: ${props => props.height ?? heightPercentage(24)}px;
 	gap: ${widthPercentage(1.3)}px;
 	width: ${props => props.width + 'px' ?? null};
+`;
+
+export const ImageBox = styled.Image<{width: number; height: number; deco?: string}>`
+	width: ${props => props.width}px;
+	height: ${props => props.height}px;
+	object-fit: fill;
+	${props => props?.deco}
+`;
+export const ProductInfoInput = styled.TextInput<{deco?: string}>`
+	flex: 1;
+	height: ${heightPercentage(54)}px;
+	border-radius: 12px;
+	border-width: 1px;
+	border-color: ${colors.grey200};
+	background-color: ${colors.backgroundWhite};
+	color: ${colors.grey800};
+	padding: 0px 10px;
+	font-size: ${fontPercentage(16)};
+	margin-top: 10px;
+	margin-bottom: 20px;
+	${props => props?.deco}
 `;

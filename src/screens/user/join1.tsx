@@ -91,6 +91,17 @@ export default function Join1({navigation, route}: any) {
 		navigation.navigate('Terms');
 	};
 	useEffect(() => {
+		if (
+			!route.params ||
+			!route.params.userToken ||
+			!route.params.loginProvider ||
+			!route.params.profileImage ||
+			!route.params.nickname
+		) {
+			Alert.alert('오류', '잘못된 접근입니다.');
+			navigation.goBack();
+			return;
+		}
 		setNickname(route.params.nickname);
 	}, []);
 	const checkList = [

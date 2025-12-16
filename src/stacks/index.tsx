@@ -1,14 +1,23 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {Image, View} from 'react-native';
+import {Image, Platform, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import CommunityMainScreen from '../screens/community/community-main-screen';
 import Main from '../screens/home/main';
 import LoginScreen from '../screens/login/login-screen';
 import MoreInfo from '../screens/more/more-info';
 import MyTravelList from '../screens/my-travel-list/my-travel-list';
-import {SvgAirplain, SvgCalendar, SvgCommunity, SvgProfile} from '../utill/svg/svg';
+import {
+	SvgAirplain,
+	SvgCalendar,
+	SvgCommunity,
+	SVGNoteList,
+	SVGNoteListIcon,
+	SVGProduct,
+	SvgProfile,
+	SVGReserveList,
+} from '../utill/svg/svg';
 import CommunityStack from './community-stack';
 import JoinStack from './join-stack';
 import MoreStack from './more-stack';
@@ -20,8 +29,12 @@ import HomeModal from '../screens/login/home-modal';
 import HikingStack from './hiking-stack';
 import {fontPercentage, heightPercentage, widthPercentage} from '../utill/layout/responsive-size';
 import Search from '../screens/home/search';
-import RecommendPlace from '../screens/home/recommendPlace';
 import RecommendPlaces from '../screens/home/recommendPlaces';
+import ProductsStack from './products-stack';
+import PlannerStack from './planner-stack';
+import PaymentStack from './payment-stack';
+import HomeProductCountry from '../screens/home/select-product-country';
+import ReserveList from '../screens/product/reserve-list';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function StackNavigator() {
@@ -34,7 +47,7 @@ export default function StackNavigator() {
 					fontSize: fontPercentage(16),
 					fontWeight: '900',
 				},
-				headerStyle: {backgroundColor: colors.main},
+				headerStyle: {backgroundColor: colors.backgroundWhite},
 				headerShadowVisible: false,
 			})}>
 			<Stack.Screen
@@ -55,7 +68,7 @@ export default function StackNavigator() {
 				name='RecommendPlaces'
 				component={RecommendPlaces}
 				options={{
-					title: '',
+					title: '다님의 추천 여행지',
 				}}
 			/>
 
@@ -66,6 +79,9 @@ export default function StackNavigator() {
 			{MoreStack()}
 			{JoinStack()}
 			{HikingStack()}
+			{ProductsStack()}
+			{PlannerStack()}
+			{PaymentStack()}
 			{/* <Tab.Navigator>
 					<Tab.Screen name='First' component={LoginScreen} />
 					<Tab.Screen name='Second' component={LoginScreen} />
@@ -82,8 +98,9 @@ function TabBar() {
 			initialRouteName='Home'
 			screenOptions={{
 				tabBarStyle: {
-					minHeight: heightPercentage(60) + insets.bottom,
-					backgroundColor: colors.main,
+					...(Platform?.isPad && 'height:150'),
+					height: heightPercentage(100),
+					marginBottom: -insets.bottom,
 				},
 				tabBarItemStyle: {
 					paddingBottom: heightPercentage(10),
@@ -103,7 +120,7 @@ function TabBar() {
 						<View style={{justifyContent: 'center', paddingLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
-								source={require('../../public/images/danim_logo_row.png')}
+								source={require('../../assets/images/danim_logo_row.png')}
 								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
@@ -129,7 +146,7 @@ function TabBar() {
 						<View style={{justifyContent: 'center', marginLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
-								source={require('../../public/images/danim_logo_row.png')}
+								source={require('../../assets/images/danim_logo_row.png')}
 								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>
@@ -143,11 +160,65 @@ function TabBar() {
 					headerShown: true,
 					tabBarActiveTintColor: colors.PointYellow,
 					tabBarIcon: ({color}) => (
-						<SvgCalendar width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
+						<SvgCalendar width={widthPercentage(18)} height={widthPercentage(18)} color={'black'} />
 					),
 				}}
 			/>
 			<Tab.Screen
+				name='HomeProductCountry'
+				component={HomeProductCountry}
+				options={{
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', marginLeft: heightPercentage(24)}}>
+							<Image
+								resizeMode='contain'
+								source={require('../../assets/images/danim_logo_row.png')}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '여행 상품',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
+					headerStyle: {backgroundColor: colors.main},
+					tabBarLabelPosition: 'below-icon',
+					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
+					tabBarIcon: ({color}) => (
+						<SVGProduct width={widthPercentage(18)} height={widthPercentage(18)} color={'black'} />
+					),
+				}}
+			/>
+
+			<Tab.Screen
+				name='ReserveList'
+				component={ReserveList}
+				options={{
+					headerLeft: () => (
+						<View style={{justifyContent: 'center', marginLeft: heightPercentage(24)}}>
+							<Image
+								resizeMode='contain'
+								source={require('../../assets/images/danim_logo_row.png')}
+								style={{height: heightPercentage(36), aspectRatio: 2.054}}
+							/>
+						</View>
+					),
+					title: '예약 목록',
+					tabBarLabelStyle: {
+						fontSize: fontPercentage(10),
+					},
+					headerStyle: {backgroundColor: colors.main},
+					tabBarLabelPosition: 'below-icon',
+					headerShown: true,
+					tabBarActiveTintColor: colors.PointYellow,
+					tabBarIcon: ({color}) => (
+						<SVGReserveList width={widthPercentage(18)} height={widthPercentage(18)} color={'black'} />
+					),
+				}}
+			/>
+
+			{/* <Tab.Screen
 				name='Community'
 				component={CommunityMainScreen}
 				options={{
@@ -172,7 +243,7 @@ function TabBar() {
 						<SvgCommunity width={widthPercentage(18)} height={widthPercentage(18)} color={color} />
 					),
 				}}
-			/>
+			/> */}
 			<Tab.Screen
 				name='More'
 				component={MoreInfo}
@@ -181,7 +252,7 @@ function TabBar() {
 						<View style={{justifyContent: 'center', paddingLeft: heightPercentage(24)}}>
 							<Image
 								resizeMode='contain'
-								source={require('../../public/images/danim_logo_row.png')}
+								source={require('../../assets/images/danim_logo_row.png')}
 								style={{height: heightPercentage(36), aspectRatio: 2.054}}
 							/>
 						</View>

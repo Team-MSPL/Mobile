@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {colors} from '../../colors';
 import {HStack, PretendardSemiBoldText} from '../../layout/layout';
-import {Pressable, View} from 'react-native';
-import {SVGNoteList, SVGRightAdd} from '../../svg/svg';
+import {Platform, Pressable, View} from 'react-native';
+import {SVGNoteList, SVGNoteListIcon, SVGRightAdd} from '../../svg/svg';
 import styled from 'styled-components/native';
-import {heightPercentage, widthPercentage} from '../../layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../layout/responsive-size';
 import {useAppDispatch, useAppSelector} from '../../../redux';
 import {NoteCount} from '../../../screens/more/more-info';
 import LinearGradient from 'react-native-linear-gradient';
@@ -37,34 +37,37 @@ export default function ImageRecursion({navigation}: any) {
 
 			{socialloginProvider != 'anonymous' && (
 				<TicketTouchable deco={'position:absolute;'}>
-					<NoteCount>
+					{/* <NoteCount>
 						<PretendardSemiBoldText size={9} lineHeight={13} color={colors.backgroundWhite}>
 							{noteList.filter(item => !item.startsWith('read')).length}
 						</PretendardSemiBoldText>
-					</NoteCount>
-					<SVGNoteList
+					</NoteCount> */}
+					<SVGNoteListIcon
 						onPress={() => {
 							navigation.navigate('NoteList');
 						}}
 						width={widthPercentage(33)}
-						height={widthPercentage(33)}></SVGNoteList>
+						height={widthPercentage(33)}></SVGNoteListIcon>
 				</TicketTouchable>
 			)}
 			<Carousel
 				loop
 				autoPlay
-				scrollAnimationDuration={1000}
+				scrollAnimationDuration={Platform.OS == 'android' ? 200 : 300}
 				autoPlayInterval={4000}
 				width={widthPercentage(378)}
-				height={heightPercentage(428)}
+				height={heightPercentage(400)}
 				data={[0, 1, 2, 3]}
 				onSnapToItem={() => {}}
 				renderItem={({index}) => (
 					<>
 						<View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
-							{mainViewList[index].photo(heightPercentage(428))}
+							{mainViewList[index].photo(heightPercentage(400))}
 						</View>
-						<BrighnessBox>
+						<BrighnessBox
+							onPress={() => {
+								navigation.navigate('RecommendPlaces', {index: index});
+							}}>
 							{socialloginProvider != 'anonymous' && <TicketTouchable></TicketTouchable>}
 							<HomeTextContainer
 								heightFlag={socialloginProvider == 'anonymous'}
@@ -114,32 +117,34 @@ export const mainViewList = [
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
 				<PretendardSemiBoldText
-					size={23}
+					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}} // 적절한 최대 폭
 				>
-					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						자연 속 여유
 					</PretendardSemiBoldText>
 					를 느끼고{'\n'}싶은 당신을 초대합니다
 				</PretendardSemiBoldText>
-
 				<SVGRightAdd
 					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
 					style={{
+						bottom: fontPercentage(7.5),
 						position: 'absolute',
-						right: -heightPercentage(28),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+						right: -widthPercentage(25),
 					}}
 				/>
 			</View>
 		),
 		subTitle: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+			<PretendardSemiBoldText size={24} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 					자연 속 여유
 				</PretendardSemiBoldText>
 				를 느끼고{`\n`}싶은 당신을 위해
@@ -156,38 +161,41 @@ export const mainViewList = [
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
 				<PretendardSemiBoldText
-					size={23}
+					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}}>
-					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						문화
 					</PretendardSemiBoldText>
 					와{' '}
-					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						트렌드
 					</PretendardSemiBoldText>
 					가 살아 숨 쉬는{`\n`}공간으로 당신을 초대합니다
 				</PretendardSemiBoldText>
 				<SVGRightAdd
 					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
 					style={{
+						bottom: fontPercentage(7.5),
 						position: 'absolute',
-						right: -heightPercentage(28),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+						right: -widthPercentage(15),
 					}}
 				/>
 			</View>
 		),
 		subTitle: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+			<PretendardSemiBoldText size={24} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 					문화
 				</PretendardSemiBoldText>
 				와{' '}
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+				<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 					트렌드
 				</PretendardSemiBoldText>
 				가{`\n`}살아 숨 쉬는 공간
@@ -204,31 +212,35 @@ export const mainViewList = [
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
 				<PretendardSemiBoldText
-					size={23}
+					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
-					style={{maxWidth: widthPercentage(375)}}>
+					style={{maxWidth: widthPercentage(375)}}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}>
 					이 순간과 연결된{' '}
-					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						과거의 세계
 					</PretendardSemiBoldText>
 					로{`\n`}당신을 초대합니다
 				</PretendardSemiBoldText>
 				<SVGRightAdd
 					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
+					width={heightPercentage(20)}
+					height={heightPercentage(20)}
 					style={{
 						position: 'absolute',
 						right: heightPercentage(98),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+						bottom: fontPercentage(7.5),
+						// 두 번째 줄 기준으로 붙음
 					}}
 				/>
 			</View>
 		),
 		subTitle: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+			<PretendardSemiBoldText size={24} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 					과거의 세계
 				</PretendardSemiBoldText>
 				와 연결될 시간
@@ -245,30 +257,33 @@ export const mainViewList = [
 		title: (
 			<View style={{position: 'relative', alignSelf: 'flex-start'}}>
 				<PretendardSemiBoldText
-					size={23}
+					size={24}
 					lineHeight={35}
 					color={colors.backgroundWhite}
+					numberOfLines={2}
+					adjustsFontSizeToFit
+					minimumFontScale={0.5}
 					style={{maxWidth: widthPercentage(320)}}>
-					<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+					<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 						열정
 					</PretendardSemiBoldText>
 					이 가득한 당신을{`\n`}이곳으로 초대합니다
 				</PretendardSemiBoldText>
 				<SVGRightAdd
 					color='white'
-					width={heightPercentage(24)}
-					height={heightPercentage(24)}
+					width={fontPercentage(20)}
+					height={fontPercentage(20)}
 					style={{
+						bottom: fontPercentage(7.5),
 						position: 'absolute',
-						right: -heightPercentage(28),
-						bottom: heightPercentage(10), // 두 번째 줄 기준으로 붙음
+						right: -widthPercentage(25),
 					}}
 				/>
 			</View>
 		),
 		subTitle: (
-			<PretendardSemiBoldText size={23} lineHeight={35} color={colors.backgroundWhite}>
-				<PretendardSemiBoldText size={23} lineHeight={35} color={colors.Primary}>
+			<PretendardSemiBoldText size={24} lineHeight={35} color={colors.backgroundWhite}>
+				<PretendardSemiBoldText size={24} lineHeight={35} color={colors.Primary}>
 					열정
 				</PretendardSemiBoldText>
 				이 가득한 당신을 위해
@@ -283,7 +298,7 @@ export const mainViewList = [
 	},
 ];
 
-const BrighnessBox = styled.View`
+const BrighnessBox = styled.Pressable`
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.3);
 	top: -${heightPercentage(20)}px;
@@ -291,15 +306,15 @@ const BrighnessBox = styled.View`
 
 const TicketTouchable = styled.TouchableOpacity`
 	border-radius: 99px;
-	top: ${heightPercentage(39)}px;
+	top: ${heightPercentage(30)}px;
 	left: ${widthPercentage(305)}px;
 	width: ${widthPercentage(50)}px;
 	height: ${widthPercentage(50)}px;
 	align-items: center;
 	justify-content: center;
 	${props => props.deco}
-	z-index:130;
+	z-index:1;
 `;
 const HomeTextContainer = styled.Pressable<{heightFlag: boolean}>`
-	top: ${props => heightPercentage(props.heightFlag ? 275 : 215)}px;
+	top: ${props => heightPercentage(props.heightFlag ? 275 : 205)}px;
 `;

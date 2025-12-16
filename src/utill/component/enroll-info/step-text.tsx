@@ -27,25 +27,27 @@ export default function StepText({
 			marginLeft={marginLeft ?? undefined}
 			marginRight={marginRight ?? undefined}
 			marginTop={marginTop ?? undefined}>
-			<PretendardSemiBoldText size={styleTextSize ?? 14} lineHeight={21} color={styleTextColor ?? colors.Gray3}>
+			<PretendardSemiBoldText size={styleTextSize ?? 18} lineHeight={22} color={styleTextColor ?? colors.Title}>
 				{styleText}
 			</PretendardSemiBoldText>
-			<PretendardSemiBoldText size={mainTextSize ?? 23} lineHeight={31} color={mainTextColor ?? colors.Black}>
+			<PretendardSemiBoldText size={mainTextSize ?? 26} lineHeight={31} color={mainTextColor ?? colors.Black}>
 				{mainText}
 			</PretendardSemiBoldText>
 			<PretendardSemiBoldText
-				size={subTextSize ?? 12}
+				size={subTextSize ?? 14}
 				lineHeight={18}
-				color={subTextColor ?? colors.Gray2}
+				color={subTextColor ?? colors.Gray3}
 				style={{zIndex: 99}}>
 				{subText ?? ''}
 			</PretendardSemiBoldText>
-			<PretendardSemiBoldText
-				size={warningTextSize ?? 12}
-				lineHeight={18}
-				color={warningTextColor ?? colors.PointGreen1}>
-				{warningText ?? ''}
-			</PretendardSemiBoldText>
+			{warningText && (
+				<PretendardSemiBoldText
+					size={warningTextSize ?? 12}
+					lineHeight={18}
+					color={warningTextColor ?? colors.PointGreen1}>
+					{warningText ?? ''}
+				</PretendardSemiBoldText>
+			)}
 		</StepTextVStack>
 	);
 }

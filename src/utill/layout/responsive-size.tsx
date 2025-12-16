@@ -19,6 +19,6 @@ export function heightPercentage(height: number) {
 }
 export function fontPercentage(size: number) {
 	const percentage =
-		size * (Platform.isPad ? (responsiveScreenHeight(100) / responsiveScreenWidth(100)) * 0.07 : 0.14);
+		size * (Platform.isPad ? (responsiveScreenHeight(100) / responsiveScreenWidth(100)) * 0.07 : 0.125);
 	return responsiveScreenFontSize(percentage);
 }

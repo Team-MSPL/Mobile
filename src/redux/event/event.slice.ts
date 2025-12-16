@@ -51,6 +51,7 @@ interface EventListType {
 	eventImage: string;
 	eventEndDate: string;
 	eventLink: string;
+	eventBannerImage: string;
 }
 
 export const eventSliceActions = eventSlice.actions;

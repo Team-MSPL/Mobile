@@ -65,6 +65,36 @@ import Train from '../../../public/train.svg';
 import Phillgram from '../../../public/mou/pillgram.svg';
 import TravleMedic from '../../../public/mou/travleMedic.svg';
 
+import Share1 from '../../../public/share1.svg';
+
+import AirPortIcon from '../../../public/airportIcon.svg';
+import AirPortIngIcon from '../../../public/airPortIng.svg';
+import TrainIcon from '../../../public/trainIcon.svg';
+
+import Clock from '../../../public/clock.svg';
+import CalendarIcon from '../../../public/calendarIcon.svg';
+import TripleDot from '../../../public/tripleDot.svg';
+import HomeIcon from '../../../public/homeIcon.svg';
+
+import CarIcon from '../../../public/carIcon.svg';
+import BagIcon from '../../../public/bagIcon.svg';
+import BuildingIcon from '../../../public/buildingIcon.svg';
+import SpoonIcon from '../../../public/spoonIcon.svg';
+
+import NoteListIcon from '../../../public/noteList.svg';
+
+import TrainCardIcon from '../../../public/trainCardIcon.svg';
+import Global from '../../../public/global.svg';
+
+import StarSmile from '../../../public/starSmile.svg';
+
+import Filter from '../../../public/filter.svg';
+
+import Money from '../../../public/money.svg';
+
+import People from '../../../public/people.svg';
+import Product from '../../../public/product.svg';
+import ReserveList from '../../../public/productList.svg';
 export const SvgHome = styled(Home)<{color: string; marginRight?: number}>`
 	color: color;
 	margin: 0px ${props => props.marginRight ?? 0}px 0px 0px;
@@ -77,17 +107,18 @@ export const SvgCancel = styled(Cancel)<{color: string}>`
 	color: color;
 `;
 export const SvgCheck = styled(Check)<{color: string}>`
-	color: color;
+	color: ${props => props.color};
 `;
 export const SvgRight = styled(Right)<{color?: string; transform?: number}>`
+	color: ${props => props.color};
+	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
+`;
+export const SvgAirplain = styled(AirPlain)<{color?: string; transform?: number}>`
 	color: color;
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
-export const SvgAirplain = styled(AirPlain)<{color?: string}>`
-	color: color;
-`;
 export const SvgCalendar = styled(Calendar)<{color?: string}>`
-	color: color;
+	color: ${props => props.color ?? 'black'};
 `;
 export const SvgCommunity = styled(Community)<{color?: string}>`
 	color: color;
@@ -99,7 +130,7 @@ export const SvgPicture = styled(Picture)<{color?: string}>`
 	color: color;
 `;
 export const SvgStart = styled(Start)<{color?: string}>`
-	color: color;
+	color: ${props => props?.color};
 `;
 export const SvgMapIcon = styled(MapIcon)<{color?: string}>`
 	color: color;
@@ -129,7 +160,7 @@ export const SvgShare = styled(Share)<{color?: string}>`
 	color: color;
 `;
 export const SVGRightAdd = styled(RightAdd)<{color?: string; transform?: number}>`
-	color: color;
+	color: ${props => props?.color};
 	transform: rotate(${props => (props.transform == null ? 0 : props.transform)}deg);
 `;
 export const SVGRegionRecommend = styled(RegionRecommend)<{color?: string; transform?: boolean}>`
@@ -187,7 +218,7 @@ export const SVGDanimLogo = styled(DanimLogo)<{color?: string}>`
 	color: color;
 `;
 export const SVGHeart = styled(Heart)<{color?: string}>`
-	color: color;
+	color: ${props => props.color};
 `;
 export const SVGMessageSquare = styled(MessageSquare)<{color?: string}>`
 	color: color;
@@ -205,13 +236,13 @@ export const SVGTravlePencil = styled(TravlePencil)<{color?: string}>`
 	color: color;
 `;
 export const SVGEmptyHeart = styled(EmptyHeart)<{color?: string}>`
-	color: color;
+	color: ${props => props.color || '#70768E'};
 `;
 export const SVGMoreHorizontal = styled(MoreHorizontal)<{color?: string}>`
 	color: color;
 `;
 export const SVGSearch = styled(Search)<{color?: string}>`
-	color: color;
+	color: ${props => props.color ?? '#B1B6CC'};
 `;
 export const SvgGuest = styled(GuestLogo)<{color?: string}>`
 	color: color;
@@ -256,4 +287,79 @@ export const SvgPillgram = styled(Phillgram)<{color?: string}>`
 
 export const SvgTravleMedic = styled(TravleMedic)<{color?: string}>`
 	color: color;
+`;
+export const SvgShare1 = styled(Share1)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgAirPortIcon = styled(AirPortIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgAirPortIngIcon = styled(AirPortIngIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgTrainIcon = styled(TrainIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGClock = styled(Clock)<{color?: string}>`
+	color: ${props => props?.color || '#5350FF'};
+`;
+
+export const SvgCalendarIcon = styled(CalendarIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgTripleDot = styled(TripleDot)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgHomeIcon = styled(HomeIcon)<{color?: string}>`
+	color: color;
+`;
+export const SvgCarIcon = styled(CarIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgBagIcon = styled(BagIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgBuildingIcon = styled(BuildingIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SvgSpoonIcon = styled(SpoonIcon)<{color?: string}>`
+	color: color;
+`;
+export const SVGNoteListIcon = styled(NoteListIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGTrainCardIcon = styled(TrainCardIcon)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGGlobal = styled(Global)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGStarSmile = styled(StarSmile)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGFilter = styled(Filter)<{color?: string}>`
+	color: color;
+`;
+export const SVGMoney = styled(Money)<{color?: string}>`
+	color: color;
+`;
+
+export const SVGPeople = styled(People)<{color?: string}>`
+	color: color;
+`;
+export const SVGProduct = styled(Product)<{color?: string}>`
+	color: ${props => props.color};
+`;
+export const SVGReserveList = styled(ReserveList)<{color?: string}>`
+	color: ${props => props.color};
 `;

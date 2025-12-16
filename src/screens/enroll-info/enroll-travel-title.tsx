@@ -22,7 +22,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	};
 	const goNext = () => {
 		dispatch(travelSliceActions.enrollTravelName(textValue));
-		regionRecommendFlag ? navigation.navigate('SelectCity') : navigation.navigate('RecommendSelectCountry');
+		regionRecommendFlag ? navigation.navigate('SelectDay') : navigation.navigate('RecommendSelectCountry');
 	};
 	const [onFocus, setOnFocus] = useState(false);
 	const handleGoogleAnalytics = async () => {
@@ -36,7 +36,7 @@ export default function EnrollTravelTitle({navigation}: any) {
 	}, []);
 	return (
 		<BackgroundGray>
-			<Stepper total={13} now={1}></Stepper>
+			<Stepper total={regionRecommendFlag ? 4 : 13} now={1}></Stepper>
 			<StepText
 				marginTop={heightPercentage(10)}
 				styleText='새 여행'
@@ -70,8 +70,10 @@ export default function EnrollTravelTitle({navigation}: any) {
 			<ButtonContainer>
 				<CustomButton
 					marginBottom={12}
+					bgColor={colors.Primary}
+					textColor={colors.Gray5}
 					isDisabled={textValue == '' || textValue.startsWith(' ')}
-					label='다음'
+					label='다음으로'
 					onPress={goNext}
 				/>
 			</ButtonContainer>
@@ -79,10 +81,12 @@ export default function EnrollTravelTitle({navigation}: any) {
 	);
 }
 const InputAllContainter = styled(InputWrap)`
-	border-color: ${colors.backgroundWhite};
+	border-color: ${colors.Gray200};
 	background-color: ${colors.backgroundWhite};
 	height: ${heightPercentage(52)}px;
 	padding: 0px 0px 0px ${widthPercentage(10)}px;
+	border-width: 1px;
+	border-radius: 8px;
 `;
 
 const TravelTitleTextInput = styled.TextInput`

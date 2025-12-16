@@ -16,7 +16,7 @@ import {
 } from '../../utill/layout/layout';
 import {Keyboard, Pressable, TouchableOpacity} from 'react-native';
 import {SVGMinus, SVGPlus, SvgLoginLogo} from '../../utill/svg/svg';
-import {heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
+import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 import PrimaryButton from '../../utill/component/primary-button';
 import {DeleteContainer, SVGContainer} from './select-multi';
 import {logEvent} from '../../../firebaseAnalytice';
@@ -198,7 +198,7 @@ export default function SearchRecommend({navigation, route}: any) {
 						key: GOOGLE_API_KEY,
 						language: 'ko',
 					}}
-					textInputProps={{placeholderTextColor: colors.Gray2}}
+					textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
 					styles={{
 						container: {alignItems: 'center'},
 						textInputContainer: {
@@ -207,9 +207,17 @@ export default function SearchRecommend({navigation, route}: any) {
 							borderRadius: 8,
 							backgroundColor: colors.backgroundWhite,
 							alignItems: 'center',
+							borderWidth: 1,
+							borderColor: colors.Primary,
+							paddingLeft: 20,
 						},
 						listView: {width: widthPercentage(327)},
-						textInput: {margin: 1, color: 'black', backgroundColor: colors.backgroundWhite},
+						textInput: {
+							margin: 0.9,
+							color: 'black',
+							backgroundColor: 'transparent',
+							fontSize: fontPercentage(18),
+						},
 						description: {color: 'black'},
 					}}
 					fetchDetails={true}

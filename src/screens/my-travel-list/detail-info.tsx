@@ -170,7 +170,7 @@ export default function DetailInfo({navigation}: any) {
 					point: 5,
 					tendencyPoint: tendency,
 				};
-				dispatch(reviewAndPoint(data));
+				if (!!travelId) dispatch(reviewAndPoint(data));
 			}
 			await dispatch(deleteTravelCourse({travelId: travelId}));
 			navigation.goBack();
@@ -290,7 +290,7 @@ export default function DetailInfo({navigation}: any) {
 			};
 			dispatch(LoadingSliceActions.onLoading());
 			setModalView(false);
-			dispatch(reviewAndPoint(data));
+			if (!!travelId) dispatch(reviewAndPoint(data));
 			dispatch(
 				modalSliceActions.setOpenModal({
 					modalTitle: '리뷰 남겨주셔서\n정말 감사드립니다! :)',
@@ -394,13 +394,13 @@ export default function DetailInfo({navigation}: any) {
 					text={text}
 					setEditing={setEditing}
 				/>
-				<Modal
+				{/* <Modal
 					animationType={'fade'}
 					transparent={true}
 					visible={viewPagerState}
 					onRequestClose={deleteMainViewPager}>
 					<ViewPager sliceNumber={4} handleFunction={deleteMainViewPager} />
-				</Modal>
+				</Modal> */}
 				<ButtonMarginBottom></ButtonMarginBottom>
 			</Scroll>
 			<ButtonContainer>

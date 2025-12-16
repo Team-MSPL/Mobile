@@ -96,7 +96,9 @@ const ScrollContainer = styled.Pressable`
 	align-items: center;
 	justify-content: center;
 `;
-const Scroll = styled.ScrollView``;
+const Scroll = styled.ScrollView`
+	height: 80%;
+`;
 const TextPressable = styled.Pressable`
 	width: 50%;
 	align-items: center;
@@ -113,7 +115,7 @@ const Container = styled.View`
 `;
 const EventImage = styled.Image`
 	width: ${devicesWidth * 0.95}px;
-	height: ${devicesWidth * 0.95}px;
+	height: 100%;
 	object-fit: contain;
 `;
 const ViewContaniner = styled.View`

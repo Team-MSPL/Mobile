@@ -14,6 +14,7 @@ export default function TendencyButton({
 	imageSvg,
 	width,
 	disabled,
+	textSize,
 }: CustomButtonProps) {
 	return (
 		<ButtonContainer
@@ -23,7 +24,10 @@ export default function TendencyButton({
 			marginBottom={marginBottom}
 			disabled={disabled}
 			width={width}>
-			<PretendardSemiBoldText size={16} lineHeight={19.09} color={bgColor ? colors.Gray5 : colors.Gray4}>
+			<PretendardSemiBoldText
+				size={textSize ?? 16}
+				lineHeight={(textSize ?? 15.09) + 4}
+				color={bgColor ? colors.Gray5 : colors.Gray4}>
 				{label}
 			</PretendardSemiBoldText>
 			{imageUrl && (
@@ -47,6 +51,7 @@ type CustomButtonProps = {
 	width?: number;
 	imageSvg?: any;
 	disabled?: boolean;
+	textSize?: number;
 };
 const ButtonContainer = styled.TouchableOpacity<{
 	select: boolean;
@@ -54,12 +59,12 @@ const ButtonContainer = styled.TouchableOpacity<{
 	marginBottom?: number;
 	width?: number;
 }>`
-	width: ${props => (props.divide ? props.width ?? 'null' : widthPercentage(327) + 'px')};
+	width: ${props => (props.divide ? props.width ?? widthPercentage(159) + 'px' : widthPercentage(327) + 'px')};
 	align-items: center;
 	height: ${heightPercentage(60)}px;
 	padding: ${props => (props.divide ? heightPercentage(10) + 'px ' + widthPercentage(13) + 'px' : '0px')};
 	justify-content: center;
-	border-radius: 17px;
+	border-radius: 8px;
 	border-width: ${props => (props.select ? '1px' : '1px')};
 	border-color: ${props => (props.select ? colors.Primary : colors.Gray1)};
 	background-color: ${props => (props.select ? 'rgba(195,245,80,0.3)' : colors.Gray1)};

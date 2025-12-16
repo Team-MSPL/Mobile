@@ -28,6 +28,7 @@ export default function SelectPlay({navigation}: any) {
 						bgColor={regionTendency[2][idx] == 1}
 						label={item}
 						key={idx}
+						divide={true}
 						imageUrl={regionTendencyList[2]?.photo[idx]}
 						onPress={() => {
 							handleSelect(idx);

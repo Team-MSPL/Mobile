@@ -1,10 +1,26 @@
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
+        maven { url "https://devrepo.kakao.com/nexus/content/groups/public/" } // ✅ 추가
+    }
+}
+
 rootProject.name = 'DanimMobile'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle");
+applyNativeModulesSettingsGradle(settings)
+
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+
 include ':react-native-lottie-splash-screen'
 project(':react-native-lottie-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-lottie-splash-screen/android')
-include ':app', ':react-native-code-push'
-project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
+
 include ':react-native-version-check'
-project(':react-native-version-check').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-version-check/android')
+project(':react-native-version-check').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-version-check/android')
+
+include ':react-native-fs'
+project(':react-native-fs').projectDir = new File(settingsDir, '../node_modules/react-native-fs/android')

@@ -167,7 +167,7 @@ const InfoView = ({navigation, test, index, idx, modify, CancelModify}: any) => 
 					  });
 			}}
 			marginBottom={heightPercentage(10)}
-			width={widthPercentage(282)}
+			width={widthPercentage(262)}
 			height={heightPercentage(42)}></PrimaryButton>
 	);
 };

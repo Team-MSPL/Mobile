@@ -16,12 +16,22 @@ export default function RecommendSelectMove({navigation}: any) {
 		{
 			name: '자동차 렌트카',
 			function: () => dispatch(travelSliceActions.enrollTransit(0)),
-			image: <MoveImage resizeMode='contain' source={require('../../../public/images/test1.png')}></MoveImage>,
+			image: (
+				<MoveImage
+					style={{width: widthPercentage(40), height: widthPercentage(40)}}
+					resizeMode='contain'
+					source={require('../../../public/images/test1.png')}></MoveImage>
+			),
 		},
 		{
 			name: '대중교통',
 			function: () => dispatch(travelSliceActions.enrollTransit(1)),
-			image: <MoveImage resizeMode='contain' source={require('../../../public/images/test2.png')}></MoveImage>,
+			image: (
+				<MoveImage
+					style={{width: widthPercentage(40), height: widthPercentage(40)}}
+					resizeMode='contain'
+					source={require('../../../public/images/test2.png')}></MoveImage>
+			),
 		},
 	];
 	return (
@@ -45,7 +55,7 @@ export default function RecommendSelectMove({navigation}: any) {
 					</SelectButton>
 				))}
 			</SelectMoveContainer>
-			<RouteButton marginBottom={12} navigation={navigation} nextTitle='RecommendSelectBusy'></RouteButton>
+			<RouteButton navigation={navigation} nextTitle='RecommendSelectBusy'></RouteButton>
 		</BackgroundGray>
 	);
 }
@@ -54,7 +64,7 @@ const MoveImage = styled.Image`
 	height: ${heightPercentage(130)}px;
 `;
 const SelectMoveContainer = styled.View`
-	flex: 1;
+	flex: 0.8;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-around;

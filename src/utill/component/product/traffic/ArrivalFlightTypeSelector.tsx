@@ -1,0 +1,132 @@
+import React, {useEffect, useState} from 'react';
+import {View, TouchableOpacity, ScrollView, StyleSheet, Text} from 'react-native';
+import {useAppDispatch, useAppSelector} from '../../../../redux';
+import {setTrafficField} from '../../../../redux/product/bookingSlice';
+import {colors} from '../../../colors';
+type Option = {id?: string; name?: string; [k: string]: any};
+
+type Props = {
+	trafficType: string; // e.g. "flight"
+	rawFields?: any;
+	trafficTypeValue?: string; // default "flight"
+	label?: string;
+	required?: boolean;
+	onValueChange?: (v: string | null) => void;
+};
+
+export default function ArrivalFlightTypeSelector({
+	trafficType,
+	rawFields,
+	trafficTypeValue = 'flight',
+	label = '항공편 유형',
+	required = false,
+	onValueChange,
+}: Props) {
+	const trafficSpec = Array.isArray(rawFields?.traffics)
+		? rawFields.traffics.find((t: any) => t?.traffic_type?.traffic_type_value === trafficTypeValue) ?? null
+		: null;
+	const options: Option[] = trafficSpec?.arrival_flightType?.list_option ?? [];
+
+	const {trafficArray} = useAppSelector(state => state.bookingSlice);
+	const stored =
+		trafficArray?.find(it => String(it?.traffic_type) === String(trafficType))?.arrival_flightType ?? null;
+	const dispatch = useAppDispatch();
+
+	const [open, setOpen] = useState(false);
+	const [selectedId, setSelectedId] = useState<string | null>(stored ?? null);
+
+	useEffect(() => {
+		if ((stored ?? null) !== selectedId) setSelectedId(stored ?? null);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [stored]);
+
+	useEffect(() => {
+		if (selectedId !== null && selectedId !== '')
+			dispatch(
+				setTrafficField({
+					trafficTypeValue: trafficType,
+					fieldId: 'arrival_flightType',
+					value: String(selectedId),
+				}),
+			);
+		else
+			dispatch(
+				setTrafficField({
+					trafficTypeValue: trafficType,
+					fieldId: 'arrival_flightType',
+					value: '',
+				}),
+			);
+		onValueChange?.(selectedId);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selectedId, trafficType]);
+
+	if (!Array.isArray(options) || options.length === 0) return null;
+
+	const selectedOption = options.find(o => String(o.id) === String(selectedId)) ?? null;
+	const selectedLabel = selectedOption?.name ?? null;
+
+	return (
+		<View style={{marginBottom: 12}}>
+			<Text style={{marginBottom: 6, color: colors.grey800, fontSize: 24}}>
+				{label} {required ? <Text style={{color: colors.red400}}>*</Text> : null}
+			</Text>
+
+			<TouchableOpacity activeOpacity={0.85} onPress={() => setOpen(p => !p)} style={styles.input}>
+				<Text style={{color: selectedLabel ? colors.grey800 : colors.grey400}}>
+					{selectedLabel ?? '선택하세요'}
+				</Text>
+			</TouchableOpacity>
+
+			{open && (
+				<View style={styles.dropdown}>
+					<ScrollView nestedScrollEnabled>
+						{options.map((opt, idx) => {
+							const id = opt.id ?? String(idx);
+							const name = opt.name ?? String(id);
+							const active = String(id) === String(selectedId);
+							return (
+								<TouchableOpacity
+									key={String(id) + String(idx)}
+									onPress={() => {
+										setSelectedId(String(id));
+										setOpen(false);
+									}}
+									style={[styles.optionRow, active ? styles.optionRowActive : undefined]}>
+									<Text style={active ? {color: '#fff'} : {color: 'black'}}>{name}</Text>
+								</TouchableOpacity>
+							);
+						})}
+					</ScrollView>
+				</View>
+			)}
+		</View>
+	);
+}
+
+const styles = StyleSheet.create({
+	input: {
+		height: 54,
+		borderRadius: 14,
+		backgroundColor: colors.greyOpacity100,
+		paddingHorizontal: 12,
+		justifyContent: 'center',
+	},
+	dropdown: {
+		backgroundColor: '#fff',
+		borderWidth: 1,
+		borderColor: colors.grey200,
+		borderRadius: 10,
+		marginTop: 8,
+		maxHeight: 220,
+	},
+	optionRow: {
+		paddingVertical: 12,
+		paddingHorizontal: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.grey100,
+	},
+	optionRowActive: {
+		backgroundColor: colors.blue500,
+	},
+});

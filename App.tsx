@@ -8,13 +8,12 @@
 import React, {useEffect, useLayoutEffect} from 'react';
 import {BackHandler, Linking, StatusBar, useColorScheme, Vibration} from 'react-native';
 
-import {KAKAO_NATIVE_KEY} from '@env';
+import {KAKAO_NATIVE_KEY, TossPayment_Live_Key, TossPayment_Test_Key} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import CodePush from 'react-native-code-push';
 import LottieSplashScreen from 'react-native-lottie-splash-screen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {RootState, useAppDispatch, useAppSelector} from './src/redux';
 import {LoadingSliceActions} from './src/redux/loading/loading.slice';
@@ -36,8 +35,11 @@ import NeedVersionUpdate from './src/screens/network/needVersionUpdate';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {logEvent, setUserId, setUserProperty} from './firebaseAnalytice';
 import Cooperation from './src/utill/component/cooperation/cooperation';
+import {initializeKakaoSDK} from '@react-native-kakao/core';
+import {PaymentWidgetProvider} from '@tosspayments/widget-sdk-react-native';
 //import messaging from '@react-native-firebase/messaging';
 function App(): JSX.Element {
+	initializeKakaoSDK(`${KAKAO_NATIVE_KEY}`);
 	const isDarkMode = useColorScheme() === 'dark';
 	const {isLoading} = useAppSelector((state: RootState) => state.loadingSlice);
 	const {networkConn, serverConn} = useAppSelector(state => state.networkSlice);
@@ -117,16 +119,20 @@ function App(): JSX.Element {
 					//앱이 꺼져있는데 켰을때
 					const pattern = /whatId=([a-zA-Z0-9]+)/;
 					const match = res.match(pattern) ?? '';
-					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-					if (q.payload == 'ERR_BAD_REQUEST') {
-						dispatch(
-							modalSliceActions.setOpenModal({
-								modalTitle: '일정 소유자가 일정을 삭제했어요!',
-								modalFunction: goOffApp,
-							}),
-						);
-					} else {
-						dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+					if (!!match[1]) {
+						const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+						if (q.payload == 'ERR_BAD_REQUEST') {
+							dispatch(
+								modalSliceActions.setOpenModal({
+									modalTitle: '일정 소유자가 일정을 삭제했어요!',
+									modalFunction: goOffApp,
+								}),
+							);
+						} else {
+							dispatch(
+								travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}),
+							);
+						}
 					}
 				}
 			} catch (err) {
@@ -143,16 +149,18 @@ function App(): JSX.Element {
 				//앱이 켜져있는데 켰을때
 				const pattern = /whatId=([a-zA-Z0-9]+)/;
 				const match = e.url.match(pattern) ?? '';
-				const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
-				if (q.payload == 0) {
-					dispatch(
-						modalSliceActions.setOpenModal({
-							modalTitle: '일정 소유자가 일정을 삭제했어요!',
-							modalFunction: goOffApp,
-						}),
-					);
-				} else {
-					dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+				if (!!match[1]) {
+					const q = await dispatch(getOneTravelCourse({travelId: match[1]}));
+					if (q.payload == 0) {
+						dispatch(
+							modalSliceActions.setOpenModal({
+								modalTitle: '일정 소유자가 일정을 삭제했어요!',
+								modalFunction: goOffApp,
+							}),
+						);
+					} else {
+						dispatch(travelSliceActions.setMakeMode({shareViewWithStartFlag: false, makeMode: 'share'}));
+					}
 				}
 			} catch (err) {
 				dispatch(
@@ -234,33 +242,26 @@ function App(): JSX.Element {
 	return (
 		<GestureHandlerRootView style={{flex: 1}}>
 			<SafeAreaProvider>
-				<StatusBar
-					animated={true}
-					barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-					backgroundColor={backgroundStyle.backgroundColor}
-				/>
-				<NavigationContainer linking={linking}>
-					{<StackNavigator />}
-					{needVersionUpdate && <NeedVersionUpdate />}
-					{eventState && <Event />}
-					{cooperationState && <Cooperation />}
-					{!(networkConn && serverConn) && <Connection />}
-					{<BaseModal />}
-					{Boolean(isLoading) && <Loading />}
-					<Toast />
-				</NavigationContainer>
+				<SafeAreaView edges={['bottom']} style={{flex: 1}}>
+					<StatusBar
+						animated={true}
+						barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+						backgroundColor={backgroundStyle.backgroundColor}
+					/>
+					<NavigationContainer linking={linking}>
+						{<StackNavigator />}
+						{needVersionUpdate && <NeedVersionUpdate />}
+						{eventState && <Event />}
+						{cooperationState && <Cooperation />}
+						{!(networkConn && serverConn) && <Connection />}
+						{<BaseModal />}
+						{Boolean(isLoading) && <Loading />}
+						<Toast />
+					</NavigationContainer>
+				</SafeAreaView>
 			</SafeAreaProvider>
 		</GestureHandlerRootView>
 	);
 }
-const codePushOptions = {
-	checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
-	updateDialog: {
-		title: '내부 업데이트가 존재합니다.',
-		optionalUpdateMessage: '보다 안정적인 서비스 사용을 위해 내부 업데이트 후 재실행 합니다.',
-		optionalInstallButtonLabel: '업데이트',
-		optionalIgnoreButtonLabel: '나중에',
-	},
-	installMode: CodePush.InstallMode.IMMEDIATE,
-};
-export default CodePush(codePushOptions)(App);
+
+export default App;

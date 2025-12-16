@@ -31,6 +31,23 @@ export default function Recommend({navigation, route}: any) {
 	const [recommendItem, setRecommendItem] = useState<TimetableType[]>([...timetable[route.params.x]]);
 	const [recommendList, setRcommendList] = useState<RecommendList[]>();
 	const departure = useRef<DistanceType>({lat: 0, lng: 0});
+	const handleColor = (e: number) => {
+		let color = colors.Green500;
+		switch (e) {
+			case 1:
+			case 3:
+				color = colors.Orange;
+				break;
+			case 4:
+				color = colors.Pink1;
+				break;
+			case 6:
+			case 7:
+				color = colors.Blue1;
+				break;
+		}
+		return color;
+	};
 	const polylineCoordinates = recommendItem
 		.map((item, value) => {
 			if (item.name != '점심 추천' && item.name != '저녁 추천' && item.name != '숙소 추천') {
@@ -53,7 +70,10 @@ export default function Recommend({navigation, route}: any) {
 						centerOffset={{x: 0, y: 0}}
 						anchor={{x: 0.5, y: 0.5}}>
 						<MarkerContainer
-							backgroundColor={route.params.index == index ? colors.PointYellow : colors.Gray5}
+							mapMarker={true}
+							backgroundColor={
+								route.params.index == index ? colors.PointYellow : handleColor(value.category)
+							}
 							key={index}>
 							<PretendardSemiBoldText size={13} lineHeight={19} color={colors.backgroundWhite}>
 								{index + 1}

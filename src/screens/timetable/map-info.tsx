@@ -1,5 +1,14 @@
 import moment from 'moment';
-import {JSXElementConstructor, ReactElement, useCallback, useEffect, useRef, useState} from 'react';
+import {
+	JSXElementConstructor,
+	MutableRefObject,
+	ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import styled from 'styled-components/native';
@@ -14,17 +23,25 @@ import {
 	PretendardVariableText,
 	VStack,
 } from '../../utill/layout/layout';
-import {Circle, DashLine, DashLineContainer} from './preset';
-import {DayTouchablOpacity, MarkerContainer} from './preset-detail';
+import {DayTouchablOpacity, MarginContainer, MarkerContainer} from './preset-detail';
 import {WhiteContainer} from '../enroll-info/final-check';
 import {fontPercentage, heightPercentage, widthPercentage} from '../../utill/layout/responsive-size';
 
 import UseDatePicker from '../../utill/hooks/useDatePicker';
 import {SelectContainer} from '../enroll-info/select-day';
-import {travelSliceActions} from '../../redux/travel-info/travel.slice';
+import {googleDetailApi, recommendProduct, travelSliceActions} from '../../redux/travel-info/travel.slice';
 import {usePosition} from '../../utill/hooks/usePosition';
-import {SVGContainer} from '../enroll-info/select-multi';
-import {SVGPlus, SVGRightAdd, SvgPolygon} from '../../utill/svg/svg';
+import {Dropdown, DropdownElement, SVGContainer} from '../enroll-info/select-multi';
+import {
+	SVGPlus,
+	SVGRightAdd,
+	SvgPolygon,
+	SvgCheck,
+	SVGPencil,
+	SVGSearch,
+	SvgCalendar,
+	SVGProduct,
+} from '../../utill/svg/svg';
 import {useViewPager} from '../../utill/hooks/useViewPager';
 import ViewPager from '../../utill/view-pager';
 import {NestableScrollContainer} from 'react-native-draggable-flatlist';
@@ -35,36 +52,45 @@ import Toast from 'react-native-toast-message';
 import CustomMapView from '../../utill/component/timetable/mapView';
 import Timetable from '../../utill/component/timetable/timetable';
 
-export default function MapInfo({navigation, modify, setModify, goSave}: any) {
-	const {timetable, day, transit, shareViewWithStartFlag, region, country} = useAppSelector(
-		state => state.travelSlice,
-	);
+import BottomSheet, {BottomSheetScrollView, useBottomSheetInternal} from '@gorhom/bottom-sheet';
+import RouteButton from '../../utill/component/route-button';
+import Animated, {useAnimatedReaction, runOnJS} from 'react-native-reanimated';
+import LinearGradient from 'react-native-linear-gradient';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {GooglePlacesAutocomplete, GooglePlacesAutocompleteRef} from 'react-native-google-places-autocomplete';
+import {GOOGLE_API_KEY} from '@env';
+import {LoadingSliceActions} from '../../redux/loading/loading.slice';
+export default function MapInfo({navigation, modify, setModify, checkSave}: any) {
+	const {timetable, day, transit, shareViewWithStartFlag, region, country, Place, beforeTimetable, tendency, season} =
+		useAppSelector(state => state.travelSlice);
+	const {cooperationState} = useAppSelector(state => state.eventSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const [select, setSelect] = useState(0);
 	const a = useRef(false);
 	const viewRef = useRef({
 		...timetable[0][0],
-		endHours: Math.floor((((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) / 60),
-		endMinute: (((timetable[0][0].y ?? 0) + timetable[0][0].takenTime / 30) * 30 + 360) % 60,
+		endHours: Math.floor((((timetable[0][0]?.y ?? 0) + timetable[0][0]?.takenTime / 30) * 30 + 360) / 60),
+		endMinute: (((timetable[0][0]?.y ?? 0) + timetable[0][0]?.takenTime / 30) * 30 + 360) % 60,
 		index: 0,
 		idx: 0,
 	});
 	const scrollRef = useRef();
 	const changeTouch = (idx: number) => {
-		//setSelect(idx);
-		let totalScroll = 0;
-		for (let i = 0; i < idx; i++) {
-			totalScroll += timetable[i].length;
-		}
-		scrollRef.current.scrollTo({
-			y:
-				totalScroll * heightPercentage(76) +
-				totalScroll * widthPercentage(3) +
-				idx * fontPercentage(16.71) +
-				idx * heightPercentage(36),
-			animate: false,
-		});
+		setSelect(idx);
+		// let totalScroll = 0;
+		// for (let i = 0; i < idx; i++) {
+		// 	totalScroll += timetable[i].length;
+		// }
+		// scrollRef.current.scrollTo({
+		// 	y:
+		// 		totalScroll * heightPercentage(76) +
+		// 		totalScroll * widthPercentage(3) +
+		// 		idx * fontPercentage(16.71) +
+		// 		idx * heightPercentage(36),
+		// 	animate: false,
+		// });
 	};
 	const change = (idx: number) => {
 		idx != select && setSelect(idx);
@@ -100,7 +126,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		}
 	};
 
-	const categoryTitle = ['관광지', '식당', '', '카페', '숙소', '필수여행지'];
+	const categoryTitle = ['여행지', '식당', '', '카페', '숙소', '필수여행지', '여행 시작', '여행 종료'];
 	// const noMove = timetable[select].filter(item => !item.name.includes('추천'));
 	useEffect(() => {
 		for (let i = 0; i < timetable.length; i++) {
@@ -113,8 +139,25 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		}
 	}, []);
 	const goRemove = () => {
-		const a = timetable.map(item => item.filter(value => value.id != viewRef.current.id));
-		dispatch(travelSliceActions.changeTimetable(a));
+		console.log('asd', open, viewRef.current);
+		if (Array.isArray(timetable) && timetable[viewRef.current.index][viewRef.current.idx]) {
+			const targetId = timetable[viewRef.current.index][viewRef.current.idx].id;
+			console.log(timetable);
+			const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
+			console.log(a);
+			dispatch(travelSliceActions.changeTimetable(a));
+			if (open.status) {
+				setOpen({...open, status: false});
+			}
+		}
+		// if (Array.isArray(timetable) && Array.isArray(timetable[open.day]) && timetable[open.day][open.index]) {
+		// 	const targetId = timetable[open.day][open.index].id;
+		// 	const a = timetable.map(item => (Array.isArray(item) ? item.filter(value => value?.id !== targetId) : []));
+		// 	dispatch(travelSliceActions.changeTimetable(a));
+		// 	if (open.status) {
+		// 		setOpen({...open, status: false});
+		// 	}
+		// }
 	};
 	const [qw, seA] = useState(0);
 	const goConfirm = (timeData: {hour: string; ampm: string; minute: string}) => {
@@ -138,7 +181,7 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 		[saveView],
 	);
 	const openModal = (index, idx) => {
-		console.log(index, idx);
+		console.log(index, idx, timeView.status);
 		viewRef.current = {
 			...timetable[index][idx],
 			endHours: Math.floor(
@@ -149,10 +192,16 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 			idx: idx,
 		};
 		timeView.status && setTimeView({status: false, value: ''});
+		setChangeDay(index);
 		setVisible(true);
 	};
 	const [timeView, setTimeView] = useState({status: false, value: ''});
 
+	const getStepColor = (step, idx, activeStep) => {
+		if (step === '항공') return idx <= activeStep ? '#93D5FF' : '#ccc';
+		if (step === '숙소') return idx <= activeStep ? 'rgba(255, 139, 109, 1)' : '#ccc';
+		return idx <= activeStep ? '#B1E832' : '#ccc';
+	};
 	const goModify = () => {
 		setVisible(false);
 		const newY = viewRef.current.y;
@@ -188,7 +237,13 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 					y: newY,
 					x: viewRef.current.index,
 					takenTime: (newEnd - newY) * 30,
+					...(placeState?.name && {
+						name: placeState.name,
+						lat: placeState.lat,
+						lng: placeState.lng,
+					}),
 				};
+
 				let deleteCopy = [...timetable[viewRef.current.index]];
 				deleteCopy.splice(viewRef.current.idx, 1);
 				changeCopy[viewRef.current.index] = deleteCopy;
@@ -278,92 +333,163 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 	}, [shareViewWithStartFlag, modify]);
 	const [viewMap, setViewMap] = useState(true);
 	const [topbar, setTopBar] = useState(true);
+
+	const sheetRef = useRef<BottomSheet>(null);
+	const [placeState, setPlaceState] = useState<{
+		name: string | undefined;
+		lat: number | undefined;
+		lng: number | undefined;
+		photo: string;
+		category: number;
+		takenTime: number;
+		formatted_address: string | undefined;
+		region: string;
+	} | null>();
+	// variables
+	const snapPoints: ReadonlyArray<string | number> = useMemo(() => ['10%', '60%', '90%'], []);
+
+	// callbacks
+	const handleSheetChange = useCallback((index: number) => {
+		console.log('handleSheetChange', index);
+	}, []);
+	const [btnVisible, setBtnVisible] = useState(true);
+	function SheetContent() {
+		const {animatedIndex} = useBottomSheetInternal();
+
+		useAnimatedReaction(
+			() => animatedIndex.value,
+			(curr, prev) => {
+				if (curr !== prev && prev != null) {
+					runOnJS(setBtnVisible)(!((curr < prev && Math.floor(curr) <= 0) || Math.floor(curr) <= 0));
+				}
+			},
+			[animatedIndex],
+		);
+
+		return <></>;
+	}
+	const [timeOutVisible, setTiemOutVisible] = useState(true);
+	useEffect(() => {
+		if (!cooperationState) {
+			const timer = setTimeout(() => {
+				setTiemOutVisible(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [cooperationState]);
+	const [open, setOpen] = useState({day: 0, index: 0, status: false, type: '', x: 0, y: 0});
+	const headerHeight = useHeaderHeight();
+	const {top: statusBarHeight} = useSafeAreaInsets();
+	const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>();
+
+	const totalTopHeight = headerHeight + statusBarHeight;
+	const countryList = [
+		{ko: '한국', en: 'Korea'},
+		{ko: '일본', en: 'Japan'},
+		{ko: '중국', en: 'China'},
+		{ko: '베트남', en: 'Vietnam'},
+		{ko: '태국', en: 'Thailand'},
+		{ko: '필리핀', en: 'Philippines'},
+		{ko: '싱가포르', en: 'Singapore'},
+	];
+	const handleProduct = async () => {
+		navigation.navigate('PresetProduct', {trigger: 'map'});
+	};
 	return (
 		<MainAllContainer>
-			{topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>}
-			<VStack flex={1}>
-				{!modify && viewMap && (
-					<CustomMapView
-						select={select}
-						onTouchStart={() => setTopBar(false)}
-						onTouchEnd={() => setTopBar(true)}
-					/>
-				)}
-				{!modify && (
-					<ViewMapTouchable
-						onPress={() => {
-							setViewMap(!viewMap);
-						}}>
-						<HStack gap={5}>
-							<PretendardSemiBoldText size={14} lineHeight={19} color={colors.Gray5}>
-								{viewMap ? '접기' : '펼치기'}
-							</PretendardSemiBoldText>
-							<SVGRightAdd
-								width={widthPercentage(20)}
-								height={widthPercentage(20)}
-								color='black'
-								transform={!viewMap ? 90 : 270}
-							/>
-						</HStack>
-					</ViewMapTouchable>
-				)}
+			{/* {topbar && <AbsoluteTopBarComponent modify={modify} viewMap={viewMap}></AbsoluteTopBarComponent>} */}
+			{/* {!modify && viewMap && (
+				<CustomMapView
+					select={select}
+					// onTouchStart={() => setTopBar(false)}
+					// onTouchEnd={() => setTopBar(true)}
+				/>
+			)} */}
+			<CustomMapView
+				select={select}
+				// onTouchStart={() => setTopBar(false)}
+				// onTouchEnd={() => setTopBar(true)}
+			/>
+			{!modify && (
+				<ProductPressable onPress={handleProduct}>
+					<SVGProduct color='white' width={widthPercentage(22)} height={widthPercentage(22)} />
+				</ProductPressable>
+			)}
+			{modify ? (
 				<BackgroundGray modify={modify} viewMap={viewMap}>
-					<DayContainer horizontal={true} showsHorizontalScrollIndicator={false}>
-						<FlexWrap gap={10} marginBottom={modify || !viewMap ? 15 : 0}>
-							{timetable.map(
-								(item, idx) =>
-									item.length != 0 && (
-										<DayTouchablOpacity
-											key={idx}
-											select={idx === select}
-											onPress={() => {
-												changeTouch(idx);
-											}}>
-											<PretendardSemiBoldText
-												size={14}
-												lineHeight={19}
-												color={select == idx ? colors.Gray5 : colors.Gray3}>
-												{'DAY' + (idx + 1)}
-											</PretendardSemiBoldText>
-										</DayTouchablOpacity>
-									),
-							)}
-						</FlexWrap>
-					</DayContainer>
-					<HStack justifyContent='space-between'>
-						<WhiteContainer width={widthPercentage(160)}>
-							<HStack justifyContent='space-between' width={widthPercentage(140)}>
-								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
-									여행지
-								</PretendardSemiBoldText>
-								<SVGContainer
-									color={colors.PointYellow}
+					{/* <PretendardSemiBoldText
+							size={14}
+							lineHeight={19}
+							color={colors.Gray3}
+							deco={'text-align:center;'}>
+							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
+						</PretendardSemiBoldText> */}
+					<View style={{marginVertical: 10, flex: 1}}>
+						<DayContainer
+							scrollEnabled={timetable.length > 4}
+							horizontal
+							nestedScrollEnabled={true}
+							showsHorizontalScrollIndicator={false}
+							onScroll={e => {
+								console.log(e.nativeEvent.contentOffset.x);
+							}}>
+							{timetable.map((item, idx) => (
+								<DayTouchablOpacity
+									key={idx}
+									select={idx === select}
+									style={{marginRight: 10}}
 									onPress={() => {
-										navigation.navigate('TimetableAddPlace', {x: select, y: [], status: 'travle'});
+										changeTouch(idx);
+										open.status && setOpen({...open, status: false});
 									}}>
-									<SVGPlus
-										width={widthPercentage(16)}
-										height={widthPercentage(16)}
-										color={colors.Primary}
-									/>
-								</SVGContainer>
-							</HStack>
-						</WhiteContainer>
-						<WhiteContainer width={widthPercentage(160)}>
-							<HStack justifyContent='space-between' width={widthPercentage(140)}>
-								<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
-									숙소
-								</PretendardSemiBoldText>
-								<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
-									<SVGPlus
-										width={widthPercentage(16)}
-										height={widthPercentage(16)}
-										color={colors.Primary}
-									/>
-								</SVGContainer>
-							</HStack>
-						</WhiteContainer>
-					</HStack>
+									<PretendardSemiBoldText
+										size={14}
+										lineHeight={19}
+										color={select == idx ? colors.Gray5 : colors.Gray3}>
+										{'DAY' + (idx + 1)}
+									</PretendardSemiBoldText>
+								</DayTouchablOpacity>
+							))}
+						</DayContainer>
+					</View>
+					{/* <HStack justifyContent='space-between'>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										여행지
+									</PretendardSemiBoldText>
+									<SVGContainer
+										color={colors.PointYellow}
+										onPress={() => {
+											navigation.navigate('TimetableAddPlace', {
+												x: select,
+												y: [],
+												status: 'travle',
+											});
+										}}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										숙소
+									</PretendardSemiBoldText>
+									<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+						</HStack> */}
 					<Timetable
 						modify={modify}
 						scrollRef={scrollRef}
@@ -377,174 +503,413 @@ export default function MapInfo({navigation, modify, setModify, goSave}: any) {
 						goNavigation={goNavigation}
 						setModify={setModify}
 						viewMap={viewMap}
+						select={select}
+						open={open}
+						setOpen={setOpen}
 					/>
+					<MarginContainer />
 				</BackgroundGray>
-				{saveView && (
-					<AbsoluteButton onPress={goSave}>
-						<PretendardSemiBoldText size={18} lineHeight={21.48} color={colors.Primary}>
-							저장
-						</PretendardSemiBoldText>
-					</AbsoluteButton>
-				)}
-				<Modal
-					visible={visible}
-					animationType={'fade'}
-					transparent={true}
-					statusBarTranslucent={true}
-					onRequestClose={() => setVisible(false)}>
-					<ModalContainer onPress={() => setVisible(false)}>
-						<InfoModalContainer>
-							<HStack gap={widthPercentage(10)}>
-								<PretendardSemiBoldText size={17.78} lineHeight={24} color={colors.Gray5}>
-									{viewRef.current.name}
+			) : (
+				<BottomSheet
+					ref={sheetRef}
+					snapPoints={modify ? ['99%', '99%'] : ['10%', '60%', '90%']}
+					handleIndicatorStyle={{backgroundColor: '#E4E6EB', width: widthPercentage(61)}}
+					handleStyle={{borderRadius: 30}}
+					backgroundStyle={{borderRadius: 30}}
+					enableDynamicSizing={false}
+					onChange={handleSheetChange}
+					index={modify ? 0 : 1}
+					style={{zIndex: 0}}>
+					<SheetContent />
+					<BottomSheetScrollView
+						onScroll={() => {
+							open.status && setOpen({...open, status: false});
+						}}
+						showsVerticalScrollIndicator={false}
+						style={{zIndex: 0}}>
+						<BackgroundGray modify={modify} viewMap={viewMap}>
+							{/* <PretendardSemiBoldText
+							size={14}
+							lineHeight={19}
+							color={colors.Gray3}
+							deco={'text-align:center;'}>
+							{moment(day[0]).format('YYYY/MM/DD')}~{moment(day[1]).format('YYYY/MM/DD')}
+						</PretendardSemiBoldText> */}
+							<DayContainer
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								nestedScrollEnabled={true}>
+								{timetable.map((item, idx) => (
+									<DayTouchablOpacity
+										key={idx}
+										style={{marginRight: 10}}
+										select={idx === select}
+										onPress={() => {
+											changeTouch(idx);
+											open.status && setOpen({...open, status: false});
+										}}>
+										<PretendardSemiBoldText
+											size={14}
+											lineHeight={19}
+											color={select == idx ? colors.Gray5 : colors.Gray3}>
+											{'DAY' + (idx + 1)}
+										</PretendardSemiBoldText>
+									</DayTouchablOpacity>
+								))}
+							</DayContainer>
+							{/* <HStack justifyContent='space-between'>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										여행지
+									</PretendardSemiBoldText>
+									<SVGContainer
+										color={colors.PointYellow}
+										onPress={() => {
+											navigation.navigate('TimetableAddPlace', {
+												x: select,
+												y: [],
+												status: 'travle',
+											});
+										}}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+							<WhiteContainer width={widthPercentage(160)}>
+								<HStack justifyContent='space-between' width={widthPercentage(140)}>
+									<PretendardSemiBoldText size={14} lineHeight={16.71} color={colors.PointYellow}>
+										숙소
+									</PretendardSemiBoldText>
+									<SVGContainer color={colors.PointYellow} onPress={checkAccommodation}>
+										<SVGPlus
+											width={widthPercentage(16)}
+											height={widthPercentage(16)}
+											color={colors.Primary}
+										/>
+									</SVGContainer>
+								</HStack>
+							</WhiteContainer>
+						</HStack> */}
+							<Timetable
+								modify={modify}
+								scrollRef={scrollRef}
+								changeViewState={changeViewState}
+								scrollhandle={scrollhandle}
+								changeLocation={changeLocation}
+								changeLocationRef={changeLocationRef}
+								openModal={openModal}
+								CancelModify={CancelModify}
+								navigation={navigation}
+								goNavigation={goNavigation}
+								setModify={setModify}
+								viewMap={viewMap}
+								select={select}
+								open={open}
+								setOpen={setOpen}
+							/>
+						</BackgroundGray>
+						<MarginContainer />
+					</BottomSheetScrollView>
+				</BottomSheet>
+			)}
+			{btnVisible && !modify && (
+				<>
+					<ModifyPressable onPress={() => setModify(true)}>
+						<SVGPencil color='white' width={widthPercentage(24)} height={widthPercentage(24)} />
+					</ModifyPressable>
+					{timeOutVisible && (
+						<PressBox>
+							<LinearGradient
+								start={{x: 0, y: 0}}
+								end={{x: 1, y: 0}}
+								colors={['rgba(83, 80, 255, 0.8) ', '#5350FF']}
+								style={{
+									zIndex: 101,
+									position: 'absolute',
+									width: '100%',
+									height: '100%',
+									alignItems: 'center',
+									justifyContent: 'center',
+									borderRadius: 18,
+								}}>
+								<PretendardSemiBoldText color={colors.backgroundWhite} size={14} lineHeight={18}>
+									수정하시려면 클릭하세요
 								</PretendardSemiBoldText>
-								<PretendardVariableText size={13.33} lineHeight={20} color={colors.Gray2}>
-									{categoryTitle[viewRef.current.category]}
-								</PretendardVariableText>
-							</HStack>
-							<FlexWrap gap={10} margintop={15}>
-								{timetable.map(
-									(item, idx) =>
-										item.length != 0 && (
-											<ChangeDayContainer
-												key={idx}
-												select={idx === changeDay}
-												onPress={() => {
-													setChangeDay(idx);
-												}}>
-												<PretendardSemiBoldText
-													size={14}
-													lineHeight={19}
-													color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
-													{moment(day[idx]).format('MM월DD일')}
-												</PretendardSemiBoldText>
-											</ChangeDayContainer>
-										),
-								)}
-							</FlexWrap>
-							<HStack justifyContent='space-between' marginVertical={5}>
-								<SelectContainer
-									onPress={() => {
-										setTimeView({status: !timeView.status, value: 'left'});
-									}}>
-									<HStack justifyContent='space-between'>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12 ? 'AM' : 'PM'}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											:
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{String(((viewRef.current.y ?? 0) * 30 + 360) % 60).padStart(2, '0')}
-										</PretendardSemiBoldText>
-									</HStack>
-								</SelectContainer>
-								<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-									~
-								</PretendardSemiBoldText>
-								<SelectContainer
-									onPress={() => {
-										setTimeView({status: !timeView.status, value: 'right'});
-									}}>
-									<HStack justifyContent='space-between'>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{viewRef.current.endHours < 12 ? 'AM' : 'PM'}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{viewRef.current.endHours}
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											:
-										</PretendardSemiBoldText>
-										<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
-											{String(viewRef.current.endMinute).padStart(2, '0')}
-										</PretendardSemiBoldText>
-									</HStack>
-								</SelectContainer>
-							</HStack>
-							<TimePickerContainer alignSelf={timeView.value == 'right' ? 'flex-end' : 'flex-start'}>
-								<UseDatePicker
-									goConfirm={goConfirm}
-									minuteData={
-										timeView.value == 'right'
-											? viewRef.current.endMinute / 30
-											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) % 60) / 30
-									}
-									ampmData={
-										timeView.value == 'right'
-											? Math.floor(
-													(((viewRef.current.y ?? 0) + viewRef.current.takenTime / 30) * 30 +
-														360) /
-														60,
-											  ) < 12
-												? 0
-												: 1
-											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+							</LinearGradient>
+							<LeftTriangle />
+						</PressBox>
+					)}
+				</>
+			)}
+			{modify && (
+				<RouteButton
+					navigation={navigation}
+					nextText='적용하기'
+					leftText='취소'
+					type={'planner'}
+					btnFunction={() => {
+						checkSave();
+						// setStep(step + 1);
+					}}
+					LeftBtnFunction={() => {
+						setModify(false);
+						console.log('asdasd');
+						dispatch(travelSliceActions.changeTimetable(beforeTimetable));
+						// setStep(step + 1);
+					}}></RouteButton>
+			)}
+			<Modal
+				visible={visible}
+				animationType={'fade'}
+				transparent={true}
+				statusBarTranslucent={true}
+				onRequestClose={() => setVisible(false)}>
+				<ModalContainer onPress={() => setVisible(false)}>
+					<InfoModalContainer>
+						<GooglePlacesAutocomplete
+							placeholder='검색어를 입력하세요.'
+							ref={autocompleteRef as MutableRefObject<GooglePlacesAutocompleteRef | null>}
+							query={{
+								key: GOOGLE_API_KEY,
+								language: 'ko',
+							}}
+							textInputProps={{placeholderTextColor: colors.Gray2, allowFontScaling: false}}
+							renderLeftButton={() => (
+								<SVGSearch
+									width={widthPercentage(20)}
+									height={widthPercentage(20)}
+									color={colors.Primary}
+								/>
+							)}
+							styles={{
+								container: {alignItems: 'center'},
+								textInputContainer: {
+									width: widthPercentage(327),
+									height: widthPercentage(52),
+									borderRadius: 99,
+									backgroundColor: colors.backgroundWhite,
+									alignItems: 'center',
+									borderWidth: 1,
+									borderColor: colors.Primary,
+									paddingLeft: 20,
+								},
+								listView: {width: widthPercentage(327), maxHeight: heightPercentage(100)},
+								textInput: {
+									color: 'black',
+									backgroundColor: 'transparent',
+									flex: 0.9,
+									fontSize: fontPercentage(18),
+								},
+								description: {color: 'black'},
+							}}
+							fetchDetails={true}
+							onPress={async (data, details) => {
+								const placeId = details?.place_id;
+								const response = await dispatch(googleDetailApi({placeId: placeId}));
+								let imageUrl;
+								if (response.payload.result.photos) {
+									const photoReference = response.payload.result?.photos[0]?.photo_reference;
+									imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_API_KEY}`;
+								} else {
+									imageUrl = null;
+								}
+								const datas = {
+									...Place,
+									name: details?.name,
+									lat: details?.geometry.location.lat,
+									lng: details?.geometry.location.lng,
+									formatted_address: details?.formatted_address.replace('대한민국 ', ''),
+									photo: imageUrl,
+									region: details?.formatted_address.replace('대한민국 ', ''),
+								};
+								setPlaceState(datas);
+								dispatch(travelSliceActions.enrollPlace(datas));
+							}}
+							onFail={error => console.log(error)}
+							onNotFound={() => console.log('no results')}></GooglePlacesAutocomplete>
+
+						<HStack gap={widthPercentage(10)}>
+							<PretendardSemiBoldText size={17.78} lineHeight={24} color={colors.Gray5}>
+								{placeState?.name || viewRef.current.name}
+							</PretendardSemiBoldText>
+							<PretendardVariableText size={13.33} lineHeight={20} color={colors.Gray2}>
+								{categoryTitle[viewRef.current.category]}
+							</PretendardVariableText>
+						</HStack>
+						<FlexWrap gap={10} margintop={15}>
+							{timetable.map(
+								(item, idx) =>
+									item.length != 0 && (
+										<ChangeDayContainer
+											key={idx}
+											select={idx === changeDay}
+											onPress={() => {
+												setChangeDay(idx);
+											}}>
+											<PretendardSemiBoldText
+												size={14}
+												lineHeight={19}
+												color={changeDay == idx ? colors.Gray5 : colors.Gray3}>
+												{moment(day[idx]).format('MM월DD일')}
+											</PretendardSemiBoldText>
+										</ChangeDayContainer>
+									),
+							)}
+						</FlexWrap>
+						<HStack justifyContent='space-between' marginVertical={5}>
+							<SelectContainer
+								onPress={() => {
+									setTimeView({status: !timeView.status, value: 'left'});
+								}}>
+								<HStack justifyContent='space-between'>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12 ? 'AM' : 'PM'}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										:
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{String(((viewRef.current.y ?? 0) * 30 + 360) % 60).padStart(2, '0')}
+									</PretendardSemiBoldText>
+								</HStack>
+							</SelectContainer>
+							<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+								~
+							</PretendardSemiBoldText>
+							<SelectContainer
+								onPress={() => {
+									setTimeView({status: !timeView.status, value: 'right'});
+								}}>
+								<HStack justifyContent='space-between'>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{viewRef.current.endHours < 12 ? 'AM' : 'PM'}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{viewRef.current.endHours}
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										:
+									</PretendardSemiBoldText>
+									<PretendardSemiBoldText size={12} lineHeight={14.32} color={colors.Gray5}>
+										{String(viewRef.current.endMinute).padStart(2, '0')}
+									</PretendardSemiBoldText>
+								</HStack>
+							</SelectContainer>
+						</HStack>
+						<TimePickerContainer alignSelf={timeView.value == 'right' ? 'flex-end' : 'flex-start'}>
+							<UseDatePicker
+								goConfirm={goConfirm}
+								minuteData={
+									timeView.value == 'right'
+										? viewRef.current.endMinute / 30
+										: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) % 60) / 30
+								}
+								ampmData={
+									timeView.value == 'right'
+										? Math.floor(
+												(((viewRef.current.y ?? 0) + viewRef.current.takenTime / 30) * 30 +
+													360) /
+													60,
+										  ) < 12
 											? 0
 											: 1
-									}
-									hourData={
-										timeView.value == 'right'
-											? viewRef.current.endHours < 12
-												? viewRef.current.endHours
-												: viewRef.current.endHours - 12
-											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
-											? Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)
-											: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) - 12
-									}
-									visible={timeView.status}
-									setVisible={setVisible}></UseDatePicker>
-							</TimePickerContainer>
-							<HStack justifyContent='space-between'>
-								<ButtonsContainer
-									backgroundColor={colors.Gray1}
-									onPress={() => {
-										setVisible(false);
-										dispatch(
-											modalSliceActions.setOpenModal({
-												modalTitle: `'${viewRef.current.name}' 일정을 삭제할까요?`,
-												modalSubTitle: '추천받은 일정을 삭제하면 되돌릴 수 없어요.',
-												modalFunction: goRemove,
-												modalBottomText: '취소',
-												modalTopText: '삭제할래요',
-											}),
-										);
-									}}>
-									<PretendardVariableText size={16} lineHeight={19} color={colors.PointGreen1}>
-										삭제
-									</PretendardVariableText>
-								</ButtonsContainer>
-								<ButtonsContainer backgroundColor='#D5FF734D' onPress={goModify}>
-									<PretendardVariableText size={16} lineHeight={19} color={colors.Gray5}>
-										저장
-									</PretendardVariableText>
-								</ButtonsContainer>
-							</HStack>
-						</InfoModalContainer>
-					</ModalContainer>
-				</Modal>
-			</VStack>
-			<Modal
+										: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+										? 0
+										: 1
+								}
+								hourData={
+									timeView.value == 'right'
+										? viewRef.current.endHours < 12
+											? viewRef.current.endHours
+											: viewRef.current.endHours - 12
+										: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) < 12
+										? Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60)
+										: Math.floor(((viewRef.current.y ?? 0) * 30 + 360) / 60) - 12
+								}
+								visible={timeView.status}
+								setVisible={setVisible}></UseDatePicker>
+						</TimePickerContainer>
+						<HStack justifyContent='space-between'>
+							<ButtonsContainer
+								backgroundColor={colors.Gray1}
+								onPress={() => {
+									setVisible(false);
+									dispatch(
+										modalSliceActions.setOpenModal({
+											modalTitle: `'${viewRef.current.name}' 일정을 삭제할까요?`,
+											modalSubTitle: '추천받은 일정을 삭제하면 되돌릴 수 없어요.',
+											modalFunction: goRemove,
+											modalBottomText: '취소',
+											modalTopText: '삭제할래요',
+										}),
+									);
+								}}>
+								<PretendardVariableText size={16} lineHeight={19} color={colors.PointGreen1}>
+									삭제
+								</PretendardVariableText>
+							</ButtonsContainer>
+							<ButtonsContainer backgroundColor='#D5FF734D' onPress={goModify}>
+								<PretendardVariableText size={16} lineHeight={19} color={colors.Gray5}>
+									저장
+								</PretendardVariableText>
+							</ButtonsContainer>
+						</HStack>
+					</InfoModalContainer>
+				</ModalContainer>
+			</Modal>
+			{/* <Modal
 				animationType={'fade'}
 				transparent={true}
 				visible={viewPagerState}
 				onRequestClose={deleteMainViewPager}>
 				<ViewPager sliceNumber={modify ? 5 : 3} handleFunction={deleteMainViewPager} />
-			</Modal>
+			</Modal> */}
+			{open.status && (
+				<Dropdown x={open.x} y={open.y - totalTopHeight}>
+					<DropdownElement
+						onPress={() => {
+							setOpen({
+								...open,
+								status: false,
+							});
+							// setModify(true);
+							openModal(timetable[open.day][open.index].x, open.index);
+							setPlaceState(null);
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							편집
+						</PretendardSemiBoldText>
+					</DropdownElement>
+					<DropdownElement
+						onPress={() => {
+							console.log('aa');
+							goRemove();
+						}}>
+						<PretendardSemiBoldText color={colors.Gray5} size={14} lineHeight={18}>
+							삭제
+						</PretendardSemiBoldText>
+					</DropdownElement>
+				</Dropdown>
+			)}
 		</MainAllContainer>
 	);
 }
 const ChangeDayContainer = styled.TouchableOpacity<{select: boolean}>`
-	padding: ${heightPercentage(5)}px ${widthPercentage(10)}px;
+	padding: ${heightPercentage(10)}px ${widthPercentage(12)}px;
 	align-items: center;
 	justify-content: center;
 	border-radius: 99px;
-	border-width: ${props => (props.select ? '0px' : '1px')};
-	border-color: ${colors.Gray3};
-	background-color: ${props => (props.select ? colors.Primary : colors.backgroundGray)};
+	border-width: ${props => (props.select ? '1px' : '0px')};
+	border-color: ${colors.Primary};
+	background-color: ${props => (props.select ? colors.PrimarySecondary : colors.backgroundWhite)};
 `;
 const AbsoluteButton = styled.TouchableOpacity`
 	width: ${widthPercentage(327)}px;
@@ -573,9 +938,9 @@ export const InfoModalContainer = styled.View`
 	flex: 0.5;
 	position: absolute;
 	bottom: 0px;
-	background-color: ${colors.backgroundGray};
+	background-color: ${colors.backgroundWhite};
 	width: ${widthPercentage(375)}px;
-	height: ${heightPercentage(409)}px;
+	height: ${heightPercentage(725)}px;
 	border-top-right-radius: 16px;
 	border-top-left-radius: 16px;
 	padding: ${heightPercentage(23.22)}px ${widthPercentage(24)}px;
@@ -587,14 +952,15 @@ const ModalContainer = styled.Pressable`
 export const DayContainer = styled.ScrollView``;
 const MainAllContainer = styled(MainContainer).attrs({as: View})`
 	flex: 1;
+	z-index: 0;
 `;
 const BackgroundGray = styled.View<{modify: boolean; viewMap: boolean}>`
 	width: ${widthPercentage(375)}px;
-	border-top-right-radius: 10px;
-	border-top-left-radius: 10px;
-	background-color: ${colors.backgroundGray};
-	padding: ${heightPercentage(18)}px ${widthPercentage(23)}px;
-	flex: ${props => (props.modify || !props.viewMap ? 1 : 0.55)};
+	background-color: ${colors.backgroundWhite};
+	padding: ${heightPercentage(0)}px ${widthPercentage(23)}px;
+	z-index: 0;
+	position: ${props => (props.modify ? 'absolute' : undefined)};
+	bottom: 0px;
 `;
 const ViewMapTouchable = styled.TouchableOpacity`
 	flex: 0.03;
@@ -602,4 +968,69 @@ const ViewMapTouchable = styled.TouchableOpacity`
 	justify-content: center;
 	align-items: center;
 	padding: ${widthPercentage(3)}px;
+`;
+
+const Circle = styled.TouchableOpacity`
+	width: ${widthPercentage(30)}px;
+	height: ${widthPercentage(30)}px;
+	border-radius: 99px;
+	background-color: ${props => (props.color == '#ccc' ? 'white' : props.color)};
+	border-color: ${props =>
+		props.color == '#ccc'
+			? props.color == '#ccc' && props.flag == 0
+				? '#93D5FF'
+				: props.color == '#ccc' && props.flag == 1
+				? '#FF8B6D'
+				: '#B1E832'
+			: props.color};
+	border-width: 2px;
+	margin-bottom: 8px;
+	align-items: center;
+	justify-content: center;
+`;
+const ModifyPressable = styled.Pressable`
+	position: absolute;
+	width: ${widthPercentage(46)}px;
+	height: ${widthPercentage(46)}px;
+	left: ${widthPercentage(304)}px;
+	bottom: ${widthPercentage(30)}px;
+	border-radius: 24px;
+	background-color: rgba(0, 0, 0, 0.5);
+	align-items: center;
+	justify-content: center;
+`;
+const ProductPressable = styled.Pressable`
+	position: absolute;
+	width: ${widthPercentage(46)}px;
+	height: ${widthPercentage(46)}px;
+	left: ${widthPercentage(15)}px;
+	top: ${widthPercentage(30)}px;
+	border-radius: 24px;
+	background-color: rgba(0, 0, 0, 0.5);
+	align-items: center;
+	justify-content: center;
+`;
+const PressBox = styled.View`
+	width: ${widthPercentage(160)}px;
+	height: ${widthPercentage(30)}px;
+	left: ${widthPercentage(136)}px;
+	bottom: ${widthPercentage(38)}px;
+	position: absolute;
+	border-radius: 18px;
+	align-items: center;
+	justify-content: center;
+`;
+const LeftTriangle = styled.View`
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	border-style: solid;
+	border-left-width: ${widthPercentage(8)}px;
+	border-top-width: ${widthPercentage(4)}px;
+	border-bottom-width: ${widthPercentage(4)}px;
+	border-top-color: transparent;
+	border-bottom-color: transparent;
+	border-left-color: rgba(83, 80, 255, 1);
+	position: absolute;
+	right: -${widthPercentage(7)}px;
 `;

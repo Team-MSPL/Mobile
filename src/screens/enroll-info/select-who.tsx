@@ -11,9 +11,10 @@ import {modalSliceActions} from '../../redux/modal/modalSlice';
 import {useEffect} from 'react';
 import {logEvent} from '../../../firebaseAnalytice';
 import RouteButton from '../../utill/component/route-button';
+import {getTendency, travelSliceActions} from '../../redux/travel-info/travel.slice';
 
 export default function RecommendSelectWho({navigation}: any) {
-	const {tendency} = useAppSelector(state => state.travelSlice);
+	const {tendency, tendencyUse} = useAppSelector(state => state.travelSlice);
 	const {socialloginProvider} = useAppSelector(state => state.userSlice);
 	const dispatch = useAppDispatch();
 	const checkNext = () => {
@@ -45,6 +46,31 @@ export default function RecommendSelectWho({navigation}: any) {
 	};
 	useEffect(() => {
 		handleGoogleAnalytics();
+	}, []);
+	const handleTendencyCheck = (tendency: number[][]) => {
+		dispatch(
+			modalSliceActions.setOpenModal({
+				modalTitle: `최근에 선택하신 여행 성향들로 ${`\n`}추천을 진행할까요?`,
+				modalTopText: '네, 최근 선택대로 추천해주세요',
+				modalBottomText: '아니요, 다시 선택할게요',
+				modalFunction: () => {
+					dispatch(travelSliceActions.enrollRecentTendency(tendency));
+					navigation.navigate('FinalCheck');
+				},
+			}),
+		);
+	};
+	const handleTendency = async () => {
+		if (!tendencyUse) {
+			const a = await dispatch(getTendency()).unwrap();
+			if (a?.data?.recentSelectList?.length != 0) {
+				handleTendencyCheck(a?.data?.recentSelectList);
+				dispatch(travelSliceActions.updateFiled({field: 'tendencyUse', value: true}));
+			}
+		}
+	};
+	useEffect(() => {
+		handleTendency();
 	}, []);
 	return (
 		<BackgroundGray>
@@ -81,6 +107,6 @@ const ButtonsContainer = styled.View`
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
-	margin-top: ${heightPercentage(155)}px;
-	gap: ${widthPercentage(10)}px;
+	margin-top: ${heightPercentage(134)}px;
+	gap: ${widthPercentage(8)}px;
 `;

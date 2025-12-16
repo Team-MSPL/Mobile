@@ -14,6 +14,7 @@ const initialState: LiteState = {
 	modalConfettiFlag: false, //빵빠레 플레그
 	modalTextSize: 20,
 	travleMedic: false,
+	modalBottomTextColor: null,
 };
 
 export const modalSlice = createSlice({
@@ -34,6 +35,7 @@ export const modalSlice = createSlice({
 			state.modalConfetti = payload.modalConfetti ?? false;
 			state.modalTextSize = payload.modalTextSize ?? 20;
 			state.travleMedic = payload.travleMedic ?? false;
+			state.modalBottomTextColor = payload?.modalBottomTextColor ?? null;
 		},
 		setCloseModal: state => {
 			state.modalOpen = false;
@@ -64,4 +66,5 @@ interface LiteState {
 	modalConfettiFlag: boolean;
 	modalTextSize: number;
 	travleMedic: boolean;
+	modalBottomTextColor: string | null;
 }
