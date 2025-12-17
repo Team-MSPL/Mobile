@@ -311,6 +311,7 @@ export default function PresetProduct({navigation}: any) {
 					ListFooterComponent={<ActivityIndicator size={'large'} />}
 					data={products}
 					renderItem={renderItem}
+					showsVerticalScrollIndicator={false}
 					keyExtractor={(item, index) => item._id ?? String(index)}
 					onEndReachedThreshold={0.5}
 					onEndReached={() => {
